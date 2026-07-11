@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${PRIZM_DB_HOST:localhost}:${PRIZM_DB_PORT:5432}/${PRIZM_DB_NAME:prizm}
+    username: ${PRIZM_DB_USERNAME}
+    password: ${PRIZM_DB_PASSWORD}
+    hikari:
+      connection-timeout: 3000
+      validation-timeout: 2000
+      maximum-pool-size: 10
+      minimum-idle: 1
+  flyway:
+    url: jdbc:postgresql://${PRIZM_DB_HOST:localhost}:${PRIZM_DB_PORT:5432}/${PRIZM_DB_NAME:prizm}
+    user: ${PRIZM_FLYWAY_USERNAME}
+    password: ${PRIZM_FLYWAY_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC

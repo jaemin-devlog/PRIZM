@@ -183,10 +183,22 @@ class AuthenticationIntegrationTest {
     }
 
     @Test
-    void rejectsSystemAdminDocumentAndSearchAccessWith403() throws Exception {
+    void rejectsSystemAdminDocumentUploadListDetailAndSearchAccessWith403() throws Exception {
         String token = tokenFor(UserRole.SYSTEM_ADMIN);
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "system-admin-upload.txt", "text/plain", "document content".getBytes(StandardCharsets.UTF_8));
 
+        mockMvc.perform(multipart("/api/documents")
+                        .file(file)
+                        .param("title", "System admin document")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
         mockMvc.perform(get("/api/documents")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+        mockMvc.perform(get("/api/documents/1")
                         .header(HttpHeaders.AUTHORIZATION, bearer(token)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));

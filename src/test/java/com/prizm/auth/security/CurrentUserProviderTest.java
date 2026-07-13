@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -35,6 +36,15 @@ class CurrentUserProviderTest {
                 .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
 
         SecurityContextHolder.getContext().setAuthentication(new JwtAuthenticationToken(jwt("not-a-number"), List.of()));
+        assertThatThrownBy(provider::userId)
+                .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
+    }
+
+    @Test
+    void rejectsUnexpectedAuthenticatedPrincipalType() {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("42", "credentials", List.of()));
+
         assertThatThrownBy(provider::userId)
                 .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
     }

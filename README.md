@@ -278,15 +278,29 @@ src/main/java/com/prizm
 ├─ auth
 ├─ user
 ├─ document
+│  ├─ controller
+│  ├─ dto/response
+│  ├─ entity
+│  ├─ exception
+│  ├─ repository
+│  └─ service
 ├─ classification
 ├─ ingestion
 ├─ embedding
+│  ├─ exception
+│  └─ service
 ├─ search
+│  ├─ controller
+│  ├─ dto/request
+│  ├─ dto/response
+│  ├─ exception
+│  ├─ repository
+│  └─ service
 ├─ policy
 ├─ mcp
 ├─ audit
-├─ infrastructure
-└─ common
+├─ infrastructure/storage
+└─ common/dto/response
 ```
 
 | 패키지 | 책임 |

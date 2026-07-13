@@ -55,3 +55,10 @@ PRIZM의 기능, 리팩토링, 설계 판단과 검증 결과를 짧게 남기�
 - 변경: 기술 배경이 없는 사람도 현재 구현 범위와 다음 단계를 이해할 수 있도록 `docs/project-status.md`를 추가했다.
 - 이유: 포트폴리오·멘토링에서 구현 상태와 남은 범위를 짧고 정확하게 설명하기 위해서다.
 - 검증: 실제 구현된 벡터 검색, TXT 등록, 테스트 결과만 반영하고 아직 없는 PDF·승인·권한 기능은 다음 단계로 구분했다.
+
+## 2026-07-13 — 역할별 패키지 구조 정리
+
+- 변경: `search`, `document`, `embedding`을 controller·DTO·entity·repository·service·exception 하위 패키지로 재배치하고 테스트도 같은 구조로 맞췄다.
+- 이유: 기능이 늘어날 때 한 패키지에 클래스가 섞이지 않도록 책임과 탐색 경로를 명확히 하기 위해서다.
+- 리팩터링: 벡터 Repository가 HTTP 응답 DTO를 직접 반환하지 않고 `VectorSearchResult`를 반환하며, Service가 API 응답으로 변환하도록 의존 방향을 정리했다.
+- 검증: Java 컴파일, 단위 테스트, Testcontainers PostgreSQL·실제 Ollama 통합 테스트가 모두 통과했다.

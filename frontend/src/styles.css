@@ -19,7 +19,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -37,6 +38,10 @@ input {
   border-radius: 1.25rem;
   background: #ffffff;
   box-shadow: 0 1rem 3rem rgb(31 47 64 / 8%);
+}
+
+.shell-wide {
+  width: min(48rem, 100%);
 }
 
 .eyebrow {
@@ -117,6 +122,14 @@ button:disabled {
   line-height: 1.5;
 }
 
+.form-success {
+  margin: 1rem 0 0;
+  color: #067647;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
 .notice {
   margin: 1.5rem 0 0;
   padding: 1rem;
@@ -135,6 +148,160 @@ button:disabled {
   background: #dce5ff;
 }
 
+.vault-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.vault-header .eyebrow {
+  margin-bottom: 0.35rem;
+}
+
+.vault-header .secondary-button {
+  margin-top: 0;
+}
+
+.account-email {
+  margin: 0;
+  color: #5d6a78;
+  font-size: 0.9rem;
+}
+
+.vault-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1.5rem;
+}
+
+.vault-actions .secondary-button {
+  margin-top: 0;
+}
+
+.upload-panel {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #dbe3ea;
+  border-radius: 0.75rem;
+  background: #fbfcfe;
+}
+
+.upload-panel h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+.upload-form {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.upload-form label {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.upload-form input,
+.upload-form select {
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.65rem;
+  color: #18202a;
+  background: #ffffff;
+}
+
+.upload-form input[type="file"] {
+  padding: 0.65rem;
+}
+
+.upload-form input:focus,
+.upload-form select:focus {
+  border-color: #4465e8;
+  outline: 3px solid rgb(68 101 232 / 18%);
+}
+
+.upload-form button {
+  justify-self: start;
+}
+
+.document-filter {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.document-filter select {
+  width: min(18rem, 100%);
+  padding: 0.75rem 0.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.65rem;
+  color: #18202a;
+  background: #ffffff;
+}
+
+.document-filter select:focus {
+  border-color: #4465e8;
+  outline: 3px solid rgb(68 101 232 / 18%);
+}
+
+.document-section {
+  margin-top: 1.25rem;
+}
+
+.state-message {
+  margin: 0;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  color: #5d6a78;
+  background: #f3f6f9;
+  line-height: 1.6;
+}
+
+.document-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.document-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #dbe3ea;
+  border-radius: 0.75rem;
+  background: #ffffff;
+}
+
+.document-card h2 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.document-meta,
+.document-card time {
+  margin: 0.4rem 0 0;
+  color: #5d6a78;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.document-card time {
+  margin-top: 0;
+  white-space: nowrap;
+}
+
 @media (max-width: 480px) {
   #root {
     padding: 1rem;
@@ -142,5 +309,14 @@ button:disabled {
 
   .shell {
     padding: 2rem;
+  }
+
+  .vault-header,
+  .document-card {
+    flex-direction: column;
+  }
+
+  .document-card time {
+    margin-top: 0;
   }
 }

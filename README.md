@@ -464,6 +464,39 @@ GET /api/admin/jobs
 GET /api/admin/audit-logs
 ```
 
+### 현재 최소 문서 등록
+
+TXT 파일만 등록할 수 있는 두 번째 세로 기능을 구현했다. 업로드 직후 문서 버전은 항상 `QUARANTINED`이고, `documents.active_version_id`는 `null`이다. 승인·텍스트 추출·청크 생성·임베딩은 아직 수행하지 않는다.
+
+- 파일 형식: `.txt`만 허용
+- 파일 크기: 기본 10 MiB (`PRIZM_UPLOAD_MAX_FILE_SIZE_BYTES`로 변경 가능)
+- 저장 루트: `PRIZM_STORAGE_ROOT` (기본 `./var/storage`)
+- 저장 경로: `documents/{documentId}/{versionId}/{originalFileName}`
+- 조회 API: `GET /api/documents`, `GET /api/documents/{documentId}`
+
+업로드 예시:
+
+```powershell
+curl.exe -X POST http://localhost:8080/api/documents `
+  -F "title=연차 안내" `
+  -F "file=@.\leave-guide.txt;type=text/plain"
+```
+
+```json
+{
+  "documentId": 1,
+  "versionId": 1,
+  "title": "연차 안내",
+  "originalFileName": "leave-guide.txt",
+  "status": "QUARANTINED",
+  "createdAt": "2026-07-13T00:00:00Z"
+}
+```
+
+서버는 문서·버전 ID로 생성한 디렉터리 안에만 파일을 저장하고, 빈 파일·경로 조작 파일명·TXT 이외 확장자·제한 초과 파일을 거부한다. SHA-256 해시를 `document_versions.content_hash`에 기록한다. 파일 저장 후 DB 커밋이 실패하면 저장 파일을 삭제하는 보상 처리를 수행한다.
+
+V3는 운영 데이터가 없는 개발 초기 migration으로 정리했으며 문서나 청크를 자동 삽입하지 않는다. 검증 데이터는 통합 테스트가 직접 만들고 테스트 종료 시 롤백한다. 2026-07-13에 로컬 PostgreSQL에서 V1~V3 적용과 빈 초기 상태를 확인했고, `test` 및 Docker Testcontainers 기반 `integrationTest`가 통과했다. 상세 기록은 [최소 문서 등록 구현·검증 기록](docs/verification/2026-07-13-minimal-document-registration.md)에서 확인할 수 있다.
+
 ### MCP
 
 ```text

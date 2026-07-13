@@ -16,20 +16,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-/** 명시적으로 활성화된 한 번의 실행에서만 최초 ADMIN을 생성한다. */
+/** 명시적으로 활성화된 한 번의 실행에서만 최초 SYSTEM_ADMIN 계정을 생성한다. */
 @Component
-@ConditionalOnProperty(prefix = "prizm.bootstrap-admin", name = "enabled", havingValue = "true")
-public class AdminBootstrapRunner implements ApplicationRunner {
+@ConditionalOnProperty(prefix = "prizm.bootstrap-system-admin", name = "enabled", havingValue = "true")
+public class SystemAdminBootstrapRunner implements ApplicationRunner {
 
-    private static final Logger log = LoggerFactory.getLogger(AdminBootstrapRunner.class);
+    private static final Logger log = LoggerFactory.getLogger(SystemAdminBootstrapRunner.class);
 
-    private final BootstrapAdminProperties properties;
+    private final BootstrapSystemAdminProperties properties;
     private final UserAccountRepository userAccountRepository;
     private final PasswordEncoder passwordEncoder;
     private final Validator validator;
 
-    public AdminBootstrapRunner(
-            BootstrapAdminProperties properties,
+    public SystemAdminBootstrapRunner(
+            BootstrapSystemAdminProperties properties,
             UserAccountRepository userAccountRepository,
             PasswordEncoder passwordEncoder,
             Validator validator) {
@@ -45,31 +45,32 @@ public class AdminBootstrapRunner implements ApplicationRunner {
         validateSettings();
         String normalizedEmail = UserAccount.normalizeEmail(properties.email());
 
-        if (userAccountRepository.existsByRole(UserRole.ADMIN)) {
+        if (userAccountRepository.existsByRole(UserRole.SYSTEM_ADMIN)) {
             throw new IllegalStateException(
-                    "Bootstrap ADMIN was not created because an ADMIN account already exists");
+                    "Bootstrap SYSTEM_ADMIN was not created because a SYSTEM_ADMIN account already exists");
         }
         if (userAccountRepository.findByEmail(normalizedEmail).isPresent()) {
             throw new IllegalStateException(
-                    "Bootstrap ADMIN was not created because the configured email already exists");
+                    "Bootstrap SYSTEM_ADMIN was not created because the configured email already exists");
         }
 
-        UserAccount admin = UserAccount.create(
+        UserAccount systemAdmin = UserAccount.create(
                 normalizedEmail,
                 passwordEncoder.encode(properties.password()),
-                UserRole.ADMIN);
-        userAccountRepository.saveAndFlush(admin);
-        log.info("One-time bootstrap ADMIN created for {}. Disable bootstrap before the next start.", normalizedEmail);
+                UserRole.SYSTEM_ADMIN);
+        userAccountRepository.saveAndFlush(systemAdmin);
+        log.info("One-time bootstrap SYSTEM_ADMIN created for {}. Disable bootstrap before the next start.",
+                normalizedEmail);
     }
 
     private void validateSettings() {
-        Set<ConstraintViolation<BootstrapAdminProperties>> violations = validator.validate(properties);
+        Set<ConstraintViolation<BootstrapSystemAdminProperties>> violations = validator.validate(properties);
         if (!violations.isEmpty()) {
             String fields = violations.stream()
                     .map(violation -> violation.getPropertyPath().toString())
                     .sorted()
                     .collect(Collectors.joining(", "));
-            throw new IllegalStateException("Invalid bootstrap ADMIN settings: " + fields);
+            throw new IllegalStateException("Invalid bootstrap SYSTEM_ADMIN settings: " + fields);
         }
     }
 }

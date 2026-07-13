@@ -34,7 +34,7 @@ class JwtTokenServiceTest {
     @Test
     void issuesAndExtractsIdentityAndRoleClaims() {
         JwtTokenService service = tokenService(Clock.systemUTC(), 3600);
-        UserAccount user = user(7L, UserRole.ADMIN);
+        UserAccount user = user(7L, UserRole.SYSTEM_ADMIN);
 
         IssuedAccessToken issued = service.issue(user);
         Jwt decoded = service.decode(issued.value());
@@ -43,7 +43,7 @@ class JwtTokenServiceTest {
         assertThat(decoded.getClaimAsString("iss")).isEqualTo("prizm");
         assertThat(decoded.hasClaim("userId")).isFalse();
         assertThat(decoded.getClaimAsString("email")).isEqualTo("user@example.com");
-        assertThat(decoded.getClaimAsString("role")).isEqualTo("ADMIN");
+        assertThat(decoded.getClaimAsString("role")).isEqualTo("SYSTEM_ADMIN");
         assertThat(issued.expiresInSeconds()).isEqualTo(3600);
     }
 

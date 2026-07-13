@@ -70,24 +70,19 @@ public class DocumentVersion {
         this.storedFilePath = storedFilePath;
     }
 
-    /** 격리된 버전만 승인할 수 있다. */
-    public void approve() {
-        transition(DocumentVersionStatus.QUARANTINED, DocumentVersionStatus.APPROVED);
-    }
-
-    /** 승인된 버전만 색인을 시작할 수 있다. */
-    public void startIndexing() {
-        transition(DocumentVersionStatus.APPROVED, DocumentVersionStatus.INDEXING);
+    /** 검증과 원본 저장이 끝난 격리 버전을 Worker 처리 상태로 전환한다. */
+    public void startProcessing() {
+        transition(DocumentVersionStatus.QUARANTINED, DocumentVersionStatus.PROCESSING);
     }
 
     /** 모든 청크 저장이 검증된 색인 작업만 활성화한다. */
     public void activate() {
-        transition(DocumentVersionStatus.INDEXING, DocumentVersionStatus.ACTIVE);
+        transition(DocumentVersionStatus.PROCESSING, DocumentVersionStatus.ACTIVE);
     }
 
     /** 색인 중 최종 실패한 버전을 검색 불가능 상태로 전환한다. */
-    public void failIndexing() {
-        transition(DocumentVersionStatus.INDEXING, DocumentVersionStatus.FAILED);
+    public void failProcessing() {
+        transition(DocumentVersionStatus.PROCESSING, DocumentVersionStatus.FAILED);
     }
 
     private void transition(DocumentVersionStatus expected, DocumentVersionStatus next) {

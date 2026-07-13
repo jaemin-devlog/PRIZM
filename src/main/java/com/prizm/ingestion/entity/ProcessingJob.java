@@ -78,7 +78,7 @@ public class ProcessingJob {
 
     public void scheduleRetry(Instant nextRetryAt, String errorMessage) {
         requireStatus(ProcessingJobStatus.PROCESSING);
-        this.status = ProcessingJobStatus.PENDING;
+        this.status = ProcessingJobStatus.RETRY_WAIT;
         this.retryCount++;
         this.nextRetryAt = nextRetryAt;
         this.startedAt = null;
@@ -110,7 +110,7 @@ public class ProcessingJob {
         requireStatus(ProcessingJobStatus.PROCESSING);
         this.claimVersion++;
         this.retryCount++;
-        this.status = ProcessingJobStatus.PENDING;
+        this.status = ProcessingJobStatus.RETRY_WAIT;
         this.nextRetryAt = nextRetryAt;
         this.startedAt = null;
         this.completedAt = null;

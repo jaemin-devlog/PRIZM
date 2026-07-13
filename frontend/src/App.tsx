@@ -2,10 +2,10 @@ function App() {
   return (
     <main className="shell">
       <p className="eyebrow">PRIZM</p>
-      <h1>개발 환경 준비 완료</h1>
+      <h1>개인 커리어 근거 문서 플랫폼</h1>
       <p className="description">
-        이 화면은 React 실행 환경을 확인하기 위한 초기 셸입니다. 문서 업로드,
-        검색, 분류와 관리 기능은 다음 개발 단계에서 구현합니다.
+        PRIZM은 개인의 커리어 문서를 축적하고 실제 경험의 원문 근거를 찾기 위한
+        문서 플랫폼으로 개발 중입니다.
       </p>
     </main>
   )

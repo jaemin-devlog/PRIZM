@@ -49,8 +49,8 @@ public class ProcessingJobRecoveryService {
                 .orElseThrow(() -> new IllegalStateException("Expired processing job disappeared."));
         DocumentVersion version = documentVersionRepository.findByIdForUpdate(job.getDocumentVersionId())
                 .orElseThrow(() -> new DocumentVersionNotFoundException(job.getDocumentVersionId()));
-        if (version.getStatus() != DocumentVersionStatus.INDEXING) {
-            throw new IllegalStateException("Expired processing job must reference an INDEXING version.");
+        if (version.getStatus() != DocumentVersionStatus.PROCESSING) {
+            throw new IllegalStateException("Expired processing job must reference a PROCESSING version.");
         }
 
         documentChunkRepository.deleteByDocumentVersionId(version.getId());
@@ -62,7 +62,7 @@ public class ProcessingJobRecoveryService {
         }
         else {
             job.recoverAsFailed(databaseNow, LEASE_EXPIRED_MESSAGE);
-            version.failIndexing();
+            version.failProcessing();
         }
         return true;
     }

@@ -51,8 +51,8 @@ public class IndexingCompletionService {
         }
         DocumentVersion version = documentVersionRepository.findByIdForUpdate(claimedJob.documentVersionId())
                 .orElseThrow(() -> new DocumentVersionNotFoundException(claimedJob.documentVersionId()));
-        if (version.getStatus() != DocumentVersionStatus.INDEXING) {
-            throw new IllegalStateException("Document version must be INDEXING before completion.");
+        if (version.getStatus() != DocumentVersionStatus.PROCESSING) {
+            throw new IllegalStateException("Document version must be PROCESSING before completion.");
         }
         Document document = documentRepository.findByIdForUpdate(version.getDocumentId())
                 .orElseThrow(() -> new DocumentNotFoundException(version.getDocumentId()));

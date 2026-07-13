@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.prizm'
 version = '0.0.1-SNAPSHOT'
-description = 'PRIZM AI document search platform'
+description = 'PRIZM personal career evidence document platform'
 
 java {
     toolchain {

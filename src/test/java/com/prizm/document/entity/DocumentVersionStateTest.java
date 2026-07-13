@@ -9,25 +9,22 @@ import org.junit.jupiter.api.Test;
 class DocumentVersionStateTest {
 
     @Test
-    void allowsApprovalIndexingAndActivationInOrder() {
+    void allowsProcessingAndActivationInOrder() {
         DocumentVersion version = version();
 
-        version.approve();
-        assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.APPROVED);
-        version.startIndexing();
-        assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.INDEXING);
+        version.startProcessing();
+        assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.PROCESSING);
         version.activate();
 
         assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.ACTIVE);
     }
 
     @Test
-    void allowsFailureOnlyWhileIndexing() {
+    void allowsFailureOnlyWhileProcessing() {
         DocumentVersion version = version();
-        version.approve();
-        version.startIndexing();
+        version.startProcessing();
 
-        version.failIndexing();
+        version.failProcessing();
 
         assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.FAILED);
     }

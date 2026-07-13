@@ -9,6 +9,8 @@ import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.infrastructure.storage.FileStorageException;
+import com.prizm.ingestion.entity.ProcessingJob;
+import com.prizm.ingestion.repository.ProcessingJobRepository;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -31,16 +33,19 @@ public class DocumentUploadService {
 
     private final DocumentRepository documentRepository;
     private final DocumentVersionRepository documentVersionRepository;
+    private final ProcessingJobRepository processingJobRepository;
     private final FileStorage fileStorage;
     private final long maxFileSizeBytes;
 
     public DocumentUploadService(
             DocumentRepository documentRepository,
             DocumentVersionRepository documentVersionRepository,
+            ProcessingJobRepository processingJobRepository,
             FileStorage fileStorage,
             @Value("${prizm.upload.max-file-size-bytes}") long maxFileSizeBytes) {
         this.documentRepository = documentRepository;
         this.documentVersionRepository = documentVersionRepository;
+        this.processingJobRepository = processingJobRepository;
         this.fileStorage = fileStorage;
         this.maxFileSizeBytes = maxFileSizeBytes;
     }
@@ -75,6 +80,8 @@ public class DocumentUploadService {
         version.updateStoredFilePath(storedFilePath);
         // 파일 저장 후 DB 커밋이 실패할 수 있으므로 트랜잭션 종료 시 보상 삭제한다.
         registerRollbackCompensation(storedFilePath);
+        // 검증과 원본 저장이 끝난 버전은 관리자 개입 없이 Worker가 처리하도록 예약한다.
+        processingJobRepository.save(ProcessingJob.pendingIndexing(version.getId()));
 
         return new DocumentUploadResponse(
                 document.getId(),

@@ -60,8 +60,8 @@ public class IndexingFailureService {
         }
         else {
             job.fail(now, safeMessage);
-            if (version.getStatus() == DocumentVersionStatus.INDEXING) {
-                version.failIndexing();
+            if (version.getStatus() == DocumentVersionStatus.PROCESSING) {
+                version.failProcessing();
             }
         }
         return job.getStatus();

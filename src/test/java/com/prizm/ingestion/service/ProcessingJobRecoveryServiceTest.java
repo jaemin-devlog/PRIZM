@@ -41,8 +41,7 @@ class ProcessingJobRecoveryServiceTest {
         ReflectionTestUtils.setField(job, "claimVersion", 7L);
         DocumentVersion version = DocumentVersion.quarantined(1L, "guide.txt", "a".repeat(64));
         ReflectionTestUtils.setField(version, "id", 10L);
-        version.approve();
-        version.startIndexing();
+        version.startProcessing();
         Instant databaseNow = Instant.parse("2026-07-13T00:00:00Z");
 
         when(claimRepository.lockNextExpiredId()).thenReturn(Optional.of(20L));

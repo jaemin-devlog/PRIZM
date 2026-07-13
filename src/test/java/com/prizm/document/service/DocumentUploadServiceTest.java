@@ -19,6 +19,9 @@ import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.infrastructure.storage.FileStorageException;
+import com.prizm.ingestion.entity.ProcessingJob;
+import com.prizm.ingestion.entity.ProcessingJobStatus;
+import com.prizm.ingestion.repository.ProcessingJobRepository;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,6 +45,9 @@ class DocumentUploadServiceTest {
     DocumentVersionRepository documentVersionRepository;
 
     @Mock
+    ProcessingJobRepository processingJobRepository;
+
+    @Mock
     FileStorage fileStorage;
 
     DocumentUploadService documentUploadService;
@@ -50,7 +56,7 @@ class DocumentUploadServiceTest {
     void setUp() {
         TransactionSynchronizationManager.initSynchronization();
         documentUploadService = new DocumentUploadService(
-                documentRepository, documentVersionRepository, fileStorage, 10);
+                documentRepository, documentVersionRepository, processingJobRepository, fileStorage, 10);
         lenient().when(documentRepository.save(any(Document.class))).thenAnswer(invocation -> {
             Document document = invocation.getArgument(0);
             ReflectionTestUtils.setField(document, "id", 11L);
@@ -84,6 +90,10 @@ class DocumentUploadServiceTest {
         assertThat(response.status()).isEqualTo(DocumentVersionStatus.QUARANTINED);
         assertThat(response.createdAt()).isNotNull();
         verify(fileStorage).store(11L, 22L, "guide.txt", content);
+        var jobCaptor = org.mockito.ArgumentCaptor.forClass(ProcessingJob.class);
+        verify(processingJobRepository).save(jobCaptor.capture());
+        assertThat(jobCaptor.getValue().getDocumentVersionId()).isEqualTo(22L);
+        assertThat(jobCaptor.getValue().getStatus()).isEqualTo(ProcessingJobStatus.PENDING);
     }
 
     @Test
@@ -101,6 +111,24 @@ class DocumentUploadServiceTest {
     }
 
     @Test
+    void deletesStoredFileWhenAutomaticJobPersistenceFails() {
+        byte[] content = "hello".getBytes(StandardCharsets.UTF_8);
+        MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", content);
+        when(fileStorage.store(11L, 22L, "guide.txt", content))
+                .thenReturn("documents/11/22/guide.txt");
+        when(processingJobRepository.save(any(ProcessingJob.class)))
+                .thenThrow(new IllegalStateException("database unavailable"));
+
+        assertThatThrownBy(() -> documentUploadService.upload("Guide", file))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("database unavailable");
+        TransactionSynchronizationManager.getSynchronizations()
+                .forEach(synchronization -> synchronization.afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK));
+
+        verify(fileStorage).delete("documents/11/22/guide.txt");
+    }
+
+    @Test
     void rejectsEmptyFileBeforePersistingMetadata() {
         MockMultipartFile file = new MockMultipartFile("file", "empty.txt", "text/plain", new byte[0]);
 
@@ -108,7 +136,7 @@ class DocumentUploadServiceTest {
                 .isInstanceOf(DocumentUploadException.class)
                 .extracting(exception -> ((DocumentUploadException) exception).code())
                 .isEqualTo(DocumentUploadErrorCode.EMPTY_FILE);
-        verifyNoInteractions(documentRepository, documentVersionRepository, fileStorage);
+        verifyNoInteractions(documentRepository, documentVersionRepository, processingJobRepository, fileStorage);
     }
 
     @Test

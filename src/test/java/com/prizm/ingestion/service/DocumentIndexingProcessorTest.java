@@ -63,6 +63,7 @@ class DocumentIndexingProcessorTest {
                 4);
         DocumentVersion version = DocumentVersion.quarantined(1L, "guide.txt", "a".repeat(64));
         ReflectionTestUtils.setField(version, "id", 10L);
+        version.startProcessing();
         version.updateStoredFilePath("documents/1/10/guide.txt");
         when(documentVersionRepository.findById(10L)).thenReturn(Optional.of(version));
         claimedJob = new ClaimedProcessingJob(20L, 10L, 1L, java.time.Instant.parse("2026-07-13T00:10:00Z"));

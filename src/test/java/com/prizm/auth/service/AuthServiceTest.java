@@ -33,17 +33,18 @@ class AuthServiceTest {
     @Test
     void logsInWithARealBcryptPasswordHash() {
         UserAccount user = UserAccount.create(
-                "admin@example.com",
+                "system-admin@example.com",
                 passwordEncoder.encode("correct-password"),
-                UserRole.ADMIN);
-        when(userAccountRepository.findByEmail("admin@example.com")).thenReturn(Optional.of(user));
+                UserRole.SYSTEM_ADMIN);
+        when(userAccountRepository.findByEmail("system-admin@example.com")).thenReturn(Optional.of(user));
         when(jwtTokenService.issue(user)).thenReturn(new IssuedAccessToken("signed-token", 3600));
 
-        LoginResponse response = authService.login(new LoginRequest("ADMIN@example.com", "correct-password"));
+        LoginResponse response = authService.login(
+                new LoginRequest("SYSTEM-ADMIN@example.com", "correct-password"));
 
         assertThat(response.accessToken()).isEqualTo("signed-token");
         assertThat(response.tokenType()).isEqualTo("Bearer");
-        assertThat(response.user().role()).isEqualTo(UserRole.ADMIN);
+        assertThat(response.user().role()).isEqualTo(UserRole.SYSTEM_ADMIN);
     }
 
     @Test

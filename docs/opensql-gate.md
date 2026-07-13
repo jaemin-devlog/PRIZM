@@ -78,7 +78,7 @@ $env:RUN_OPENSQL_TESTS='true'
 1. `vector` extension 존재와 버전을 확인한다.
 2. 1024차원 테스트 벡터를 저장한다.
 3. `<=>` 연산자로 exact cosine 검색을 실행한다.
-4. 등급과 활성 상태에 해당하는 일반 컬럼 필터를 함께 적용한다.
+4. 문서 상태와 `active_version_id`에 해당하는 일반 컬럼 필터를 함께 적용한다.
 5. 실행 계획과 소요 시간을 저장한다.
 6. 로컬 PostgreSQL 결과와 상위 결과 ID가 일치하는지 확인한다.
 

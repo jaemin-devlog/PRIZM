@@ -1,6 +1,6 @@
 package com.prizm.user.entity;
 
 public enum UserRole {
-    ADMIN,
+    SYSTEM_ADMIN,
     USER
 }

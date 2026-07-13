@@ -46,6 +46,7 @@ public class IndexingCompletionService {
         if (!job.getDocumentVersionId().equals(claimedJob.documentVersionId())) {
             throw new IllegalStateException("Claimed job and document version do not match.");
         }
+        requireSameOwner(claimedJob.ownerUserId(), job.getOwnerUserId());
         if (chunks.isEmpty()) {
             throw new IllegalArgumentException("At least one indexed chunk is required.");
         }
@@ -54,12 +55,15 @@ public class IndexingCompletionService {
         if (version.getStatus() != DocumentVersionStatus.PROCESSING) {
             throw new IllegalStateException("Document version must be PROCESSING before completion.");
         }
+        requireSameOwner(claimedJob.ownerUserId(), version.getOwnerUserId());
         Document document = documentRepository.findByIdForUpdate(version.getDocumentId())
                 .orElseThrow(() -> new DocumentNotFoundException(version.getDocumentId()));
+        requireSameOwner(claimedJob.ownerUserId(), document.getOwnerUserId());
 
         // 재시도 전에 남은 미완성 청크가 있어도 같은 트랜잭션에서 전부 교체한다.
-        documentChunkRepository.replaceAll(version.getId(), chunks);
-        long storedCount = documentChunkRepository.countByDocumentVersionId(version.getId());
+        documentChunkRepository.replaceAll(claimedJob.ownerUserId(), version.getId(), chunks);
+        long storedCount = documentChunkRepository.countByOwnerUserIdAndDocumentVersionId(
+                claimedJob.ownerUserId(), version.getId());
         if (storedCount != chunks.size()) {
             throw new IllegalStateException("Stored chunk count does not match generated chunk count.");
         }
@@ -67,5 +71,11 @@ public class IndexingCompletionService {
         version.activate();
         document.activateVersion(version.getId());
         job.complete(claimRepository.currentDatabaseTime());
+    }
+
+    private void requireSameOwner(Long claimedOwnerUserId, Long actualOwnerUserId) {
+        if (!claimedOwnerUserId.equals(actualOwnerUserId)) {
+            throw new IllegalStateException("Processing job ownership does not match its document hierarchy.");
+        }
     }
 }

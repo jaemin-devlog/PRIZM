@@ -11,7 +11,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface DocumentRepository extends JpaRepository<Document, Long> {
 
-    List<Document> findAllByOrderByCreatedAtDesc();
+    List<Document> findAllByOwnerUserIdOrderByCreatedAtDesc(Long ownerUserId);
+
+    Optional<Document> findByIdAndOwnerUserId(Long id, Long ownerUserId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select document from Document document where document.id = :id")

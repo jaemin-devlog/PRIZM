@@ -34,6 +34,7 @@ public class ProcessingJobClaimRepository {
             WHERE job.id = candidate.id
             RETURNING job.id AS processing_job_id,
                       job.document_version_id,
+                      job.owner_user_id,
                       job.claim_version,
                       job.lease_expires_at
             """;
@@ -70,6 +71,7 @@ public class ProcessingJobClaimRepository {
                 (resultSet, rowNum) -> new ClaimedProcessingJob(
                         resultSet.getLong("processing_job_id"),
                         resultSet.getLong("document_version_id"),
+                        resultSet.getLong("owner_user_id"),
                         resultSet.getLong("claim_version"),
                         resultSet.getTimestamp("lease_expires_at").toInstant()));
         return claims.stream().findFirst();

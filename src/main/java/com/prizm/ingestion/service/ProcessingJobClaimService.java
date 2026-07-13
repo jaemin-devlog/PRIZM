@@ -1,8 +1,11 @@
 package com.prizm.ingestion.service;
 
+import com.prizm.document.entity.Document;
 import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.entity.DocumentVersionStatus;
+import com.prizm.document.exception.DocumentNotFoundException;
 import com.prizm.document.exception.DocumentVersionNotFoundException;
+import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.ingestion.entity.ProcessingJob;
 import com.prizm.ingestion.config.IngestionProperties;
@@ -19,16 +22,19 @@ public class ProcessingJobClaimService {
     private final ProcessingJobClaimRepository claimRepository;
     private final ProcessingJobRepository processingJobRepository;
     private final DocumentVersionRepository documentVersionRepository;
+    private final DocumentRepository documentRepository;
     private final IngestionProperties properties;
 
     public ProcessingJobClaimService(
             ProcessingJobClaimRepository claimRepository,
             ProcessingJobRepository processingJobRepository,
             DocumentVersionRepository documentVersionRepository,
+            DocumentRepository documentRepository,
             IngestionProperties properties) {
         this.claimRepository = claimRepository;
         this.processingJobRepository = processingJobRepository;
         this.documentVersionRepository = documentVersionRepository;
+        this.documentRepository = documentRepository;
         this.properties = properties;
     }
 
@@ -46,8 +52,13 @@ public class ProcessingJobClaimService {
         if (!job.getDocumentVersionId().equals(claimedJob.documentVersionId())) {
             throw new IllegalStateException("Claimed job and document version do not match.");
         }
+        requireSameOwner(claimedJob.ownerUserId(), job.getOwnerUserId());
         DocumentVersion version = documentVersionRepository.findByIdForUpdate(job.getDocumentVersionId())
                 .orElseThrow(() -> new DocumentVersionNotFoundException(job.getDocumentVersionId()));
+        requireSameOwner(claimedJob.ownerUserId(), version.getOwnerUserId());
+        Document document = documentRepository.findByIdForUpdate(version.getDocumentId())
+                .orElseThrow(() -> new DocumentNotFoundException(version.getDocumentId()));
+        requireSameOwner(claimedJob.ownerUserId(), document.getOwnerUserId());
         if (version.getStatus() == DocumentVersionStatus.QUARANTINED) {
             version.startProcessing();
         }
@@ -55,5 +66,11 @@ public class ProcessingJobClaimService {
             throw new IllegalStateException("Only QUARANTINED or PROCESSING document versions can be claimed.");
         }
         return Optional.of(claimedJob);
+    }
+
+    private void requireSameOwner(Long claimedOwnerUserId, Long actualOwnerUserId) {
+        if (!claimedOwnerUserId.equals(actualOwnerUserId)) {
+            throw new IllegalStateException("Processing job ownership does not match its document hierarchy.");
+        }
     }
 }

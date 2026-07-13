@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface DocumentVersionRepository extends JpaRepository<DocumentVersion, Long> {
 
-    List<DocumentVersion> findByDocumentIdOrderByVersionNoDesc(Long documentId);
+    List<DocumentVersion> findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(Long ownerUserId, Long documentId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select version from DocumentVersion version where version.id = :id")

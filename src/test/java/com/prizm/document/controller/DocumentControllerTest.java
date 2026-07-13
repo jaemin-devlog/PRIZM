@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.prizm.auth.security.CurrentUserProvider;
 import com.prizm.document.dto.response.DocumentSummaryResponse;
 import com.prizm.document.dto.response.DocumentDetailResponse;
 import com.prizm.document.dto.response.DocumentUploadResponse;
@@ -36,13 +37,18 @@ class DocumentControllerTest {
     @Mock
     DocumentQueryService documentQueryService;
 
+    @Mock
+    CurrentUserProvider currentUserProvider;
+
     MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
-        mockMvc = MockMvcBuilders.standaloneSetup(new DocumentController(documentUploadService, documentQueryService))
+        when(currentUserProvider.userId()).thenReturn(7L);
+        mockMvc = MockMvcBuilders.standaloneSetup(
+                        new DocumentController(documentUploadService, documentQueryService, currentUserProvider))
                 .setControllerAdvice(new DocumentExceptionHandler())
                 .setValidator(validator)
                 .build();
@@ -51,7 +57,7 @@ class DocumentControllerTest {
     @Test
     void acceptsMultipartTxtUpload() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", "hello".getBytes());
-        when(documentUploadService.upload("Guide", file)).thenReturn(new DocumentUploadResponse(
+        when(documentUploadService.upload(7L, "Guide", file)).thenReturn(new DocumentUploadResponse(
                 1L, 2L, "Guide", "guide.txt", DocumentVersionStatus.QUARANTINED, Instant.parse("2026-07-13T00:00:00Z")));
 
         mockMvc.perform(multipart("/api/documents").file(file).param("title", "Guide"))
@@ -63,7 +69,7 @@ class DocumentControllerTest {
 
     @Test
     void returnsDocumentList() throws Exception {
-        when(documentQueryService.list()).thenReturn(List.of(new DocumentSummaryResponse(
+        when(documentQueryService.list(7L)).thenReturn(List.of(new DocumentSummaryResponse(
                 1L, "Guide", null, 2L, DocumentVersionStatus.QUARANTINED, Instant.parse("2026-07-13T00:00:00Z"))));
 
         mockMvc.perform(get("/api/documents"))
@@ -74,7 +80,7 @@ class DocumentControllerTest {
     @Test
     void doesNotExposeInternalStoredFilePathInDocumentDetail() throws Exception {
         Instant createdAt = Instant.parse("2026-07-13T00:00:00Z");
-        when(documentQueryService.get(1L)).thenReturn(new DocumentDetailResponse(
+        when(documentQueryService.get(7L, 1L)).thenReturn(new DocumentDetailResponse(
                 1L,
                 "Guide",
                 null,

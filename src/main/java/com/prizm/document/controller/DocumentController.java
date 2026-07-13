@@ -1,5 +1,6 @@
 package com.prizm.document.controller;
 
+import com.prizm.auth.security.CurrentUserProvider;
 import com.prizm.document.dto.response.DocumentDetailResponse;
 import com.prizm.document.dto.response.DocumentSummaryResponse;
 import com.prizm.document.dto.response.DocumentUploadResponse;
@@ -28,10 +29,15 @@ public class DocumentController {
 
     private final DocumentUploadService documentUploadService;
     private final DocumentQueryService documentQueryService;
+    private final CurrentUserProvider currentUserProvider;
 
-    public DocumentController(DocumentUploadService documentUploadService, DocumentQueryService documentQueryService) {
+    public DocumentController(
+            DocumentUploadService documentUploadService,
+            DocumentQueryService documentQueryService,
+            CurrentUserProvider currentUserProvider) {
         this.documentUploadService = documentUploadService;
         this.documentQueryService = documentQueryService;
+        this.currentUserProvider = currentUserProvider;
     }
 
     /** TXT 원본을 QUARANTINED 문서 버전으로 등록한다. */
@@ -39,18 +45,19 @@ public class DocumentController {
     public ResponseEntity<DocumentUploadResponse> upload(
             @RequestParam @NotBlank @Size(max = 200) String title,
             @RequestPart("file") MultipartFile file) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(documentUploadService.upload(title, file));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(documentUploadService.upload(currentUserProvider.userId(), title, file));
     }
 
     /** 문서 목록을 조회한다. */
     @GetMapping
     public List<DocumentSummaryResponse> list() {
-        return documentQueryService.list();
+        return documentQueryService.list(currentUserProvider.userId());
     }
 
     /** 문서와 버전 메타데이터를 상세 조회한다. */
     @GetMapping("/{documentId}")
     public DocumentDetailResponse get(@PathVariable Long documentId) {
-        return documentQueryService.get(documentId);
+        return documentQueryService.get(currentUserProvider.userId(), documentId);
     }
 }

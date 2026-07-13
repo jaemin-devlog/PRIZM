@@ -25,6 +25,9 @@ public class ProcessingJob {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "owner_user_id", nullable = false, updatable = false)
+    private Long ownerUserId;
+
     @Column(name = "document_version_id", nullable = false)
     private Long documentVersionId;
 
@@ -63,7 +66,8 @@ public class ProcessingJob {
     protected ProcessingJob() {
     }
 
-    private ProcessingJob(Long documentVersionId) {
+    private ProcessingJob(Long ownerUserId, Long documentVersionId) {
+        this.ownerUserId = ownerUserId;
         this.documentVersionId = documentVersionId;
         this.jobType = ProcessingJobType.INDEXING;
         this.status = ProcessingJobStatus.PENDING;
@@ -72,8 +76,8 @@ public class ProcessingJob {
         this.createdAt = Instant.now();
     }
 
-    public static ProcessingJob pendingIndexing(Long documentVersionId) {
-        return new ProcessingJob(documentVersionId);
+    public static ProcessingJob pendingIndexing(Long ownerUserId, Long documentVersionId) {
+        return new ProcessingJob(ownerUserId, documentVersionId);
     }
 
     public void scheduleRetry(Instant nextRetryAt, String errorMessage) {
@@ -144,6 +148,7 @@ public class ProcessingJob {
     }
 
     public Long getId() { return id; }
+    public Long getOwnerUserId() { return ownerUserId; }
     public Long getDocumentVersionId() { return documentVersionId; }
     public ProcessingJobType getJobType() { return jobType; }
     public ProcessingJobStatus getStatus() { return status; }

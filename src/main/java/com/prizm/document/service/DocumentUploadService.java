@@ -57,13 +57,13 @@ public class DocumentUploadService {
      * @return 등록된 문서와 버전의 API 응답
      */
     @Transactional
-    public DocumentUploadResponse upload(String title, MultipartFile file) {
+    public DocumentUploadResponse upload(Long ownerUserId, String title, MultipartFile file) {
         String normalizedTitle = validateTitle(title);
         UploadContent content = validateAndRead(file);
 
-        Document document = documentRepository.save(Document.create(normalizedTitle));
+        Document document = documentRepository.save(Document.create(ownerUserId, normalizedTitle));
         DocumentVersion version = documentVersionRepository.save(DocumentVersion.quarantined(
-                document.getId(), content.originalFileName(), content.contentHash()));
+                ownerUserId, document.getId(), content.originalFileName(), content.contentHash()));
 
         final String storedFilePath;
         try {
@@ -81,7 +81,7 @@ public class DocumentUploadService {
         // 파일 저장 후 DB 커밋이 실패할 수 있으므로 트랜잭션 종료 시 보상 삭제한다.
         registerRollbackCompensation(storedFilePath);
         // 검증과 원본 저장이 끝난 버전은 관리자 개입 없이 Worker가 처리하도록 예약한다.
-        processingJobRepository.save(ProcessingJob.pendingIndexing(version.getId()));
+        processingJobRepository.save(ProcessingJob.pendingIndexing(ownerUserId, version.getId()));
 
         return new DocumentUploadResponse(
                 document.getId(),
@@ -170,7 +170,7 @@ public class DocumentUploadService {
                         fileStorage.delete(storedFilePath);
                     }
                     catch (RuntimeException exception) {
-                        log.error("Failed to delete file after database rollback: {}", storedFilePath, exception);
+                        log.error("Failed to remove stored document after transaction rollback", exception);
                     }
                 }
             }

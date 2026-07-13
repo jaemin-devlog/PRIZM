@@ -1,8 +1,11 @@
 package com.prizm.ingestion.service;
 
+import com.prizm.document.entity.Document;
 import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.entity.DocumentVersionStatus;
+import com.prizm.document.exception.DocumentNotFoundException;
 import com.prizm.document.exception.DocumentVersionNotFoundException;
+import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.ingestion.entity.ProcessingJob;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
@@ -21,6 +24,7 @@ public class IndexingFailureService {
 
     private final ProcessingJobRepository processingJobRepository;
     private final DocumentVersionRepository documentVersionRepository;
+    private final DocumentRepository documentRepository;
     private final DocumentChunkRepository documentChunkRepository;
     private final ProcessingJobClaimRepository claimRepository;
     private final IndexingRetryPolicy retryPolicy;
@@ -28,11 +32,13 @@ public class IndexingFailureService {
     public IndexingFailureService(
             ProcessingJobRepository processingJobRepository,
             DocumentVersionRepository documentVersionRepository,
+            DocumentRepository documentRepository,
             DocumentChunkRepository documentChunkRepository,
             ProcessingJobClaimRepository claimRepository,
             IndexingRetryPolicy retryPolicy) {
         this.processingJobRepository = processingJobRepository;
         this.documentVersionRepository = documentVersionRepository;
+        this.documentRepository = documentRepository;
         this.documentChunkRepository = documentChunkRepository;
         this.claimRepository = claimRepository;
         this.retryPolicy = retryPolicy;
@@ -49,9 +55,15 @@ public class IndexingFailureService {
         if (!job.getDocumentVersionId().equals(claimedJob.documentVersionId())) {
             throw new IllegalStateException("Claimed job and document version do not match.");
         }
+        requireSameOwner(claimedJob.ownerUserId(), job.getOwnerUserId());
         DocumentVersion version = documentVersionRepository.findByIdForUpdate(claimedJob.documentVersionId())
                 .orElseThrow(() -> new DocumentVersionNotFoundException(claimedJob.documentVersionId()));
-        documentChunkRepository.deleteByDocumentVersionId(version.getId());
+        requireSameOwner(claimedJob.ownerUserId(), version.getOwnerUserId());
+        Document document = documentRepository.findByIdForUpdate(version.getDocumentId())
+                .orElseThrow(() -> new DocumentNotFoundException(version.getDocumentId()));
+        requireSameOwner(claimedJob.ownerUserId(), document.getOwnerUserId());
+        documentChunkRepository.deleteByOwnerUserIdAndDocumentVersionId(
+                claimedJob.ownerUserId(), version.getId());
 
         String safeMessage = truncate(errorMessage == null ? "Indexing failed." : errorMessage);
         Instant now = claimRepository.currentDatabaseTime();
@@ -65,6 +77,12 @@ public class IndexingFailureService {
             }
         }
         return job.getStatus();
+    }
+
+    private void requireSameOwner(Long claimedOwnerUserId, Long actualOwnerUserId) {
+        if (!claimedOwnerUserId.equals(actualOwnerUserId)) {
+            throw new IllegalStateException("Processing job ownership does not match its document hierarchy.");
+        }
     }
 
     private String truncate(String message) {

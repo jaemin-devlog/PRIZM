@@ -1,10 +1,12 @@
 package com.prizm.search.controller;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.lenient;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.prizm.auth.security.CurrentUserProvider;
 import com.prizm.search.dto.response.SearchResponse;
 import com.prizm.search.service.SearchService;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,13 +26,17 @@ class SearchControllerTest {
     @Mock
     SearchService searchService;
 
+    @Mock
+    CurrentUserProvider currentUserProvider;
+
     MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
-        mockMvc = MockMvcBuilders.standaloneSetup(new SearchController(searchService))
+        lenient().when(currentUserProvider.userId()).thenReturn(7L);
+        mockMvc = MockMvcBuilders.standaloneSetup(new SearchController(searchService, currentUserProvider))
                 .setControllerAdvice(new SearchExceptionHandler())
                 .setValidator(validator)
                 .build();
@@ -38,7 +44,7 @@ class SearchControllerTest {
 
     @Test
     void returnsActualSearchValues() throws Exception {
-        when(searchService.search("휴가는 어디에서 신청하나요?"))
+        when(searchService.search(7L, "휴가는 어디에서 신청하나요?"))
                 .thenReturn(new SearchResponse(
                         10L,
                         20L,

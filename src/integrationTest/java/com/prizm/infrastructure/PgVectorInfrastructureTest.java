@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -150,7 +151,7 @@ class PgVectorInfrastructureTest {
                 PgVectorSmokeAssertions.verifyExactCosineSearch(jdbcTemplate);
 
         assertThat(serverVersion).isBetween(160000, 169999);
-        assertThat(successfulMigrations).isEqualTo(7);
+        assertThat(successfulMigrations).isEqualTo(8);
         assertThat(result.extensionVersion()).isEqualTo("0.8.2");
         assertThat(documentCount).isZero();
         assertThat(versionCount).isZero();
@@ -164,15 +165,19 @@ class PgVectorInfrastructureTest {
     @Transactional
     // 검색 경로가 실제 임베딩과 저장된 active 청크를 사용해 의미상 가까운 문장을 찾는지 확인한다.
     void storesBgeM3EmbeddingsAndFindsAnnualLeaveSentenceFirst() {
-        long documentVersionId = createActiveVectorDocumentVersion();
+        Long ownerUserId = createUser();
+        long documentVersionId = createActiveVectorDocumentVersion(ownerUserId);
         for (int index = 0; index < SEARCH_TEST_SENTENCES.size(); index++) {
             String sentence = SEARCH_TEST_SENTENCES.get(index);
             float[] embedding = embeddingService.embed(sentence);
             jdbcTemplate.update(
                     """
-                    INSERT INTO document_chunks(content, embedding, document_version_id, chunk_no, page_no)
-                    VALUES (?, CAST(? AS vector), ?, ?, ?)
+                    INSERT INTO document_chunks(
+                        owner_user_id, content, embedding, document_version_id, chunk_no, page_no
+                    )
+                    VALUES (?, ?, CAST(? AS vector), ?, ?, ?)
                     """,
+                    ownerUserId,
                     sentence,
                     toVectorLiteral(embedding),
                     documentVersionId,
@@ -180,7 +185,7 @@ class PgVectorInfrastructureTest {
                     1);
         }
 
-        SearchResponse result = searchService.search("휴가는 어디에서 신청하나요?");
+        SearchResponse result = searchService.search(ownerUserId, "휴가는 어디에서 신청하나요?");
 
         assertThat(result.content()).isEqualTo(SEARCH_TEST_SENTENCES.get(0));
         assertThat(result.documentTitle()).isEqualTo("Vector search verification");
@@ -194,12 +199,14 @@ class PgVectorInfrastructureTest {
     @Transactional
     // 업로드 직후 파일·메타데이터·처리 작업을 만들되 버전은 QUARANTINED로 남아야 한다.
     void uploadsTxtAsQuarantinedDocumentAndStoresFile() throws IOException {
+        Long ownerUserId = createUser();
         byte[] content = "연차 신청은 인사 시스템에서 진행합니다.".getBytes(StandardCharsets.UTF_8);
         DocumentUploadResponse response = documentUploadService.upload(
+                ownerUserId,
                 "휴가 안내",
                 new MockMultipartFile("file", "leave-guide.txt", "text/plain", content));
 
-        DocumentDetailResponse detail = documentQueryService.get(response.documentId());
+        DocumentDetailResponse detail = documentQueryService.get(ownerUserId, response.documentId());
 
         assertThat(response.status()).isEqualTo(DocumentVersionStatus.QUARANTINED);
         assertThat(detail.activeVersionId()).isNull();
@@ -218,10 +225,12 @@ class PgVectorInfrastructureTest {
     @Test
     // 실제 원본 파일이 자동 색인된 뒤에만 출처 정보와 함께 검색되는 전체 세로 흐름을 확인한다.
     void uploadsIndexesAndSearchesActiveTxtDocumentAutomatically() {
+        Long ownerUserId = createUser();
         byte[] content = ("연차 신청은 인사 시스템에서 진행합니다. "
                         + "휴가 신청 절차는 사내 인사 시스템의 휴가 메뉴를 사용합니다.")
                 .getBytes(StandardCharsets.UTF_8);
         DocumentUploadResponse uploaded = documentUploadService.upload(
+                ownerUserId,
                 "휴가 신청 안내",
                 new MockMultipartFile("file", "leave-search.txt", "text/plain", content));
         String storedFilePath = documentVersionRepository.findById(uploaded.versionId())
@@ -230,7 +239,7 @@ class PgVectorInfrastructureTest {
 
         try {
             assertThat(uploaded.status()).isEqualTo(DocumentVersionStatus.QUARANTINED);
-            assertThatThrownBy(() -> searchService.search("휴가는 어디에서 신청하나요?"))
+            assertThatThrownBy(() -> searchService.search(ownerUserId, "휴가는 어디에서 신청하나요?"))
                     .isInstanceOf(SearchResultNotFoundException.class);
 
             assertThat(processingJobRepository.count()).isEqualTo(1);
@@ -238,6 +247,11 @@ class PgVectorInfrastructureTest {
                     .isEqualTo(ProcessingJobStatus.PENDING);
             assertThat(processingJobRepository.findAll().get(0).getDocumentVersionId())
                     .isEqualTo(uploaded.versionId());
+            assertThat(documentRepository.findById(uploaded.documentId()).orElseThrow().getOwnerUserId())
+                    .isEqualTo(ownerUserId);
+            assertThat(documentVersionRepository.findById(uploaded.versionId()).orElseThrow().getOwnerUserId())
+                    .isEqualTo(ownerUserId);
+            assertThat(processingJobRepository.findAll().get(0).getOwnerUserId()).isEqualTo(ownerUserId);
 
             ClaimedProcessingJob claimed = processingJobClaimService.claimNext().orElseThrow();
             assertThat(processingJobClaimService.claimNext()).isEmpty();
@@ -266,8 +280,13 @@ class PgVectorInfrastructureTest {
                     "SELECT COUNT(*) FROM document_chunks WHERE document_version_id = ? AND page_no IS NOT NULL",
                     Long.class,
                     uploaded.versionId())).isZero();
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM document_chunks WHERE document_version_id = ? AND owner_user_id = ?",
+                    Long.class,
+                    uploaded.versionId(),
+                    ownerUserId)).isPositive();
 
-            SearchResponse result = searchService.search("휴가는 어디에서 신청하나요?");
+            SearchResponse result = searchService.search(ownerUserId, "휴가는 어디에서 신청하나요?");
             assertThat(result.documentId()).isEqualTo(uploaded.documentId());
             assertThat(result.documentVersionId()).isEqualTo(uploaded.versionId());
             assertThat(result.documentTitle()).isEqualTo("휴가 신청 안내");
@@ -287,31 +306,39 @@ class PgVectorInfrastructureTest {
     @Transactional
     // 부분 청크가 있어도 ACTIVE 상태와 활성 버전 연결을 모두 만족하지 않으면 검색하지 않는다.
     void excludesPartialChunksFromIndexingDocumentVersion() {
+        Long ownerUserId = createUser();
         String content = "색인 중인 문서는 검색 결과에 노출되면 안 됩니다.";
         float[] embedding = embeddingService.embed(content);
         Long documentId = jdbcTemplate.queryForObject(
-                "INSERT INTO documents(title) VALUES ('부분 색인 문서') RETURNING id", Long.class);
+                "INSERT INTO documents(owner_user_id, title) VALUES (?, '부분 색인 문서') RETURNING id",
+                Long.class,
+                ownerUserId);
         Long versionId = jdbcTemplate.queryForObject(
                 """
                 INSERT INTO document_versions(
-                    document_id, version_no, original_file_name, stored_file_path, file_type, content_hash, status
+                    owner_user_id, document_id, version_no, original_file_name, stored_file_path, file_type,
+                    content_hash, status
                 )
-                VALUES (?, 1, 'partial.txt', 'test/partial.txt', 'TXT', repeat('b', 64), 'PROCESSING')
+                VALUES (?, ?, 1, 'partial.txt', 'test/partial.txt', 'TXT', repeat('b', 64), 'PROCESSING')
                 RETURNING id
                 """,
                 Long.class,
+                ownerUserId,
                 documentId);
         jdbcTemplate.update("UPDATE documents SET active_version_id = ? WHERE id = ?", versionId, documentId);
         jdbcTemplate.update(
                 """
-                INSERT INTO document_chunks(content, embedding, document_version_id, chunk_no, page_no)
-                VALUES (?, CAST(? AS vector), ?, 1, NULL)
+                INSERT INTO document_chunks(
+                    owner_user_id, content, embedding, document_version_id, chunk_no, page_no
+                )
+                VALUES (?, ?, CAST(? AS vector), ?, 1, NULL)
                 """,
+                ownerUserId,
                 content,
                 toVectorLiteral(embedding),
                 versionId);
 
-        assertThatThrownBy(() -> searchService.search(content))
+        assertThatThrownBy(() -> searchService.search(ownerUserId, content))
                 .isInstanceOf(SearchResultNotFoundException.class);
     }
 
@@ -439,27 +466,34 @@ class PgVectorInfrastructureTest {
 
     @Test
     void keepsExistingActiveVersionSearchableWhenReplacementVersionFails() {
+        Long ownerUserId = createUser();
         String activeContent = "Implemented a retry policy with explicit backoff intervals.";
         Long documentId = jdbcTemplate.queryForObject(
-                "INSERT INTO documents(title) VALUES (?) RETURNING id",
+                "INSERT INTO documents(owner_user_id, title) VALUES (?, ?) RETURNING id",
                 Long.class,
+                ownerUserId,
                 "Career project report");
         Long activeVersionId = jdbcTemplate.queryForObject(
                 """
                 INSERT INTO document_versions(
-                    document_id, version_no, original_file_name, stored_file_path, file_type, content_hash, status
+                    owner_user_id, document_id, version_no, original_file_name, stored_file_path, file_type,
+                    content_hash, status
                 )
-                VALUES (?, 1, 'project-v1.txt', 'test/project-v1.txt', 'TXT', repeat('d', 64), 'ACTIVE')
+                VALUES (?, ?, 1, 'project-v1.txt', 'test/project-v1.txt', 'TXT', repeat('d', 64), 'ACTIVE')
                 RETURNING id
                 """,
                 Long.class,
+                ownerUserId,
                 documentId);
         jdbcTemplate.update("UPDATE documents SET active_version_id = ? WHERE id = ?", activeVersionId, documentId);
         jdbcTemplate.update(
                 """
-                INSERT INTO document_chunks(content, embedding, document_version_id, chunk_no, page_no)
-                VALUES (?, CAST(? AS vector), ?, 1, NULL)
+                INSERT INTO document_chunks(
+                    owner_user_id, content, embedding, document_version_id, chunk_no, page_no
+                )
+                VALUES (?, ?, CAST(? AS vector), ?, 1, NULL)
                 """,
+                ownerUserId,
                 activeContent,
                 toVectorLiteral(embeddingService.embed(activeContent)),
                 activeVersionId);
@@ -467,20 +501,23 @@ class PgVectorInfrastructureTest {
         Long replacementVersionId = jdbcTemplate.queryForObject(
                 """
                 INSERT INTO document_versions(
-                    document_id, version_no, original_file_name, stored_file_path, file_type, content_hash, status
+                    owner_user_id, document_id, version_no, original_file_name, stored_file_path, file_type,
+                    content_hash, status
                 )
-                VALUES (?, 2, 'project-v2.txt', 'test/project-v2.txt', 'TXT', repeat('e', 64), 'QUARANTINED')
+                VALUES (?, ?, 2, 'project-v2.txt', 'test/project-v2.txt', 'TXT', repeat('e', 64), 'QUARANTINED')
                 RETURNING id
                 """,
                 Long.class,
+                ownerUserId,
                 documentId);
         Long jobId = jdbcTemplate.queryForObject(
                 """
-                INSERT INTO processing_jobs(document_version_id, job_type, status)
-                VALUES (?, 'INDEXING', 'PENDING')
+                INSERT INTO processing_jobs(owner_user_id, document_version_id, job_type, status)
+                VALUES (?, ?, 'INDEXING', 'PENDING')
                 RETURNING id
                 """,
                 Long.class,
+                ownerUserId,
                 replacementVersionId);
 
         try {
@@ -503,7 +540,7 @@ class PgVectorInfrastructureTest {
                     .isEqualTo(DocumentVersionStatus.FAILED);
             assertThat(documentRepository.findById(documentId).orElseThrow().getActiveVersionId())
                     .isEqualTo(activeVersionId);
-            SearchResponse result = searchService.search(activeContent);
+            SearchResponse result = searchService.search(ownerUserId, activeContent);
             assertThat(result.documentVersionId()).isEqualTo(activeVersionId);
             assertThat(result.content()).isEqualTo(activeContent);
         }
@@ -518,51 +555,71 @@ class PgVectorInfrastructureTest {
         jdbcTemplate.update("UPDATE documents SET active_version_id = NULL");
         jdbcTemplate.update("DELETE FROM document_versions");
         jdbcTemplate.update("DELETE FROM documents");
+        jdbcTemplate.update("DELETE FROM users");
     }
 
-    private long createActiveVectorDocumentVersion() {
+    private long createActiveVectorDocumentVersion(Long ownerUserId) {
         Long documentId = jdbcTemplate.queryForObject(
-                "INSERT INTO documents(title) VALUES (?) RETURNING id",
+                "INSERT INTO documents(owner_user_id, title) VALUES (?, ?) RETURNING id",
                 Long.class,
+                ownerUserId,
                 "Vector search verification");
         Long versionId = jdbcTemplate.queryForObject(
                 """
                 INSERT INTO document_versions(
-                    document_id, version_no, original_file_name, stored_file_path, file_type, content_hash, status
+                    owner_user_id, document_id, version_no, original_file_name, stored_file_path, file_type,
+                    content_hash, status
                 )
-                VALUES (?, 1, 'vector-search.txt', 'test/vector-search.txt', 'TXT', repeat('a', 64), 'ACTIVE')
+                VALUES (?, ?, 1, 'vector-search.txt', 'test/vector-search.txt', 'TXT', repeat('a', 64), 'ACTIVE')
                 RETURNING id
                 """,
                 Long.class,
+                ownerUserId,
                 documentId);
         jdbcTemplate.update("UPDATE documents SET active_version_id = ? WHERE id = ?", versionId, documentId);
         return versionId;
     }
 
     private PendingJobFixture createPendingIndexingJob(String title) {
+        Long ownerUserId = createUser();
         Long documentId = jdbcTemplate.queryForObject(
-                "INSERT INTO documents(title) VALUES (?) RETURNING id",
+                "INSERT INTO documents(owner_user_id, title) VALUES (?, ?) RETURNING id",
                 Long.class,
+                ownerUserId,
                 title);
         Long versionId = jdbcTemplate.queryForObject(
                 """
                 INSERT INTO document_versions(
-                    document_id, version_no, original_file_name, stored_file_path, file_type, content_hash, status
+                    owner_user_id, document_id, version_no, original_file_name, stored_file_path, file_type,
+                    content_hash, status
                 )
-                VALUES (?, 1, 'worker.txt', 'test/worker.txt', 'TXT', repeat('c', 64), 'QUARANTINED')
+                VALUES (?, ?, 1, 'worker.txt', 'test/worker.txt', 'TXT', repeat('c', 64), 'QUARANTINED')
                 RETURNING id
                 """,
                 Long.class,
+                ownerUserId,
                 documentId);
         Long jobId = jdbcTemplate.queryForObject(
                 """
-                INSERT INTO processing_jobs(document_version_id, job_type, status)
-                VALUES (?, 'INDEXING', 'PENDING')
+                INSERT INTO processing_jobs(owner_user_id, document_version_id, job_type, status)
+                VALUES (?, ?, 'INDEXING', 'PENDING')
                 RETURNING id
                 """,
                 Long.class,
+                ownerUserId,
                 versionId);
-        return new PendingJobFixture(documentId, versionId, jobId);
+        return new PendingJobFixture(ownerUserId, documentId, versionId, jobId);
+    }
+
+    private Long createUser() {
+        return jdbcTemplate.queryForObject(
+                """
+                INSERT INTO users(email, password_hash, role, enabled)
+                VALUES (?, 'not-used-by-infrastructure-test', 'USER', TRUE)
+                RETURNING id
+                """,
+                Long.class,
+                UUID.randomUUID() + "@example.com");
     }
 
     private IndexedChunk indexedChunk(String content) {
@@ -609,6 +666,10 @@ class PgVectorInfrastructureTest {
         }
     }
 
-    private record PendingJobFixture(Long documentId, Long documentVersionId, Long processingJobId) {
+    private record PendingJobFixture(
+            Long ownerUserId,
+            Long documentId,
+            Long documentVersionId,
+            Long processingJobId) {
     }
 }

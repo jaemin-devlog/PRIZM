@@ -6,6 +6,7 @@ import java.time.Instant;
 public record ClaimedProcessingJob(
         Long processingJobId,
         Long documentVersionId,
+        Long ownerUserId,
         long claimVersion,
         Instant leaseExpiresAt) {
 }

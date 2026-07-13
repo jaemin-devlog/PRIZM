@@ -52,6 +52,9 @@ public class DocumentIndexingProcessor {
     public void process(ClaimedProcessingJob claimedJob) {
         DocumentVersion version = documentVersionRepository.findById(claimedJob.documentVersionId())
                 .orElseThrow(() -> new DocumentVersionNotFoundException(claimedJob.documentVersionId()));
+        if (!claimedJob.ownerUserId().equals(version.getOwnerUserId())) {
+            throw new IllegalStateException("Processing job ownership does not match its document version.");
+        }
         byte[] fileContent = readFile(version.getStoredFilePath());
         String text = decodeUtf8(fileContent);
         List<TextChunk> textChunks = textChunker.split(text);

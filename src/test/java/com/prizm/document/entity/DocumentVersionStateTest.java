@@ -39,6 +39,6 @@ class DocumentVersionStateTest {
     }
 
     private DocumentVersion version() {
-        return DocumentVersion.quarantined(1L, "guide.txt", "a".repeat(64));
+        return DocumentVersion.quarantined(7L, 1L, "guide.txt", "a".repeat(64));
     }
 }

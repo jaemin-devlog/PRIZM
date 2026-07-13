@@ -32,10 +32,10 @@ public class SearchService {
      * @param query 사용자가 입력한 자연어 질문
      * @return 검색 내용과 cosine distance 기반 점수
      */
-    public SearchResponse search(String query) {
+    public SearchResponse search(Long ownerUserId, String query) {
         validateQuery(query);
         float[] queryEmbedding = embeddingService.embed(query);
-        return vectorSearchRepository.findNearest(queryEmbedding)
+        return vectorSearchRepository.findNearest(ownerUserId, queryEmbedding)
                 .map(result -> new SearchResponse(
                         result.documentId(),
                         result.documentVersionId(),

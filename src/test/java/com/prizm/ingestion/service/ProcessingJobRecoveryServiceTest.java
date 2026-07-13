@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.prizm.document.entity.Document;
 import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.entity.DocumentVersionStatus;
 import com.prizm.document.repository.DocumentVersionRepository;
+import com.prizm.document.repository.DocumentRepository;
 import com.prizm.ingestion.entity.ProcessingJob;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
 import com.prizm.ingestion.repository.DocumentChunkRepository;
@@ -30,16 +32,18 @@ class ProcessingJobRecoveryServiceTest {
     @Mock
     DocumentVersionRepository documentVersionRepository;
     @Mock
+    DocumentRepository documentRepository;
+    @Mock
     DocumentChunkRepository documentChunkRepository;
 
     @Test
     void marksExpiredJobAndVersionFailedAfterMaximumRetries() {
-        ProcessingJob job = ProcessingJob.pendingIndexing(10L);
+        ProcessingJob job = ProcessingJob.pendingIndexing(7L, 10L);
         ReflectionTestUtils.setField(job, "id", 20L);
         ReflectionTestUtils.setField(job, "status", ProcessingJobStatus.PROCESSING);
         ReflectionTestUtils.setField(job, "retryCount", 3);
         ReflectionTestUtils.setField(job, "claimVersion", 7L);
-        DocumentVersion version = DocumentVersion.quarantined(1L, "guide.txt", "a".repeat(64));
+        DocumentVersion version = DocumentVersion.quarantined(7L, 1L, "guide.txt", "a".repeat(64));
         ReflectionTestUtils.setField(version, "id", 10L);
         version.startProcessing();
         Instant databaseNow = Instant.parse("2026-07-13T00:00:00Z");
@@ -47,11 +51,15 @@ class ProcessingJobRecoveryServiceTest {
         when(claimRepository.lockNextExpiredId()).thenReturn(Optional.of(20L));
         when(processingJobRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(job));
         when(documentVersionRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(version));
+        Document document = Document.create(7L, "Guide");
+        ReflectionTestUtils.setField(document, "id", 1L);
+        when(documentRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(document));
         when(claimRepository.currentDatabaseTime()).thenReturn(databaseNow);
         ProcessingJobRecoveryService service = new ProcessingJobRecoveryService(
                 claimRepository,
                 processingJobRepository,
                 documentVersionRepository,
+                documentRepository,
                 documentChunkRepository,
                 new IndexingRetryPolicy());
 
@@ -61,6 +69,6 @@ class ProcessingJobRecoveryServiceTest {
         assertThat(job.getClaimVersion()).isEqualTo(8L);
         assertThat(job.getCompletedAt()).isEqualTo(databaseNow);
         assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.FAILED);
-        verify(documentChunkRepository).deleteByDocumentVersionId(10L);
+        verify(documentChunkRepository).deleteByOwnerUserIdAndDocumentVersionId(7L, 10L);
     }
 }

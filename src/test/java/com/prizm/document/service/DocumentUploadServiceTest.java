@@ -81,7 +81,7 @@ class DocumentUploadServiceTest {
         when(fileStorage.store(11L, 22L, "guide.txt", content))
                 .thenReturn("documents/11/22/guide.txt");
 
-        DocumentUploadResponse response = documentUploadService.upload(" Guide ", file);
+        DocumentUploadResponse response = documentUploadService.upload(7L, " Guide ", file);
 
         assertThat(response.documentId()).isEqualTo(11L);
         assertThat(response.versionId()).isEqualTo(22L);
@@ -90,8 +90,15 @@ class DocumentUploadServiceTest {
         assertThat(response.status()).isEqualTo(DocumentVersionStatus.QUARANTINED);
         assertThat(response.createdAt()).isNotNull();
         verify(fileStorage).store(11L, 22L, "guide.txt", content);
+        var documentCaptor = org.mockito.ArgumentCaptor.forClass(Document.class);
+        verify(documentRepository).save(documentCaptor.capture());
+        assertThat(documentCaptor.getValue().getOwnerUserId()).isEqualTo(7L);
+        var versionCaptor = org.mockito.ArgumentCaptor.forClass(DocumentVersion.class);
+        verify(documentVersionRepository).save(versionCaptor.capture());
+        assertThat(versionCaptor.getValue().getOwnerUserId()).isEqualTo(7L);
         var jobCaptor = org.mockito.ArgumentCaptor.forClass(ProcessingJob.class);
         verify(processingJobRepository).save(jobCaptor.capture());
+        assertThat(jobCaptor.getValue().getOwnerUserId()).isEqualTo(7L);
         assertThat(jobCaptor.getValue().getDocumentVersionId()).isEqualTo(22L);
         assertThat(jobCaptor.getValue().getStatus()).isEqualTo(ProcessingJobStatus.PENDING);
     }
@@ -103,7 +110,7 @@ class DocumentUploadServiceTest {
         when(fileStorage.store(11L, 22L, "guide.txt", content))
                 .thenReturn("documents/11/22/guide.txt");
 
-        documentUploadService.upload("Guide", file);
+        documentUploadService.upload(7L, "Guide", file);
         TransactionSynchronizationManager.getSynchronizations()
                 .forEach(synchronization -> synchronization.afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK));
 
@@ -119,7 +126,7 @@ class DocumentUploadServiceTest {
         when(processingJobRepository.save(any(ProcessingJob.class)))
                 .thenThrow(new IllegalStateException("database unavailable"));
 
-        assertThatThrownBy(() -> documentUploadService.upload("Guide", file))
+        assertThatThrownBy(() -> documentUploadService.upload(7L, "Guide", file))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("database unavailable");
         TransactionSynchronizationManager.getSynchronizations()
@@ -132,7 +139,7 @@ class DocumentUploadServiceTest {
     void rejectsEmptyFileBeforePersistingMetadata() {
         MockMultipartFile file = new MockMultipartFile("file", "empty.txt", "text/plain", new byte[0]);
 
-        assertThatThrownBy(() -> documentUploadService.upload("Guide", file))
+        assertThatThrownBy(() -> documentUploadService.upload(7L, "Guide", file))
                 .isInstanceOf(DocumentUploadException.class)
                 .extracting(exception -> ((DocumentUploadException) exception).code())
                 .isEqualTo(DocumentUploadErrorCode.EMPTY_FILE);
@@ -144,11 +151,11 @@ class DocumentUploadServiceTest {
         MockMultipartFile pdf = new MockMultipartFile("file", "guide.pdf", "application/pdf", new byte[] {1});
         MockMultipartFile traversal = new MockMultipartFile("file", "../guide.txt", "text/plain", new byte[] {1});
 
-        assertThatThrownBy(() -> documentUploadService.upload("Guide", pdf))
+        assertThatThrownBy(() -> documentUploadService.upload(7L, "Guide", pdf))
                 .isInstanceOf(DocumentUploadException.class)
                 .extracting(exception -> ((DocumentUploadException) exception).code())
                 .isEqualTo(DocumentUploadErrorCode.UNSUPPORTED_FILE_TYPE);
-        assertThatThrownBy(() -> documentUploadService.upload("Guide", traversal))
+        assertThatThrownBy(() -> documentUploadService.upload(7L, "Guide", traversal))
                 .isInstanceOf(DocumentUploadException.class)
                 .extracting(exception -> ((DocumentUploadException) exception).code())
                 .isEqualTo(DocumentUploadErrorCode.INVALID_FILE_NAME);
@@ -158,7 +165,7 @@ class DocumentUploadServiceTest {
     void rejectsFileThatExceedsConfiguredSizeLimit() {
         MockMultipartFile file = new MockMultipartFile("file", "large.txt", "text/plain", new byte[11]);
 
-        assertThatThrownBy(() -> documentUploadService.upload("Guide", file))
+        assertThatThrownBy(() -> documentUploadService.upload(7L, "Guide", file))
                 .isInstanceOf(DocumentUploadException.class)
                 .extracting(exception -> ((DocumentUploadException) exception).code())
                 .isEqualTo(DocumentUploadErrorCode.FILE_SIZE_EXCEEDED);
@@ -171,7 +178,7 @@ class DocumentUploadServiceTest {
         when(fileStorage.store(eq(11L), eq(22L), eq("guide.txt"), eq(content)))
                 .thenThrow(new FileStorageException("disk unavailable"));
 
-        assertThatThrownBy(() -> documentUploadService.upload("Guide", file))
+        assertThatThrownBy(() -> documentUploadService.upload(7L, "Guide", file))
                 .isInstanceOf(DocumentUploadException.class)
                 .extracting(exception -> ((DocumentUploadException) exception).code())
                 .isEqualTo(DocumentUploadErrorCode.FILE_STORAGE_FAILED);

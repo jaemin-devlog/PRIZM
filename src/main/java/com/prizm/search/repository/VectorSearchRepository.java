@@ -30,6 +30,9 @@ public class VectorSearchRepository {
              AND document.active_version_id = version.id
             WHERE version.status = 'ACTIVE'
               AND chunk.document_version_id = version.id
+              AND document.owner_user_id = ?
+              AND version.owner_user_id = ?
+              AND chunk.owner_user_id = ?
             ORDER BY chunk.embedding <=> CAST(? AS vector), chunk.id
             LIMIT 1
             """;
@@ -46,7 +49,7 @@ public class VectorSearchRepository {
      * @param embedding 검색 질문에서 생성된 1024차원 벡터
      * @return 결과가 있으면 내용, 거리, 검색 점수를 포함한 값
      */
-    public Optional<VectorSearchResult> findNearest(float[] embedding) {
+    public Optional<VectorSearchResult> findNearest(Long ownerUserId, float[] embedding) {
         String vector = toVectorLiteral(embedding);
         List<VectorSearchResult> results = jdbcTemplate.query(
                 NEAREST_CHUNK_SQL,
@@ -66,6 +69,9 @@ public class VectorSearchRepository {
                             1.0d - distance);
                 },
                 vector,
+                ownerUserId,
+                ownerUserId,
+                ownerUserId,
                 vector);
         return results.stream().findFirst();
     }

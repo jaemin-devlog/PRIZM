@@ -42,10 +42,10 @@ class SearchServiceTest {
                         0.2d,
                         0.8d);
         when(embeddingService.embed("휴가는 어디에서 신청하나요?")).thenReturn(embedding);
-        when(vectorSearchRepository.findNearest(embedding)).thenReturn(Optional.of(repositoryResult));
+        when(vectorSearchRepository.findNearest(7L, embedding)).thenReturn(Optional.of(repositoryResult));
 
         SearchResponse result = new SearchService(embeddingService, vectorSearchRepository)
-                .search("휴가는 어디에서 신청하나요?");
+                .search(7L, "휴가는 어디에서 신청하나요?");
 
         assertThat(result).isEqualTo(
                 new SearchResponse(
@@ -58,12 +58,12 @@ class SearchServiceTest {
                         "연차 신청은 인사 시스템에서 진행합니다.",
                         0.2d,
                         0.8d));
-        verify(vectorSearchRepository).findNearest(embedding);
+        verify(vectorSearchRepository).findNearest(7L, embedding);
     }
 
     @Test
     void rejectsBlankQueryBeforeEmbedding() {
-        assertThatThrownBy(() -> new SearchService(embeddingService, vectorSearchRepository).search(" "))
+        assertThatThrownBy(() -> new SearchService(embeddingService, vectorSearchRepository).search(7L, " "))
                 .isInstanceOf(InvalidSearchQueryException.class)
                 .hasMessage("query must not be blank");
     }
@@ -72,9 +72,9 @@ class SearchServiceTest {
     void signalsWhenNoChunkExists() {
         float[] embedding = new float[1024];
         when(embeddingService.embed("검색어")).thenReturn(embedding);
-        when(vectorSearchRepository.findNearest(embedding)).thenReturn(Optional.empty());
+        when(vectorSearchRepository.findNearest(7L, embedding)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> new SearchService(embeddingService, vectorSearchRepository).search("검색어"))
+        assertThatThrownBy(() -> new SearchService(embeddingService, vectorSearchRepository).search(7L, "검색어"))
                 .isInstanceOf(SearchResultNotFoundException.class);
     }
 }

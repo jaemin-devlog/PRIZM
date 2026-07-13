@@ -202,7 +202,8 @@ class AuthenticationIntegrationTest {
 
     @Test
     void allowsAuthenticatedUserToUploadTxtDocument() throws Exception {
-        String token = tokenFor(UserRole.USER);
+        UserAccount owner = createUser(UserRole.USER, true);
+        String token = login(owner.getEmail());
         MockMultipartFile file = new MockMultipartFile(
                 "file", "user-upload.txt", "text/plain", "사용자 업로드 문서".getBytes(StandardCharsets.UTF_8));
 
@@ -217,14 +218,21 @@ class AuthenticationIntegrationTest {
         assertThat(processingJobRepository.count()).isEqualTo(1L);
         var job = processingJobRepository.findAll().get(0);
         assertThat(job.getStatus()).isEqualTo(ProcessingJobStatus.PENDING);
-        assertThat(documentVersionRepository.findById(job.getDocumentVersionId())).isPresent();
+        var version = documentVersionRepository.findById(job.getDocumentVersionId()).orElseThrow();
+        assertThat(job.getOwnerUserId()).isEqualTo(owner.getId());
+        assertThat(version.getOwnerUserId()).isEqualTo(owner.getId());
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT owner_user_id FROM documents WHERE id = ?",
+                Long.class,
+                version.getDocumentId())).isEqualTo(owner.getId());
     }
 
     @Test
     void allowsAuthenticatedUserToSearchActiveDocument() throws Exception {
-        String token = tokenFor(UserRole.USER);
+        UserAccount owner = createUser(UserRole.USER, true);
+        String token = login(owner.getEmail());
         String content = "연차 신청은 인사 시스템에서 진행합니다.";
-        long versionId = createActiveDocument(content);
+        ActiveDocument activeDocument = createActiveDocument(owner.getId(), "인사 안내", content);
 
         mockMvc.perform(post("/api/search")
                         .header(HttpHeaders.AUTHORIZATION, bearer(token))
@@ -233,8 +241,64 @@ class AuthenticationIntegrationTest {
                                 {"query":"휴가는 어디에서 신청하나요?"}
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.documentVersionId").value(versionId))
+                .andExpect(jsonPath("$.documentVersionId").value(activeDocument.versionId()))
                 .andExpect(jsonPath("$.content").value(content));
+    }
+
+    @Test
+    void isolatesDocumentListAndDetailByAuthenticatedUser() throws Exception {
+        UserAccount userA = createUser("user-a@prizm.local", UserRole.USER, true);
+        UserAccount userB = createUser("user-b@prizm.local", UserRole.USER, true);
+        String tokenA = login(userA.getEmail());
+        String tokenB = login(userB.getEmail());
+        ActiveDocument documentA = createActiveDocument(userA.getId(), "A 프로젝트", "A 사용자의 프로젝트 기록");
+        ActiveDocument documentB = createActiveDocument(userB.getId(), "B 프로젝트", "B 사용자의 프로젝트 기록");
+
+        mockMvc.perform(get("/api/documents").header(HttpHeaders.AUTHORIZATION, bearer(tokenA)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].documentId").value(documentA.documentId()))
+                .andExpect(jsonPath("$[1]").doesNotExist());
+        mockMvc.perform(get("/api/documents").header(HttpHeaders.AUTHORIZATION, bearer(tokenB)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].documentId").value(documentB.documentId()))
+                .andExpect(jsonPath("$[1]").doesNotExist());
+
+        mockMvc.perform(get("/api/documents/{documentId}", documentA.documentId())
+                        .header(HttpHeaders.AUTHORIZATION, bearer(tokenA)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("A 프로젝트"));
+        mockMvc.perform(get("/api/documents/{documentId}", documentA.documentId())
+                        .header(HttpHeaders.AUTHORIZATION, bearer(tokenB)))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/documents/{documentId}", documentB.documentId())
+                        .header(HttpHeaders.AUTHORIZATION, bearer(tokenA)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void isolatesVectorSearchCandidatesByAuthenticatedUser() throws Exception {
+        UserAccount userA = createUser("search-a@prizm.local", UserRole.USER, true);
+        UserAccount userB = createUser("search-b@prizm.local", UserRole.USER, true);
+        String tokenA = login(userA.getEmail());
+        String tokenB = login(userB.getEmail());
+        String content = "Spring Boot와 Redis를 이용해 동시 요청 처리를 구현했습니다.";
+        ActiveDocument documentA = createActiveDocument(userA.getId(), "A 동시성 프로젝트", content);
+        ActiveDocument documentB = createActiveDocument(userB.getId(), "B 동시성 프로젝트", content);
+
+        mockMvc.perform(post("/api/search")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(tokenA))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"query\":\"Spring Boot 동시 요청 처리 경험\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.documentId").value(documentA.documentId()))
+                .andExpect(jsonPath("$.documentVersionId").value(documentA.versionId()));
+        mockMvc.perform(post("/api/search")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(tokenB))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"query\":\"Spring Boot 동시 요청 처리 경험\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.documentId").value(documentB.documentId()))
+                .andExpect(jsonPath("$.documentVersionId").value(documentB.versionId()));
     }
 
     @Test
@@ -444,35 +508,47 @@ class AuthenticationIntegrationTest {
 
     private UserAccount createUser(UserRole role, boolean enabled) {
         String email = role == UserRole.SYSTEM_ADMIN ? "system-admin@prizm.local" : "user@prizm.local";
+        return createUser(email, role, enabled);
+    }
+
+    private UserAccount createUser(String email, UserRole role, boolean enabled) {
         UserAccount user = enabled
                 ? UserAccount.create(email, passwordEncoder.encode("test-password"), role)
                 : UserAccount.createDisabled(email, passwordEncoder.encode("test-password"), role);
         return userAccountRepository.saveAndFlush(user);
     }
 
-    private long createActiveDocument(String content) {
+    private ActiveDocument createActiveDocument(Long ownerUserId, String title, String content) {
         Long documentId = jdbcTemplate.queryForObject(
-                "INSERT INTO documents(title) VALUES ('인사 안내') RETURNING id", Long.class);
+                "INSERT INTO documents(owner_user_id, title) VALUES (?, ?) RETURNING id",
+                Long.class,
+                ownerUserId,
+                title);
         Long versionId = jdbcTemplate.queryForObject(
                 """
                 INSERT INTO document_versions(
-                    document_id, version_no, original_file_name, stored_file_path, file_type, content_hash, status
+                    owner_user_id, document_id, version_no, original_file_name, stored_file_path, file_type,
+                    content_hash, status
                 )
-                VALUES (?, 1, 'search.txt', 'test/search.txt', 'TXT', repeat('a', 64), 'ACTIVE')
+                VALUES (?, ?, 1, 'search.txt', 'test/search.txt', 'TXT', repeat('a', 64), 'ACTIVE')
                 RETURNING id
                 """,
                 Long.class,
+                ownerUserId,
                 documentId);
         jdbcTemplate.update("UPDATE documents SET active_version_id = ? WHERE id = ?", versionId, documentId);
         jdbcTemplate.update(
                 """
-                INSERT INTO document_chunks(content, embedding, document_version_id, chunk_no, page_no)
-                VALUES (?, CAST(? AS vector), ?, 1, NULL)
+                INSERT INTO document_chunks(
+                    owner_user_id, content, embedding, document_version_id, chunk_no, page_no
+                )
+                VALUES (?, ?, CAST(? AS vector), ?, 1, NULL)
                 """,
+                ownerUserId,
                 content,
                 toVectorLiteral(embeddingService.embed(content)),
                 versionId);
-        return versionId;
+        return new ActiveDocument(documentId, versionId);
     }
 
     private String toVectorLiteral(float[] embedding) {
@@ -488,6 +564,9 @@ class AuthenticationIntegrationTest {
 
     private String bearer(String token) {
         return "Bearer " + token;
+    }
+
+    private record ActiveDocument(Long documentId, Long versionId) {
     }
 
     private static Path createStorageRoot() {

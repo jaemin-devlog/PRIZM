@@ -69,6 +69,6 @@ class IndexingCoordinatorTest {
     }
 
     private ClaimedProcessingJob claimedJob() {
-        return new ClaimedProcessingJob(20L, 10L, 1L, Instant.parse("2026-07-13T00:10:00Z"));
+        return new ClaimedProcessingJob(20L, 10L, 7L, 1L, Instant.parse("2026-07-13T00:10:00Z"));
     }
 }

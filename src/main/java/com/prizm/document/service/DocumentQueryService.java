@@ -28,18 +28,18 @@ public class DocumentQueryService {
     }
 
     /** 저장된 문서를 최신 생성 순서로 요약 조회한다. */
-    public List<DocumentSummaryResponse> list() {
-        return documentRepository.findAllByOrderByCreatedAtDesc().stream()
-                .map(this::toSummary)
+    public List<DocumentSummaryResponse> list(Long ownerUserId) {
+        return documentRepository.findAllByOwnerUserIdOrderByCreatedAtDesc(ownerUserId).stream()
+                .map(document -> toSummary(ownerUserId, document))
                 .toList();
     }
 
     /** 문서와 버전 목록을 조회한다. */
-    public DocumentDetailResponse get(Long documentId) {
-        Document document = documentRepository.findById(documentId)
+    public DocumentDetailResponse get(Long ownerUserId, Long documentId) {
+        Document document = documentRepository.findByIdAndOwnerUserId(documentId, ownerUserId)
                 .orElseThrow(() -> new DocumentNotFoundException(documentId));
         List<DocumentVersionResponse> versions = documentVersionRepository
-                .findByDocumentIdOrderByVersionNoDesc(documentId)
+                .findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(ownerUserId, documentId)
                 .stream()
                 .map(this::toVersionResponse)
                 .toList();
@@ -52,9 +52,9 @@ public class DocumentQueryService {
                 versions);
     }
 
-    private DocumentSummaryResponse toSummary(Document document) {
+    private DocumentSummaryResponse toSummary(Long ownerUserId, Document document) {
         DocumentVersion latestVersion = documentVersionRepository
-                .findByDocumentIdOrderByVersionNoDesc(document.getId())
+                .findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(ownerUserId, document.getId())
                 .stream()
                 .findFirst()
                 .orElse(null);

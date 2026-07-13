@@ -1,8 +1,11 @@
 package com.prizm.ingestion.service;
 
+import com.prizm.document.entity.Document;
 import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.entity.DocumentVersionStatus;
+import com.prizm.document.exception.DocumentNotFoundException;
 import com.prizm.document.exception.DocumentVersionNotFoundException;
+import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.ingestion.entity.ProcessingJob;
 import com.prizm.ingestion.repository.DocumentChunkRepository;
@@ -22,6 +25,7 @@ public class ProcessingJobRecoveryService {
     private final ProcessingJobClaimRepository claimRepository;
     private final ProcessingJobRepository processingJobRepository;
     private final DocumentVersionRepository documentVersionRepository;
+    private final DocumentRepository documentRepository;
     private final DocumentChunkRepository documentChunkRepository;
     private final IndexingRetryPolicy retryPolicy;
 
@@ -29,11 +33,13 @@ public class ProcessingJobRecoveryService {
             ProcessingJobClaimRepository claimRepository,
             ProcessingJobRepository processingJobRepository,
             DocumentVersionRepository documentVersionRepository,
+            DocumentRepository documentRepository,
             DocumentChunkRepository documentChunkRepository,
             IndexingRetryPolicy retryPolicy) {
         this.claimRepository = claimRepository;
         this.processingJobRepository = processingJobRepository;
         this.documentVersionRepository = documentVersionRepository;
+        this.documentRepository = documentRepository;
         this.documentChunkRepository = documentChunkRepository;
         this.retryPolicy = retryPolicy;
     }
@@ -52,8 +58,12 @@ public class ProcessingJobRecoveryService {
         if (version.getStatus() != DocumentVersionStatus.PROCESSING) {
             throw new IllegalStateException("Expired processing job must reference a PROCESSING version.");
         }
+        requireSameOwner(job.getOwnerUserId(), version.getOwnerUserId());
+        Document document = documentRepository.findByIdForUpdate(version.getDocumentId())
+                .orElseThrow(() -> new DocumentNotFoundException(version.getDocumentId()));
+        requireSameOwner(job.getOwnerUserId(), document.getOwnerUserId());
 
-        documentChunkRepository.deleteByDocumentVersionId(version.getId());
+        documentChunkRepository.deleteByOwnerUserIdAndDocumentVersionId(job.getOwnerUserId(), version.getId());
         Instant databaseNow = claimRepository.currentDatabaseTime();
         if (retryPolicy.canRetry(job.getRetryCount())) {
             job.recoverForRetry(
@@ -65,5 +75,11 @@ public class ProcessingJobRecoveryService {
             version.failProcessing();
         }
         return true;
+    }
+
+    private void requireSameOwner(Long jobOwnerUserId, Long actualOwnerUserId) {
+        if (!jobOwnerUserId.equals(actualOwnerUserId)) {
+            throw new IllegalStateException("Processing job ownership does not match its document hierarchy.");
+        }
     }
 }

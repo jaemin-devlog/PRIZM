@@ -17,6 +17,9 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "owner_user_id", nullable = false, updatable = false)
+    private Long ownerUserId;
+
     @Column(nullable = false, length = 200)
     private String title;
 
@@ -32,14 +35,15 @@ public class Document {
     protected Document() {
     }
 
-    private Document(String title) {
+    private Document(Long ownerUserId, String title) {
+        this.ownerUserId = ownerUserId;
         this.title = title;
         this.createdAt = Instant.now();
         this.updatedAt = createdAt;
     }
 
-    public static Document create(String title) {
-        return new Document(title);
+    public static Document create(Long ownerUserId, String title) {
+        return new Document(ownerUserId, title);
     }
 
     @PreUpdate
@@ -57,6 +61,10 @@ public class Document {
 
     public Long getId() {
         return id;
+    }
+
+    public Long getOwnerUserId() {
+        return ownerUserId;
     }
 
     public String getTitle() {

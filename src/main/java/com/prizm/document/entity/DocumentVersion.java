@@ -20,6 +20,9 @@ public class DocumentVersion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "owner_user_id", nullable = false, updatable = false)
+    private Long ownerUserId;
+
     @Column(name = "document_id", nullable = false)
     private Long documentId;
 
@@ -49,7 +52,8 @@ public class DocumentVersion {
     protected DocumentVersion() {
     }
 
-    private DocumentVersion(Long documentId, String originalFileName, String contentHash) {
+    private DocumentVersion(Long ownerUserId, Long documentId, String originalFileName, String contentHash) {
+        this.ownerUserId = ownerUserId;
         this.documentId = documentId;
         this.versionNo = 1;
         this.originalFileName = originalFileName;
@@ -61,8 +65,12 @@ public class DocumentVersion {
     }
 
     /** 업로드 직후 검색에 사용하지 않는 QUARANTINED 버전을 만든다. */
-    public static DocumentVersion quarantined(Long documentId, String originalFileName, String contentHash) {
-        return new DocumentVersion(documentId, originalFileName, contentHash);
+    public static DocumentVersion quarantined(
+            Long ownerUserId,
+            Long documentId,
+            String originalFileName,
+            String contentHash) {
+        return new DocumentVersion(ownerUserId, documentId, originalFileName, contentHash);
     }
 
     /** 파일 저장이 성공한 뒤 임시 경로를 실제 서버 저장 경로로 교체한다. */
@@ -94,6 +102,10 @@ public class DocumentVersion {
 
     public Long getId() {
         return id;
+    }
+
+    public Long getOwnerUserId() {
+        return ownerUserId;
     }
 
     public Long getDocumentId() {

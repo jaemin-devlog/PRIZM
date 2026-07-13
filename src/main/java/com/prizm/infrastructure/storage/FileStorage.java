@@ -10,6 +10,9 @@ public interface FileStorage {
      */
     String store(long documentId, long versionId, String originalFileName, byte[] content);
 
+    /** DB에 기록된 저장소 기준 경로에서 원본 파일을 읽는다. */
+    byte[] read(String storedFilePath);
+
     /** 저장 실패 보상이나 정리 작업에서 저장된 파일을 삭제한다. */
     void delete(String storedFilePath);
 }

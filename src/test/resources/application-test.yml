@@ -12,3 +12,7 @@ spring:
     model:
       chat: none
       embedding: ollama
+
+prizm:
+  ingestion:
+    worker-enabled: false

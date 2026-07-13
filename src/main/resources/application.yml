@@ -49,3 +49,8 @@ prizm:
     max-file-size-bytes: ${PRIZM_UPLOAD_MAX_FILE_SIZE_BYTES:10485760}
   embedding:
     dimensions: ${PRIZM_EMBEDDING_DIMENSIONS:1024}
+  ingestion:
+    max-chunk-length: ${PRIZM_MAX_CHUNK_LENGTH:800}
+    overlap: ${PRIZM_CHUNK_OVERLAP:120}
+    poll-delay-ms: ${PRIZM_INDEXING_POLL_DELAY_MS:1000}
+    worker-enabled: ${PRIZM_INDEXING_WORKER_ENABLED:true}

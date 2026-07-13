@@ -31,7 +31,16 @@ class SearchServiceTest {
     void returnsNearestChunkFromExactSearchRepository() {
         float[] embedding = new float[1024];
         VectorSearchResult repositoryResult =
-                new VectorSearchResult("연차 신청은 인사 시스템에서 진행합니다.", 0.2d, 0.8d);
+                new VectorSearchResult(
+                        10L,
+                        20L,
+                        "휴가 안내",
+                        1,
+                        1,
+                        null,
+                        "연차 신청은 인사 시스템에서 진행합니다.",
+                        0.2d,
+                        0.8d);
         when(embeddingService.embed("휴가는 어디에서 신청하나요?")).thenReturn(embedding);
         when(vectorSearchRepository.findNearest(embedding)).thenReturn(Optional.of(repositoryResult));
 
@@ -39,7 +48,16 @@ class SearchServiceTest {
                 .search("휴가는 어디에서 신청하나요?");
 
         assertThat(result).isEqualTo(
-                new SearchResponse("연차 신청은 인사 시스템에서 진행합니다.", 0.2d, 0.8d));
+                new SearchResponse(
+                        10L,
+                        20L,
+                        "휴가 안내",
+                        1,
+                        1,
+                        null,
+                        "연차 신청은 인사 시스템에서 진행합니다.",
+                        0.2d,
+                        0.8d));
         verify(vectorSearchRepository).findNearest(embedding);
     }
 

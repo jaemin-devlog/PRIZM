@@ -55,6 +55,21 @@ public class LocalFileStorage implements FileStorage {
         }
     }
 
+    @Override
+    public byte[] read(String storedFilePath) {
+        Path target = storageRoot.resolve(storedFilePath).normalize();
+        ensureInsideStorageRoot(target);
+        if (!Files.isRegularFile(target)) {
+            throw new FileStorageException("Stored file does not exist.");
+        }
+        try {
+            return Files.readAllBytes(target);
+        }
+        catch (IOException exception) {
+            throw new FileStorageException("Failed to read stored file.", exception);
+        }
+    }
+
     /** 저장 경로가 루트 밖으로 나가지 않는지 확인한 뒤 파일을 삭제한다. */
     @Override
     public void delete(String storedFilePath) {

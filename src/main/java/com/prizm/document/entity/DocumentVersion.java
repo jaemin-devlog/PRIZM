@@ -1,5 +1,6 @@
 package com.prizm.document.entity;
 
+import com.prizm.document.exception.InvalidDocumentVersionStateException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -67,6 +68,33 @@ public class DocumentVersion {
     /** 파일 저장이 성공한 뒤 임시 경로를 실제 서버 저장 경로로 교체한다. */
     public void updateStoredFilePath(String storedFilePath) {
         this.storedFilePath = storedFilePath;
+    }
+
+    /** 격리된 버전만 승인할 수 있다. */
+    public void approve() {
+        transition(DocumentVersionStatus.QUARANTINED, DocumentVersionStatus.APPROVED);
+    }
+
+    /** 승인된 버전만 색인을 시작할 수 있다. */
+    public void startIndexing() {
+        transition(DocumentVersionStatus.APPROVED, DocumentVersionStatus.INDEXING);
+    }
+
+    /** 모든 청크 저장이 검증된 색인 작업만 활성화한다. */
+    public void activate() {
+        transition(DocumentVersionStatus.INDEXING, DocumentVersionStatus.ACTIVE);
+    }
+
+    /** 색인 중 최종 실패한 버전을 검색 불가능 상태로 전환한다. */
+    public void failIndexing() {
+        transition(DocumentVersionStatus.INDEXING, DocumentVersionStatus.FAILED);
+    }
+
+    private void transition(DocumentVersionStatus expected, DocumentVersionStatus next) {
+        if (status != expected) {
+            throw new InvalidDocumentVersionStateException(id, status, next);
+        }
+        status = next;
     }
 
     public Long getId() {

@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 /**
  * 질문을 임베딩하고 pgvector exact cosine 검색 결과를 API 응답으로 변환한다.
  *
- * <p>현재 업로드 문서는 QUARANTINED 상태이고 자동 청크·임베딩이 아직 없으므로 검색 행이 생성되지 않는다.
- * 따라서 이 단계에서는 격리 문서가 검색 결과에 나오지 않지만, 상태 필터 자체는 아직 이 서비스의 책임이 아니다.</p>
+ * <p>Repository가 ACTIVE이면서 documents.active_version_id에 연결된 청크만 조회하므로
+ * 승인 전이거나 처리에 실패한 문서는 결과에 포함되지 않는다.</p>
  */
 @Service
 public class SearchService {
@@ -36,7 +36,16 @@ public class SearchService {
         validateQuery(query);
         float[] queryEmbedding = embeddingService.embed(query);
         return vectorSearchRepository.findNearest(queryEmbedding)
-                .map(result -> new SearchResponse(result.content(), result.distance(), result.score()))
+                .map(result -> new SearchResponse(
+                        result.documentId(),
+                        result.documentVersionId(),
+                        result.documentTitle(),
+                        result.versionNo(),
+                        result.chunkNo(),
+                        result.pageNo(),
+                        result.content(),
+                        result.distance(),
+                        result.score()))
                 .orElseThrow(SearchResultNotFoundException::new);
     }
 

@@ -47,6 +47,14 @@ public class Document {
         updatedAt = Instant.now();
     }
 
+    /** 색인이 완전히 끝난 버전만 현재 검색 대상 버전으로 연결한다. */
+    public void activateVersion(Long versionId) {
+        if (versionId == null) {
+            throw new IllegalArgumentException("versionId must not be null");
+        }
+        this.activeVersionId = versionId;
+    }
+
     public Long getId() {
         return id;
     }

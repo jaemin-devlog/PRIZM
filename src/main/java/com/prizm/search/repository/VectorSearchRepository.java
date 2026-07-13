@@ -14,10 +14,23 @@ import org.springframework.stereotype.Repository;
 public class VectorSearchRepository {
 
     private static final String NEAREST_CHUNK_SQL = """
-            SELECT content,
-                   embedding <=> CAST(? AS vector) AS distance
-            FROM document_chunks
-            ORDER BY embedding <=> CAST(? AS vector), id
+            SELECT document.id AS document_id,
+                   version.id AS document_version_id,
+                   document.title AS document_title,
+                   version.version_no,
+                   chunk.chunk_no,
+                   chunk.page_no,
+                   chunk.content,
+                   chunk.embedding <=> CAST(? AS vector) AS distance
+            FROM document_chunks chunk
+            JOIN document_versions version
+              ON chunk.document_version_id = version.id
+            JOIN documents document
+              ON document.id = version.document_id
+             AND document.active_version_id = version.id
+            WHERE version.status = 'ACTIVE'
+              AND chunk.document_version_id = version.id
+            ORDER BY chunk.embedding <=> CAST(? AS vector), chunk.id
             LIMIT 1
             """;
 
@@ -41,6 +54,12 @@ public class VectorSearchRepository {
                     // pgvector의 <=> 결과는 cosine distance이며 작을수록 가깝다.
                     double distance = resultSet.getDouble("distance");
                     return new VectorSearchResult(
+                            resultSet.getLong("document_id"),
+                            resultSet.getLong("document_version_id"),
+                            resultSet.getString("document_title"),
+                            resultSet.getInt("version_no"),
+                            resultSet.getInt("chunk_no"),
+                            resultSet.getObject("page_no", Integer.class),
                             resultSet.getString("content"),
                             distance,
                             // distance를 유사도 형태로 보여주기 위해 역변환한다. 정확도나 확률은 아니다.

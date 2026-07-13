@@ -3,6 +3,7 @@ package com.prizm.infrastructure.storage;
 import java.io.IOException;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,6 +56,21 @@ public class LocalFileStorage implements FileStorage {
         }
     }
 
+    @Override
+    public byte[] read(String storedFilePath) {
+        Path target = storageRoot.resolve(storedFilePath).normalize();
+        ensureInsideStorageRoot(target);
+        if (!Files.isRegularFile(target)) {
+            throw new FileStorageException("Stored file does not exist.");
+        }
+        try {
+            return Files.readAllBytes(target);
+        }
+        catch (IOException exception) {
+            throw new FileStorageException("Failed to read stored file.", exception);
+        }
+    }
+
     /** 저장 경로가 루트 밖으로 나가지 않는지 확인한 뒤 파일을 삭제한다. */
     @Override
     public void delete(String storedFilePath) {
@@ -78,8 +94,23 @@ public class LocalFileStorage implements FileStorage {
     }
 
     private void validateFileName(String fileName) {
-        if (fileName == null || fileName.isBlank() || fileName.contains("/") || fileName.contains("\\")) {
+        if (fileName == null
+                || fileName.isBlank()
+                || fileName.contains("/")
+                || fileName.contains("\\")
+                || fileName.contains(":")) {
             throw new FileStorageException("Stored file name must be a single file name.");
+        }
+        try {
+            Path fileNamePath = Path.of(fileName);
+            if (fileNamePath.isAbsolute()
+                    || fileNamePath.getNameCount() != 1
+                    || !fileName.equals(fileNamePath.getFileName().toString())) {
+                throw new FileStorageException("Stored file name must be a single file name.");
+            }
+        }
+        catch (InvalidPathException exception) {
+            throw new FileStorageException("Stored file name is invalid.", exception);
         }
     }
 

@@ -411,13 +411,13 @@ POST /api/document-versions/{versionId}/retry
 POST /api/search
 ```
 
-### 현재 최소 벡터 검색
+### 현재 벡터 검색
 
-첫 번째 세로 흐름은 업로드 기능 없이 `document_chunks`에 저장된 문장을 검색한다. 질문과 문장은 같은 Ollama 임베딩으로 변환하고, pgvector의 exact cosine 거리 연산으로 가장 가까운 한 문장을 반환한다.
+질문과 승인된 TXT 청크를 같은 Ollama 임베딩으로 변환하고, pgvector의 exact cosine 거리 연산으로 가장 가까운 활성 문서 청크 한 건을 반환한다. 검색 SQL에서 `document_versions.status = 'ACTIVE'`와 `documents.active_version_id`를 함께 검사하므로 승인 전·색인 중·실패한 버전은 노출되지 않는다.
 
 - 모델: Ollama `bge-m3:latest` (애플리케이션 설정값은 `bge-m3` 별칭)
 - 실제 확인 차원: `1024`
-- 검색 SQL: `ORDER BY embedding <=> CAST(? AS vector), id LIMIT 1`
+- 검색 SQL: 활성 버전 조건 적용 후 `ORDER BY embedding <=> CAST(? AS vector), chunk.id LIMIT 1`
 - `distance`는 cosine distance, `score`는 `1 - distance`다. 두 값 모두 검색 결과에서 계산하며 하드코딩하지 않는다.
 
 Ollama를 실행하고 모델을 준비한다.
@@ -435,7 +435,7 @@ docker compose up -d
 .\gradlew.bat bootRun
 ```
 
-현재는 업로드 API 이전 단계이므로, 통합 테스트가 아래의 세 문장을 같은 `bge-m3` 모델로 임베딩해 저장한다.
+기존 벡터 검색 회귀 테스트는 아래 세 문장을 같은 `bge-m3` 모델로 임베딩해 의미 검색 결과를 계속 확인한다.
 
 - 연차 신청은 인사 시스템에서 진행합니다.
 - 서버 장애가 발생하면 운영 담당자에게 보고합니다.
@@ -452,10 +452,16 @@ Content-Type: application/json
 }
 ```
 
-응답은 다음 필드만 반환한다. 값은 실행 시 생성된 임베딩과 DB 검색 결과에 따라 달라진다.
+응답에는 실제 문서 출처가 포함된다. 거리와 점수는 실행 시 생성된 임베딩과 DB 검색 결과에 따라 달라진다.
 
 ```json
 {
+  "documentId": 1,
+  "documentVersionId": 1,
+  "documentTitle": "휴가 신청 안내",
+  "versionNo": 1,
+  "chunkNo": 1,
+  "pageNo": null,
   "content": "연차 신청은 인사 시스템에서 진행합니다.",
   "distance": 0.03939452,
   "score": 0.96060548
@@ -478,15 +484,17 @@ GET /api/admin/jobs
 GET /api/admin/audit-logs
 ```
 
-### 현재 최소 문서 등록
+### TXT 문서 등록·승인·검색 연결
 
-TXT 파일만 등록할 수 있는 두 번째 세로 기능을 구현했다. 업로드 직후 문서 버전은 항상 `QUARANTINED`이고, `documents.active_version_id`는 `null`이다. 승인·텍스트 추출·청크 생성·임베딩은 아직 수행하지 않는다.
+TXT 파일을 등록하면 문서 버전은 `QUARANTINED`로 시작하고 `documents.active_version_id`는 `null`이다. 관리자가 승인하면 `processing_jobs`에 색인 작업 하나가 생성되고, Worker가 TXT 읽기·청크 분할·임베딩 저장을 모두 완료한 뒤에만 버전을 `ACTIVE`로 전환한다.
 
 - 파일 형식: `.txt`만 허용
 - 파일 크기: 기본 10 MiB (`PRIZM_UPLOAD_MAX_FILE_SIZE_BYTES`로 변경 가능)
 - 저장 루트: `PRIZM_STORAGE_ROOT` (기본 `./var/storage`)
 - 저장 경로: `documents/{documentId}/{versionId}/{originalFileName}`
 - 조회 API: `GET /api/documents`, `GET /api/documents/{documentId}`
+- 승인 API: `POST /api/document-versions/{versionId}/approve`
+- 공개 조회 응답에는 내부 `storedFilePath`를 포함하지 않음
 
 업로드 예시:
 
@@ -507,9 +515,31 @@ curl.exe -X POST http://localhost:8080/api/documents `
 }
 ```
 
-서버는 문서·버전 ID로 생성한 디렉터리 안에만 파일을 저장하고, 빈 파일·경로 조작 파일명·TXT 이외 확장자·제한 초과 파일을 거부한다. SHA-256 해시를 `document_versions.content_hash`에 기록한다. 파일 저장 후 DB 커밋이 실패하면 저장 파일을 삭제하는 보상 처리를 수행한다.
+서버는 문서·버전 ID로 생성한 디렉터리 안에만 파일을 저장하고, 빈 파일·경로 조작 파일명·TXT 이외 확장자·제한 초과 파일을 거부한다. SHA-256 해시를 `document_versions.content_hash`에 기록한다. 파일 저장 후 DB 커밋이 실패하면 저장 파일을 삭제하는 보상 처리를 수행한다. 심볼릭 링크를 이용한 저장 루트 우회는 애플리케이션 전용 디렉터리와 운영체제 권한으로 제한하며, 별도 보안 강화가 필요한 향후 위험요소로 남아 있다.
 
 V3는 운영 데이터가 없는 개발 초기 migration으로 정리했으며 문서나 청크를 자동 삽입하지 않는다. 검증 데이터는 통합 테스트가 직접 만들고 테스트 종료 시 롤백한다. 2026-07-13에 로컬 PostgreSQL에서 V1~V3 적용과 빈 초기 상태를 확인했고, `test` 및 Docker Testcontainers 기반 `integrationTest`가 통과했다. 상세 기록은 [최소 문서 등록 구현·검증 기록](docs/verification/2026-07-13-minimal-document-registration.md)에서 확인할 수 있다.
+
+현재 구현된 상태 전환은 다음 네 경로만 허용한다.
+
+```text
+QUARANTINED → APPROVED → INDEXING → ACTIVE
+                                  ↘ FAILED
+```
+
+`processing_jobs`는 문서 버전과 작업 유형의 조합을 UNIQUE로 제한해 중복 승인이나 Worker 중복 실행에서도 같은 `INDEXING` 작업이 여러 개 생기지 않게 한다. Worker는 `SELECT ... FOR UPDATE SKIP LOCKED` 방식으로 처리 가능한 `PENDING` 작업을 한 건씩 선점한다. 작업 선점 트랜잭션은 즉시 끝내고, 로컬 파일 읽기와 Ollama 호출 동안 DB row lock을 유지하지 않는다.
+
+V5부터 작업 선점 시 `claim_version`을 증가시키고 `lease_expires_at`을 DB `now()` 기준 기본 10분 뒤로 설정한다. 파일 읽기와 청크 생성 후, 임베딩 10개마다, 완료 트랜잭션 진입 전에 현재 `claim_version`이 일치할 때만 lease를 갱신한다. lease가 만료되면 복구 Worker가 `claim_version`을 다시 증가시켜 이전 Worker를 무효화하고 작업을 재예약한다. 따라서 이전 Worker가 늦게 완료 또는 실패를 시도해도 청크·문서 상태·활성 버전·작업 상태를 변경할 수 없다.
+
+TXT 청크 분할 기본값:
+
+- 최대 길이: 800자 (`PRIZM_MAX_CHUNK_LENGTH`)
+- overlap: 120자 (`PRIZM_CHUNK_OVERLAP`)
+- 공백 청크 제외, `page_no = null`
+- `UNIQUE(document_version_id, chunk_no)` 유지
+
+Ollama처럼 복구 가능한 실패와 프로세스 중단으로 발생한 lease 만료는 최대 세 번 재시도한다. 실패 후 대기 시간은 PostgreSQL `now()`를 기준으로 차례로 1분, 5분, 15분이며 `retry_count`와 `next_retry_at`에 기록한다. 파일 누락·잘못된 UTF-8·빈 TXT·임베딩 차원 불일치처럼 반복해도 해결되지 않는 오류는 즉시 최종 실패 처리한다. 최대 횟수를 넘으면 작업과 문서 버전을 `FAILED`로 바꾸고 부분 청크를 삭제한다. 검색 SQL도 ACTIVE와 활성 버전을 모두 검사하므로 처리 중 청크는 결과에 노출되지 않는다.
+
+2026-07-13 기준 `test`와 실제 Testcontainers PostgreSQL 16·pgvector 0.8.2·Ollama `bge-m3`를 사용하는 `integrationTest --rerun-tasks`가 통과했다. 통합 테스트는 업로드부터 승인, 1024차원 청크 저장, 활성 버전 전환, 출처 포함 자연어 검색뿐 아니라 독립 트랜잭션 동시 선점, lease 만료 복구, 이전 Worker fencing, 청크 중복 방지를 검증한다. 문서 API의 내부 저장 경로 비노출과 로컬 저장 경로 조작 차단도 단위 테스트로 확인하며, Docker나 Ollama가 없으면 통합 테스트를 건너뛰지 않고 실패한다. OpenSQL·OpenProxy·OpenHA는 아직 실제 환경에서 검증하지 않았다.
 
 ### MCP
 

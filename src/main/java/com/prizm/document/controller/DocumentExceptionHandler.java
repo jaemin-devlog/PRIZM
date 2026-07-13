@@ -2,8 +2,11 @@ package com.prizm.document.controller;
 
 import com.prizm.common.dto.response.ErrorResponse;
 import com.prizm.document.exception.DocumentNotFoundException;
+import com.prizm.document.exception.DocumentVersionNotFoundException;
+import com.prizm.document.exception.InvalidDocumentVersionStateException;
 import com.prizm.document.exception.DocumentUploadErrorCode;
 import com.prizm.document.exception.DocumentUploadException;
+import com.prizm.ingestion.exception.DuplicateProcessingJobException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,6 +27,18 @@ public class DocumentExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNotFound(DocumentNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse("DOCUMENT_NOT_FOUND", exception.getMessage()));
+    }
+
+    @ExceptionHandler(DocumentVersionNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleVersionNotFound(DocumentVersionNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse("DOCUMENT_VERSION_NOT_FOUND", exception.getMessage()));
+    }
+
+    @ExceptionHandler({InvalidDocumentVersionStateException.class, DuplicateProcessingJobException.class})
+    public ResponseEntity<ErrorResponse> handleConflict(RuntimeException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse("DOCUMENT_VERSION_CONFLICT", exception.getMessage()));
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)

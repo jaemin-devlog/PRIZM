@@ -14,6 +14,7 @@ import com.prizm.auth.dto.request.LoginRequest;
 import com.prizm.auth.bootstrap.BootstrapSystemAdminProperties;
 import com.prizm.auth.bootstrap.SystemAdminBootstrapRunner;
 import com.prizm.auth.service.AuthService;
+import com.prizm.document.entity.DocumentType;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.document.service.DocumentUploadService;
 import com.prizm.embedding.service.EmbeddingService;
@@ -195,6 +196,7 @@ class AuthenticationIntegrationTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
         mockMvc.perform(get("/api/documents")
+                        .param("documentType", "PORTFOLIO")
                         .header(HttpHeaders.AUTHORIZATION, bearer(token)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
@@ -306,6 +308,48 @@ class AuthenticationIntegrationTest {
         mockMvc.perform(get("/api/documents/{documentId}", documentB.documentId())
                         .header(HttpHeaders.AUTHORIZATION, bearer(tokenA)))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void filtersDocumentListByTypeWithinAuthenticatedUserBoundary() throws Exception {
+        UserAccount userA = createUser("filter-a@prizm.local", UserRole.USER, true);
+        UserAccount userB = createUser("filter-b@prizm.local", UserRole.USER, true);
+        String tokenA = login(userA.getEmail());
+        String tokenB = login(userB.getEmail());
+        ActiveDocument portfolioA = createActiveDocument(
+                userA.getId(), "A 포트폴리오", "A 포트폴리오 내용", DocumentType.PORTFOLIO);
+        ActiveDocument resumeA = createActiveDocument(
+                userA.getId(), "A 이력서", "A 이력서 내용", DocumentType.RESUME);
+        ActiveDocument portfolioB = createActiveDocument(
+                userB.getId(), "B 포트폴리오", "B 포트폴리오 내용", DocumentType.PORTFOLIO);
+
+        mockMvc.perform(get("/api/documents").header(HttpHeaders.AUTHORIZATION, bearer(tokenA)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
+        mockMvc.perform(get("/api/documents")
+                        .param("documentType", "PORTFOLIO")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(tokenA)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].documentId").value(portfolioA.documentId()))
+                .andExpect(jsonPath("$[0].documentType").value("PORTFOLIO"))
+                .andExpect(jsonPath("$[1]").doesNotExist());
+        mockMvc.perform(get("/api/documents")
+                        .param("documentType", "RESUME")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(tokenA)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].documentId").value(resumeA.documentId()))
+                .andExpect(jsonPath("$[1]").doesNotExist());
+        mockMvc.perform(get("/api/documents")
+                        .param("documentType", "CERTIFICATE")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(tokenA)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+        mockMvc.perform(get("/api/documents")
+                        .param("documentType", "PORTFOLIO")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(tokenB)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].documentId").value(portfolioB.documentId()))
+                .andExpect(jsonPath("$[1]").doesNotExist());
     }
 
     @Test
@@ -552,11 +596,17 @@ class AuthenticationIntegrationTest {
     }
 
     private ActiveDocument createActiveDocument(Long ownerUserId, String title, String content) {
+        return createActiveDocument(ownerUserId, title, content, DocumentType.OTHER);
+    }
+
+    private ActiveDocument createActiveDocument(
+            Long ownerUserId, String title, String content, DocumentType documentType) {
         Long documentId = jdbcTemplate.queryForObject(
-                "INSERT INTO documents(owner_user_id, title) VALUES (?, ?) RETURNING id",
+                "INSERT INTO documents(owner_user_id, title, document_type) VALUES (?, ?, ?) RETURNING id",
                 Long.class,
                 ownerUserId,
-                title);
+                title,
+                documentType.name());
         Long versionId = jdbcTemplate.queryForObject(
                 """
                 INSERT INTO document_versions(

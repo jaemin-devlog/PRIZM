@@ -213,7 +213,7 @@ class PgVectorInfrastructureTest {
         assertThat(response.documentType()).isEqualTo(DocumentType.OTHER);
         assertThat(detail.activeVersionId()).isNull();
         assertThat(detail.documentType()).isEqualTo(DocumentType.OTHER);
-        assertThat(documentQueryService.list(ownerUserId).get(0).documentType()).isEqualTo(DocumentType.OTHER);
+        assertThat(documentQueryService.list(ownerUserId, null).get(0).documentType()).isEqualTo(DocumentType.OTHER);
         assertThat(detail.versions()).hasSize(1);
         assertThat(detail.versions().get(0).status()).isEqualTo(DocumentVersionStatus.QUARANTINED);
         assertThat(documentVersionRepository.findById(response.versionId()).orElseThrow().getContentHash())

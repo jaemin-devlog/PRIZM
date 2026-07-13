@@ -2,6 +2,7 @@ package com.prizm.document.controller;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -93,7 +94,7 @@ class DocumentControllerTest {
 
     @Test
     void returnsDocumentList() throws Exception {
-        when(documentQueryService.list(7L)).thenReturn(List.of(new DocumentSummaryResponse(
+        when(documentQueryService.list(7L, null)).thenReturn(List.of(new DocumentSummaryResponse(
                 1L, "Guide", DocumentType.PROJECT_REPORT, null, 2L,
                 DocumentVersionStatus.QUARANTINED, Instant.parse("2026-07-13T00:00:00Z"))));
 
@@ -101,6 +102,26 @@ class DocumentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].documentType").value("PROJECT_REPORT"))
                 .andExpect(jsonPath("$[0].latestVersionStatus").value("QUARANTINED"));
+    }
+
+    @Test
+    void filtersDocumentListByDocumentType() throws Exception {
+        when(documentQueryService.list(7L, DocumentType.PORTFOLIO)).thenReturn(List.of(new DocumentSummaryResponse(
+                1L, "Portfolio", DocumentType.PORTFOLIO, null, 2L,
+                DocumentVersionStatus.QUARANTINED, Instant.parse("2026-07-13T00:00:00Z"))));
+
+        mockMvc.perform(get("/api/documents").param("documentType", "PORTFOLIO"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("Portfolio"))
+                .andExpect(jsonPath("$[0].documentType").value("PORTFOLIO"));
+
+        verify(documentQueryService).list(7L, DocumentType.PORTFOLIO);
+    }
+
+    @Test
+    void rejectsUnknownDocumentTypeFilter() throws Exception {
+        mockMvc.perform(get("/api/documents").param("documentType", "UNKNOWN"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

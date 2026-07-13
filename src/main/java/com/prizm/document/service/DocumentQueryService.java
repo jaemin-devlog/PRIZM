@@ -4,6 +4,7 @@ import com.prizm.document.dto.response.DocumentDetailResponse;
 import com.prizm.document.dto.response.DocumentSummaryResponse;
 import com.prizm.document.dto.response.DocumentVersionResponse;
 import com.prizm.document.entity.Document;
+import com.prizm.document.entity.DocumentType;
 import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.exception.DocumentNotFoundException;
 import com.prizm.document.repository.DocumentRepository;
@@ -28,8 +29,11 @@ public class DocumentQueryService {
     }
 
     /** 저장된 문서를 최신 생성 순서로 요약 조회한다. */
-    public List<DocumentSummaryResponse> list(Long ownerUserId) {
-        return documentRepository.findAllByOwnerUserIdOrderByCreatedAtDesc(ownerUserId).stream()
+    public List<DocumentSummaryResponse> list(Long ownerUserId, DocumentType documentType) {
+        List<Document> documents = documentType == null
+                ? documentRepository.findAllByOwnerUserIdOrderByCreatedAtDesc(ownerUserId)
+                : documentRepository.findAllByOwnerUserIdAndDocumentTypeOrderByCreatedAtDesc(ownerUserId, documentType);
+        return documents.stream()
                 .map(document -> toSummary(ownerUserId, document))
                 .toList();
     }

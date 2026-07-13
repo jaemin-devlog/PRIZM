@@ -53,8 +53,9 @@ public class DocumentController {
 
     /** 문서 목록을 조회한다. */
     @GetMapping
-    public List<DocumentSummaryResponse> list() {
-        return documentQueryService.list(currentUserProvider.userId());
+    public List<DocumentSummaryResponse> list(
+            @RequestParam(required = false) DocumentType documentType) {
+        return documentQueryService.list(currentUserProvider.userId(), documentType);
     }
 
     /** 문서와 버전 메타데이터를 상세 조회한다. */

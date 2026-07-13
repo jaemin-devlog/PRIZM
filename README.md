@@ -397,6 +397,66 @@ POST /api/document-versions/{versionId}/retry
 POST /api/search
 ```
 
+### 현재 최소 벡터 검색
+
+첫 번째 세로 흐름은 업로드 기능 없이 `document_chunks`에 저장된 문장을 검색한다. 질문과 문장은 같은 Ollama 임베딩으로 변환하고, pgvector의 exact cosine 거리 연산으로 가장 가까운 한 문장을 반환한다.
+
+- 모델: Ollama `bge-m3:latest` (애플리케이션 설정값은 `bge-m3` 별칭)
+- 실제 확인 차원: `1024`
+- 검색 SQL: `ORDER BY embedding <=> CAST(? AS vector), id LIMIT 1`
+- `distance`는 cosine distance, `score`는 `1 - distance`다. 두 값 모두 검색 결과에서 계산하며 하드코딩하지 않는다.
+
+Ollama를 실행하고 모델을 준비한다.
+
+```powershell
+ollama serve
+ollama pull bge-m3
+```
+
+로컬 DB와 애플리케이션은 다음 순서로 실행한다. `.env`에는 비밀값을 넣을 수 있으므로 커밋하지 않는다.
+
+```powershell
+Copy-Item .env.example .env
+docker compose up -d
+.\gradlew.bat bootRun
+```
+
+현재는 업로드 API 이전 단계이므로, 통합 테스트가 아래의 세 문장을 같은 `bge-m3` 모델로 임베딩해 저장한다.
+
+- 연차 신청은 인사 시스템에서 진행합니다.
+- 서버 장애가 발생하면 운영 담당자에게 보고합니다.
+- 기밀 문서는 외부 AI 서비스에 전송할 수 없습니다.
+
+검색 요청 예시:
+
+```http
+POST /api/search
+Content-Type: application/json
+
+{
+  "query": "휴가는 어디에서 신청하나요?"
+}
+```
+
+응답은 다음 필드만 반환한다. 값은 실행 시 생성된 임베딩과 DB 검색 결과에 따라 달라진다.
+
+```json
+{
+  "content": "연차 신청은 인사 시스템에서 진행합니다.",
+  "distance": 0.03939452,
+  "score": 0.96060548
+}
+```
+
+검증 명령:
+
+```powershell
+.\gradlew.bat test --no-daemon
+.\gradlew.bat integrationTest --no-daemon
+```
+
+2026-07-13 기준 두 명령은 모두 성공했다. 통합 테스트는 Docker 또는 Ollama가 없을 때 건너뛰지 않고 실패한다.
+
 ### 관리자
 
 ```http
@@ -522,40 +582,6 @@ search_documents
 - 최초 실패 요청 수
 - 재시도 후 성공 요청 수
 - 최종 요청 성공률
-
----
-
-## 실행 방법
-
-> OpenSQL 설치 파일과 OpenHA·OpenProxy 구성 방식이 확정된 후 구체적인 실행 명령을 업데이트할 예정입니다.
-
-### 환경 변수 예시
-
-```env
-DB_URL=jdbc:postgresql://localhost:5432/prizm
-DB_USERNAME=prizm
-DB_PASSWORD=change-me
-
-JWT_SECRET=change-me
-FILE_STORAGE_PATH=./storage
-
-OLLAMA_BASE_URL=http://localhost:11434
-EMBEDDING_MODEL=your-embedding-model
-CHAT_MODEL=your-chat-model
-```
-
-### 예정 실행 순서
-
-```bash
-# 1. 인프라 실행
-docker compose up -d
-
-# 2. 애플리케이션 실행
-./gradlew bootRun
-
-# 3. 테스트
-./gradlew test
-```
 
 ---
 

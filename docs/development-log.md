@@ -33,3 +33,11 @@ PRIZM의 기능, 리팩토링, 설계 판단과 검증 결과를 짧게 남기�
 - 이유: 설정 파일만으로 DB, Flyway, 벡터 연산이 동작한다고 가정하지 않기 위해서다.
 - 검증: Flyway V1 성공 이력, pgvector 0.8.2, `vector(1024)`, 동일 벡터 cosine distance `0`을 확인했다. runtime 계정에는 DB와 `public` 스키마의 `CREATE` 권한이 없음을 확인했고, Testcontainers 및 설정된 런타임 endpoint 대상 통합 테스트가 모두 성공했다.
 - 다음: 이 결과는 PostgreSQL 개발 환경 검증이다. 실제 OpenSQL/OpenProxy/OpenHA 접속 정보와 설치 환경이 확보되면 같은 smoke test로 별도 기록한다.
+
+## 2026-07-13 — 최소 벡터 검색 세로 흐름
+
+- 변경: `document_chunks` V2 migration, Ollama 임베딩 어댑터, JdbcTemplate exact cosine 검색, `POST /api/search`와 오류 응답을 추가했다.
+- 이유: 업로드·권한 기능을 넣기 전에 실제 로컬 모델과 pgvector가 연결된 가장 작은 검색 경로를 검증하기 위해서다.
+- 검증: 실행 중인 `bge-m3:latest`가 1024차원 벡터를 반환하는 것을 확인했고, 세 문장을 저장한 뒤 휴가 질문에서 연차 신청 문장이 최상위로 반환되는 PostgreSQL 통합 테스트를 통과했다.
+- 다음: 이 검색 경로에 업로드와 문서 상태를 연결하되, 승인 전 문서는 검색하지 않는 규칙을 추가한다.
+- 상세 결과: [최소 벡터 검색 구현·검증 기록](verification/2026-07-13-minimal-vector-search.md)

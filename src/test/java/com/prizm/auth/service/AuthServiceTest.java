@@ -1,0 +1,84 @@
+package com.prizm.auth.service;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.prizm.auth.dto.request.LoginRequest;
+import com.prizm.auth.dto.response.LoginResponse;
+import com.prizm.auth.exception.InvalidCredentialsException;
+import com.prizm.user.entity.UserAccount;
+import com.prizm.user.entity.UserRole;
+import com.prizm.user.repository.UserAccountRepository;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+class AuthServiceTest {
+
+    private final UserAccountRepository userAccountRepository = mock(UserAccountRepository.class);
+    private final JwtTokenService jwtTokenService = mock(JwtTokenService.class);
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(4);
+    private AuthService authService;
+
+    @BeforeEach
+    void setUp() {
+        authService = new AuthService(userAccountRepository, passwordEncoder, jwtTokenService);
+    }
+
+    @Test
+    void logsInWithARealBcryptPasswordHash() {
+        UserAccount user = UserAccount.create(
+                "admin@example.com",
+                passwordEncoder.encode("correct-password"),
+                UserRole.ADMIN);
+        when(userAccountRepository.findByEmail("admin@example.com")).thenReturn(Optional.of(user));
+        when(jwtTokenService.issue(user)).thenReturn(new IssuedAccessToken("signed-token", 3600));
+
+        LoginResponse response = authService.login(new LoginRequest("ADMIN@example.com", "correct-password"));
+
+        assertThat(response.accessToken()).isEqualTo("signed-token");
+        assertThat(response.tokenType()).isEqualTo("Bearer");
+        assertThat(response.user().role()).isEqualTo(UserRole.ADMIN);
+    }
+
+    @Test
+    void rejectsWrongPassword() {
+        UserAccount user = UserAccount.create(
+                "user@example.com",
+                passwordEncoder.encode("correct-password"),
+                UserRole.USER);
+        when(userAccountRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> authService.login(new LoginRequest("user@example.com", "wrong-password")))
+                .isInstanceOf(InvalidCredentialsException.class)
+                .hasMessage("Email or password is incorrect");
+    }
+
+    @Test
+    void rejectsMissingAccountWithTheSamePublicError() {
+        when(userAccountRepository.findByEmail("missing@example.com")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> authService.login(new LoginRequest("missing@example.com", "any-password")))
+                .isInstanceOf(InvalidCredentialsException.class)
+                .hasMessage("Email or password is incorrect");
+        verify(userAccountRepository).findByEmail("missing@example.com");
+    }
+
+    @Test
+    void rejectsDisabledAccount() {
+        UserAccount user = UserAccount.createDisabled(
+                "disabled@example.com",
+                passwordEncoder.encode("correct-password"),
+                UserRole.USER);
+        when(userAccountRepository.findByEmail("disabled@example.com")).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> authService.login(new LoginRequest("disabled@example.com", "correct-password")))
+                .isInstanceOf(InvalidCredentialsException.class)
+                .hasMessage("Email or password is incorrect");
+    }
+}

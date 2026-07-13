@@ -541,6 +541,44 @@ Ollama처럼 복구 가능한 실패와 프로세스 중단으로 발생한 leas
 
 2026-07-13 기준 `test`와 실제 Testcontainers PostgreSQL 16·pgvector 0.8.2·Ollama `bge-m3`를 사용하는 `integrationTest --rerun-tasks`가 통과했다. 통합 테스트는 업로드부터 승인, 1024차원 청크 저장, 활성 버전 전환, 출처 포함 자연어 검색뿐 아니라 독립 트랜잭션 동시 선점, lease 만료 복구, 이전 Worker fencing, 청크 중복 방지를 검증한다. 문서 API의 내부 저장 경로 비노출과 로컬 저장 경로 조작 차단도 단위 테스트로 확인하며, Docker나 Ollama가 없으면 통합 테스트를 건너뛰지 않고 실패한다. OpenSQL·OpenProxy·OpenHA는 아직 실제 환경에서 검증하지 않았다.
 
+### 관리자 인증과 API 권한
+
+PRIZM은 서버 세션을 만들지 않고 JWT Access Token으로 요청을 인증한다. 비밀번호는 BCrypt 해시만 `users.password_hash`에 저장하며, 운영·공통 프로필에서 기본 계정을 자동 생성하지 않는다. 현재 서비스 역할은 `ADMIN`, `USER` 두 가지이고 C/S/O 문서 보안 등급 권한은 아직 구현하지 않았다.
+
+- 인증 없이 사용: `POST /api/auth/login`, `/actuator/health`, 정적 리소스, 오류 처리 경로
+- ADMIN과 USER 사용: 문서 등록·목록·상세, `POST /api/search`, `GET /api/users/me`
+- ADMIN만 사용: `POST /api/document-versions/{versionId}/approve`
+
+로그인 요청:
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@prizm.local",
+  "password": "사용자 입력값"
+}
+```
+
+로그인 후 보호 API에는 발급받은 토큰을 전달한다.
+
+```http
+Authorization: Bearer {accessToken}
+```
+
+JWT 비밀키와 만료 시간은 환경변수로 설정한다. 비밀키는 최소 32자여야 하며 실제 `.env`는 커밋하지 않는다. 예를 들어 OpenSSL이 설치된 환경에서는 `openssl rand -base64 48`로 충분히 긴 값을 만들 수 있다.
+
+```properties
+PRIZM_JWT_SECRET=replace-with-a-long-random-secret
+PRIZM_JWT_EXPIRATION_SECONDS=3600
+PRIZM_CORS_ALLOWED_ORIGINS=http://localhost:5173
+```
+
+사용자 등록 API는 이번 범위에 포함하지 않았다. 최초 계정은 운영자가 BCrypt 해시와 역할을 확인해 별도로 프로비저닝해야 하며, 평문 비밀번호나 기본 운영 계정은 migration에 넣지 않는다. 비활성화된 사용자는 로그인할 수 없고, 이미 발급된 토큰도 각 요청에서 현재 DB 상태를 다시 확인하므로 거부된다.
+
+2026-07-13 기준 단위 테스트 60개가 성공했고, PostgreSQL·pgvector·실제 Ollama 통합 테스트는 16개 성공했다. 실제 OpenSQL 환경 테스트 1개는 기존과 같이 환경 미제공으로 제외되며, Docker나 Ollama가 없을 때 핵심 통합 테스트를 성공으로 건너뛰지는 않는다.
+
 ### MCP
 
 ```text

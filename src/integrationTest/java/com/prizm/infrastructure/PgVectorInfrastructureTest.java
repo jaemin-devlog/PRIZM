@@ -148,6 +148,7 @@ class PgVectorInfrastructureTest {
         Long versionCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM document_versions", Long.class);
         Long chunkCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM document_chunks", Long.class);
         Long jobCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM processing_jobs", Long.class);
+        Long userCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Long.class);
         Long uniqueJobConstraints = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM pg_constraint WHERE conname = 'uq_processing_jobs_version_type'",
                 Long.class);
@@ -155,12 +156,13 @@ class PgVectorInfrastructureTest {
                 PgVectorSmokeAssertions.verifyExactCosineSearch(jdbcTemplate);
 
         assertThat(serverVersion).isBetween(160000, 169999);
-        assertThat(successfulMigrations).isEqualTo(5);
+        assertThat(successfulMigrations).isEqualTo(6);
         assertThat(result.extensionVersion()).isEqualTo("0.8.2");
         assertThat(documentCount).isZero();
         assertThat(versionCount).isZero();
         assertThat(chunkCount).isZero();
         assertThat(jobCount).isZero();
+        assertThat(userCount).isZero();
         assertThat(uniqueJobConstraints).isEqualTo(1);
     }
 

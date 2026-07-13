@@ -8,6 +8,7 @@ import java.nio.file.StandardCopyOption;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/** 로컬 디스크에 문서 원본을 저장하는 기본 구현체다. */
 @Component
 public class LocalFileStorage implements FileStorage {
 
@@ -17,6 +18,10 @@ public class LocalFileStorage implements FileStorage {
         this.storageRoot = Path.of(storageRoot).toAbsolutePath().normalize();
     }
 
+    /**
+     * 문서 ID와 버전 ID로 부모 디렉터리를 만들고 파일을 저장한다.
+     * 원본 파일명은 표시 정보로만 사용하고, 부모 경로는 서버가 생성해 경로 조작을 막는다.
+     */
     @Override
     public String store(long documentId, long versionId, String originalFileName, byte[] content) {
         validateFileName(originalFileName);
@@ -28,6 +33,7 @@ public class LocalFileStorage implements FileStorage {
 
         Path temporaryFile = null;
         try {
+            // 임시 파일에 먼저 쓴 뒤 이동해 저장 중인 불완전한 원본이 노출되지 않게 한다.
             Files.createDirectories(directory);
             temporaryFile = Files.createTempFile(directory, ".upload-", ".tmp");
             Files.write(temporaryFile, content);
@@ -49,6 +55,7 @@ public class LocalFileStorage implements FileStorage {
         }
     }
 
+    /** 저장 경로가 루트 밖으로 나가지 않는지 확인한 뒤 파일을 삭제한다. */
     @Override
     public void delete(String storedFilePath) {
         Path target = storageRoot.resolve(storedFilePath).normalize();
@@ -77,6 +84,7 @@ public class LocalFileStorage implements FileStorage {
     }
 
     private void ensureInsideStorageRoot(Path target) {
+        // 입력 파일명 검증과 별도로 정규화된 최종 경로도 다시 확인한다.
         if (!target.startsWith(storageRoot)) {
             throw new FileStorageException("Stored file path escapes the storage root.");
         }

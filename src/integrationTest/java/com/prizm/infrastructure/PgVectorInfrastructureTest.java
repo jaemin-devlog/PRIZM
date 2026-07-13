@@ -2,15 +2,15 @@ package com.prizm.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.prizm.document.DocumentDetailResponse;
-import com.prizm.document.DocumentQueryService;
-import com.prizm.document.DocumentUploadResponse;
-import com.prizm.document.DocumentUploadService;
-import com.prizm.document.DocumentVersionRepository;
-import com.prizm.document.DocumentVersionStatus;
-import com.prizm.embedding.EmbeddingService;
-import com.prizm.search.SearchResponse;
-import com.prizm.search.SearchService;
+import com.prizm.document.dto.response.DocumentDetailResponse;
+import com.prizm.document.dto.response.DocumentUploadResponse;
+import com.prizm.document.entity.DocumentVersionStatus;
+import com.prizm.document.repository.DocumentVersionRepository;
+import com.prizm.document.service.DocumentQueryService;
+import com.prizm.document.service.DocumentUploadService;
+import com.prizm.embedding.service.EmbeddingService;
+import com.prizm.search.dto.response.SearchResponse;
+import com.prizm.search.service.SearchService;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +31,10 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
+/**
+ * Docker PostgreSQL, Flyway, 실제 Ollama를 연결한 통합 검증이다.
+ * Docker나 Ollama가 없으면 테스트를 건너뛰지 않고 컨텍스트 초기화 실패로 드러나게 한다.
+ */
 @ActiveProfiles("integration-test")
 @SpringBootTest
 @Testcontainers
@@ -81,6 +85,7 @@ class PgVectorInfrastructureTest {
 
     @Test
     @Transactional
+    // 새 DB에 migration만 적용했을 때 문서 데이터가 비어 있고 pgvector가 동작하는지 확인한다.
     void appliesFlywayAndStores1024DimensionVectorsForExactCosineSearch() {
         Integer serverVersion = jdbcTemplate.queryForObject(
                 "SELECT current_setting('server_version_num')::integer", Integer.class);
@@ -103,6 +108,7 @@ class PgVectorInfrastructureTest {
 
     @Test
     @Transactional
+    // 검색 경로가 실제 임베딩과 저장된 active 청크를 사용해 의미상 가까운 문장을 찾는지 확인한다.
     void storesBgeM3EmbeddingsAndFindsAnnualLeaveSentenceFirst() {
         long documentVersionId = createActiveVectorDocumentVersion();
         for (int index = 0; index < SEARCH_TEST_SENTENCES.size(); index++) {
@@ -129,6 +135,7 @@ class PgVectorInfrastructureTest {
 
     @Test
     @Transactional
+    // 업로드 직후에는 파일과 메타데이터만 존재하고 버전은 QUARANTINED로 남아야 한다.
     void uploadsTxtAsQuarantinedDocumentAndStoresFile() throws IOException {
         byte[] content = "연차 신청은 인사 시스템에서 진행합니다.".getBytes(StandardCharsets.UTF_8);
         DocumentUploadResponse response = documentUploadService.upload(

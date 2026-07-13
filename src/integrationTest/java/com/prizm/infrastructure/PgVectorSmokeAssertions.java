@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+/** pgvector 확장, 1024차원 저장, exact cosine distance 정렬을 검증하는 공통 smoke 검사다. */
 final class PgVectorSmokeAssertions {
 
     static final int DIMENSIONS = 1024;
@@ -13,6 +14,7 @@ final class PgVectorSmokeAssertions {
     private PgVectorSmokeAssertions() {
     }
 
+    /** 동일한 단위 벡터의 거리가 0이고 차원이 1024인지 확인한다. */
     static SmokeResult verifyExactCosineSearch(JdbcTemplate jdbcTemplate) {
         String extensionVersion = jdbcTemplate.queryForObject(
                 "SELECT extversion FROM pg_extension WHERE extname = 'vector'", String.class);

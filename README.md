@@ -427,10 +427,14 @@ ollama serve
 ollama pull bge-m3
 ```
 
-로컬 DB와 애플리케이션은 다음 순서로 실행한다. `.env`에는 비밀값을 넣을 수 있으므로 커밋하지 않는다.
+로컬 DB와 애플리케이션은 다음 순서로 실행한다. `.env.example`의 JWT 값은 비어 있으므로 먼저 32바이트 난수를 만들고 `.env`에만 넣어야 한다. `.env`에는 비밀값이 있으므로 커밋하지 않는다.
 
 ```powershell
 Copy-Item .env.example .env
+$bytes = New-Object byte[] 32
+[System.Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
+$jwtSecret = [Convert]::ToBase64String($bytes)
+(Get-Content .env) -replace '^PRIZM_JWT_SECRET=.*$', "PRIZM_JWT_SECRET=$jwtSecret" | Set-Content .env -Encoding utf8
 docker compose up -d
 .\gradlew.bat bootRun
 ```
@@ -540,6 +544,66 @@ TXT 청크 분할 기본값:
 Ollama처럼 복구 가능한 실패와 프로세스 중단으로 발생한 lease 만료는 최대 세 번 재시도한다. 실패 후 대기 시간은 PostgreSQL `now()`를 기준으로 차례로 1분, 5분, 15분이며 `retry_count`와 `next_retry_at`에 기록한다. 파일 누락·잘못된 UTF-8·빈 TXT·임베딩 차원 불일치처럼 반복해도 해결되지 않는 오류는 즉시 최종 실패 처리한다. 최대 횟수를 넘으면 작업과 문서 버전을 `FAILED`로 바꾸고 부분 청크를 삭제한다. 검색 SQL도 ACTIVE와 활성 버전을 모두 검사하므로 처리 중 청크는 결과에 노출되지 않는다.
 
 2026-07-13 기준 `test`와 실제 Testcontainers PostgreSQL 16·pgvector 0.8.2·Ollama `bge-m3`를 사용하는 `integrationTest --rerun-tasks`가 통과했다. 통합 테스트는 업로드부터 승인, 1024차원 청크 저장, 활성 버전 전환, 출처 포함 자연어 검색뿐 아니라 독립 트랜잭션 동시 선점, lease 만료 복구, 이전 Worker fencing, 청크 중복 방지를 검증한다. 문서 API의 내부 저장 경로 비노출과 로컬 저장 경로 조작 차단도 단위 테스트로 확인하며, Docker나 Ollama가 없으면 통합 테스트를 건너뛰지 않고 실패한다. OpenSQL·OpenProxy·OpenHA는 아직 실제 환경에서 검증하지 않았다.
+
+### 관리자 인증과 API 권한
+
+PRIZM은 서버 세션을 만들지 않고 JWT Access Token으로 요청을 인증한다. 비밀번호는 BCrypt 해시만 `users.password_hash`에 저장하며, 운영·공통 프로필에서 기본 계정을 자동 생성하지 않는다. 현재 서비스 역할은 `ADMIN`, `USER` 두 가지이고 C/S/O 문서 보안 등급 권한은 아직 구현하지 않았다.
+
+- 인증 없이 사용: `POST /api/auth/login`, `/actuator/health`, 정적 리소스, 오류 처리 경로
+- ADMIN과 USER 사용: 문서 등록·목록·상세, `POST /api/search`, `GET /api/users/me`
+- ADMIN만 사용: `POST /api/document-versions/{versionId}/approve`
+
+로그인 요청:
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@prizm.local",
+  "password": "사용자 입력값"
+}
+```
+
+로그인 후 보호 API에는 발급받은 토큰을 전달한다.
+
+```http
+Authorization: Bearer {accessToken}
+```
+
+JWT 비밀키, issuer, 만료 시간은 환경변수로 설정한다. 비밀키는 문자 수가 아니라 UTF-8 기준 최소 32바이트여야 한다. 빈 값과 저장소에 공개된 `change-me`, `example`, `replace-with-...` 같은 placeholder는 기동 단계에서 거부한다.
+
+```properties
+PRIZM_JWT_SECRET=
+PRIZM_JWT_EXPIRATION_SECONDS=3600
+PRIZM_JWT_ISSUER=prizm
+PRIZM_CORS_ALLOWED_ORIGINS=http://localhost:5173
+```
+
+JWT 만료 시간은 60초 이상 86,400초 이하만 허용한다. 모든 Access Token에는 `exp`가 반드시 있어야 하며, 사용자 ID는 `sub` 하나만 사용한다. issuer·서명·만료를 검증한 뒤 DB의 현재 이메일·역할·활성 상태를 다시 확인하고, 비활성화되거나 삭제된 사용자의 기존 토큰도 거부한다. 인증 관련 객체를 문자열로 출력할 때는 비밀번호·JWT·비밀키를 마스킹한다.
+
+사용자 등록 API와 평문 기본 계정은 만들지 않는다. 깨끗한 DB에서 최초 ADMIN이 필요할 때만 아래의 일회성 bootstrap을 사용한다. 비밀번호는 콘솔 입력으로만 받고 저장 시 BCrypt 해시로 변환한다.
+
+```powershell
+$credential = Get-Credential -UserName admin@prizm.local -Message "최초 ADMIN 비밀번호 입력(12자 이상)"
+$env:PRIZM_BOOTSTRAP_ADMIN_ENABLED = "true"
+$env:PRIZM_BOOTSTRAP_ADMIN_EMAIL = $credential.UserName
+$env:PRIZM_BOOTSTRAP_ADMIN_PASSWORD = $credential.GetNetworkCredential().Password
+.\gradlew.bat bootRun
+```
+
+ADMIN 생성 로그를 확인한 뒤 애플리케이션을 종료하고 bootstrap 환경변수를 제거한다. 다음 실행부터는 `.env`의 기본값 `false`가 적용되어 자동 계정 생성이 동작하지 않는다.
+
+```powershell
+Remove-Item Env:PRIZM_BOOTSTRAP_ADMIN_ENABLED
+Remove-Item Env:PRIZM_BOOTSTRAP_ADMIN_EMAIL
+Remove-Item Env:PRIZM_BOOTSTRAP_ADMIN_PASSWORD
+.\gradlew.bat bootRun
+```
+
+기존 ADMIN 또는 같은 이메일 계정이 있거나 설정이 누락되면 bootstrap은 기존 계정·비밀번호를 변경하지 않고 기동을 실패시킨다. API 보안은 명시한 로그인과 정확한 `/actuator/health`, 오류 처리 경로만 공개하고 나머지 미등록 경로는 `denyAll`로 차단한다. CORS는 명시적인 HTTP·HTTPS Origin만 허용하며 wildcard는 거부한다. C/S/O 문서 보안 등급 권한은 아직 구현하지 않았다.
+
+2026-07-13 기준 단위 테스트 85개가 성공했고, PostgreSQL·pgvector·실제 Ollama 통합 테스트는 29개 성공했다. 실제 OpenSQL 환경 테스트 1개는 기존과 같이 환경 미제공으로 제외되며, Docker나 Ollama가 없을 때 핵심 통합 테스트를 성공으로 건너뛰지는 않는다.
 
 ### MCP
 

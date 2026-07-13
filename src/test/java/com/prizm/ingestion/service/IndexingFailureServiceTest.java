@@ -50,21 +50,21 @@ class IndexingFailureServiceTest {
     @Test
     void schedulesRetryAndIncrementsCountForTransientFailure() {
         ProcessingJob job = processingJob(0);
-        DocumentVersion version = indexingVersion();
+        DocumentVersion version = processingVersion();
         stub(job, version);
 
         ProcessingJobStatus status = service.handleFailure(claimed(job), true, "Ollama unavailable");
 
-        assertThat(status).isEqualTo(ProcessingJobStatus.PENDING);
+        assertThat(status).isEqualTo(ProcessingJobStatus.RETRY_WAIT);
         assertThat(job.getRetryCount()).isEqualTo(1);
         assertThat(job.getNextRetryAt()).isEqualTo(Instant.parse("2026-07-13T00:01:00Z"));
-        assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.INDEXING);
+        assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.PROCESSING);
     }
 
     @Test
     void marksJobAndVersionFailedAfterMaximumRetries() {
         ProcessingJob job = processingJob(3);
-        DocumentVersion version = indexingVersion();
+        DocumentVersion version = processingVersion();
         stub(job, version);
 
         ProcessingJobStatus status = service.handleFailure(claimed(job), true, "still unavailable");
@@ -76,7 +76,7 @@ class IndexingFailureServiceTest {
     @Test
     void marksPermanentFileFailureImmediately() {
         ProcessingJob job = processingJob(0);
-        DocumentVersion version = indexingVersion();
+        DocumentVersion version = processingVersion();
         stub(job, version);
 
         ProcessingJobStatus status = service.handleFailure(claimed(job), false, "invalid UTF-8");
@@ -118,11 +118,10 @@ class IndexingFailureServiceTest {
         return job;
     }
 
-    private DocumentVersion indexingVersion() {
+    private DocumentVersion processingVersion() {
         DocumentVersion version = DocumentVersion.quarantined(1L, "guide.txt", "a".repeat(64));
         ReflectionTestUtils.setField(version, "id", 10L);
-        version.approve();
-        version.startIndexing();
+        version.startProcessing();
         return version;
     }
 

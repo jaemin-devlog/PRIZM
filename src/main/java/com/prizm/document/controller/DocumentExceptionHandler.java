@@ -6,7 +6,6 @@ import com.prizm.document.exception.DocumentVersionNotFoundException;
 import com.prizm.document.exception.InvalidDocumentVersionStateException;
 import com.prizm.document.exception.DocumentUploadErrorCode;
 import com.prizm.document.exception.DocumentUploadException;
-import com.prizm.ingestion.exception.DuplicateProcessingJobException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,7 +34,7 @@ public class DocumentExceptionHandler {
                 .body(new ErrorResponse("DOCUMENT_VERSION_NOT_FOUND", exception.getMessage()));
     }
 
-    @ExceptionHandler({InvalidDocumentVersionStateException.class, DuplicateProcessingJobException.class})
+    @ExceptionHandler(InvalidDocumentVersionStateException.class)
     public ResponseEntity<ErrorResponse> handleConflict(RuntimeException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ErrorResponse("DOCUMENT_VERSION_CONFLICT", exception.getMessage()));

@@ -13,7 +13,6 @@ export default defineConfig(({ mode }) => {
       proxy: {
         '/api': backendTarget,
         '/actuator': backendTarget,
-        '/mcp': backendTarget,
       },
     },
   }

@@ -51,11 +51,9 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers("/actuator/health", "/error").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/document-versions/*/approve").hasRole("ADMIN")
                         .requestMatchers("/api/documents", "/api/documents/**", "/api/search", "/api/search/**")
-                        .authenticated()
+                        .hasRole("USER")
                         .requestMatchers("/api/users/me").authenticated()
-                        .requestMatchers("/api/**", "/actuator/**").authenticated()
                         .anyRequest().denyAll())
                 .oauth2ResourceServer(resourceServer -> resourceServer
                         .authenticationEntryPoint(authenticationEntryPoint)

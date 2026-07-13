@@ -12,7 +12,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** 작업 한 건을 선점하고 문서 버전을 INDEXING으로 바꾸는 짧은 트랜잭션이다. */
+/** 작업 한 건을 선점하고 격리된 문서 버전을 PROCESSING으로 바꾸는 짧은 트랜잭션이다. */
 @Service
 public class ProcessingJobClaimService {
 
@@ -48,11 +48,11 @@ public class ProcessingJobClaimService {
         }
         DocumentVersion version = documentVersionRepository.findByIdForUpdate(job.getDocumentVersionId())
                 .orElseThrow(() -> new DocumentVersionNotFoundException(job.getDocumentVersionId()));
-        if (version.getStatus() == DocumentVersionStatus.APPROVED) {
-            version.startIndexing();
+        if (version.getStatus() == DocumentVersionStatus.QUARANTINED) {
+            version.startProcessing();
         }
-        else if (version.getStatus() != DocumentVersionStatus.INDEXING) {
-            throw new IllegalStateException("Only APPROVED or INDEXING document versions can be claimed.");
+        else if (version.getStatus() != DocumentVersionStatus.PROCESSING) {
+            throw new IllegalStateException("Only QUARANTINED or PROCESSING document versions can be claimed.");
         }
         return Optional.of(claimedJob);
     }

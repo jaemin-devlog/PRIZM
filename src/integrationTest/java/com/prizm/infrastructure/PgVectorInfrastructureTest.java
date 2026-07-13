@@ -3,19 +3,16 @@ package com.prizm.infrastructure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.prizm.document.dto.response.DocumentApprovalResponse;
 import com.prizm.document.dto.response.DocumentDetailResponse;
 import com.prizm.document.dto.response.DocumentUploadResponse;
 import com.prizm.document.entity.DocumentVersionStatus;
 import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
-import com.prizm.document.service.DocumentApprovalService;
 import com.prizm.document.service.DocumentQueryService;
 import com.prizm.document.service.DocumentUploadService;
 import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
-import com.prizm.ingestion.exception.DuplicateProcessingJobException;
 import com.prizm.ingestion.exception.StaleProcessingJobClaimException;
 import com.prizm.ingestion.repository.ProcessingJobRepository;
 import com.prizm.ingestion.service.ClaimedProcessingJob;
@@ -70,7 +67,7 @@ class PgVectorInfrastructureTest {
     private static final List<String> SEARCH_TEST_SENTENCES = List.of(
             "연차 신청은 인사 시스템에서 진행합니다.",
             "서버 장애가 발생하면 운영 담당자에게 보고합니다.",
-            "기밀 문서는 외부 AI 서비스에 전송할 수 없습니다.");
+            "프로젝트 회고에는 장애 원인과 해결 과정이 기록되어 있습니다.");
 
     private static final DockerImageName PGVECTOR_IMAGE = DockerImageName
             .parse("pgvector/pgvector:0.8.2-pg16-bookworm")
@@ -110,9 +107,6 @@ class PgVectorInfrastructureTest {
 
     @Autowired
     DocumentRepository documentRepository;
-
-    @Autowired
-    DocumentApprovalService documentApprovalService;
 
     @Autowired
     ProcessingJobRepository processingJobRepository;
@@ -156,7 +150,7 @@ class PgVectorInfrastructureTest {
                 PgVectorSmokeAssertions.verifyExactCosineSearch(jdbcTemplate);
 
         assertThat(serverVersion).isBetween(160000, 169999);
-        assertThat(successfulMigrations).isEqualTo(6);
+        assertThat(successfulMigrations).isEqualTo(7);
         assertThat(result.extensionVersion()).isEqualTo("0.8.2");
         assertThat(documentCount).isZero();
         assertThat(versionCount).isZero();
@@ -198,7 +192,7 @@ class PgVectorInfrastructureTest {
 
     @Test
     @Transactional
-    // 업로드 직후에는 파일과 메타데이터만 존재하고 버전은 QUARANTINED로 남아야 한다.
+    // 업로드 직후 파일·메타데이터·처리 작업을 만들되 버전은 QUARANTINED로 남아야 한다.
     void uploadsTxtAsQuarantinedDocumentAndStoresFile() throws IOException {
         byte[] content = "연차 신청은 인사 시스템에서 진행합니다.".getBytes(StandardCharsets.UTF_8);
         DocumentUploadResponse response = documentUploadService.upload(
@@ -222,8 +216,8 @@ class PgVectorInfrastructureTest {
     }
 
     @Test
-    // 실제 원본 파일이 승인·색인된 뒤에만 출처 정보와 함께 검색되는 전체 세로 흐름을 확인한다.
-    void uploadsApprovesIndexesAndSearchesActiveTxtDocument() {
+    // 실제 원본 파일이 자동 색인된 뒤에만 출처 정보와 함께 검색되는 전체 세로 흐름을 확인한다.
+    void uploadsIndexesAndSearchesActiveTxtDocumentAutomatically() {
         byte[] content = ("연차 신청은 인사 시스템에서 진행합니다. "
                         + "휴가 신청 절차는 사내 인사 시스템의 휴가 메뉴를 사용합니다.")
                 .getBytes(StandardCharsets.UTF_8);
@@ -239,19 +233,18 @@ class PgVectorInfrastructureTest {
             assertThatThrownBy(() -> searchService.search("휴가는 어디에서 신청하나요?"))
                     .isInstanceOf(SearchResultNotFoundException.class);
 
-            DocumentApprovalResponse approval = documentApprovalService.approve(uploaded.versionId());
-            assertThat(approval.status()).isEqualTo(DocumentVersionStatus.APPROVED);
-            assertThat(approval.jobStatus()).isEqualTo(ProcessingJobStatus.PENDING);
             assertThat(processingJobRepository.count()).isEqualTo(1);
-            assertThatThrownBy(() -> documentApprovalService.approve(uploaded.versionId()))
-                    .isInstanceOf(DuplicateProcessingJobException.class);
+            assertThat(processingJobRepository.findAll().get(0).getStatus())
+                    .isEqualTo(ProcessingJobStatus.PENDING);
+            assertThat(processingJobRepository.findAll().get(0).getDocumentVersionId())
+                    .isEqualTo(uploaded.versionId());
 
             ClaimedProcessingJob claimed = processingJobClaimService.claimNext().orElseThrow();
             assertThat(processingJobClaimService.claimNext()).isEmpty();
             assertThat(processingJobRepository.findById(claimed.processingJobId()).orElseThrow().getStatus())
                     .isEqualTo(ProcessingJobStatus.PROCESSING);
             assertThat(documentVersionRepository.findById(uploaded.versionId()).orElseThrow().getStatus())
-                    .isEqualTo(DocumentVersionStatus.INDEXING);
+                    .isEqualTo(DocumentVersionStatus.PROCESSING);
 
             documentIndexingProcessor.process(claimed);
 
@@ -303,7 +296,7 @@ class PgVectorInfrastructureTest {
                 INSERT INTO document_versions(
                     document_id, version_no, original_file_name, stored_file_path, file_type, content_hash, status
                 )
-                VALUES (?, 1, 'partial.txt', 'test/partial.txt', 'TXT', repeat('b', 64), 'INDEXING')
+                VALUES (?, 1, 'partial.txt', 'test/partial.txt', 'TXT', repeat('b', 64), 'PROCESSING')
                 RETURNING id
                 """,
                 Long.class,
@@ -399,7 +392,7 @@ class PgVectorInfrastructureTest {
                     "SELECT next_retry_at FROM processing_jobs WHERE id = ?",
                     (resultSet, rowNum) -> resultSet.getTimestamp(1).toInstant(),
                     fixture.processingJobId());
-            assertThat(recoveredStatus).isEqualTo("PENDING");
+            assertThat(recoveredStatus).isEqualTo("RETRY_WAIT");
             assertThat(retryCount).isEqualTo(1);
             assertThat(recoveredClaimVersion).isEqualTo(workerA.claimVersion() + 1);
             assertThat(nextRetryAt).isBetween(beforeRecovery.plusSeconds(60), databaseNow().plusSeconds(60));
@@ -408,7 +401,7 @@ class PgVectorInfrastructureTest {
                     Boolean.class,
                     fixture.processingJobId())).isTrue();
             assertThat(documentVersionRepository.findById(fixture.documentVersionId()).orElseThrow().getStatus())
-                    .isEqualTo(DocumentVersionStatus.INDEXING);
+                    .isEqualTo(DocumentVersionStatus.PROCESSING);
 
             jdbcTemplate.update(
                     "UPDATE processing_jobs SET next_retry_at = now() - INTERVAL '1 second' WHERE id = ?",
@@ -438,6 +431,81 @@ class PgVectorInfrastructureTest {
                     "SELECT COUNT(*) FROM document_chunks WHERE document_version_id = ?",
                     Long.class,
                     fixture.documentVersionId())).isEqualTo(1L);
+        }
+        finally {
+            deleteCommittedDocumentData();
+        }
+    }
+
+    @Test
+    void keepsExistingActiveVersionSearchableWhenReplacementVersionFails() {
+        String activeContent = "Implemented a retry policy with explicit backoff intervals.";
+        Long documentId = jdbcTemplate.queryForObject(
+                "INSERT INTO documents(title) VALUES (?) RETURNING id",
+                Long.class,
+                "Career project report");
+        Long activeVersionId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO document_versions(
+                    document_id, version_no, original_file_name, stored_file_path, file_type, content_hash, status
+                )
+                VALUES (?, 1, 'project-v1.txt', 'test/project-v1.txt', 'TXT', repeat('d', 64), 'ACTIVE')
+                RETURNING id
+                """,
+                Long.class,
+                documentId);
+        jdbcTemplate.update("UPDATE documents SET active_version_id = ? WHERE id = ?", activeVersionId, documentId);
+        jdbcTemplate.update(
+                """
+                INSERT INTO document_chunks(content, embedding, document_version_id, chunk_no, page_no)
+                VALUES (?, CAST(? AS vector), ?, 1, NULL)
+                """,
+                activeContent,
+                toVectorLiteral(embeddingService.embed(activeContent)),
+                activeVersionId);
+
+        Long replacementVersionId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO document_versions(
+                    document_id, version_no, original_file_name, stored_file_path, file_type, content_hash, status
+                )
+                VALUES (?, 2, 'project-v2.txt', 'test/project-v2.txt', 'TXT', repeat('e', 64), 'QUARANTINED')
+                RETURNING id
+                """,
+                Long.class,
+                documentId);
+        Long jobId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO processing_jobs(document_version_id, job_type, status)
+                VALUES (?, 'INDEXING', 'PENDING')
+                RETURNING id
+                """,
+                Long.class,
+                replacementVersionId);
+
+        try {
+            ClaimedProcessingJob claim = processingJobClaimService.claimNext().orElseThrow();
+            assertThat(claim.processingJobId()).isEqualTo(jobId);
+            assertThat(documentVersionRepository.findById(replacementVersionId).orElseThrow().getStatus())
+                    .isEqualTo(DocumentVersionStatus.PROCESSING);
+            jdbcTemplate.update(
+                    """
+                    UPDATE processing_jobs
+                    SET retry_count = 3,
+                        lease_expires_at = now() - INTERVAL '1 second'
+                    WHERE id = ?
+                    """,
+                    jobId);
+
+            assertThat(processingJobRecoveryService.recoverNext()).isTrue();
+
+            assertThat(documentVersionRepository.findById(replacementVersionId).orElseThrow().getStatus())
+                    .isEqualTo(DocumentVersionStatus.FAILED);
+            assertThat(documentRepository.findById(documentId).orElseThrow().getActiveVersionId())
+                    .isEqualTo(activeVersionId);
+            SearchResponse result = searchService.search(activeContent);
+            assertThat(result.documentVersionId()).isEqualTo(activeVersionId);
+            assertThat(result.content()).isEqualTo(activeContent);
         }
         finally {
             deleteCommittedDocumentData();
@@ -481,7 +549,7 @@ class PgVectorInfrastructureTest {
                 INSERT INTO document_versions(
                     document_id, version_no, original_file_name, stored_file_path, file_type, content_hash, status
                 )
-                VALUES (?, 1, 'worker.txt', 'test/worker.txt', 'TXT', repeat('c', 64), 'APPROVED')
+                VALUES (?, 1, 'worker.txt', 'test/worker.txt', 'TXT', repeat('c', 64), 'QUARANTINED')
                 RETURNING id
                 """,
                 Long.class,

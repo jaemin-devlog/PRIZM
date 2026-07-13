@@ -17,9 +17,9 @@ public class ProcessingJobClaimRepository {
                 SELECT job.id
                 FROM processing_jobs job
                 JOIN document_versions version ON version.id = job.document_version_id
-                WHERE job.status = 'PENDING'
+                WHERE job.status IN ('PENDING', 'RETRY_WAIT')
                   AND (job.next_retry_at IS NULL OR job.next_retry_at <= now())
-                  AND version.status IN ('APPROVED', 'INDEXING')
+                  AND version.status IN ('QUARANTINED', 'PROCESSING')
                 ORDER BY job.created_at, job.id
                 FOR UPDATE OF job SKIP LOCKED
                 LIMIT 1

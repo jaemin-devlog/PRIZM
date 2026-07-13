@@ -11,14 +11,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.prizm.auth.dto.request.LoginRequest;
-import com.prizm.auth.bootstrap.AdminBootstrapRunner;
-import com.prizm.auth.bootstrap.BootstrapAdminProperties;
+import com.prizm.auth.bootstrap.BootstrapSystemAdminProperties;
+import com.prizm.auth.bootstrap.SystemAdminBootstrapRunner;
 import com.prizm.auth.service.AuthService;
-import com.prizm.document.dto.response.DocumentUploadResponse;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.document.service.DocumentUploadService;
 import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.infrastructure.storage.FileStorage;
+import com.prizm.ingestion.entity.ProcessingJobStatus;
+import com.prizm.ingestion.repository.ProcessingJobRepository;
 import com.prizm.user.entity.UserAccount;
 import com.prizm.user.entity.UserRole;
 import com.prizm.user.repository.UserAccountRepository;
@@ -60,7 +61,7 @@ import org.testcontainers.utility.DockerImageName;
 @ActiveProfiles("integration-test")
 @SpringBootTest
 @Testcontainers
-class AdminAuthIntegrationTest {
+class AuthenticationIntegrationTest {
 
     private static final Path STORAGE_ROOT = createStorageRoot();
     private static final DockerImageName PGVECTOR_IMAGE = DockerImageName
@@ -103,6 +104,9 @@ class AdminAuthIntegrationTest {
     DocumentVersionRepository documentVersionRepository;
 
     @Autowired
+    ProcessingJobRepository processingJobRepository;
+
+    @Autowired
     EmbeddingService embeddingService;
 
     @Autowired
@@ -138,70 +142,37 @@ class AdminAuthIntegrationTest {
 
     @Test
     void loginEndpointReturnsAccessTokenAndPublicUserInformation() throws Exception {
-        createUser(UserRole.ADMIN, true);
+        createUser(UserRole.SYSTEM_ADMIN, true);
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"email":"admin@prizm.local","password":"test-password"}
+                                {"email":"system-admin@prizm.local","password":"test-password"}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
                 .andExpect(jsonPath("$.tokenType").value("Bearer"))
                 .andExpect(jsonPath("$.expiresIn").value(3600))
-                .andExpect(jsonPath("$.user.email").value("admin@prizm.local"))
-                .andExpect(jsonPath("$.user.role").value("ADMIN"));
+                .andExpect(jsonPath("$.user.email").value("system-admin@prizm.local"))
+                .andExpect(jsonPath("$.user.role").value("SYSTEM_ADMIN"));
     }
 
     @Test
-    void createsInitialAdminInCleanDatabaseOnlyWhenExplicitlyInvoked() throws Exception {
-        AdminBootstrapRunner runner = new AdminBootstrapRunner(
-                new BootstrapAdminProperties(true, "ADMIN@Prizm.Local", "integration-password"),
+    void createsInitialSystemAdminInCleanDatabaseOnlyWhenExplicitlyInvoked() throws Exception {
+        SystemAdminBootstrapRunner runner = new SystemAdminBootstrapRunner(
+                new BootstrapSystemAdminProperties(
+                        true, "SYSTEM-ADMIN@Prizm.Local", "integration-password"),
                 userAccountRepository,
                 passwordEncoder,
                 validator);
 
         runner.run(new DefaultApplicationArguments(new String[0]));
 
-        UserAccount admin = userAccountRepository.findByEmail("admin@prizm.local").orElseThrow();
-        assertThat(admin.getRole()).isEqualTo(UserRole.ADMIN);
-        assertThat(admin.isEnabled()).isTrue();
-        assertThat(admin.getPasswordHash()).isNotEqualTo("integration-password");
-        assertThat(passwordEncoder.matches("integration-password", admin.getPasswordHash())).isTrue();
-    }
-
-    @Test
-    void rejectsUnauthenticatedApprovalWith401() throws Exception {
-        mockMvc.perform(post("/api/document-versions/1/approve"))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty());
-    }
-
-    @Test
-    void rejectsUserApprovalWith403() throws Exception {
-        String token = tokenFor(UserRole.USER);
-
-        mockMvc.perform(post("/api/document-versions/1/approve")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
-    }
-
-    @Test
-    void allowsAdminToApproveQuarantinedDocument() throws Exception {
-        String token = tokenFor(UserRole.ADMIN);
-        DocumentUploadResponse uploaded = documentUploadService.upload(
-                "관리자 승인 문서",
-                new MockMultipartFile(
-                        "file", "approval.txt", "text/plain", "승인할 문서입니다.".getBytes(StandardCharsets.UTF_8)));
-
-        mockMvc.perform(post("/api/document-versions/{versionId}/approve", uploaded.versionId())
-                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.versionId").value(uploaded.versionId()))
-                .andExpect(jsonPath("$.status").value("APPROVED"))
-                .andExpect(jsonPath("$.jobStatus").value("PENDING"));
+        UserAccount systemAdmin = userAccountRepository.findByEmail("system-admin@prizm.local").orElseThrow();
+        assertThat(systemAdmin.getRole()).isEqualTo(UserRole.SYSTEM_ADMIN);
+        assertThat(systemAdmin.isEnabled()).isTrue();
+        assertThat(systemAdmin.getPasswordHash()).isNotEqualTo("integration-password");
+        assertThat(passwordEncoder.matches("integration-password", systemAdmin.getPasswordHash())).isTrue();
     }
 
     @Test
@@ -209,6 +180,24 @@ class AdminAuthIntegrationTest {
         mockMvc.perform(get("/api/documents"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+    }
+
+    @Test
+    void rejectsSystemAdminDocumentAndSearchAccessWith403() throws Exception {
+        String token = tokenFor(UserRole.SYSTEM_ADMIN);
+
+        mockMvc.perform(get("/api/documents")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+        mockMvc.perform(post("/api/search")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"query":"career evidence"}
+                                """))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
     }
 
     @Test
@@ -224,6 +213,11 @@ class AdminAuthIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title").value("사용자 업로드"))
                 .andExpect(jsonPath("$.status").value("QUARANTINED"));
+
+        assertThat(processingJobRepository.count()).isEqualTo(1L);
+        var job = processingJobRepository.findAll().get(0);
+        assertThat(job.getStatus()).isEqualTo(ProcessingJobStatus.PENDING);
+        assertThat(documentVersionRepository.findById(job.getDocumentVersionId())).isPresent();
     }
 
     @Test
@@ -352,14 +346,14 @@ class AdminAuthIntegrationTest {
     void rejectsJwtWhoseRoleDiffersFromDatabase() throws Exception {
         UserAccount user = createUser(UserRole.USER, true);
         Instant now = Instant.now();
-        String token = signedToken(user, user.getEmail(), "ADMIN", "prizm", now, now.plusSeconds(3600));
+        String token = signedToken(user, user.getEmail(), "SYSTEM_ADMIN", "prizm", now, now.plusSeconds(3600));
 
         expectUnauthorized("Bearer " + token);
     }
 
     @Test
     void deniesUnregisteredPathEvenForAuthenticatedUser() throws Exception {
-        String token = tokenFor(UserRole.ADMIN);
+        String token = tokenFor(UserRole.SYSTEM_ADMIN);
 
         mockMvc.perform(get("/unregistered-path")
                         .header(HttpHeaders.AUTHORIZATION, bearer(token)))
@@ -449,7 +443,7 @@ class AdminAuthIntegrationTest {
     }
 
     private UserAccount createUser(UserRole role, boolean enabled) {
-        String email = role == UserRole.ADMIN ? "admin@prizm.local" : "user@prizm.local";
+        String email = role == UserRole.SYSTEM_ADMIN ? "system-admin@prizm.local" : "user@prizm.local";
         UserAccount user = enabled
                 ? UserAccount.create(email, passwordEncoder.encode("test-password"), role)
                 : UserAccount.createDisabled(email, passwordEncoder.encode("test-password"), role);

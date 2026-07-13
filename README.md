@@ -427,10 +427,14 @@ ollama serve
 ollama pull bge-m3
 ```
 
-로컬 DB와 애플리케이션은 다음 순서로 실행한다. `.env`에는 비밀값을 넣을 수 있으므로 커밋하지 않는다.
+로컬 DB와 애플리케이션은 다음 순서로 실행한다. `.env.example`의 JWT 값은 비어 있으므로 먼저 32바이트 난수를 만들고 `.env`에만 넣어야 한다. `.env`에는 비밀값이 있으므로 커밋하지 않는다.
 
 ```powershell
 Copy-Item .env.example .env
+$bytes = New-Object byte[] 32
+[System.Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
+$jwtSecret = [Convert]::ToBase64String($bytes)
+(Get-Content .env) -replace '^PRIZM_JWT_SECRET=.*$', "PRIZM_JWT_SECRET=$jwtSecret" | Set-Content .env -Encoding utf8
 docker compose up -d
 .\gradlew.bat bootRun
 ```
@@ -567,17 +571,39 @@ Content-Type: application/json
 Authorization: Bearer {accessToken}
 ```
 
-JWT 비밀키와 만료 시간은 환경변수로 설정한다. 비밀키는 최소 32자여야 하며 실제 `.env`는 커밋하지 않는다. 예를 들어 OpenSSL이 설치된 환경에서는 `openssl rand -base64 48`로 충분히 긴 값을 만들 수 있다.
+JWT 비밀키, issuer, 만료 시간은 환경변수로 설정한다. 비밀키는 문자 수가 아니라 UTF-8 기준 최소 32바이트여야 한다. 빈 값과 저장소에 공개된 `change-me`, `example`, `replace-with-...` 같은 placeholder는 기동 단계에서 거부한다.
 
 ```properties
-PRIZM_JWT_SECRET=replace-with-a-long-random-secret
+PRIZM_JWT_SECRET=
 PRIZM_JWT_EXPIRATION_SECONDS=3600
+PRIZM_JWT_ISSUER=prizm
 PRIZM_CORS_ALLOWED_ORIGINS=http://localhost:5173
 ```
 
-사용자 등록 API는 이번 범위에 포함하지 않았다. 최초 계정은 운영자가 BCrypt 해시와 역할을 확인해 별도로 프로비저닝해야 하며, 평문 비밀번호나 기본 운영 계정은 migration에 넣지 않는다. 비활성화된 사용자는 로그인할 수 없고, 이미 발급된 토큰도 각 요청에서 현재 DB 상태를 다시 확인하므로 거부된다.
+JWT 만료 시간은 60초 이상 86,400초 이하만 허용한다. 사용자 ID는 `sub` 하나만 사용하고, issuer·서명·만료를 검증한 뒤 DB의 현재 이메일·역할·활성 상태를 다시 확인한다. 비활성화되거나 삭제된 사용자의 기존 토큰도 거부된다.
 
-2026-07-13 기준 단위 테스트 60개가 성공했고, PostgreSQL·pgvector·실제 Ollama 통합 테스트는 16개 성공했다. 실제 OpenSQL 환경 테스트 1개는 기존과 같이 환경 미제공으로 제외되며, Docker나 Ollama가 없을 때 핵심 통합 테스트를 성공으로 건너뛰지는 않는다.
+사용자 등록 API와 평문 기본 계정은 만들지 않는다. 깨끗한 DB에서 최초 ADMIN이 필요할 때만 아래의 일회성 bootstrap을 사용한다. 비밀번호는 콘솔 입력으로만 받고 저장 시 BCrypt 해시로 변환한다.
+
+```powershell
+$credential = Get-Credential -UserName admin@prizm.local -Message "최초 ADMIN 비밀번호 입력(12자 이상)"
+$env:PRIZM_BOOTSTRAP_ADMIN_ENABLED = "true"
+$env:PRIZM_BOOTSTRAP_ADMIN_EMAIL = $credential.UserName
+$env:PRIZM_BOOTSTRAP_ADMIN_PASSWORD = $credential.GetNetworkCredential().Password
+.\gradlew.bat bootRun
+```
+
+ADMIN 생성 로그를 확인한 뒤 애플리케이션을 종료하고 bootstrap 환경변수를 제거한다. 다음 실행부터는 `.env`의 기본값 `false`가 적용되어 자동 계정 생성이 동작하지 않는다.
+
+```powershell
+Remove-Item Env:PRIZM_BOOTSTRAP_ADMIN_ENABLED
+Remove-Item Env:PRIZM_BOOTSTRAP_ADMIN_EMAIL
+Remove-Item Env:PRIZM_BOOTSTRAP_ADMIN_PASSWORD
+.\gradlew.bat bootRun
+```
+
+기존 ADMIN 또는 같은 이메일 계정이 있거나 설정이 누락되면 bootstrap은 기존 계정·비밀번호를 변경하지 않고 기동을 실패시킨다. API 보안은 명시한 로그인과 정확한 `/actuator/health`, 오류 처리 경로만 공개하고 나머지 미등록 경로는 `denyAll`로 차단한다. CORS는 명시적인 HTTP·HTTPS Origin만 허용하며 wildcard는 거부한다. C/S/O 문서 보안 등급 권한은 아직 구현하지 않았다.
+
+2026-07-13 기준 단위 테스트 83개가 성공했고, PostgreSQL·pgvector·실제 Ollama 통합 테스트는 28개 성공했다. 실제 OpenSQL 환경 테스트 1개는 기존과 같이 환경 미제공으로 제외되며, Docker나 Ollama가 없을 때 핵심 통합 테스트를 성공으로 건너뛰지는 않는다.
 
 ### MCP
 

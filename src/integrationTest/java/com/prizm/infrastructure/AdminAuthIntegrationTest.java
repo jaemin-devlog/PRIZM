@@ -1,13 +1,18 @@
 package com.prizm.infrastructure;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.prizm.auth.dto.request.LoginRequest;
+import com.prizm.auth.bootstrap.AdminBootstrapRunner;
+import com.prizm.auth.bootstrap.BootstrapAdminProperties;
 import com.prizm.auth.service.AuthService;
 import com.prizm.document.dto.response.DocumentUploadResponse;
 import com.prizm.document.repository.DocumentVersionRepository;
@@ -22,17 +27,25 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.List;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -78,6 +91,9 @@ class AdminAuthIntegrationTest {
     PasswordEncoder passwordEncoder;
 
     @Autowired
+    JwtEncoder jwtEncoder;
+
+    @Autowired
     AuthService authService;
 
     @Autowired
@@ -94,6 +110,9 @@ class AdminAuthIntegrationTest {
 
     @Autowired
     FileStorage fileStorage;
+
+    @Autowired
+    Validator validator;
 
     private MockMvc mockMvc;
 
@@ -132,6 +151,23 @@ class AdminAuthIntegrationTest {
                 .andExpect(jsonPath("$.expiresIn").value(3600))
                 .andExpect(jsonPath("$.user.email").value("admin@prizm.local"))
                 .andExpect(jsonPath("$.user.role").value("ADMIN"));
+    }
+
+    @Test
+    void createsInitialAdminInCleanDatabaseOnlyWhenExplicitlyInvoked() throws Exception {
+        AdminBootstrapRunner runner = new AdminBootstrapRunner(
+                new BootstrapAdminProperties(true, "ADMIN@Prizm.Local", "integration-password"),
+                userAccountRepository,
+                passwordEncoder,
+                validator);
+
+        runner.run(new DefaultApplicationArguments(new String[0]));
+
+        UserAccount admin = userAccountRepository.findByEmail("admin@prizm.local").orElseThrow();
+        assertThat(admin.getRole()).isEqualTo(UserRole.ADMIN);
+        assertThat(admin.isEnabled()).isTrue();
+        assertThat(admin.getPasswordHash()).isNotEqualTo("integration-password");
+        assertThat(passwordEncoder.matches("integration-password", admin.getPasswordHash())).isTrue();
     }
 
     @Test
@@ -232,6 +268,117 @@ class AdminAuthIntegrationTest {
                 .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
     }
 
+    @Test
+    void rejectsExpiredJwtThroughSecurityFilterChain() throws Exception {
+        UserAccount user = createUser(UserRole.USER, true);
+        Instant now = Instant.now();
+        String token = signedToken(user, user.getEmail(), "USER", "prizm", now.minusSeconds(300), now.minusSeconds(120));
+
+        expectUnauthorized("Bearer " + token);
+    }
+
+    @Test
+    void rejectsDeterministicallyTamperedJwtThroughSecurityFilterChain() throws Exception {
+        String token = tokenFor(UserRole.USER);
+        String[] parts = token.split("\\.");
+        char replacement = parts[1].charAt(0) == 'a' ? 'b' : 'a';
+        parts[1] = replacement + parts[1].substring(1);
+
+        expectUnauthorized("Bearer " + String.join(".", parts));
+    }
+
+    @Test
+    void rejectsMalformedAndEmptyBearerHeaders() throws Exception {
+        expectUnauthorized("Bearer not-a-jwt");
+        expectUnauthorized("Bearer");
+        expectUnauthorized("Bearer ");
+        expectUnauthorized("Basic dXNlcjpwYXNzd29yZA==");
+    }
+
+    @Test
+    void rejectsDuplicateAndCommaJoinedAuthorizationValues() throws Exception {
+        String token = tokenFor(UserRole.USER);
+
+        mockMvc.perform(get("/api/users/me")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token, "Bearer " + token))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+
+        expectUnauthorized("Bearer " + token + ", Bearer " + token);
+    }
+
+    @Test
+    void rejectsJwtFromAnotherIssuer() throws Exception {
+        UserAccount user = createUser(UserRole.USER, true);
+        Instant now = Instant.now();
+        String token = signedToken(user, user.getEmail(), "USER", "another-service", now, now.plusSeconds(3600));
+
+        expectUnauthorized("Bearer " + token);
+    }
+
+    @Test
+    void rejectsJwtForDeletedUser() throws Exception {
+        UserAccount user = createUser(UserRole.USER, true);
+        String token = login(user.getEmail());
+        userAccountRepository.delete(user);
+        userAccountRepository.flush();
+
+        expectUnauthorized("Bearer " + token);
+    }
+
+    @Test
+    void rejectsJwtWhoseEmailDiffersFromDatabase() throws Exception {
+        UserAccount user = createUser(UserRole.USER, true);
+        Instant now = Instant.now();
+        String token = signedToken(user, "other@prizm.local", "USER", "prizm", now, now.plusSeconds(3600));
+
+        expectUnauthorized("Bearer " + token);
+    }
+
+    @Test
+    void rejectsJwtWhoseRoleDiffersFromDatabase() throws Exception {
+        UserAccount user = createUser(UserRole.USER, true);
+        Instant now = Instant.now();
+        String token = signedToken(user, user.getEmail(), "ADMIN", "prizm", now, now.plusSeconds(3600));
+
+        expectUnauthorized("Bearer " + token);
+    }
+
+    @Test
+    void deniesUnregisteredPathEvenForAuthenticatedUser() throws Exception {
+        String token = tokenFor(UserRole.ADMIN);
+
+        mockMvc.perform(get("/unregistered-path")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+    }
+
+    @Test
+    void exposesOnlyExactHealthEndpointWithoutAuthentication() throws Exception {
+        mockMvc.perform(get("/actuator/health"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/actuator/info"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+    }
+
+    @Test
+    void allowsConfiguredCorsPreflightAndRejectsUnknownOrigin() throws Exception {
+        mockMvc.perform(options("/api/documents")
+                        .header(HttpHeaders.ORIGIN, "http://localhost:5173")
+                        .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:5173"));
+
+        mockMvc.perform(options("/api/documents")
+                        .header(HttpHeaders.ORIGIN, "https://evil.example.com")
+                        .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET"))
+                .andExpect(status().isForbidden())
+                .andExpect(header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN));
+    }
+
     private String tokenFor(UserRole role) {
         UserAccount user = createUser(role, true);
         return login(user.getEmail());
@@ -239,6 +386,35 @@ class AdminAuthIntegrationTest {
 
     private String login(String email) {
         return authService.login(new LoginRequest(email, "test-password")).accessToken();
+    }
+
+    private void expectUnauthorized(String authorization) throws Exception {
+        mockMvc.perform(get("/api/users/me")
+                        .header(HttpHeaders.AUTHORIZATION, authorization))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
+    }
+
+    private String signedToken(
+            UserAccount user,
+            String email,
+            String role,
+            String issuer,
+            Instant issuedAt,
+            Instant expiresAt) {
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer(issuer)
+                .subject(user.getId().toString())
+                .issuedAt(issuedAt)
+                .expiresAt(expiresAt)
+                .claim("email", email)
+                .claim("role", role)
+                .build();
+        return jwtEncoder.encode(JwtEncoderParameters.from(
+                        JwsHeader.with(MacAlgorithm.HS256).type("JWT").build(),
+                        claims))
+                .getTokenValue();
     }
 
     private UserAccount createUser(UserRole role, boolean enabled) {

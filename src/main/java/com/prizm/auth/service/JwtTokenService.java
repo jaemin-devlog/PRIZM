@@ -33,11 +33,10 @@ public class JwtTokenService {
         Instant issuedAt = clock.instant();
         Instant expiresAt = issuedAt.plusSeconds(properties.expirationSeconds());
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer("prizm")
+                .issuer(properties.issuer())
                 .subject(user.getId().toString())
                 .issuedAt(issuedAt)
                 .expiresAt(expiresAt)
-                .claim("userId", user.getId())
                 .claim("email", user.getEmail())
                 .claim("role", user.getRole().name())
                 .build();

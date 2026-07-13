@@ -17,5 +17,6 @@ prizm:
   jwt:
     secret: unit-test-jwt-secret-at-least-32-characters-long
     expiration-seconds: 3600
+    issuer: prizm
   ingestion:
     worker-enabled: false

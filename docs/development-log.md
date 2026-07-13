@@ -85,3 +85,11 @@ PRIZM의 기능, 리팩토링, 설계 판단과 검증 결과를 짧게 남기�
 - 설계: JWT 서명과 만료를 검증한 뒤 DB의 현재 사용자·활성 상태·역할을 다시 확인한다. 세션과 Refresh Token은 만들지 않고, 비밀키는 환경변수에서만 받는다.
 - 검증: 단위 테스트 60개와 PostgreSQL·pgvector·실제 Ollama 통합 테스트 16개가 성공했다. ADMIN 승인 성공, USER 승인 403, 미인증 401, USER 업로드·검색, 비활성 사용자 토큰 차단을 확인했다.
 - 다음: 사용자 등록·비밀번호 재설정은 현재 범위가 아니며, 다음 단계에서 C/S/O 문서 등급과 사용자 역할을 분리해 접근 정책을 설계한다.
+
+## 2026-07-13 — 인증 보안 감사 후 보강
+
+- 변경: 공개 placeholder JWT 키를 거부하고 UTF-8 32바이트 최소 길이·60초~24시간 만료 범위·issuer 검증을 적용했다. 사용자 ID claim은 `sub` 하나로 통일했다.
+- 이유: 예시 설정을 그대로 사용한 토큰 위조와 중복 claim 불일치, 다른 발급자의 토큰 수용 가능성을 기동·인증 단계에서 차단하기 위해서다.
+- 설계: 명시적으로 활성화한 한 번의 실행에서만 최초 ADMIN을 BCrypt로 생성하고, strict Bearer resolver와 기본 `denyAll`, 명시적 CORS Origin, 정확한 `/actuator/health` 공개 범위를 사용한다.
+- 검증: 단위 테스트 83개와 PostgreSQL·pgvector·실제 Ollama 통합 테스트 28개가 성공했다. 만료·변조·잘못된 Bearer·issuer/DB 불일치·삭제 사용자·CORS·Actuator·ADMIN/USER 경계를 실제 필터 체인에서 확인했다.
+- 현재 범위: 회원가입·Refresh Token·로그아웃 블랙리스트·C/S/O 문서 권한은 구현하지 않았다.

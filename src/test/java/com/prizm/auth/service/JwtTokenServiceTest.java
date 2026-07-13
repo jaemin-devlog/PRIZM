@@ -16,8 +16,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class JwtTokenServiceTest {
@@ -33,7 +37,8 @@ class JwtTokenServiceTest {
         Jwt decoded = service.decode(issued.value());
 
         assertThat(decoded.getSubject()).isEqualTo("7");
-        assertThat(decoded.getClaimAsString("userId")).isEqualTo("7");
+        assertThat(decoded.getClaimAsString("iss")).isEqualTo("prizm");
+        assertThat(decoded.hasClaim("userId")).isFalse();
         assertThat(decoded.getClaimAsString("email")).isEqualTo("user@example.com");
         assertThat(decoded.getClaimAsString("role")).isEqualTo("ADMIN");
         assertThat(issued.expiresInSeconds()).isEqualTo(3600);
@@ -42,7 +47,7 @@ class JwtTokenServiceTest {
     @Test
     void rejectsExpiredToken() {
         Clock pastClock = Clock.fixed(Instant.parse("2020-01-01T00:00:00Z"), ZoneOffset.UTC);
-        JwtTokenService service = tokenService(pastClock, 1);
+        JwtTokenService service = tokenService(pastClock, 60);
         String token = service.issue(user(8L, UserRole.USER)).value();
 
         assertThatThrownBy(() -> service.decode(token)).isInstanceOf(JwtException.class);
@@ -52,19 +57,57 @@ class JwtTokenServiceTest {
     void rejectsTamperedToken() {
         JwtTokenService service = tokenService(Clock.systemUTC(), 3600);
         String token = service.issue(user(9L, UserRole.USER)).value();
-        char replacement = token.endsWith("a") ? 'b' : 'a';
-        String tampered = token.substring(0, token.length() - 1) + replacement;
+        String[] parts = token.split("\\.");
+        char replacement = parts[1].charAt(0) == 'a' ? 'b' : 'a';
+        parts[1] = replacement + parts[1].substring(1);
+        String tampered = String.join(".", parts);
 
         assertThatThrownBy(() -> service.decode(tampered)).isInstanceOf(JwtException.class);
     }
 
+    @Test
+    void rejectsTokenWithoutIssuer() {
+        JwtTokenService service = tokenService(Clock.systemUTC(), 3600);
+
+        assertThatThrownBy(() -> service.decode(customToken(null)))
+                .isInstanceOf(JwtException.class);
+    }
+
+    @Test
+    void rejectsTokenFromAnotherIssuer() {
+        JwtTokenService service = tokenService(Clock.systemUTC(), 3600);
+
+        assertThatThrownBy(() -> service.decode(customToken("another-service")))
+                .isInstanceOf(JwtException.class);
+    }
+
     private JwtTokenService tokenService(Clock clock, long expirationSeconds) {
         SecretKey key = new SecretKeySpec(SECRET.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
+        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer("prizm"));
         return new JwtTokenService(
                 NimbusJwtEncoder.withSecretKey(key).build(),
-                NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build(),
-                new JwtProperties(SECRET, expirationSeconds),
+                decoder,
+                new JwtProperties(SECRET, expirationSeconds, "prizm"),
                 clock);
+    }
+
+    private String customToken(String issuer) {
+        SecretKey key = new SecretKeySpec(SECRET.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        JwtClaimsSet.Builder claims = JwtClaimsSet.builder()
+                .subject("10")
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plusSeconds(3600))
+                .claim("email", "user@example.com")
+                .claim("role", "USER");
+        if (issuer != null) {
+            claims.issuer(issuer);
+        }
+        return NimbusJwtEncoder.withSecretKey(key).build()
+                .encode(JwtEncoderParameters.from(
+                        JwsHeader.with(MacAlgorithm.HS256).type("JWT").build(),
+                        claims.build()))
+                .getTokenValue();
     }
 
     private UserAccount user(Long id, UserRole role) {

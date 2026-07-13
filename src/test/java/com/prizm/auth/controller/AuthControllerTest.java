@@ -6,6 +6,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.prizm.auth.service.AuthService;
+import com.prizm.auth.dto.request.LoginRequest;
+import com.prizm.auth.dto.response.AuthenticatedUserResponse;
+import com.prizm.auth.dto.response.LoginResponse;
+import com.prizm.user.entity.UserRole;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -44,5 +49,18 @@ class AuthControllerTest {
                                 """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("INVALID_LOGIN_REQUEST"));
+    }
+
+    @Test
+    void redactsPasswordAndAccessTokenFromDtoStrings() {
+        LoginRequest request = new LoginRequest("user@example.com", "plain-password");
+        LoginResponse response = new LoginResponse(
+                "complete.jwt.value",
+                "Bearer",
+                3600,
+                new AuthenticatedUserResponse(1L, "user@example.com", UserRole.USER));
+
+        assertThat(request.toString()).doesNotContain("plain-password").contains("[REDACTED]");
+        assertThat(response.toString()).doesNotContain("complete.jwt.value").contains("[REDACTED]");
     }
 }

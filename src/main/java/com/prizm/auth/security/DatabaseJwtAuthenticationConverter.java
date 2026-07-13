@@ -42,7 +42,11 @@ public class DatabaseJwtAuthenticationConverter
 
     private Long parseUserId(String subject) {
         try {
-            return Long.valueOf(subject);
+            Long userId = Long.valueOf(subject);
+            if (userId <= 0) {
+                throw new BadCredentialsException("Invalid access token");
+            }
+            return userId;
         }
         catch (NumberFormatException | NullPointerException exception) {
             throw new BadCredentialsException("Invalid access token", exception);

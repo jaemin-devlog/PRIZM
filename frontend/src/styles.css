@@ -18,6 +18,11 @@ body {
   margin: 0;
 }
 
+button,
+input {
+  font: inherit;
+}
+
 #root {
   min-height: 100vh;
   display: grid;
@@ -26,7 +31,7 @@ body {
 }
 
 .shell {
-  width: min(42rem, 100%);
+  width: min(29rem, 100%);
   padding: 3rem;
   border: 1px solid #dbe3ea;
   border-radius: 1.25rem;
@@ -44,13 +49,98 @@ body {
 
 h1 {
   margin: 0;
-  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-size: clamp(2rem, 6vw, 3.25rem);
   line-height: 1.08;
 }
 
 .description {
-  margin: 1.5rem 0 0;
+  margin: 1.25rem 0 0;
   color: #5d6a78;
-  font-size: 1rem;
   line-height: 1.75;
+}
+
+.login-form {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 2rem;
+}
+
+.login-form label {
+  margin-top: 0.55rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.65rem;
+  color: #18202a;
+  background: #ffffff;
+}
+
+.login-form input:focus {
+  border-color: #4465e8;
+  outline: 3px solid rgb(68 101 232 / 18%);
+}
+
+button {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border: 0;
+  border-radius: 0.65rem;
+  color: #ffffff;
+  background: #4465e8;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: #3553ca;
+}
+
+button:focus-visible {
+  outline: 3px solid rgb(68 101 232 / 35%);
+  outline-offset: 2px;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.form-error {
+  margin: 0.6rem 0 0;
+  color: #b42318;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.notice {
+  margin: 1.5rem 0 0;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  color: #3d4c5b;
+  background: #eef3ff;
+  line-height: 1.6;
+}
+
+.secondary-button {
+  color: #2643bb;
+  background: #e8edff;
+}
+
+.secondary-button:hover:not(:disabled) {
+  background: #dce5ff;
+}
+
+@media (max-width: 480px) {
+  #root {
+    padding: 1rem;
+  }
+
+  .shell {
+    padding: 2rem;
+  }
 }

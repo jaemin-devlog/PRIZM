@@ -7,6 +7,7 @@ import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.ingestion.entity.ProcessingJob;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
 import com.prizm.ingestion.repository.DocumentChunkRepository;
+import com.prizm.ingestion.repository.ProcessingJobClaimRepository;
 import com.prizm.ingestion.repository.ProcessingJobRepository;
 import java.time.Instant;
 import org.springframework.stereotype.Service;
@@ -21,16 +22,19 @@ public class IndexingFailureService {
     private final ProcessingJobRepository processingJobRepository;
     private final DocumentVersionRepository documentVersionRepository;
     private final DocumentChunkRepository documentChunkRepository;
+    private final ProcessingJobClaimRepository claimRepository;
     private final IndexingRetryPolicy retryPolicy;
 
     public IndexingFailureService(
             ProcessingJobRepository processingJobRepository,
             DocumentVersionRepository documentVersionRepository,
             DocumentChunkRepository documentChunkRepository,
+            ProcessingJobClaimRepository claimRepository,
             IndexingRetryPolicy retryPolicy) {
         this.processingJobRepository = processingJobRepository;
         this.documentVersionRepository = documentVersionRepository;
         this.documentChunkRepository = documentChunkRepository;
+        this.claimRepository = claimRepository;
         this.retryPolicy = retryPolicy;
     }
 
@@ -39,14 +43,18 @@ public class IndexingFailureService {
             ClaimedProcessingJob claimedJob,
             boolean retryable,
             String errorMessage) {
-        ProcessingJob job = processingJobRepository.findByIdForUpdate(claimedJob.jobId())
+        ProcessingJob job = processingJobRepository.findByIdForUpdate(claimedJob.processingJobId())
                 .orElseThrow(() -> new IllegalStateException("Processing job was not found."));
+        job.requireClaim(claimedJob.claimVersion());
+        if (!job.getDocumentVersionId().equals(claimedJob.documentVersionId())) {
+            throw new IllegalStateException("Claimed job and document version do not match.");
+        }
         DocumentVersion version = documentVersionRepository.findByIdForUpdate(claimedJob.documentVersionId())
                 .orElseThrow(() -> new DocumentVersionNotFoundException(claimedJob.documentVersionId()));
         documentChunkRepository.deleteByDocumentVersionId(version.getId());
 
         String safeMessage = truncate(errorMessage == null ? "Indexing failed." : errorMessage);
-        Instant now = Instant.now();
+        Instant now = claimRepository.currentDatabaseTime();
         if (retryable && retryPolicy.canRetry(job.getRetryCount())) {
             job.scheduleRetry(retryPolicy.nextRetryAt(job.getRetryCount(), now), safeMessage);
         }

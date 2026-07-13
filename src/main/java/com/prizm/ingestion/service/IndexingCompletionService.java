@@ -9,8 +9,8 @@ import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.ingestion.entity.ProcessingJob;
 import com.prizm.ingestion.repository.DocumentChunkRepository;
+import com.prizm.ingestion.repository.ProcessingJobClaimRepository;
 import com.prizm.ingestion.repository.ProcessingJobRepository;
-import java.time.Instant;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,25 +23,32 @@ public class IndexingCompletionService {
     private final DocumentVersionRepository documentVersionRepository;
     private final DocumentRepository documentRepository;
     private final DocumentChunkRepository documentChunkRepository;
+    private final ProcessingJobClaimRepository claimRepository;
 
     public IndexingCompletionService(
             ProcessingJobRepository processingJobRepository,
             DocumentVersionRepository documentVersionRepository,
             DocumentRepository documentRepository,
-            DocumentChunkRepository documentChunkRepository) {
+            DocumentChunkRepository documentChunkRepository,
+            ProcessingJobClaimRepository claimRepository) {
         this.processingJobRepository = processingJobRepository;
         this.documentVersionRepository = documentVersionRepository;
         this.documentRepository = documentRepository;
         this.documentChunkRepository = documentChunkRepository;
+        this.claimRepository = claimRepository;
     }
 
     @Transactional
     public void complete(ClaimedProcessingJob claimedJob, List<IndexedChunk> chunks) {
+        ProcessingJob job = processingJobRepository.findByIdForUpdate(claimedJob.processingJobId())
+                .orElseThrow(() -> new IllegalStateException("Processing job was not found."));
+        job.requireClaim(claimedJob.claimVersion());
+        if (!job.getDocumentVersionId().equals(claimedJob.documentVersionId())) {
+            throw new IllegalStateException("Claimed job and document version do not match.");
+        }
         if (chunks.isEmpty()) {
             throw new IllegalArgumentException("At least one indexed chunk is required.");
         }
-        ProcessingJob job = processingJobRepository.findByIdForUpdate(claimedJob.jobId())
-                .orElseThrow(() -> new IllegalStateException("Processing job was not found."));
         DocumentVersion version = documentVersionRepository.findByIdForUpdate(claimedJob.documentVersionId())
                 .orElseThrow(() -> new DocumentVersionNotFoundException(claimedJob.documentVersionId()));
         if (version.getStatus() != DocumentVersionStatus.INDEXING) {
@@ -59,6 +66,6 @@ public class IndexingCompletionService {
 
         version.activate();
         document.activateVersion(version.getId());
-        job.complete(Instant.now());
+        job.complete(claimRepository.currentDatabaseTime());
     }
 }

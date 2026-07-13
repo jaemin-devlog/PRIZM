@@ -5,6 +5,7 @@ import com.prizm.document.entity.DocumentVersionStatus;
 import com.prizm.document.exception.DocumentVersionNotFoundException;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.ingestion.entity.ProcessingJob;
+import com.prizm.ingestion.config.IngestionProperties;
 import com.prizm.ingestion.repository.ProcessingJobClaimRepository;
 import com.prizm.ingestion.repository.ProcessingJobRepository;
 import java.util.Optional;
@@ -18,25 +19,33 @@ public class ProcessingJobClaimService {
     private final ProcessingJobClaimRepository claimRepository;
     private final ProcessingJobRepository processingJobRepository;
     private final DocumentVersionRepository documentVersionRepository;
+    private final IngestionProperties properties;
 
     public ProcessingJobClaimService(
             ProcessingJobClaimRepository claimRepository,
             ProcessingJobRepository processingJobRepository,
-            DocumentVersionRepository documentVersionRepository) {
+            DocumentVersionRepository documentVersionRepository,
+            IngestionProperties properties) {
         this.claimRepository = claimRepository;
         this.processingJobRepository = processingJobRepository;
         this.documentVersionRepository = documentVersionRepository;
+        this.properties = properties;
     }
 
     @Transactional
     public Optional<ClaimedProcessingJob> claimNext() {
-        Optional<Long> claimedId = claimRepository.claimNextId();
-        if (claimedId.isEmpty()) {
+        Optional<ClaimedProcessingJob> claimed = claimRepository.claimNext(properties.getLeaseDuration());
+        if (claimed.isEmpty()) {
             return Optional.empty();
         }
 
-        ProcessingJob job = processingJobRepository.findByIdForUpdate(claimedId.orElseThrow())
+        ClaimedProcessingJob claimedJob = claimed.orElseThrow();
+        ProcessingJob job = processingJobRepository.findByIdForUpdate(claimedJob.processingJobId())
                 .orElseThrow(() -> new IllegalStateException("Claimed processing job disappeared."));
+        job.requireClaim(claimedJob.claimVersion());
+        if (!job.getDocumentVersionId().equals(claimedJob.documentVersionId())) {
+            throw new IllegalStateException("Claimed job and document version do not match.");
+        }
         DocumentVersion version = documentVersionRepository.findByIdForUpdate(job.getDocumentVersionId())
                 .orElseThrow(() -> new DocumentVersionNotFoundException(job.getDocumentVersionId()));
         if (version.getStatus() == DocumentVersionStatus.APPROVED) {
@@ -45,6 +54,6 @@ public class ProcessingJobClaimService {
         else if (version.getStatus() != DocumentVersionStatus.INDEXING) {
             throw new IllegalStateException("Only APPROVED or INDEXING document versions can be claimed.");
         }
-        return Optional.of(new ClaimedProcessingJob(job.getId(), job.getDocumentVersionId(), job.getRetryCount()));
+        return Optional.of(claimedJob);
     }
 }

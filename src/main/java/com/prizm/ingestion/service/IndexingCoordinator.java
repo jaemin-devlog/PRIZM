@@ -1,5 +1,6 @@
 package com.prizm.ingestion.service;
 
+import com.prizm.ingestion.exception.StaleProcessingJobClaimException;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,9 +39,18 @@ public class IndexingCoordinator {
         try {
             processor.process(job);
         }
+        catch (StaleProcessingJobClaimException exception) {
+            log.info("Ignored stale indexing claim for job {}.", job.processingJobId());
+        }
         catch (RuntimeException exception) {
-            failureService.handleFailure(job, failureClassifier.isRetryable(exception), exception.getMessage());
-            log.warn("Indexing job {} failed with {}.", job.jobId(), exception.getClass().getSimpleName());
+            try {
+                failureService.handleFailure(job, failureClassifier.isRetryable(exception), exception.getMessage());
+                log.warn("Indexing job {} failed with {}.",
+                        job.processingJobId(), exception.getClass().getSimpleName());
+            }
+            catch (StaleProcessingJobClaimException staleClaim) {
+                log.info("Ignored failure from stale indexing claim for job {}.", job.processingJobId());
+            }
         }
         return true;
     }

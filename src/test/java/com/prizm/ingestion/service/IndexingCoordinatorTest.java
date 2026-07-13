@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 
 import com.prizm.embedding.exception.EmbeddingErrorCode;
 import com.prizm.embedding.exception.EmbeddingException;
+import com.prizm.ingestion.exception.StaleProcessingJobClaimException;
+import java.time.Instant;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +27,7 @@ class IndexingCoordinatorTest {
 
     @Test
     void recordsRetryableOllamaFailureWithoutHoldingClaimTransaction() {
-        ClaimedProcessingJob job = new ClaimedProcessingJob(20L, 10L, 0);
+        ClaimedProcessingJob job = claimedJob();
         when(claimService.claimNext()).thenReturn(Optional.of(job));
         org.mockito.Mockito.doThrow(new EmbeddingException(
                         EmbeddingErrorCode.OLLAMA_UNAVAILABLE, "unavailable"))
@@ -46,5 +48,27 @@ class IndexingCoordinatorTest {
 
         assertThat(coordinator.processNext()).isFalse();
         verify(processor, never()).process(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    void ignoresCompletionFromAStaleWorkerWithoutChangingCurrentJob() {
+        ClaimedProcessingJob job = claimedJob();
+        when(claimService.claimNext()).thenReturn(Optional.of(job));
+        org.mockito.Mockito.doThrow(new StaleProcessingJobClaimException(
+                        job.processingJobId(), job.claimVersion()))
+                .when(processor).process(job);
+        IndexingCoordinator coordinator = new IndexingCoordinator(
+                claimService, processor, new IndexingFailureClassifier(), failureService);
+
+        assertThat(coordinator.processNext()).isTrue();
+
+        verify(failureService, never()).handleFailure(
+                org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.anyBoolean(),
+                org.mockito.ArgumentMatchers.any());
+    }
+
+    private ClaimedProcessingJob claimedJob() {
+        return new ClaimedProcessingJob(20L, 10L, 1L, Instant.parse("2026-07-13T00:10:00Z"));
     }
 }

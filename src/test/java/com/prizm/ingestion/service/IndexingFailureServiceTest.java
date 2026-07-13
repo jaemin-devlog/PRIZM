@@ -1,6 +1,8 @@
 package com.prizm.ingestion.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.prizm.document.entity.DocumentVersion;
@@ -8,8 +10,11 @@ import com.prizm.document.entity.DocumentVersionStatus;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.ingestion.entity.ProcessingJob;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
+import com.prizm.ingestion.exception.StaleProcessingJobClaimException;
 import com.prizm.ingestion.repository.DocumentChunkRepository;
+import com.prizm.ingestion.repository.ProcessingJobClaimRepository;
 import com.prizm.ingestion.repository.ProcessingJobRepository;
+import java.time.Instant;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +32,8 @@ class IndexingFailureServiceTest {
     DocumentVersionRepository documentVersionRepository;
     @Mock
     DocumentChunkRepository documentChunkRepository;
+    @Mock
+    ProcessingJobClaimRepository claimRepository;
 
     IndexingFailureService service;
 
@@ -36,6 +43,7 @@ class IndexingFailureServiceTest {
                 processingJobRepository,
                 documentVersionRepository,
                 documentChunkRepository,
+                claimRepository,
                 new IndexingRetryPolicy());
     }
 
@@ -49,7 +57,7 @@ class IndexingFailureServiceTest {
 
         assertThat(status).isEqualTo(ProcessingJobStatus.PENDING);
         assertThat(job.getRetryCount()).isEqualTo(1);
-        assertThat(job.getNextRetryAt()).isNotNull();
+        assertThat(job.getNextRetryAt()).isEqualTo(Instant.parse("2026-07-13T00:01:00Z"));
         assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.INDEXING);
     }
 
@@ -78,9 +86,27 @@ class IndexingFailureServiceTest {
         assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.FAILED);
     }
 
+    @Test
+    void rejectsFailureFromStaleWorkerBeforeDeletingChunks() {
+        ProcessingJob job = processingJob(0);
+        when(processingJobRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(job));
+        ClaimedProcessingJob staleClaim = new ClaimedProcessingJob(
+                20L,
+                10L,
+                job.getClaimVersion() - 1,
+                Instant.parse("2026-07-13T00:10:00Z"));
+
+        assertThatThrownBy(() -> service.handleFailure(staleClaim, true, "late failure"))
+                .isInstanceOf(StaleProcessingJobClaimException.class);
+
+        assertThat(job.getStatus()).isEqualTo(ProcessingJobStatus.PROCESSING);
+        verifyNoInteractions(documentVersionRepository, documentChunkRepository, claimRepository);
+    }
+
     private void stub(ProcessingJob job, DocumentVersion version) {
         when(processingJobRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(job));
         when(documentVersionRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(version));
+        when(claimRepository.currentDatabaseTime()).thenReturn(Instant.parse("2026-07-13T00:00:00Z"));
     }
 
     private ProcessingJob processingJob(int retryCount) {
@@ -88,6 +114,7 @@ class IndexingFailureServiceTest {
         ReflectionTestUtils.setField(job, "id", 20L);
         ReflectionTestUtils.setField(job, "status", ProcessingJobStatus.PROCESSING);
         ReflectionTestUtils.setField(job, "retryCount", retryCount);
+        ReflectionTestUtils.setField(job, "claimVersion", 4L);
         return job;
     }
 
@@ -100,6 +127,10 @@ class IndexingFailureServiceTest {
     }
 
     private ClaimedProcessingJob claimed(ProcessingJob job) {
-        return new ClaimedProcessingJob(job.getId(), job.getDocumentVersionId(), job.getRetryCount());
+        return new ClaimedProcessingJob(
+                job.getId(),
+                job.getDocumentVersionId(),
+                job.getClaimVersion(),
+                Instant.parse("2026-07-13T00:10:00Z"));
     }
 }

@@ -6,6 +6,7 @@ import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.infrastructure.storage.FileStorageException;
+import com.prizm.ingestion.config.IngestionProperties;
 import com.prizm.ingestion.exception.DocumentIndexingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
@@ -25,7 +26,9 @@ public class DocumentIndexingProcessor {
     private final TextChunker textChunker;
     private final EmbeddingService embeddingService;
     private final IndexingCompletionService completionService;
+    private final ProcessingJobLeaseService leaseService;
     private final int expectedDimensions;
+    private final int leaseRefreshChunkInterval;
 
     public DocumentIndexingProcessor(
             DocumentVersionRepository documentVersionRepository,
@@ -33,13 +36,17 @@ public class DocumentIndexingProcessor {
             TextChunker textChunker,
             EmbeddingService embeddingService,
             IndexingCompletionService completionService,
+            ProcessingJobLeaseService leaseService,
+            IngestionProperties ingestionProperties,
             @Value("${prizm.embedding.dimensions}") int expectedDimensions) {
         this.documentVersionRepository = documentVersionRepository;
         this.fileStorage = fileStorage;
         this.textChunker = textChunker;
         this.embeddingService = embeddingService;
         this.completionService = completionService;
+        this.leaseService = leaseService;
         this.expectedDimensions = expectedDimensions;
+        this.leaseRefreshChunkInterval = ingestionProperties.getLeaseRefreshChunkInterval();
     }
 
     public void process(ClaimedProcessingJob claimedJob) {
@@ -51,13 +58,19 @@ public class DocumentIndexingProcessor {
         if (textChunks.isEmpty()) {
             throw new DocumentIndexingException("TXT file contains no searchable text.", false);
         }
+        leaseService.renew(claimedJob);
 
         List<IndexedChunk> indexedChunks = new ArrayList<>(textChunks.size());
-        for (TextChunk chunk : textChunks) {
+        for (int index = 0; index < textChunks.size(); index++) {
+            TextChunk chunk = textChunks.get(index);
             float[] embedding = embeddingService.embed(chunk.content());
             validateEmbedding(embedding);
             indexedChunks.add(new IndexedChunk(chunk.chunkNo(), chunk.content(), embedding));
+            if ((index + 1) % leaseRefreshChunkInterval == 0) {
+                leaseService.renew(claimedJob);
+            }
         }
+        leaseService.renew(claimedJob);
         completionService.complete(claimedJob, List.copyOf(indexedChunks));
     }
 

@@ -16,9 +16,13 @@ import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
 import com.prizm.ingestion.exception.DuplicateProcessingJobException;
+import com.prizm.ingestion.exception.StaleProcessingJobClaimException;
 import com.prizm.ingestion.repository.ProcessingJobRepository;
 import com.prizm.ingestion.service.ClaimedProcessingJob;
 import com.prizm.ingestion.service.DocumentIndexingProcessor;
+import com.prizm.ingestion.service.IndexedChunk;
+import com.prizm.ingestion.service.IndexingCompletionService;
+import com.prizm.ingestion.service.ProcessingJobRecoveryService;
 import com.prizm.ingestion.service.ProcessingJobClaimService;
 import com.prizm.search.dto.response.SearchResponse;
 import com.prizm.search.exception.SearchResultNotFoundException;
@@ -28,16 +32,25 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
@@ -111,6 +124,15 @@ class PgVectorInfrastructureTest {
     DocumentIndexingProcessor documentIndexingProcessor;
 
     @Autowired
+    IndexingCompletionService indexingCompletionService;
+
+    @Autowired
+    ProcessingJobRecoveryService processingJobRecoveryService;
+
+    @Autowired
+    PlatformTransactionManager transactionManager;
+
+    @Autowired
     FileStorage fileStorage;
 
     @Test
@@ -133,7 +155,7 @@ class PgVectorInfrastructureTest {
                 PgVectorSmokeAssertions.verifyExactCosineSearch(jdbcTemplate);
 
         assertThat(serverVersion).isBetween(160000, 169999);
-        assertThat(successfulMigrations).isEqualTo(4);
+        assertThat(successfulMigrations).isEqualTo(5);
         assertThat(result.extensionVersion()).isEqualTo("0.8.2");
         assertThat(documentCount).isZero();
         assertThat(versionCount).isZero();
@@ -224,14 +246,14 @@ class PgVectorInfrastructureTest {
 
             ClaimedProcessingJob claimed = processingJobClaimService.claimNext().orElseThrow();
             assertThat(processingJobClaimService.claimNext()).isEmpty();
-            assertThat(processingJobRepository.findById(claimed.jobId()).orElseThrow().getStatus())
+            assertThat(processingJobRepository.findById(claimed.processingJobId()).orElseThrow().getStatus())
                     .isEqualTo(ProcessingJobStatus.PROCESSING);
             assertThat(documentVersionRepository.findById(uploaded.versionId()).orElseThrow().getStatus())
                     .isEqualTo(DocumentVersionStatus.INDEXING);
 
             documentIndexingProcessor.process(claimed);
 
-            assertThat(processingJobRepository.findById(claimed.jobId()).orElseThrow().getStatus())
+            assertThat(processingJobRepository.findById(claimed.processingJobId()).orElseThrow().getStatus())
                     .isEqualTo(ProcessingJobStatus.COMPLETED);
             assertThat(documentVersionRepository.findById(uploaded.versionId()).orElseThrow().getStatus())
                     .isEqualTo(DocumentVersionStatus.ACTIVE);
@@ -298,6 +320,128 @@ class PgVectorInfrastructureTest {
                 .isInstanceOf(SearchResultNotFoundException.class);
     }
 
+    @Test
+    void allowsOnlyOneIndependentTransactionToClaimTheSamePendingJob() throws Exception {
+        PendingJobFixture fixture = createPendingIndexingJob("동시 선점 문서");
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        CountDownLatch firstClaimed = new CountDownLatch(1);
+        CountDownLatch releaseFirst = new CountDownLatch(1);
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+
+        try {
+            Future<Optional<ClaimedProcessingJob>> first = executor.submit(() -> transactionTemplate.execute(status -> {
+                Optional<ClaimedProcessingJob> claimed = processingJobClaimService.claimNext();
+                firstClaimed.countDown();
+                await(releaseFirst);
+                return claimed;
+            }));
+            assertThat(firstClaimed.await(5, TimeUnit.SECONDS)).isTrue();
+
+            Future<Optional<ClaimedProcessingJob>> second = executor.submit(
+                    () -> transactionTemplate.execute(status -> processingJobClaimService.claimNext()));
+            Optional<ClaimedProcessingJob> secondClaim = second.get(5, TimeUnit.SECONDS);
+            releaseFirst.countDown();
+            Optional<ClaimedProcessingJob> firstClaim = first.get(5, TimeUnit.SECONDS);
+
+            List<ClaimedProcessingJob> claims = java.util.stream.Stream.of(firstClaim, secondClaim)
+                    .flatMap(Optional::stream)
+                    .toList();
+            assertThat(claims).hasSize(1);
+            assertThat(claims.get(0).processingJobId()).isEqualTo(fixture.processingJobId());
+            assertThat(claims.get(0).claimVersion()).isEqualTo(1L);
+            assertThat(claims.get(0).leaseExpiresAt()).isNotNull();
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM processing_jobs WHERE id = ? AND status = 'PROCESSING'",
+                    Long.class,
+                    fixture.processingJobId())).isEqualTo(1L);
+
+            indexingCompletionService.complete(claims.get(0), List.of(indexedChunk("동시 선점 결과")));
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM document_chunks WHERE document_version_id = ?",
+                    Long.class,
+                    fixture.documentVersionId())).isEqualTo(1L);
+        }
+        finally {
+            releaseFirst.countDown();
+            executor.shutdownNow();
+            deleteCommittedDocumentData();
+        }
+    }
+
+    @Test
+    void recoversExpiredLeaseAndRejectsCompletionFromTheOldWorker() {
+        PendingJobFixture fixture = createPendingIndexingJob("중단 복구 문서");
+
+        try {
+            ClaimedProcessingJob workerA = processingJobClaimService.claimNext().orElseThrow();
+            jdbcTemplate.update(
+                    "UPDATE processing_jobs SET lease_expires_at = now() - INTERVAL '1 second' WHERE id = ?",
+                    fixture.processingJobId());
+            Instant beforeRecovery = databaseNow();
+
+            assertThat(processingJobRecoveryService.recoverNext()).isTrue();
+
+            Long recoveredClaimVersion = jdbcTemplate.queryForObject(
+                    "SELECT claim_version FROM processing_jobs WHERE id = ?",
+                    Long.class,
+                    fixture.processingJobId());
+            Integer retryCount = jdbcTemplate.queryForObject(
+                    "SELECT retry_count FROM processing_jobs WHERE id = ?",
+                    Integer.class,
+                    fixture.processingJobId());
+            String recoveredStatus = jdbcTemplate.queryForObject(
+                    "SELECT status FROM processing_jobs WHERE id = ?",
+                    String.class,
+                    fixture.processingJobId());
+            Instant nextRetryAt = jdbcTemplate.queryForObject(
+                    "SELECT next_retry_at FROM processing_jobs WHERE id = ?",
+                    (resultSet, rowNum) -> resultSet.getTimestamp(1).toInstant(),
+                    fixture.processingJobId());
+            assertThat(recoveredStatus).isEqualTo("PENDING");
+            assertThat(retryCount).isEqualTo(1);
+            assertThat(recoveredClaimVersion).isEqualTo(workerA.claimVersion() + 1);
+            assertThat(nextRetryAt).isBetween(beforeRecovery.plusSeconds(60), databaseNow().plusSeconds(60));
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT lease_expires_at IS NULL AND started_at IS NULL FROM processing_jobs WHERE id = ?",
+                    Boolean.class,
+                    fixture.processingJobId())).isTrue();
+            assertThat(documentVersionRepository.findById(fixture.documentVersionId()).orElseThrow().getStatus())
+                    .isEqualTo(DocumentVersionStatus.INDEXING);
+
+            jdbcTemplate.update(
+                    "UPDATE processing_jobs SET next_retry_at = now() - INTERVAL '1 second' WHERE id = ?",
+                    fixture.processingJobId());
+            ClaimedProcessingJob workerB = processingJobClaimService.claimNext().orElseThrow();
+            assertThat(workerB.claimVersion()).isGreaterThan(workerA.claimVersion());
+
+            List<IndexedChunk> chunks = List.of(indexedChunk("복구된 Worker 결과"));
+            assertThatThrownBy(() -> indexingCompletionService.complete(workerA, chunks))
+                    .isInstanceOf(StaleProcessingJobClaimException.class);
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM document_chunks WHERE document_version_id = ?",
+                    Long.class,
+                    fixture.documentVersionId())).isZero();
+
+            indexingCompletionService.complete(workerB, chunks);
+
+            assertThat(documentVersionRepository.findById(fixture.documentVersionId()).orElseThrow().getStatus())
+                    .isEqualTo(DocumentVersionStatus.ACTIVE);
+            assertThat(documentRepository.findById(fixture.documentId()).orElseThrow().getActiveVersionId())
+                    .isEqualTo(fixture.documentVersionId());
+            assertThat(processingJobRepository.findById(fixture.processingJobId()).orElseThrow().getStatus())
+                    .isEqualTo(ProcessingJobStatus.COMPLETED);
+            assertThat(processingJobRepository.findById(fixture.processingJobId()).orElseThrow().getLeaseExpiresAt())
+                    .isNull();
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM document_chunks WHERE document_version_id = ?",
+                    Long.class,
+                    fixture.documentVersionId())).isEqualTo(1L);
+        }
+        finally {
+            deleteCommittedDocumentData();
+        }
+    }
+
     private void deleteCommittedDocumentData() {
         jdbcTemplate.update("DELETE FROM processing_jobs");
         jdbcTemplate.update("DELETE FROM document_chunks");
@@ -325,6 +469,56 @@ class PgVectorInfrastructureTest {
         return versionId;
     }
 
+    private PendingJobFixture createPendingIndexingJob(String title) {
+        Long documentId = jdbcTemplate.queryForObject(
+                "INSERT INTO documents(title) VALUES (?) RETURNING id",
+                Long.class,
+                title);
+        Long versionId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO document_versions(
+                    document_id, version_no, original_file_name, stored_file_path, file_type, content_hash, status
+                )
+                VALUES (?, 1, 'worker.txt', 'test/worker.txt', 'TXT', repeat('c', 64), 'APPROVED')
+                RETURNING id
+                """,
+                Long.class,
+                documentId);
+        Long jobId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO processing_jobs(document_version_id, job_type, status)
+                VALUES (?, 'INDEXING', 'PENDING')
+                RETURNING id
+                """,
+                Long.class,
+                versionId);
+        return new PendingJobFixture(documentId, versionId, jobId);
+    }
+
+    private IndexedChunk indexedChunk(String content) {
+        float[] embedding = new float[1024];
+        embedding[0] = 1.0f;
+        return new IndexedChunk(1, content, embedding);
+    }
+
+    private Instant databaseNow() {
+        return jdbcTemplate.queryForObject(
+                "SELECT now()",
+                (resultSet, rowNum) -> resultSet.getTimestamp(1).toInstant());
+    }
+
+    private static void await(CountDownLatch latch) {
+        try {
+            if (!latch.await(5, TimeUnit.SECONDS)) {
+                throw new IllegalStateException("Timed out while coordinating concurrent claims.");
+            }
+        }
+        catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Concurrent claim test was interrupted.", exception);
+        }
+    }
+
     private String toVectorLiteral(float[] embedding) {
         StringBuilder literal = new StringBuilder("[");
         for (int index = 0; index < embedding.length; index++) {
@@ -343,5 +537,8 @@ class PgVectorInfrastructureTest {
         catch (IOException exception) {
             throw new UncheckedIOException(exception);
         }
+    }
+
+    private record PendingJobFixture(Long documentId, Long documentVersionId, Long processingJobId) {
     }
 }

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -39,6 +40,9 @@ class DocumentIndexingProcessorTest {
     @Mock
     IndexingCompletionService completionService;
 
+    @Mock
+    ProcessingJobLeaseService leaseService;
+
     DocumentIndexingProcessor processor;
     ClaimedProcessingJob claimedJob;
 
@@ -47,18 +51,21 @@ class DocumentIndexingProcessorTest {
         IngestionProperties properties = new IngestionProperties();
         properties.setMaxChunkLength(8);
         properties.setOverlap(2);
+        properties.setLeaseRefreshChunkInterval(2);
         processor = new DocumentIndexingProcessor(
                 documentVersionRepository,
                 fileStorage,
                 new TextChunker(properties),
                 embeddingService,
                 completionService,
+                leaseService,
+                properties,
                 4);
         DocumentVersion version = DocumentVersion.quarantined(1L, "guide.txt", "a".repeat(64));
         ReflectionTestUtils.setField(version, "id", 10L);
         version.updateStoredFilePath("documents/1/10/guide.txt");
         when(documentVersionRepository.findById(10L)).thenReturn(Optional.of(version));
-        claimedJob = new ClaimedProcessingJob(20L, 10L, 0);
+        claimedJob = new ClaimedProcessingJob(20L, 10L, 1L, java.time.Instant.parse("2026-07-13T00:10:00Z"));
     }
 
     @Test
@@ -69,6 +76,7 @@ class DocumentIndexingProcessorTest {
 
         processor.process(claimedJob);
 
+        verify(leaseService, times(3)).renew(claimedJob);
         verify(completionService).complete(any(ClaimedProcessingJob.class), any(List.class));
     }
 

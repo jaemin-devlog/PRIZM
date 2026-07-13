@@ -7,7 +7,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.prizm.document.dto.response.DocumentSummaryResponse;
+import com.prizm.document.dto.response.DocumentDetailResponse;
 import com.prizm.document.dto.response.DocumentUploadResponse;
+import com.prizm.document.dto.response.DocumentVersionResponse;
+import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.entity.DocumentVersionStatus;
 import com.prizm.document.service.DocumentQueryService;
 import com.prizm.document.service.DocumentUploadService;
@@ -66,5 +69,28 @@ class DocumentControllerTest {
         mockMvc.perform(get("/api/documents"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].latestVersionStatus").value("QUARANTINED"));
+    }
+
+    @Test
+    void doesNotExposeInternalStoredFilePathInDocumentDetail() throws Exception {
+        Instant createdAt = Instant.parse("2026-07-13T00:00:00Z");
+        when(documentQueryService.get(1L)).thenReturn(new DocumentDetailResponse(
+                1L,
+                "Guide",
+                null,
+                createdAt,
+                createdAt,
+                List.of(new DocumentVersionResponse(
+                        2L,
+                        1,
+                        "guide.txt",
+                        DocumentFileType.TXT,
+                        DocumentVersionStatus.QUARANTINED,
+                        createdAt))));
+
+        mockMvc.perform(get("/api/documents/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.versions[0].originalFileName").value("guide.txt"))
+                .andExpect(jsonPath("$.versions[0].storedFilePath").doesNotExist());
     }
 }

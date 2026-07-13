@@ -72,7 +72,6 @@ public class DocumentQueryService {
                 version.getId(),
                 version.getVersionNo(),
                 version.getOriginalFileName(),
-                version.getStoredFilePath(),
                 version.getFileType(),
                 version.getStatus(),
                 version.getCreatedAt());

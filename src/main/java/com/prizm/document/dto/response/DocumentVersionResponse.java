@@ -8,7 +8,6 @@ public record DocumentVersionResponse(
         Long versionId,
         int versionNo,
         String originalFileName,
-        String storedFilePath,
         DocumentFileType fileType,
         DocumentVersionStatus status,
         Instant createdAt) {

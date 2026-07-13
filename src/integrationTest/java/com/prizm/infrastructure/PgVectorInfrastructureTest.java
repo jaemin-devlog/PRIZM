@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.prizm.document.dto.response.DocumentDetailResponse;
 import com.prizm.document.dto.response.DocumentUploadResponse;
+import com.prizm.document.entity.DocumentType;
 import com.prizm.document.entity.DocumentVersionStatus;
 import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
@@ -151,7 +152,7 @@ class PgVectorInfrastructureTest {
                 PgVectorSmokeAssertions.verifyExactCosineSearch(jdbcTemplate);
 
         assertThat(serverVersion).isBetween(160000, 169999);
-        assertThat(successfulMigrations).isEqualTo(8);
+        assertThat(successfulMigrations).isEqualTo(9);
         assertThat(result.extensionVersion()).isEqualTo("0.8.2");
         assertThat(documentCount).isZero();
         assertThat(versionCount).isZero();
@@ -209,7 +210,10 @@ class PgVectorInfrastructureTest {
         DocumentDetailResponse detail = documentQueryService.get(ownerUserId, response.documentId());
 
         assertThat(response.status()).isEqualTo(DocumentVersionStatus.QUARANTINED);
+        assertThat(response.documentType()).isEqualTo(DocumentType.OTHER);
         assertThat(detail.activeVersionId()).isNull();
+        assertThat(detail.documentType()).isEqualTo(DocumentType.OTHER);
+        assertThat(documentQueryService.list(ownerUserId).get(0).documentType()).isEqualTo(DocumentType.OTHER);
         assertThat(detail.versions()).hasSize(1);
         assertThat(detail.versions().get(0).status()).isEqualTo(DocumentVersionStatus.QUARANTINED);
         assertThat(documentVersionRepository.findById(response.versionId()).orElseThrow().getContentHash())

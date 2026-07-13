@@ -2,6 +2,7 @@ package com.prizm.document.service;
 
 import com.prizm.document.dto.response.DocumentUploadResponse;
 import com.prizm.document.entity.Document;
+import com.prizm.document.entity.DocumentType;
 import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.exception.DocumentUploadErrorCode;
 import com.prizm.document.exception.DocumentUploadException;
@@ -58,10 +59,20 @@ public class DocumentUploadService {
      */
     @Transactional
     public DocumentUploadResponse upload(Long ownerUserId, String title, MultipartFile file) {
+        return upload(ownerUserId, title, DocumentType.OTHER, file);
+    }
+
+    @Transactional
+    public DocumentUploadResponse upload(
+            Long ownerUserId,
+            String title,
+            DocumentType documentType,
+            MultipartFile file) {
         String normalizedTitle = validateTitle(title);
         UploadContent content = validateAndRead(file);
+        DocumentType resolvedDocumentType = documentType == null ? DocumentType.OTHER : documentType;
 
-        Document document = documentRepository.save(Document.create(ownerUserId, normalizedTitle));
+        Document document = documentRepository.save(Document.create(ownerUserId, normalizedTitle, resolvedDocumentType));
         DocumentVersion version = documentVersionRepository.save(DocumentVersion.quarantined(
                 ownerUserId, document.getId(), content.originalFileName(), content.contentHash()));
 
@@ -88,6 +99,7 @@ public class DocumentUploadService {
                 version.getId(),
                 document.getTitle(),
                 version.getOriginalFileName(),
+                document.getDocumentType(),
                 version.getStatus(),
                 version.getCreatedAt());
     }

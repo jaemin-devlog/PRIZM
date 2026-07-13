@@ -222,9 +222,11 @@ class AuthenticationIntegrationTest {
         mockMvc.perform(multipart("/api/documents")
                         .file(file)
                         .param("title", "사용자 업로드")
+                        .param("documentType", "PORTFOLIO")
                         .header(HttpHeaders.AUTHORIZATION, bearer(token)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title").value("사용자 업로드"))
+                .andExpect(jsonPath("$.documentType").value("PORTFOLIO"))
                 .andExpect(jsonPath("$.status").value("QUARANTINED"));
 
         assertThat(processingJobRepository.count()).isEqualTo(1L);
@@ -237,6 +239,25 @@ class AuthenticationIntegrationTest {
                 "SELECT owner_user_id FROM documents WHERE id = ?",
                 Long.class,
                 version.getDocumentId())).isEqualTo(owner.getId());
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT document_type FROM documents WHERE id = ?",
+                String.class,
+                version.getDocumentId())).isEqualTo("PORTFOLIO");
+    }
+
+    @Test
+    void rejectsUnknownDocumentTypeWith400() throws Exception {
+        UserAccount owner = createUser(UserRole.USER, true);
+        String token = login(owner.getEmail());
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "invalid-type.txt", "text/plain", "문서 유형 검증".getBytes(StandardCharsets.UTF_8));
+
+        mockMvc.perform(multipart("/api/documents")
+                        .file(file)
+                        .param("title", "유형 검증")
+                        .param("documentType", "UNKNOWN")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

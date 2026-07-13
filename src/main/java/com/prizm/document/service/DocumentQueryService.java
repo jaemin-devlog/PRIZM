@@ -46,6 +46,7 @@ public class DocumentQueryService {
         return new DocumentDetailResponse(
                 document.getId(),
                 document.getTitle(),
+                document.getDocumentType(),
                 document.getActiveVersionId(),
                 document.getCreatedAt(),
                 document.getUpdatedAt(),
@@ -61,6 +62,7 @@ public class DocumentQueryService {
         return new DocumentSummaryResponse(
                 document.getId(),
                 document.getTitle(),
+                document.getDocumentType(),
                 document.getActiveVersionId(),
                 latestVersion == null ? null : latestVersion.getId(),
                 latestVersion == null ? null : latestVersion.getStatus(),

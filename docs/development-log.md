@@ -101,3 +101,10 @@ PRIZM의 기능, 리팩토링, 설계 판단과 검증 결과를 짧게 남기�
 - 유지: 원본 저장과 해시, 문서 버전, `active_version_id`, 청크·임베딩, exact cosine 검색, 처리 작업, lease, claim-version fencing, 재시도와 JWT 보안은 주제와 무관한 플랫폼 기반으로 유지했다.
 - 문서: `AGENTS.md`, `README.md`와 현재 구현 현황을 실제 코드 기준으로 다시 작성하고 OpenSQL·OpenProxy·OpenHA는 미검증 상태로 명시했다.
 - 검증: 단위 테스트 80개가 성공했다. 통합 테스트는 30개 중 Testcontainers PostgreSQL 16·pgvector 0.8.2·실제 Ollama와 V6→V7 데이터 전환을 포함한 29개가 성공했고, 실제 OpenSQL 접속 정보가 필요한 별도 테스트 1개만 제외됐다. 프런트엔드 lint·build와 Docker Compose 설정 검증도 성공했다.
+
+## 2026-07-14 문서 유형 저장
+
+- 변경: `documents.document_type`과 `DocumentType` enum을 추가하고, TXT 업로드에서 선택한 유형을 저장해 업로드·목록·상세 응답으로 반환한다.
+- 이유: 향후 커리어 문서 활용 기능의 기준 정보를 보관하되, 자동 분류나 유형별 필터 없이 사용자가 지정한 값만 다루기 위해서다.
+- 기본값: 요청에서 생략하거나 기존 V8 문서를 V9로 전환할 때는 `OTHER`를 사용하며, DB CHECK 제약으로 허용된 enum 문자열만 저장한다.
+- 검증: 단위 테스트와 PostgreSQL·pgvector·실제 Ollama 통합 테스트로 기본값, 지정 값, 잘못된 요청 400, 기존 소유권·검색 회귀를 확인했다.

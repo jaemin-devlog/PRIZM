@@ -41,7 +41,8 @@ class CareerPlatformMigrationTest {
         migrateLatest(database);
 
         assertOwnershipSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(8L);
+        assertDocumentTypeSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(9L);
         for (String table : DOCUMENT_TABLES) {
             assertThat(rowCount(database.jdbcTemplate(), table)).isZero();
         }
@@ -58,9 +59,30 @@ class CareerPlatformMigrationTest {
         migrateLatest(database);
 
         assertOwnershipSchema(database.jdbcTemplate());
+        assertDocumentTypeSchema(database.jdbcTemplate());
         for (String table : DOCUMENT_TABLES) {
             assertThat(rowCount(database.jdbcTemplate(), table)).isZero();
         }
+    }
+
+    @Test
+    void migratesExistingV8DocumentToOtherDocumentType() {
+        MigrationDatabase database = createMigrationDatabase();
+
+        migrateTo(database, "8");
+        Long ownerUserId = createUser(database.jdbcTemplate(), "owner@prizm.local", "USER", true);
+        Long documentId = database.jdbcTemplate().queryForObject(
+                "INSERT INTO documents(owner_user_id, title) VALUES (?, 'existing-document') RETURNING id",
+                Long.class,
+                ownerUserId);
+
+        migrateLatest(database);
+
+        assertThat(database.jdbcTemplate().queryForObject(
+                "SELECT document_type FROM documents WHERE id = ?", String.class, documentId))
+                .isEqualTo("OTHER");
+        assertDocumentTypeSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(9L);
     }
 
     @Test
@@ -256,6 +278,19 @@ class CareerPlatformMigrationTest {
                     Long.class,
                     indexName)).isEqualTo(1L);
         }
+    }
+
+    private void assertDocumentTypeSchema(JdbcTemplate jdbcTemplate) {
+        assertThat(jdbcTemplate.queryForObject(
+                """
+                SELECT is_nullable
+                FROM information_schema.columns
+                WHERE table_schema = 'public' AND table_name = 'documents' AND column_name = 'document_type'
+                """,
+                String.class)).isEqualTo("NO");
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM pg_constraint WHERE conname = 'ck_documents_document_type'", Long.class))
+                .isEqualTo(1L);
     }
 
     private long ownerColumnCount(JdbcTemplate jdbcTemplate, String tableName) {

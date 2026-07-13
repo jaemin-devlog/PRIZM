@@ -11,6 +11,7 @@ import static org.mockito.Mockito.lenient;
 
 import com.prizm.document.dto.response.DocumentUploadResponse;
 import com.prizm.document.entity.Document;
+import com.prizm.document.entity.DocumentType;
 import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.entity.DocumentVersionStatus;
 import com.prizm.document.exception.DocumentUploadErrorCode;
@@ -87,12 +88,14 @@ class DocumentUploadServiceTest {
         assertThat(response.versionId()).isEqualTo(22L);
         assertThat(response.title()).isEqualTo("Guide");
         assertThat(response.originalFileName()).isEqualTo("guide.txt");
+        assertThat(response.documentType()).isEqualTo(DocumentType.OTHER);
         assertThat(response.status()).isEqualTo(DocumentVersionStatus.QUARANTINED);
         assertThat(response.createdAt()).isNotNull();
         verify(fileStorage).store(11L, 22L, "guide.txt", content);
         var documentCaptor = org.mockito.ArgumentCaptor.forClass(Document.class);
         verify(documentRepository).save(documentCaptor.capture());
         assertThat(documentCaptor.getValue().getOwnerUserId()).isEqualTo(7L);
+        assertThat(documentCaptor.getValue().getDocumentType()).isEqualTo(DocumentType.OTHER);
         var versionCaptor = org.mockito.ArgumentCaptor.forClass(DocumentVersion.class);
         verify(documentVersionRepository).save(versionCaptor.capture());
         assertThat(versionCaptor.getValue().getOwnerUserId()).isEqualTo(7L);
@@ -101,6 +104,22 @@ class DocumentUploadServiceTest {
         assertThat(jobCaptor.getValue().getOwnerUserId()).isEqualTo(7L);
         assertThat(jobCaptor.getValue().getDocumentVersionId()).isEqualTo(22L);
         assertThat(jobCaptor.getValue().getStatus()).isEqualTo(ProcessingJobStatus.PENDING);
+    }
+
+    @Test
+    void storesSpecifiedDocumentType() {
+        byte[] content = "hello".getBytes(StandardCharsets.UTF_8);
+        MockMultipartFile file = new MockMultipartFile("file", "portfolio.txt", "text/plain", content);
+        when(fileStorage.store(11L, 22L, "portfolio.txt", content))
+                .thenReturn("documents/11/22/portfolio.txt");
+
+        DocumentUploadResponse response = documentUploadService.upload(
+                7L, "Portfolio", DocumentType.PORTFOLIO, file);
+
+        assertThat(response.documentType()).isEqualTo(DocumentType.PORTFOLIO);
+        var documentCaptor = org.mockito.ArgumentCaptor.forClass(Document.class);
+        verify(documentRepository).save(documentCaptor.capture());
+        assertThat(documentCaptor.getValue().getDocumentType()).isEqualTo(DocumentType.PORTFOLIO);
     }
 
     @Test

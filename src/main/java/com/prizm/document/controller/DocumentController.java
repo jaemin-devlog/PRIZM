@@ -4,6 +4,7 @@ import com.prizm.auth.security.CurrentUserProvider;
 import com.prizm.document.dto.response.DocumentDetailResponse;
 import com.prizm.document.dto.response.DocumentSummaryResponse;
 import com.prizm.document.dto.response.DocumentUploadResponse;
+import com.prizm.document.entity.DocumentType;
 import com.prizm.document.service.DocumentQueryService;
 import com.prizm.document.service.DocumentUploadService;
 import jakarta.validation.constraints.NotBlank;
@@ -44,9 +45,10 @@ public class DocumentController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DocumentUploadResponse> upload(
             @RequestParam @NotBlank @Size(max = 200) String title,
+            @RequestParam(required = false) DocumentType documentType,
             @RequestPart("file") MultipartFile file) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(documentUploadService.upload(currentUserProvider.userId(), title, file));
+                .body(documentUploadService.upload(currentUserProvider.userId(), title, documentType, file));
     }
 
     /** 문서 목록을 조회한다. */

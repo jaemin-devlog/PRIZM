@@ -1,6 +1,7 @@
 package com.prizm.document.controller;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.lenient;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -12,6 +13,7 @@ import com.prizm.document.dto.response.DocumentDetailResponse;
 import com.prizm.document.dto.response.DocumentUploadResponse;
 import com.prizm.document.dto.response.DocumentVersionResponse;
 import com.prizm.document.entity.DocumentFileType;
+import com.prizm.document.entity.DocumentType;
 import com.prizm.document.entity.DocumentVersionStatus;
 import com.prizm.document.service.DocumentQueryService;
 import com.prizm.document.service.DocumentUploadService;
@@ -46,7 +48,7 @@ class DocumentControllerTest {
     void setUp() {
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
-        when(currentUserProvider.userId()).thenReturn(7L);
+        lenient().when(currentUserProvider.userId()).thenReturn(7L);
         mockMvc = MockMvcBuilders.standaloneSetup(
                         new DocumentController(documentUploadService, documentQueryService, currentUserProvider))
                 .setControllerAdvice(new DocumentExceptionHandler())
@@ -57,23 +59,47 @@ class DocumentControllerTest {
     @Test
     void acceptsMultipartTxtUpload() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", "hello".getBytes());
-        when(documentUploadService.upload(7L, "Guide", file)).thenReturn(new DocumentUploadResponse(
-                1L, 2L, "Guide", "guide.txt", DocumentVersionStatus.QUARANTINED, Instant.parse("2026-07-13T00:00:00Z")));
+        when(documentUploadService.upload(7L, "Guide", DocumentType.PORTFOLIO, file)).thenReturn(new DocumentUploadResponse(
+                1L, 2L, "Guide", "guide.txt", DocumentType.PORTFOLIO,
+                DocumentVersionStatus.QUARANTINED, Instant.parse("2026-07-13T00:00:00Z")));
 
-        mockMvc.perform(multipart("/api/documents").file(file).param("title", "Guide"))
+        mockMvc.perform(multipart("/api/documents").file(file).param("title", "Guide").param("documentType", "PORTFOLIO"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.documentId").value(1))
                 .andExpect(jsonPath("$.versionId").value(2))
+                .andExpect(jsonPath("$.documentType").value("PORTFOLIO"))
                 .andExpect(jsonPath("$.status").value("QUARANTINED"));
+    }
+
+    @Test
+    void acceptsMultipartUploadWithoutDocumentType() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", "hello".getBytes());
+        when(documentUploadService.upload(7L, "Guide", null, file)).thenReturn(new DocumentUploadResponse(
+                1L, 2L, "Guide", "guide.txt", DocumentType.OTHER,
+                DocumentVersionStatus.QUARANTINED, Instant.parse("2026-07-13T00:00:00Z")));
+
+        mockMvc.perform(multipart("/api/documents").file(file).param("title", "Guide"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.documentType").value("OTHER"));
+    }
+
+    @Test
+    void rejectsUnknownDocumentType() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", "hello".getBytes());
+
+        mockMvc.perform(multipart("/api/documents").file(file).param("title", "Guide").param("documentType", "UNKNOWN"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     void returnsDocumentList() throws Exception {
         when(documentQueryService.list(7L)).thenReturn(List.of(new DocumentSummaryResponse(
-                1L, "Guide", null, 2L, DocumentVersionStatus.QUARANTINED, Instant.parse("2026-07-13T00:00:00Z"))));
+                1L, "Guide", DocumentType.PROJECT_REPORT, null, 2L,
+                DocumentVersionStatus.QUARANTINED, Instant.parse("2026-07-13T00:00:00Z"))));
 
         mockMvc.perform(get("/api/documents"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].documentType").value("PROJECT_REPORT"))
                 .andExpect(jsonPath("$[0].latestVersionStatus").value("QUARANTINED"));
     }
 
@@ -83,6 +109,7 @@ class DocumentControllerTest {
         when(documentQueryService.get(7L, 1L)).thenReturn(new DocumentDetailResponse(
                 1L,
                 "Guide",
+                DocumentType.PORTFOLIO,
                 null,
                 createdAt,
                 createdAt,
@@ -96,6 +123,7 @@ class DocumentControllerTest {
 
         mockMvc.perform(get("/api/documents/1"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.documentType").value("PORTFOLIO"))
                 .andExpect(jsonPath("$.versions[0].originalFileName").value("guide.txt"))
                 .andExpect(jsonPath("$.versions[0].storedFilePath").doesNotExist());
     }

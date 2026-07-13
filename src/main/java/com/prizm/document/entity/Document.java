@@ -2,6 +2,8 @@ package com.prizm.document.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,6 +25,10 @@ public class Document {
     @Column(nullable = false, length = 200)
     private String title;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "document_type", nullable = false, length = 30)
+    private DocumentType documentType;
+
     @Column(name = "active_version_id")
     private Long activeVersionId;
 
@@ -35,15 +41,20 @@ public class Document {
     protected Document() {
     }
 
-    private Document(Long ownerUserId, String title) {
+    private Document(Long ownerUserId, String title, DocumentType documentType) {
         this.ownerUserId = ownerUserId;
         this.title = title;
+        this.documentType = documentType;
         this.createdAt = Instant.now();
         this.updatedAt = createdAt;
     }
 
     public static Document create(Long ownerUserId, String title) {
-        return new Document(ownerUserId, title);
+        return create(ownerUserId, title, DocumentType.OTHER);
+    }
+
+    public static Document create(Long ownerUserId, String title, DocumentType documentType) {
+        return new Document(ownerUserId, title, documentType);
     }
 
     @PreUpdate
@@ -69,6 +80,10 @@ public class Document {
 
     public String getTitle() {
         return title;
+    }
+
+    public DocumentType getDocumentType() {
+        return documentType;
     }
 
     public Long getActiveVersionId() {

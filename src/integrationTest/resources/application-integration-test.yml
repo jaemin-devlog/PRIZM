@@ -7,4 +7,4 @@ spring:
   ai:
     model:
       chat: none
-      embedding: none
+      embedding: ollama

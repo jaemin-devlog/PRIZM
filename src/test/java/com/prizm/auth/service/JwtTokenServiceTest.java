@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.List;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
@@ -54,6 +57,14 @@ class JwtTokenServiceTest {
     }
 
     @Test
+    void rejectsTokenWithoutExpiration() {
+        JwtTokenService service = tokenService(Clock.systemUTC(), 3600);
+
+        assertThatThrownBy(() -> service.decode(customTokenWithoutExpiration()))
+                .isInstanceOf(JwtException.class);
+    }
+
+    @Test
     void rejectsTamperedToken() {
         JwtTokenService service = tokenService(Clock.systemUTC(), 3600);
         String token = service.issue(user(9L, UserRole.USER)).value();
@@ -81,10 +92,24 @@ class JwtTokenServiceTest {
                 .isInstanceOf(JwtException.class);
     }
 
+    @Test
+    void redactsIssuedAccessTokenFromStringRepresentation() {
+        IssuedAccessToken token = tokenService(Clock.systemUTC(), 3600).issue(user(11L, UserRole.USER));
+
+        assertThat(token.toString())
+                .doesNotContain(token.value())
+                .contains("[REDACTED]")
+                .contains("expiresInSeconds=3600");
+    }
+
     private JwtTokenService tokenService(Clock clock, long expirationSeconds) {
         SecretKey key = new SecretKeySpec(SECRET.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
         NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
-        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer("prizm"));
+        JwtTimestampValidator timestampValidator = new JwtTimestampValidator();
+        timestampValidator.setAllowEmptyExpiryClaim(false);
+        decoder.setJwtValidator(JwtValidators.createDefaultWithValidators(List.of(
+                timestampValidator,
+                new JwtIssuerValidator("prizm"))));
         return new JwtTokenService(
                 NimbusJwtEncoder.withSecretKey(key).build(),
                 decoder,
@@ -107,6 +132,22 @@ class JwtTokenServiceTest {
                 .encode(JwtEncoderParameters.from(
                         JwsHeader.with(MacAlgorithm.HS256).type("JWT").build(),
                         claims.build()))
+                .getTokenValue();
+    }
+
+    private String customTokenWithoutExpiration() {
+        SecretKey key = new SecretKeySpec(SECRET.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("prizm")
+                .subject("10")
+                .issuedAt(Instant.now())
+                .claim("email", "user@example.com")
+                .claim("role", "USER")
+                .build();
+        return NimbusJwtEncoder.withSecretKey(key).build()
+                .encode(JwtEncoderParameters.from(
+                        JwsHeader.with(MacAlgorithm.HS256).type("JWT").build(),
+                        claims))
                 .getTokenValue();
     }
 

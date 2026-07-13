@@ -580,7 +580,7 @@ PRIZM_JWT_ISSUER=prizm
 PRIZM_CORS_ALLOWED_ORIGINS=http://localhost:5173
 ```
 
-JWT 만료 시간은 60초 이상 86,400초 이하만 허용한다. 사용자 ID는 `sub` 하나만 사용하고, issuer·서명·만료를 검증한 뒤 DB의 현재 이메일·역할·활성 상태를 다시 확인한다. 비활성화되거나 삭제된 사용자의 기존 토큰도 거부된다.
+JWT 만료 시간은 60초 이상 86,400초 이하만 허용한다. 모든 Access Token에는 `exp`가 반드시 있어야 하며, 사용자 ID는 `sub` 하나만 사용한다. issuer·서명·만료를 검증한 뒤 DB의 현재 이메일·역할·활성 상태를 다시 확인하고, 비활성화되거나 삭제된 사용자의 기존 토큰도 거부한다. 인증 관련 객체를 문자열로 출력할 때는 비밀번호·JWT·비밀키를 마스킹한다.
 
 사용자 등록 API와 평문 기본 계정은 만들지 않는다. 깨끗한 DB에서 최초 ADMIN이 필요할 때만 아래의 일회성 bootstrap을 사용한다. 비밀번호는 콘솔 입력으로만 받고 저장 시 BCrypt 해시로 변환한다.
 
@@ -603,7 +603,7 @@ Remove-Item Env:PRIZM_BOOTSTRAP_ADMIN_PASSWORD
 
 기존 ADMIN 또는 같은 이메일 계정이 있거나 설정이 누락되면 bootstrap은 기존 계정·비밀번호를 변경하지 않고 기동을 실패시킨다. API 보안은 명시한 로그인과 정확한 `/actuator/health`, 오류 처리 경로만 공개하고 나머지 미등록 경로는 `denyAll`로 차단한다. CORS는 명시적인 HTTP·HTTPS Origin만 허용하며 wildcard는 거부한다. C/S/O 문서 보안 등급 권한은 아직 구현하지 않았다.
 
-2026-07-13 기준 단위 테스트 83개가 성공했고, PostgreSQL·pgvector·실제 Ollama 통합 테스트는 28개 성공했다. 실제 OpenSQL 환경 테스트 1개는 기존과 같이 환경 미제공으로 제외되며, Docker나 Ollama가 없을 때 핵심 통합 테스트를 성공으로 건너뛰지는 않는다.
+2026-07-13 기준 단위 테스트 85개가 성공했고, PostgreSQL·pgvector·실제 Ollama 통합 테스트는 29개 성공했다. 실제 OpenSQL 환경 테스트 1개는 기존과 같이 환경 미제공으로 제외되며, Docker나 Ollama가 없을 때 핵심 통합 테스트를 성공으로 건너뛰지는 않는다.
 
 ### MCP
 

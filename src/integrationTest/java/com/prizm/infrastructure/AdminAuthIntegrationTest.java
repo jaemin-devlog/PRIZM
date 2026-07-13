@@ -278,6 +278,19 @@ class AdminAuthIntegrationTest {
     }
 
     @Test
+    void rejectsJwtWithoutExpirationThroughSecurityFilterChain() throws Exception {
+        UserAccount user = createUser(UserRole.USER, true);
+        String token = signedTokenWithoutExpiration(user);
+
+        String responseBody = expectUnauthorized("Bearer " + token);
+
+        assertThat(responseBody)
+                .doesNotContain(token)
+                .doesNotContain("exp is required")
+                .doesNotContain("JwtValidationException");
+    }
+
+    @Test
     void rejectsDeterministicallyTamperedJwtThroughSecurityFilterChain() throws Exception {
         String token = tokenFor(UserRole.USER);
         String[] parts = token.split("\\.");
@@ -388,12 +401,16 @@ class AdminAuthIntegrationTest {
         return authService.login(new LoginRequest(email, "test-password")).accessToken();
     }
 
-    private void expectUnauthorized(String authorization) throws Exception {
-        mockMvc.perform(get("/api/users/me")
+    private String expectUnauthorized(String authorization) throws Exception {
+        return mockMvc.perform(get("/api/users/me")
                         .header(HttpHeaders.AUTHORIZATION, authorization))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty());
+                .andExpect(jsonPath("$.message").value("인증이 필요합니다."))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
     }
 
     private String signedToken(
@@ -410,6 +427,20 @@ class AdminAuthIntegrationTest {
                 .expiresAt(expiresAt)
                 .claim("email", email)
                 .claim("role", role)
+                .build();
+        return jwtEncoder.encode(JwtEncoderParameters.from(
+                        JwsHeader.with(MacAlgorithm.HS256).type("JWT").build(),
+                        claims))
+                .getTokenValue();
+    }
+
+    private String signedTokenWithoutExpiration(UserAccount user) {
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("prizm")
+                .subject(user.getId().toString())
+                .issuedAt(Instant.now())
+                .claim("email", user.getEmail())
+                .claim("role", user.getRole().name())
                 .build();
         return jwtEncoder.encode(JwtEncoderParameters.from(
                         JwsHeader.with(MacAlgorithm.HS256).type("JWT").build(),

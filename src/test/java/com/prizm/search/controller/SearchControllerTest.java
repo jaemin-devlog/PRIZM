@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.prizm.auth.security.CurrentUserProvider;
+import com.prizm.ingestion.entity.ChunkSourceType;
 import com.prizm.search.dto.response.SearchResponse;
 import com.prizm.search.service.SearchService;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,6 +53,9 @@ class SearchControllerTest {
                         1,
                         1,
                         null,
+                        ChunkSourceType.TEXT_CHUNK,
+                        1,
+                        "텍스트 구간 1",
                         "연차 신청은 인사 시스템에서 진행합니다.",
                         0.25d,
                         0.75d));
@@ -65,6 +69,9 @@ class SearchControllerTest {
                 .andExpect(jsonPath("$.documentTitle").value("휴가 안내"))
                 .andExpect(jsonPath("$.chunkNo").value(1))
                 .andExpect(jsonPath("$.pageNo").doesNotExist())
+                .andExpect(jsonPath("$.sourceType").value("TEXT_CHUNK"))
+                .andExpect(jsonPath("$.sourceIndex").value(1))
+                .andExpect(jsonPath("$.sourceLabel").value("텍스트 구간 1"))
                 .andExpect(jsonPath("$.content").value("연차 신청은 인사 시스템에서 진행합니다."))
                 .andExpect(jsonPath("$.distance").value(0.25d))
                 .andExpect(jsonPath("$.score").value(0.75d));

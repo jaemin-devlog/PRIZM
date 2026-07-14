@@ -11,8 +11,11 @@ import org.springframework.stereotype.Repository;
 public class DocumentChunkRepository {
 
     private static final String INSERT_SQL = """
-            INSERT INTO document_chunks(owner_user_id, document_version_id, chunk_no, page_no, content, embedding)
-            VALUES (?, ?, ?, NULL, ?, CAST(? AS vector))
+            INSERT INTO document_chunks(
+                owner_user_id, document_version_id, chunk_no, page_no,
+                source_type, source_index, source_label, content, embedding
+            )
+            VALUES (?, ?, ?, NULL, ?, ?, ?, ?, CAST(? AS vector))
             """;
 
     private final JdbcTemplate jdbcTemplate;
@@ -31,8 +34,11 @@ public class DocumentChunkRepository {
                     statement.setLong(1, ownerUserId);
                     statement.setLong(2, documentVersionId);
                     statement.setInt(3, chunk.chunkNo());
-                    statement.setString(4, chunk.content());
-                    statement.setString(5, toVectorLiteral(chunk.embedding()));
+                    statement.setString(4, chunk.sourceType().name());
+                    statement.setInt(5, chunk.sourceIndex());
+                    statement.setString(6, chunk.sourceLabel());
+                    statement.setString(7, chunk.content());
+                    statement.setString(8, toVectorLiteral(chunk.embedding()));
                 });
     }
 

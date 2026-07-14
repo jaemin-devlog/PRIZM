@@ -42,7 +42,8 @@ class CareerPlatformMigrationTest {
 
         assertOwnershipSchema(database.jdbcTemplate());
         assertDocumentTypeSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(9L);
+        assertChunkSourceSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(10L);
         for (String table : DOCUMENT_TABLES) {
             assertThat(rowCount(database.jdbcTemplate(), table)).isZero();
         }
@@ -82,7 +83,77 @@ class CareerPlatformMigrationTest {
                 "SELECT document_type FROM documents WHERE id = ?", String.class, documentId))
                 .isEqualTo("OTHER");
         assertDocumentTypeSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(9L);
+        assertChunkSourceSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(10L);
+    }
+
+    @Test
+    void backfillsV9ChunksWithTextSourceWithoutDeletingContentOrEmbeddings() {
+        MigrationDatabase database = createMigrationDatabase();
+
+        migrateTo(database, "9");
+        Long ownerUserId = createUser(database.jdbcTemplate(), "owner@prizm.local", "USER", true);
+        Long documentId = database.jdbcTemplate().queryForObject(
+                "INSERT INTO documents(owner_user_id, title, document_type) VALUES (?, 'existing-document', 'OTHER') RETURNING id",
+                Long.class,
+                ownerUserId);
+        Long versionId = database.jdbcTemplate().queryForObject(
+                """
+                INSERT INTO document_versions(
+                    owner_user_id, document_id, version_no, original_file_name, stored_file_path, file_type,
+                    content_hash, status
+                )
+                VALUES (?, ?, 1, 'existing.txt', 'documents/existing.txt', 'TXT', repeat('a', 64), 'ACTIVE')
+                RETURNING id
+                """,
+                Long.class,
+                ownerUserId,
+                documentId);
+        database.jdbcTemplate().update(
+                """
+                INSERT INTO document_chunks(
+                    owner_user_id, content, embedding, document_version_id, chunk_no, page_no
+                )
+                VALUES (?, ?, array_fill(0::real, ARRAY[1024])::vector, ?, ?, NULL)
+                """,
+                ownerUserId,
+                "first existing chunk",
+                versionId,
+                5);
+        database.jdbcTemplate().update(
+                """
+                INSERT INTO document_chunks(
+                    owner_user_id, content, embedding, document_version_id, chunk_no, page_no
+                )
+                VALUES (?, ?, array_fill(0::real, ARRAY[1024])::vector, ?, ?, NULL)
+                """,
+                ownerUserId,
+                "second existing chunk",
+                versionId,
+                9);
+
+        migrateLatest(database);
+
+        List<StoredChunk> chunks = database.jdbcTemplate().query(
+                """
+                SELECT content, source_type, source_index, source_label, vector_dims(embedding) AS embedding_dimensions
+                FROM document_chunks
+                WHERE document_version_id = ?
+                ORDER BY chunk_no
+                """,
+                (resultSet, rowNum) -> new StoredChunk(
+                        resultSet.getString("content"),
+                        resultSet.getString("source_type"),
+                        resultSet.getInt("source_index"),
+                        resultSet.getString("source_label"),
+                        resultSet.getInt("embedding_dimensions")),
+                versionId);
+
+        assertThat(chunks).containsExactly(
+                new StoredChunk("first existing chunk", "TEXT_CHUNK", 1, "텍스트 구간 1", 1024),
+                new StoredChunk("second existing chunk", "TEXT_CHUNK", 2, "텍스트 구간 2", 1024));
+        assertChunkSourceSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(10L);
     }
 
     @Test
@@ -293,6 +364,25 @@ class CareerPlatformMigrationTest {
                 .isEqualTo(1L);
     }
 
+    private void assertChunkSourceSchema(JdbcTemplate jdbcTemplate) {
+        for (String columnName : List.of("source_type", "source_index", "source_label")) {
+            assertThat(jdbcTemplate.queryForObject(
+                    """
+                    SELECT is_nullable
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public' AND table_name = 'document_chunks' AND column_name = ?
+                    """,
+                    String.class,
+                    columnName)).isEqualTo("NO");
+        }
+        for (String constraintName : List.of(
+                "ck_document_chunks_source_type", "ck_document_chunks_source_index")) {
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM pg_constraint WHERE conname = ?", Long.class, constraintName))
+                    .isEqualTo(1L);
+        }
+    }
+
     private long ownerColumnCount(JdbcTemplate jdbcTemplate, String tableName) {
         return jdbcTemplate.queryForObject(
                 """
@@ -317,5 +407,13 @@ class CareerPlatformMigrationTest {
     }
 
     private record LegacyDocument(Long documentId, Long versionId, Long chunkId, Long processingJobId) {
+    }
+
+    private record StoredChunk(
+            String content,
+            String sourceType,
+            int sourceIndex,
+            String sourceLabel,
+            int embeddingDimensions) {
     }
 }

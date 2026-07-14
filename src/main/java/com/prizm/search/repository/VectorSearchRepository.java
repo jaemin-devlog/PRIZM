@@ -1,5 +1,7 @@
 package com.prizm.search.repository;
 
+import com.prizm.ingestion.entity.ChunkSourceType;
+
 import java.util.List;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,6 +22,9 @@ public class VectorSearchRepository {
                    version.version_no,
                    chunk.chunk_no,
                    chunk.page_no,
+                   chunk.source_type,
+                   chunk.source_index,
+                   chunk.source_label,
                    chunk.content,
                    chunk.embedding <=> CAST(? AS vector) AS distance
             FROM document_chunks chunk
@@ -63,6 +68,9 @@ public class VectorSearchRepository {
                             resultSet.getInt("version_no"),
                             resultSet.getInt("chunk_no"),
                             resultSet.getObject("page_no", Integer.class),
+                            ChunkSourceType.valueOf(resultSet.getString("source_type")),
+                            resultSet.getInt("source_index"),
+                            resultSet.getString("source_label"),
                             resultSet.getString("content"),
                             distance,
                             // distance를 유사도 형태로 보여주기 위해 역변환한다. 정확도나 확률은 아니다.

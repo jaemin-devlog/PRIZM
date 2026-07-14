@@ -1,4 +1,12 @@
 package com.prizm.ingestion.service;
 
-public record IndexedChunk(int chunkNo, String content, float[] embedding) {
+import com.prizm.ingestion.entity.ChunkSourceType;
+
+public record IndexedChunk(
+        int chunkNo,
+        ChunkSourceType sourceType,
+        int sourceIndex,
+        String sourceLabel,
+        String content,
+        float[] embedding) {
 }

@@ -136,3 +136,9 @@ PRIZM의 기능, 리팩토링, 설계 판단과 검증 결과를 짧게 남기�
 - 이유: 이미 구현된 TXT 업로드 API를 프런트엔드 문서 목록 화면에 연결하되 PDF, 상세, 검색, 진행률 같은 다음 범위는 포함하지 않기 위해서다.
 - 설계: `FormData`에 `title`, `documentType`, `file`을 넣고 Bearer Access Token을 전송한다. 성공하면 입력을 초기화하고 현재 선택된 문서 유형 필터를 유지한 채 목록을 다시 조회한다.
 - 검증: 기존 프런트엔드 테스트 환경은 없어 새 도구를 추가하지 않았고, `npm run lint`, `npm run build`, `git diff --check`로 확인한다.
+
+## 2026-07-14 TXT 청크 출처 정보
+
+- 변경: `document_chunks`에 TXT 청크의 출처 유형·표시 순서·표시 라벨을 저장하고, 검색 응답에 함께 반환하도록 V10 migration과 JDBC 저장·검색 경로를 추가했다.
+- 설계: 기존 `chunk_no`는 변경하지 않는다. TXT Worker는 `TEXT_CHUNK`, 1부터 시작하는 `source_index`, `텍스트 구간 N` 라벨을 저장하며, V9 기존 청크는 버전별 `chunk_no` 순서로 안전하게 backfill한다.
+- 검증: PostgreSQL 16+pgvector Testcontainers와 Ollama를 사용해 `./gradlew.bat test --no-daemon --rerun-tasks`, `./gradlew.bat integrationTest --no-daemon --rerun-tasks`를 성공했다. OpenSQL 실환경 테스트는 기존 제외 정책에 따라 실행하지 않았다.

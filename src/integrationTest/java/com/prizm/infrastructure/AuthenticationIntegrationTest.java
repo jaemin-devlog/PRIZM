@@ -277,6 +277,9 @@ class AuthenticationIntegrationTest {
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.documentVersionId").value(activeDocument.versionId()))
+                .andExpect(jsonPath("$.sourceType").value("TEXT_CHUNK"))
+                .andExpect(jsonPath("$.sourceIndex").value(1))
+                .andExpect(jsonPath("$.sourceLabel").value("텍스트 구간 1"))
                 .andExpect(jsonPath("$.content").value(content));
     }
 
@@ -623,9 +626,10 @@ class AuthenticationIntegrationTest {
         jdbcTemplate.update(
                 """
                 INSERT INTO document_chunks(
-                    owner_user_id, content, embedding, document_version_id, chunk_no, page_no
+                    owner_user_id, content, embedding, document_version_id, chunk_no, page_no,
+                    source_type, source_index, source_label
                 )
-                VALUES (?, ?, CAST(? AS vector), ?, 1, NULL)
+                VALUES (?, ?, CAST(? AS vector), ?, 1, NULL, 'TEXT_CHUNK', 1, '텍스트 구간 1')
                 """,
                 ownerUserId,
                 content,

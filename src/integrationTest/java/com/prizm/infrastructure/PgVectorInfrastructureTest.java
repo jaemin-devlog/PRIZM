@@ -14,6 +14,7 @@ import com.prizm.document.service.DocumentUploadService;
 import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
+import com.prizm.ingestion.entity.ChunkSourceType;
 import com.prizm.ingestion.exception.StaleProcessingJobClaimException;
 import com.prizm.ingestion.repository.ProcessingJobRepository;
 import com.prizm.ingestion.service.ClaimedProcessingJob;
@@ -152,7 +153,7 @@ class PgVectorInfrastructureTest {
                 PgVectorSmokeAssertions.verifyExactCosineSearch(jdbcTemplate);
 
         assertThat(serverVersion).isBetween(160000, 169999);
-        assertThat(successfulMigrations).isEqualTo(9);
+        assertThat(successfulMigrations).isEqualTo(10L);
         assertThat(result.extensionVersion()).isEqualTo("0.8.2");
         assertThat(documentCount).isZero();
         assertThat(versionCount).isZero();
@@ -174,16 +175,19 @@ class PgVectorInfrastructureTest {
             jdbcTemplate.update(
                     """
                     INSERT INTO document_chunks(
-                        owner_user_id, content, embedding, document_version_id, chunk_no, page_no
+                        owner_user_id, content, embedding, document_version_id, chunk_no, page_no,
+                        source_type, source_index, source_label
                     )
-                    VALUES (?, ?, CAST(? AS vector), ?, ?, ?)
+                    VALUES (?, ?, CAST(? AS vector), ?, ?, ?, 'TEXT_CHUNK', ?, ?)
                     """,
                     ownerUserId,
                     sentence,
                     toVectorLiteral(embedding),
                     documentVersionId,
                     index + 1,
-                    1);
+                    1,
+                    index + 1,
+                    "텍스트 구간 " + (index + 1));
         }
 
         SearchResponse result = searchService.search(ownerUserId, "휴가는 어디에서 신청하나요?");
@@ -192,6 +196,9 @@ class PgVectorInfrastructureTest {
         assertThat(result.documentTitle()).isEqualTo("Vector search verification");
         assertThat(result.documentVersionId()).isEqualTo(documentVersionId);
         assertThat(result.chunkNo()).isEqualTo(1);
+        assertThat(result.sourceType()).isEqualTo(ChunkSourceType.TEXT_CHUNK);
+        assertThat(result.sourceIndex()).isEqualTo(1);
+        assertThat(result.sourceLabel()).isEqualTo("텍스트 구간 1");
         assertThat(result.distance()).isBetween(0.0d, 2.0d);
         assertThat(result.score()).isEqualTo(1.0d - result.distance());
     }
@@ -231,7 +238,8 @@ class PgVectorInfrastructureTest {
     void uploadsIndexesAndSearchesActiveTxtDocumentAutomatically() {
         Long ownerUserId = createUser();
         byte[] content = ("연차 신청은 인사 시스템에서 진행합니다. "
-                        + "휴가 신청 절차는 사내 인사 시스템의 휴가 메뉴를 사용합니다.")
+                        + "휴가 신청 절차는 사내 인사 시스템의 휴가 메뉴를 사용합니다. ")
+                .repeat(40)
                 .getBytes(StandardCharsets.UTF_8);
         DocumentUploadResponse uploaded = documentUploadService.upload(
                 ownerUserId,
@@ -289,14 +297,37 @@ class PgVectorInfrastructureTest {
                     Long.class,
                     uploaded.versionId(),
                     ownerUserId)).isPositive();
+            List<StoredChunkSource> storedSources = jdbcTemplate.query(
+                    """
+                    SELECT chunk_no, source_type, source_index, source_label
+                    FROM document_chunks
+                    WHERE document_version_id = ?
+                    ORDER BY source_index
+                    """,
+                    (resultSet, rowNum) -> new StoredChunkSource(
+                            resultSet.getInt("chunk_no"),
+                            resultSet.getString("source_type"),
+                            resultSet.getInt("source_index"),
+                            resultSet.getString("source_label")),
+                    uploaded.versionId());
+            assertThat(storedSources).hasSizeGreaterThan(1);
+            for (int index = 0; index < storedSources.size(); index++) {
+                StoredChunkSource source = storedSources.get(index);
+                assertThat(source.chunkNo()).isEqualTo(index + 1);
+                assertThat(source.sourceType()).isEqualTo("TEXT_CHUNK");
+                assertThat(source.sourceIndex()).isEqualTo(index + 1);
+                assertThat(source.sourceLabel()).isEqualTo("텍스트 구간 " + (index + 1));
+            }
 
             SearchResponse result = searchService.search(ownerUserId, "휴가는 어디에서 신청하나요?");
             assertThat(result.documentId()).isEqualTo(uploaded.documentId());
             assertThat(result.documentVersionId()).isEqualTo(uploaded.versionId());
             assertThat(result.documentTitle()).isEqualTo("휴가 신청 안내");
             assertThat(result.versionNo()).isEqualTo(1);
-            assertThat(result.chunkNo()).isEqualTo(1);
             assertThat(result.pageNo()).isNull();
+            assertThat(result.sourceType()).isEqualTo(ChunkSourceType.TEXT_CHUNK);
+            assertThat(result.sourceIndex()).isBetween(1, storedSources.size());
+            assertThat(result.sourceLabel()).isEqualTo("텍스트 구간 " + result.sourceIndex());
             assertThat(result.content()).contains("인사 시스템");
             assertThat(result.score()).isEqualTo(1.0d - result.distance());
         }
@@ -333,9 +364,10 @@ class PgVectorInfrastructureTest {
         jdbcTemplate.update(
                 """
                 INSERT INTO document_chunks(
-                    owner_user_id, content, embedding, document_version_id, chunk_no, page_no
+                    owner_user_id, content, embedding, document_version_id, chunk_no, page_no,
+                    source_type, source_index, source_label
                 )
-                VALUES (?, ?, CAST(? AS vector), ?, 1, NULL)
+                VALUES (?, ?, CAST(? AS vector), ?, 1, NULL, 'TEXT_CHUNK', 1, '텍스트 구간 1')
                 """,
                 ownerUserId,
                 content,
@@ -493,9 +525,10 @@ class PgVectorInfrastructureTest {
         jdbcTemplate.update(
                 """
                 INSERT INTO document_chunks(
-                    owner_user_id, content, embedding, document_version_id, chunk_no, page_no
+                    owner_user_id, content, embedding, document_version_id, chunk_no, page_no,
+                    source_type, source_index, source_label
                 )
-                VALUES (?, ?, CAST(? AS vector), ?, 1, NULL)
+                VALUES (?, ?, CAST(? AS vector), ?, 1, NULL, 'TEXT_CHUNK', 1, '텍스트 구간 1')
                 """,
                 ownerUserId,
                 activeContent,
@@ -629,7 +662,8 @@ class PgVectorInfrastructureTest {
     private IndexedChunk indexedChunk(String content) {
         float[] embedding = new float[1024];
         embedding[0] = 1.0f;
-        return new IndexedChunk(1, content, embedding);
+        return new IndexedChunk(
+                1, ChunkSourceType.TEXT_CHUNK, 1, "텍스트 구간 1", content, embedding);
     }
 
     private Instant databaseNow() {
@@ -675,5 +709,8 @@ class PgVectorInfrastructureTest {
             Long documentId,
             Long documentVersionId,
             Long processingJobId) {
+    }
+
+    private record StoredChunkSource(int chunkNo, String sourceType, int sourceIndex, String sourceLabel) {
     }
 }

@@ -1,8 +1,10 @@
 package com.prizm.ingestion.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -14,6 +16,7 @@ import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.infrastructure.storage.FileStorageException;
 import com.prizm.ingestion.config.IngestionProperties;
+import com.prizm.ingestion.entity.ChunkSourceType;
 import com.prizm.ingestion.exception.DocumentIndexingException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -79,7 +82,18 @@ class DocumentIndexingProcessorTest {
         processor.process(claimedJob);
 
         verify(leaseService, times(3)).renew(claimedJob);
-        verify(completionService).complete(any(ClaimedProcessingJob.class), any(List.class));
+        verify(completionService).complete(any(ClaimedProcessingJob.class), argThat(indexedChunks -> {
+            assertThat(indexedChunks).hasSize(2);
+            assertThat(indexedChunks.get(0).chunkNo()).isEqualTo(1);
+            assertThat(indexedChunks.get(0).sourceType()).isEqualTo(ChunkSourceType.TEXT_CHUNK);
+            assertThat(indexedChunks.get(0).sourceIndex()).isEqualTo(1);
+            assertThat(indexedChunks.get(0).sourceLabel()).isEqualTo("텍스트 구간 1");
+            assertThat(indexedChunks.get(1).chunkNo()).isEqualTo(2);
+            assertThat(indexedChunks.get(1).sourceType()).isEqualTo(ChunkSourceType.TEXT_CHUNK);
+            assertThat(indexedChunks.get(1).sourceIndex()).isEqualTo(2);
+            assertThat(indexedChunks.get(1).sourceLabel()).isEqualTo("텍스트 구간 2");
+            return true;
+        }));
     }
 
     @Test

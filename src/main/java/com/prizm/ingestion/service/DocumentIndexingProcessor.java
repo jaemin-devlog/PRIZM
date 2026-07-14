@@ -7,6 +7,7 @@ import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.infrastructure.storage.FileStorageException;
 import com.prizm.ingestion.config.IngestionProperties;
+import com.prizm.ingestion.entity.ChunkSourceType;
 import com.prizm.ingestion.exception.DocumentIndexingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
@@ -68,7 +69,14 @@ public class DocumentIndexingProcessor {
             TextChunk chunk = textChunks.get(index);
             float[] embedding = embeddingService.embed(chunk.content());
             validateEmbedding(embedding);
-            indexedChunks.add(new IndexedChunk(chunk.chunkNo(), chunk.content(), embedding));
+            int sourceIndex = chunk.chunkNo();
+            indexedChunks.add(new IndexedChunk(
+                    chunk.chunkNo(),
+                    ChunkSourceType.TEXT_CHUNK,
+                    sourceIndex,
+                    "텍스트 구간 " + sourceIndex,
+                    chunk.content(),
+                    embedding));
             if ((index + 1) % leaseRefreshChunkInterval == 0) {
                 leaseService.renew(claimedJob);
             }

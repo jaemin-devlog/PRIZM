@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.prizm.embedding.service.EmbeddingService;
+import com.prizm.ingestion.entity.ChunkSourceType;
 import com.prizm.search.dto.response.SearchResponse;
 import com.prizm.search.exception.InvalidSearchQueryException;
 import com.prizm.search.exception.SearchResultNotFoundException;
@@ -38,6 +39,9 @@ class SearchServiceTest {
                         1,
                         1,
                         null,
+                        ChunkSourceType.TEXT_CHUNK,
+                        1,
+                        "텍스트 구간 1",
                         "연차 신청은 인사 시스템에서 진행합니다.",
                         0.2d,
                         0.8d);
@@ -55,6 +59,9 @@ class SearchServiceTest {
                         1,
                         1,
                         null,
+                        ChunkSourceType.TEXT_CHUNK,
+                        1,
+                        "텍스트 구간 1",
                         "연차 신청은 인사 시스템에서 진행합니다.",
                         0.2d,
                         0.8d));

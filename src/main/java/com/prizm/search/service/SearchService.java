@@ -43,6 +43,9 @@ public class SearchService {
                         result.versionNo(),
                         result.chunkNo(),
                         result.pageNo(),
+                        result.sourceType(),
+                        result.sourceIndex(),
+                        result.sourceLabel(),
                         result.content(),
                         result.distance(),
                         result.score()))

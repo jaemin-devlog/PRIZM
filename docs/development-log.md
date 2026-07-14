@@ -224,3 +224,11 @@
 - 측정: 별도 `searchEvaluation` task가 실제 PostgreSQL·pgvector와 Ollama `bge-m3`, 현재 청킹·owner·ACTIVE 조건을 사용해 Dense top 5·20을 조회하고 Recall@20, Precision@5, MRR@20, nDCG@5, 중복률과 지연을 로컬 JSON·CSV로 기록한다.
 - 범위: 프로덕션 검색 API, score 임계값, Reranker, Hybrid Search, 청킹과 프런트엔드는 변경하지 않았다.
 - 검증: 단위 테스트 162개, PostgreSQL·pgvector·실제 Ollama 통합 테스트 49개와 합성 기준선 평가를 통과했다. OpenSQL 실환경 테스트 1개는 기존 정책대로 제외했다.
+
+## 2026-07-14 — 검색 평가 파일럿 데이터 확장
+
+- 데이터: 기존 합성 사례를 보존하면서 가상 문서 11개, 질문 30개로 확장했다. 기술 8개, 문제 해결 6개, 협업 4개, 정확한 수치·표현 6개, 무근거 6개이며 hard negative 질문은 11개다.
+- 분리: 질문을 TUNING 20개와 TEST 10개로 구분하고, 동일 정규화 질문 중복·잘못된 split·누락된 fixture 근거·무근거 라벨 충돌을 실행 전에 차단한다. 의미가 같은 패러프레이즈의 split 간 중복은 수동 검토했다.
+- 출력: Dense 기준선 보고서에 전체·split·category별 Precision@5, Recall@20, MRR@20, nDCG@5, 중복률, score 분포와 지연을 추가했다.
+- 기준선: 실제 PostgreSQL 16.14·pgvector와 Ollama `bge-m3` 최종 실행에서 전체 Recall@20 1.0000, Precision@5 0.1933, MRR@20 0.6556, nDCG@5 0.8543, 중복률 0.0067, 평균/p95 864.20/999ms를 기록했다. 합성 결과는 실제 서비스 성능을 보장하지 않는다.
+- 범위: 운영 검색, 임계값, Reranker, Hybrid Search, 청킹, 프런트엔드와 DB migration은 변경하지 않았다.

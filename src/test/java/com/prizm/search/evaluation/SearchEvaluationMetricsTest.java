@@ -3,10 +3,12 @@ package com.prizm.search.evaluation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.prizm.search.evaluation.SearchEvaluationData.CandidateResult;
+import com.prizm.search.evaluation.SearchEvaluationData.Breakdown;
 import com.prizm.search.evaluation.SearchEvaluationData.Category;
 import com.prizm.search.evaluation.SearchEvaluationData.ExpectedEvidence;
 import com.prizm.search.evaluation.SearchEvaluationData.QuestionResult;
 import com.prizm.search.evaluation.SearchEvaluationData.Summary;
+import com.prizm.search.evaluation.SearchEvaluationData.Split;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -81,6 +83,36 @@ class SearchEvaluationMetricsTest {
         assertThat(metrics.calculate(List.of(result)).duplicateResultRatio()).isEqualTo(0.2d);
     }
 
+    @Test
+    void calculatesSplitAndCategoryBreakdowns() {
+        QuestionResult tuning = result(
+                List.of(expected("direct", 2, "direct-group")),
+                List.of(candidate(1, 2, "direct-group")));
+        QuestionResult test = new QuestionResult(
+                "q-2",
+                "합성 테스트 질문",
+                true,
+                Split.TEST,
+                Category.NO_EVIDENCE,
+                List.of(),
+                List.of(2L),
+                List.of(0),
+                0.4d,
+                0.6d,
+                false,
+                12L,
+                List.of(candidate(1, 0, "irrelevant")));
+
+        Breakdown breakdown = metrics.calculateBreakdown(List.of(tuning, test));
+
+        assertThat(breakdown.overall().questionCount()).isEqualTo(2);
+        assertThat(breakdown.splits().get(Split.TUNING).questionCount()).isEqualTo(1);
+        assertThat(breakdown.splits().get(Split.TEST).questionCount()).isEqualTo(1);
+        assertThat(breakdown.categories().get(Category.TECHNICAL_EXPERIENCE).questionCount()).isEqualTo(1);
+        assertThat(breakdown.categories().get(Category.NO_EVIDENCE).noEvidenceScoreDistribution().questionCount())
+                .isEqualTo(1);
+    }
+
     private QuestionResult result(List<ExpectedEvidence> expected, List<CandidateResult> candidates) {
         List<Long> chunkIds = candidates.stream().limit(5).map(CandidateResult::chunkId).toList();
         List<Integer> relevance = candidates.stream().limit(5).map(CandidateResult::relevance).toList();
@@ -88,6 +120,7 @@ class SearchEvaluationMetricsTest {
                 "q-1",
                 "합성 질문",
                 false,
+                Split.TUNING,
                 Category.TECHNICAL_EXPERIENCE,
                 expected,
                 chunkIds,

@@ -1,12 +1,16 @@
 package com.prizm.search.evaluation;
 
 import com.prizm.search.evaluation.SearchEvaluationData.CandidateResult;
+import com.prizm.search.evaluation.SearchEvaluationData.Breakdown;
+import com.prizm.search.evaluation.SearchEvaluationData.Category;
 import com.prizm.search.evaluation.SearchEvaluationData.ExpectedEvidence;
 import com.prizm.search.evaluation.SearchEvaluationData.QuestionResult;
 import com.prizm.search.evaluation.SearchEvaluationData.ScoreDistribution;
+import com.prizm.search.evaluation.SearchEvaluationData.Split;
 import com.prizm.search.evaluation.SearchEvaluationData.Summary;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +22,29 @@ public class SearchEvaluationMetrics {
 
     private static final int FINAL_RESULT_LIMIT = 5;
     private static final int CANDIDATE_LIMIT = 20;
+
+    public Breakdown calculateBreakdown(List<QuestionResult> results) {
+        Summary overall = calculate(results);
+        Map<Split, Summary> splits = new EnumMap<>(Split.class);
+        for (Split split : Split.values()) {
+            List<QuestionResult> selected = results.stream()
+                    .filter(result -> result.split() == split)
+                    .toList();
+            if (!selected.isEmpty()) {
+                splits.put(split, calculate(selected));
+            }
+        }
+        Map<Category, Summary> categories = new EnumMap<>(Category.class);
+        for (Category category : Category.values()) {
+            List<QuestionResult> selected = results.stream()
+                    .filter(result -> result.category() == category)
+                    .toList();
+            if (!selected.isEmpty()) {
+                categories.put(category, calculate(selected));
+            }
+        }
+        return new Breakdown(overall, Map.copyOf(splits), Map.copyOf(categories));
+    }
 
     public Summary calculate(List<QuestionResult> results) {
         if (results == null || results.isEmpty()) {

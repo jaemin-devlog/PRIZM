@@ -12,6 +12,7 @@ import com.prizm.ingestion.service.TextChunk;
 import com.prizm.ingestion.service.TextChunker;
 import com.prizm.search.dto.response.CareerEvidenceSearchResponse;
 import com.prizm.search.evaluation.SearchEvaluationData.CandidateResult;
+import com.prizm.search.evaluation.SearchEvaluationData.Breakdown;
 import com.prizm.search.evaluation.SearchEvaluationData.ChunkDescriptor;
 import com.prizm.search.evaluation.SearchEvaluationData.Dataset;
 import com.prizm.search.evaluation.SearchEvaluationData.EvidenceAnchor;
@@ -22,6 +23,7 @@ import com.prizm.search.evaluation.SearchEvaluationData.Question;
 import com.prizm.search.evaluation.SearchEvaluationData.QuestionResult;
 import com.prizm.search.evaluation.SearchEvaluationData.Report;
 import com.prizm.search.evaluation.SearchEvaluationData.ReportFiles;
+import com.prizm.search.evaluation.SearchEvaluationData.ScoreDistribution;
 import com.prizm.search.evaluation.SearchEvaluationData.Summary;
 import com.prizm.search.repository.VectorSearchResult;
 import com.prizm.search.service.SearchService;
@@ -120,15 +122,15 @@ class SearchEvaluationBaselineTest {
         validateExpectedEvidence(dataset, seededCorpus.fixtureEvidenceIds());
 
         List<QuestionResult> questionResults = evaluate(dataset, seededCorpus);
-        Summary summary = new SearchEvaluationMetrics().calculate(questionResults);
+        Breakdown breakdown = new SearchEvaluationMetrics().calculateBreakdown(questionResults);
         Report report = new Report(
                 Instant.now().toString(),
                 dataset.corpus().datasetId(),
-                summary,
+                breakdown,
                 questionResults);
         ReportFiles files = new SearchEvaluationReportWriter(objectMapper).write(outputPath, report);
 
-        printReport(summary, questionResults, files);
+        printReport(breakdown, questionResults, files);
         assertThat(questionResults).hasSize(dataset.questions().size());
     }
 
@@ -323,6 +325,7 @@ class SearchEvaluationBaselineTest {
                     question.questionId(),
                     question.query(),
                     question.noEvidence(),
+                    question.split(),
                     question.category(),
                     question.expectedEvidence(),
                     productionIds,
@@ -411,22 +414,16 @@ class SearchEvaluationBaselineTest {
         }
     }
 
-    private void printReport(Summary summary, List<QuestionResult> questions, ReportFiles files) {
-        System.out.printf(Locale.ROOT, "%nPRIZM Dense 검색 기준선 (%d개 질문)%n", summary.questionCount());
-        System.out.printf(Locale.ROOT, "Recall@20: %.4f (direct %.4f)%n",
-                summary.recallAt20(), summary.directRecallAt20());
-        System.out.printf(Locale.ROOT, "Precision@5: %.4f (direct %.4f)%n",
-                summary.precisionAt5(), summary.directPrecisionAt5());
-        System.out.printf(Locale.ROOT, "MRR@20: %.4f%n", summary.mrr());
-        System.out.printf(Locale.ROOT, "nDCG@5: %.4f%n", summary.ndcgAt5());
-        System.out.printf(Locale.ROOT, "중복 결과 비율: %.4f%n", summary.duplicateResultRatio());
-        System.out.printf(Locale.ROOT, "검색 지연 평균/p95: %.2fms/%dms%n",
-                summary.averageSearchTimeMillis(), summary.p95SearchTimeMillis());
+    private void printReport(Breakdown breakdown, List<QuestionResult> questions, ReportFiles files) {
+        printSummary("전체", breakdown.overall());
+        breakdown.splits().forEach((split, summary) -> printSummary("split=" + split, summary));
+        breakdown.categories().forEach((category, summary) -> printSummary("category=" + category, summary));
         for (QuestionResult question : questions) {
             System.out.printf(Locale.ROOT,
-                    "- %s | %s | chunks=%s | relevance=%s | top1Score=%s | top1Distance=%s | duplicate=%s | %dms%n",
+                    "- %s | %s/%s | chunks=%s | relevance=%s | top1Score=%s | top1Distance=%s | duplicate=%s | %dms%n",
                     question.questionId(),
-                    question.query(),
+                    question.split(),
+                    question.category(),
                     question.returnedChunkIds(),
                     question.relevanceOrder(),
                     question.top1Score(),
@@ -436,6 +433,36 @@ class SearchEvaluationBaselineTest {
         }
         System.out.println("결과 JSON: " + files.report());
         System.out.println("후보 CSV: " + files.rawCandidates());
+    }
+
+    private void printSummary(String label, Summary summary) {
+        System.out.printf(Locale.ROOT, "%nPRIZM Dense 검색 기준선 [%s] (%d개 질문)%n",
+                label, summary.questionCount());
+        System.out.printf(Locale.ROOT, "Recall@20: %.4f (direct %.4f)%n",
+                summary.recallAt20(), summary.directRecallAt20());
+        System.out.printf(Locale.ROOT, "Precision@5: %.4f (direct %.4f)%n",
+                summary.precisionAt5(), summary.directPrecisionAt5());
+        System.out.printf(Locale.ROOT, "MRR@20: %.4f%n", summary.mrr());
+        System.out.printf(Locale.ROOT, "nDCG@5: %.4f%n", summary.ndcgAt5());
+        System.out.printf(Locale.ROOT, "중복 결과 비율: %.4f%n", summary.duplicateResultRatio());
+        System.out.printf(Locale.ROOT, "검색 지연 평균/p95: %.2fms/%dms%n",
+                summary.averageSearchTimeMillis(), summary.p95SearchTimeMillis());
+        System.out.printf(Locale.ROOT, "근거/무근거 질문 수: %d/%d%n",
+                summary.evidenceScoreDistribution().questionCount(),
+                summary.noEvidenceScoreDistribution().questionCount());
+        printScoreDistribution("근거", summary.evidenceScoreDistribution());
+        printScoreDistribution("무근거", summary.noEvidenceScoreDistribution());
+    }
+
+    private void printScoreDistribution(String label, ScoreDistribution distribution) {
+        if (distribution.questionCount() == 0) {
+            return;
+        }
+        System.out.printf(Locale.ROOT, "%s top1 score min/avg/max: %.4f/%.4f/%.4f%n",
+                label,
+                distribution.minimumTop1Score(),
+                distribution.averageTop1Score(),
+                distribution.maximumTop1Score());
     }
 
     private static Path createTemporaryStorageRoot() {

@@ -3,6 +3,7 @@ package com.prizm.search.evaluation;
 import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.entity.DocumentType;
 import java.util.List;
+import java.util.Map;
 
 /** 검색 품질 평가 파일, 실행 결과와 요약에 사용하는 로컬 전용 데이터 계약이다. */
 public final class SearchEvaluationData {
@@ -16,6 +17,11 @@ public final class SearchEvaluationData {
         COLLABORATION,
         EXACT_VALUE,
         NO_EVIDENCE
+    }
+
+    public enum Split {
+        TUNING,
+        TEST
     }
 
     public record Corpus(String datasetId, List<FixtureDocument> documents) {
@@ -45,6 +51,7 @@ public final class SearchEvaluationData {
             String query,
             List<ExpectedEvidence> expectedEvidence,
             boolean noEvidence,
+            Split split,
             Category category) {
     }
 
@@ -75,6 +82,7 @@ public final class SearchEvaluationData {
             String questionId,
             String query,
             boolean noEvidence,
+            Split split,
             Category category,
             List<ExpectedEvidence> expectedEvidence,
             List<Long> returnedChunkIds,
@@ -111,10 +119,16 @@ public final class SearchEvaluationData {
             ScoreDistribution noEvidenceScoreDistribution) {
     }
 
+    public record Breakdown(
+            Summary overall,
+            Map<Split, Summary> splits,
+            Map<Category, Summary> categories) {
+    }
+
     public record Report(
             String generatedAt,
             String datasetId,
-            Summary summary,
+            Breakdown metrics,
             List<QuestionResult> questions) {
     }
 

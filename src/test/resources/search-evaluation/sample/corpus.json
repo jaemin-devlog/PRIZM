@@ -1,5 +1,5 @@
 {
-  "datasetId": "prizm-synthetic-dense-baseline-v1",
+  "datasetId": "prizm-synthetic-dense-pilot-v2",
   "documents": [
     {
       "fixtureId": "airconnect-report",
@@ -13,18 +13,10 @@
         }
       ],
       "evidenceAnchors": [
-        {
-          "fixtureEvidenceId": "airconnect-stack",
-          "anchorText": "Spring Boot와 Redis를 사용해 요청 상태를 관리했다"
-        },
-        {
-          "fixtureEvidenceId": "airconnect-duplicate-prevention",
-          "anchorText": "동일 요청 키에 대한 중복 처리를 방지했다"
-        },
-        {
-          "fixtureEvidenceId": "airconnect-exact-load-value",
-          "anchorText": "1,000개의 가상 요청을 생성했고"
-        }
+        {"fixtureEvidenceId": "airconnect-stack", "anchorText": "Spring Boot와 Redis를 사용해 요청 상태를 관리했다"},
+        {"fixtureEvidenceId": "airconnect-duplicate-prevention", "anchorText": "동일 요청 키에 대한 중복 처리를 방지했다"},
+        {"fixtureEvidenceId": "airconnect-notification-retry", "anchorText": "지연이 긴 호출은 제한된 횟수만 재시도했다"},
+        {"fixtureEvidenceId": "airconnect-exact-load-value", "anchorText": "1,000개의 가상 요청을 생성했고"}
       ]
     },
     {
@@ -32,17 +24,9 @@
       "title": "합성 Redis 학습 노트",
       "documentType": "SCHOOL_ASSIGNMENT",
       "fileType": "TXT",
-      "pages": [
-        {
-          "pageNumber": 1,
-          "text": "Redis는 메모리 기반 자료구조 저장소라고 학습 노트에 정리했다. 문자열과 집합의 개념을 설명하지만 실제 프로젝트에 적용했다는 내용은 없다."
-        }
-      ],
+      "pages": [{"pageNumber": 1, "text": "Redis는 메모리 기반 자료구조 저장소라고 학습 노트에 정리했다. 문자열과 집합의 개념을 설명하지만 실제 프로젝트에 적용했다는 내용은 없다."}],
       "evidenceAnchors": [
-        {
-          "fixtureEvidenceId": "redis-definition-only",
-          "anchorText": "실제 프로젝트에 적용했다는 내용은 없다"
-        }
+        {"fixtureEvidenceId": "redis-definition-only", "anchorText": "실제 프로젝트에 적용했다는 내용은 없다"}
       ]
     },
     {
@@ -50,17 +34,10 @@
       "title": "합성 협업 회고",
       "documentType": "CAREER_REVIEW",
       "fileType": "TXT",
-      "pages": [
-        {
-          "pageNumber": 1,
-          "text": "합성 프로젝트에서 API 담당자와 화면 담당자가 오류 응답 형식을 함께 정의했다. 의견이 달랐을 때 실패 사례를 작은 테스트로 재현하고 두 대안을 비교한 뒤 팀 회의에서 결론을 기록했다."
-        }
-      ],
+      "pages": [{"pageNumber": 1, "text": "합성 프로젝트에서 API 담당자와 화면 담당자가 오류 응답 형식을 함께 정의했다. 의견이 달랐을 때 실패 사례를 작은 테스트로 재현하고 두 대안을 비교한 뒤 팀 회의에서 결론을 기록했다."}],
       "evidenceAnchors": [
-        {
-          "fixtureEvidenceId": "collaboration-decision",
-          "anchorText": "두 대안을 비교한 뒤 팀 회의에서 결론을 기록했다"
-        }
+        {"fixtureEvidenceId": "api-error-contract", "anchorText": "API 담당자와 화면 담당자가 오류 응답 형식을 함께 정의했다"},
+        {"fixtureEvidenceId": "collaboration-decision", "anchorText": "두 대안을 비교한 뒤 팀 회의에서 결론을 기록했다"}
       ]
     },
     {
@@ -68,17 +45,97 @@
       "title": "합성 향후 기술 검토",
       "documentType": "CAREER_REVIEW",
       "fileType": "TXT",
+      "pages": [{"pageNumber": 1, "text": "Kubernetes는 향후 학습 후보로만 적어 두었으며 이 합성 프로젝트에서 구축하거나 운영하지 않았다. 금융권 업무도 수행하지 않았다."}],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "kubernetes-negated", "anchorText": "구축하거나 운영하지 않았다"},
+        {"fixtureEvidenceId": "finance-negated", "anchorText": "금융권 업무도 수행하지 않았다"}
+      ]
+    },
+    {
+      "fixtureId": "cache-optimization-report",
+      "title": "합성 Maple 캐시 최적화 보고서",
+      "documentType": "PROJECT_REPORT",
+      "fileType": "PDF",
       "pages": [
-        {
-          "pageNumber": 1,
-          "text": "Kubernetes는 향후 학습 후보로만 적어 두었으며 이 합성 프로젝트에서 구축하거나 운영하지 않았다. 금융권 업무도 수행하지 않았다."
-        }
+        {"pageNumber": 1, "text": "Maple 프로젝트는 Spring Boot 조회 API에 Redis 캐시를 적용했다. 캐시 키에는 상품 식별자와 언어 코드를 포함했고 갱신 시 관련 키를 제거했다. 캐시 장애나 miss가 발생하면 PostgreSQL 원본 조회로 안전하게 복구하도록 구현했다."},
+        {"pageNumber": 2, "text": "동일한 합성 부하 조건에서 조회 API의 p95 응답 시간이 30% 감소했다. 이 수치는 50% 개선이나 실제 운영 성과를 의미하지 않는다."}
       ],
       "evidenceAnchors": [
-        {
-          "fixtureEvidenceId": "kubernetes-negated",
-          "anchorText": "구축하거나 운영하지 않았다"
-        }
+        {"fixtureEvidenceId": "maple-redis-cache", "anchorText": "Spring Boot 조회 API에 Redis 캐시를 적용했다"},
+        {"fixtureEvidenceId": "maple-cache-fallback", "anchorText": "PostgreSQL 원본 조회로 안전하게 복구하도록 구현했다"},
+        {"fixtureEvidenceId": "maple-p95-thirty-percent", "anchorText": "p95 응답 시간이 30% 감소했다"}
+      ]
+    },
+    {
+      "fixtureId": "inventory-lock-report",
+      "title": "합성 Pine 재고 동시성 보고서",
+      "documentType": "PROJECT_REPORT",
+      "fileType": "TXT",
+      "pages": [{"pageNumber": 1, "text": "Pine 주문 프로젝트에서는 동시에 들어온 재고 차감 요청이 같은 수량을 읽는 경쟁 상태를 재현했다. Redis 분산 락으로 상품별 임계 구역을 보호하고 락 획득 실패 시 주문을 다시 처리하도록 했다. 이 구현은 조회 캐시 용도가 아니었다."}],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "pine-race-condition", "anchorText": "재고 차감 요청이 같은 수량을 읽는 경쟁 상태를 재현했다"},
+        {"fixtureEvidenceId": "pine-redis-lock", "anchorText": "Redis 분산 락으로 상품별 임계 구역을 보호하고"}
+      ]
+    },
+    {
+      "fixtureId": "payment-incident-report",
+      "title": "합성 Cedar 결제 장애 기록",
+      "documentType": "PROJECT_REPORT",
+      "fileType": "PDF",
+      "pages": [
+        {"pageNumber": 1, "text": "Cedar 결제 연동에서 외부 승인 API의 응답 지연이 전체 요청 스레드를 점유하는 문제가 발생했다. 타임아웃과 circuit breaker를 적용해 실패를 빠르게 반환하고 허용된 요청만 제한적으로 재시도했다."},
+        {"pageNumber": 2, "text": "합성 장애 훈련에서는 최초 경보부터 정상화 확인까지 17분이 걸렸다. 회고에서 경보 확인과 우회 절차를 문서화했다."}
+      ],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "cedar-circuit-breaker", "anchorText": "타임아웃과 circuit breaker를 적용해 실패를 빠르게 반환하고"},
+        {"fixtureEvidenceId": "cedar-recovery-seventeen", "anchorText": "정상화 확인까지 17분이 걸렸다"}
+      ]
+    },
+    {
+      "fixtureId": "observability-report",
+      "title": "합성 Birch 관측성과 쿼리 개선 기록",
+      "documentType": "PROJECT_REPORT",
+      "fileType": "TXT",
+      "pages": [{"pageNumber": 1, "text": "Birch 서비스에서 요청 지연과 오류율을 Prometheus 지표로 수집하고 Grafana 대시보드에 표시했다. 목록 API의 N+1 쿼리를 실행 계획과 SQL 로그로 확인한 뒤 fetch join으로 변경했다. 합성 측정에서 평균 쿼리 시간이 320ms에서 95ms로 줄었다."}],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "birch-observability", "anchorText": "Prometheus 지표로 수집하고 Grafana 대시보드에 표시했다"},
+        {"fixtureEvidenceId": "birch-n-plus-one", "anchorText": "N+1 쿼리를 실행 계획과 SQL 로그로 확인한 뒤 fetch join으로 변경했다"},
+        {"fixtureEvidenceId": "birch-query-latency", "anchorText": "평균 쿼리 시간이 320ms에서 95ms로 줄었다"}
+      ]
+    },
+    {
+      "fixtureId": "orbit-project-summary",
+      "title": "합성 Orbit 프로젝트 요약",
+      "documentType": "PORTFOLIO",
+      "fileType": "TXT",
+      "pages": [{"pageNumber": 1, "text": "프로젝트 이름은 Orbit이다. 네 명으로 구성된 합성 팀에서 백엔드 작업 순서를 조정하고 주간 위험 항목을 공유했다. 총 12개의 REST API endpoint를 구현했다. 새 팀원이 작성한 변경 사항은 답을 대신 작성하지 않고 함께 코드 리뷰하며 테스트 관점을 설명했다."}],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "orbit-project-name", "anchorText": "프로젝트 이름은 Orbit이다"},
+        {"fixtureEvidenceId": "orbit-four-person-lead", "anchorText": "네 명으로 구성된 합성 팀에서 백엔드 작업 순서를 조정하고"},
+        {"fixtureEvidenceId": "orbit-twelve-endpoints", "anchorText": "총 12개의 REST API endpoint를 구현했다"},
+        {"fixtureEvidenceId": "orbit-code-review", "anchorText": "함께 코드 리뷰하며 테스트 관점을 설명했다"}
+      ]
+    },
+    {
+      "fixtureId": "security-implementation-note",
+      "title": "합성 인증 구현 기록",
+      "documentType": "PROJECT_REPORT",
+      "fileType": "TXT",
+      "pages": [{"pageNumber": 1, "text": "합성 계정 서비스에서 Spring Security와 JWT로 로그인 인증을 구현했다. access token의 사용자 정보를 DB에서 다시 확인했고 refresh token은 회전시켜 이전 값을 재사용하지 못하게 했다."}],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "security-jwt-auth", "anchorText": "Spring Security와 JWT로 로그인 인증을 구현했다"},
+        {"fixtureEvidenceId": "security-token-rotation", "anchorText": "refresh token은 회전시켜 이전 값을 재사용하지 못하게 했다"}
+      ]
+    },
+    {
+      "fixtureId": "technology-reading-note",
+      "title": "합성 기술 독서 노트",
+      "documentType": "COURSE_COMPLETION",
+      "fileType": "TXT",
+      "pages": [{"pageNumber": 1, "text": "AWS ECS 배포 절차와 OCR 모델 개념을 강의 자료로 읽었지만 프로젝트에 적용하거나 운영하지 않았다. 해외 개발팀의 협업 사례도 책에서 읽었을 뿐 직접 이끌어 본 경험은 없다."}],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "aws-ecs-theory-only", "anchorText": "AWS ECS 배포 절차와 OCR 모델 개념을 강의 자료로 읽었지만"},
+        {"fixtureEvidenceId": "overseas-team-theory-only", "anchorText": "직접 이끌어 본 경험은 없다"}
       ]
     }
   ]

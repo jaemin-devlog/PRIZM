@@ -19,11 +19,20 @@
 
 질문 필드:
 
-- `questionId`, `query`, `category`, `noEvidence`
+- `questionId`, `query`, `split`, `category`, `noEvidence`
 - `expectedEvidence[]`: `fixtureEvidenceId`, `relevance`, `evidenceGroupId`
 - relevance `2`: 직접 근거, `1`: 부분 근거, `0`: 무관·hard negative
 
 `noEvidence=true` 질문에는 relevance 1 또는 2를 넣을 수 없습니다. 같은 근거가 overlap 청크 여러 개에 포함되면 같은 `evidenceGroupId`로 중복률을 측정합니다.
+
+추적되는 파일럿 데이터는 가상 문서 11개와 질문 30개로 구성됩니다. 질문 구성은 기술·도구 8개, 문제 해결 6개, 협업·역할 4개, 수치·고유 표현 6개, 실제 근거 없음 6개입니다. 기술명만 같은 문서와 수치가 다른 문서를 포함한 hard negative 질문은 11개입니다.
+
+`split`은 다음 용도로만 사용합니다.
+
+- `TUNING` 20개: 향후 임계값이나 후보 수를 결정할 때만 사용
+- `TEST` 10개: 결정이 끝난 뒤 최종 비교에만 사용
+
+동일한 정규화 질문은 두 split에 들어갈 수 없습니다. 의미가 같은 패러프레이즈와 같은 원문 근거를 묻는 질문이 split 사이에 반복되지 않는지도 파일럿 작성 시 수동 검토했습니다. `TEST` 결과를 보고 임계값이나 라벨을 다시 맞추지 않습니다.
 
 ## 실행
 
@@ -48,8 +57,8 @@ Docker Desktop, PostgreSQL·pgvector Testcontainer와 로컬 Ollama `bge-m3`가 
 - 요약과 질문별 결과: `dense-baseline-<UTC timestamp>.json`
 - 임계값 분석용 원시 후보: `dense-baseline-candidates-<UTC timestamp>.csv`
 
-전체 원문은 결과에 복사하지 않습니다. JSON에는 질문, 예상 근거, 반환 chunk ID, relevance 순서, top1 score·distance, 중복 여부와 지연이 기록됩니다. CSV에는 후보 rank, score, distance, relevance와 evidence group이 기록됩니다.
+전체 원문은 결과에 복사하지 않습니다. JSON에는 질문, 예상 근거, 반환 chunk ID, relevance 순서, top1 score·distance, 중복 여부와 지연이 기록됩니다. CSV에는 split·category와 후보 rank, score, distance, relevance, evidence group이 기록됩니다.
 
-지표는 Recall@20, direct Recall@20, Precision@5, direct Precision@5, MRR@20, evidence-group 기준 nDCG@5, 중복 결과 비율, 평균·p95 검색 지연입니다. 근거 있음/없음 질문의 top1 score·distance 분포도 별도로 기록합니다.
+지표는 전체, TUNING, TEST, category별로 구분합니다. 각 구분에서 Recall@20, direct Recall@20, Precision@5, direct Precision@5, MRR@20, evidence-group 기준 nDCG@5, 중복 결과 비율, 평균·p95 검색 지연을 기록합니다. 근거 있음/없음 질문의 top1 score·distance 분포도 별도로 기록합니다.
 
-이 수치는 이후 Reranker, Hybrid Search, 청킹 실험의 비교 기준입니다. 현재 score에 운영 임계값을 적용하거나 정답 확률로 해석하지 않습니다.
+합성 파일럿 기준선은 실제 개인 문서나 서비스 전체 검색 성능을 보장하지 않습니다. 이 수치는 이후 Reranker, Hybrid Search, 청킹 실험의 비교 기준입니다. 현재 score에 운영 임계값을 적용하거나 정답 확률로 해석하지 않습니다.

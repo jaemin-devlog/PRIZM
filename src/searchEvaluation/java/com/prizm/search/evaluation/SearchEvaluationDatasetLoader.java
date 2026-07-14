@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Locale;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
@@ -38,8 +39,8 @@ public class SearchEvaluationDatasetLoader {
 
         Corpus corpus = readCorpus(datasetDirectory.resolve(CORPUS_FILE));
         List<Question> questions = readQuestions(datasetDirectory.resolve(QUESTIONS_FILE));
-        validateCorpus(corpus);
-        validateQuestions(questions);
+        Set<String> evidenceIds = validateCorpus(corpus);
+        validateQuestions(questions, evidenceIds);
         return new Dataset(corpus, List.copyOf(questions));
     }
 
@@ -82,7 +83,7 @@ public class SearchEvaluationDatasetLoader {
         return questions;
     }
 
-    private void validateCorpus(Corpus corpus) {
+    private Set<String> validateCorpus(Corpus corpus) {
         if (corpus == null || isBlank(corpus.datasetId()) || corpus.documents() == null
                 || corpus.documents().isEmpty()) {
             throw new SearchEvaluationDataException("Evaluation corpus requires datasetId and documents.");
@@ -130,17 +131,24 @@ public class SearchEvaluationDatasetLoader {
                 }
             }
         }
+        return Set.copyOf(evidenceIds);
     }
 
-    private void validateQuestions(List<Question> questions) {
+    private void validateQuestions(List<Question> questions, Set<String> corpusEvidenceIds) {
         Set<String> questionIds = new HashSet<>();
+        Set<String> normalizedQueries = new HashSet<>();
         for (Question question : questions) {
             if (question == null || isBlank(question.questionId()) || isBlank(question.query())
-                    || question.query().length() > 500 || question.category() == null) {
-                throw new SearchEvaluationDataException("Every question requires a valid ID, query, and category.");
+                    || question.query().length() > 500 || question.split() == null
+                    || question.category() == null) {
+                throw new SearchEvaluationDataException(
+                        "Every question requires a valid ID, query, split, and category.");
             }
             if (!questionIds.add(question.questionId())) {
                 throw new SearchEvaluationDataException("Duplicate questionId is not allowed.");
+            }
+            if (!normalizedQueries.add(normalizeQuery(question.query()))) {
+                throw new SearchEvaluationDataException("Duplicate normalized query is not allowed across splits.");
             }
             if (question.expectedEvidence() == null) {
                 throw new SearchEvaluationDataException("expectedEvidence must be an array.");
@@ -157,6 +165,9 @@ public class SearchEvaluationDatasetLoader {
                 if (!expectedIds.add(evidence.fixtureEvidenceId())) {
                     throw new SearchEvaluationDataException("Duplicate expected evidence is not allowed per question.");
                 }
+                if (!corpusEvidenceIds.contains(evidence.fixtureEvidenceId())) {
+                    throw new SearchEvaluationDataException("Question references an unknown fixture evidence ID.");
+                }
                 hasPositiveEvidence |= evidence.relevance() > 0;
             }
             if (question.noEvidence() && hasPositiveEvidence) {
@@ -166,6 +177,10 @@ public class SearchEvaluationDatasetLoader {
                 throw new SearchEvaluationDataException("Evidence-bearing questions require relevance 1 or 2.");
             }
         }
+    }
+
+    private String normalizeQuery(String query) {
+        return query.strip().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
     }
 
     private boolean isBlank(String value) {

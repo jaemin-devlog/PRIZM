@@ -62,6 +62,39 @@ class SearchEvaluationDatasetLoaderTest {
     }
 
     @Test
+    void rejectsUnknownFixtureEvidenceId() throws IOException {
+        writeCorpus();
+        writeQuestions(validQuestion("q-1").replace("spring-evidence", "missing-evidence"));
+
+        assertThatThrownBy(() -> loader.load(temporaryDirectory))
+                .isInstanceOf(SearchEvaluationDataException.class)
+                .hasMessageContaining("unknown fixture evidence ID");
+    }
+
+    @Test
+    void rejectsMissingOrInvalidSplit() throws IOException {
+        writeCorpus();
+        writeQuestions(validQuestion("q-1").replace("\"TUNING\"", "\"INVALID\""));
+
+        assertThatThrownBy(() -> loader.load(temporaryDirectory))
+                .isInstanceOf(SearchEvaluationDataException.class)
+                .hasMessageContaining("Invalid questions.jsonl entry");
+    }
+
+    @Test
+    void rejectsDuplicateNormalizedQueriesAcrossSplits() throws IOException {
+        writeCorpus();
+        writeQuestions(
+                validQuestion("q-1"),
+                validQuestion("q-2").replace("\"TUNING\"", "\"TEST\"")
+                        .replace("Spring Boot 경험은?", "  Spring   Boot 경험은?  "));
+
+        assertThatThrownBy(() -> loader.load(temporaryDirectory))
+                .isInstanceOf(SearchEvaluationDataException.class)
+                .hasMessageContaining("Duplicate normalized query");
+    }
+
+    @Test
     void rejectsEmptyQuestionsFile() throws IOException {
         writeCorpus();
         writeQuestions();
@@ -113,7 +146,7 @@ class SearchEvaluationDatasetLoaderTest {
 
     private String validQuestion(String questionId) {
         return """
-                {"questionId":"%s","query":"Spring Boot 경험은?","expectedEvidence":[{"fixtureEvidenceId":"spring-evidence","relevance":2,"evidenceGroupId":"spring-group"}],"noEvidence":false,"category":"TECHNICAL_EXPERIENCE"}
+                {"questionId":"%s","query":"Spring Boot 경험은?","expectedEvidence":[{"fixtureEvidenceId":"spring-evidence","relevance":2,"evidenceGroupId":"spring-group"}],"noEvidence":false,"split":"TUNING","category":"TECHNICAL_EXPERIENCE"}
                 """.formatted(questionId).strip();
     }
 }

@@ -50,10 +50,12 @@ public class SearchEvaluationReportWriter {
 
     private String rawCandidates(Report report) {
         StringBuilder csv = new StringBuilder(
-                "question_id,no_evidence,rank,chunk_id,fixture_chunk_id,fixture_evidence_ids,score,distance,relevance,evidence_group_id\n");
+                "question_id,split,category,no_evidence,rank,chunk_id,fixture_chunk_id,fixture_evidence_ids,score,distance,relevance,evidence_group_id\n");
         for (QuestionResult question : report.questions()) {
             for (CandidateResult candidate : question.candidates()) {
                 csv.append(escape(question.questionId())).append(',')
+                        .append(question.split()).append(',')
+                        .append(question.category()).append(',')
                         .append(question.noEvidence()).append(',')
                         .append(candidate.rank()).append(',')
                         .append(candidate.chunkId()).append(',')

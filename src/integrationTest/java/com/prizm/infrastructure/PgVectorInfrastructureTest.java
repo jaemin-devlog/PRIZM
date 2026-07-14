@@ -2,6 +2,7 @@ package com.prizm.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
 import com.prizm.document.dto.response.DocumentDetailResponse;
 import com.prizm.document.dto.response.DocumentUploadResponse;
@@ -16,14 +17,18 @@ import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
 import com.prizm.ingestion.entity.ChunkSourceType;
+import com.prizm.ingestion.exception.DocumentIndexingException;
 import com.prizm.ingestion.exception.StaleProcessingJobClaimException;
 import com.prizm.ingestion.repository.ProcessingJobRepository;
 import com.prizm.ingestion.service.ClaimedProcessingJob;
 import com.prizm.ingestion.service.DocumentIndexingProcessor;
 import com.prizm.ingestion.service.IndexedChunk;
 import com.prizm.ingestion.service.IndexingCompletionService;
+import com.prizm.ingestion.service.IndexingFailureClassifier;
+import com.prizm.ingestion.service.IndexingFailureService;
 import com.prizm.ingestion.service.ProcessingJobRecoveryService;
 import com.prizm.ingestion.service.ProcessingJobClaimService;
+import com.prizm.ingestion.service.ProcessingJobLeaseService;
 import com.prizm.search.dto.response.SearchResponse;
 import com.prizm.search.dto.response.CareerEvidenceSearchResponse;
 import com.prizm.search.exception.SearchResultNotFoundException;
@@ -126,6 +131,9 @@ class PgVectorInfrastructureTest {
     ProcessingJobClaimService processingJobClaimService;
 
     @Autowired
+    ProcessingJobLeaseService processingJobLeaseService;
+
+    @Autowired
     DocumentIndexingProcessor documentIndexingProcessor;
 
     @Autowired
@@ -133,6 +141,12 @@ class PgVectorInfrastructureTest {
 
     @Autowired
     ProcessingJobRecoveryService processingJobRecoveryService;
+
+    @Autowired
+    IndexingFailureService indexingFailureService;
+
+    @Autowired
+    IndexingFailureClassifier indexingFailureClassifier;
 
     @Autowired
     PlatformTransactionManager transactionManager;
@@ -650,6 +664,106 @@ class PgVectorInfrastructureTest {
                     "SELECT COUNT(*) FROM document_chunks WHERE document_version_id = ?",
                     Long.class,
                     fixture.documentVersionId())).isEqualTo(1L);
+        }
+        finally {
+            deleteCommittedDocumentData();
+        }
+    }
+
+    @Test
+    void renewsHeartbeatLeaseBeforeRecoveryWithoutChangingTheClaimVersion() {
+        PendingJobFixture fixture = createPendingIndexingJob("heartbeat lease renewal document");
+
+        try {
+            ClaimedProcessingJob worker = processingJobClaimService.claimNext().orElseThrow();
+            jdbcTemplate.update(
+                    "UPDATE processing_jobs SET lease_expires_at = now() - INTERVAL '1 second' WHERE id = ?",
+                    fixture.processingJobId());
+
+            processingJobLeaseService.renew(worker);
+
+            Long currentClaimVersion = jdbcTemplate.queryForObject(
+                    "SELECT claim_version FROM processing_jobs WHERE id = ?",
+                    Long.class,
+                    fixture.processingJobId());
+            Boolean leaseIsCurrent = jdbcTemplate.queryForObject(
+                    "SELECT lease_expires_at > now() FROM processing_jobs WHERE id = ?",
+                    Boolean.class,
+                    fixture.processingJobId());
+            assertThat(currentClaimVersion).isEqualTo(worker.claimVersion());
+            assertThat(leaseIsCurrent).isTrue();
+            assertThat(processingJobRecoveryService.recoverNext()).isFalse();
+            assertThat(processingJobRepository.findById(fixture.processingJobId()).orElseThrow().getStatus())
+                    .isEqualTo(ProcessingJobStatus.PROCESSING);
+        }
+        finally {
+            deleteCommittedDocumentData();
+        }
+    }
+
+    @Test
+    void rejectsHeartbeatRenewalFromAStaleClaimVersion() {
+        PendingJobFixture fixture = createPendingIndexingJob("stale heartbeat claim document");
+
+        try {
+            ClaimedProcessingJob worker = processingJobClaimService.claimNext().orElseThrow();
+            jdbcTemplate.update(
+                    "UPDATE processing_jobs SET claim_version = claim_version + 1 WHERE id = ?",
+                    fixture.processingJobId());
+
+            assertThatThrownBy(() -> processingJobLeaseService.renew(worker))
+                    .isInstanceOf(StaleProcessingJobClaimException.class);
+        }
+        finally {
+            deleteCommittedDocumentData();
+        }
+    }
+
+    @Test
+    void rejectsHeartbeatRenewalWhenTheJobIsNoLongerProcessing() {
+        PendingJobFixture fixture = createPendingIndexingJob("non-processing heartbeat document");
+
+        try {
+            ClaimedProcessingJob worker = processingJobClaimService.claimNext().orElseThrow();
+            jdbcTemplate.update(
+                    "UPDATE processing_jobs SET status = 'RETRY_WAIT', lease_expires_at = NULL WHERE id = ?",
+                    fixture.processingJobId());
+
+            assertThatThrownBy(() -> processingJobLeaseService.renew(worker))
+                    .isInstanceOf(StaleProcessingJobClaimException.class);
+        }
+        finally {
+            deleteCommittedDocumentData();
+        }
+    }
+
+    @Test
+    void failsMissingOriginalFileWithoutStoringChunksOrActivatingTheVersion() {
+        PendingJobFixture fixture = createPendingIndexingJob("missing source file document");
+
+        try {
+            ClaimedProcessingJob claim = processingJobClaimService.claimNext().orElseThrow();
+
+            DocumentIndexingException exception = catchThrowableOfType(
+                    () -> documentIndexingProcessor.process(claim), DocumentIndexingException.class);
+            assertThat(exception).isNotNull();
+            assertThat(exception.isRetryable()).isFalse();
+
+            ProcessingJobStatus status = indexingFailureService.handleFailure(
+                    claim,
+                    indexingFailureClassifier.isRetryable(exception),
+                    exception.getMessage());
+
+            assertThat(status).isEqualTo(ProcessingJobStatus.FAILED);
+            assertThat(processingJobRepository.findById(fixture.processingJobId()).orElseThrow().getRetryCount())
+                    .isZero();
+            assertThat(documentVersionRepository.findById(fixture.documentVersionId()).orElseThrow().getStatus())
+                    .isEqualTo(DocumentVersionStatus.FAILED);
+            assertThat(documentRepository.findById(fixture.documentId()).orElseThrow().getActiveVersionId()).isNull();
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM document_chunks WHERE document_version_id = ?",
+                    Long.class,
+                    fixture.documentVersionId())).isZero();
         }
         finally {
             deleteCommittedDocumentData();

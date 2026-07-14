@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -18,18 +19,21 @@ import com.prizm.embedding.exception.EmbeddingException;
 import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.embedding.service.EmbeddingValidator;
 import com.prizm.infrastructure.storage.FileStorage;
-import com.prizm.infrastructure.storage.FileStorageException;
+import com.prizm.infrastructure.storage.PermanentFileStorageException;
+import com.prizm.infrastructure.storage.TransientFileStorageException;
 import com.prizm.ingestion.config.IngestionProperties;
 import com.prizm.ingestion.config.PdfExtractionProperties;
 import com.prizm.ingestion.entity.ChunkSourceType;
 import com.prizm.ingestion.exception.DocumentIndexingException;
 import com.prizm.ingestion.exception.DocumentTextExtractionException;
+import com.prizm.ingestion.exception.StaleProcessingJobClaimException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -60,6 +64,12 @@ class DocumentIndexingProcessorTest {
     @Mock
     ProcessingJobLeaseService leaseService;
 
+    @Mock
+    WorkerLeaseHeartbeat workerLeaseHeartbeat;
+
+    @Mock
+    WorkerLeaseHeartbeat.LeaseHeartbeat heartbeat;
+
     DocumentIndexingProcessor processor;
     ClaimedProcessingJob claimedJob;
 
@@ -78,6 +88,7 @@ class DocumentIndexingProcessorTest {
                 new EmbeddingValidator(4),
                 completionService,
                 leaseService,
+                workerLeaseHeartbeat,
                 properties);
         DocumentVersion version = DocumentVersion.quarantined(7L, 1L, "guide.txt", "a".repeat(64));
         ReflectionTestUtils.setField(version, "id", 10L);
@@ -86,6 +97,7 @@ class DocumentIndexingProcessorTest {
         when(documentVersionRepository.findById(10L)).thenReturn(Optional.of(version));
         claimedJob = new ClaimedProcessingJob(
                 20L, 10L, 7L, 1L, java.time.Instant.parse("2026-07-13T00:10:00Z"));
+        when(workerLeaseHeartbeat.start(claimedJob)).thenReturn(heartbeat);
     }
 
     @Test
@@ -97,6 +109,8 @@ class DocumentIndexingProcessorTest {
         processor.process(claimedJob);
 
         verify(leaseService, times(3)).renew(claimedJob);
+        verify(workerLeaseHeartbeat).start(claimedJob);
+        verify(heartbeat).close();
         verify(completionService).complete(any(ClaimedProcessingJob.class), argThat(indexedChunks -> {
             assertThat(indexedChunks).hasSize(2);
             assertThat(indexedChunks.get(0).chunkNo()).isEqualTo(1);
@@ -114,13 +128,29 @@ class DocumentIndexingProcessorTest {
     @Test
     void treatsMissingStoredFileAsPermanentFailure() {
         when(fileStorage.read("documents/1/10/guide.txt"))
-                .thenThrow(new FileStorageException("missing"));
+                .thenThrow(new PermanentFileStorageException("missing"));
 
         assertThatThrownBy(() -> processor.process(claimedJob))
                 .isInstanceOf(DocumentIndexingException.class)
                 .extracting(exception -> ((DocumentIndexingException) exception).isRetryable())
                 .isEqualTo(false);
         verify(embeddingService, never()).embed(anyString());
+        verify(heartbeat).close();
+    }
+
+    @Test
+    void treatsTransientStoredFileReadFailureAsRetryable() {
+        when(fileStorage.read("documents/1/10/guide.txt"))
+                .thenThrow(new TransientFileStorageException("unavailable", new java.io.IOException("unavailable")));
+
+        assertThatThrownBy(() -> processor.process(claimedJob))
+                .isInstanceOf(DocumentIndexingException.class)
+                .extracting(exception -> ((DocumentIndexingException) exception).isRetryable())
+                .isEqualTo(true);
+
+        verify(embeddingService, never()).embed(anyString());
+        verify(completionService, never()).complete(any(), any());
+        verify(heartbeat).close();
     }
 
     @Test
@@ -207,6 +237,7 @@ class DocumentIndexingProcessorTest {
                 new EmbeddingValidator(4),
                 completionService,
                 leaseService,
+                workerLeaseHeartbeat,
                 properties);
 
         assertThatThrownBy(() -> limitedProcessor.process(claimedJob))
@@ -214,6 +245,28 @@ class DocumentIndexingProcessorTest {
                 .hasMessage("PDF document exceeds processing limits.");
         verify(embeddingService, never()).embed(anyString());
         verify(completionService, never()).complete(any(), any());
+    }
+
+    @Test
+    void stopsBeforeCompletionWhenHeartbeatDetectsAStaleClaimAfterEmbedding() {
+        when(fileStorage.read("documents/1/10/guide.txt")).thenReturn("text".getBytes(StandardCharsets.UTF_8));
+        when(embeddingService.embed("text")).thenReturn(nonZeroEmbedding());
+        AtomicInteger ownershipChecks = new AtomicInteger();
+        doAnswer(invocation -> {
+                    if (ownershipChecks.incrementAndGet() == 5) {
+                        throw new StaleProcessingJobClaimException(
+                                claimedJob.processingJobId(), claimedJob.claimVersion());
+                    }
+                    return null;
+                })
+                .when(heartbeat)
+                .assertOwnership();
+
+        assertThatThrownBy(() -> processor.process(claimedJob))
+                .isInstanceOf(StaleProcessingJobClaimException.class);
+
+        verify(completionService, never()).complete(any(), any());
+        verify(heartbeat).close();
     }
 
     private byte[] textPdf(List<String> pageTexts) {

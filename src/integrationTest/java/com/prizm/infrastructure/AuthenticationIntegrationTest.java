@@ -212,6 +212,14 @@ class AuthenticationIntegrationTest {
                                 """))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+        mockMvc.perform(post("/api/career-evidence/search")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"query":"career evidence"}
+                                """))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
     }
 
     @Test
@@ -281,6 +289,48 @@ class AuthenticationIntegrationTest {
                 .andExpect(jsonPath("$.sourceIndex").value(1))
                 .andExpect(jsonPath("$.sourceLabel").value("텍스트 구간 1"))
                 .andExpect(jsonPath("$.content").value(content));
+
+        mockMvc.perform(post("/api/career-evidence/search")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"query":"휴가 안내에서 요청하는 내용"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].chunkId").isNumber())
+                .andExpect(jsonPath("$[0].documentId").value(activeDocument.documentId()))
+                .andExpect(jsonPath("$[0].documentVersionId").value(activeDocument.versionId()))
+                .andExpect(jsonPath("$[0].sourceType").value("TEXT_CHUNK"))
+                .andExpect(jsonPath("$[0].sourceLabel").value("텍스트 구간 1"))
+                .andExpect(jsonPath("$[0].content").value(content));
+    }
+
+    @Test
+    void returnsAnEmptyCareerEvidenceArrayAndValidatesTheQuery() throws Exception {
+        UserAccount owner = createUser(UserRole.USER, true);
+        String token = login(owner.getEmail());
+
+        mockMvc.perform(post("/api/career-evidence/search")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"query\":\"no registered evidence\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+        mockMvc.perform(post("/api/career-evidence/search")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"query\":\" \"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_SEARCH_QUERY"));
+
+        String overlongQuery = "x".repeat(501);
+        mockMvc.perform(post("/api/career-evidence/search")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"query\":\"%s\"}".formatted(overlongQuery)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_SEARCH_QUERY"));
     }
 
     @Test

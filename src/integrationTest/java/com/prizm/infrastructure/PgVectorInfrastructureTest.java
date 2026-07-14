@@ -25,6 +25,7 @@ import com.prizm.ingestion.service.IndexingCompletionService;
 import com.prizm.ingestion.service.ProcessingJobRecoveryService;
 import com.prizm.ingestion.service.ProcessingJobClaimService;
 import com.prizm.search.dto.response.SearchResponse;
+import com.prizm.search.dto.response.CareerEvidenceSearchResponse;
 import com.prizm.search.exception.SearchResultNotFoundException;
 import com.prizm.search.service.SearchService;
 import java.io.ByteArrayOutputStream;
@@ -208,6 +209,72 @@ class PgVectorInfrastructureTest {
         assertThat(result.sourceLabel()).isEqualTo("텍스트 구간 1");
         assertThat(result.distance()).isBetween(0.0d, 2.0d);
         assertThat(result.score()).isEqualTo(1.0d - result.distance());
+    }
+
+    @Test
+    @Transactional
+    void returnsAtMostFiveOrderedCareerEvidenceChunksOnlyForTheCurrentActiveOwnerVersion() {
+        Long ownerA = createUser();
+        Long ownerB = createUser();
+        String query = "Spring Boot and Redis experience";
+        ActiveVectorDocument ownerEvidence = createActiveVectorDocument(ownerA, "Owner A career evidence");
+        List<String> ownerContents = List.of(
+                query,
+                "Built a Spring Boot API with Redis caching.",
+                "Implemented Spring Boot background processing.",
+                "Used Redis to coordinate cache invalidation.",
+                "Created backend integration tests for a Spring service.",
+                "Maintained Java services and REST APIs.");
+        for (int index = 0; index < ownerContents.size(); index++) {
+            insertVectorChunk(ownerA, ownerEvidence.versionId(), ownerContents.get(index), index + 1);
+        }
+
+        ActiveVectorDocument otherOwnerEvidence = createActiveVectorDocument(ownerB, "Owner B career evidence");
+        insertVectorChunk(ownerB, otherOwnerEvidence.versionId(), query, 1);
+
+        ActiveVectorDocument supersededEvidence = createActiveVectorDocument(ownerA, "Superseded evidence");
+        insertVectorChunk(ownerA, supersededEvidence.versionId(), query, 1);
+        Long replacementVersionId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO document_versions(
+                    owner_user_id, document_id, version_no, original_file_name, stored_file_path, file_type,
+                    content_hash, status
+                )
+                VALUES (?, ?, 2, 'replacement.txt', 'test/replacement.txt', 'TXT', repeat('d', 64), 'ACTIVE')
+                RETURNING id
+                """,
+                Long.class,
+                ownerA,
+                supersededEvidence.documentId());
+        jdbcTemplate.update(
+                "UPDATE documents SET active_version_id = ? WHERE id = ?",
+                replacementVersionId,
+                supersededEvidence.documentId());
+
+        ActiveVectorDocument processingEvidence = createActiveVectorDocument(ownerA, "Processing evidence");
+        jdbcTemplate.update(
+                "UPDATE document_versions SET status = 'PROCESSING' WHERE id = ?",
+                processingEvidence.versionId());
+        insertVectorChunk(ownerA, processingEvidence.versionId(), query, 1);
+
+        ActiveVectorDocument failedEvidence = createActiveVectorDocument(ownerA, "Failed evidence");
+        jdbcTemplate.update(
+                "UPDATE document_versions SET status = 'FAILED' WHERE id = ?",
+                failedEvidence.versionId());
+        insertVectorChunk(ownerA, failedEvidence.versionId(), query, 1);
+
+        List<CareerEvidenceSearchResponse> results = searchService.searchCareerEvidence(ownerA, query);
+
+        assertThat(results).hasSize(5);
+        assertThat(results).extracting(CareerEvidenceSearchResponse::documentId)
+                .containsOnly(ownerEvidence.documentId());
+        assertThat(results).extracting(CareerEvidenceSearchResponse::distance).isSorted();
+        assertThat(results.get(0).content()).isEqualTo(query);
+        assertThat(results.get(0).chunkId()).isPositive();
+        assertThat(results.get(0).documentVersionId()).isEqualTo(ownerEvidence.versionId());
+        assertThat(results.get(0).sourceType()).isEqualTo(ChunkSourceType.TEXT_CHUNK);
+        assertThat(results.get(0).sourceIndex()).isPositive();
+        assertThat(results.get(0).sourceLabel()).isEqualTo("텍스트 구간 " + results.get(0).sourceIndex());
     }
 
     @Test
@@ -685,11 +752,15 @@ class PgVectorInfrastructureTest {
     }
 
     private long createActiveVectorDocumentVersion(Long ownerUserId) {
+        return createActiveVectorDocument(ownerUserId, "Vector search verification").versionId();
+    }
+
+    private ActiveVectorDocument createActiveVectorDocument(Long ownerUserId, String title) {
         Long documentId = jdbcTemplate.queryForObject(
                 "INSERT INTO documents(owner_user_id, title) VALUES (?, ?) RETURNING id",
                 Long.class,
                 ownerUserId,
-                "Vector search verification");
+                title);
         Long versionId = jdbcTemplate.queryForObject(
                 """
                 INSERT INTO document_versions(
@@ -703,7 +774,25 @@ class PgVectorInfrastructureTest {
                 ownerUserId,
                 documentId);
         jdbcTemplate.update("UPDATE documents SET active_version_id = ? WHERE id = ?", versionId, documentId);
-        return versionId;
+        return new ActiveVectorDocument(documentId, versionId);
+    }
+
+    private void insertVectorChunk(Long ownerUserId, Long documentVersionId, String content, int chunkNo) {
+        jdbcTemplate.update(
+                """
+                INSERT INTO document_chunks(
+                    owner_user_id, content, embedding, document_version_id, chunk_no, page_no,
+                    source_type, source_index, source_label
+                )
+                VALUES (?, ?, CAST(? AS vector), ?, ?, NULL, 'TEXT_CHUNK', ?, ?)
+                """,
+                ownerUserId,
+                content,
+                toVectorLiteral(embeddingService.embed(content)),
+                documentVersionId,
+                chunkNo,
+                chunkNo,
+                "텍스트 구간 " + chunkNo);
     }
 
     private Long createActivePdfPageDocument(Long ownerUserId, String content) {
@@ -855,6 +944,9 @@ class PgVectorInfrastructureTest {
             Long documentId,
             Long documentVersionId,
             Long processingJobId) {
+    }
+
+    private record ActiveVectorDocument(Long documentId, Long versionId) {
     }
 
     private record StoredChunkSource(int chunkNo, String sourceType, int sourceIndex, String sourceLabel) {

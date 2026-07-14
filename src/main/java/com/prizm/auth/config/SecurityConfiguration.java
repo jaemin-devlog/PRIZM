@@ -51,7 +51,12 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers("/actuator/health", "/error").permitAll()
-                        .requestMatchers("/api/documents", "/api/documents/**", "/api/search", "/api/search/**")
+                        .requestMatchers(
+                                "/api/documents",
+                                "/api/documents/**",
+                                "/api/search",
+                                "/api/search/**",
+                                "/api/career-evidence/search")
                         .hasRole("USER")
                         .requestMatchers("/api/users/me").authenticated()
                         .anyRequest().denyAll())

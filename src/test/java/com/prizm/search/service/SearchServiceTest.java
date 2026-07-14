@@ -33,6 +33,7 @@ class SearchServiceTest {
         float[] embedding = new float[1024];
         VectorSearchResult repositoryResult =
                 new VectorSearchResult(
+                        30L,
                         10L,
                         20L,
                         "휴가 안내",

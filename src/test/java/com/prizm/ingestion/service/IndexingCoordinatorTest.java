@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.prizm.embedding.exception.EmbeddingErrorCode;
 import com.prizm.embedding.exception.EmbeddingException;
+import com.prizm.ingestion.exception.DocumentTextExtractionException;
 import com.prizm.ingestion.exception.StaleProcessingJobClaimException;
 import java.time.Instant;
 import java.util.Optional;
@@ -38,6 +39,35 @@ class IndexingCoordinatorTest {
         assertThat(coordinator.processNext()).isTrue();
 
         verify(failureService).handleFailure(job, true, "unavailable");
+    }
+
+    @Test
+    void recordsInvalidEmbeddingResponseAsRetryableFailure() {
+        ClaimedProcessingJob job = claimedJob();
+        when(claimService.claimNext()).thenReturn(Optional.of(job));
+        org.mockito.Mockito.doThrow(new EmbeddingException(
+                        EmbeddingErrorCode.EMBEDDING_INVALID_RESPONSE, "invalid response"))
+                .when(processor).process(job);
+        IndexingCoordinator coordinator = new IndexingCoordinator(
+                claimService, processor, new IndexingFailureClassifier(), failureService);
+
+        assertThat(coordinator.processNext()).isTrue();
+
+        verify(failureService).handleFailure(job, true, "invalid response");
+    }
+
+    @Test
+    void recordsPdfProcessingLimitAsPermanentFailure() {
+        ClaimedProcessingJob job = claimedJob();
+        when(claimService.claimNext()).thenReturn(Optional.of(job));
+        org.mockito.Mockito.doThrow(new DocumentTextExtractionException("PDF document exceeds processing limits."))
+                .when(processor).process(job);
+        IndexingCoordinator coordinator = new IndexingCoordinator(
+                claimService, processor, new IndexingFailureClassifier(), failureService);
+
+        assertThat(coordinator.processNext()).isTrue();
+
+        verify(failureService).handleFailure(job, false, "PDF document exceeds processing limits.");
     }
 
     @Test

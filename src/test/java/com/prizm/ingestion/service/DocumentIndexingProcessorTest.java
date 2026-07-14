@@ -13,12 +13,17 @@ import static org.mockito.Mockito.when;
 import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.repository.DocumentVersionRepository;
+import com.prizm.embedding.exception.EmbeddingErrorCode;
+import com.prizm.embedding.exception.EmbeddingException;
 import com.prizm.embedding.service.EmbeddingService;
+import com.prizm.embedding.service.EmbeddingValidator;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.infrastructure.storage.FileStorageException;
 import com.prizm.ingestion.config.IngestionProperties;
+import com.prizm.ingestion.config.PdfExtractionProperties;
 import com.prizm.ingestion.entity.ChunkSourceType;
 import com.prizm.ingestion.exception.DocumentIndexingException;
+import com.prizm.ingestion.exception.DocumentTextExtractionException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -67,13 +72,13 @@ class DocumentIndexingProcessorTest {
         processor = new DocumentIndexingProcessor(
                 documentVersionRepository,
                 fileStorage,
-                new DocumentTextExtractor(),
+                new DocumentTextExtractor(pdfProperties(300, 2_000_000)),
                 new TextChunker(properties),
                 embeddingService,
+                new EmbeddingValidator(4),
                 completionService,
                 leaseService,
-                properties,
-                4);
+                properties);
         DocumentVersion version = DocumentVersion.quarantined(7L, 1L, "guide.txt", "a".repeat(64));
         ReflectionTestUtils.setField(version, "id", 10L);
         version.startProcessing();
@@ -87,7 +92,7 @@ class DocumentIndexingProcessorTest {
     void createsEmbeddingsAndCompletesWithNonEmptyChunks() {
         when(fileStorage.read("documents/1/10/guide.txt"))
                 .thenReturn("abcdefghijk".getBytes(StandardCharsets.UTF_8));
-        when(embeddingService.embed(anyString())).thenReturn(new float[4]);
+        when(embeddingService.embed(anyString())).thenReturn(nonZeroEmbedding());
 
         processor.process(claimedJob);
 
@@ -138,8 +143,21 @@ class DocumentIndexingProcessorTest {
         when(embeddingService.embed("text")).thenReturn(new float[3]);
 
         assertThatThrownBy(() -> processor.process(claimedJob))
-                .isInstanceOf(DocumentIndexingException.class)
-                .hasMessageContaining("4-dimensional");
+                .isInstanceOf(EmbeddingException.class)
+                .extracting(exception -> ((EmbeddingException) exception).code())
+                .isEqualTo(EmbeddingErrorCode.EMBEDDING_DIMENSION_MISMATCH);
+        verify(completionService, never()).complete(any(), any());
+    }
+
+    @Test
+    void rejectsZeroNormEmbeddingBeforeCompletingDocumentVersion() {
+        when(fileStorage.read("documents/1/10/guide.txt")).thenReturn("text".getBytes(StandardCharsets.UTF_8));
+        when(embeddingService.embed("text")).thenReturn(new float[4]);
+
+        assertThatThrownBy(() -> processor.process(claimedJob))
+                .isInstanceOf(EmbeddingException.class)
+                .extracting(exception -> ((EmbeddingException) exception).code())
+                .isEqualTo(EmbeddingErrorCode.EMBEDDING_INVALID_RESPONSE);
         verify(completionService, never()).complete(any(), any());
     }
 
@@ -153,7 +171,7 @@ class DocumentIndexingProcessorTest {
         when(documentVersionRepository.findById(10L)).thenReturn(Optional.of(pdfVersion));
         when(fileStorage.read("documents/1/10/guide.pdf"))
                 .thenReturn(textPdf(List.of("first", "", "third-page-text")));
-        when(embeddingService.embed(anyString())).thenReturn(new float[4]);
+        when(embeddingService.embed(anyString())).thenReturn(nonZeroEmbedding());
 
         processor.process(claimedJob);
 
@@ -167,6 +185,35 @@ class DocumentIndexingProcessorTest {
                     .containsExactly("1페이지", "3페이지", "3페이지", "3페이지");
             return true;
         }));
+    }
+
+    @Test
+    void rejectsPdfAbovePageLimitBeforeEmbeddingOrCompletion() {
+        DocumentVersion pdfVersion = DocumentVersion.quarantined(
+                7L, 1L, "guide.pdf", DocumentFileType.PDF, "a".repeat(64));
+        ReflectionTestUtils.setField(pdfVersion, "id", 10L);
+        pdfVersion.startProcessing();
+        pdfVersion.updateStoredFilePath("documents/1/10/guide.pdf");
+        when(documentVersionRepository.findById(10L)).thenReturn(Optional.of(pdfVersion));
+        when(fileStorage.read("documents/1/10/guide.pdf"))
+                .thenReturn(textPdf(List.of("first page", "second page")));
+        IngestionProperties properties = ingestionProperties();
+        DocumentIndexingProcessor limitedProcessor = new DocumentIndexingProcessor(
+                documentVersionRepository,
+                fileStorage,
+                new DocumentTextExtractor(pdfProperties(1, 100)),
+                new TextChunker(properties),
+                embeddingService,
+                new EmbeddingValidator(4),
+                completionService,
+                leaseService,
+                properties);
+
+        assertThatThrownBy(() -> limitedProcessor.process(claimedJob))
+                .isInstanceOf(DocumentTextExtractionException.class)
+                .hasMessage("PDF document exceeds processing limits.");
+        verify(embeddingService, never()).embed(anyString());
+        verify(completionService, never()).complete(any(), any());
     }
 
     private byte[] textPdf(List<String> pageTexts) {
@@ -190,5 +237,25 @@ class DocumentIndexingProcessorTest {
         catch (IOException exception) {
             throw new UncheckedIOException(exception);
         }
+    }
+
+    private float[] nonZeroEmbedding() {
+        return new float[] {1.0f, 0.0f, 0.0f, 0.0f};
+    }
+
+    private IngestionProperties ingestionProperties() {
+        IngestionProperties properties = new IngestionProperties();
+        properties.setMaxChunkLength(8);
+        properties.setOverlap(2);
+        properties.setLeaseRefreshChunkInterval(2);
+        return properties;
+    }
+
+    private PdfExtractionProperties pdfProperties(int maxPages, int maxExtractedCharacters) {
+        PdfExtractionProperties properties = new PdfExtractionProperties();
+        properties.setMaxPages(maxPages);
+        properties.setMaxExtractedCharacters(maxExtractedCharacters);
+        properties.validate();
+        return properties;
     }
 }

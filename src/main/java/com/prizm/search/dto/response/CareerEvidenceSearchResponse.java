@@ -1,19 +1,18 @@
-package com.prizm.search.repository;
+package com.prizm.search.dto.response;
 
 import com.prizm.ingestion.entity.ChunkSourceType;
 
-public record VectorSearchResult(
+/** A searchable source chunk for a user's career evidence query. */
+public record CareerEvidenceSearchResponse(
         Long chunkId,
         Long documentId,
         Long documentVersionId,
         String documentTitle,
         int versionNo,
-        int chunkNo,
-        Integer pageNo,
+        String content,
         ChunkSourceType sourceType,
         int sourceIndex,
         String sourceLabel,
-        String content,
         double distance,
         double score) {
 }

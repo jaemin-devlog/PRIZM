@@ -23,12 +23,14 @@ import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.infrastructure.storage.FileStorageException;
 import com.prizm.ingestion.entity.ProcessingJob;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
+import com.prizm.ingestion.config.PdfExtractionProperties;
 import com.prizm.ingestion.repository.ProcessingJobRepository;
 import com.prizm.ingestion.service.DocumentTextExtractor;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -71,7 +73,7 @@ class DocumentUploadServiceTest {
                 documentVersionRepository,
                 processingJobRepository,
                 fileStorage,
-                new DocumentTextExtractor(),
+                new DocumentTextExtractor(pdfProperties(300, 2_000_000)),
                 1_000_000);
         lenient().when(documentRepository.save(any(Document.class))).thenAnswer(invocation -> {
             Document document = invocation.getArgument(0);
@@ -235,6 +237,25 @@ class DocumentUploadServiceTest {
     }
 
     @Test
+    void rejectsPdfThatExceedsConfiguredProcessingLimitBeforePersistingMetadata() {
+        DocumentUploadService limitedUploadService = new DocumentUploadService(
+                documentRepository,
+                documentVersionRepository,
+                processingJobRepository,
+                fileStorage,
+                new DocumentTextExtractor(pdfProperties(1, 100)),
+                1_000_000);
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "large-pages.pdf", "application/pdf", textPdf(List.of("one", "two")));
+
+        assertThatThrownBy(() -> limitedUploadService.upload(7L, "Guide", file))
+                .isInstanceOf(DocumentUploadException.class)
+                .extracting(exception -> ((DocumentUploadException) exception).code())
+                .isEqualTo(DocumentUploadErrorCode.INVALID_DOCUMENT_CONTENT);
+        verifyNoInteractions(documentRepository, documentVersionRepository, processingJobRepository, fileStorage);
+    }
+
+    @Test
     void rejectsFileThatExceedsConfiguredSizeLimit() {
         MockMultipartFile file = new MockMultipartFile("file", "large.txt", "text/plain", new byte[1_000_001]);
 
@@ -258,16 +279,22 @@ class DocumentUploadServiceTest {
     }
 
     private byte[] textPdf(String pageText) {
+        return textPdf(List.of(pageText));
+    }
+
+    private byte[] textPdf(List<String> pageTexts) {
         try (PDDocument document = new PDDocument(); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-            PDPage page = new PDPage();
-            document.addPage(page);
-            if (!pageText.isBlank()) {
-                try (PDPageContentStream stream = new PDPageContentStream(document, page)) {
-                    stream.beginText();
-                    stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                    stream.newLineAtOffset(72, 720);
-                    stream.showText(pageText);
-                    stream.endText();
+            for (String pageText : pageTexts) {
+                PDPage page = new PDPage();
+                document.addPage(page);
+                if (!pageText.isBlank()) {
+                    try (PDPageContentStream stream = new PDPageContentStream(document, page)) {
+                        stream.beginText();
+                        stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+                        stream.newLineAtOffset(72, 720);
+                        stream.showText(pageText);
+                        stream.endText();
+                    }
                 }
             }
             document.save(output);
@@ -276,5 +303,13 @@ class DocumentUploadServiceTest {
         catch (IOException exception) {
             throw new UncheckedIOException(exception);
         }
+    }
+
+    private PdfExtractionProperties pdfProperties(int maxPages, int maxExtractedCharacters) {
+        PdfExtractionProperties properties = new PdfExtractionProperties();
+        properties.setMaxPages(maxPages);
+        properties.setMaxExtractedCharacters(maxExtractedCharacters);
+        properties.validate();
+        return properties;
     }
 }

@@ -57,6 +57,10 @@ prizm:
     temp: ${PRIZM_STORAGE_TEMP:./var/tmp}
   upload:
     max-file-size-bytes: ${PRIZM_UPLOAD_MAX_FILE_SIZE_BYTES:10485760}
+  document:
+    pdf:
+      max-pages: ${PRIZM_DOCUMENT_PDF_MAX_PAGES:300}
+      max-extracted-characters: ${PRIZM_DOCUMENT_PDF_MAX_EXTRACTED_CHARACTERS:2000000}
   embedding:
     dimensions: ${PRIZM_EMBEDDING_DIMENSIONS:1024}
   ingestion:

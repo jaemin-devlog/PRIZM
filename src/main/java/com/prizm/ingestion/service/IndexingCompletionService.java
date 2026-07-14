@@ -7,6 +7,7 @@ import com.prizm.document.exception.DocumentNotFoundException;
 import com.prizm.document.exception.DocumentVersionNotFoundException;
 import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
+import com.prizm.embedding.service.EmbeddingValidator;
 import com.prizm.ingestion.entity.ProcessingJob;
 import com.prizm.ingestion.repository.DocumentChunkRepository;
 import com.prizm.ingestion.repository.ProcessingJobClaimRepository;
@@ -24,22 +25,30 @@ public class IndexingCompletionService {
     private final DocumentRepository documentRepository;
     private final DocumentChunkRepository documentChunkRepository;
     private final ProcessingJobClaimRepository claimRepository;
+    private final EmbeddingValidator embeddingValidator;
 
     public IndexingCompletionService(
             ProcessingJobRepository processingJobRepository,
             DocumentVersionRepository documentVersionRepository,
             DocumentRepository documentRepository,
             DocumentChunkRepository documentChunkRepository,
-            ProcessingJobClaimRepository claimRepository) {
+            ProcessingJobClaimRepository claimRepository,
+            EmbeddingValidator embeddingValidator) {
         this.processingJobRepository = processingJobRepository;
         this.documentVersionRepository = documentVersionRepository;
         this.documentRepository = documentRepository;
         this.documentChunkRepository = documentChunkRepository;
         this.claimRepository = claimRepository;
+        this.embeddingValidator = embeddingValidator;
     }
 
     @Transactional
     public void complete(ClaimedProcessingJob claimedJob, List<IndexedChunk> chunks) {
+        if (chunks.isEmpty()) {
+            throw new IllegalArgumentException("At least one indexed chunk is required.");
+        }
+        chunks.forEach(chunk -> embeddingValidator.validate(chunk.embedding()));
+
         ProcessingJob job = processingJobRepository.findByIdForUpdate(claimedJob.processingJobId())
                 .orElseThrow(() -> new IllegalStateException("Processing job was not found."));
         job.requireClaim(claimedJob.claimVersion());
@@ -47,9 +56,6 @@ public class IndexingCompletionService {
             throw new IllegalStateException("Claimed job and document version do not match.");
         }
         requireSameOwner(claimedJob.ownerUserId(), job.getOwnerUserId());
-        if (chunks.isEmpty()) {
-            throw new IllegalArgumentException("At least one indexed chunk is required.");
-        }
         DocumentVersion version = documentVersionRepository.findByIdForUpdate(claimedJob.documentVersionId())
                 .orElseThrow(() -> new DocumentVersionNotFoundException(claimedJob.documentVersionId()));
         if (version.getStatus() != DocumentVersionStatus.PROCESSING) {

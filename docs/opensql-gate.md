@@ -2,6 +2,8 @@
 
 이 문서는 로컬 PostgreSQL 개발 결과를 OpenSQL 3 환경으로 옮기기 전에 확인할 외부 의존성과 증거를 기록한다. 체크되지 않은 항목을 추정으로 완료 처리하지 않는다.
 
+> **현재 상태(2026-07-14):** PostgreSQL 16·pgvector와 실제 Ollama 통합 테스트는 성공했지만 OpenSQL, OpenProxy, OpenHA 실환경은 아직 검증하지 않았다. 현재 구현 범위는 [PRIZM 현재 구현 현황](project-status.md)을 참고하며, 이 Gate의 미확인 항목은 그대로 유지한다.
+
 ## 완료 기준
 
 다음 조건을 모두 만족해야 OpenSQL Gate를 통과한 것으로 본다.

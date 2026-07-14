@@ -2,6 +2,7 @@ package com.prizm.ingestion.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -67,6 +68,26 @@ class IndexingFailureServiceTest {
     }
 
     @Test
+    void keepsExistingActiveVersionWhenInvalidEmbeddingSchedulesRetry() {
+        ProcessingJob job = processingJob(0);
+        DocumentVersion version = processingVersion();
+        Document document = document();
+        document.activateVersion(5L);
+        when(processingJobRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(job));
+        when(documentVersionRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(version));
+        when(documentRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(document));
+        when(claimRepository.currentDatabaseTime()).thenReturn(Instant.parse("2026-07-13T00:00:00Z"));
+
+        ProcessingJobStatus status = service.handleFailure(
+                claimed(job), true, "Embedding service returned an invalid response.");
+
+        assertThat(status).isEqualTo(ProcessingJobStatus.RETRY_WAIT);
+        assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.PROCESSING);
+        assertThat(document.getActiveVersionId()).isEqualTo(5L);
+        verify(documentChunkRepository).deleteByOwnerUserIdAndDocumentVersionId(7L, 10L);
+    }
+
+    @Test
     void marksJobAndVersionFailedAfterMaximumRetries() {
         ProcessingJob job = processingJob(3);
         DocumentVersion version = processingVersion();
@@ -89,6 +110,26 @@ class IndexingFailureServiceTest {
         assertThat(status).isEqualTo(ProcessingJobStatus.FAILED);
         assertThat(job.getRetryCount()).isZero();
         assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.FAILED);
+    }
+
+    @Test
+    void keepsExistingActiveVersionWhenPdfProcessingLimitFailsPermanently() {
+        ProcessingJob job = processingJob(0);
+        DocumentVersion version = processingVersion();
+        Document document = document();
+        document.activateVersion(5L);
+        when(processingJobRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(job));
+        when(documentVersionRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(version));
+        when(documentRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(document));
+        when(claimRepository.currentDatabaseTime()).thenReturn(Instant.parse("2026-07-13T00:00:00Z"));
+
+        ProcessingJobStatus status = service.handleFailure(
+                claimed(job), false, "PDF document exceeds processing limits.");
+
+        assertThat(status).isEqualTo(ProcessingJobStatus.FAILED);
+        assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.FAILED);
+        assertThat(document.getActiveVersionId()).isEqualTo(5L);
+        verify(documentChunkRepository).deleteByOwnerUserIdAndDocumentVersionId(7L, 10L);
     }
 
     @Test

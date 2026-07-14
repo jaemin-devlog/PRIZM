@@ -22,9 +22,10 @@ class OllamaEmbeddingServiceTest {
     @Test
     void returnsEmbeddingWhenDimensionMatches() {
         float[] expected = new float[1024];
+        expected[0] = 1.0f;
         when(embeddingModel.embed("query")).thenReturn(expected);
 
-        float[] result = new OllamaEmbeddingService(embeddingModel, "bge-m3", 1024).embed("query");
+        float[] result = service().embed("query");
 
         assertThat(result).isSameAs(expected);
     }
@@ -33,7 +34,7 @@ class OllamaEmbeddingServiceTest {
     void rejectsUnexpectedEmbeddingDimension() {
         when(embeddingModel.embed("query")).thenReturn(new float[768]);
 
-        assertThatThrownBy(() -> new OllamaEmbeddingService(embeddingModel, "bge-m3", 1024).embed("query"))
+        assertThatThrownBy(() -> service().embed("query"))
                 .isInstanceOf(EmbeddingException.class)
                 .extracting(exception -> ((EmbeddingException) exception).code())
                 .isEqualTo(EmbeddingErrorCode.EMBEDDING_DIMENSION_MISMATCH);
@@ -43,7 +44,7 @@ class OllamaEmbeddingServiceTest {
     void rejectsEmptyEmbeddingResponse() {
         when(embeddingModel.embed("query")).thenReturn((float[]) null);
 
-        assertThatThrownBy(() -> new OllamaEmbeddingService(embeddingModel, "bge-m3", 1024).embed("query"))
+        assertThatThrownBy(() -> service().embed("query"))
                 .isInstanceOf(EmbeddingException.class)
                 .extracting(exception -> ((EmbeddingException) exception).code())
                 .isEqualTo(EmbeddingErrorCode.EMBEDDING_EMPTY_RESPONSE);
@@ -53,7 +54,7 @@ class OllamaEmbeddingServiceTest {
     void classifiesMissingModelResponse() {
         when(embeddingModel.embed("query")).thenThrow(new RuntimeException("model 'bge-m3' not found"));
 
-        assertThatThrownBy(() -> new OllamaEmbeddingService(embeddingModel, "bge-m3", 1024).embed("query"))
+        assertThatThrownBy(() -> service().embed("query"))
                 .isInstanceOf(EmbeddingException.class)
                 .extracting(exception -> ((EmbeddingException) exception).code())
                 .isEqualTo(EmbeddingErrorCode.OLLAMA_MODEL_NOT_INSTALLED);
@@ -63,9 +64,23 @@ class OllamaEmbeddingServiceTest {
     void classifiesConnectionFailure() {
         when(embeddingModel.embed("query")).thenThrow(new RuntimeException("Connection refused"));
 
-        assertThatThrownBy(() -> new OllamaEmbeddingService(embeddingModel, "bge-m3", 1024).embed("query"))
+        assertThatThrownBy(() -> service().embed("query"))
                 .isInstanceOf(EmbeddingException.class)
                 .extracting(exception -> ((EmbeddingException) exception).code())
                 .isEqualTo(EmbeddingErrorCode.OLLAMA_UNAVAILABLE);
+    }
+
+    @Test
+    void rejectsZeroNormResponse() {
+        when(embeddingModel.embed("query")).thenReturn(new float[1024]);
+
+        assertThatThrownBy(() -> service().embed("query"))
+                .isInstanceOf(EmbeddingException.class)
+                .extracting(exception -> ((EmbeddingException) exception).code())
+                .isEqualTo(EmbeddingErrorCode.EMBEDDING_INVALID_RESPONSE);
+    }
+
+    private OllamaEmbeddingService service() {
+        return new OllamaEmbeddingService(embeddingModel, "bge-m3", new EmbeddingValidator(1024));
     }
 }

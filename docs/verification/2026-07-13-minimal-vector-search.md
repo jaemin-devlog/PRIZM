@@ -2,6 +2,8 @@
 
 > 작성일: 2026-07-13  
 > 범위: Ollama 임베딩 → PostgreSQL pgvector 저장 → exact cosine 검색 → REST API
+>
+> **역사적 검증 기록:** 이 문서는 문서·권한·버전 연결 전의 최소 검색 단계입니다. 최신 소유권, ACTIVE 버전, 출처, 다중 검색과 임베딩 검증 상태는 [현재 구현 현황](../project-status.md)을 확인합니다.
 
 ## 1. 목적
 

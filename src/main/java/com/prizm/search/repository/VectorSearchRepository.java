@@ -15,8 +15,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class VectorSearchRepository {
 
-    private static final String NEAREST_CHUNK_SQL = """
-            SELECT document.id AS document_id,
+    private static final String SEARCHABLE_CHUNKS_SQL = """
+            SELECT chunk.id AS chunk_id,
+                   document.id AS document_id,
                    version.id AS document_version_id,
                    document.title AS document_title,
                    version.version_no,
@@ -39,8 +40,10 @@ public class VectorSearchRepository {
               AND version.owner_user_id = ?
               AND chunk.owner_user_id = ?
             ORDER BY chunk.embedding <=> CAST(? AS vector), chunk.id
-            LIMIT 1
             """;
+
+    private static final String NEAREST_CHUNK_SQL = SEARCHABLE_CHUNKS_SQL + "LIMIT 1";
+    private static final String CAREER_EVIDENCE_SQL = SEARCHABLE_CHUNKS_SQL + "LIMIT 5";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -55,13 +58,25 @@ public class VectorSearchRepository {
      * @return 결과가 있으면 내용, 거리, 검색 점수를 포함한 값
      */
     public Optional<VectorSearchResult> findNearest(Long ownerUserId, float[] embedding) {
+        return find(ownerUserId, embedding, NEAREST_CHUNK_SQL).stream().findFirst();
+    }
+
+    /**
+     * Returns up to five active chunks owned by the authenticated user, ordered by cosine distance.
+     */
+    public List<VectorSearchResult> findCareerEvidence(Long ownerUserId, float[] embedding) {
+        return find(ownerUserId, embedding, CAREER_EVIDENCE_SQL);
+    }
+
+    private List<VectorSearchResult> find(Long ownerUserId, float[] embedding, String sql) {
         String vector = toVectorLiteral(embedding);
-        List<VectorSearchResult> results = jdbcTemplate.query(
-                NEAREST_CHUNK_SQL,
+        return jdbcTemplate.query(
+                sql,
                 (resultSet, rowNum) -> {
                     // pgvector의 <=> 결과는 cosine distance이며 작을수록 가깝다.
                     double distance = resultSet.getDouble("distance");
                     return new VectorSearchResult(
+                            resultSet.getLong("chunk_id"),
                             resultSet.getLong("document_id"),
                             resultSet.getLong("document_version_id"),
                             resultSet.getString("document_title"),
@@ -81,7 +96,6 @@ public class VectorSearchRepository {
                 ownerUserId,
                 ownerUserId,
                 vector);
-        return results.stream().findFirst();
     }
 
     static String toVectorLiteral(float[] embedding) {

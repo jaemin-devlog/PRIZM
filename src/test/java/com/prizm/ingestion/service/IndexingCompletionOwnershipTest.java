@@ -6,6 +6,9 @@ import static org.mockito.Mockito.when;
 
 import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
+import com.prizm.embedding.exception.EmbeddingErrorCode;
+import com.prizm.embedding.exception.EmbeddingException;
+import com.prizm.embedding.service.EmbeddingValidator;
 import com.prizm.ingestion.entity.ProcessingJob;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
 import com.prizm.ingestion.repository.DocumentChunkRepository;
@@ -40,18 +43,52 @@ class IndexingCompletionOwnershipTest {
         ClaimedProcessingJob claim = new ClaimedProcessingJob(
                 20L, 10L, 7L, 1L, Instant.parse("2026-07-13T00:10:00Z"));
         IndexedChunk chunk = new IndexedChunk(
-                1, ChunkSourceType.TEXT_CHUNK, 1, "텍스트 구간 1", "content", new float[1024]);
+                1, ChunkSourceType.TEXT_CHUNK, 1, "텍스트 구간 1", "content", nonZeroEmbedding());
         IndexingCompletionService service = new IndexingCompletionService(
                 processingJobRepository,
                 documentVersionRepository,
                 documentRepository,
                 documentChunkRepository,
-                claimRepository);
+                claimRepository,
+                new EmbeddingValidator(1024));
 
         assertThatThrownBy(() -> service.complete(claim, List.of(chunk)))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("ownership");
 
         verifyNoInteractions(documentVersionRepository, documentRepository, documentChunkRepository, claimRepository);
+    }
+
+    @Test
+    void rejectsZeroNormEmbeddingBeforeLockingOrWriting() {
+        ClaimedProcessingJob claim = new ClaimedProcessingJob(
+                20L, 10L, 7L, 1L, Instant.parse("2026-07-13T00:10:00Z"));
+        IndexedChunk chunk = new IndexedChunk(
+                1, ChunkSourceType.TEXT_CHUNK, 1, "텍스트 구간 1", "content", new float[1024]);
+        IndexingCompletionService service = new IndexingCompletionService(
+                processingJobRepository,
+                documentVersionRepository,
+                documentRepository,
+                documentChunkRepository,
+                claimRepository,
+                new EmbeddingValidator(1024));
+
+        assertThatThrownBy(() -> service.complete(claim, List.of(chunk)))
+                .isInstanceOf(EmbeddingException.class)
+                .extracting(exception -> ((EmbeddingException) exception).code())
+                .isEqualTo(EmbeddingErrorCode.EMBEDDING_INVALID_RESPONSE);
+
+        verifyNoInteractions(
+                processingJobRepository,
+                documentVersionRepository,
+                documentRepository,
+                documentChunkRepository,
+                claimRepository);
+    }
+
+    private float[] nonZeroEmbedding() {
+        float[] embedding = new float[1024];
+        embedding[0] = 1.0f;
+        return embedding;
     }
 }

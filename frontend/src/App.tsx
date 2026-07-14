@@ -12,7 +12,11 @@ import {
   type DocumentSummary,
   type DocumentType,
 } from './api/documentApi'
-import { SearchApiError, searchDocuments, type SearchResult } from './api/searchApi'
+import {
+  SearchApiError,
+  searchCareerEvidence,
+  type CareerEvidenceSearchResult,
+} from './api/searchApi'
 import {
   clearSession,
   getAccessToken,
@@ -209,7 +213,7 @@ function CareerVault({
   const [uploadErrorMessage, setUploadErrorMessage] = useState<string | null>(null)
   const [uploadSuccessMessage, setUploadSuccessMessage] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchResult, setSearchResult] = useState<SearchResult | null>(null)
+  const [searchResults, setSearchResults] = useState<CareerEvidenceSearchResult[]>([])
   const [searchState, setSearchState] = useState<SearchState>('idle')
 
   useEffect(() => {
@@ -313,7 +317,7 @@ function CareerVault({
 
   const handleSearchQueryChange = (value: string) => {
     setSearchQuery(value)
-    setSearchResult(null)
+    setSearchResults([])
     setSearchState('idle')
   }
 
@@ -326,20 +330,15 @@ function CareerVault({
     }
 
     setSearchState('loading')
-    setSearchResult(null)
+    setSearchResults([])
 
     try {
-      const result = await searchDocuments(normalizedQuery)
-      setSearchResult(result)
-      setSearchState('result')
+      const results = await searchCareerEvidence(normalizedQuery)
+      setSearchResults(results)
+      setSearchState(results.length === 0 ? 'empty' : 'result')
     } catch (error) {
       if (error instanceof SearchApiError && (error.status === 401 || error.status === 403)) {
         onSessionExpired()
-        return
-      }
-
-      if (error instanceof SearchApiError && error.status === 404) {
-        setSearchState('empty')
         return
       }
 
@@ -384,7 +383,7 @@ function CareerVault({
       )}
 
       <section className="document-search" aria-labelledby="document-search-title">
-        <h2 id="document-search-title">문서 검색</h2>
+        <h2 id="document-search-title">경력 근거 검색</h2>
         <form className="document-search-form" onSubmit={handleSearchSubmit} noValidate>
           <label htmlFor="document-search-query">자연어 검색어</label>
           <div className="document-search-controls">
@@ -408,22 +407,31 @@ function CareerVault({
 
         <div className="search-result" aria-live="polite">
           {searchState === 'idle' && (
-            <p className="state-message">등록된 문서에서 관련 경험과 원문 근거를 찾아보세요.</p>
+            <p className="state-message">등록된 문서에서 관련 경험의 원문 근거를 찾아보세요.</p>
           )}
-          {searchState === 'loading' && <p className="state-message">관련 문서를 찾는 중입니다.</p>}
+          {searchState === 'loading' && <p className="state-message">관련 근거를 찾는 중입니다.</p>}
           {searchState === 'empty' && (
-            <p className="state-message">현재 등록된 문서에서는 관련 근거를 찾지 못했습니다.</p>
+            <p className="state-message">현재 PRIZM에 등록된 문서에서는 관련 근거를 찾지 못했습니다.</p>
           )}
-          {searchState === 'error' && <p className="form-error">문서 검색 중 문제가 발생했습니다.</p>}
-          {searchState === 'result' && searchResult !== null && (
-            <article className="search-result-card">
-              <h3>{searchResult.documentTitle}</h3>
-              <p className="search-result-meta">
-                버전 {searchResult.versionNo} · {searchResult.sourceLabel}
-              </p>
-              <blockquote>{searchResult.content}</blockquote>
-              <p className="search-result-score">유사도 점수 {formatSearchScore(searchResult.score)}</p>
-            </article>
+          {searchState === 'error' && <p className="form-error">경력 근거 검색 중 문제가 발생했습니다.</p>}
+          {searchState === 'result' && searchResults.length > 0 && (
+            <>
+              <p className="search-result-summary">관련 근거 {searchResults.length}개</p>
+              <ol className="search-result-list">
+                {searchResults.map((result) => (
+                  <li key={result.chunkId}>
+                    <article className="search-result-card">
+                      <h3>{result.documentTitle}</h3>
+                      <p className="search-result-meta">
+                        버전 {result.versionNo} · {result.sourceLabel}
+                      </p>
+                      <blockquote>{result.content}</blockquote>
+                      <p className="search-result-score">관련도 점수 {formatSearchScore(result.score)}</p>
+                    </article>
+                  </li>
+                ))}
+              </ol>
+            </>
           )}
         </div>
       </section>

@@ -211,3 +211,9 @@
 - 안전성: 정상 삭제에는 작업을 만들지 않으며, cleanup 등록 실패는 원래 업로드 rollback 예외를 바꾸지 않는다. 로그에는 저장 경로나 원본 파일명·stack trace를 남기지 않는다.
 - 보완: transaction 결과가 `STATUS_UNKNOWN`이면 원본 파일과 cleanup 작업을 모두 보존하고, 명확한 `STATUS_ROLLED_BACK`에서만 보상 삭제를 수행한다.
 - 범위: cleanup Scheduler·Worker·실제 재삭제·attempts 증가·재시도 backoff·외부 조회 API는 추가하지 않았다.
+
+## 2026-07-14 — 경력 근거 다중 검색 UI
+
+- 변경: Career Vault의 기존 검색 입력을 `POST /api/career-evidence/search`에 연결해 인증 사용자의 관련 원문 근거를 최대 5개 카드로 표시한다.
+- 표시: 문서 제목·버전·출처 라벨·원문·원래 score를 보여주며, 빈 배열은 근거를 찾지 못했다는 중립 문구로 처리한다. score는 `1 - distance` 계약이므로 퍼센트로 단정하지 않는다.
+- 보존: 기존 문서 목록·유형 필터·TXT/PDF 업로드·인증 만료 처리를 유지하며, AI 답변·근거 저장·백엔드 변경은 추가하지 않았다.

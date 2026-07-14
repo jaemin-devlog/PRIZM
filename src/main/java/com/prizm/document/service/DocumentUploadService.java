@@ -9,6 +9,7 @@ import com.prizm.document.exception.DocumentUploadErrorCode;
 import com.prizm.document.exception.DocumentUploadException;
 import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
+import com.prizm.cleanup.service.FileCleanupJobService;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.infrastructure.storage.FileStorageException;
 import com.prizm.ingestion.entity.ProcessingJob;
@@ -39,6 +40,7 @@ public class DocumentUploadService {
     private final DocumentVersionRepository documentVersionRepository;
     private final ProcessingJobRepository processingJobRepository;
     private final FileStorage fileStorage;
+    private final FileCleanupJobService fileCleanupJobService;
     private final DocumentTextExtractor documentTextExtractor;
     private final long maxFileSizeBytes;
 
@@ -47,12 +49,14 @@ public class DocumentUploadService {
             DocumentVersionRepository documentVersionRepository,
             ProcessingJobRepository processingJobRepository,
             FileStorage fileStorage,
+            FileCleanupJobService fileCleanupJobService,
             DocumentTextExtractor documentTextExtractor,
             @Value("${prizm.upload.max-file-size-bytes}") long maxFileSizeBytes) {
         this.documentRepository = documentRepository;
         this.documentVersionRepository = documentVersionRepository;
         this.processingJobRepository = processingJobRepository;
         this.fileStorage = fileStorage;
+        this.fileCleanupJobService = fileCleanupJobService;
         this.documentTextExtractor = documentTextExtractor;
         this.maxFileSizeBytes = maxFileSizeBytes;
     }
@@ -210,13 +214,22 @@ public class DocumentUploadService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCompletion(int status) {
-                if (status != STATUS_COMMITTED) {
+                if (status == STATUS_ROLLED_BACK) {
                     try {
                         fileStorage.delete(storedFilePath);
                     }
-                    catch (RuntimeException exception) {
-                        log.error("Failed to remove stored document after transaction rollback", exception);
+                    catch (RuntimeException deleteFailure) {
+                        log.error("Failed to remove stored document after transaction rollback.");
+                        try {
+                            fileCleanupJobService.registerPendingCleanup(storedFilePath);
+                        }
+                        catch (RuntimeException cleanupRegistrationFailure) {
+                            log.error("Failed to register pending file cleanup job after transaction rollback.");
+                        }
                     }
+                }
+                else if (status == STATUS_UNKNOWN) {
+                    log.warn("Transaction outcome is unknown; stored document was preserved for reconciliation.");
                 }
             }
         });

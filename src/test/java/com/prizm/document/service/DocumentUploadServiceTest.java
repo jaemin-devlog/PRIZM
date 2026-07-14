@@ -4,12 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.lenient;
 
 import com.prizm.document.dto.response.DocumentUploadResponse;
+import com.prizm.cleanup.service.FileCleanupJobService;
 import com.prizm.document.entity.Document;
 import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.entity.DocumentType;
@@ -63,6 +65,9 @@ class DocumentUploadServiceTest {
     @Mock
     FileStorage fileStorage;
 
+    @Mock
+    FileCleanupJobService fileCleanupJobService;
+
     DocumentUploadService documentUploadService;
 
     @BeforeEach
@@ -73,6 +78,7 @@ class DocumentUploadServiceTest {
                 documentVersionRepository,
                 processingJobRepository,
                 fileStorage,
+                fileCleanupJobService,
                 new DocumentTextExtractor(pdfProperties(300, 2_000_000)),
                 1_000_000);
         lenient().when(documentRepository.save(any(Document.class))).thenAnswer(invocation -> {
@@ -167,6 +173,55 @@ class DocumentUploadServiceTest {
                 .forEach(synchronization -> synchronization.afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK));
 
         verify(fileStorage).delete("documents/11/22/guide.txt");
+        verifyNoInteractions(fileCleanupJobService);
+    }
+
+    @Test
+    void preservesStoredFileWhenTransactionCommits() {
+        byte[] content = "hello".getBytes(StandardCharsets.UTF_8);
+        MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", content);
+        when(fileStorage.store(11L, 22L, "guide.txt", content))
+                .thenReturn("documents/11/22/guide.txt");
+
+        documentUploadService.upload(7L, "Guide", file);
+        TransactionSynchronizationManager.getSynchronizations()
+                .forEach(synchronization -> synchronization.afterCompletion(TransactionSynchronization.STATUS_COMMITTED));
+
+        verify(fileStorage, never()).delete("documents/11/22/guide.txt");
+        verifyNoInteractions(fileCleanupJobService);
+    }
+
+    @Test
+    void preservesStoredFileWhenTransactionOutcomeIsUnknown() {
+        byte[] content = "hello".getBytes(StandardCharsets.UTF_8);
+        MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", content);
+        when(fileStorage.store(11L, 22L, "guide.txt", content))
+                .thenReturn("documents/11/22/guide.txt");
+
+        documentUploadService.upload(7L, "Guide", file);
+        TransactionSynchronizationManager.getSynchronizations()
+                .forEach(synchronization -> synchronization.afterCompletion(TransactionSynchronization.STATUS_UNKNOWN));
+
+        verify(fileStorage, never()).delete("documents/11/22/guide.txt");
+        verifyNoInteractions(fileCleanupJobService);
+    }
+
+    @Test
+    void registersPendingCleanupWhenRollbackDeleteFails() {
+        byte[] content = "hello".getBytes(StandardCharsets.UTF_8);
+        MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", content);
+        when(fileStorage.store(11L, 22L, "guide.txt", content))
+                .thenReturn("documents/11/22/guide.txt");
+        org.mockito.Mockito.doThrow(new FileStorageException("delete unavailable"))
+                .when(fileStorage)
+                .delete("documents/11/22/guide.txt");
+
+        documentUploadService.upload(7L, "Guide", file);
+        TransactionSynchronizationManager.getSynchronizations()
+                .forEach(synchronization -> synchronization.afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK));
+
+        verify(fileStorage).delete("documents/11/22/guide.txt");
+        verify(fileCleanupJobService).registerPendingCleanup("documents/11/22/guide.txt");
     }
 
     @Test
@@ -185,6 +240,51 @@ class DocumentUploadServiceTest {
                 .forEach(synchronization -> synchronization.afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK));
 
         verify(fileStorage).delete("documents/11/22/guide.txt");
+    }
+
+    @Test
+    void preservesOriginalUploadFailureWhenCleanupRegistrationSucceeds() {
+        byte[] content = "hello".getBytes(StandardCharsets.UTF_8);
+        MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", content);
+        when(fileStorage.store(11L, 22L, "guide.txt", content))
+                .thenReturn("documents/11/22/guide.txt");
+        when(processingJobRepository.save(any(ProcessingJob.class)))
+                .thenThrow(new IllegalStateException("database unavailable"));
+        org.mockito.Mockito.doThrow(new FileStorageException("delete unavailable"))
+                .when(fileStorage)
+                .delete("documents/11/22/guide.txt");
+
+        assertThatThrownBy(() -> documentUploadService.upload(7L, "Guide", file))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("database unavailable");
+        TransactionSynchronizationManager.getSynchronizations()
+                .forEach(synchronization -> synchronization.afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK));
+
+        verify(fileCleanupJobService).registerPendingCleanup("documents/11/22/guide.txt");
+    }
+
+    @Test
+    void preservesOriginalUploadFailureWhenCleanupRegistrationFails() {
+        byte[] content = "hello".getBytes(StandardCharsets.UTF_8);
+        MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", content);
+        when(fileStorage.store(11L, 22L, "guide.txt", content))
+                .thenReturn("documents/11/22/guide.txt");
+        when(processingJobRepository.save(any(ProcessingJob.class)))
+                .thenThrow(new IllegalStateException("database unavailable"));
+        org.mockito.Mockito.doThrow(new FileStorageException("delete unavailable"))
+                .when(fileStorage)
+                .delete("documents/11/22/guide.txt");
+        org.mockito.Mockito.doThrow(new IllegalStateException("cleanup unavailable"))
+                .when(fileCleanupJobService)
+                .registerPendingCleanup("documents/11/22/guide.txt");
+
+        assertThatThrownBy(() -> documentUploadService.upload(7L, "Guide", file))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("database unavailable");
+        TransactionSynchronizationManager.getSynchronizations()
+                .forEach(synchronization -> synchronization.afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK));
+
+        verify(fileCleanupJobService).registerPendingCleanup("documents/11/22/guide.txt");
     }
 
     @Test
@@ -243,6 +343,7 @@ class DocumentUploadServiceTest {
                 documentVersionRepository,
                 processingJobRepository,
                 fileStorage,
+                fileCleanupJobService,
                 new DocumentTextExtractor(pdfProperties(1, 100)),
                 1_000_000);
         MockMultipartFile file = new MockMultipartFile(

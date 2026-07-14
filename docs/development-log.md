@@ -204,3 +204,10 @@
 - 변경: 원본 읽기에서 파일 없음·경로 이탈·유효하지 않은 경로·일반 파일이 아닌 대상은 `PermanentFileStorageException`으로, 실제 읽기 중 일반 `IOException`은 `TransientFileStorageException`으로 구분했다.
 - Worker: `DocumentIndexingProcessor`는 일시 오류만 재시도 가능 `DocumentIndexingException`으로 변환한다. 기존 FailureService가 1분·5분·15분 backoff 및 최대 3회 후 FAILED를 적용하며 영구 오류는 즉시 FAILED로 처리한다.
 - 보존: 안전한 일반 오류 메시지만 작업 상태에 남기고, 청크 저장·ACTIVE 전환·기존 active version·lease heartbeat·claim-version fencing 동작은 변경하지 않았다.
+
+## 2026-07-14 — 고아 원본 파일 cleanup 작업 등록
+
+- 변경: V12 `file_cleanup_jobs`에 상대 storage key별 PENDING cleanup 작업을 유일하게 기록하고, rollback 보상 삭제가 실패했을 때만 별도 `REQUIRES_NEW` transaction으로 등록하도록 했다.
+- 안전성: 정상 삭제에는 작업을 만들지 않으며, cleanup 등록 실패는 원래 업로드 rollback 예외를 바꾸지 않는다. 로그에는 저장 경로나 원본 파일명·stack trace를 남기지 않는다.
+- 보완: transaction 결과가 `STATUS_UNKNOWN`이면 원본 파일과 cleanup 작업을 모두 보존하고, 명확한 `STATUS_ROLLED_BACK`에서만 보상 삭제를 수행한다.
+- 범위: cleanup Scheduler·Worker·실제 재삭제·attempts 증가·재시도 backoff·외부 조회 API는 추가하지 않았다.

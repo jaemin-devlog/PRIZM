@@ -44,10 +44,12 @@ class CareerPlatformMigrationTest {
         assertDocumentTypeSchema(database.jdbcTemplate());
         assertChunkSourceSchema(database.jdbcTemplate());
         assertPdfFileTypeSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(11L);
+        assertFileCleanupJobSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(12L);
         for (String table : DOCUMENT_TABLES) {
             assertThat(rowCount(database.jdbcTemplate(), table)).isZero();
         }
+        assertThat(rowCount(database.jdbcTemplate(), "file_cleanup_jobs")).isZero();
     }
 
     @Test
@@ -62,6 +64,7 @@ class CareerPlatformMigrationTest {
 
         assertOwnershipSchema(database.jdbcTemplate());
         assertDocumentTypeSchema(database.jdbcTemplate());
+        assertFileCleanupJobSchema(database.jdbcTemplate());
         for (String table : DOCUMENT_TABLES) {
             assertThat(rowCount(database.jdbcTemplate(), table)).isZero();
         }
@@ -86,7 +89,8 @@ class CareerPlatformMigrationTest {
         assertDocumentTypeSchema(database.jdbcTemplate());
         assertChunkSourceSchema(database.jdbcTemplate());
         assertPdfFileTypeSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(11L);
+        assertFileCleanupJobSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(12L);
     }
 
     @Test
@@ -156,7 +160,8 @@ class CareerPlatformMigrationTest {
                 new StoredChunk("second existing chunk", "TEXT_CHUNK", 2, "텍스트 구간 2", 1024));
         assertChunkSourceSchema(database.jdbcTemplate());
         assertPdfFileTypeSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(11L);
+        assertFileCleanupJobSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(12L);
     }
 
     @Test
@@ -393,6 +398,29 @@ class CareerPlatformMigrationTest {
         assertThat(jdbcTemplate.queryForObject(
                 "SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'ck_document_versions_file_type'",
                 String.class)).contains("TXT", "PDF");
+    }
+
+    private void assertFileCleanupJobSchema(JdbcTemplate jdbcTemplate) {
+        for (String columnName : List.of(
+                "storage_key", "status", "attempts", "available_at", "created_at", "updated_at")) {
+            assertThat(jdbcTemplate.queryForObject(
+                    """
+                    SELECT is_nullable
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public' AND table_name = 'file_cleanup_jobs' AND column_name = ?
+                    """,
+                    String.class,
+                    columnName)).isEqualTo("NO");
+        }
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'ck_file_cleanup_jobs_status'",
+                String.class)).contains("PENDING");
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM pg_constraint WHERE conname = 'uq_file_cleanup_jobs_storage_key'", Long.class))
+                .isEqualTo(1L);
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'ix_file_cleanup_jobs_pending_available'",
+                Long.class)).isEqualTo(1L);
     }
 
     private long ownerColumnCount(JdbcTemplate jdbcTemplate, String tableName) {

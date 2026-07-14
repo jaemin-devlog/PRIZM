@@ -13,6 +13,7 @@ import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.document.service.DocumentQueryService;
 import com.prizm.document.service.DocumentUploadService;
+import com.prizm.cleanup.service.FileCleanupJobService;
 import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
@@ -116,6 +117,9 @@ class PgVectorInfrastructureTest {
     DocumentUploadService documentUploadService;
 
     @Autowired
+    FileCleanupJobService fileCleanupJobService;
+
+    @Autowired
     DocumentQueryService documentQueryService;
 
     @Autowired
@@ -168,6 +172,7 @@ class PgVectorInfrastructureTest {
         Long chunkCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM document_chunks", Long.class);
         Long jobCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM processing_jobs", Long.class);
         Long userCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Long.class);
+        Long fileCleanupJobCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM file_cleanup_jobs", Long.class);
         Long uniqueJobConstraints = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM pg_constraint WHERE conname = 'uq_processing_jobs_version_type'",
                 Long.class);
@@ -175,13 +180,14 @@ class PgVectorInfrastructureTest {
                 PgVectorSmokeAssertions.verifyExactCosineSearch(jdbcTemplate);
 
         assertThat(serverVersion).isBetween(160000, 169999);
-        assertThat(successfulMigrations).isEqualTo(11L);
+        assertThat(successfulMigrations).isEqualTo(12L);
         assertThat(result.extensionVersion()).isEqualTo("0.8.2");
         assertThat(documentCount).isZero();
         assertThat(versionCount).isZero();
         assertThat(chunkCount).isZero();
         assertThat(jobCount).isZero();
         assertThat(userCount).isZero();
+        assertThat(fileCleanupJobCount).isZero();
         assertThat(uniqueJobConstraints).isEqualTo(1);
     }
 
@@ -597,6 +603,44 @@ class PgVectorInfrastructureTest {
     }
 
     @Test
+    void commitsCleanupRegistrationIndependentlyAndKeepsItIdempotent() {
+        String storageKey = "documents/cleanup/rollback.txt";
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+
+        try {
+            transactionTemplate.execute(status -> {
+                fileCleanupJobService.registerPendingCleanup(storageKey);
+                status.setRollbackOnly();
+                return null;
+            });
+
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM file_cleanup_jobs WHERE storage_key = ?", Long.class, storageKey))
+                    .isEqualTo(1L);
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT status FROM file_cleanup_jobs WHERE storage_key = ?", String.class, storageKey))
+                    .isEqualTo("PENDING");
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT attempts FROM file_cleanup_jobs WHERE storage_key = ?", Integer.class, storageKey))
+                    .isZero();
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT available_at <= now() AND created_at IS NOT NULL AND updated_at IS NOT NULL "
+                            + "FROM file_cleanup_jobs WHERE storage_key = ?",
+                    Boolean.class,
+                    storageKey)).isTrue();
+
+            fileCleanupJobService.registerPendingCleanup(storageKey);
+
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM file_cleanup_jobs WHERE storage_key = ?", Long.class, storageKey))
+                    .isEqualTo(1L);
+        }
+        finally {
+            jdbcTemplate.update("DELETE FROM file_cleanup_jobs WHERE storage_key = ?", storageKey);
+        }
+    }
+
+    @Test
     void recoversExpiredLeaseAndRejectsCompletionFromTheOldWorker() {
         PendingJobFixture fixture = createPendingIndexingJob("중단 복구 문서");
 
@@ -857,6 +901,7 @@ class PgVectorInfrastructureTest {
     }
 
     private void deleteCommittedDocumentData() {
+        jdbcTemplate.update("DELETE FROM file_cleanup_jobs");
         jdbcTemplate.update("DELETE FROM processing_jobs");
         jdbcTemplate.update("DELETE FROM document_chunks");
         jdbcTemplate.update("UPDATE documents SET active_version_id = NULL");

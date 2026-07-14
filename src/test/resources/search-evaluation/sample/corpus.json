@@ -1,0 +1,85 @@
+{
+  "datasetId": "prizm-synthetic-dense-baseline-v1",
+  "documents": [
+    {
+      "fixtureId": "airconnect-report",
+      "title": "합성 AirConnect 프로젝트 보고서",
+      "documentType": "PROJECT_REPORT",
+      "fileType": "PDF",
+      "pages": [
+        {
+          "pageNumber": 1,
+          "text": "이 문서는 검색 평가를 위해 작성한 합성 프로젝트 보고서다. 실제 사용자, 회사, 서비스의 정보는 포함하지 않는다. 합성 팀은 모바일 요청을 처리하는 백엔드 구조를 검토했다. 초기 구조에서는 모든 상태를 한 프로세스의 메모리에 저장했다. 프로세스가 재시작되면 상태가 사라지는 문제가 있었다. 여러 인스턴스를 가정하면 상태 공유도 어려웠다. 팀은 요청의 수명과 실패 시나리오를 먼저 표로 정리했다. 각 요청에는 서버가 생성한 식별자를 부여했다. API 계층은 입력 형식만 확인하고 핵심 처리는 서비스 계층에 위임했다. 데이터 변경은 짧은 트랜잭션 안에서 수행했다. 외부 알림 호출은 트랜잭션이 끝난 뒤 실행하도록 분리했다. 실패한 알림은 별도 작업이 다시 처리하도록 설계했다. 합성 구현은 Spring Boot와 Redis를 사용해 요청 상태를 관리했다. Redis 자료구조는 임시 상태와 만료 시간을 표현하는 용도로만 사용했다. 영구 기록은 관계형 데이터베이스에 남겼다. 캐시가 비어 있어도 원본 기록으로 복구할 수 있도록 했다. 요청 처리 서비스는 같은 작업이 반복 호출되는 상황을 고려했다. 클라이언트가 응답을 받지 못해 다시 요청하는 경우도 포함했다. 작업 시작 전에 요청 키와 기존 처리 상태를 함께 확인했다. 처리 중인 요청은 새 작업을 만들지 않고 기존 상태를 반환했다. 완료된 요청은 저장된 결과를 다시 반환했다. 이 규칙은 합성 테스트에서 반복 요청에도 한 번만 상태가 변경되는지 확인했다. 팀은 재시도와 정상적인 중복 요청을 구분하기 위한 로그 항목도 정의했다. 동일 요청 키에 대한 중복 처리를 방지했다. 이 문장은 overlap 청크가 같은 근거를 공유하는 상황을 평가하기 위한 합성 anchor다. 이후 단계에서는 잠금 시간이 길어지지 않도록 외부 호출을 분리했다. 처리 실패 시에는 상태를 실패로 기록하고 안전한 요청만 다시 시도했다. 지연이 긴 호출은 제한된 횟수만 재시도했다. 합성 부하 시험에서는 1,000개의 가상 요청을 생성했고 이는 실제 사용자 수나 운영 실적을 의미하지 않는다. 측정 결과는 평가 fixture의 정확한 수치 검색을 확인하는 용도로만 사용한다. 팀원은 설계 검토에서 상태 전이 표를 함께 읽고 예외 경로를 점검했다. 마지막 회고에서는 구현 사실과 검증하지 않은 가정을 분리해 문서에 남겼다."
+        }
+      ],
+      "evidenceAnchors": [
+        {
+          "fixtureEvidenceId": "airconnect-stack",
+          "anchorText": "Spring Boot와 Redis를 사용해 요청 상태를 관리했다"
+        },
+        {
+          "fixtureEvidenceId": "airconnect-duplicate-prevention",
+          "anchorText": "동일 요청 키에 대한 중복 처리를 방지했다"
+        },
+        {
+          "fixtureEvidenceId": "airconnect-exact-load-value",
+          "anchorText": "1,000개의 가상 요청을 생성했고"
+        }
+      ]
+    },
+    {
+      "fixtureId": "redis-study-note",
+      "title": "합성 Redis 학습 노트",
+      "documentType": "SCHOOL_ASSIGNMENT",
+      "fileType": "TXT",
+      "pages": [
+        {
+          "pageNumber": 1,
+          "text": "Redis는 메모리 기반 자료구조 저장소라고 학습 노트에 정리했다. 문자열과 집합의 개념을 설명하지만 실제 프로젝트에 적용했다는 내용은 없다."
+        }
+      ],
+      "evidenceAnchors": [
+        {
+          "fixtureEvidenceId": "redis-definition-only",
+          "anchorText": "실제 프로젝트에 적용했다는 내용은 없다"
+        }
+      ]
+    },
+    {
+      "fixtureId": "collaboration-retrospective",
+      "title": "합성 협업 회고",
+      "documentType": "CAREER_REVIEW",
+      "fileType": "TXT",
+      "pages": [
+        {
+          "pageNumber": 1,
+          "text": "합성 프로젝트에서 API 담당자와 화면 담당자가 오류 응답 형식을 함께 정의했다. 의견이 달랐을 때 실패 사례를 작은 테스트로 재현하고 두 대안을 비교한 뒤 팀 회의에서 결론을 기록했다."
+        }
+      ],
+      "evidenceAnchors": [
+        {
+          "fixtureEvidenceId": "collaboration-decision",
+          "anchorText": "두 대안을 비교한 뒤 팀 회의에서 결론을 기록했다"
+        }
+      ]
+    },
+    {
+      "fixtureId": "future-technology-note",
+      "title": "합성 향후 기술 검토",
+      "documentType": "CAREER_REVIEW",
+      "fileType": "TXT",
+      "pages": [
+        {
+          "pageNumber": 1,
+          "text": "Kubernetes는 향후 학습 후보로만 적어 두었으며 이 합성 프로젝트에서 구축하거나 운영하지 않았다. 금융권 업무도 수행하지 않았다."
+        }
+      ],
+      "evidenceAnchors": [
+        {
+          "fixtureEvidenceId": "kubernetes-negated",
+          "anchorText": "구축하거나 운영하지 않았다"
+        }
+      ]
+    }
+  ]
+}

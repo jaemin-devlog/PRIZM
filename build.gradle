@@ -68,11 +68,25 @@ sourceSets {
         compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
         runtimeClasspath += output + compileClasspath
     }
+
+    searchEvaluation {
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        runtimeClasspath += output + compileClasspath
+    }
 }
 
 configurations {
     integrationTestImplementation.extendsFrom testImplementation
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+    searchEvaluationImplementation.extendsFrom testImplementation
+    searchEvaluationRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+sourceSets.test.compileClasspath += sourceSets.searchEvaluation.output
+sourceSets.test.runtimeClasspath += sourceSets.searchEvaluation.output
+
+tasks.named('compileTestJava') {
+    dependsOn tasks.named('compileSearchEvaluationJava')
 }
 
 tasks.register('integrationTest', Test) {
@@ -82,6 +96,26 @@ tasks.register('integrationTest', Test) {
     classpath = sourceSets.integrationTest.runtimeClasspath
     shouldRunAfter tasks.named('test')
     useJUnitPlatform()
+}
+
+tasks.register('searchEvaluation', Test) {
+    description = 'Measures the current dense search baseline with PostgreSQL, pgvector, and Ollama.'
+    group = 'verification'
+    testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
+    classpath = sourceSets.searchEvaluation.runtimeClasspath
+    useJUnitPlatform()
+    outputs.upToDateWhen { false }
+
+    systemProperty 'prizm.search-evaluation.dataset-dir',
+            providers.gradleProperty('searchEvaluationDataset')
+                    .getOrElse('src/test/resources/search-evaluation/sample')
+    systemProperty 'prizm.search-evaluation.output-dir',
+            providers.gradleProperty('searchEvaluationOutput')
+                    .getOrElse('local/search-evaluation/results')
+
+    testLogging {
+        showStandardStreams = true
+    }
 }
 
 tasks.named('check') {

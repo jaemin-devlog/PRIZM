@@ -217,3 +217,10 @@
 - 변경: Career Vault의 기존 검색 입력을 `POST /api/career-evidence/search`에 연결해 인증 사용자의 관련 원문 근거를 최대 5개 카드로 표시한다.
 - 표시: 문서 제목·버전·출처 라벨·원문·원래 score를 보여주며, 빈 배열은 근거를 찾지 못했다는 중립 문구로 처리한다. score는 `1 - distance` 계약이므로 퍼센트로 단정하지 않는다.
 - 보존: 기존 문서 목록·유형 필터·TXT/PDF 업로드·인증 만료 처리를 유지하며, AI 답변·근거 저장·백엔드 변경은 추가하지 않았다.
+
+## 2026-07-14 — 검색 품질 평가 기반
+
+- 변경: 합성 `corpus.json`·`questions.jsonl` 형식과 개인 데이터가 Git에서 제외되는 `local/search-evaluation/` 경계를 추가했다.
+- 측정: 별도 `searchEvaluation` task가 실제 PostgreSQL·pgvector와 Ollama `bge-m3`, 현재 청킹·owner·ACTIVE 조건을 사용해 Dense top 5·20을 조회하고 Recall@20, Precision@5, MRR@20, nDCG@5, 중복률과 지연을 로컬 JSON·CSV로 기록한다.
+- 범위: 프로덕션 검색 API, score 임계값, Reranker, Hybrid Search, 청킹과 프런트엔드는 변경하지 않았다.
+- 검증: 단위 테스트 162개, PostgreSQL·pgvector·실제 Ollama 통합 테스트 49개와 합성 기준선 평가를 통과했다. OpenSQL 실환경 테스트 1개는 기존 정책대로 제외했다.

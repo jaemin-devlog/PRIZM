@@ -194,6 +194,20 @@ button:disabled {
   line-height: 1.4;
 }
 
+.upload-guide {
+  margin: 0.5rem 0 0;
+  color: #44505c;
+  line-height: 1.55;
+}
+
+.upload-restrictions {
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+  color: #5d6a78;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
 .upload-form {
   display: grid;
   gap: 0.65rem;

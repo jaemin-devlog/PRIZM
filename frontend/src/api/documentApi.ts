@@ -36,10 +36,12 @@ export type DocumentUploadResponse = {
 
 export class DocumentApiError extends Error {
   readonly status: number
+  readonly code: string | null
 
-  constructor(status: number) {
+  constructor(status: number, code: string | null = null) {
     super('Document request failed')
     this.status = status
+    this.code = code
   }
 }
 
@@ -93,8 +95,21 @@ export async function uploadDocument(
   })
 
   if (!response.ok) {
-    throw new DocumentApiError(response.status)
+    throw new DocumentApiError(response.status, await responseErrorCode(response))
   }
 
   return (await response.json()) as DocumentUploadResponse
+}
+
+async function responseErrorCode(response: Response): Promise<string | null> {
+  try {
+    const body: unknown = await response.json()
+    if (typeof body === 'object' && body !== null && 'code' in body && typeof body.code === 'string') {
+      return body.code
+    }
+  } catch {
+    // 서버 오류 본문은 사용자에게 표시하지 않는다.
+  }
+
+  return null
 }

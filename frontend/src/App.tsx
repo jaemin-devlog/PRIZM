@@ -22,6 +22,7 @@ import {
 
 const LOGIN_PATH = '/login'
 const CAREER_VAULT_PATH = '/career-vault'
+const MAX_UPLOAD_FILE_SIZE_BYTES = 10 * 1024 * 1024
 
 const DOCUMENT_TYPE_OPTIONS: ReadonlyArray<{ value: DocumentType | undefined; label: string }> = [
   { value: undefined, label: '전체' },
@@ -246,11 +247,12 @@ function CareerVault({
 
   const handleUploadFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null
+    const fileValidationMessage = uploadFileValidationMessage(file)
     setUploadFile(file)
-    setUploadErrorMessage(null)
+    setUploadErrorMessage(fileValidationMessage)
     setUploadSuccessMessage(null)
 
-    if (file !== null && uploadTitle.trim() === '') {
+    if (file !== null && fileValidationMessage === null && uploadTitle.trim() === '') {
       setUploadTitle(titleFromFileName(file.name))
     }
   }
@@ -263,12 +265,13 @@ function CareerVault({
     }
 
     if (uploadFile === null) {
-      setUploadErrorMessage('TXT 파일을 선택해 주세요.')
+      setUploadErrorMessage('파일을 선택해 주세요.')
       return
     }
 
-    if (!uploadFile.name.toLowerCase().endsWith('.txt')) {
-      setUploadErrorMessage('TXT 파일만 업로드할 수 있습니다.')
+    const fileValidationMessage = uploadFileValidationMessage(uploadFile)
+    if (fileValidationMessage !== null) {
+      setUploadErrorMessage(fileValidationMessage)
       return
     }
 
@@ -341,15 +344,21 @@ function CareerVault({
 
       {isUploadOpen && (
         <section className="upload-panel" aria-labelledby="upload-title">
-          <h2 id="upload-title">TXT 문서 업로드</h2>
+          <h2 id="upload-title">TXT·PDF 문서 업로드</h2>
+          <p className="upload-guide">TXT 또는 텍스트가 포함된 PDF 파일을 업로드할 수 있습니다.</p>
+          <ul className="upload-restrictions">
+            <li>최대 10MB</li>
+            <li>스캔 PDF와 암호화 PDF는 지원하지 않음</li>
+            <li>PDF는 텍스트가 포함된 파일만 지원</li>
+          </ul>
           <form className="upload-form" onSubmit={handleUploadSubmit} noValidate>
-            <label htmlFor="upload-file">TXT 파일</label>
+            <label htmlFor="upload-file">TXT 또는 PDF 파일</label>
             <input
               key={uploadFormKey}
               id="upload-file"
               name="file"
               type="file"
-              accept=".txt,text/plain"
+              accept=".txt,.pdf"
               onChange={handleUploadFileChange}
               disabled={isUploading}
             />
@@ -445,7 +454,24 @@ function toDocumentType(value: string): DocumentType | undefined {
 }
 
 function titleFromFileName(fileName: string): string {
-  return fileName.replace(/\.txt$/i, '').trim() || fileName
+  return fileName.replace(/\.(txt|pdf)$/i, '').trim() || fileName
+}
+
+function uploadFileValidationMessage(file: File | null): string | null {
+  if (file === null) {
+    return null
+  }
+
+  const normalizedFileName = file.name.toLowerCase()
+  if (!normalizedFileName.endsWith('.txt') && !normalizedFileName.endsWith('.pdf')) {
+    return '지원하는 파일 형식은 TXT와 PDF입니다.'
+  }
+
+  if (file.size > MAX_UPLOAD_FILE_SIZE_BYTES) {
+    return '파일 크기가 10MB를 초과했습니다.'
+  }
+
+  return null
 }
 
 function documentTypeLabel(documentType: string): string {
@@ -490,12 +516,16 @@ function loginErrorMessage(error: unknown): string {
 
 function uploadFailureMessage(error: unknown): string {
   if (error instanceof DocumentApiError) {
+    if (error.code === 'INVALID_DOCUMENT_CONTENT') {
+      return 'PDF에서 처리 가능한 텍스트를 찾지 못했습니다. 스캔 파일이나 암호화된 PDF인지 확인해 주세요.'
+    }
+
     if (error.status === 400) {
-      return 'TXT 파일과 문서 제목을 확인해 주세요.'
+      return '파일 형식과 내용을 확인해 주세요.'
     }
 
     if (error.status === 413) {
-      return '업로드할 수 있는 파일 크기를 초과했습니다.'
+      return '파일 크기가 10MB를 초과했습니다.'
     }
   }
 

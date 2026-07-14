@@ -1,7 +1,7 @@
 package com.prizm.search.controller;
 
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -10,8 +10,9 @@ import com.prizm.auth.security.CurrentUserProvider;
 import com.prizm.embedding.exception.EmbeddingErrorCode;
 import com.prizm.embedding.exception.EmbeddingException;
 import com.prizm.ingestion.entity.ChunkSourceType;
-import com.prizm.search.dto.response.SearchResponse;
+import com.prizm.search.dto.response.CareerEvidenceSearchResponse;
 import com.prizm.search.service.SearchService;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,9 +23,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-/** 검색 API의 JSON 응답과 입력 길이 검증 목적을 확인한다. */
 @ExtendWith(MockitoExtension.class)
-class SearchControllerTest {
+class CareerEvidenceSearchControllerTest {
 
     @Mock
     SearchService searchService;
@@ -39,60 +39,68 @@ class SearchControllerTest {
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
         lenient().when(currentUserProvider.userId()).thenReturn(7L);
-        mockMvc = MockMvcBuilders.standaloneSetup(new SearchController(searchService, currentUserProvider))
+        mockMvc = MockMvcBuilders.standaloneSetup(
+                        new CareerEvidenceSearchController(searchService, currentUserProvider))
                 .setControllerAdvice(new SearchExceptionHandler())
                 .setValidator(validator)
                 .build();
     }
 
     @Test
-    void returnsActualSearchValues() throws Exception {
-        when(searchService.search(7L, "휴가는 어디에서 신청하나요?"))
-                .thenReturn(new SearchResponse(
+    void returnsAnOrderedArrayOfActualEvidenceFields() throws Exception {
+        when(searchService.searchCareerEvidence(7L, "Spring Boot experience"))
+                .thenReturn(List.of(new CareerEvidenceSearchResponse(
+                        30L,
                         10L,
                         20L,
-                        "휴가 안내",
-                        1,
-                        1,
-                        null,
+                        "Career record",
+                        2,
+                        "Spring Boot and Redis experience",
                         ChunkSourceType.TEXT_CHUNK,
                         1,
                         "텍스트 구간 1",
-                        "연차 신청은 인사 시스템에서 진행합니다.",
-                        0.25d,
-                        0.75d));
+                        0.2d,
+                        0.8d)));
 
-        mockMvc.perform(post("/api/search")
+        mockMvc.perform(post("/api/career-evidence/search")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"query\":\"휴가는 어디에서 신청하나요?\"}"))
+                        .content("{\"query\":\"Spring Boot experience\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.documentId").value(10L))
-                .andExpect(jsonPath("$.documentVersionId").value(20L))
-                .andExpect(jsonPath("$.documentTitle").value("휴가 안내"))
-                .andExpect(jsonPath("$.chunkNo").value(1))
-                .andExpect(jsonPath("$.pageNo").doesNotExist())
-                .andExpect(jsonPath("$.sourceType").value("TEXT_CHUNK"))
-                .andExpect(jsonPath("$.sourceIndex").value(1))
-                .andExpect(jsonPath("$.sourceLabel").value("텍스트 구간 1"))
-                .andExpect(jsonPath("$.content").value("연차 신청은 인사 시스템에서 진행합니다."))
-                .andExpect(jsonPath("$.distance").value(0.25d))
-                .andExpect(jsonPath("$.score").value(0.75d));
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].chunkId").value(30L))
+                .andExpect(jsonPath("$[0].documentId").value(10L))
+                .andExpect(jsonPath("$[0].documentVersionId").value(20L))
+                .andExpect(jsonPath("$[0].documentTitle").value("Career record"))
+                .andExpect(jsonPath("$[0].versionNo").value(2))
+                .andExpect(jsonPath("$[0].content").value("Spring Boot and Redis experience"))
+                .andExpect(jsonPath("$[0].sourceType").value("TEXT_CHUNK"))
+                .andExpect(jsonPath("$[0].sourceIndex").value(1))
+                .andExpect(jsonPath("$[0].sourceLabel").value("텍스트 구간 1"))
+                .andExpect(jsonPath("$[0].distance").value(0.2d))
+                .andExpect(jsonPath("$[0].score").value(0.8d));
     }
 
     @Test
-    void rejectsBlankQuery() throws Exception {
-        mockMvc.perform(post("/api/search")
+    void returnsEmptyArrayWhenNoEvidenceIsSearchable() throws Exception {
+        when(searchService.searchCareerEvidence(7L, "no evidence")).thenReturn(List.of());
+
+        mockMvc.perform(post("/api/career-evidence/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"query\":\"no evidence\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void rejectsBlankAndOverlongQueries() throws Exception {
+        mockMvc.perform(post("/api/career-evidence/search")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"query\":\" \"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("INVALID_SEARCH_QUERY"));
-    }
 
-    @Test
-    void rejectsOverlongQuery() throws Exception {
         String query = "x".repeat(SearchService.MAX_QUERY_LENGTH + 1);
-
-        mockMvc.perform(post("/api/search")
+        mockMvc.perform(post("/api/career-evidence/search")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"query\":\"%s\"}".formatted(query)))
                 .andExpect(status().isBadRequest())
@@ -101,12 +109,12 @@ class SearchControllerTest {
 
     @Test
     void returnsSafeGatewayErrorForInvalidQueryEmbedding() throws Exception {
-        when(searchService.search(7L, "zero vector"))
+        when(searchService.searchCareerEvidence(7L, "zero vector"))
                 .thenThrow(new EmbeddingException(
                         EmbeddingErrorCode.EMBEDDING_INVALID_RESPONSE,
                         "Embedding service returned an invalid response."));
 
-        mockMvc.perform(post("/api/search")
+        mockMvc.perform(post("/api/career-evidence/search")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"query\":\"zero vector\"}"))
                 .andExpect(status().isBadGateway())

@@ -41,6 +41,21 @@ class IndexingCoordinatorTest {
     }
 
     @Test
+    void recordsInvalidEmbeddingResponseAsRetryableFailure() {
+        ClaimedProcessingJob job = claimedJob();
+        when(claimService.claimNext()).thenReturn(Optional.of(job));
+        org.mockito.Mockito.doThrow(new EmbeddingException(
+                        EmbeddingErrorCode.EMBEDDING_INVALID_RESPONSE, "invalid response"))
+                .when(processor).process(job);
+        IndexingCoordinator coordinator = new IndexingCoordinator(
+                claimService, processor, new IndexingFailureClassifier(), failureService);
+
+        assertThat(coordinator.processNext()).isTrue();
+
+        verify(failureService).handleFailure(job, true, "invalid response");
+    }
+
+    @Test
     void doesNothingWhenAnotherWorkerAlreadyClaimedTheJob() {
         when(claimService.claimNext()).thenReturn(Optional.empty());
         IndexingCoordinator coordinator = new IndexingCoordinator(

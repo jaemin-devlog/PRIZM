@@ -13,7 +13,10 @@ import static org.mockito.Mockito.when;
 import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.repository.DocumentVersionRepository;
+import com.prizm.embedding.exception.EmbeddingErrorCode;
+import com.prizm.embedding.exception.EmbeddingException;
 import com.prizm.embedding.service.EmbeddingService;
+import com.prizm.embedding.service.EmbeddingValidator;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.infrastructure.storage.FileStorageException;
 import com.prizm.ingestion.config.IngestionProperties;
@@ -70,10 +73,10 @@ class DocumentIndexingProcessorTest {
                 new DocumentTextExtractor(),
                 new TextChunker(properties),
                 embeddingService,
+                new EmbeddingValidator(4),
                 completionService,
                 leaseService,
-                properties,
-                4);
+                properties);
         DocumentVersion version = DocumentVersion.quarantined(7L, 1L, "guide.txt", "a".repeat(64));
         ReflectionTestUtils.setField(version, "id", 10L);
         version.startProcessing();
@@ -87,7 +90,7 @@ class DocumentIndexingProcessorTest {
     void createsEmbeddingsAndCompletesWithNonEmptyChunks() {
         when(fileStorage.read("documents/1/10/guide.txt"))
                 .thenReturn("abcdefghijk".getBytes(StandardCharsets.UTF_8));
-        when(embeddingService.embed(anyString())).thenReturn(new float[4]);
+        when(embeddingService.embed(anyString())).thenReturn(nonZeroEmbedding());
 
         processor.process(claimedJob);
 
@@ -138,8 +141,21 @@ class DocumentIndexingProcessorTest {
         when(embeddingService.embed("text")).thenReturn(new float[3]);
 
         assertThatThrownBy(() -> processor.process(claimedJob))
-                .isInstanceOf(DocumentIndexingException.class)
-                .hasMessageContaining("4-dimensional");
+                .isInstanceOf(EmbeddingException.class)
+                .extracting(exception -> ((EmbeddingException) exception).code())
+                .isEqualTo(EmbeddingErrorCode.EMBEDDING_DIMENSION_MISMATCH);
+        verify(completionService, never()).complete(any(), any());
+    }
+
+    @Test
+    void rejectsZeroNormEmbeddingBeforeCompletingDocumentVersion() {
+        when(fileStorage.read("documents/1/10/guide.txt")).thenReturn("text".getBytes(StandardCharsets.UTF_8));
+        when(embeddingService.embed("text")).thenReturn(new float[4]);
+
+        assertThatThrownBy(() -> processor.process(claimedJob))
+                .isInstanceOf(EmbeddingException.class)
+                .extracting(exception -> ((EmbeddingException) exception).code())
+                .isEqualTo(EmbeddingErrorCode.EMBEDDING_INVALID_RESPONSE);
         verify(completionService, never()).complete(any(), any());
     }
 
@@ -153,7 +169,7 @@ class DocumentIndexingProcessorTest {
         when(documentVersionRepository.findById(10L)).thenReturn(Optional.of(pdfVersion));
         when(fileStorage.read("documents/1/10/guide.pdf"))
                 .thenReturn(textPdf(List.of("first", "", "third-page-text")));
-        when(embeddingService.embed(anyString())).thenReturn(new float[4]);
+        when(embeddingService.embed(anyString())).thenReturn(nonZeroEmbedding());
 
         processor.process(claimedJob);
 
@@ -190,5 +206,9 @@ class DocumentIndexingProcessorTest {
         catch (IOException exception) {
             throw new UncheckedIOException(exception);
         }
+    }
+
+    private float[] nonZeroEmbedding() {
+        return new float[] {1.0f, 0.0f, 0.0f, 0.0f};
     }
 }

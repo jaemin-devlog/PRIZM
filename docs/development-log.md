@@ -1,5 +1,17 @@
 # 개발 기록
 
+## 2026-07-14 0-norm 임베딩 검증
+
+- 변경: 공통 `EmbeddingValidator`에서 1024차원, 유한값, 0보다 큰 L2 norm을 검증하고 Ollama 응답, 문서 색인·저장 직전, 단일 검색과 Career Evidence 검색에 적용했다.
+- 실패 처리: 0-norm 응답은 `EMBEDDING_INVALID_RESPONSE`로 거부한다. 색인은 기존 임베딩 오류 정책에 따라 재시도 대상으로 처리하며 완료 트랜잭션을 호출하지 않고, 검색은 pgvector SQL 실행 전에 중단해 안전한 502 오류를 반환한다.
+- 검증: 전체 단위 테스트와 Docker PostgreSQL 16·pgvector 및 로컬 Ollama `bge-m3` 통합 테스트를 통과했다. OpenSQL 실환경 테스트는 기존 제외 정책을 유지했다.
+
+## 2026-07-14 Career Evidence 다중 검색 API
+
+- 변경: `POST /api/career-evidence/search`를 추가해 인증 사용자의 ACTIVE 현재 문서 버전 청크를 관련도 순으로 최대 5개 배열로 반환한다. 기존 `POST /api/search` 단일 결과·404 계약은 변경하지 않았다.
+- 구조: 기존 BGE-M3 임베딩과 pgvector exact cosine SQL의 소유권·ACTIVE 조건을 재사용하고, 새 응답에는 청크 ID, 문서·버전, 원문, 출처, 거리와 점수를 포함했다.
+- 검증: 단위 테스트와 Docker PostgreSQL 16·pgvector 및 로컬 Ollama `bge-m3` 통합 테스트를 통과했다. 통합 테스트에서 사용자 A/B 격리, 현재 ACTIVE 버전 조건, 최대 5개 및 거리 정렬을 확인했으며 OpenSQL 실환경 테스트는 기존 제외 정책을 유지했다.
+
 ## 2026-07-14 프런트엔드 문서 검색 UI
 
 - 변경: Career Vault에 자연어 검색 입력과 단일 벡터 검색 결과 표시를 추가하고, `POST /api/search` 요청을 별도 API 모듈로 분리했다.

@@ -1,6 +1,7 @@
 package com.prizm.search.service;
 
 import com.prizm.embedding.service.EmbeddingService;
+import com.prizm.embedding.service.EmbeddingValidator;
 import com.prizm.search.dto.response.CareerEvidenceSearchResponse;
 import com.prizm.search.dto.response.SearchResponse;
 import com.prizm.search.exception.InvalidSearchQueryException;
@@ -21,10 +22,15 @@ public class SearchService {
     public static final int MAX_QUERY_LENGTH = 500;
 
     private final EmbeddingService embeddingService;
+    private final EmbeddingValidator embeddingValidator;
     private final VectorSearchRepository vectorSearchRepository;
 
-    public SearchService(EmbeddingService embeddingService, VectorSearchRepository vectorSearchRepository) {
+    public SearchService(
+            EmbeddingService embeddingService,
+            EmbeddingValidator embeddingValidator,
+            VectorSearchRepository vectorSearchRepository) {
         this.embeddingService = embeddingService;
+        this.embeddingValidator = embeddingValidator;
         this.vectorSearchRepository = vectorSearchRepository;
     }
 
@@ -37,6 +43,7 @@ public class SearchService {
     public SearchResponse search(Long ownerUserId, String query) {
         validateQuery(query);
         float[] queryEmbedding = embeddingService.embed(query);
+        embeddingValidator.validate(queryEmbedding);
         return vectorSearchRepository.findNearest(ownerUserId, queryEmbedding)
                 .map(result -> new SearchResponse(
                         result.documentId(),
@@ -61,6 +68,7 @@ public class SearchService {
     public List<CareerEvidenceSearchResponse> searchCareerEvidence(Long ownerUserId, String query) {
         validateQuery(query);
         float[] queryEmbedding = embeddingService.embed(query);
+        embeddingValidator.validate(queryEmbedding);
         return vectorSearchRepository.findCareerEvidence(ownerUserId, queryEmbedding).stream()
                 .map(result -> new CareerEvidenceSearchResponse(
                         result.chunkId(),

@@ -5,6 +5,7 @@ import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.exception.DocumentVersionNotFoundException;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.embedding.service.EmbeddingService;
+import com.prizm.embedding.service.EmbeddingValidator;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.infrastructure.storage.FileStorageException;
 import com.prizm.ingestion.config.IngestionProperties;
@@ -12,7 +13,6 @@ import com.prizm.ingestion.entity.ChunkSourceType;
 import com.prizm.ingestion.exception.DocumentIndexingException;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /** 락 없는 구간에서 TXT를 읽고 청크별 임베딩을 만든 뒤 완료 트랜잭션에 전달한다. */
@@ -24,9 +24,9 @@ public class DocumentIndexingProcessor {
     private final DocumentTextExtractor documentTextExtractor;
     private final TextChunker textChunker;
     private final EmbeddingService embeddingService;
+    private final EmbeddingValidator embeddingValidator;
     private final IndexingCompletionService completionService;
     private final ProcessingJobLeaseService leaseService;
-    private final int expectedDimensions;
     private final int leaseRefreshChunkInterval;
 
     public DocumentIndexingProcessor(
@@ -35,18 +35,18 @@ public class DocumentIndexingProcessor {
             DocumentTextExtractor documentTextExtractor,
             TextChunker textChunker,
             EmbeddingService embeddingService,
+            EmbeddingValidator embeddingValidator,
             IndexingCompletionService completionService,
             ProcessingJobLeaseService leaseService,
-            IngestionProperties ingestionProperties,
-            @Value("${prizm.embedding.dimensions}") int expectedDimensions) {
+            IngestionProperties ingestionProperties) {
         this.documentVersionRepository = documentVersionRepository;
         this.fileStorage = fileStorage;
         this.documentTextExtractor = documentTextExtractor;
         this.textChunker = textChunker;
         this.embeddingService = embeddingService;
+        this.embeddingValidator = embeddingValidator;
         this.completionService = completionService;
         this.leaseService = leaseService;
-        this.expectedDimensions = expectedDimensions;
         this.leaseRefreshChunkInterval = ingestionProperties.getLeaseRefreshChunkInterval();
     }
 
@@ -66,7 +66,7 @@ public class DocumentIndexingProcessor {
         for (PageText page : pages) {
             for (TextChunk chunk : textChunker.split(page.text())) {
                 float[] embedding = embeddingService.embed(chunk.content());
-                validateEmbedding(embedding);
+                embeddingValidator.validate(embedding);
                 indexedChunks.add(createIndexedChunk(
                         version.getFileType(), nextChunkNo++, page.pageNumber(), chunk.content(), embedding));
                 processedChunkCount++;
@@ -119,18 +119,4 @@ public class DocumentIndexingProcessor {
         }
     }
 
-    private void validateEmbedding(float[] embedding) {
-        if (embedding == null || embedding.length != expectedDimensions) {
-            int actual = embedding == null ? 0 : embedding.length;
-            throw new DocumentIndexingException(
-                    "Expected a %d-dimensional embedding but received %d."
-                            .formatted(expectedDimensions, actual),
-                    false);
-        }
-        for (float value : embedding) {
-            if (!Float.isFinite(value)) {
-                throw new DocumentIndexingException("Embedding contains a non-finite value.", false);
-            }
-        }
-    }
 }

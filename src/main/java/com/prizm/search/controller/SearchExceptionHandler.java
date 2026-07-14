@@ -38,7 +38,7 @@ public class SearchExceptionHandler {
     private HttpStatus statusFor(EmbeddingErrorCode code) {
         return switch (code) {
             case OLLAMA_UNAVAILABLE, OLLAMA_MODEL_NOT_INSTALLED -> HttpStatus.SERVICE_UNAVAILABLE;
-            case EMBEDDING_EMPTY_RESPONSE -> HttpStatus.BAD_GATEWAY;
+            case EMBEDDING_EMPTY_RESPONSE, EMBEDDING_INVALID_RESPONSE -> HttpStatus.BAD_GATEWAY;
             case EMBEDDING_DIMENSION_MISMATCH -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
     }

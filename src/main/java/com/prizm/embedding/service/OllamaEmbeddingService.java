@@ -13,15 +13,15 @@ public class OllamaEmbeddingService implements EmbeddingService {
 
     private final EmbeddingModel embeddingModel;
     private final String modelName;
-    private final int expectedDimensions;
+    private final EmbeddingValidator embeddingValidator;
 
     public OllamaEmbeddingService(
             EmbeddingModel embeddingModel,
             @Value("${spring.ai.ollama.embedding.model}") String modelName,
-            @Value("${prizm.embedding.dimensions}") int expectedDimensions) {
+            EmbeddingValidator embeddingValidator) {
         this.embeddingModel = embeddingModel;
         this.modelName = modelName;
-        this.expectedDimensions = expectedDimensions;
+        this.embeddingValidator = embeddingValidator;
     }
 
     /**
@@ -38,17 +38,7 @@ public class OllamaEmbeddingService implements EmbeddingService {
             throw classifyFailure(exception);
         }
 
-        if (embedding == null || embedding.length == 0) {
-            throw new EmbeddingException(
-                    EmbeddingErrorCode.EMBEDDING_EMPTY_RESPONSE,
-                    "Ollama returned no embedding values.");
-        }
-        if (embedding.length != expectedDimensions) {
-            throw new EmbeddingException(
-                    EmbeddingErrorCode.EMBEDDING_DIMENSION_MISMATCH,
-                    "Expected a %d-dimensional embedding but received %d."
-                            .formatted(expectedDimensions, embedding.length));
-        }
+        embeddingValidator.validate(embedding);
         return embedding;
     }
 

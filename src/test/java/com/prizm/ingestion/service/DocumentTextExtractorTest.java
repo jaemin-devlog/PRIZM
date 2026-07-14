@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.prizm.document.entity.DocumentFileType;
+import com.prizm.ingestion.config.PdfExtractionProperties;
 import com.prizm.ingestion.exception.DocumentTextExtractionException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,7 +21,7 @@ import org.junit.jupiter.api.Test;
 
 class DocumentTextExtractorTest {
 
-    private final DocumentTextExtractor extractor = new DocumentTextExtractor();
+    private final DocumentTextExtractor extractor = extractor(300, 2_000_000);
 
     @Test
     void extractsTextByOneBasedPdfPageNumberAndSkipsBlankPages() {
@@ -48,6 +49,38 @@ class DocumentTextExtractorTest {
         assertThatThrownBy(() -> extractor.extract(DocumentFileType.PDF, "not a pdf".getBytes()))
                 .isInstanceOf(DocumentTextExtractionException.class)
                 .hasMessageContaining("invalid or unreadable");
+    }
+
+    @Test
+    void allowsPdfAtOrBelowConfiguredPageLimit() {
+        assertThat(extractor(3, 100).extract(DocumentFileType.PDF, textPdf(List.of("one", "two"))))
+                .hasSize(2);
+        assertThat(extractor(2, 100).extract(DocumentFileType.PDF, textPdf(List.of("one", "two"))))
+                .hasSize(2);
+    }
+
+    @Test
+    void rejectsPdfAboveConfiguredPageLimitBeforeTextExtraction() {
+        assertThatThrownBy(() -> extractor(2, 100)
+                        .extract(DocumentFileType.PDF, textPdf(List.of("one", "two", "three"))))
+                .isInstanceOf(DocumentTextExtractionException.class)
+                .hasMessage("PDF document exceeds processing limits.");
+    }
+
+    @Test
+    void allowsExtractedTextAtOrBelowConfiguredCharacterLimit() {
+        assertThat(extractor(10, 6).extract(DocumentFileType.PDF, textPdf(List.of("abc", "de"))))
+                .containsExactly(new PageText(1, "abc"), new PageText(2, "de"));
+        assertThat(extractor(10, 5).extract(DocumentFileType.PDF, textPdf(List.of("abc", "de"))))
+                .containsExactly(new PageText(1, "abc"), new PageText(2, "de"));
+    }
+
+    @Test
+    void rejectsPdfWhenCumulativeExtractedCharactersExceedLimit() {
+        assertThatThrownBy(() -> extractor(10, 5)
+                        .extract(DocumentFileType.PDF, textPdf(List.of("abc", "def"))))
+                .isInstanceOf(DocumentTextExtractionException.class)
+                .hasMessage("PDF document exceeds processing limits.");
     }
 
     private byte[] textPdf(List<String> pageTexts) {
@@ -87,5 +120,13 @@ class DocumentTextExtractorTest {
         catch (IOException exception) {
             throw new UncheckedIOException(exception);
         }
+    }
+
+    private DocumentTextExtractor extractor(int maxPages, int maxExtractedCharacters) {
+        PdfExtractionProperties properties = new PdfExtractionProperties();
+        properties.setMaxPages(maxPages);
+        properties.setMaxExtractedCharacters(maxExtractedCharacters);
+        properties.validate();
+        return new DocumentTextExtractor(properties);
     }
 }

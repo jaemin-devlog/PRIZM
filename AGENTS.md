@@ -28,7 +28,7 @@ evidence to make that conclusion.
 
 ## Current implementation phase
 
-The current phase is codebase transition and platform foundation cleanup.
+The current phase is platform foundation hardening and small Career Vault vertical slices.
 
 Do not implement the full career product unless a later task explicitly requests it.
 
@@ -51,6 +51,13 @@ Do not implement the full career product unless a later task explicitly requests
 - original file storage
 - Flyway migrations
 - OpenSQL compatibility work
+- user ownership across documents, versions, jobs, and chunks
+- the 12-value DocumentType contract and owner-scoped type filter
+- TXT `TEXT_CHUNK` and PDF `PAGE` source metadata
+- text-layer PDF validation, page extraction, and configured processing limits
+- embedding dimension, finite-value, and non-zero-norm validation
+- the existing single-result search and five-result Career Evidence API contracts
+- frontend login, Career Vault list/filter, TXT/PDF upload, and single-result search flows
 
 ## Do not assume
 
@@ -87,8 +94,8 @@ platform value.
 - Preserve unrelated user changes and generated files.
 - Do not commit `.env`, credentials, tokens, uploaded originals, database volumes,
   model files, IDE metadata, build output, or frontend dependency output.
-- Keep the frontend honest about its current scope. It is an initial shell until
-  functional screens and API clients are actually implemented.
+- Keep the frontend honest about its current scope. Login, list/filter, TXT/PDF upload,
+  and single-result search are implemented; document detail and multi-evidence UI are not.
 - Record meaningful implementation, refactoring, design, and infrastructure
   verification work briefly in `docs/development-log.md`.
 

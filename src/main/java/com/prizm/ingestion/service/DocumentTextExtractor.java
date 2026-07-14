@@ -1,6 +1,7 @@
 package com.prizm.ingestion.service;
 
 import com.prizm.document.entity.DocumentFileType;
+import com.prizm.ingestion.config.PdfExtractionProperties;
 import com.prizm.ingestion.exception.DocumentIndexingException;
 import com.prizm.ingestion.exception.DocumentTextExtractionException;
 import java.io.IOException;
@@ -19,6 +20,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class DocumentTextExtractor {
 
+    private final PdfExtractionProperties pdfExtractionProperties;
+
+    public DocumentTextExtractor(PdfExtractionProperties pdfExtractionProperties) {
+        this.pdfExtractionProperties = pdfExtractionProperties;
+    }
+
     public List<PageText> extract(DocumentFileType fileType, byte[] content) {
         return switch (fileType) {
             case TXT -> List.of(new PageText(1, decodeUtf8(content)));
@@ -31,13 +38,21 @@ public class DocumentTextExtractor {
             if (document.isEncrypted()) {
                 throw new DocumentTextExtractionException("PDF file is encrypted.");
             }
+            if (document.getNumberOfPages() > pdfExtractionProperties.getMaxPages()) {
+                throw processingLimitExceeded();
+            }
 
             PDFTextStripper textStripper = new PDFTextStripper();
             List<PageText> pages = new ArrayList<>();
+            long extractedCharacterCount = 0;
             for (int pageNumber = 1; pageNumber <= document.getNumberOfPages(); pageNumber++) {
                 textStripper.setStartPage(pageNumber);
                 textStripper.setEndPage(pageNumber);
                 String text = textStripper.getText(document).strip();
+                extractedCharacterCount += text.length();
+                if (extractedCharacterCount > pdfExtractionProperties.getMaxExtractedCharacters()) {
+                    throw processingLimitExceeded();
+                }
                 if (!text.isBlank()) {
                     pages.add(new PageText(pageNumber, text));
                 }
@@ -53,6 +68,10 @@ public class DocumentTextExtractor {
         catch (IOException exception) {
             throw new DocumentTextExtractionException("PDF file is invalid or unreadable.", exception);
         }
+    }
+
+    private DocumentTextExtractionException processingLimitExceeded() {
+        return new DocumentTextExtractionException("PDF document exceeds processing limits.");
     }
 
     private String decodeUtf8(byte[] content) {

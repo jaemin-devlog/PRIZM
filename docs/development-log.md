@@ -1,36 +1,6 @@
 # 개발 기록
 
-## 2026-07-14 0-norm 임베딩 검증
-
-- 변경: 공통 `EmbeddingValidator`에서 1024차원, 유한값, 0보다 큰 L2 norm을 검증하고 Ollama 응답, 문서 색인·저장 직전, 단일 검색과 Career Evidence 검색에 적용했다.
-- 실패 처리: 0-norm 응답은 `EMBEDDING_INVALID_RESPONSE`로 거부한다. 색인은 기존 임베딩 오류 정책에 따라 재시도 대상으로 처리하며 완료 트랜잭션을 호출하지 않고, 검색은 pgvector SQL 실행 전에 중단해 안전한 502 오류를 반환한다.
-- 검증: 전체 단위 테스트와 Docker PostgreSQL 16·pgvector 및 로컬 Ollama `bge-m3` 통합 테스트를 통과했다. OpenSQL 실환경 테스트는 기존 제외 정책을 유지했다.
-
-## 2026-07-14 Career Evidence 다중 검색 API
-
-- 변경: `POST /api/career-evidence/search`를 추가해 인증 사용자의 ACTIVE 현재 문서 버전 청크를 관련도 순으로 최대 5개 배열로 반환한다. 기존 `POST /api/search` 단일 결과·404 계약은 변경하지 않았다.
-- 구조: 기존 BGE-M3 임베딩과 pgvector exact cosine SQL의 소유권·ACTIVE 조건을 재사용하고, 새 응답에는 청크 ID, 문서·버전, 원문, 출처, 거리와 점수를 포함했다.
-- 검증: 단위 테스트와 Docker PostgreSQL 16·pgvector 및 로컬 Ollama `bge-m3` 통합 테스트를 통과했다. 통합 테스트에서 사용자 A/B 격리, 현재 ACTIVE 버전 조건, 최대 5개 및 거리 정렬을 확인했으며 OpenSQL 실환경 테스트는 기존 제외 정책을 유지했다.
-
-## 2026-07-14 프런트엔드 문서 검색 UI
-
-- 변경: Career Vault에 자연어 검색 입력과 단일 벡터 검색 결과 표시를 추가하고, `POST /api/search` 요청을 별도 API 모듈로 분리했다.
-- 표시: 문서 제목, 버전, `sourceLabel`, 원문, 유사도 점수만 표시하며 결과 없음은 현재 등록 문서에서 근거를 찾지 못했다는 중립 문구로 안내한다.
-- 유지: Bearer 인증과 401·403 세션 만료 처리를 기존 흐름으로 사용하고, 목록 필터·TXT/PDF 업로드·백엔드 검색 계약은 변경하지 않았다.
-
-## 2026-07-14 프런트엔드 PDF 업로드 지원
-
-- 변경: Career Vault 기존 업로드 UI가 `.txt`와 `.pdf`를 선택하고, 확장자·10MB 제한을 클라이언트에서 먼저 확인하도록 확장했다.
-- 안내: 텍스트 PDF만 지원하며 스캔·암호화 PDF는 지원하지 않는다는 제한을 표시하고, 서버의 `INVALID_DOCUMENT_CONTENT`는 이해하기 쉬운 PDF 안내 문구로 변환한다.
-- 범위: 기존 FormData·Bearer 인증·성공 후 현재 문서 유형 필터 재조회 흐름을 유지했고, OCR·미리보기·백엔드 변경은 추가하지 않았다.
-
-## 2026-07-14 텍스트 PDF 페이지 출처 처리
-
-- 변경: Apache PDFBox로 텍스트 레이어 PDF를 업로드 시 검증하고, Worker가 페이지별 텍스트를 기존 청킹·임베딩 흐름으로 저장하도록 확장했다.
-- 출처: PDF 청크는 `PAGE`, 1부터의 실제 페이지 번호, `N페이지` 라벨을 사용하며 V11에서 `PDF` 파일 형식과 `PAGE` 출처 제약을 추가했다.
-- 검증: 단위 테스트와 Docker PostgreSQL 16·pgvector·실제 Ollama `bge-m3` 통합 테스트가 통과했다. V1~V11 migration, PDF PAGE 출처 저장·검색, 사용자별 격리를 확인했으며 OpenSQL 실환경 테스트는 기존 정책대로 제외했다.
-
-PRIZM의 기능, 리팩토링, 설계 판단과 검증 결과를 짧게 남기는 기록이다. 포트폴리오와 멘토링에서 개발 흐름을 설명할 수 있도록 작성하되, 일일 작업 내역이나 세부 구현을 모두 옮기지는 않는다.
+> PRIZM의 기능, 리팩토링, 설계 판단과 검증 결과를 오래된 기록부터 시간순으로 남깁니다. 현재 구현의 단일 요약은 [현재 구현 현황](project-status.md)을 기준으로 합니다.
 
 ## 작성 원칙
 
@@ -122,7 +92,7 @@ PRIZM의 기능, 리팩토링, 설계 판단과 검증 결과를 짧게 남기�
 - 이유: 예시 설정을 그대로 사용한 토큰 위조와 중복 claim 불일치, 다른 발급자의 토큰 수용 가능성을 기동·인증 단계에서 차단하기 위해서다.
 - 설계: 명시적으로 활성화한 한 번의 실행에서만 당시 최초 운영 계정을 BCrypt로 생성하고, strict Bearer resolver와 기본 `denyAll`, 명시적 CORS Origin, 정확한 `/actuator/health` 공개 범위를 사용한다. Access Token의 `exp`를 필수로 검증하고 인증 객체의 문자열 출력에서는 토큰을 마스킹한다.
 - 검증: 단위 테스트 85개와 PostgreSQL·pgvector·실제 Ollama 통합 테스트 29개가 성공했다. `exp` 누락·만료·변조·잘못된 Bearer·issuer/DB 불일치·삭제 사용자·CORS·Actuator·당시 운영자/일반 사용자 경계를 실제 필터 체인에서 확인했다.
-- 현재 범위: 회원가입·Refresh Token·로그아웃 블랙리스트·사용자별 문서 소유권은 구현하지 않았다.
+- 당시 범위: 회원가입·Refresh Token·로그아웃 블랙리스트·사용자별 문서 소유권은 이 시점에는 구현하지 않았다. 이후 사용자별 소유권은 별도 작업으로 추가했다.
 
 ## 2026-07-13 — 개인 커리어 문서 플랫폼으로 방향 전환
 
@@ -132,43 +102,93 @@ PRIZM의 기능, 리팩토링, 설계 판단과 검증 결과를 짧게 남기�
 - 문서: `AGENTS.md`, `README.md`와 현재 구현 현황을 실제 코드 기준으로 다시 작성하고 OpenSQL·OpenProxy·OpenHA는 미검증 상태로 명시했다.
 - 검증: 단위 테스트 80개가 성공했다. 통합 테스트는 30개 중 Testcontainers PostgreSQL 16·pgvector 0.8.2·실제 Ollama와 V6→V7 데이터 전환을 포함한 29개가 성공했고, 실제 OpenSQL 접속 정보가 필요한 별도 테스트 1개만 제외됐다. 프런트엔드 lint·build와 Docker Compose 설정 검증도 성공했다.
 
-## 2026-07-14 문서 유형 저장
+## 2026-07-14 — 사용자별 문서 소유권
+
+- 변경: `documents`, `document_versions`, `processing_jobs`, `document_chunks`에 인증 사용자 소유권을 연결하고 목록·상세·색인·검색 전 경로에서 같은 소유자를 강제했다.
+- 이유: 다른 사용자의 문서나 벡터가 조회 결과뿐 아니라 검색 후보 단계에도 섞이지 않도록 다중 사용자 경계를 확정하기 위해서다.
+- 설계: 사용자 ID는 요청에서 받지 않고 JWT 인증 사용자로 결정하며, 문서·버전·청크 owner 조건과 ACTIVE 현재 버전 조건을 SQL에 함께 적용한다. `SYSTEM_ADMIN`은 개인 문서 API를 우회하지 않는다.
+- 검증: PostgreSQL·pgvector 통합 테스트에서 USER A/B의 동일·유사 문서를 사용해 목록·상세·단일 검색 격리와 SYSTEM_ADMIN 403을 확인했다.
+
+## 2026-07-14 — 문서 유형 저장
 
 - 변경: `documents.document_type`과 `DocumentType` enum을 추가하고, TXT 업로드에서 선택한 유형을 저장해 업로드·목록·상세 응답으로 반환한다.
 - 이유: 향후 커리어 문서 활용 기능의 기준 정보를 보관하되, 자동 분류나 유형별 필터 없이 사용자가 지정한 값만 다루기 위해서다.
 - 기본값: 요청에서 생략하거나 기존 V8 문서를 V9로 전환할 때는 `OTHER`를 사용하며, DB CHECK 제약으로 허용된 enum 문자열만 저장한다.
 - 검증: 단위 테스트와 PostgreSQL·pgvector·실제 Ollama 통합 테스트로 기본값, 지정 값, 잘못된 요청 400, 기존 소유권·검색 회귀를 확인했다.
 
-## 2026-07-14 문서 유형별 목록 필터
+## 2026-07-14 — 문서 유형별 목록 필터
 
 - 변경: 기존 `GET /api/documents`에 선택적 `documentType` 파라미터를 추가해, 한 가지 문서 유형만 목록에서 조회할 수 있게 했다.
 - 이유: 이미 저장된 문서 유형을 바로 활용하되 여러 조건·페이지네이션 같은 범위 확장은 뒤 단계로 미루기 위해서다.
 - 설계: 유형이 있으면 Repository에서 `owner_user_id`와 `document_type`을 함께 조건으로 조회하고, 없으면 기존 소유자별 전체 목록 조회를 유지한다.
 - 검증: 단위 테스트 89개와 PostgreSQL·pgvector·실제 Ollama 통합 테스트 40개가 성공했다. 유형별 결과, 빈 목록, 잘못된 유형 400, USER A/B 격리와 SYSTEM_ADMIN 403을 확인했다.
 
-## 2026-07-14 프런트엔드 로그인
+## 2026-07-14 — 프런트엔드 로그인
 
 - 변경: `/login` 화면, 로그인 API 모듈, Access Token·현재 사용자 저장소와 `/career-vault` 임시 화면·로그아웃을 추가했다.
 - 이유: 문서 화면을 만들기 전에 백엔드 JWT 인증을 실제 프런트엔드 흐름으로 연결하고, 인증된 사용자만 다음 화면으로 이동하게 하기 위해서다.
 - 설계: 로그인 응답의 토큰을 저장한 뒤 `GET /api/users/me`를 Bearer 인증으로 확인해야만 성공 처리한다. 확인 실패와 로그아웃에서는 토큰·사용자 정보를 함께 삭제하며, 비밀번호와 토큰은 화면·로그에 출력하지 않는다.
 - 검증: 기존 프런트엔드 테스트 환경은 없어 새 도구를 추가하지 않았고, `npm run lint`와 `npm run build`를 성공했다.
 
-## 2026-07-14 Career Vault 문서 목록
+## 2026-07-14 — Career Vault 문서 목록
 
 - 변경: `/career-vault`에서 로그인한 사용자의 문서 목록을 조회하고, 한 가지 문서 유형을 선택해 다시 조회하는 UI를 추가했다.
 - 이유: 문서 업로드·상세·검색 화면을 추가하기 전에 이미 구현된 사용자별 문서 목록과 서버 필터를 실제 사용자 화면으로 연결하기 위해서다.
 - 설계: 전체 선택은 `GET /api/documents`를 호출하고, 유형 선택은 `documentType` 쿼리와 Bearer Access Token을 함께 전송한다. 401·403 응답은 목록 오류를 보여 주지 않고 저장된 인증 정보를 삭제한 뒤 로그인 화면으로 이동한다.
 - 검증: 기존 프런트엔드 테스트 환경은 없어 새 도구를 추가하지 않았고, `npm run lint`, `npm run build`, `git diff --check`를 성공했다.
 
-## 2026-07-14 Career Vault TXT 문서 업로드 UI
+## 2026-07-14 — Career Vault TXT 문서 업로드 UI
 
 - 변경: Career Vault 화면에서 단일 TXT 파일, 문서 유형, 필수 제목을 입력해 `POST /api/documents`로 업로드하는 UI를 추가했다.
 - 이유: 이미 구현된 TXT 업로드 API를 프런트엔드 문서 목록 화면에 연결하되 PDF, 상세, 검색, 진행률 같은 다음 범위는 포함하지 않기 위해서다.
 - 설계: `FormData`에 `title`, `documentType`, `file`을 넣고 Bearer Access Token을 전송한다. 성공하면 입력을 초기화하고 현재 선택된 문서 유형 필터를 유지한 채 목록을 다시 조회한다.
 - 검증: 기존 프런트엔드 테스트 환경은 없어 새 도구를 추가하지 않았고, `npm run lint`, `npm run build`, `git diff --check`로 확인한다.
 
-## 2026-07-14 TXT 청크 출처 정보
+## 2026-07-14 — TXT 청크 출처 정보
 
 - 변경: `document_chunks`에 TXT 청크의 출처 유형·표시 순서·표시 라벨을 저장하고, 검색 응답에 함께 반환하도록 V10 migration과 JDBC 저장·검색 경로를 추가했다.
 - 설계: 기존 `chunk_no`는 변경하지 않는다. TXT Worker는 `TEXT_CHUNK`, 1부터 시작하는 `source_index`, `텍스트 구간 N` 라벨을 저장하며, V9 기존 청크는 버전별 `chunk_no` 순서로 안전하게 backfill한다.
 - 검증: PostgreSQL 16+pgvector Testcontainers와 Ollama를 사용해 `./gradlew.bat test --no-daemon --rerun-tasks`, `./gradlew.bat integrationTest --no-daemon --rerun-tasks`를 성공했다. OpenSQL 실환경 테스트는 기존 제외 정책에 따라 실행하지 않았다.
+
+## 2026-07-14 — 텍스트 PDF 페이지 출처 처리
+
+- 변경: Apache PDFBox로 텍스트 레이어 PDF를 업로드 시 검증하고, Worker가 페이지별 텍스트를 기존 청킹·임베딩 흐름으로 저장하도록 확장했다.
+- 출처: PDF 청크는 `PAGE`, 1부터의 실제 페이지 번호, `N페이지` 라벨을 사용하며 V11에서 `PDF` 파일 형식과 `PAGE` 출처 제약을 추가했다.
+- 검증: 단위 테스트와 Docker PostgreSQL 16·pgvector·실제 Ollama `bge-m3` 통합 테스트가 통과했다. V1~V11 migration, PDF PAGE 출처 저장·검색, 사용자별 격리를 확인했으며 OpenSQL 실환경 테스트는 기존 정책대로 제외했다.
+
+## 2026-07-14 — 프런트엔드 PDF 업로드 지원
+
+- 변경: Career Vault 기존 업로드 UI가 `.txt`와 `.pdf`를 선택하고, 확장자·10MB 제한을 클라이언트에서 먼저 확인하도록 확장했다.
+- 안내: 텍스트 PDF만 지원하며 스캔·암호화 PDF는 지원하지 않는다는 제한을 표시하고, 서버의 `INVALID_DOCUMENT_CONTENT`는 이해하기 쉬운 PDF 안내 문구로 변환한다.
+- 범위: 기존 FormData·Bearer 인증·성공 후 현재 문서 유형 필터 재조회 흐름을 유지했고, OCR·미리보기·백엔드 변경은 추가하지 않았다.
+
+## 2026-07-14 — 프런트엔드 문서 검색 UI
+
+- 변경: Career Vault에 자연어 검색 입력과 단일 벡터 검색 결과 표시를 추가하고, `POST /api/search` 요청을 별도 API 모듈로 분리했다.
+- 표시: 문서 제목, 버전, `sourceLabel`, 원문, 유사도 점수만 표시하며 결과 없음은 현재 등록 문서에서 근거를 찾지 못했다는 중립 문구로 안내한다.
+- 유지: Bearer 인증과 401·403 세션 만료 처리를 기존 흐름으로 사용하고, 목록 필터·TXT/PDF 업로드·백엔드 검색 계약은 변경하지 않았다.
+
+## 2026-07-14 — Career Evidence 다중 검색 API
+
+- 변경: `POST /api/career-evidence/search`를 추가해 인증 사용자의 ACTIVE 현재 문서 버전 청크를 관련도 순으로 최대 5개 배열로 반환한다. 기존 `POST /api/search` 단일 결과·404 계약은 변경하지 않았다.
+- 구조: 기존 BGE-M3 임베딩과 pgvector exact cosine SQL의 소유권·ACTIVE 조건을 재사용하고, 새 응답에는 청크 ID, 문서·버전, 원문, 출처, 거리와 점수를 포함했다.
+- 검증: 단위 테스트와 Docker PostgreSQL 16·pgvector 및 로컬 Ollama `bge-m3` 통합 테스트를 통과했다. 통합 테스트에서 사용자 A/B 격리, 현재 ACTIVE 버전 조건, 최대 5개 및 거리 정렬을 확인했으며 OpenSQL 실환경 테스트는 기존 제외 정책을 유지했다.
+
+## 2026-07-14 — 0-norm 임베딩 검증
+
+- 변경: 공통 `EmbeddingValidator`에서 1024차원, 유한값, 0보다 큰 L2 norm을 검증하고 Ollama 응답, 문서 색인·저장 직전, 단일 검색과 Career Evidence 검색에 적용했다.
+- 실패 처리: 0-norm 응답은 `EMBEDDING_INVALID_RESPONSE`로 거부한다. 색인은 기존 임베딩 오류 정책에 따라 재시도 대상으로 처리하며 완료 트랜잭션을 호출하지 않고, 검색은 pgvector SQL 실행 전에 중단해 안전한 502 오류를 반환한다.
+- 검증: 전체 단위 테스트와 Docker PostgreSQL 16·pgvector 및 로컬 Ollama `bge-m3` 통합 테스트를 통과했다. OpenSQL 실환경 테스트는 기존 제외 정책을 유지했다.
+
+## 2026-07-14 — PDF 추출 처리량 제한
+
+- 변경: `prizm.document.pdf.max-pages`(기본 300)와 `max-extracted-characters`(기본 2,000,000)를 추가하고, 공통 PDF 추출기에서 페이지 수와 페이지별 `strip()` 텍스트의 누적 길이를 제한했다.
+- 실패 처리: 제한을 넘는 PDF는 업로드 시 `INVALID_DOCUMENT_CONTENT` 400으로 메타데이터·작업 생성 전에 거부한다. Worker에서는 영구 문서 오류로 분류되어 청크 저장·ACTIVE 전환 없이 FAILED 처리되며 기존 ACTIVE 버전은 유지된다.
+- 검증: 단위 테스트와 Docker PostgreSQL 16·pgvector 및 로컬 Ollama `bge-m3` 통합 테스트를 통과했다. OpenSQL 실환경 테스트는 기존 제외 정책을 유지했다.
+
+## 2026-07-14 — 프로젝트 문서 현행화와 중복 통합
+
+- 변경: README, 작업 지침, 현재 구현 현황, 장기 기획안, 개발 기록, OpenSQL Gate와 초기 검증 기록을 실제 코드·migration·실행 결과에 맞춰 함께 갱신했다.
+- 통합: 별도로 작성돼 내용이 겹치던 한국어 개발 현황 문서는 `docs/project-status.md`에 흡수하고, 이 파일을 현재 구현과 미구현 범위의 단일 기준으로 정했다.
+- 구분: 장기 기획안의 outbox·generation·MCP·지원 패키지·OpenSQL HA는 미래 목표로 표시하고, 초기 검증 문서는 당시 단계의 역사적 기록임을 명시했다.
+- 검증: 저장소의 모든 Markdown 로컬 링크와 오래된 API·enum 표기를 검사했고 `git diff --check`를 통과했다.

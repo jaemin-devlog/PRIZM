@@ -177,7 +177,7 @@ public class DocumentUploadService {
         catch (DocumentTextExtractionException exception) {
             throw new DocumentUploadException(
                     DocumentUploadErrorCode.INVALID_DOCUMENT_CONTENT,
-                    "PDF must be unencrypted and contain extractable text.");
+                    "PDF must be unencrypted, contain extractable text, and be within processing limits.");
         }
     }
 

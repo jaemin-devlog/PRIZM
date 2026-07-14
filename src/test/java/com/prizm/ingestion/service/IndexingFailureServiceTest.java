@@ -113,6 +113,26 @@ class IndexingFailureServiceTest {
     }
 
     @Test
+    void keepsExistingActiveVersionWhenPdfProcessingLimitFailsPermanently() {
+        ProcessingJob job = processingJob(0);
+        DocumentVersion version = processingVersion();
+        Document document = document();
+        document.activateVersion(5L);
+        when(processingJobRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(job));
+        when(documentVersionRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(version));
+        when(documentRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(document));
+        when(claimRepository.currentDatabaseTime()).thenReturn(Instant.parse("2026-07-13T00:00:00Z"));
+
+        ProcessingJobStatus status = service.handleFailure(
+                claimed(job), false, "PDF document exceeds processing limits.");
+
+        assertThat(status).isEqualTo(ProcessingJobStatus.FAILED);
+        assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.FAILED);
+        assertThat(document.getActiveVersionId()).isEqualTo(5L);
+        verify(documentChunkRepository).deleteByOwnerUserIdAndDocumentVersionId(7L, 10L);
+    }
+
+    @Test
     void rejectsFailureFromStaleWorkerBeforeDeletingChunks() {
         ProcessingJob job = processingJob(0);
         when(processingJobRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(job));

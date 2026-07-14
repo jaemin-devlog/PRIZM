@@ -20,8 +20,10 @@ import com.prizm.embedding.service.EmbeddingValidator;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.infrastructure.storage.FileStorageException;
 import com.prizm.ingestion.config.IngestionProperties;
+import com.prizm.ingestion.config.PdfExtractionProperties;
 import com.prizm.ingestion.entity.ChunkSourceType;
 import com.prizm.ingestion.exception.DocumentIndexingException;
+import com.prizm.ingestion.exception.DocumentTextExtractionException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -70,7 +72,7 @@ class DocumentIndexingProcessorTest {
         processor = new DocumentIndexingProcessor(
                 documentVersionRepository,
                 fileStorage,
-                new DocumentTextExtractor(),
+                new DocumentTextExtractor(pdfProperties(300, 2_000_000)),
                 new TextChunker(properties),
                 embeddingService,
                 new EmbeddingValidator(4),
@@ -185,6 +187,35 @@ class DocumentIndexingProcessorTest {
         }));
     }
 
+    @Test
+    void rejectsPdfAbovePageLimitBeforeEmbeddingOrCompletion() {
+        DocumentVersion pdfVersion = DocumentVersion.quarantined(
+                7L, 1L, "guide.pdf", DocumentFileType.PDF, "a".repeat(64));
+        ReflectionTestUtils.setField(pdfVersion, "id", 10L);
+        pdfVersion.startProcessing();
+        pdfVersion.updateStoredFilePath("documents/1/10/guide.pdf");
+        when(documentVersionRepository.findById(10L)).thenReturn(Optional.of(pdfVersion));
+        when(fileStorage.read("documents/1/10/guide.pdf"))
+                .thenReturn(textPdf(List.of("first page", "second page")));
+        IngestionProperties properties = ingestionProperties();
+        DocumentIndexingProcessor limitedProcessor = new DocumentIndexingProcessor(
+                documentVersionRepository,
+                fileStorage,
+                new DocumentTextExtractor(pdfProperties(1, 100)),
+                new TextChunker(properties),
+                embeddingService,
+                new EmbeddingValidator(4),
+                completionService,
+                leaseService,
+                properties);
+
+        assertThatThrownBy(() -> limitedProcessor.process(claimedJob))
+                .isInstanceOf(DocumentTextExtractionException.class)
+                .hasMessage("PDF document exceeds processing limits.");
+        verify(embeddingService, never()).embed(anyString());
+        verify(completionService, never()).complete(any(), any());
+    }
+
     private byte[] textPdf(List<String> pageTexts) {
         try (PDDocument document = new PDDocument(); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             for (String pageText : pageTexts) {
@@ -210,5 +241,21 @@ class DocumentIndexingProcessorTest {
 
     private float[] nonZeroEmbedding() {
         return new float[] {1.0f, 0.0f, 0.0f, 0.0f};
+    }
+
+    private IngestionProperties ingestionProperties() {
+        IngestionProperties properties = new IngestionProperties();
+        properties.setMaxChunkLength(8);
+        properties.setOverlap(2);
+        properties.setLeaseRefreshChunkInterval(2);
+        return properties;
+    }
+
+    private PdfExtractionProperties pdfProperties(int maxPages, int maxExtractedCharacters) {
+        PdfExtractionProperties properties = new PdfExtractionProperties();
+        properties.setMaxPages(maxPages);
+        properties.setMaxExtractedCharacters(maxExtractedCharacters);
+        properties.validate();
+        return properties;
     }
 }

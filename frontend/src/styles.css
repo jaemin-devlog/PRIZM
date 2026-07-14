@@ -180,6 +180,91 @@ button:disabled {
   margin-top: 0;
 }
 
+.document-search {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #dbe3ea;
+  border-radius: 0.75rem;
+  background: #fbfcfe;
+}
+
+.document-search h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+.document-search-form {
+  margin-top: 1rem;
+}
+
+.document-search-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.document-search-controls {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.document-search-controls input {
+  min-width: 0;
+  flex: 1;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.65rem;
+  color: #18202a;
+  background: #ffffff;
+}
+
+.document-search-controls input:focus {
+  border-color: #4465e8;
+  outline: 3px solid rgb(68 101 232 / 18%);
+}
+
+.document-search-controls button {
+  margin-top: 0;
+  white-space: nowrap;
+}
+
+.search-processing-note,
+.search-result-meta,
+.search-result-score {
+  margin: 0.6rem 0 0;
+  color: #5d6a78;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.search-result {
+  margin-top: 0.75rem;
+}
+
+.search-result-card {
+  padding: 1rem;
+  border: 1px solid #dbe3ea;
+  border-radius: 0.75rem;
+  background: #ffffff;
+}
+
+.search-result-card h3 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.search-result-card blockquote {
+  margin: 0.85rem 0 0;
+  padding-left: 0.85rem;
+  border-left: 3px solid #b9c8ff;
+  color: #26313c;
+  white-space: pre-wrap;
+  line-height: 1.65;
+}
+
 .upload-panel {
   margin-top: 1rem;
   padding: 1rem;
@@ -326,8 +411,13 @@ button:disabled {
   }
 
   .vault-header,
-  .document-card {
+  .document-card,
+  .document-search-controls {
     flex-direction: column;
+  }
+
+  .document-search-controls button {
+    align-self: flex-start;
   }
 
   .document-card time {

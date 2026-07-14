@@ -12,6 +12,7 @@ import {
   type DocumentSummary,
   type DocumentType,
 } from './api/documentApi'
+import { SearchApiError, searchDocuments, type SearchResult } from './api/searchApi'
 import {
   clearSession,
   getAccessToken,
@@ -57,6 +58,7 @@ const UPLOAD_DOCUMENT_TYPE_OPTIONS = DOCUMENT_TYPE_OPTIONS.filter(
 )
 
 type AppPath = typeof LOGIN_PATH | typeof CAREER_VAULT_PATH
+type SearchState = 'idle' | 'loading' | 'result' | 'empty' | 'error'
 
 function toAppPath(pathname: string): AppPath {
   return pathname === CAREER_VAULT_PATH ? CAREER_VAULT_PATH : LOGIN_PATH
@@ -206,6 +208,9 @@ function CareerVault({
   const [isUploading, setIsUploading] = useState(false)
   const [uploadErrorMessage, setUploadErrorMessage] = useState<string | null>(null)
   const [uploadSuccessMessage, setUploadSuccessMessage] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResult, setSearchResult] = useState<SearchResult | null>(null)
+  const [searchState, setSearchState] = useState<SearchState>('idle')
 
   useEffect(() => {
     let isCurrentRequest = true
@@ -306,6 +311,42 @@ function CareerVault({
     }
   }
 
+  const handleSearchQueryChange = (value: string) => {
+    setSearchQuery(value)
+    setSearchResult(null)
+    setSearchState('idle')
+  }
+
+  const handleSearchSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const normalizedQuery = searchQuery.trim()
+    if (normalizedQuery === '' || searchState === 'loading') {
+      return
+    }
+
+    setSearchState('loading')
+    setSearchResult(null)
+
+    try {
+      const result = await searchDocuments(normalizedQuery)
+      setSearchResult(result)
+      setSearchState('result')
+    } catch (error) {
+      if (error instanceof SearchApiError && (error.status === 401 || error.status === 403)) {
+        onSessionExpired()
+        return
+      }
+
+      if (error instanceof SearchApiError && error.status === 404) {
+        setSearchState('empty')
+        return
+      }
+
+      setSearchState('error')
+    }
+  }
+
   return (
     <main className="shell shell-wide">
       <header className="vault-header">
@@ -341,6 +382,51 @@ function CareerVault({
           {uploadSuccessMessage}
         </p>
       )}
+
+      <section className="document-search" aria-labelledby="document-search-title">
+        <h2 id="document-search-title">문서 검색</h2>
+        <form className="document-search-form" onSubmit={handleSearchSubmit} noValidate>
+          <label htmlFor="document-search-query">자연어 검색어</label>
+          <div className="document-search-controls">
+            <input
+              id="document-search-query"
+              name="query"
+              type="text"
+              maxLength={500}
+              placeholder="Spring Boot와 Redis를 사용한 경험을 찾아보세요."
+              value={searchQuery}
+              onChange={(event) => handleSearchQueryChange(event.target.value)}
+              disabled={searchState === 'loading'}
+            />
+            <button type="submit" disabled={searchQuery.trim() === '' || searchState === 'loading'}>
+              검색
+            </button>
+          </div>
+        </form>
+
+        <p className="search-processing-note">처리 중인 문서는 검색 결과에 포함되지 않을 수 있습니다.</p>
+
+        <div className="search-result" aria-live="polite">
+          {searchState === 'idle' && (
+            <p className="state-message">등록된 문서에서 관련 경험과 원문 근거를 찾아보세요.</p>
+          )}
+          {searchState === 'loading' && <p className="state-message">관련 문서를 찾는 중입니다.</p>}
+          {searchState === 'empty' && (
+            <p className="state-message">현재 등록된 문서에서는 관련 근거를 찾지 못했습니다.</p>
+          )}
+          {searchState === 'error' && <p className="form-error">문서 검색 중 문제가 발생했습니다.</p>}
+          {searchState === 'result' && searchResult !== null && (
+            <article className="search-result-card">
+              <h3>{searchResult.documentTitle}</h3>
+              <p className="search-result-meta">
+                버전 {searchResult.versionNo} · {searchResult.sourceLabel}
+              </p>
+              <blockquote>{searchResult.content}</blockquote>
+              <p className="search-result-score">유사도 점수 {formatSearchScore(searchResult.score)}</p>
+            </article>
+          )}
+        </div>
+      </section>
 
       {isUploadOpen && (
         <section className="upload-panel" aria-labelledby="upload-title">
@@ -484,6 +570,10 @@ function documentStatusLabel(status: string | null): string {
   }
 
   return DOCUMENT_STATUS_LABELS[status] ?? status
+}
+
+function formatSearchScore(score: number): string {
+  return score.toFixed(2)
 }
 
 function formatCreatedAt(createdAt: string): string {

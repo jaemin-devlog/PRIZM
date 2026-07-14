@@ -2,6 +2,7 @@ package com.prizm.document.service;
 
 import com.prizm.document.dto.response.DocumentUploadResponse;
 import com.prizm.document.entity.Document;
+import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.entity.DocumentType;
 import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.exception.DocumentUploadErrorCode;
@@ -11,7 +12,9 @@ import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.infrastructure.storage.FileStorageException;
 import com.prizm.ingestion.entity.ProcessingJob;
+import com.prizm.ingestion.exception.DocumentTextExtractionException;
 import com.prizm.ingestion.repository.ProcessingJobRepository;
+import com.prizm.ingestion.service.DocumentTextExtractor;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -36,6 +39,7 @@ public class DocumentUploadService {
     private final DocumentVersionRepository documentVersionRepository;
     private final ProcessingJobRepository processingJobRepository;
     private final FileStorage fileStorage;
+    private final DocumentTextExtractor documentTextExtractor;
     private final long maxFileSizeBytes;
 
     public DocumentUploadService(
@@ -43,11 +47,13 @@ public class DocumentUploadService {
             DocumentVersionRepository documentVersionRepository,
             ProcessingJobRepository processingJobRepository,
             FileStorage fileStorage,
+            DocumentTextExtractor documentTextExtractor,
             @Value("${prizm.upload.max-file-size-bytes}") long maxFileSizeBytes) {
         this.documentRepository = documentRepository;
         this.documentVersionRepository = documentVersionRepository;
         this.processingJobRepository = processingJobRepository;
         this.fileStorage = fileStorage;
+        this.documentTextExtractor = documentTextExtractor;
         this.maxFileSizeBytes = maxFileSizeBytes;
     }
 
@@ -74,7 +80,11 @@ public class DocumentUploadService {
 
         Document document = documentRepository.save(Document.create(ownerUserId, normalizedTitle, resolvedDocumentType));
         DocumentVersion version = documentVersionRepository.save(DocumentVersion.quarantined(
-                ownerUserId, document.getId(), content.originalFileName(), content.contentHash()));
+                ownerUserId,
+                document.getId(),
+                content.originalFileName(),
+                content.fileType(),
+                content.contentHash()));
 
         final String storedFilePath;
         try {
@@ -129,22 +139,45 @@ public class DocumentUploadService {
 
         String originalFileName = file.getOriginalFilename();
         validateFileName(originalFileName);
-        if (!originalFileName.toLowerCase(Locale.ROOT).endsWith(".txt")) {
-            throw new DocumentUploadException(
-                    DocumentUploadErrorCode.UNSUPPORTED_FILE_TYPE,
-                    "Only TXT files are supported.");
-        }
+        DocumentFileType fileType = resolveFileType(originalFileName);
 
         try {
             byte[] bytes = file.getBytes();
+            if (fileType == DocumentFileType.PDF) {
+                validatePdf(bytes);
+            }
             // 해시는 원본 무결성과 동일 파일 식별에 사용하며 파일 본문 자체는 DB에 넣지 않는다.
-            return new UploadContent(originalFileName, bytes, sha256(bytes));
+            return new UploadContent(originalFileName, fileType, bytes, sha256(bytes));
         }
         catch (IOException exception) {
             throw new DocumentUploadException(
                     DocumentUploadErrorCode.FILE_READ_FAILED,
                     "Failed to read uploaded file.",
                     exception);
+        }
+    }
+
+    private DocumentFileType resolveFileType(String originalFileName) {
+        String normalizedFileName = originalFileName.toLowerCase(Locale.ROOT);
+        if (normalizedFileName.endsWith(".txt")) {
+            return DocumentFileType.TXT;
+        }
+        if (normalizedFileName.endsWith(".pdf")) {
+            return DocumentFileType.PDF;
+        }
+        throw new DocumentUploadException(
+                DocumentUploadErrorCode.UNSUPPORTED_FILE_TYPE,
+                "Only TXT and PDF files are supported.");
+    }
+
+    private void validatePdf(byte[] bytes) {
+        try {
+            documentTextExtractor.extract(DocumentFileType.PDF, bytes);
+        }
+        catch (DocumentTextExtractionException exception) {
+            throw new DocumentUploadException(
+                    DocumentUploadErrorCode.INVALID_DOCUMENT_CONTENT,
+                    "PDF must be unencrypted and contain extractable text.");
         }
     }
 
@@ -189,6 +222,10 @@ public class DocumentUploadService {
         });
     }
 
-    private record UploadContent(String originalFileName, byte[] bytes, String contentHash) {
+    private record UploadContent(
+            String originalFileName,
+            DocumentFileType fileType,
+            byte[] bytes,
+            String contentHash) {
     }
 }

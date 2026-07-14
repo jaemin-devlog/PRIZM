@@ -11,6 +11,7 @@ import static org.mockito.Mockito.lenient;
 
 import com.prizm.document.dto.response.DocumentUploadResponse;
 import com.prizm.document.entity.Document;
+import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.entity.DocumentType;
 import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.entity.DocumentVersionStatus;
@@ -23,7 +24,16 @@ import com.prizm.infrastructure.storage.FileStorageException;
 import com.prizm.ingestion.entity.ProcessingJob;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
 import com.prizm.ingestion.repository.ProcessingJobRepository;
+import com.prizm.ingestion.service.DocumentTextExtractor;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +67,12 @@ class DocumentUploadServiceTest {
     void setUp() {
         TransactionSynchronizationManager.initSynchronization();
         documentUploadService = new DocumentUploadService(
-                documentRepository, documentVersionRepository, processingJobRepository, fileStorage, 10);
+                documentRepository,
+                documentVersionRepository,
+                processingJobRepository,
+                fileStorage,
+                new DocumentTextExtractor(),
+                1_000_000);
         lenient().when(documentRepository.save(any(Document.class))).thenAnswer(invocation -> {
             Document document = invocation.getArgument(0);
             ReflectionTestUtils.setField(document, "id", 11L);
@@ -123,6 +138,22 @@ class DocumentUploadServiceTest {
     }
 
     @Test
+    void storesTextPdfAsQuarantinedDocument() {
+        byte[] content = textPdf("PDF text layer evidence");
+        MockMultipartFile file = new MockMultipartFile("file", "evidence.pdf", "application/pdf", content);
+        when(fileStorage.store(11L, 22L, "evidence.pdf", content))
+                .thenReturn("documents/11/22/evidence.pdf");
+
+        DocumentUploadResponse response = documentUploadService.upload(7L, "Evidence", file);
+
+        assertThat(response.status()).isEqualTo(DocumentVersionStatus.QUARANTINED);
+        var versionCaptor = org.mockito.ArgumentCaptor.forClass(DocumentVersion.class);
+        verify(documentVersionRepository).save(versionCaptor.capture());
+        assertThat(versionCaptor.getValue().getFileType()).isEqualTo(DocumentFileType.PDF);
+        verify(fileStorage).store(11L, 22L, "evidence.pdf", content);
+    }
+
+    @Test
     void deletesStoredFileWhenTransactionRollsBack() {
         byte[] content = "hello".getBytes(StandardCharsets.UTF_8);
         MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", content);
@@ -166,11 +197,12 @@ class DocumentUploadServiceTest {
     }
 
     @Test
-    void rejectsNonTxtAndPathTraversalFileNames() {
-        MockMultipartFile pdf = new MockMultipartFile("file", "guide.pdf", "application/pdf", new byte[] {1});
+    void rejectsUnsupportedAndPathTraversalFileNames() {
+        MockMultipartFile docx = new MockMultipartFile(
+                "file", "guide.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", new byte[] {1});
         MockMultipartFile traversal = new MockMultipartFile("file", "../guide.txt", "text/plain", new byte[] {1});
 
-        assertThatThrownBy(() -> documentUploadService.upload(7L, "Guide", pdf))
+        assertThatThrownBy(() -> documentUploadService.upload(7L, "Guide", docx))
                 .isInstanceOf(DocumentUploadException.class)
                 .extracting(exception -> ((DocumentUploadException) exception).code())
                 .isEqualTo(DocumentUploadErrorCode.UNSUPPORTED_FILE_TYPE);
@@ -181,8 +213,30 @@ class DocumentUploadServiceTest {
     }
 
     @Test
+    void rejectsInvalidPdfBeforePersistingMetadata() {
+        MockMultipartFile file = new MockMultipartFile("file", "guide.pdf", "application/pdf", new byte[] {1});
+
+        assertThatThrownBy(() -> documentUploadService.upload(7L, "Guide", file))
+                .isInstanceOf(DocumentUploadException.class)
+                .extracting(exception -> ((DocumentUploadException) exception).code())
+                .isEqualTo(DocumentUploadErrorCode.INVALID_DOCUMENT_CONTENT);
+        verifyNoInteractions(documentRepository, documentVersionRepository, processingJobRepository, fileStorage);
+    }
+
+    @Test
+    void rejectsPdfWithoutTextBeforePersistingMetadata() {
+        MockMultipartFile file = new MockMultipartFile("file", "empty.pdf", "application/pdf", textPdf(""));
+
+        assertThatThrownBy(() -> documentUploadService.upload(7L, "Guide", file))
+                .isInstanceOf(DocumentUploadException.class)
+                .extracting(exception -> ((DocumentUploadException) exception).code())
+                .isEqualTo(DocumentUploadErrorCode.INVALID_DOCUMENT_CONTENT);
+        verifyNoInteractions(documentRepository, documentVersionRepository, processingJobRepository, fileStorage);
+    }
+
+    @Test
     void rejectsFileThatExceedsConfiguredSizeLimit() {
-        MockMultipartFile file = new MockMultipartFile("file", "large.txt", "text/plain", new byte[11]);
+        MockMultipartFile file = new MockMultipartFile("file", "large.txt", "text/plain", new byte[1_000_001]);
 
         assertThatThrownBy(() -> documentUploadService.upload(7L, "Guide", file))
                 .isInstanceOf(DocumentUploadException.class)
@@ -201,5 +255,26 @@ class DocumentUploadServiceTest {
                 .isInstanceOf(DocumentUploadException.class)
                 .extracting(exception -> ((DocumentUploadException) exception).code())
                 .isEqualTo(DocumentUploadErrorCode.FILE_STORAGE_FAILED);
+    }
+
+    private byte[] textPdf(String pageText) {
+        try (PDDocument document = new PDDocument(); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            PDPage page = new PDPage();
+            document.addPage(page);
+            if (!pageText.isBlank()) {
+                try (PDPageContentStream stream = new PDPageContentStream(document, page)) {
+                    stream.beginText();
+                    stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+                    stream.newLineAtOffset(72, 720);
+                    stream.showText(pageText);
+                    stream.endText();
+                }
+            }
+            document.save(output);
+            return output.toByteArray();
+        }
+        catch (IOException exception) {
+            throw new UncheckedIOException(exception);
+        }
     }
 }

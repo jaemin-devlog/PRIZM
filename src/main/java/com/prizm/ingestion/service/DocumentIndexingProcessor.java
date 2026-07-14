@@ -1,5 +1,6 @@
 package com.prizm.ingestion.service;
 
+import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.exception.DocumentVersionNotFoundException;
 import com.prizm.document.repository.DocumentVersionRepository;
@@ -9,10 +10,6 @@ import com.prizm.infrastructure.storage.FileStorageException;
 import com.prizm.ingestion.config.IngestionProperties;
 import com.prizm.ingestion.entity.ChunkSourceType;
 import com.prizm.ingestion.exception.DocumentIndexingException;
-import java.nio.ByteBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.CodingErrorAction;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +21,7 @@ public class DocumentIndexingProcessor {
 
     private final DocumentVersionRepository documentVersionRepository;
     private final FileStorage fileStorage;
+    private final DocumentTextExtractor documentTextExtractor;
     private final TextChunker textChunker;
     private final EmbeddingService embeddingService;
     private final IndexingCompletionService completionService;
@@ -34,6 +32,7 @@ public class DocumentIndexingProcessor {
     public DocumentIndexingProcessor(
             DocumentVersionRepository documentVersionRepository,
             FileStorage fileStorage,
+            DocumentTextExtractor documentTextExtractor,
             TextChunker textChunker,
             EmbeddingService embeddingService,
             IndexingCompletionService completionService,
@@ -42,6 +41,7 @@ public class DocumentIndexingProcessor {
             @Value("${prizm.embedding.dimensions}") int expectedDimensions) {
         this.documentVersionRepository = documentVersionRepository;
         this.fileStorage = fileStorage;
+        this.documentTextExtractor = documentTextExtractor;
         this.textChunker = textChunker;
         this.embeddingService = embeddingService;
         this.completionService = completionService;
@@ -57,32 +57,57 @@ public class DocumentIndexingProcessor {
             throw new IllegalStateException("Processing job ownership does not match its document version.");
         }
         byte[] fileContent = readFile(version.getStoredFilePath());
-        String text = decodeUtf8(fileContent);
-        List<TextChunk> textChunks = textChunker.split(text);
-        if (textChunks.isEmpty()) {
-            throw new DocumentIndexingException("TXT file contains no searchable text.", false);
-        }
+        List<PageText> pages = documentTextExtractor.extract(version.getFileType(), fileContent);
         leaseService.renew(claimedJob);
 
-        List<IndexedChunk> indexedChunks = new ArrayList<>(textChunks.size());
-        for (int index = 0; index < textChunks.size(); index++) {
-            TextChunk chunk = textChunks.get(index);
-            float[] embedding = embeddingService.embed(chunk.content());
-            validateEmbedding(embedding);
-            int sourceIndex = chunk.chunkNo();
-            indexedChunks.add(new IndexedChunk(
-                    chunk.chunkNo(),
-                    ChunkSourceType.TEXT_CHUNK,
-                    sourceIndex,
-                    "텍스트 구간 " + sourceIndex,
-                    chunk.content(),
-                    embedding));
-            if ((index + 1) % leaseRefreshChunkInterval == 0) {
-                leaseService.renew(claimedJob);
+        List<IndexedChunk> indexedChunks = new ArrayList<>();
+        int nextChunkNo = 1;
+        int processedChunkCount = 0;
+        for (PageText page : pages) {
+            for (TextChunk chunk : textChunker.split(page.text())) {
+                float[] embedding = embeddingService.embed(chunk.content());
+                validateEmbedding(embedding);
+                indexedChunks.add(createIndexedChunk(
+                        version.getFileType(), nextChunkNo++, page.pageNumber(), chunk.content(), embedding));
+                processedChunkCount++;
+                if (processedChunkCount % leaseRefreshChunkInterval == 0) {
+                    leaseService.renew(claimedJob);
+                }
             }
+        }
+        if (indexedChunks.isEmpty()) {
+            throw new DocumentIndexingException(
+                    version.getFileType() == DocumentFileType.TXT
+                            ? "TXT file is empty or contains only whitespace."
+                            : "PDF file contains no searchable text.",
+                    false);
         }
         leaseService.renew(claimedJob);
         completionService.complete(claimedJob, List.copyOf(indexedChunks));
+    }
+
+    private IndexedChunk createIndexedChunk(
+            DocumentFileType fileType,
+            int chunkNo,
+            int pageNumber,
+            String content,
+            float[] embedding) {
+        if (fileType == DocumentFileType.TXT) {
+            return new IndexedChunk(
+                    chunkNo,
+                    ChunkSourceType.TEXT_CHUNK,
+                    chunkNo,
+                    "텍스트 구간 " + chunkNo,
+                    content,
+                    embedding);
+        }
+        return new IndexedChunk(
+                chunkNo,
+                ChunkSourceType.PAGE,
+                pageNumber,
+                pageNumber + "페이지",
+                content,
+                embedding);
     }
 
     private byte[] readFile(String storedFilePath) {
@@ -90,24 +115,7 @@ public class DocumentIndexingProcessor {
             return fileStorage.read(storedFilePath);
         }
         catch (FileStorageException exception) {
-            throw new DocumentIndexingException("Stored TXT file could not be read.", false, exception);
-        }
-    }
-
-    private String decodeUtf8(byte[] content) {
-        try {
-            String text = StandardCharsets.UTF_8.newDecoder()
-                    .onMalformedInput(CodingErrorAction.REPORT)
-                    .onUnmappableCharacter(CodingErrorAction.REPORT)
-                    .decode(ByteBuffer.wrap(content))
-                    .toString();
-            if (text.isBlank()) {
-                throw new DocumentIndexingException("TXT file is empty or contains only whitespace.", false);
-            }
-            return text;
-        }
-        catch (CharacterCodingException exception) {
-            throw new DocumentIndexingException("TXT file is not valid UTF-8.", false, exception);
+            throw new DocumentIndexingException("Stored document file could not be read.", false, exception);
         }
     }
 

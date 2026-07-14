@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.prizm.document.entity.DocumentVersion;
+import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.infrastructure.storage.FileStorage;
@@ -18,9 +19,17 @@ import com.prizm.infrastructure.storage.FileStorageException;
 import com.prizm.ingestion.config.IngestionProperties;
 import com.prizm.ingestion.entity.ChunkSourceType;
 import com.prizm.ingestion.exception.DocumentIndexingException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,6 +67,7 @@ class DocumentIndexingProcessorTest {
         processor = new DocumentIndexingProcessor(
                 documentVersionRepository,
                 fileStorage,
+                new DocumentTextExtractor(),
                 new TextChunker(properties),
                 embeddingService,
                 completionService,
@@ -131,5 +141,54 @@ class DocumentIndexingProcessorTest {
                 .isInstanceOf(DocumentIndexingException.class)
                 .hasMessageContaining("4-dimensional");
         verify(completionService, never()).complete(any(), any());
+    }
+
+    @Test
+    void createsPageSourcesWithDocumentWideChunkNumbersForPdf() {
+        DocumentVersion pdfVersion = DocumentVersion.quarantined(
+                7L, 1L, "guide.pdf", DocumentFileType.PDF, "a".repeat(64));
+        ReflectionTestUtils.setField(pdfVersion, "id", 10L);
+        pdfVersion.startProcessing();
+        pdfVersion.updateStoredFilePath("documents/1/10/guide.pdf");
+        when(documentVersionRepository.findById(10L)).thenReturn(Optional.of(pdfVersion));
+        when(fileStorage.read("documents/1/10/guide.pdf"))
+                .thenReturn(textPdf(List.of("first", "", "third-page-text")));
+        when(embeddingService.embed(anyString())).thenReturn(new float[4]);
+
+        processor.process(claimedJob);
+
+        verify(completionService).complete(any(ClaimedProcessingJob.class), argThat(indexedChunks -> {
+            assertThat(indexedChunks).hasSize(4);
+            assertThat(indexedChunks).extracting(IndexedChunk::chunkNo).containsExactly(1, 2, 3, 4);
+            assertThat(indexedChunks).extracting(IndexedChunk::sourceType)
+                    .containsOnly(ChunkSourceType.PAGE);
+            assertThat(indexedChunks).extracting(IndexedChunk::sourceIndex).containsExactly(1, 3, 3, 3);
+            assertThat(indexedChunks).extracting(IndexedChunk::sourceLabel)
+                    .containsExactly("1페이지", "3페이지", "3페이지", "3페이지");
+            return true;
+        }));
+    }
+
+    private byte[] textPdf(List<String> pageTexts) {
+        try (PDDocument document = new PDDocument(); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            for (String pageText : pageTexts) {
+                PDPage page = new PDPage();
+                document.addPage(page);
+                if (!pageText.isBlank()) {
+                    try (PDPageContentStream stream = new PDPageContentStream(document, page)) {
+                        stream.beginText();
+                        stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+                        stream.newLineAtOffset(72, 720);
+                        stream.showText(pageText);
+                        stream.endText();
+                    }
+                }
+            }
+            document.save(output);
+            return output.toByteArray();
+        }
+        catch (IOException exception) {
+            throw new UncheckedIOException(exception);
+        }
     }
 }

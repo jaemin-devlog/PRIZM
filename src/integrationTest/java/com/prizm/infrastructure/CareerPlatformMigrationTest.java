@@ -43,7 +43,8 @@ class CareerPlatformMigrationTest {
         assertOwnershipSchema(database.jdbcTemplate());
         assertDocumentTypeSchema(database.jdbcTemplate());
         assertChunkSourceSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(10L);
+        assertPdfFileTypeSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(11L);
         for (String table : DOCUMENT_TABLES) {
             assertThat(rowCount(database.jdbcTemplate(), table)).isZero();
         }
@@ -84,7 +85,8 @@ class CareerPlatformMigrationTest {
                 .isEqualTo("OTHER");
         assertDocumentTypeSchema(database.jdbcTemplate());
         assertChunkSourceSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(10L);
+        assertPdfFileTypeSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(11L);
     }
 
     @Test
@@ -153,7 +155,8 @@ class CareerPlatformMigrationTest {
                 new StoredChunk("first existing chunk", "TEXT_CHUNK", 1, "텍스트 구간 1", 1024),
                 new StoredChunk("second existing chunk", "TEXT_CHUNK", 2, "텍스트 구간 2", 1024));
         assertChunkSourceSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(10L);
+        assertPdfFileTypeSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(11L);
     }
 
     @Test
@@ -381,6 +384,15 @@ class CareerPlatformMigrationTest {
                     "SELECT COUNT(*) FROM pg_constraint WHERE conname = ?", Long.class, constraintName))
                     .isEqualTo(1L);
         }
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'ck_document_chunks_source_type'",
+                String.class)).contains("TEXT_CHUNK", "PAGE");
+    }
+
+    private void assertPdfFileTypeSchema(JdbcTemplate jdbcTemplate) {
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'ck_document_versions_file_type'",
+                String.class)).contains("TXT", "PDF");
     }
 
     private long ownerColumnCount(JdbcTemplate jdbcTemplate, String tableName) {

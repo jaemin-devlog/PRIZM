@@ -52,13 +52,18 @@ public class DocumentVersion {
     protected DocumentVersion() {
     }
 
-    private DocumentVersion(Long ownerUserId, Long documentId, String originalFileName, String contentHash) {
+    private DocumentVersion(
+            Long ownerUserId,
+            Long documentId,
+            String originalFileName,
+            DocumentFileType fileType,
+            String contentHash) {
         this.ownerUserId = ownerUserId;
         this.documentId = documentId;
         this.versionNo = 1;
         this.originalFileName = originalFileName;
         this.storedFilePath = "pending";
-        this.fileType = DocumentFileType.TXT;
+        this.fileType = fileType;
         this.contentHash = contentHash;
         this.status = DocumentVersionStatus.QUARANTINED;
         this.createdAt = Instant.now();
@@ -70,7 +75,16 @@ public class DocumentVersion {
             Long documentId,
             String originalFileName,
             String contentHash) {
-        return new DocumentVersion(ownerUserId, documentId, originalFileName, contentHash);
+        return quarantined(ownerUserId, documentId, originalFileName, DocumentFileType.TXT, contentHash);
+    }
+
+    public static DocumentVersion quarantined(
+            Long ownerUserId,
+            Long documentId,
+            String originalFileName,
+            DocumentFileType fileType,
+            String contentHash) {
+        return new DocumentVersion(ownerUserId, documentId, originalFileName, fileType, contentHash);
     }
 
     /** 파일 저장이 성공한 뒤 임시 경로를 실제 서버 저장 경로로 교체한다. */

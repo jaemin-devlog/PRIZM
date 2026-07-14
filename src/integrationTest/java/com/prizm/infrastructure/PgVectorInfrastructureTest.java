@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.prizm.document.dto.response.DocumentDetailResponse;
 import com.prizm.document.dto.response.DocumentUploadResponse;
+import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.entity.DocumentType;
 import com.prizm.document.entity.DocumentVersionStatus;
 import com.prizm.document.repository.DocumentRepository;
@@ -26,6 +27,7 @@ import com.prizm.ingestion.service.ProcessingJobClaimService;
 import com.prizm.search.dto.response.SearchResponse;
 import com.prizm.search.exception.SearchResultNotFoundException;
 import com.prizm.search.service.SearchService;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -40,6 +42,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,7 +160,7 @@ class PgVectorInfrastructureTest {
                 PgVectorSmokeAssertions.verifyExactCosineSearch(jdbcTemplate);
 
         assertThat(serverVersion).isBetween(160000, 169999);
-        assertThat(successfulMigrations).isEqualTo(10L);
+        assertThat(successfulMigrations).isEqualTo(11L);
         assertThat(result.extensionVersion()).isEqualTo("0.8.2");
         assertThat(documentCount).isZero();
         assertThat(versionCount).isZero();
@@ -335,6 +342,88 @@ class PgVectorInfrastructureTest {
             fileStorage.delete(storedFilePath);
             deleteCommittedDocumentData();
         }
+    }
+
+    @Test
+    void uploadsIndexesAndSearchesPdfPagesWithPageSources() {
+        Long ownerUserId = createUser();
+        String indexedPageText = ("PDF page source indexing evidence for Spring Boot. ").repeat(50);
+        DocumentUploadResponse uploaded = documentUploadService.upload(
+                ownerUserId,
+                "PDF evidence",
+                new MockMultipartFile(
+                        "file",
+                        "evidence.pdf",
+                        "application/pdf",
+                        textPdf(List.of("First PDF page", "", indexedPageText))));
+        String storedFilePath = documentVersionRepository.findById(uploaded.versionId())
+                .orElseThrow()
+                .getStoredFilePath();
+
+        try {
+            assertThat(uploaded.status()).isEqualTo(DocumentVersionStatus.QUARANTINED);
+            assertThat(documentVersionRepository.findById(uploaded.versionId()).orElseThrow().getFileType())
+                    .isEqualTo(DocumentFileType.PDF);
+
+            ClaimedProcessingJob claimed = processingJobClaimService.claimNext().orElseThrow();
+            documentIndexingProcessor.process(claimed);
+
+            assertThat(documentVersionRepository.findById(uploaded.versionId()).orElseThrow().getStatus())
+                    .isEqualTo(DocumentVersionStatus.ACTIVE);
+            List<StoredChunkSource> storedSources = jdbcTemplate.query(
+                    """
+                    SELECT chunk_no, source_type, source_index, source_label
+                    FROM document_chunks
+                    WHERE document_version_id = ?
+                    ORDER BY chunk_no
+                    """,
+                    (resultSet, rowNum) -> new StoredChunkSource(
+                            resultSet.getInt("chunk_no"),
+                            resultSet.getString("source_type"),
+                            resultSet.getInt("source_index"),
+                            resultSet.getString("source_label")),
+                    uploaded.versionId());
+            assertThat(storedSources).hasSizeGreaterThan(2);
+            assertThat(storedSources).extracting(StoredChunkSource::chunkNo)
+                    .containsExactlyElementsOf(java.util.stream.IntStream.rangeClosed(1, storedSources.size())
+                            .boxed()
+                            .toList());
+            assertThat(storedSources.get(0))
+                    .isEqualTo(new StoredChunkSource(1, "PAGE", 1, "1페이지"));
+            assertThat(storedSources.subList(1, storedSources.size())).allSatisfy(source -> {
+                assertThat(source.sourceType()).isEqualTo("PAGE");
+                assertThat(source.sourceIndex()).isEqualTo(3);
+                assertThat(source.sourceLabel()).isEqualTo("3페이지");
+            });
+
+            SearchResponse result = searchService.search(ownerUserId, "PDF page source indexing evidence");
+            assertThat(result.documentId()).isEqualTo(uploaded.documentId());
+            assertThat(result.documentVersionId()).isEqualTo(uploaded.versionId());
+            assertThat(result.sourceType()).isEqualTo(ChunkSourceType.PAGE);
+            assertThat(result.sourceIndex()).isEqualTo(3);
+            assertThat(result.sourceLabel()).isEqualTo("3페이지");
+        }
+        finally {
+            fileStorage.delete(storedFilePath);
+            deleteCommittedDocumentData();
+        }
+    }
+
+    @Test
+    @Transactional
+    void keepsPdfPageSearchResultsIsolatedByOwner() {
+        Long firstOwnerUserId = createUser();
+        Long secondOwnerUserId = createUser();
+        Long firstDocumentId = createActivePdfPageDocument(
+                firstOwnerUserId, "First owner PDF career evidence");
+        createActivePdfPageDocument(secondOwnerUserId, "Second owner PDF career evidence");
+
+        SearchResponse result = searchService.search(firstOwnerUserId, "First owner PDF career evidence");
+
+        assertThat(result.documentId()).isEqualTo(firstDocumentId);
+        assertThat(result.sourceType()).isEqualTo(ChunkSourceType.PAGE);
+        assertThat(result.sourceIndex()).isEqualTo(1);
+        assertThat(result.sourceLabel()).isEqualTo("1페이지");
     }
 
     @Test
@@ -617,6 +706,40 @@ class PgVectorInfrastructureTest {
         return versionId;
     }
 
+    private Long createActivePdfPageDocument(Long ownerUserId, String content) {
+        Long documentId = jdbcTemplate.queryForObject(
+                "INSERT INTO documents(owner_user_id, title) VALUES (?, ?) RETURNING id",
+                Long.class,
+                ownerUserId,
+                "PDF ownership verification");
+        Long versionId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO document_versions(
+                    owner_user_id, document_id, version_no, original_file_name, stored_file_path, file_type,
+                    content_hash, status
+                )
+                VALUES (?, ?, 1, 'ownership.pdf', 'test/ownership.pdf', 'PDF', repeat('f', 64), 'ACTIVE')
+                RETURNING id
+                """,
+                Long.class,
+                ownerUserId,
+                documentId);
+        jdbcTemplate.update("UPDATE documents SET active_version_id = ? WHERE id = ?", versionId, documentId);
+        jdbcTemplate.update(
+                """
+                INSERT INTO document_chunks(
+                    owner_user_id, content, embedding, document_version_id, chunk_no, page_no,
+                    source_type, source_index, source_label
+                )
+                VALUES (?, ?, CAST(? AS vector), ?, 1, NULL, 'PAGE', 1, '1페이지')
+                """,
+                ownerUserId,
+                content,
+                toVectorLiteral(embeddingService.embed(content)),
+                versionId);
+        return documentId;
+    }
+
     private PendingJobFixture createPendingIndexingJob(String title) {
         Long ownerUserId = createUser();
         Long documentId = jdbcTemplate.queryForObject(
@@ -693,6 +816,29 @@ class PgVectorInfrastructureTest {
             literal.append(embedding[index]);
         }
         return literal.append(']').toString();
+    }
+
+    private byte[] textPdf(List<String> pageTexts) {
+        try (PDDocument document = new PDDocument(); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            for (String pageText : pageTexts) {
+                PDPage page = new PDPage();
+                document.addPage(page);
+                if (!pageText.isBlank()) {
+                    try (PDPageContentStream stream = new PDPageContentStream(document, page)) {
+                        stream.beginText();
+                        stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+                        stream.newLineAtOffset(72, 720);
+                        stream.showText(pageText);
+                        stream.endText();
+                    }
+                }
+            }
+            document.save(output);
+            return output.toByteArray();
+        }
+        catch (IOException exception) {
+            throw new UncheckedIOException(exception);
+        }
     }
 
     private static Path createStorageRoot() {

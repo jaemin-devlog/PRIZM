@@ -192,3 +192,15 @@
 - 통합: 별도로 작성돼 내용이 겹치던 한국어 개발 현황 문서는 `docs/project-status.md`에 흡수하고, 이 파일을 현재 구현과 미구현 범위의 단일 기준으로 정했다.
 - 구분: 장기 기획안의 outbox·generation·MCP·지원 패키지·OpenSQL HA는 미래 목표로 표시하고, 초기 검증 문서는 당시 단계의 역사적 기록임을 명시했다.
 - 검증: 저장소의 모든 Markdown 로컬 링크와 오래된 API·enum 표기를 검사했고 `git diff --check`를 통과했다.
+
+## 2026-07-14 — Worker 시간 기반 lease heartbeat
+
+- 변경: Worker가 job을 선점한 직후 별도 daemon scheduler heartbeat를 시작하고, 문서 원본 읽기·PDF 추출·Ollama 임베딩을 포함한 전체 처리 구간 동안 기존 lease 갱신 SQL을 lease duration의 1/3 주기로 호출하도록 했다. 기존 청크 단위 갱신도 유지했다.
+- fencing: heartbeat 갱신은 기존의 `processing_jobs.id`, `PROCESSING`, `claim_version` 조건을 그대로 사용하며 claim version을 변경하지 않는다. 0행(stale claim)이면 heartbeat를 중지하고 processor가 청크 저장·ACTIVE 전환·COMPLETED 처리 전에 stale 예외를 받는다.
+- 검증: scheduler를 제어하는 단위 테스트와 PostgreSQL 통합 테스트로 갱신·종료·stale 차단·recovery 비회수를 확인했다. OpenSQL 실환경 테스트는 기존 제외 정책을 유지한다.
+
+## 2026-07-14 — 원본 저장소 I/O 재시도 분류
+
+- 변경: 원본 읽기에서 파일 없음·경로 이탈·유효하지 않은 경로·일반 파일이 아닌 대상은 `PermanentFileStorageException`으로, 실제 읽기 중 일반 `IOException`은 `TransientFileStorageException`으로 구분했다.
+- Worker: `DocumentIndexingProcessor`는 일시 오류만 재시도 가능 `DocumentIndexingException`으로 변환한다. 기존 FailureService가 1분·5분·15분 backoff 및 최대 3회 후 FAILED를 적용하며 영구 오류는 즉시 FAILED로 처리한다.
+- 보존: 안전한 일반 오류 메시지만 작업 상태에 남기고, 청크 저장·ACTIVE 전환·기존 active version·lease heartbeat·claim-version fencing 동작은 변경하지 않았다.

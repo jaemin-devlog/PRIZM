@@ -7,6 +7,9 @@ import static org.mockito.Mockito.when;
 
 import com.prizm.embedding.exception.EmbeddingErrorCode;
 import com.prizm.embedding.exception.EmbeddingException;
+import com.prizm.infrastructure.storage.PermanentFileStorageException;
+import com.prizm.infrastructure.storage.TransientFileStorageException;
+import com.prizm.ingestion.exception.DocumentIndexingException;
 import com.prizm.ingestion.exception.DocumentTextExtractionException;
 import com.prizm.ingestion.exception.StaleProcessingJobClaimException;
 import java.time.Instant;
@@ -68,6 +71,40 @@ class IndexingCoordinatorTest {
         assertThat(coordinator.processNext()).isTrue();
 
         verify(failureService).handleFailure(job, false, "PDF document exceeds processing limits.");
+    }
+
+    @Test
+    void schedulesRetryForTransientStoredFileReadFailure() {
+        ClaimedProcessingJob job = claimedJob();
+        when(claimService.claimNext()).thenReturn(Optional.of(job));
+        org.mockito.Mockito.doThrow(new DocumentIndexingException(
+                        "Stored document file could not be read.",
+                        true,
+                        new TransientFileStorageException("temporary storage failure", new java.io.IOException())))
+                .when(processor).process(job);
+        IndexingCoordinator coordinator = new IndexingCoordinator(
+                claimService, processor, new IndexingFailureClassifier(), failureService);
+
+        assertThat(coordinator.processNext()).isTrue();
+
+        verify(failureService).handleFailure(job, true, "Stored document file could not be read.");
+    }
+
+    @Test
+    void failsImmediatelyForPermanentStoredFileReadFailure() {
+        ClaimedProcessingJob job = claimedJob();
+        when(claimService.claimNext()).thenReturn(Optional.of(job));
+        org.mockito.Mockito.doThrow(new DocumentIndexingException(
+                        "Stored document file could not be read.",
+                        false,
+                        new PermanentFileStorageException("missing")))
+                .when(processor).process(job);
+        IndexingCoordinator coordinator = new IndexingCoordinator(
+                claimService, processor, new IndexingFailureClassifier(), failureService);
+
+        assertThat(coordinator.processNext()).isTrue();
+
+        verify(failureService).handleFailure(job, false, "Stored document file could not be read.");
     }
 
     @Test

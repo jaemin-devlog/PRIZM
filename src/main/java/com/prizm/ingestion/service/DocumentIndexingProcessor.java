@@ -8,6 +8,7 @@ import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.embedding.service.EmbeddingValidator;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.infrastructure.storage.FileStorageException;
+import com.prizm.infrastructure.storage.TransientFileStorageException;
 import com.prizm.ingestion.config.IngestionProperties;
 import com.prizm.ingestion.entity.ChunkSourceType;
 import com.prizm.ingestion.exception.DocumentIndexingException;
@@ -27,6 +28,7 @@ public class DocumentIndexingProcessor {
     private final EmbeddingValidator embeddingValidator;
     private final IndexingCompletionService completionService;
     private final ProcessingJobLeaseService leaseService;
+    private final WorkerLeaseHeartbeat workerLeaseHeartbeat;
     private final int leaseRefreshChunkInterval;
 
     public DocumentIndexingProcessor(
@@ -38,6 +40,7 @@ public class DocumentIndexingProcessor {
             EmbeddingValidator embeddingValidator,
             IndexingCompletionService completionService,
             ProcessingJobLeaseService leaseService,
+            WorkerLeaseHeartbeat workerLeaseHeartbeat,
             IngestionProperties ingestionProperties) {
         this.documentVersionRepository = documentVersionRepository;
         this.fileStorage = fileStorage;
@@ -47,43 +50,52 @@ public class DocumentIndexingProcessor {
         this.embeddingValidator = embeddingValidator;
         this.completionService = completionService;
         this.leaseService = leaseService;
+        this.workerLeaseHeartbeat = workerLeaseHeartbeat;
         this.leaseRefreshChunkInterval = ingestionProperties.getLeaseRefreshChunkInterval();
     }
 
     public void process(ClaimedProcessingJob claimedJob) {
-        DocumentVersion version = documentVersionRepository.findById(claimedJob.documentVersionId())
-                .orElseThrow(() -> new DocumentVersionNotFoundException(claimedJob.documentVersionId()));
-        if (!claimedJob.ownerUserId().equals(version.getOwnerUserId())) {
-            throw new IllegalStateException("Processing job ownership does not match its document version.");
-        }
-        byte[] fileContent = readFile(version.getStoredFilePath());
-        List<PageText> pages = documentTextExtractor.extract(version.getFileType(), fileContent);
-        leaseService.renew(claimedJob);
+        try (WorkerLeaseHeartbeat.LeaseHeartbeat heartbeat = workerLeaseHeartbeat.start(claimedJob)) {
+            heartbeat.assertOwnership();
+            DocumentVersion version = documentVersionRepository.findById(claimedJob.documentVersionId())
+                    .orElseThrow(() -> new DocumentVersionNotFoundException(claimedJob.documentVersionId()));
+            if (!claimedJob.ownerUserId().equals(version.getOwnerUserId())) {
+                throw new IllegalStateException("Processing job ownership does not match its document version.");
+            }
+            byte[] fileContent = readFile(version.getStoredFilePath());
+            heartbeat.assertOwnership();
+            List<PageText> pages = documentTextExtractor.extract(version.getFileType(), fileContent);
+            heartbeat.assertOwnership();
+            leaseService.renew(claimedJob);
 
-        List<IndexedChunk> indexedChunks = new ArrayList<>();
-        int nextChunkNo = 1;
-        int processedChunkCount = 0;
-        for (PageText page : pages) {
-            for (TextChunk chunk : textChunker.split(page.text())) {
-                float[] embedding = embeddingService.embed(chunk.content());
-                embeddingValidator.validate(embedding);
-                indexedChunks.add(createIndexedChunk(
-                        version.getFileType(), nextChunkNo++, page.pageNumber(), chunk.content(), embedding));
-                processedChunkCount++;
-                if (processedChunkCount % leaseRefreshChunkInterval == 0) {
-                    leaseService.renew(claimedJob);
+            List<IndexedChunk> indexedChunks = new ArrayList<>();
+            int nextChunkNo = 1;
+            int processedChunkCount = 0;
+            for (PageText page : pages) {
+                for (TextChunk chunk : textChunker.split(page.text())) {
+                    heartbeat.assertOwnership();
+                    float[] embedding = embeddingService.embed(chunk.content());
+                    heartbeat.assertOwnership();
+                    embeddingValidator.validate(embedding);
+                    indexedChunks.add(createIndexedChunk(
+                            version.getFileType(), nextChunkNo++, page.pageNumber(), chunk.content(), embedding));
+                    processedChunkCount++;
+                    if (processedChunkCount % leaseRefreshChunkInterval == 0) {
+                        leaseService.renew(claimedJob);
+                    }
                 }
             }
+            if (indexedChunks.isEmpty()) {
+                throw new DocumentIndexingException(
+                        version.getFileType() == DocumentFileType.TXT
+                                ? "TXT file is empty or contains only whitespace."
+                                : "PDF file contains no searchable text.",
+                        false);
+            }
+            leaseService.renew(claimedJob);
+            heartbeat.assertOwnership();
+            completionService.complete(claimedJob, List.copyOf(indexedChunks));
         }
-        if (indexedChunks.isEmpty()) {
-            throw new DocumentIndexingException(
-                    version.getFileType() == DocumentFileType.TXT
-                            ? "TXT file is empty or contains only whitespace."
-                            : "PDF file contains no searchable text.",
-                    false);
-        }
-        leaseService.renew(claimedJob);
-        completionService.complete(claimedJob, List.copyOf(indexedChunks));
     }
 
     private IndexedChunk createIndexedChunk(
@@ -115,7 +127,10 @@ public class DocumentIndexingProcessor {
             return fileStorage.read(storedFilePath);
         }
         catch (FileStorageException exception) {
-            throw new DocumentIndexingException("Stored document file could not be read.", false, exception);
+            throw new DocumentIndexingException(
+                    "Stored document file could not be read.",
+                    exception instanceof TransientFileStorageException,
+                    exception);
         }
     }
 

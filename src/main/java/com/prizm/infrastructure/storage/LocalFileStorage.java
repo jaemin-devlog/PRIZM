@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
+import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -58,16 +61,20 @@ public class LocalFileStorage implements FileStorage {
 
     @Override
     public byte[] read(String storedFilePath) {
-        Path target = storageRoot.resolve(storedFilePath).normalize();
-        ensureInsideStorageRoot(target);
-        if (!Files.isRegularFile(target)) {
-            throw new FileStorageException("Stored file does not exist.");
-        }
+        Path target = resolveStoredFilePath(storedFilePath);
         try {
-            return Files.readAllBytes(target);
+            BasicFileAttributes attributes = Files.readAttributes(
+                    target, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+            if (!attributes.isRegularFile()) {
+                throw new PermanentFileStorageException("Stored path is not a regular file.");
+            }
+            return readAllBytes(target);
+        }
+        catch (NoSuchFileException exception) {
+            throw new PermanentFileStorageException("Stored file does not exist.", exception);
         }
         catch (IOException exception) {
-            throw new FileStorageException("Failed to read stored file.", exception);
+            throw new TransientFileStorageException("Failed to read stored file.", exception);
         }
     }
 
@@ -119,5 +126,25 @@ public class LocalFileStorage implements FileStorage {
         if (!target.startsWith(storageRoot)) {
             throw new FileStorageException("Stored file path escapes the storage root.");
         }
+    }
+
+    private Path resolveStoredFilePath(String storedFilePath) {
+        if (storedFilePath == null || storedFilePath.isBlank()) {
+            throw new PermanentFileStorageException("Stored file path is invalid.");
+        }
+        try {
+            Path target = storageRoot.resolve(storedFilePath).normalize();
+            if (!target.startsWith(storageRoot)) {
+                throw new PermanentFileStorageException("Stored file path escapes the storage root.");
+            }
+            return target;
+        }
+        catch (InvalidPathException exception) {
+            throw new PermanentFileStorageException("Stored file path is invalid.", exception);
+        }
+    }
+
+    protected byte[] readAllBytes(Path target) throws IOException {
+        return Files.readAllBytes(target);
     }
 }

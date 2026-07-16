@@ -45,7 +45,7 @@ class CareerPlatformMigrationTest {
         assertChunkSourceSchema(database.jdbcTemplate());
         assertPdfFileTypeSchema(database.jdbcTemplate());
         assertFileCleanupJobSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(12L);
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(13L);
         for (String table : DOCUMENT_TABLES) {
             assertThat(rowCount(database.jdbcTemplate(), table)).isZero();
         }
@@ -90,7 +90,7 @@ class CareerPlatformMigrationTest {
         assertChunkSourceSchema(database.jdbcTemplate());
         assertPdfFileTypeSchema(database.jdbcTemplate());
         assertFileCleanupJobSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(12L);
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(13L);
     }
 
     @Test
@@ -161,7 +161,7 @@ class CareerPlatformMigrationTest {
         assertChunkSourceSchema(database.jdbcTemplate());
         assertPdfFileTypeSchema(database.jdbcTemplate());
         assertFileCleanupJobSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(12L);
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(13L);
     }
 
     @Test
@@ -402,7 +402,7 @@ class CareerPlatformMigrationTest {
 
     private void assertFileCleanupJobSchema(JdbcTemplate jdbcTemplate) {
         for (String columnName : List.of(
-                "storage_key", "status", "attempts", "available_at", "created_at", "updated_at")) {
+                "storage_key", "status", "attempts", "available_at", "claim_version", "created_at", "updated_at")) {
             assertThat(jdbcTemplate.queryForObject(
                     """
                     SELECT is_nullable
@@ -414,12 +414,15 @@ class CareerPlatformMigrationTest {
         }
         assertThat(jdbcTemplate.queryForObject(
                 "SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'ck_file_cleanup_jobs_status'",
-                String.class)).contains("PENDING");
+                String.class)).contains("PENDING", "PROCESSING", "RETRY_WAIT", "COMPLETED", "FAILED");
         assertThat(jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM pg_constraint WHERE conname = 'uq_file_cleanup_jobs_storage_key'", Long.class))
                 .isEqualTo(1L);
         assertThat(jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'ix_file_cleanup_jobs_pending_available'",
+                Long.class)).isEqualTo(1L);
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'ix_file_cleanup_jobs_processing_lease'",
                 Long.class)).isEqualTo(1L);
     }
 

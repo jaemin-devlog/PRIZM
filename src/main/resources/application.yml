@@ -71,3 +71,9 @@ prizm:
     lease-refresh-chunk-interval: ${PRIZM_INDEXING_LEASE_REFRESH_CHUNK_INTERVAL:10}
     recovery-delay-ms: ${PRIZM_INDEXING_RECOVERY_DELAY_MS:60000}
     worker-enabled: ${PRIZM_INDEXING_WORKER_ENABLED:true}
+  cleanup:
+    worker-enabled: ${PRIZM_CLEANUP_WORKER_ENABLED:true}
+    poll-delay-ms: ${PRIZM_CLEANUP_POLL_DELAY_MS:5000}
+    recovery-delay-ms: ${PRIZM_CLEANUP_RECOVERY_DELAY_MS:60000}
+    batch-size: ${PRIZM_CLEANUP_BATCH_SIZE:10}
+    lease-duration: ${PRIZM_CLEANUP_LEASE_DURATION:5m}

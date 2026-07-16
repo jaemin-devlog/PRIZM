@@ -2,13 +2,18 @@ package com.prizm.infrastructure.storage;
 
 import java.io.IOException;
 import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.SecureDirectoryStream;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +43,7 @@ public class LocalFileStorage implements FileStorage {
         Path temporaryFile = null;
         try {
             // 임시 파일에 먼저 쓴 뒤 이동해 저장 중인 불완전한 원본이 노출되지 않게 한다.
-            Files.createDirectories(directory);
+            createSafeDirectories(directory);
             temporaryFile = Files.createTempFile(directory, ".upload-", ".tmp");
             Files.write(temporaryFile, content);
             moveIntoPlace(temporaryFile, target);
@@ -61,14 +66,15 @@ public class LocalFileStorage implements FileStorage {
 
     @Override
     public byte[] read(String storedFilePath) {
-        Path target = resolveStoredFilePath(storedFilePath);
+        ResolvedStoredFilePath resolvedPath = resolveSafeStoredFilePath(storedFilePath);
+        if (!resolvedPath.parentExists()) {
+            throw new PermanentFileStorageException("Stored file does not exist.");
+        }
         try {
             BasicFileAttributes attributes = Files.readAttributes(
-                    target, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
-            if (!attributes.isRegularFile()) {
-                throw new PermanentFileStorageException("Stored path is not a regular file.");
-            }
-            return readAllBytes(target);
+                    resolvedPath.target(), BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+            requireRegularFile(resolvedPath, attributes);
+            return readAllBytes(resolvedPath.target());
         }
         catch (NoSuchFileException exception) {
             throw new PermanentFileStorageException("Stored file does not exist.", exception);
@@ -81,13 +87,39 @@ public class LocalFileStorage implements FileStorage {
     /** 저장 경로가 루트 밖으로 나가지 않는지 확인한 뒤 파일을 삭제한다. */
     @Override
     public void delete(String storedFilePath) {
-        Path target = storageRoot.resolve(storedFilePath).normalize();
-        ensureInsideStorageRoot(target);
+        Path target = resolveStoredFilePath(storedFilePath);
+        Path relativeTarget = storageRoot.relativize(target);
+        if (relativeTarget.toString().isBlank() || relativeTarget.getFileName() == null) {
+            throw new PermanentFileStorageException("Stored path is not a regular file.");
+        }
+
+        Path fileSystemRoot = storageRoot.getRoot();
+        if (fileSystemRoot == null) {
+            throw new PermanentFileStorageException("Storage root is unavailable.");
+        }
+
+        List<Path> storageRootComponents = pathComponents(fileSystemRoot, storageRoot);
+        List<Path> targetParentComponents = pathComponents(relativeTarget.getParent());
         try {
-            Files.deleteIfExists(target);
+            try (DirectoryStream<Path> anchorStream = openDirectoryStream(fileSystemRoot)) {
+                SecureDirectoryStream<Path> anchor = requireSecureDirectoryStream(anchorStream);
+                deleteFromFileSystemAnchor(
+                        anchor,
+                        storageRootComponents,
+                        0,
+                        targetParentComponents,
+                        relativeTarget.getFileName());
+            }
+        }
+        catch (PermanentFileStorageException | TransientFileStorageException exception) {
+            throw exception;
+        }
+        catch (UnsupportedOperationException exception) {
+            throw new PermanentFileStorageException(
+                    "Secure file deletion is not supported by this filesystem.", exception);
         }
         catch (IOException exception) {
-            throw new FileStorageException("Failed to delete stored file.", exception);
+            throw new TransientFileStorageException("Failed to delete stored file.", exception);
         }
     }
 
@@ -133,7 +165,14 @@ public class LocalFileStorage implements FileStorage {
             throw new PermanentFileStorageException("Stored file path is invalid.");
         }
         try {
-            Path target = storageRoot.resolve(storedFilePath).normalize();
+            if (storedFilePath.contains("\\") || storedFilePath.contains(":")) {
+                throw new PermanentFileStorageException("Stored file path must use a relative storage key.");
+            }
+            Path relativePath = Path.of(storedFilePath);
+            if (relativePath.isAbsolute()) {
+                throw new PermanentFileStorageException("Stored file path must be relative.");
+            }
+            Path target = storageRoot.resolve(relativePath).normalize();
             if (!target.startsWith(storageRoot)) {
                 throw new PermanentFileStorageException("Stored file path escapes the storage root.");
             }
@@ -144,7 +183,245 @@ public class LocalFileStorage implements FileStorage {
         }
     }
 
+    private ResolvedStoredFilePath resolveSafeStoredFilePath(String storedFilePath) {
+        Path target = resolveStoredFilePath(storedFilePath);
+        Path storageRootRealPath = requireSafeStorageRoot();
+        return new ResolvedStoredFilePath(
+                target,
+                storageRootRealPath,
+                validateExistingParentDirectories(target.getParent(), storageRootRealPath));
+    }
+
+    private Path requireSafeStorageRoot() {
+        try {
+            BasicFileAttributes attributes = Files.readAttributes(
+                    storageRoot, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+            if (attributes.isSymbolicLink() || !attributes.isDirectory()) {
+                throw new PermanentFileStorageException("Storage root is not a safe directory.");
+            }
+            return storageRoot.toRealPath();
+        }
+        catch (NoSuchFileException exception) {
+            throw new PermanentFileStorageException("Storage root is unavailable.", exception);
+        }
+        catch (IOException exception) {
+            throw new TransientFileStorageException("Failed to access storage root.", exception);
+        }
+    }
+
+    private boolean validateExistingParentDirectories(Path targetParent, Path storageRootRealPath) {
+        Path relativeParent = storageRoot.relativize(targetParent);
+        Path current = storageRoot;
+        for (Path component : relativeParent) {
+            current = current.resolve(component);
+            try {
+                BasicFileAttributes attributes = Files.readAttributes(
+                        current, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+                if (attributes.isSymbolicLink() || !attributes.isDirectory()) {
+                    throw new PermanentFileStorageException("Stored file parent is not a safe directory.");
+                }
+                if (!current.toRealPath().startsWith(storageRootRealPath)) {
+                    throw new PermanentFileStorageException("Stored file path escapes the storage root.");
+                }
+            }
+            catch (NoSuchFileException exception) {
+                return false;
+            }
+            catch (IOException exception) {
+                throw new TransientFileStorageException("Failed to access stored file parent.", exception);
+            }
+        }
+        return true;
+    }
+
+    private void requireRegularFile(ResolvedStoredFilePath resolvedPath, BasicFileAttributes attributes)
+            throws IOException {
+        if (attributes.isSymbolicLink() || !attributes.isRegularFile()) {
+            throw new PermanentFileStorageException("Stored path is not a regular file.");
+        }
+        if (!resolvedPath.target().toRealPath(LinkOption.NOFOLLOW_LINKS)
+                .startsWith(resolvedPath.storageRootRealPath())) {
+            throw new PermanentFileStorageException("Stored file path escapes the storage root.");
+        }
+    }
+
+    private void createSafeDirectories(Path directory) throws IOException {
+        Files.createDirectories(storageRoot);
+        Path storageRootRealPath = requireSafeStorageRoot();
+        Path relativeDirectory = storageRoot.relativize(directory);
+        Path current = storageRoot;
+        for (Path component : relativeDirectory) {
+            current = current.resolve(component);
+            try {
+                Files.createDirectory(current);
+            }
+            catch (java.nio.file.FileAlreadyExistsException ignored) {
+                // The existing path is verified below before it is used.
+            }
+
+            BasicFileAttributes attributes = Files.readAttributes(
+                    current, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+            if (attributes.isSymbolicLink() || !attributes.isDirectory()) {
+                throw new FileStorageException("Storage directory is not safe.");
+            }
+            if (!current.toRealPath().startsWith(storageRootRealPath)) {
+                throw new FileStorageException("Storage directory escapes the storage root.");
+            }
+        }
+    }
+
     protected byte[] readAllBytes(Path target) throws IOException {
         return Files.readAllBytes(target);
+    }
+
+    protected DirectoryStream<Path> openDirectoryStream(Path directory) throws IOException {
+        return Files.newDirectoryStream(directory);
+    }
+
+    protected void deleteFile(SecureDirectoryStream<Path> parentDirectory, Path fileName) throws IOException {
+        parentDirectory.deleteFile(fileName);
+    }
+
+    private boolean deleteFromFileSystemAnchor(
+            SecureDirectoryStream<Path> current,
+            List<Path> storageRootComponents,
+            int componentIndex,
+            List<Path> targetParentComponents,
+            Path fileName) throws IOException {
+        if (componentIndex == storageRootComponents.size()) {
+            return deleteFromStorageRoot(current, targetParentComponents, 0, fileName);
+        }
+
+        Path component = storageRootComponents.get(componentIndex);
+        BasicFileAttributes attributes;
+        try {
+            attributes = readRelativeAttributes(current, component);
+        }
+        catch (NoSuchFileException exception) {
+            throw new PermanentFileStorageException("Storage root is unavailable.", exception);
+        }
+        requireDirectory(attributes, "Storage root is not a safe directory.");
+
+        try (SecureDirectoryStream<Path> child = openChildDirectory(current, component)) {
+            return deleteFromFileSystemAnchor(
+                    child,
+                    storageRootComponents,
+                    componentIndex + 1,
+                    targetParentComponents,
+                    fileName);
+        }
+        catch (NoSuchFileException exception) {
+            throw new PermanentFileStorageException("Storage root is unavailable.", exception);
+        }
+    }
+
+    private boolean deleteFromStorageRoot(
+            SecureDirectoryStream<Path> current,
+            List<Path> parentComponents,
+            int componentIndex,
+            Path fileName) throws IOException {
+        if (componentIndex == parentComponents.size()) {
+            return deleteRelativeFile(current, fileName);
+        }
+
+        Path component = parentComponents.get(componentIndex);
+        BasicFileAttributes attributes;
+        try {
+            attributes = readRelativeAttributes(current, component);
+        }
+        catch (NoSuchFileException exception) {
+            return false;
+        }
+        requireDirectory(attributes, "Stored file parent is not a safe directory.");
+
+        try (SecureDirectoryStream<Path> child = openChildDirectory(current, component)) {
+            return deleteFromStorageRoot(child, parentComponents, componentIndex + 1, fileName);
+        }
+        catch (NoSuchFileException exception) {
+            return false;
+        }
+    }
+
+    private boolean deleteRelativeFile(SecureDirectoryStream<Path> parentDirectory, Path fileName) throws IOException {
+        BasicFileAttributes attributes;
+        try {
+            attributes = readRelativeAttributes(parentDirectory, fileName);
+        }
+        catch (NoSuchFileException exception) {
+            return false;
+        }
+        if (attributes.isSymbolicLink() || !attributes.isRegularFile()) {
+            throw new PermanentFileStorageException("Stored path is not a regular file.");
+        }
+
+        try {
+            deleteFile(parentDirectory, fileName);
+            return true;
+        }
+        catch (NoSuchFileException exception) {
+            return false;
+        }
+    }
+
+    private SecureDirectoryStream<Path> openChildDirectory(
+            SecureDirectoryStream<Path> parentDirectory,
+            Path component) throws IOException {
+        return parentDirectory.newDirectoryStream(component, LinkOption.NOFOLLOW_LINKS);
+    }
+
+    private BasicFileAttributes readRelativeAttributes(
+            SecureDirectoryStream<Path> parentDirectory,
+            Path entryName) throws IOException {
+        BasicFileAttributeView attributeView = parentDirectory.getFileAttributeView(
+                entryName,
+                BasicFileAttributeView.class,
+                LinkOption.NOFOLLOW_LINKS);
+        if (attributeView == null) {
+            throw new PermanentFileStorageException(
+                    "Secure file attributes are not supported by this filesystem.");
+        }
+        return attributeView.readAttributes();
+    }
+
+    private void requireDirectory(BasicFileAttributes attributes, String errorMessage) {
+        if (attributes.isSymbolicLink() || !attributes.isDirectory()) {
+            throw new PermanentFileStorageException(errorMessage);
+        }
+    }
+
+    private List<Path> pathComponents(Path fileSystemRoot, Path directory) {
+        if (fileSystemRoot.equals(directory)) {
+            return List.of();
+        }
+        return pathComponents(fileSystemRoot.relativize(directory));
+    }
+
+    private List<Path> pathComponents(Path path) {
+        if (path == null || path.toString().isEmpty()) {
+            return List.of();
+        }
+        List<Path> components = new ArrayList<>();
+        for (Path component : path) {
+            if (!component.toString().isEmpty()) {
+                components.add(component);
+            }
+        }
+        return List.copyOf(components);
+    }
+
+    private SecureDirectoryStream<Path> requireSecureDirectoryStream(DirectoryStream<Path> directoryStream) {
+        if (!(directoryStream instanceof SecureDirectoryStream<?>)) {
+            throw new PermanentFileStorageException(
+                    "Secure file deletion is not supported by this filesystem.");
+        }
+        return castSecureDirectoryStream(directoryStream);
+    }
+
+    @SuppressWarnings("unchecked")
+    private SecureDirectoryStream<Path> castSecureDirectoryStream(DirectoryStream<Path> directoryStream) {
+        return (SecureDirectoryStream<Path>) directoryStream;
+    }
+
+    private record ResolvedStoredFilePath(Path target, Path storageRootRealPath, boolean parentExists) {
     }
 }

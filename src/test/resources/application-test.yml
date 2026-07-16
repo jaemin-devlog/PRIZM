@@ -20,3 +20,5 @@ prizm:
     issuer: prizm
   ingestion:
     worker-enabled: false
+  cleanup:
+    worker-enabled: false

@@ -13,6 +13,16 @@ import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.document.service.DocumentQueryService;
 import com.prizm.document.service.DocumentUploadService;
+import com.prizm.cleanup.exception.StaleFileCleanupJobClaimException;
+import com.prizm.cleanup.repository.FileCleanupJobRepository;
+import com.prizm.cleanup.service.ClaimedFileCleanupJob;
+import com.prizm.cleanup.service.CleanupFailure;
+import com.prizm.cleanup.service.FileCleanupCoordinator;
+import com.prizm.cleanup.service.FileCleanupCompletionService;
+import com.prizm.cleanup.service.FileCleanupFailureClassifier;
+import com.prizm.cleanup.service.FileCleanupFailureService;
+import com.prizm.cleanup.service.FileCleanupJobClaimService;
+import com.prizm.cleanup.service.FileCleanupJobRecoveryService;
 import com.prizm.cleanup.service.FileCleanupJobService;
 import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.infrastructure.storage.FileStorage;
@@ -38,8 +48,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SecureDirectoryStream;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -54,10 +66,12 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.test.context.ActiveProfiles;
@@ -67,6 +81,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.lifecycle.Startable;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
@@ -80,6 +95,11 @@ import org.testcontainers.utility.DockerImageName;
 class PgVectorInfrastructureTest {
 
     private static final Path STORAGE_ROOT = createStorageRoot();
+    private static final String EXTERNAL_DATABASE_URL = System.getenv("PRIZM_INTEGRATION_TEST_DATABASE_URL");
+    private static final String EXTERNAL_DATABASE_USERNAME = System.getenv("PRIZM_INTEGRATION_TEST_DATABASE_USERNAME");
+    private static final String EXTERNAL_DATABASE_PASSWORD = System.getenv("PRIZM_INTEGRATION_TEST_DATABASE_PASSWORD");
+    private static final boolean USE_EXTERNAL_DATABASE = EXTERNAL_DATABASE_URL != null
+            && !EXTERNAL_DATABASE_URL.isBlank();
 
     private static final List<String> SEARCH_TEST_SENTENCES = List.of(
             "연차 신청은 인사 시스템에서 진행합니다.",
@@ -90,17 +110,26 @@ class PgVectorInfrastructureTest {
             .parse("pgvector/pgvector:0.8.2-pg16-bookworm")
             .asCompatibleSubstituteFor("postgres");
 
-    @Container
     static final PostgreSQLContainer postgres = new PostgreSQLContainer(PGVECTOR_IMAGE)
             .withDatabaseName("prizm")
             .withUsername("prizm")
             .withPassword("prizm-test");
 
+    @Container
+    static final Startable database = USE_EXTERNAL_DATABASE ? new ExternalDatabaseLifecycle() : postgres;
+
     @DynamicPropertySource
     static void databaseProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
+        if (USE_EXTERNAL_DATABASE) {
+            registry.add("spring.datasource.url", () -> EXTERNAL_DATABASE_URL);
+            registry.add("spring.datasource.username", () -> EXTERNAL_DATABASE_USERNAME);
+            registry.add("spring.datasource.password", () -> EXTERNAL_DATABASE_PASSWORD);
+        }
+        else {
+            registry.add("spring.datasource.url", postgres::getJdbcUrl);
+            registry.add("spring.datasource.username", postgres::getUsername);
+            registry.add("spring.datasource.password", postgres::getPassword);
+        }
         registry.add("prizm.storage.root", STORAGE_ROOT::toString);
     }
 
@@ -118,6 +147,27 @@ class PgVectorInfrastructureTest {
 
     @Autowired
     FileCleanupJobService fileCleanupJobService;
+
+    @Autowired
+    FileCleanupJobRepository fileCleanupJobRepository;
+
+    @Autowired
+    FileCleanupCoordinator fileCleanupCoordinator;
+
+    @Autowired
+    FileCleanupCompletionService fileCleanupCompletionService;
+
+    @Autowired
+    FileCleanupJobClaimService fileCleanupJobClaimService;
+
+    @Autowired
+    FileCleanupJobRecoveryService fileCleanupJobRecoveryService;
+
+    @Autowired
+    FileCleanupFailureClassifier fileCleanupFailureClassifier;
+
+    @Autowired
+    FileCleanupFailureService fileCleanupFailureService;
 
     @Autowired
     DocumentQueryService documentQueryService;
@@ -180,7 +230,7 @@ class PgVectorInfrastructureTest {
                 PgVectorSmokeAssertions.verifyExactCosineSearch(jdbcTemplate);
 
         assertThat(serverVersion).isBetween(160000, 169999);
-        assertThat(successfulMigrations).isEqualTo(12L);
+        assertThat(successfulMigrations).isEqualTo(13L);
         assertThat(result.extensionVersion()).isEqualTo("0.8.2");
         assertThat(documentCount).isZero();
         assertThat(versionCount).isZero();
@@ -641,6 +691,296 @@ class PgVectorInfrastructureTest {
     }
 
     @Test
+    void cleanupWorkerDeletesPendingFilesTreatsMissingFilesAsCompletedAndDoesNotReclaimCompletedJobs() throws Exception {
+        assumeSecureFileDeletionSupported();
+        String existingKey = "documents/cleanup/worker-existing.txt";
+        String missingKey = "documents/cleanup/worker-missing.txt";
+        Path existingFile = STORAGE_ROOT.resolve(existingKey);
+        Files.createDirectories(existingFile.getParent());
+        Files.writeString(existingFile, "orphan", StandardCharsets.UTF_8);
+
+        try {
+            fileCleanupJobService.registerPendingCleanup(existingKey);
+            assertThat(fileCleanupCoordinator.processNext()).isTrue();
+            assertThat(Files.exists(existingFile)).isFalse();
+            assertThat(cleanupStatus(existingKey)).isEqualTo("COMPLETED");
+            assertThat(fileCleanupCoordinator.processNext()).isFalse();
+
+            fileCleanupJobService.registerPendingCleanup(missingKey);
+            assertThat(fileCleanupCoordinator.processNext()).isTrue();
+            assertThat(cleanupStatus(missingKey)).isEqualTo("COMPLETED");
+        }
+        finally {
+            jdbcTemplate.update("DELETE FROM file_cleanup_jobs WHERE storage_key IN (?, ?)", existingKey, missingKey);
+            Files.deleteIfExists(existingFile);
+        }
+    }
+
+    @Test
+    void cleanupClaimSkipsLockedFirstJobAndClaimsNextJobBeforeLockRelease() throws Exception {
+        String firstStorageKey = "documents/cleanup/skip-locked-first.txt";
+        String secondStorageKey = "documents/cleanup/skip-locked-second.txt";
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        CountDownLatch firstRowLocked = new CountDownLatch(1);
+        CountDownLatch releaseFirstLock = new CountDownLatch(1);
+        Future<Void> firstLockTransaction = null;
+
+        try {
+            fileCleanupJobService.registerPendingCleanup(firstStorageKey);
+            fileCleanupJobService.registerPendingCleanup(secondStorageKey);
+            jdbcTemplate.update(
+                    "UPDATE file_cleanup_jobs SET available_at = now() - INTERVAL '2 seconds' WHERE storage_key = ?",
+                    firstStorageKey);
+            jdbcTemplate.update(
+                    "UPDATE file_cleanup_jobs SET available_at = now() - INTERVAL '1 second' WHERE storage_key = ?",
+                    secondStorageKey);
+            long firstJobId = jdbcTemplate.queryForObject(
+                    "SELECT id FROM file_cleanup_jobs WHERE storage_key = ?", Long.class, firstStorageKey);
+            long secondJobId = jdbcTemplate.queryForObject(
+                    "SELECT id FROM file_cleanup_jobs WHERE storage_key = ?", Long.class, secondStorageKey);
+
+            firstLockTransaction = executor.submit(() -> {
+                TransactionTemplate lockTransaction = new TransactionTemplate(transactionManager);
+                lockTransaction.executeWithoutResult(status -> {
+                    Long lockedJobId = jdbcTemplate.queryForObject(
+                            "SELECT id FROM file_cleanup_jobs WHERE id = ? FOR UPDATE", Long.class, firstJobId);
+                    assertThat(lockedJobId).isEqualTo(firstJobId);
+                    firstRowLocked.countDown();
+                    awaitLatch(releaseFirstLock);
+                });
+                return null;
+            });
+            assertThat(firstRowLocked.await(5, TimeUnit.SECONDS)).isTrue();
+
+            Future<Optional<ClaimedFileCleanupJob>> secondClaimTransaction = executor.submit(() -> {
+                TransactionTemplate claimTransaction = new TransactionTemplate(transactionManager);
+                return claimTransaction.execute(status -> {
+                    jdbcTemplate.execute("SET LOCAL lock_timeout = '2s'");
+                    return fileCleanupJobClaimService.claimNext();
+                });
+            });
+            ClaimedFileCleanupJob secondClaim = secondClaimTransaction.get(5, TimeUnit.SECONDS).orElseThrow();
+
+            assertThat(releaseFirstLock.getCount()).isOne();
+            assertThat(secondClaim.fileCleanupJobId()).isEqualTo(secondJobId);
+            assertThat(secondClaim.fileCleanupJobId()).isNotEqualTo(firstJobId);
+            assertThat(cleanupStatus(firstStorageKey)).isEqualTo("PENDING");
+            assertThat(cleanupStatus(secondStorageKey)).isEqualTo("PROCESSING");
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT claim_version FROM file_cleanup_jobs WHERE storage_key = ?", Long.class, secondStorageKey))
+                    .isGreaterThan(0L);
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT lease_expires_at IS NOT NULL FROM file_cleanup_jobs WHERE storage_key = ?",
+                    Boolean.class,
+                    secondStorageKey)).isTrue();
+
+            releaseFirstLock.countDown();
+            firstLockTransaction.get(5, TimeUnit.SECONDS);
+
+            ClaimedFileCleanupJob firstClaim = fileCleanupJobClaimService.claimNext().orElseThrow();
+            assertThat(firstClaim.fileCleanupJobId()).isEqualTo(firstJobId);
+            assertThat(firstClaim.fileCleanupJobId()).isNotEqualTo(secondClaim.fileCleanupJobId());
+        }
+        finally {
+            releaseFirstLock.countDown();
+            if (firstLockTransaction != null) {
+                firstLockTransaction.get(5, TimeUnit.SECONDS);
+            }
+            executor.shutdownNow();
+            assertThat(executor.awaitTermination(5, TimeUnit.SECONDS)).isTrue();
+            jdbcTemplate.update(
+                    "DELETE FROM file_cleanup_jobs WHERE storage_key IN (?, ?)", firstStorageKey, secondStorageKey);
+        }
+    }
+
+    @Test
+    void cleanupWorkerConvergesToCompletedAfterCompletionUpdateFailureAndLeaseRecovery() throws Exception {
+        assumeSecureFileDeletionSupported();
+        String storageKey = "documents/cleanup/completion-update-failure.txt";
+        Path file = STORAGE_ROOT.resolve(storageKey);
+        Files.createDirectories(file.getParent());
+        Files.writeString(file, "orphan", StandardCharsets.UTF_8);
+        FileCleanupCompletionService failingCompletionService = new FileCleanupCompletionService(fileCleanupJobRepository) {
+            @Override
+            public void complete(ClaimedFileCleanupJob job) {
+                throw new DataAccessResourceFailureException("simulated completion update failure");
+            }
+        };
+        FileCleanupCoordinator coordinatorWithFailingCompletion = new FileCleanupCoordinator(
+                fileCleanupJobClaimService,
+                fileStorage,
+                failingCompletionService,
+                fileCleanupFailureClassifier,
+                fileCleanupFailureService);
+
+        try {
+            fileCleanupJobService.registerPendingCleanup(storageKey);
+            assertThat(coordinatorWithFailingCompletion.processNext()).isTrue();
+            assertThat(Files.exists(file)).isFalse();
+            assertThat(cleanupStatus(storageKey)).isEqualTo("PROCESSING");
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT attempts FROM file_cleanup_jobs WHERE storage_key = ?", Integer.class, storageKey))
+                    .isZero();
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT lease_expires_at IS NOT NULL FROM file_cleanup_jobs WHERE storage_key = ?",
+                    Boolean.class,
+                    storageKey)).isTrue();
+
+            long jobId = jdbcTemplate.queryForObject(
+                    "SELECT id FROM file_cleanup_jobs WHERE storage_key = ?", Long.class, storageKey);
+            long initialClaimVersion = jdbcTemplate.queryForObject(
+                    "SELECT claim_version FROM file_cleanup_jobs WHERE storage_key = ?", Long.class, storageKey);
+            ClaimedFileCleanupJob staleClaim = new ClaimedFileCleanupJob(
+                    jobId, storageKey, 0, initialClaimVersion, Instant.EPOCH);
+
+            jdbcTemplate.update(
+                    "UPDATE file_cleanup_jobs SET lease_expires_at = now() - INTERVAL '1 second' WHERE storage_key = ?",
+                    storageKey);
+            assertThat(fileCleanupJobRecoveryService.recoverNext()).isTrue();
+            assertThat(cleanupStatus(storageKey)).isEqualTo("RETRY_WAIT");
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT attempts FROM file_cleanup_jobs WHERE storage_key = ?", Integer.class, storageKey))
+                    .isEqualTo(1);
+            assertThatThrownBy(() -> fileCleanupCompletionService.complete(staleClaim))
+                    .isInstanceOf(StaleFileCleanupJobClaimException.class);
+
+            jdbcTemplate.update(
+                    "UPDATE file_cleanup_jobs SET available_at = now() - INTERVAL '1 second' WHERE storage_key = ?",
+                    storageKey);
+            assertThat(fileCleanupCoordinator.processNext()).isTrue();
+            assertThat(cleanupStatus(storageKey)).isEqualTo("COMPLETED");
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT claim_version FROM file_cleanup_jobs WHERE storage_key = ?", Long.class, storageKey))
+                    .isGreaterThan(initialClaimVersion);
+            assertThat(Files.exists(file)).isFalse();
+        }
+        finally {
+            jdbcTemplate.update("DELETE FROM file_cleanup_jobs WHERE storage_key = ?", storageKey);
+            Files.deleteIfExists(file);
+        }
+    }
+
+    @Test
+    void cleanupWorkerClaimsOnceWithSkipLockedAndRecoversAnExpiredClaim() throws Exception {
+        String storageKey = "documents/cleanup/worker-recovery.txt";
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        CountDownLatch start = new CountDownLatch(1);
+        try {
+            fileCleanupJobService.registerPendingCleanup(storageKey);
+            List<Future<Optional<com.prizm.cleanup.service.ClaimedFileCleanupJob>>> futures = List.of(
+                    executor.submit(() -> {
+                        start.await(5, TimeUnit.SECONDS);
+                        return fileCleanupJobClaimService.claimNext();
+                    }),
+                    executor.submit(() -> {
+                        start.await(5, TimeUnit.SECONDS);
+                        return fileCleanupJobClaimService.claimNext();
+                    }));
+            start.countDown();
+            List<com.prizm.cleanup.service.ClaimedFileCleanupJob> claims = futures.stream()
+                    .map(future -> {
+                        try {
+                            return future.get(5, TimeUnit.SECONDS);
+                        }
+                        catch (Exception exception) {
+                            throw new IllegalStateException(exception);
+                        }
+                    })
+                    .flatMap(Optional::stream)
+                    .toList();
+            assertThat(claims).hasSize(1);
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT status FROM file_cleanup_jobs WHERE storage_key = ?", String.class, storageKey))
+                    .isEqualTo("PROCESSING");
+
+            jdbcTemplate.update(
+                    "UPDATE file_cleanup_jobs SET lease_expires_at = now() - INTERVAL '1 second' WHERE storage_key = ?",
+                    storageKey);
+            assertThat(fileCleanupJobRecoveryService.recoverNext()).isTrue();
+            assertThat(cleanupStatus(storageKey)).isEqualTo("RETRY_WAIT");
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT attempts FROM file_cleanup_jobs WHERE storage_key = ?", Integer.class, storageKey))
+                    .isEqualTo(1);
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT last_error_code FROM file_cleanup_jobs WHERE storage_key = ?", String.class, storageKey))
+                    .isEqualTo("LEASE_EXPIRED");
+            assertThatThrownBy(() -> fileCleanupCompletionService.complete(claims.get(0)))
+                    .isInstanceOf(com.prizm.cleanup.exception.StaleFileCleanupJobClaimException.class);
+        }
+        finally {
+            executor.shutdownNow();
+            jdbcTemplate.update("DELETE FROM file_cleanup_jobs WHERE storage_key = ?", storageKey);
+        }
+    }
+
+    @Test
+    void staleCleanupClaimCannotOverwriteRetryOrFailureStateOwnedByNewWorker() {
+        String storageKey = "documents/cleanup/stale-failure-fencing.txt";
+        try {
+            fileCleanupJobService.registerPendingCleanup(storageKey);
+            ClaimedFileCleanupJob workerA = fileCleanupJobClaimService.claimNext().orElseThrow();
+            jdbcTemplate.update(
+                    "UPDATE file_cleanup_jobs SET lease_expires_at = now() - INTERVAL '1 second' WHERE storage_key = ?",
+                    storageKey);
+
+            assertThat(fileCleanupJobRecoveryService.recoverNext()).isTrue();
+            assertThat(cleanupStatus(storageKey)).isEqualTo("RETRY_WAIT");
+            jdbcTemplate.update(
+                    "UPDATE file_cleanup_jobs SET available_at = now() - INTERVAL '1 second' WHERE storage_key = ?",
+                    storageKey);
+            ClaimedFileCleanupJob workerB = fileCleanupJobClaimService.claimNext().orElseThrow();
+            assertThat(workerB.fileCleanupJobId()).isEqualTo(workerA.fileCleanupJobId());
+            assertThat(workerB.claimVersion()).isEqualTo(workerA.claimVersion() + 2);
+
+            CleanupJobState workerBState = cleanupJobState(storageKey);
+            assertThat(workerBState.status()).isEqualTo("PROCESSING");
+            assertThat(workerBState.attempts()).isEqualTo(1);
+            assertThat(workerBState.claimVersion()).isEqualTo(workerB.claimVersion());
+            assertThat(workerBState.leaseExpiresAt()).isNotNull();
+            assertThat(workerBState.lastErrorCode()).isEqualTo("LEASE_EXPIRED");
+            assertThat(workerBState.completedAt()).isNull();
+
+            assertThatThrownBy(() -> fileCleanupFailureService.handleFailure(
+                    workerA,
+                    new CleanupFailure(true, "STALE_WORKER_RETRY")))
+                    .isInstanceOf(StaleFileCleanupJobClaimException.class);
+            assertThat(cleanupJobState(storageKey)).isEqualTo(workerBState);
+
+            assertThatThrownBy(() -> fileCleanupFailureService.handleFailure(
+                    workerA,
+                    new CleanupFailure(false, "STALE_WORKER_FAIL")))
+                    .isInstanceOf(StaleFileCleanupJobClaimException.class);
+            assertThat(cleanupJobState(storageKey)).isEqualTo(workerBState);
+        }
+        finally {
+            jdbcTemplate.update("DELETE FROM file_cleanup_jobs WHERE storage_key = ?", storageKey);
+        }
+    }
+
+    @Test
+    void cleanupWorkerMarksInvalidStorageKeyAsFailedWithoutRetry() {
+        String storageKey = "/not-a-relative-storage-key";
+        try {
+            jdbcTemplate.update(
+                    "INSERT INTO file_cleanup_jobs(storage_key, status, attempts, available_at, created_at, updated_at) "
+                            + "VALUES (?, 'PENDING', 0, now(), now(), now())",
+                    storageKey);
+
+            assertThat(fileCleanupCoordinator.processNext()).isTrue();
+            assertThat(cleanupStatus(storageKey)).isEqualTo("FAILED");
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT attempts FROM file_cleanup_jobs WHERE storage_key = ?", Integer.class, storageKey))
+                    .isZero();
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT last_error_code FROM file_cleanup_jobs WHERE storage_key = ?", String.class, storageKey))
+                    .isEqualTo("PERMANENT_STORAGE_ERROR");
+        }
+        finally {
+            jdbcTemplate.update("DELETE FROM file_cleanup_jobs WHERE storage_key = ?", storageKey);
+        }
+    }
+
+    @Test
     void recoversExpiredLeaseAndRejectsCompletionFromTheOldWorker() {
         PendingJobFixture fixture = createPendingIndexingJob("중단 복구 문서");
 
@@ -910,6 +1250,51 @@ class PgVectorInfrastructureTest {
         jdbcTemplate.update("DELETE FROM users");
     }
 
+    private String cleanupStatus(String storageKey) {
+        return jdbcTemplate.queryForObject(
+                "SELECT status FROM file_cleanup_jobs WHERE storage_key = ?", String.class, storageKey);
+    }
+
+    private CleanupJobState cleanupJobState(String storageKey) {
+        return jdbcTemplate.queryForObject(
+                """
+                SELECT status, attempts, claim_version, lease_expires_at, available_at,
+                       last_error_code, completed_at, updated_at
+                FROM file_cleanup_jobs
+                WHERE storage_key = ?
+                """,
+                (resultSet, rowNum) -> new CleanupJobState(
+                        resultSet.getString("status"),
+                        resultSet.getInt("attempts"),
+                        resultSet.getLong("claim_version"),
+                        resultSet.getTimestamp("lease_expires_at"),
+                        resultSet.getTimestamp("available_at"),
+                        resultSet.getString("last_error_code"),
+                        resultSet.getTimestamp("completed_at"),
+                        resultSet.getTimestamp("updated_at")),
+                storageKey);
+    }
+
+    private void assumeSecureFileDeletionSupported() throws IOException {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(STORAGE_ROOT.getRoot())) {
+            Assumptions.assumeTrue(
+                    stream instanceof SecureDirectoryStream<?>,
+                    "SecureDirectoryStream is not available in this test environment.");
+        }
+    }
+
+    private void awaitLatch(CountDownLatch latch) {
+        try {
+            if (!latch.await(5, TimeUnit.SECONDS)) {
+                throw new IllegalStateException("Timed out waiting for the test transaction latch.");
+            }
+        }
+        catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted while waiting for the test transaction latch.", exception);
+        }
+    }
+
     private long createActiveVectorDocumentVersion(Long ownerUserId) {
         return createActiveVectorDocument(ownerUserId, "Vector search verification").versionId();
     }
@@ -1098,11 +1483,35 @@ class PgVectorInfrastructureTest {
         }
     }
 
+    private static final class ExternalDatabaseLifecycle implements Startable {
+
+        @Override
+        public void start() {
+            // The caller owns the lifecycle of the explicitly configured integration-test database.
+        }
+
+        @Override
+        public void stop() {
+            // The caller owns the lifecycle of the explicitly configured integration-test database.
+        }
+    }
+
     private record PendingJobFixture(
             Long ownerUserId,
             Long documentId,
             Long documentVersionId,
             Long processingJobId) {
+    }
+
+    private record CleanupJobState(
+            String status,
+            int attempts,
+            long claimVersion,
+            java.sql.Timestamp leaseExpiresAt,
+            java.sql.Timestamp availableAt,
+            String lastErrorCode,
+            java.sql.Timestamp completedAt,
+            java.sql.Timestamp updatedAt) {
     }
 
     private record ActiveVectorDocument(Long documentId, Long versionId) {

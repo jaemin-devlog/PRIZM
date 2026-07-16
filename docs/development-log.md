@@ -217,3 +217,55 @@
 - 변경: Career Vault의 기존 검색 입력을 `POST /api/career-evidence/search`에 연결해 인증 사용자의 관련 원문 근거를 최대 5개 카드로 표시한다.
 - 표시: 문서 제목·버전·출처 라벨·원문·원래 score를 보여주며, 빈 배열은 근거를 찾지 못했다는 중립 문구로 처리한다. score는 `1 - distance` 계약이므로 퍼센트로 단정하지 않는다.
 - 보존: 기존 문서 목록·유형 필터·TXT/PDF 업로드·인증 만료 처리를 유지하며, AI 답변·근거 저장·백엔드 변경은 추가하지 않았다.
+
+## 2026-07-15 — 고아 원본 파일 Cleanup Worker
+
+- 변경: V13에서 cleanup 작업을 `PENDING`, `PROCESSING`, `RETRY_WAIT`, `COMPLETED`, `FAILED` 상태로 확장하고, PostgreSQL `FOR UPDATE SKIP LOCKED`와 lease·claim version으로 짧게 선점한 뒤 파일 삭제를 DB 트랜잭션 밖에서 실행하도록 구현했다.
+- 실패 처리: 상대 storage key의 경로 이탈·절대 경로·일반 파일이 아닌 대상은 영구 실패로, 일반 파일 시스템 I/O 오류는 기존 1분·5분·15분 backoff와 최대 3회 재시도 정책으로 처리한다. 이미 삭제된 파일은 멱등 성공으로 완료 처리한다.
+- 복구·검증: 만료된 PROCESSING lease는 재시도 또는 최종 실패로 회수하며, Docker PostgreSQL 16+pgvector 통합 테스트로 V1~V13 migration, SKIP LOCKED 단일 선점, 만료 claim 회수와 실제 파일 삭제를 확인했다. OpenSQL 실환경 테스트는 기존 정책대로 제외한다.
+
+## 2026-07-15 — Cleanup 저장 경로 부모 심볼릭 링크 차단
+
+- 보완: Cleanup 삭제와 원본 읽기 경로에서 storage root부터 대상 부모까지 모든 기존 경로 요소를 `NOFOLLOW_LINKS`로 검사하고, 심볼릭 링크·비디렉터리 부모를 영구 저장소 오류로 거부한다. storage root와 대상 부모의 real path containment도 추가로 확인한다.
+- 한계: 지원 파일 시스템별 `SecureDirectoryStream` 보장을 전제하지 않아 검사와 삭제 사이의 로컬 파일 시스템 TOCTOU 교체 가능성은 남아 있다. 부모 심볼릭 링크 생성 테스트는 현재 Windows 환경의 권한 제한 시 JUnit assumption으로 명시적으로 제외된다.
+
+## 2026-07-15 — Cleanup 완료 DB 실패와 파일 삭제 실패 분리
+
+- 보완: Cleanup Coordinator에서 파일 삭제 예외만 실패 분류·재시도 처리하고, 물리 삭제 후 COMPLETED 갱신 예외는 PROCESSING lease를 유지한 채 별도로 기록한다. 완료 갱신의 stale claim도 실패 상태 전이로 바꾸지 않는다.
+- 검증: 실제 PostgreSQL에서 삭제 성공 뒤 완료 갱신 실패를 재현하고, lease 만료 회수 후 파일 없음 멱등 삭제와 새 claim version의 COMPLETED 전환으로 수렴함을 확인했다.
+
+## 2026-07-15 — Cleanup SKIP LOCKED 행 잠금 통합 검증
+
+- 검증: 첫 별도 transaction이 정렬상 먼저 선택될 PENDING cleanup 행을 `FOR UPDATE`로 잠근 상태에서, 두 번째 별도 transaction이 실제 claim SQL을 실행해 잠긴 행을 기다리지 않고 다음 행을 `PROCESSING`으로 선점함을 PostgreSQL에서 확인했다. 첫 lock 해제 전 두 번째 claim 완료와 lease·claim version 갱신을 assertion으로 검증했다.
+
+## 2026-07-15 — 오픈소스 엔진 전환 실행 계획
+
+- 방향: PRIZM의 본체를 문서 처리·근거 검색·커리어 구조화·포트폴리오 생성을 제공하는 self-hosted 오픈소스 엔진으로 정의하고, 현재 Career Vault는 개인용 참조 애플리케이션으로 역할을 변경했다.
+- 계획: 구현 기준선, 거버넌스, Quickstart, port/adapter 경계, canonical source, CareerFact, portfolio, API v1, 멀티모듈 패키징, 기관 scope, 최종 감사의 11단계 실행 계획을 `docs/oss-transition-execution-plan.md`에 기록했다.
+- 운영: 각 단계에 Codex 권장 모델·추론 강도, 실행 프롬프트, 완료 조건과 독립 검토 프롬프트를 포함했으며 독립 검토가 통과하기 전에는 완료 상태로 바꾸지 않도록 정했다.
+
+## 2026-07-15 — Engine과 Reference App 제품 경계 기준선
+
+- 설계 결정: PRIZM Engine을 문서·version·원본·비동기 processing·출처 검색의 본체로, `frontend/` Career Vault를 개인용 Reference App으로 정의했다. 현재 단일 Spring Boot project는 아직 독립 engine artifact나 완전한 adapter 구조가 아님을 명시했다.
+- 구현 진실성: 실제 프런트엔드의 최대 5개 Career Evidence UI와 전체 처리 구간 lease heartbeat를 현재 기능으로 바로잡고, CareerFact·portfolio·MCP·`/api/v1`·OpenSQL HA는 계획으로 분리했다. V12 cleanup 등록은 기준선, dirty worktree의 V13 cleanup Worker는 독립 검토 전 작업으로 구분했다.
+- 제품 방향: 이전 B2C 가격·전환율 검토는 역사적 가설로 보존하되 현재 결론에서 내리고, 오픈소스 엔진 재사용성과 Reference App 검증을 우선하도록 장기 기획안을 현행화했다. 단계 0 상태는 독립 검토 전이므로 `IN_PROGRESS`로 유지한다.
+
+## 2026-07-15 — 단계 0 독립 검토 지적 문서 정합성 보완
+
+- 결정: 공식 제품 정의를 재사용 가능한 PRIZM Engine과 이를 검증하는 Reference App으로 통일하고, Career Vault를 개인용 활용·통합 예제로 한정했다.
+- 정합성: 실행 계획 단계 8의 module graph를 유일한 canonical target으로 지정하고, TXT 전용 JavaDoc과 `.env.example`의 PDF·Cleanup 환경변수 누락을 알려진 기술 부채로 기록했다.
+- 검증: Markdown 로컬 링크 37개와 code fence 39개를 검사해 누락·미종료 0건을 확인했고 `git diff --check`를 통과했다. 애플리케이션 테스트는 문서 전용 작업이므로 실행하지 않았다.
+- 다음: 1차 독립 검토 지적은 수정했지만 독립 재검토 전이므로 단계 0은 `IN_PROGRESS`로 유지한다.
+
+## 2026-07-15 — 단계 0 2차 독립 재검토 JavaDoc 기술 부채 보완
+
+- 검토 결과: 2차 독립 재검토는 기존 목록에서 `DocumentIndexingProcessor`, `IngestionProperties`, `TextChunker`의 오래된 TXT 전용 JavaDoc이 빠진 점을 Medium finding으로 판정해 FAIL했다.
+- 전수 검사: `src/main/java` 122개 Java 파일의 JavaDoc 100개 블록과 일반 주석을 검색해 `DocumentController`, `DocumentUploadService`를 포함한 다섯 곳을 부정확한 설명으로 확정했다. PDF 전용 설정과 TXT 전용 decode·오류·출처 분기는 실제 책임에 맞아 제외했다.
+- 후속 결정: 다섯 JavaDoc을 `docs/project-status.md`의 알려진 기술 부채와 실행 계획 단계 3 범위에 모두 연결했다. Java source·`.env.example`·V13 Cleanup Worker는 수정하지 않았으며 단계 0은 재검토 전까지 `IN_PROGRESS`다.
+- 검증: 저장소 Markdown 10개의 로컬 링크 37개와 code fence 균형을 확인하고 `git diff --check`를 통과했다. 문서 전용 작업이므로 애플리케이션 테스트는 실행하지 않았다.
+
+## 2026-07-16 — Cleanup Worker 감사 완료와 단계 0 마감
+
+- Cleanup 기준선: V13 Cleanup Worker는 descriptor-relative `SecureDirectoryStream` 삭제, symlink·부모 교체 TOCTOU 방어, lease·claim-version fencing, retry/backoff·recovery와 삭제 뒤 DB 완료 실패의 멱등 수렴을 포함해 최종 감사에서 CRITICAL/HIGH/MEDIUM finding 없이 통과했다. `86387e7c227ede3be96c538aafc48b0205bc5e18`가 main에 병합됐다.
+- 단계 0 결정: 최종 독립 재검토 PASS에 따라 Engine/Reference App 제품 경계와 단계 8 canonical module graph를 확정하고 단계 0을 `COMPLETE`로 변경했다. 다섯 오래된 TXT 전용 JavaDoc은 단계 3, `.env.example` 불일치는 단계 2 후속 대상으로 남긴다.
+- 남은 경계: OpenSQL profile·조건부 integration test는 실제 OpenSQL/OpenProxy/OpenHA 호환성 증명이 아니며, OpenSQL 단일 migration·vector 검색, OpenProxy runtime, OpenHA 장애전환·검색 복구 순으로 검증한다. V13 CHECK·backfill 회귀 테스트와 SecureDirectoryStream 미지원 filesystem의 fail-closed 운영 문서는 LOW backlog다.

@@ -1,19 +1,30 @@
 # PRIZM 최종 기획안
 
-**부제:** 내 경험의 근거를 원문으로 연결하는 AI 커리어 문서 플랫폼
-**문서 버전:** 1.0
+**부제:** 커리어 문서의 근거를 구조화하는 오픈소스 Career Intelligence Engine
+**문서 버전:** 1.1
 **작성 기준일:** 2026-07-13
+**방향 현행화:** 2026-07-15
 **개발 목표일:** 2026-08-27
 **대상 과제:** 2026 공개SW 개발자대회 티맥스티베로 지정과제 — OpenSQL 기반 AI 검색 및 벡터 데이터 플랫폼 개발
 
-> **문서 성격:** 이 문서는 장기 제품 목표와 설계 가설을 설명합니다. outbox, generation, MCP, 경력 근거 카드, 지원 패키지, OpenSQL HA 등은 구현 예정 항목을 포함합니다. 현재 실제 구현 범위는 [PRIZM 현재 구현 현황](project-status.md)을 기준으로 확인합니다.
+> **문서 성격:** 이 문서는 장기 제품 목표와 설계 가설, 그리고 이전 B2C 검토의 역사적 결정을 함께 보존합니다. outbox, generation, MCP, CareerFact, portfolio, OpenSQL HA 등은 구현 예정 항목을 포함합니다. 현재 실제 구현 범위는 [PRIZM 현재 구현 현황](project-status.md), 제품 책임 경계는 [오픈소스 제품 경계](architecture/oss-product-boundary.md)를 기준으로 확인합니다.
 
-### 2026-07-14 구현 반영 요약
+### 2026-07-15 오픈소스 엔진 방향 현행화
+
+- 현재 최종 방향은 재사용 가능한 **PRIZM Engine**과 이를 검증하는 Reference App을 제품 경계로 두는 것입니다. `frontend/`의 **Career Vault**는 개인 활용과 통합 방식을 보여주는 첫 Reference App입니다.
+- 이전 문서의 B2C 사용자·가격·전환율 검토는 당시 제품가설의 근거를 보존하기 위해 삭제하지 않습니다. 다만 현재 구현 우선순위나 확정 수익모델이 아니며, 오픈소스 엔진의 활용 사례를 검증할 때 다시 평가할 역사적 가설로 내립니다.
+- 현재 코드는 아직 단일 Spring Boot project이며 독립 엔진 artifact, CareerFact, portfolio, MCP, OpenSQL HA가 구현된 상태가 아닙니다. 물리적 분리는 [오픈소스 엔진 전환 실행 계획](oss-transition-execution-plan.md)의 후속 단계입니다.
+
+### 2026-07-16 구현 기준선 반영 요약
 
 - 구현됨: JWT 로그인, 사용자별 문서·버전·작업·청크 격리, 12개 문서 유형과 필터, TXT·텍스트 PDF 업로드, PDF 페이지 출처, 비동기 색인과 원자적 ACTIVE 전환, 단일 검색, 최대 5개 Career Evidence 검색 API
 - 안전장치: 임베딩 차원·유한값·0-norm 검증, PDF 최대 300페이지·추출 텍스트 2,000,000자 제한
-- 프런트엔드: 로그인, Career Vault 목록·단일 유형 필터, TXT·PDF 업로드, 단일 검색 결과 표시
-- 미구현: 새 문서 버전 업로드 API, 경력 근거 카드, 공고 분석·매칭, 지원 패키지, MCP, OpenSQL·OpenProxy·OpenHA 실환경 검증
+- 프런트엔드: 로그인, Career Vault 목록·단일 유형 필터, TXT·PDF 업로드, 최대 5개 Career Evidence 결과 표시
+- 추가 기반: 전체 처리 구간 lease heartbeat, rollback 보상 삭제 실패용 V12 cleanup job 등록과 V13 Cleanup Worker
+- Cleanup Worker: `PENDING/PROCESSING/RETRY_WAIT/COMPLETED/FAILED`, PostgreSQL `FOR UPDATE SKIP LOCKED`, lease·claim-version fencing, 1분·5분·15분 retry/backoff·recovery, descriptor-relative `SecureDirectoryStream` 삭제와 부모 symlink·TOCTOU 방어. 삭제 성공 뒤 DB 완료 갱신 실패도 recovery가 멱등 수렴시킨다. `86387e7c227ede3be96c538aafc48b0205bc5e18`가 main에 병합되었고 최종 감사에 CRITICAL/HIGH/MEDIUM finding은 없었다.
+- 미구현: 새 문서 version 업로드 API, CareerFact, portfolio, 공고 분석·매칭, MCP, `/api/v1`, OpenSQL·OpenProxy·OpenHA 실환경 검증
+
+OpenSQL profile과 조건부 integration test는 있으나 PostgreSQL 성공은 OpenSQL 성공이 아니다. OpenSQL·OpenProxy·OpenHA는 실제 환경 미검증이며, 다음 기술 우선순위는 OpenSQL 단일 환경 migration·vector 검색, OpenProxy runtime 연결, OpenHA 장애전환·검색 복구 검증 순서다. V13의 `claim_version >= 0` CHECK, populated V12 row V13 backfill 전용 회귀 테스트, `SecureDirectoryStream` 미지원 filesystem의 fail-closed Quickstart·운영 제약 표기는 LOW backlog로 남는다.
 
 ---
 
@@ -21,23 +32,25 @@
 
 PRIZM의 최종 주제는 **PRIZM**으로 확정한다.
 
-PRIZM은 **OpenSQL 기반 공개SW 문서근거 플랫폼을 개인 커리어에 적용한 참조 B2C 서비스**다. 사용자가 직접 업로드한 이력서·포트폴리오·프로젝트 자료·수료증·채용공고를 장기적으로 축적하고, 새 채용공고의 요구사항과 관련된 실제 경험을 원문·페이지·버전과 함께 찾아준다. 업로드·임베딩·버전·outbox·MCP·장애복구는 같은 저장소의 도메인 독립 모듈로 구현하며, PRIZM 화면은 그 코어의 실제 활용가치를 증명한다.
+PRIZM은 **커리어 문서의 분석, 정보 구조화, 근거 검색 및 포트폴리오 생성을 위한 오픈소스 Career Intelligence Engine과 이를 검증하는 Reference App**이다. 개인뿐 아니라 대학, 취업 지원기관, 기업 및 개발자가 각자의 환경에 맞는 커리어 관리 서비스를 구축할 수 있도록 재사용 가능한 모듈과 확장 지점을 제공하는 것을 목표로 한다. Career Vault는 엔진의 개인용 활용과 통합 방식을 보여주는 첫 Reference App이다.
+
+현재 구현은 이 목표의 기반인 문서 등록·version·원본 보존, 추출·청킹·embedding, owner-scoped 검색과 Worker 복구까지다. CareerFact, portfolio, outbox, MCP, 독립 engine module과 OpenSQL HA는 계획이며 구현된 것처럼 표현하지 않는다.
 
 제품의 핵심은 이력서를 대신 써주는 생성형 AI가 아니다. AI는 사용자의 전체 커리어 문서에서 관련 근거 **후보**를 검색하고, 사용자가 확인한 연결만 경력 근거로 확정한다. 자료에서 확인되지 않은 경험이나 숫자는 만들지 않고 “현재 Vault에서 근거를 찾지 못함”으로 표시한다.
 
 ### 30초 피치
 
-> PRIZM은 OpenSQL 기반 공개SW 문서근거 플랫폼을 개인 커리어에 적용한 참조 B2C 서비스입니다. 커리어 문서와 채용공고를 올리면 자동 임베딩·버전 동기화·MCP 검색을 수행하고, 공고 요건마다 관련 경험과 원문 위치를 연결합니다. 근거 없는 수치는 만들지 않으며 회사별 실제 제출본의 version ID를 고정합니다. 즉, 개인에게는 커리어 근거 보관함을, 대회에는 재사용 가능한 기업형 AI 문서 플랫폼 코어를 보여줍니다.
+> PRIZM은 커리어 문서의 version과 원본을 보존하고, 비동기 추출·embedding과 owner-scoped 검색으로 실제 경험의 원문 근거를 찾는 오픈소스 엔진을 지향합니다. 현재 Career Vault Reference App은 개인용 업로드와 최대 5개 근거 검색을 보여줍니다. CareerFact와 portfolio, MCP, OpenSQL HA는 다음 단계에서 증명할 계획입니다.
 
 ### 핵심 결정 7개
 
-1. **주제는 B2C다.** 최종 사용자는 개인이며, 기업의 채용판정이나 지원자 순위화 기능을 만들지 않는다.
+1. **본체는 오픈소스 엔진이다.** Career Vault는 개인용 Reference App이며 B2C 가격은 역사적 검증 가설로 보존한다.
 2. **문서 업로드가 출발점이다.** 공공데이터 수집이 아니라 사용자가 자신의 문서를 올려 즉시 검색가치를 얻는다.
 3. **자소서 생성기가 아니다.** 검색·출처·버전·제출 스냅샷을 핵심으로 삼는다.
 4. **AI가 사실을 인증하지 않는다.** 검색된 근거는 후보이며 사용자가 확인한 연결만 확정한다.
 5. **현재본과 제출본을 분리한다.** Vault 검색은 최신 ACTIVE 버전을, 지원 패키지는 당시 고정된 버전을 사용한다.
 6. **개인정보 격리를 제품의 최우선 불변식으로 둔다.** 다른 사용자의 문서는 검색 후보에도 들어가지 않는다.
-7. **1인 MVP는 텍스트 PDF·TXT와 한 직군에 집중한다.** 기본 데모는 백엔드 개발자 채용으로 제한한다.
+7. **현재 수직 슬라이스는 텍스트 PDF·TXT와 개인 Career Vault에 집중한다.** 기관 scope와 완성형 career product를 한 번에 구현하지 않는다.
 
 ---
 
@@ -56,7 +69,7 @@ PRIZM은 **OpenSQL 기반 공개SW 문서근거 플랫폼을 개인 커리어에
 - MCP 기반 검색 API
 - OpenSQL의 고가용성·보안·관리 기능
 
-PRIZM은 이 흐름을 소비자 커리어 문서라는 구체적인 사용 장면으로 구현한다.
+PRIZM은 이 흐름을 재사용 가능한 Engine으로 구현하고, Career Vault Reference App에서 개인 커리어 문서라는 첫 사용 장면을 검증한다.
 
 | 지정과제 요소 | PRIZM 적용 | 시연 증거 |
 |---|---|---|
@@ -88,6 +101,8 @@ PRIZM에서 OpenSQL은 단순 저장소가 아니다.
 - 사람인과 원티드는 공고 맞춤 이력서 분석·코칭을 제공하고, Teal은 이력서 작성·지원 추적·공고 맞춤 기능을 제공한다.
 
 **검증이 필요한 가설**
+
+아래 지불의사·가격 가설은 2026-07-13 B2C 검토의 역사적 항목입니다. 현재 오픈소스 엔진 roadmap의 Go/No-Go 기준으로 사용하지 않습니다.
 
 - 사용자는 현재 이력서 한 장보다 과거 자료 전체에서 경험을 찾는 데 가치를 느낀다.
 - 출처·페이지·버전이 보이는 결과가 일반 AI 생성보다 신뢰와 지불의사를 높인다.
@@ -147,7 +162,7 @@ NotebookLM은 PDF·웹·오디오 등 다양한 출처 업로드와 출처 기�
 
 ### 3.1 한 문장 정의
 
-**PRIZM은 사용자가 업로드한 전체 커리어 문서에서 채용공고와 관련된 경험을 찾아 원문·페이지·버전으로 연결하고, 회사별 실제 제출본을 보존하는 개인 커리어 검색 플랫폼이다.**
+**PRIZM은 커리어 문서의 분석, 정보 구조화, 근거 검색 및 포트폴리오 생성을 위한 오픈소스 Career Intelligence Engine과 이를 검증하는 Reference App이다. 개인뿐 아니라 대학, 취업 지원기관, 기업 및 개발자가 각자의 환경에 맞는 커리어 관리 서비스를 구축할 수 있도록 재사용 가능한 모듈과 확장 지점을 제공한다.**
 
 ### 3.2 브랜드 의미
 
@@ -163,7 +178,7 @@ NotebookLM은 PDF·웹·오디오 등 다양한 출처 업로드와 출처 기�
 
 `Zero-stale`은 모든 장애에서 절대 무중단을 보장한다는 뜻이 아니다. 미완성본과 오래된 처리결과가 정상 검색경로에 섞이지 않도록 설계하고 실제 복구시간을 측정한다는 목표다.
 
-### 3.3 핵심 가치제안
+### 3.3 Career Vault Reference App 핵심 가치제안
 
 #### 대학생·신입 구직자
 
@@ -195,7 +210,7 @@ NotebookLM은 PDF·웹·오디오 등 다양한 출처 업로드와 출처 기�
 
 ---
 
-## 4. 사용자와 사용 생애주기
+## 4. Career Vault Reference App 사용자와 활용 생애주기
 
 ### 4.1 핵심 사용자
 
@@ -284,6 +299,8 @@ flowchart LR
 
 ## 6. 기능 요구사항과 범위
 
+이 절은 장기 목표 요구사항입니다. 표의 `Must`는 현재 구현 완료 표시가 아니며, 구현 여부는 [현재 구현 현황](project-status.md)의 matrix를 따릅니다.
+
 ### 6.1 MVP 필수기능 — Must
 
 | ID | 기능 | 인수 기준 |
@@ -342,6 +359,8 @@ flowchart LR
 ---
 
 ## 7. 상태모델과 핵심 불변식
+
+이 절에는 목표 상태모델이 포함됩니다. 현재 version은 `QUARANTINED/PROCESSING/ACTIVE/FAILED`, processing job은 `PENDING/RETRY_WAIT/PROCESSING/COMPLETED/FAILED`만 구현하며 `SUPERSEDED`, `generation`, application snapshot은 아직 없습니다.
 
 ### 7.1 문서 버전 상태
 
@@ -570,7 +589,7 @@ MVP에서 사용자는 검색결과의 원문을 선택해 카드를 저장한�
 |---|---|
 | `documents` | 사용자 소유 논리문서와 active pointer |
 | `document_versions` | 원본·추출상태·버전·해시 |
-| chunk·embedding | BGE-M3 1024차원 검색 단위와 처리 generation |
+| chunk·embedding | BGE-M3 1024차원 검색 단위와 TXT/PDF 출처 |
 | `processing_jobs` | 추출·임베딩 비동기 작업 |
 | lease·`claim_version` | Worker 복구와 stale 완료 차단 |
 | JWT·SYSTEM_ADMIN/USER | 인증기반과 초기 역할 |
@@ -642,7 +661,9 @@ erDiagram
 
 ---
 
-## 11. 시스템 아키텍처
+## 11. 목표 시스템 아키텍처
+
+아래 그림은 전환이 끝난 뒤의 목표입니다. 현재는 단일 Spring Boot 서버, host Ollama, local file storage, PostgreSQL 16+pgvector와 별도 React Reference App이며 MCP, Career/Job/Package service, OpenProxy/OpenHA topology는 구현되지 않았습니다.
 
 ```mermaid
 flowchart TB
@@ -768,7 +789,7 @@ GET    /api/operations/jobs              # SYSTEM_ADMIN, content-minimized
 
 MVP는 `search_career_evidence` 하나를 완성한다. `match_job_requirements`, `check_claim_support`, `get_application_package`는 REST 화면으로 제공하고 MCP 후속범위로 남긴다. 검색·매칭 확정·패키지 변경을 MCP에서 수행하지 않는다.
 
-기준일 현재 MCP 2025-11-25 규격의 Streamable HTTP와 JSON-RPC를 구현하고 `/mcp` 단일 endpoint를 제공한다. 제출 직전 최신 규격을 다시 확인하며, 실제 검증한 호환 client 이름·버전과 호출 로그를 공개한다. [MCP 공식 전송 규격](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports)
+MCP를 구현하는 단계에서는 당시 최신 공식 규격의 Streamable HTTP와 JSON-RPC를 검토하고 `/mcp` 단일 endpoint를 목표로 한다. 현재 MCP endpoint는 없다. 제출 직전 규격을 다시 확인하고, 실제 검증한 호환 client 이름·version과 호출 로그가 있을 때만 지원을 주장한다. [MCP 공식 전송 규격](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports)
 
 ### 12.3 MCP 보안규칙
 
@@ -837,7 +858,9 @@ PRIZM의 가장 큰 제품위험은 실제 성과근거가 회사 기밀문서�
 
 ---
 
-## 14. OpenSQL·고가용성 설계
+## 14. 목표 OpenSQL·고가용성 설계
+
+이 절은 실제 환경에서 검증해야 할 목표입니다. 현재 성공 근거는 PostgreSQL 16+pgvector 통합 테스트이며 OpenSQL, OpenProxy, OpenHA 지원을 증명하지 않습니다. 확인 절차는 [OpenSQL 기술 Gate](opensql-gate.md)에 분리합니다.
 
 ### 14.1 OpenSQL의 역할
 
@@ -896,7 +919,9 @@ PRIZM의 가장 큰 제품위험은 실제 성과근거가 회사 기밀문서�
 
 ---
 
-## 15. MVP 4화면·UX 기획
+## 15. 목표 MVP 4화면·UX 기획
+
+현재 Reference App은 로그인, Career Vault 목록·단일 유형 필터, TXT/PDF 업로드, 최대 5개 원문 근거 검색만 제공합니다. 아래 4화면은 구현 완료 목록이 아닙니다.
 
 ### 화면 1. Career Vault·업로드
 
@@ -1035,6 +1060,8 @@ pgvector는 로컬 PoC의 기준선이자 OpenSQL 목표 구현경로다. OpenSQ
 
 ## 18. 시장성·경쟁구도
 
+이 절은 Career Vault 활용 사례를 선택할 때 조사한 시장 배경입니다. PRIZM Engine의 채택·기여·통합 수요를 검증하는 오픈소스 지표와는 구분합니다.
+
 ### 18.1 왜 지금 필요한가
 
 고용노동부가 공개한 2025년 조사에서 응답 기업 396개사의 52.8%는 청년 채용 시 `전문성`을 우선 요구했고, 85.4%는 지원자의 일경험이 입사 후 조직·직무 적응에 도움이 된다고 평가했다. 경험 평가 시에는 직무 관련성 84.0%, 경험을 통해 만든 성과 43.9%가 주요 기준으로 나타났다. 이는 사용자가 경험을 단순 나열하지 않고 공고와 연결해 구체적으로 설명해야 한다는 문제근거다. [고용노동부 기업 채용동향 조사](https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=18595)
@@ -1045,7 +1072,7 @@ pgvector는 로컬 PoC의 기준선이자 OpenSQL 목표 구현경로다. OpenSQ
 
 이 수치는 PRIZM의 구매를 보장하지 않는다. **직무경험 설명의 중요성, AI 취업도구의 사용, 반복되는 이동**이 존재한다는 시장배경이며, 실제 업로드 의향과 결제는 별도 실험으로 검증한다.
 
-### 18.2 우선 고객
+### 18.2 역사적 B2C 우선 사용자 가설
 
 | 순위 | 사용자 | 핵심 상황 | 지불가치 가설 |
 |---:|---|---|---|
@@ -1070,7 +1097,7 @@ pgvector는 로컬 PoC의 기준선이자 OpenSQL 목표 구현경로다. OpenSQ
 
 따라서 발표에서 “경쟁자가 없다”라고 말하지 않는다. 핵심 진입점은 다음 한 줄이다.
 
-> PRIZM은 이력서를 대신 쓰는 도구가 아니라, 공고 요구사항→경력 주장→원문·페이지·버전→실제 제출본을 잇는 개인 커리어 근거 원장이다.
+> Career Vault Reference App은 이력서를 대신 쓰는 도구가 아니라, 공고 요구사항→경력 주장→원문·페이지·버전→실제 제출본을 잇는 개인 커리어 근거 원장 활용 시나리오다.
 
 ### 18.4 제품가설 검증 게이트
 
@@ -1089,7 +1116,9 @@ pgvector는 로컬 PoC의 기준선이자 OpenSQL 목표 구현경로다. OpenSQ
 
 ---
 
-## 19. B2C 사업모델
+## 19. 역사적 B2C 사업모델 가설
+
+이 절은 2026-07-13에 검토한 개인용 hosted product 가설과 가격 실험안을 의사결정 이력으로 보존합니다. 2026-07-15 현재 PRIZM의 본체는 오픈소스 엔진이고 Career Vault는 Reference App이므로, 아래 가격·전환율·매출 민감도는 현재 roadmap의 결론이나 확정 수익모델이 아닙니다. 향후 hosted distribution을 실제로 검토할 때만 최신 비용·수요 자료로 다시 검증합니다.
 
 ### 19.1 요금제 가설
 
@@ -1142,12 +1171,12 @@ pgvector는 로컬 PoC의 기준선이자 OpenSQL 목표 구현경로다. OpenSQ
 
 ### 20.1 대회 제출물의 정체성
 
-PRIZM은 B2C 화면만 만든 SaaS가 아니다. 다음 두 층을 함께 개발한다.
+PRIZM은 B2C 화면을 중심으로 한 SaaS가 아니다. 다음 두 층의 경계를 순서대로 확정한다.
 
-1. **PRIZM App**: 개인이 공고와 경력 근거를 연결하는 참조제품
-2. **PRIZM Document Evidence Core**: 같은 저장소 안에서 업로드·임베딩·버전·outbox 동기화·owner 격리·MCP·lease/fencing·스냅샷을 담당하는 도메인 독립 공개SW 모듈
+1. **PRIZM Engine**: 문서·version·원본, processing, source-preserving retrieval을 기반으로 CareerFact와 검증된 portfolio까지 확장하는 self-hosted 오픈소스 엔진
+2. **Career Vault Reference App**: 개인이 엔진의 업로드·검색 흐름을 사용하는 예제 제품
 
-즉, B2C 문제로 가치를 설명하고 재사용 가능한 문서 플랫폼 코어로 공개SW성을 증명한다. 대학 포트폴리오, 연구노트, 자격증명, 개인 지식보관함도 같은 코어 위에 별도 도메인 adapter로 만들 수 있다.
+즉, 개인 커리어 문제는 엔진의 첫 활용 사례이지 제품 본체의 가격정책을 결정하는 경계가 아니다. 대학·취업지원기관과 다른 개발자는 같은 엔진을 별도 adapter와 Reference App으로 재사용할 수 있어야 한다. 현재는 단일 project이므로 이 재사용성은 후속 단계에서 package dependency와 두 번째 예제로 증명한다.
 
 ### 20.2 공개 범위와 라이선스
 
@@ -1160,7 +1189,9 @@ PRIZM은 B2C 화면만 만든 SaaS가 아니다. 다음 두 층을 함께 개발
 
 제3자 라이브러리·모델·폰트·샘플문서는 각 원 라이선스를 유지하고 NOTICE와 SBOM에 기록한다. release 전 특허·상표·모델 라이선스 충돌과 재배포 조건을 검사한다.
 
-### 20.3 호스팅으로 돈을 버는 이유
+### 20.3 역사적 hosted distribution 가설
+
+현재 수익모델은 확정하지 않습니다. 아래 내용은 향후 hosted distribution을 선택할 때 오픈소스 엔진과 유료 운영편의를 어떻게 구분할지 검토한 원칙으로만 보존합니다.
 
 오픈소스 코어의 기능을 일부러 망가뜨려 유료화를 강제하지 않는다. 개인이 로컬 PostgreSQL 프로필로 직접 운영할 수 있게 하고, 유료 Hosted PRIZM은 다음 운영편의에 과금한다.
 
@@ -1185,7 +1216,9 @@ issue template에 재현환경·문서유형·개인정보 제거 여부를 강�
 
 ---
 
-## 21. 6.5주 제출 일정과 의사결정 게이트
+## 21. 역사적 6.5주 제출 일정과 의사결정 게이트
+
+이 절은 2026-07-13 기획 당시의 일정과 의사결정 이력입니다. 2026-07-15 이후 구현 순서와 완료 상태는 [오픈소스 엔진 전환 실행 계획](oss-transition-execution-plan.md)이 대체하며, 아래 날짜가 현재 단계의 완료를 뜻하지 않습니다.
 
 ### 21.1 공식 일정
 
@@ -1287,9 +1320,9 @@ issue template에 재현환경·문서유형·개인정보 제거 여부를 강�
 
 진위를 인증하지 않는다. 사용자가 업로드한 자료 안에서 해당 주장을 뒷받침할 원문을 찾고, 없거나 일부만 있으면 그대로 표시한다. 제3기관의 경력·자격 검증은 범위 밖이다.
 
-### Q4. 기업용 OpenSQL 지정과제인데 왜 B2C인가?
+### Q4. 기업용 OpenSQL 지정과제인데 왜 개인용 Career Vault가 있는가?
 
-서비스 사용자는 개인이지만 운영환경은 민감한 개인문서를 다루는 다중사용자 플랫폼이다. owner 격리, 관계형 상태와 벡터의 정합성, version 전환, 삭제, 장애복구가 필요하다. 같은 공개SW 코어는 교육기관의 개인 포트폴리오 서비스에도 재사용할 수 있다.
+Career Vault는 엔진의 개인 활용을 검증하는 Reference App이다. 민감한 개인문서를 다루므로 owner 격리, 관계형 상태와 vector의 정합성, version 전환과 장애복구가 필요하며, 같은 공개SW 엔진을 교육기관의 portfolio service 같은 별도 애플리케이션에서 재사용하는 것이 목표다. OpenSQL 적합성은 실제 환경 Gate를 통과한 범위만 주장한다.
 
 ### Q5. PostgreSQL로도 가능한데 OpenSQL이 왜 필요한가?
 
@@ -1313,7 +1346,7 @@ issue template에 재현환경·문서유형·개인정보 제거 여부를 강�
 
 ### Q10. Worker가 죽었다가 뒤늦게 완료하면 어떻게 막는가?
 
-DB 시간 기반 lease와 증가하는 `claim_version`을 사용한다. chunk에는 generation을 기록하고, 완료 갱신은 현재 lease owner와 claim version이 모두 맞는 Worker만 성공한다. 검색도 `ready_generation`과 일치하는 chunk만 허용한다.
+현재 구현은 DB 시간 기반 lease, 전체 처리 구간 heartbeat와 증가하는 `claim_version`을 사용한다. 완료 transaction이 현재 claim을 다시 확인하므로 stale Worker는 청크 저장과 ACTIVE 전환을 커밋할 수 없다. chunk generation과 `ready_generation`은 아직 없으며 processing provenance 단계에서 도입 여부를 검증한다.
 
 ### Q11. DB 장애조치가 정말 무중단인가?
 
@@ -1333,7 +1366,7 @@ active 전환 직후와 핵심 검색은 Primary 전용 경로를 사용하거�
 
 ### Q15. 단순 SaaS이지 공개SW 프로젝트는 아닌 것 아닌가?
 
-업로드·버전·outbox·검색·MCP·owner 격리·lease/fencing·스냅샷 코어, 합성 데이터, Docker 개발환경, OpenSQL profile, 시험과 SBOM을 Apache License 2.0으로 공개한다. PRIZM은 코어의 가치와 완성도를 보여주는 참조 B2C 제품이고, 수익은 호스팅·저장·운영편의에서 만든다.
+본체를 PRIZM Engine으로 정의하고 Career Vault를 Reference App으로 분리한다. 현재 구현된 업로드·version·검색·owner 격리·lease/fencing을 먼저 재현 가능하게 공개하고, outbox·MCP·snapshot·SBOM·OpenSQL 호환성은 실제 구현과 검증 이후에만 제출 범위에 넣는다. hosted 수익은 과거 가설이며 오픈소스 엔진의 기능 경계를 훼손하는 전제가 아니다.
 
 ---
 
@@ -1359,51 +1392,32 @@ active 전환 직후와 핵심 검색은 Primary 전용 경로를 사용하거�
 
 ### 24.3 권장 저장소 구조
 
-다음은 장기 모듈화 목표 구조이며 현재 저장소의 실제 디렉터리 구조가 아닙니다. 1인 MVP 단계에서는 기능 경계가 충분히 안정되기 전 멀티모듈 전환을 선행하지 않습니다.
+현재 오픈소스 전환의 canonical target은 [오픈소스 엔진 전환 실행 계획](oss-transition-execution-plan.md) 단계 8의 목표 구조입니다. 아래 구조는 이를 그대로 옮긴 것이며 현재 저장소의 실제 디렉터리 구조가 아닙니다. 단계 3에서 논리적 port·adapter 경계를 안정화하고 단계 7에서 public contract를 확정한 뒤에만 단계 8에서 물리적 멀티모듈 분리를 수행합니다.
 
 ```text
-prizm/
-├─ apps/
-│  ├─ api/                    # Spring Boot REST
-│  └─ web/                    # B2C Web
-├─ modules/
-│  ├─ document-core/          # 문서·version·active pointer
-│  ├─ ingestion-worker/       # 추출·chunk·embedding·lease/fencing
-│  ├─ evidence-search/        # exact search·source contract
-│  ├─ career-domain/          # project·evidence·requirement·package
-│  ├─ auth-scope/             # principal·owner policy
-│  └─ mcp-server/             # 읽기 tool 1개
-├─ database/
-│  ├─ migrations/
-│  ├─ rls-experiments/
-│  └─ synthetic-seed/
-├─ deploy/
-│  ├─ postgres-local/
-│  └─ opensql-ha/             # 설정·설치문서; 비허용 바이너리 제외
-├─ benchmark/
-│  ├─ corpus/
-│  ├─ labels/
-│  └─ reports/
-├─ tests/
-│  ├─ isolation/
-│  ├─ concurrency/
-│  ├─ failure-injection/
-│  ├─ deletion/
-│  └─ license/
-├─ docs/
-│  ├─ architecture/
-│  ├─ threat-model.md
-│  ├─ opensql-compatibility.md
-│  ├─ demo-script.md
-│  └─ evaluation-card.md
-├─ LICENSE
-├─ NOTICE
-├─ SECURITY.md
-├─ CONTRIBUTING.md
-├─ CODE_OF_CONDUCT.md
-├─ CHANGELOG.md
-└─ README.md
+modules/
+  prizm-contracts
+  prizm-document-core
+  prizm-ingestion
+  prizm-evidence-search
+  prizm-career-analysis
+  prizm-portfolio
+  adapter-parser-pdfbox
+  adapter-embedding-ollama
+  adapter-search-pgvector
+  adapter-storage-local
+  prizm-spring-boot-starter
+
+apps/
+  prizm-server
+  career-vault-reference-web
+
+examples/
+  personal-vault
+  university-portfolio
 ```
+
+database, deploy, benchmark, test, docs와 거버넌스 파일은 이 module graph를 지원하는 저장소 구성요소이지 별도의 경쟁하는 제품 모듈 경계가 아닙니다. canonical target이 바뀌면 실행 계획 단계 8을 먼저 변경하고 이 절은 그 결정을 따라야 합니다.
 
 ### 24.4 시험 매트릭스
 
@@ -1443,38 +1457,40 @@ prizm/
 
 ### 25.1 프로젝트명
 
-**PRIZM — 내 경험의 근거를 원문으로 연결하는 AI 커리어 문서 플랫폼**
+**PRIZM — 커리어 문서의 근거를 구조화하는 오픈소스 Career Intelligence Engine**
 
 ### 25.2 “그래서 무슨 프로젝트인가?”에 대한 쉬운 답
 
-> 내가 예전에 만든 이력서·포트폴리오·프로젝트 보고서를 올려두면, 새 채용공고에 필요한 경험이 어느 문서 몇 페이지에 있는지 찾아주는 서비스다. AI가 없는 경력을 만들어주지 않고, 내가 실제로 확인한 근거와 그때 제출한 문서 버전을 함께 보관한다.
+> 커리어 문서를 version과 원본 출처를 보존한 채 처리하고, 필요한 경험이 어느 문서의 어떤 구간이나 페이지에 있는지 찾는 self-hosted 오픈소스 엔진이다. 현재 Career Vault는 개인이 TXT·PDF를 올리고 원문 근거를 찾는 Reference App이며, 문서에 없는 경력은 만들지 않는다.
 
 ### 25.3 제출용 500자 요약
 
-PRIZM은 개인이 이력서, 포트폴리오, 프로젝트 보고서와 채용공고를 업로드하면 공고 요구사항과 관련된 경력 근거를 원문·페이지·문서 버전과 함께 찾아주는 AI 커리어 문서 플랫폼입니다. AI는 경력의 진위나 합격 가능성을 판정하지 않고 후보만 제시하며, 사용자가 확인한 연결과 실제 제출본을 이후 문서 수정에 영향받지 않는 version 고정 스냅샷으로 보관합니다. 사용자가 원문을 삭제하면 해당 내용은 파기하고 `CONTENT_DELETED`로 표시합니다. 완성된 최신 문서만 검색하고 Worker 장애는 lease·fencing·generation으로 복구하며, OpenSQL 환경에서 문서 상태와 벡터의 정합성을 유지합니다. MCP로 외부 AI에서도 본인 근거를 안전하게 조회하고 공개SW 코어와 합성 평가데이터를 공개합니다. B2C 서비스는 무료 Vault·90일 Job Sprint·연간 Career Memory의 수익성을 단계적으로 검증합니다.
+PRIZM은 커리어 문서를 version과 원본 출처를 보존한 채 처리하고 검색하는 self-hosted 오픈소스 엔진을 지향합니다. 현재 Spring Boot 기반은 JWT owner 격리, TXT·텍스트 PDF 원본 저장, 비동기 추출·청킹·BGE-M3 embedding, lease·heartbeat·fencing 복구, PostgreSQL pgvector exact 검색과 원자적 ACTIVE 전환을 제공합니다. React Career Vault Reference App은 개인용 목록·필터·업로드와 최대 5개 원문 근거 검색을 보여줍니다. 등록 문서에서 확인되지 않은 경력·기술·성과·수치는 만들지 않습니다. CareerFact, 검증된 portfolio, `/api/v1`, MCP, 교체 가능한 adapter와 OpenSQL HA는 향후 구현·검증 범위입니다.
 
 ### 25.4 최종 결정표
 
 | 항목 | 최종안 |
 |---|---|
-| 서비스 | 개인용 커리어 근거 검색·버전 보관 B2C |
-| 핵심 사용자 | 2~8년차 지식근로자, 프로젝트형 취업준비생, 프리랜서 |
+| 제품 본체 | self-hosted 오픈소스 PRIZM Engine |
+| Reference App | 개인용 Career Vault |
+| 첫 사용자 | 2~8년차 지식근로자, 프로젝트형 취업준비생, 프리랜서 |
 | 핵심 입력 | 사용자가 권리를 가진 이력서·프로젝트자료·포트폴리오·채용공고 |
-| 핵심 출력 | 공고요건별 원문 근거, 부분·미발견 표시, version 고정 제출 패키지 |
+| 현재 출력 | 문서·version·TXT 구간/PDF 페이지가 연결된 단일 또는 최대 5개 검색 결과 |
+| 목표 출력 | CareerFact와 source manifest가 있는 검증된 portfolio |
 | AI 책임 | 후보 검색·정렬·메타데이터 제안; 진위·합격 판정과 근거 없는 생성 금지 |
-| 기술 핵심 | OpenSQL, pgvector 호환검증, BGE-M3, outbox, lease/fencing/generation, MCP |
-| 차별점 | 공고→주장→원문·페이지·version→실제 제출본의 provenance chain |
-| 수익가설 | Free Vault + 90일 Job Sprint + 검증 후 연간 Career Memory |
-| 공개SW | 재사용 가능한 Document Evidence Core와 합성 benchmark 공개 |
+| 현재 기술 | PostgreSQL 16+pgvector, BGE-M3, version·owner 격리, lease/heartbeat/fencing |
+| 검증 전 목표 | OpenSQL/OpenProxy/OpenHA, outbox, generation, MCP |
+| 수익가설 | 현재 결론 없음; 이전 B2C 가격안은 역사적 가설로 보존 |
+| 공개SW | 재사용 가능한 Engine, 기본 adapter, Reference App과 합성 benchmark |
 | 제외 | 기업 지원자 랭킹, 자동지원, 합격예측, OCR, 회사 내부문서 수집, 완전자동 작성 |
 
 ### 25.5 최종 판단
 
-PRIZM은 문서 업로드가 부가절차가 아니라 가치의 출발점이고, 일반인이 직접 질문·검색할 수 있으며, 진위인증·합격예측을 제외해 규제와 오판 피해를 좁게 통제할 수 있다. 동시에 버전·벡터·MCP·장애복구·OpenSQL을 제품가치와 자연스럽게 연결한다.
+PRIZM은 문서 업로드가 부가절차가 아니라 가치의 출발점이고, 진위인증·합격예측을 제외해 오판 피해를 좁게 통제한다. 현재 구현은 version·vector 검색·owner 격리·Worker 장애복구라는 엔진 기반을 증명한다. MCP와 OpenSQL HA는 제품가치에 연결할 목표이지만 아직 구현·검증 근거가 없다.
 
-다만 “가장 넓고 안정적으로 돈을 번다”는 결론은 아직 아니다. **기술과 대회 적합성은 GO, 시장과 가격은 조건부 GO**다. 업로드 의향·근거 승인율·90일 결제와 출시 후 12주 재방문 게이트를 통과할 때만 지속 가능한 B2C 사업으로 확정한다.
+현재 결론은 **오픈소스 엔진 전환과 Career Vault Reference App 유지**다. 기술 기반은 다음 단계로 진행하되 재사용 가능한 package, clean-clone 실행, CareerFact·portfolio와 OpenSQL 환경은 각각 실행 가능한 증거가 생길 때만 완료로 판단한다. B2C 시장·가격은 현재 우선 결론이 아니며, 향후 hosted distribution을 선택할 때만 별도 Gate로 다시 검증한다.
 
-> 최종 권고: 주제는 PRIZM으로 확정하되, “AI 이력서 생성기”가 아니라 “커리어 근거 원장과 공개SW 문서 플랫폼 코어”로 제출한다.
+> 최종 권고: 프로젝트명은 PRIZM으로 유지하고, 본체는 오픈소스 커리어 인텔리전스 엔진, Career Vault는 그 개인용 Reference App으로 제출한다.
 
 ---
 

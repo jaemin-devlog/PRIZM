@@ -8,13 +8,19 @@ Do not rename the project to CareerProof or PRIZM CareerProof.
 
 ## Current product direction
 
-PRIZM is a personal career evidence document platform.
+PRIZM is an open-source Career Intelligence Engine and a set of Reference
+Applications for career-document analysis, information structuring,
+evidence-backed search, and portfolio generation.
 
-Users will store resumes, portfolios, project reports, school assignments,
-certificates, career reviews, job postings, and previous application documents.
+The product target is to provide reusable modules and extension points so
+individuals, universities, career-support organizations, companies, and
+developers can build career-management services suited to their environments.
 
-PRIZM will search those documents to find real experiences and original evidence
-that can be used for future job applications.
+The current Career Vault is the personal Reference App that demonstrates the
+Engine's capabilities and integration patterns. It is not the whole PRIZM
+product. Reusable engine modules, structured CareerFact data, and verified
+portfolio generation remain planned work until source and executable tests prove
+otherwise.
 
 ## Core principle
 
@@ -49,6 +55,8 @@ Do not implement the full career product unless a later task explicitly requests
 - database revalidation of users and roles
 - content hashing
 - original file storage
+- orphan-file cleanup job processing with lease, claim-version fencing, retry/backoff, and recovery
+- descriptor-relative cleanup deletion with SecureDirectoryStream fail-closed behavior
 - Flyway migrations
 - OpenSQL compatibility work
 - user ownership across documents, versions, jobs, and chunks
@@ -57,7 +65,7 @@ Do not implement the full career product unless a later task explicitly requests
 - text-layer PDF validation, page extraction, and configured processing limits
 - embedding dimension, finite-value, and non-zero-norm validation
 - the existing single-result search and five-result Career Evidence API contracts
-- frontend login, Career Vault list/filter, TXT/PDF upload, and single-result search flows
+- frontend login, Career Vault list/filter, TXT/PDF upload, and up-to-five-result Career Evidence search flows
 
 ## Do not assume
 
@@ -95,7 +103,7 @@ platform value.
 - Do not commit `.env`, credentials, tokens, uploaded originals, database volumes,
   model files, IDE metadata, build output, or frontend dependency output.
 - Keep the frontend honest about its current scope. Login, list/filter, TXT/PDF upload,
-  and single-result search are implemented; document detail and multi-evidence UI are not.
+  and up-to-five-result Career Evidence search are implemented; document detail is not.
 - Record meaningful implementation, refactoring, design, and infrastructure
   verification work briefly in `docs/development-log.md`.
 

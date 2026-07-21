@@ -269,3 +269,16 @@
 - Cleanup 기준선: V13 Cleanup Worker는 descriptor-relative `SecureDirectoryStream` 삭제, symlink·부모 교체 TOCTOU 방어, lease·claim-version fencing, retry/backoff·recovery와 삭제 뒤 DB 완료 실패의 멱등 수렴을 포함해 최종 감사에서 CRITICAL/HIGH/MEDIUM finding 없이 통과했다. `86387e7c227ede3be96c538aafc48b0205bc5e18`가 main에 병합됐다.
 - 단계 0 결정: 최종 독립 재검토 PASS에 따라 Engine/Reference App 제품 경계와 단계 8 canonical module graph를 확정하고 단계 0을 `COMPLETE`로 변경했다. 다섯 오래된 TXT 전용 JavaDoc은 단계 3, `.env.example` 불일치는 단계 2 후속 대상으로 남긴다.
 - 남은 경계: OpenSQL profile·조건부 integration test는 실제 OpenSQL/OpenProxy/OpenHA 호환성 증명이 아니며, OpenSQL 단일 migration·vector 검색, OpenProxy runtime, OpenHA 장애전환·검색 복구 순으로 검증한다. V13 CHECK·backfill 회귀 테스트와 SecureDirectoryStream 미지원 filesystem의 fail-closed 운영 문서는 LOW backlog다.
+
+## 2026-07-16 — OpenSQL 단일 환경 SQL 호환성 Gate 준비
+
+- 테스트: PostgreSQL Testcontainers와 opt-in 외부 OpenSQL 실행이 같은 assertion suite를 사용해 V1~V13·schema·pgvector 1024차원·실제 `VectorSearchRepository`·Indexing/Cleanup claim·lease·fencing·recovery·두 connection의 `SKIP LOCKED`를 검증하도록 구성했다.
+- 격리: 외부 실행은 `RUN_OPENSQL_TESTS=true`와 새 검증 전용 DB/schema 확인이 필요하며 runtime/Flyway 접속을 별도 환경변수로 받는다. Spring context, Scheduler, 파일 삭제, Ollama·Reranker·GPU는 사용하지 않고 실패 출력은 Migration·SQLState·SQL 기능으로 제한한다.
+- PostgreSQL 검증: Docker Desktop 28.2.2의 PostgreSQL 16+pgvector 컨테이너에서 공통 suite 1개를 통과했고, 전체 unit test 186개는 176개 성공·환경 조건 10개 skip·실패 0개였다. OpenSQL 환경변수 없이 외부 Gate 1개가 실제 접속 없이 skip되는 것도 확인했다.
+- 상태: 테스트 준비는 OpenSQL 호환성 통과가 아니다. 실제 OpenSQL 환경이 없어 현재 결과는 `NOT_RUN`이며 PostgreSQL 기준 검증과 분리한다. OpenProxy와 OpenHA도 계속 미검증이다.
+
+## 2026-07-21 — OpenSQL Gate 대상 동일성·데이터 안전성 보강
+
+- 안전성: Flyway와 runtime을 migration 전에 각각 빈 대상으로 확인하고, migration 뒤 Flyway가 만든 비활성 UUID marker를 runtime이 읽어야만 fixture를 시작하도록 했다. 전역 domain 삭제를 제거하고 실행별 UUID·생성 ID만 정리한다.
+- 회귀 검증: 별도 datasource 정상 경로와 기존 V13 sentinel runtime·서로 다른 빈 runtime 오설정 경로를 Docker PostgreSQL 16+pgvector에서 3건 모두 통과했으며 sentinel 데이터 보존과 marker fail-closed를 확인했다.
+- 상태: 실제 OpenSQL 환경은 사용하지 않아 결과는 계속 `NOT_RUN`이다. OpenProxy·OpenHA·Ollama도 이번 검증에 사용하지 않았다.

@@ -2,7 +2,7 @@
 
 이 문서는 로컬 PostgreSQL 개발 결과를 OpenSQL 3 환경으로 옮기기 전에 확인할 외부 의존성과 증거를 기록한다. 체크되지 않은 항목을 추정으로 완료 처리하지 않는다.
 
-> **현재 상태(2026-07-14):** PostgreSQL 16·pgvector와 실제 Ollama 통합 테스트는 성공했지만 OpenSQL, OpenProxy, OpenHA 실환경은 아직 검증하지 않았다. 현재 구현 범위는 [PRIZM 현재 구현 현황](project-status.md)을 참고하며, 이 Gate의 미확인 항목은 그대로 유지한다.
+> **현재 상태(2026-07-16):** PostgreSQL 16·pgvector 기준선과 OpenSQL 단일 환경용 실행 가능한 호환성 suite는 있지만, OpenSQL, OpenProxy, OpenHA 실환경은 아직 검증하지 않았다. 현재 구현 범위는 [PRIZM 현재 구현 현황](project-status.md)을 참고하며, 이 Gate의 미확인 항목은 그대로 유지한다.
 
 ## 완료 기준
 
@@ -53,12 +53,27 @@ SELECT vector_dims(array_fill(0::real, ARRAY[1024])::vector);
 SELECT '[1,0]'::vector <=> '[1,0]'::vector AS cosine_distance;
 ```
 
-런타임 JDBC와 별도로 확정한 Flyway 경로에 환경변수를 주입한 뒤 다음 smoke test로 확인한다.
+런타임 JDBC와 Flyway JDBC를 분리하고, 애플리케이션과 Worker가 연결되지 않은 새 검증 전용 DB 또는 schema임을 확인한 뒤 다음 suite를 실행한다. 변수 값은 shell history, 문서, 테스트 출력에 남기지 않는다.
 
 ```powershell
 $env:RUN_OPENSQL_TESTS='true'
+$env:PRIZM_OPENSQL_VERIFICATION_TARGET_CONFIRMED='true'
+$env:PRIZM_DB_URL='<runtime JDBC URL>'
+$env:PRIZM_DB_USERNAME='<runtime user>'
+$env:PRIZM_DB_PASSWORD='<runtime password>'
+$env:PRIZM_FLYWAY_URL='<migration JDBC URL>'
+$env:PRIZM_FLYWAY_USERNAME='<migration user>'
+$env:PRIZM_FLYWAY_PASSWORD='<migration password>'
 .\gradlew.bat integrationTest --no-daemon --tests com.prizm.infrastructure.OpenSqlInfrastructureTest
 ```
+
+`RUN_OPENSQL_TESTS`가 없으면 이 테스트는 `SKIPPED`이며 OpenSQL 성공 증거가 아니다. suite는 Spring application context를 띄우지 않으므로 Indexing/Cleanup Scheduler와 Ollama를 사용하지 않는다. V1~V13, schema, `vector(1024)`·`CAST`·`vector_dims`·`<=>`, 실제 `VectorSearchRepository`, Indexing/Cleanup claim·lease·fencing·recovery SQL과 두 connection의 `FOR UPDATE SKIP LOCKED`를 검증한다. 파일 삭제, HNSW, OpenProxy, OpenHA는 범위 밖이다.
+
+안전 검증은 환경변수 확인만 신뢰하지 않는다. Migration 전에 Flyway와 runtime datasource가 가리키는 schema를 각각 독립 조회해 base table이 하나라도 있거나 조회 권한이 불충분하면 fixture 생성 전에 실패한다. V1~V13 적용 후에는 Flyway 계정이 비활성 UUID marker 사용자 한 건을 만들고, runtime 계정이 같은 ID와 UUID를 읽은 경우에만 실제 SQL fixture 검증을 시작한다. `current_database()`·`current_schema()`·`search_path` 같은 이름 정보만으로 동일 대상을 판정하지 않는다.
+
+suite는 domain table 전체 `DELETE`나 `TRUNCATE`를 사용하지 않는다. 모든 fixture는 실행별 UUID로 식별하고 생성 ID 또는 UUID storage key만 FK 역순으로 `finally` 정리하며, marker도 정확한 ID와 email 조건으로만 삭제한다. 검증 중 외부 애플리케이션이나 Worker가 같은 DB/schema에 쓰지 않는 독점 실행을 전제로 한다.
+
+실패 결과는 단계와 Migration 번호, SQLState, SQL 기능 범주만 포함한다. 전체 JDBC URL, host, 계정과 비밀번호는 출력하지 않는다.
 
 ## 3. 연결과 역할
 
@@ -67,6 +82,7 @@ $env:RUN_OPENSQL_TESTS='true'
 | Migration 연결 | 검증된 migration endpoint에서 Flyway migration 성공 | 미확인 | OpenProxy DDL 지원 여부 확인 후 endpoint 확정 |
 | Runtime 연결 | 애플리케이션 계정으로 CRUD 가능 | 미확인 | |
 | 역할 분리 | Runtime 계정에 DDL·`BYPASSRLS` 권한 없음 | 미확인 | |
+| 검증 schema | 양쪽 preflight가 base table 0개이고 Flyway UUID marker를 runtime이 동일하게 조회 | 미확인 | 기존 데이터 또는 부분 schema가 있으면 fixture 전 fail-closed |
 | OpenProxy 경유 | 런타임 애플리케이션이 직접 Primary 주소 없이 기동 | 미확인 | |
 | TLS/네트워크 | 요구되는 SSL mode와 방화벽 규칙 확정 | 미확인 | |
 | Connection pool | timeout과 pool 크기 기준 기록 | 미확인 | |

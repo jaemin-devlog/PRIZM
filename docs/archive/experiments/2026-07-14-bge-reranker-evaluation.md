@@ -45,4 +45,4 @@ Dense 검색의 상위 20개 후보를 `BAAI/bge-reranker-v2-m3` Cross-Encoder�
 - CPU 지연과 메모리 비용이 현재 Reference App의 상호작용 경로에 부적합하다.
 - 외부 Python 실행 도구, 모델 배포·캐시와 제3자 라이선스 검토 범위를 늘리지만 현재 품질 이득이 이를 정당화하지 못한다.
 
-따라서 Reranker Java/Python 코드는 `main`에 보존하지 않는다. Dense 평가 하네스, 합성 데이터와 측정 방법은 [검색 품질 평가](../search-evaluation.md)에 유지한다. 이후 재평가는 더 큰 고정 TEST corpus, 명시적인 latency budget과 라이선스 검토를 먼저 정한 별도 spec에서만 수행한다.
+따라서 Reranker Java/Python 코드는 `main`에 보존하지 않는다. Dense 평가 하네스, 합성 데이터와 측정 방법은 [검색 품질 평가](../../evaluation/search-evaluation.md)에 유지한다. 이후 재평가는 더 큰 고정 TEST corpus, 명시적인 latency budget과 라이선스 검토를 먼저 정한 별도 spec에서만 수행한다.

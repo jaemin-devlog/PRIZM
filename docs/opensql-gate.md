@@ -1,59 +1,42 @@
-# OpenSQL 기술 Gate
+# OpenSQL 단일 환경 기술 Gate
 
-이 문서는 로컬 PostgreSQL 개발 결과를 OpenSQL 3 환경으로 옮기기 전에 확인할 외부 의존성과 증거를 기록한다. 체크되지 않은 항목을 추정으로 완료 처리하지 않는다.
+> 상태: `NOT_RUN` (2026-07-23)
 
-> **현재 상태(2026-07-16):** PostgreSQL 16·pgvector 기준선과 OpenSQL 단일 환경용 실행 가능한 호환성 suite는 있지만, OpenSQL, OpenProxy, OpenHA 실환경은 아직 검증하지 않았다. 현재 구현 범위는 [PRIZM 현재 구현 현황](project-status.md)을 참고하며, 이 Gate의 미확인 항목은 그대로 유지한다.
+이 문서는 실제 OpenSQL 환경을 확보하기 전까지 사용하는 임시 체크리스트다. 실제
+작업을 시작하면 내용을 `PRZ-001-opensql-vector-gate`의 `spec.md`, `plan.md`,
+`tasks.md`, `evidence.md`로 옮기고 이 파일은 제거한다.
+
+PostgreSQL 성공을 OpenSQL 성공으로 바꾸어 표현하지 않는다.
 
 ## 완료 기준
 
-다음 조건을 모두 만족해야 OpenSQL Gate를 통과한 것으로 본다.
+다음 조건을 모두 실제 OpenSQL 환경에서 확인해야 `PASS`로 바꿀 수 있다.
 
-- OpenSQL과 pgvector를 설치한 실제 환경에 JDBC로 접속할 수 있다.
-- 문장 임베딩을 `vector(1024)`로 저장하고 exact cosine 검색 결과를 확인한다.
-- 런타임 애플리케이션 JDBC URL이 OpenProxy를 가리킨다.
-- OpenHA/DCS 토폴로지와 Primary 장애 시연 절차가 확정되어 있다.
-- 설치 버전, 실행 명령, 결과 로그가 재현 가능한 형태로 남아 있다.
+1. OpenSQL과 pgvector가 설치된 검증 전용 DB 또는 schema에 JDBC로 접속한다.
+2. Flyway V1~V13 migration을 순서대로 적용한다.
+3. `vector(1024)`, `vector_dims`, exact cosine `<=>`를 실제 실행한다.
+4. `VectorSearchRepository`의 owner·ACTIVE version 조건을 검증한다.
+5. Indexing·Cleanup claim, lease, fencing, recovery와 두 connection의
+   `FOR UPDATE SKIP LOCKED`를 검증한다.
+6. 설치 버전, 실행 명령, 결과와 한계를 비밀정보 없이 `evidence.md`에 기록한다.
 
-## 1. 제공물과 권한
+## 실행 전 확인
 
-| 항목 | 확인 내용 | 상태 | 증거/메모 |
-|---|---|---|---|
-| OpenSQL 3 설치 파일 | 배포 파일명, 체크섬, 제공 주체 | 미확인 | |
-| 사용 권한/라이선스 | 개발·시연·배포 가능 범위 | 미확인 | |
-| OpenProxy | 바이너리와 설정 예제 제공 여부 | 미확인 | |
-| OpenHA/Patroni | 바이너리와 운영 권한 | 미확인 | |
-| etcd 또는 witness | 최소 쿼럼 구성 가능 여부 | 미확인 | |
-| OpenCrypto | ARIA/SEED 모듈 제공 여부 | 조건부 | 미제공 시 MVP에서 제외 |
-| 장애 시연 권한 | Primary 종료와 승격 로그 수집 허용 여부 | 미확인 | |
+| 항목 | 상태 |
+|---|---|
+| OpenSQL 설치 파일·버전·체크섬 | 미확인 |
+| 개발·시연·재배포 라이선스 | 미확인 |
+| pgvector 제공 버전 | 미확인 |
+| 검증 전용 DB/schema | 미확인 |
+| Flyway 계정과 runtime 계정 | 미확인 |
+| TLS·네트워크 요구사항 | 미확인 |
 
-## 2. 환경과 버전
+민감한 JDBC URL, 사용자명, 비밀번호와 host 목록은 Git에 기록하지 않는다.
 
-실제 명령 출력 전체를 증거 파일 또는 실행 기록에 보관한다.
+## 실행
 
-| 항목 | 기대 기준 | 실제 값 | 상태 |
-|---|---|---|---|
-| OS | 공식 지원 Linux 배포판 | | 미확인 |
-| OpenSQL | 3.x | | 미확인 |
-| PostgreSQL | OpenSQL 패키지 제공 버전 | | 미확인 |
-| pgvector | 설치 여부와 `extversion` | | 미확인 |
-| OpenProxy | 버전과 listen 주소 | | 미확인 |
-| Patroni/OpenHA | 버전과 cluster name | | 미확인 |
-| etcd/DCS | 버전과 member 수 | | 미확인 |
-| JDBC driver | Gradle resolved version | | 미확인 |
-
-확인 명령 예시:
-
-```sql
-SELECT version();
-SELECT extname, extversion
-FROM pg_extension
-WHERE extname = 'vector';
-
-SELECT vector_dims(array_fill(0::real, ARRAY[1024])::vector);
-SELECT '[1,0]'::vector <=> '[1,0]'::vector AS cosine_distance;
-```
-
-런타임 JDBC와 Flyway JDBC를 분리하고, 애플리케이션과 Worker가 연결되지 않은 새 검증 전용 DB 또는 schema임을 확인한 뒤 다음 suite를 실행한다. 변수 값은 shell history, 문서, 테스트 출력에 남기지 않는다.
+Flyway와 runtime datasource는 migration 전에 각각 base table이 없는지 확인한다.
+조회 권한이 부족하거나 기존 table이 있으면 fixture 생성 전에 실패해야 한다.
 
 ```powershell
 $env:RUN_OPENSQL_TESTS='true'
@@ -67,69 +50,28 @@ $env:PRIZM_FLYWAY_PASSWORD='<migration password>'
 .\gradlew.bat integrationTest --no-daemon --tests com.prizm.infrastructure.OpenSqlInfrastructureTest
 ```
 
-`RUN_OPENSQL_TESTS`가 없으면 이 테스트는 `SKIPPED`이며 OpenSQL 성공 증거가 아니다. suite는 Spring application context를 띄우지 않으므로 Indexing/Cleanup Scheduler와 Ollama를 사용하지 않는다. V1~V13, schema, `vector(1024)`·`CAST`·`vector_dims`·`<=>`, 실제 `VectorSearchRepository`, Indexing/Cleanup claim·lease·fencing·recovery SQL과 두 connection의 `FOR UPDATE SKIP LOCKED`를 검증한다. 파일 삭제, HNSW, OpenProxy, OpenHA는 범위 밖이다.
+`RUN_OPENSQL_TESTS`가 없으면 test는 `SKIPPED`이며 성공 증거가 아니다. Suite는
+Flyway가 만든 비활성 UUID marker를 runtime 계정이 같은 ID로 읽어야만 fixture를
+시작한다. 전역 `DELETE`나 `TRUNCATE` 없이 실행별 UUID와 생성 ID만 정리한다.
 
-안전 검증은 환경변수 확인만 신뢰하지 않는다. Migration 전에 Flyway와 runtime datasource가 가리키는 schema를 각각 독립 조회해 base table이 하나라도 있거나 조회 권한이 불충분하면 fixture 생성 전에 실패한다. V1~V13 적용 후에는 Flyway 계정이 비활성 UUID marker 사용자 한 건을 만들고, runtime 계정이 같은 ID와 UUID를 읽은 경우에만 실제 SQL fixture 검증을 시작한다. `current_database()`·`current_schema()`·`search_path` 같은 이름 정보만으로 동일 대상을 판정하지 않는다.
+## 현재 Gate에 포함하지 않는 것
 
-suite는 domain table 전체 `DELETE`나 `TRUNCATE`를 사용하지 않는다. 모든 fixture는 실행별 UUID로 식별하고 생성 ID 또는 UUID storage key만 FK 역순으로 `finally` 정리하며, marker도 정확한 ID와 email 조건으로만 삭제한다. 검증 중 외부 애플리케이션이나 Worker가 같은 DB/schema에 쓰지 않는 독점 실행을 전제로 한다.
+- Ollama와 실제 embedding 생성
+- Indexing·Cleanup Scheduler 실행과 실제 파일 삭제
+- HNSW 성능
+- OpenProxy runtime 연결
+- OpenHA 장애전환, RTO와 RPO
 
-실패 결과는 단계와 Migration 번호, SQLState, SQL 기능 범주만 포함한다. 전체 JDBC URL, host, 계정과 비밀번호는 출력하지 않는다.
+OpenProxy와 OpenHA는 이 단일 환경 Gate가 통과한 뒤 별도 spec으로 착수 여부를
+판단한다.
 
-## 3. 연결과 역할
+## 실패·미확보 처리
 
-| 항목 | 성공 조건 | 상태 | 증거/메모 |
-|---|---|---|---|
-| Migration 연결 | 검증된 migration endpoint에서 Flyway migration 성공 | 미확인 | OpenProxy DDL 지원 여부 확인 후 endpoint 확정 |
-| Runtime 연결 | 애플리케이션 계정으로 CRUD 가능 | 미확인 | |
-| 역할 분리 | Runtime 계정에 DDL·`BYPASSRLS` 권한 없음 | 미확인 | |
-| 검증 schema | 양쪽 preflight가 base table 0개이고 Flyway UUID marker를 runtime이 동일하게 조회 | 미확인 | 기존 데이터 또는 부분 schema가 있으면 fixture 전 fail-closed |
-| OpenProxy 경유 | 런타임 애플리케이션이 직접 Primary 주소 없이 기동 | 미확인 | |
-| TLS/네트워크 | 요구되는 SSL mode와 방화벽 규칙 확정 | 미확인 | |
-| Connection pool | timeout과 pool 크기 기준 기록 | 미확인 | |
+- 실제 환경을 확보하지 못하면 `NOT_RUN`을 유지한다.
+- 라이선스나 재배포 조건이 불명확하면 구성요소를 저장소에 포함하지 않는다.
+- 실패 결과에는 migration 번호, SQLState와 SQL 기능 범주만 기록한다.
+- 전체 JDBC URL, host, 계정과 비밀번호는 출력하지 않는다.
+- OpenSQL이 없으면 PostgreSQL 16+pgvector 회귀 test를 유지하되 별도 결과로 기록한다.
 
-민감한 JDBC URL, 사용자명, 비밀번호, 호스트 목록은 이 문서에 직접 기록하지 않는다.
-
-## 4. pgvector 호환성 PoC
-
-다음 순서만 수행하며 도메인 기능 구현과 분리한다.
-
-1. `vector` extension 존재와 버전을 확인한다.
-2. 1024차원 테스트 벡터를 저장한다.
-3. `<=>` 연산자로 exact cosine 검색을 실행한다.
-4. 문서 상태와 `active_version_id`에 해당하는 일반 컬럼 필터를 함께 적용한다.
-5. 실행 계획과 소요 시간을 저장한다.
-6. 로컬 PostgreSQL 결과와 상위 결과 ID가 일치하는지 확인한다.
-
-HNSW 인덱스는 이 Gate의 완료 조건이 아니다. 10,000청크 exact 검색이 성능 목표를 넘을 때만 별도 Gate로 연다.
-
-## 5. OpenHA/OpenProxy 토폴로지
-
-| 확인 항목 | 상태 | 증거/메모 |
-|---|---|---|
-| Primary/Standby 노드 수와 주소 | 미확인 | |
-| etcd/DCS member 수와 쿼럼 | 미확인 | |
-| Patroni leader 조회 방법 | 미확인 | |
-| OpenProxy backend 상태 조회 방법 | 미확인 | |
-| 애플리케이션 접속 endpoint | 미확인 | 비밀값은 별도 보관 |
-| Primary 중지 명령과 복구 명령 | 미확인 | |
-| 실패 시 수동 복구 담당자 | 미확인 | |
-
-두 데이터 노드만으로 안전한 자동 선출이 끝난다고 가정하지 않는다. witness 또는 3개 DCS member 구성을 제공 환경의 공식 지침으로 확인한다.
-
-## 6. 장애 실험 진입 조건
-
-- 합성 문서만 사용한다.
-- 정상 상태 검색이 최소 3분 동안 안정적으로 성공한다.
-- 마지막 committed ID를 기록할 수 있다.
-- Primary 중지와 복구 명령을 사전 리허설한다.
-- OpenHA, OpenProxy, 애플리케이션 시간을 같은 표준시로 동기화한다.
-- CSV와 JSON 결과를 저장할 쓰기 경로를 준비한다.
-
-실험 결과에는 장애 감지 시각, 승격 시각, 첫 연속 성공 5건 시각, RTO, 총 요청 수, 최종 성공률, 정상·장애 구간 p95, 마지막 committed ID 기반 RPO를 포함한다.
-
-## 7. 미확보 시 처리
-
-- OpenSQL이 없으면 PostgreSQL 16 + pgvector에서 자동 통합 테스트를 계속한다.
-- OpenProxy/OpenHA가 없으면 로컬 PostgreSQL 결과를 OpenSQL HA 결과로 표현하지 않는다.
-- 7월 17일까지 환경을 확보하지 못하면 지원 요청과 대체 PoC를 별도 기록한다.
-- 8월 15일까지 HA 환경이 없으면 제출물에 환경 의존 미완료를 명시하고 기능 범위를 더 늘리지 않는다.
+현재 구현과 환경별 검증 상태는 [현재 구현 현황](project-status.md)과
+[PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md)를 기준으로 한다.

@@ -110,10 +110,17 @@ platform value.
   generation are not.
 - Keep `main` as the only long-lived branch. Temporary branches must be integrated,
   documented as rejected experiments, or discarded with evidence, then deleted.
+- Before deleting a temporary branch, inspect its merge base, unique commits, changed
+  files, and linked pull request. Push the integrated `main` first, then delete the
+  exact local and remote branch names.
+- Preserve releases with annotated or signed tags and GitHub Releases, not long-lived
+  `release/*` or `archive/*` branches.
 - Record functionality that predates the spec registry only as `AS_BUILT_BASELINE`.
   Do not fabricate or backdate Issues, pull requests, reviews, or pre-implementation specs.
 - Treat specs as intent and traceability documents, not implementation proof. Source code,
   Flyway migrations, and executable tests remain the implementation truth.
+- Use `docs/project-status.md` for the current summary and `docs/roadmap.md` for future
+  order. Treat everything under `docs/archive/` as historical context, not current truth.
 - Record meaningful implementation, refactoring, design, and infrastructure
   verification work briefly in `docs/development-log.md`.
 

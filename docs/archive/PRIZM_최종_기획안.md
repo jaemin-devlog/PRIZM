@@ -1,5 +1,9 @@
 # PRIZM 최종 기획안
 
+> **보관 문서:** 과거 제품·시장 가설과 장기 설계를 보존한 자료다. 현재 구현은
+> [현재 구현 현황](../project-status.md), 앞으로의 순서는
+> [개발 로드맵](../roadmap.md)을 기준으로 판단한다.
+
 **부제:** 커리어 문서의 근거를 구조화하는 오픈소스 Career Intelligence Engine
 **문서 버전:** 1.1
 **작성 기준일:** 2026-07-13
@@ -7,7 +11,7 @@
 **개발 목표일:** 2026-08-27
 **대상 과제:** 2026 공개SW 개발자대회 티맥스티베로 지정과제 — OpenSQL 기반 AI 검색 및 벡터 데이터 플랫폼 개발
 
-> **문서 성격:** 이 문서는 장기 제품 목표와 설계 가설, 그리고 이전 B2C 검토의 역사적 결정을 함께 보존합니다. outbox, generation, MCP, CareerFact, portfolio, OpenSQL HA 등은 구현 예정 항목을 포함합니다. 현재 실제 구현 범위는 [PRIZM 현재 구현 현황](project-status.md), 제품 책임 경계는 [오픈소스 제품 경계](architecture/oss-product-boundary.md)를 기준으로 확인합니다.
+> **문서 성격:** 이 문서는 장기 제품 목표와 설계 가설, 그리고 이전 B2C 검토의 역사적 결정을 함께 보존합니다. outbox, generation, MCP, CareerFact, portfolio, OpenSQL HA 등은 구현 예정 항목을 포함합니다. 현재 실제 구현 범위와 제품 책임 경계는 [PRIZM 현재 구현 현황](../project-status.md)을 기준으로 확인합니다.
 
 ### 2026-07-15 오픈소스 엔진 방향 현행화
 
@@ -299,7 +303,7 @@ flowchart LR
 
 ## 6. 기능 요구사항과 범위
 
-이 절은 장기 목표 요구사항입니다. 표의 `Must`는 현재 구현 완료 표시가 아니며, 구현 여부는 [현재 구현 현황](project-status.md)의 matrix를 따릅니다.
+이 절은 장기 목표 요구사항입니다. 표의 `Must`는 현재 구현 완료 표시가 아니며, 구현 여부는 [현재 구현 현황](../project-status.md)의 matrix를 따릅니다.
 
 ### 6.1 MVP 필수기능 — Must
 
@@ -744,7 +748,7 @@ flowchart TB
 
 ### 12.1 권장 REST API
 
-아래 목록은 현재 API와 향후 목표 API를 함께 나타냅니다. 현재 제공되는 endpoint와 계약은 [현재 구현 현황](project-status.md)의 API 표를 기준으로 합니다.
+아래 목록은 현재 API와 향후 목표 API를 함께 나타냅니다. 현재 제공되는 endpoint와 계약은 [현재 구현 현황](../project-status.md)의 API 표를 기준으로 합니다.
 
 ```text
 POST   /api/auth/signup
@@ -860,7 +864,7 @@ PRIZM의 가장 큰 제품위험은 실제 성과근거가 회사 기밀문서�
 
 ## 14. 목표 OpenSQL·고가용성 설계
 
-이 절은 실제 환경에서 검증해야 할 목표입니다. 현재 성공 근거는 PostgreSQL 16+pgvector 통합 테스트이며 OpenSQL, OpenProxy, OpenHA 지원을 증명하지 않습니다. 확인 절차는 [OpenSQL 기술 Gate](opensql-gate.md)에 분리합니다.
+이 절은 실제 환경에서 검증해야 할 목표입니다. 현재 성공 근거는 PostgreSQL 16+pgvector 통합 테스트이며 OpenSQL, OpenProxy, OpenHA 지원을 증명하지 않습니다. 확인 절차는 [OpenSQL 기술 Gate](../opensql-gate.md)에 분리합니다.
 
 ### 14.1 OpenSQL의 역할
 

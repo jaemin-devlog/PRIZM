@@ -79,4 +79,4 @@ Docker Desktop, PostgreSQL·pgvector Testcontainer와 로컬 Ollama `bge-m3`가 
 
 합성 corpus가 실제로 만든 청크는 14개이므로 Recall@20은 사실상 작은 corpus의 hit-rate 성격이며 운영 규모 회수 성능을 증명하지 않습니다. 이 결과는 평가 파이프라인의 재현 가능한 기준선이지 제품 품질 보증이 아닙니다.
 
-같은 후보에 `BAAI/bge-reranker-v2-m3`를 적용한 CPU 실험은 상위 5개 직접 근거 품질을 개선하지 못하고 큰 지연·메모리 비용을 보여 운영 도입에서 제외했습니다. 코드가 아니라 조건·수치·거절 근거만 [BGE Reranker 평가와 비채택 결정](experiments/2026-07-14-bge-reranker-evaluation.md)에 보존합니다.
+같은 후보에 `BAAI/bge-reranker-v2-m3`를 적용한 CPU 실험은 상위 5개 직접 근거 품질을 개선하지 못하고 큰 지연·메모리 비용을 보여 운영 도입에서 제외했습니다. 코드가 아니라 조건·수치·거절 근거만 [BGE Reranker 평가와 비채택 결정](../archive/experiments/2026-07-14-bge-reranker-evaluation.md)에 보존합니다.

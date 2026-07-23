@@ -1,5 +1,8 @@
 # PRIZM 오픈소스 엔진 전환 실행 계획
 
+> **보관 문서:** 0~10단계 상세 계획과 과거 실행 프롬프트를 보존한다. 현재 개발
+> 순서와 상태는 [개발 로드맵](../roadmap.md)을 기준으로 판단한다.
+
 > 문서 버전: 1.0
 > 작성일: 2026-07-15
 > 목적: PRIZM을 재사용 가능한 오픈소스 Career Intelligence Engine과 이를 검증하는 Reference App으로 단계적으로 전환한다.
@@ -110,7 +113,7 @@ Codex 공식 모델 선택 지침을 기준으로 다음 원칙을 사용한다.
 ```text
 PRIZM 오픈소스 엔진 전환 계획의 단계 {단계 번호} 결과를 독립적으로 검토해줘.
 
-반드시 먼저 AGENTS.md와 docs/oss-transition-execution-plan.md 전체를 읽고, 현재 git status와 해당 단계의 실제 diff를 확인해. 구현자의 설명이나 계획 문서만 믿지 말고 소스 코드, Flyway migration, 실행 가능한 테스트를 기준으로 판단해.
+반드시 먼저 AGENTS.md와 docs/archive/oss-transition-execution-plan.md 전체를 읽고, 현재 git status와 해당 단계의 실제 diff를 확인해. 구현자의 설명이나 계획 문서만 믿지 말고 소스 코드, Flyway migration, 실행 가능한 테스트를 기준으로 판단해.
 
 검토 범위:
 1. 해당 단계의 목표와 완료 조건이 실제로 충족됐는지 확인
@@ -120,7 +123,7 @@ PRIZM 오픈소스 엔진 전환 계획의 단계 {단계 번호} 결과를 독�
 5. 필요한 단위·통합·프런트엔드·Compose 검증을 실제로 실행하고, PostgreSQL·pgvector·Ollama·Docker 사용 여부를 구분해 보고
 6. 보안, 데이터 migration, 공개 API 호환성, 재현성 위험을 우선순위별로 보고
 
-먼저 검토만 수행해. 결함을 발견해도 바로 수정하지 말고 파일과 근거를 포함한 findings를 우선순위 순서로 제시해. 치명적 또는 중요 finding이 하나라도 있으면 단계 상태를 COMPLETE로 바꾸지 마. finding이 없고 모든 완료 조건이 충족된 경우에만 docs/oss-transition-execution-plan.md의 상태표와 완료 증거를 갱신하고 docs/development-log.md에 검토 결과를 짧게 기록해.
+먼저 검토만 수행해. 결함을 발견해도 바로 수정하지 말고 파일과 근거를 포함한 findings를 우선순위 순서로 제시해. 치명적 또는 중요 finding이 하나라도 있으면 단계 상태를 COMPLETE로 바꾸지 마. finding이 없고 모든 완료 조건이 충족된 경우에만 docs/archive/oss-transition-execution-plan.md의 상태표와 완료 증거를 갱신하고 docs/development-log.md에 검토 결과를 짧게 기록해.
 
 commit, push, PR 생성은 하지 마.
 ```
@@ -143,7 +146,7 @@ commit, push, PR 생성은 하지 마.
 
 - `README.md`, `docs/project-status.md`, 장기 기획안의 B2C 중심 표현을 오픈소스 엔진 중심으로 재정리
 - 실제 구현과 미구현 기능 matrix 작성
-- `docs/architecture/oss-product-boundary.md` 작성
+- `docs/project-status.md`에 제품 경계 기록
 - 현재 API, migration, 테스트, 외부 의존성 기준선 기록
 - 당시 작업 중이던 Cleanup Worker 변경을 별도 작업으로 보존해 독립 감사한 뒤 main 기준선으로 편입
 - 다중 Career Evidence UI 등 문서와 코드가 어긋난 부분 수정
@@ -173,12 +176,12 @@ PRIZM 오픈소스 엔진 전환 계획의 단계 0을 수행해줘.
 
 권장 설정은 5.6 Sol, 추론 강도 매우 높음이다.
 
-먼저 AGENTS.md와 docs/oss-transition-execution-plan.md를 전체 읽고, git status를 확인해. 현재 작업 중인 cleanup Worker와 다른 사용자 변경을 절대 되돌리거나 정리하지 마.
+먼저 AGENTS.md와 docs/archive/oss-transition-execution-plan.md를 전체 읽고, git status를 확인해. 현재 작업 중인 cleanup Worker와 다른 사용자 변경을 절대 되돌리거나 정리하지 마.
 
 실제 source, Flyway migration, test, frontend를 기준으로 현재 구현을 다시 확인한 뒤 다음을 수행해:
 - PRIZM Engine과 Career Vault Reference App의 제품 경계를 문서화
 - README와 project-status의 현재/계획 기능을 정확히 분리
-- docs/architecture/oss-product-boundary.md 작성
+- docs/project-status.md에 제품 경계 기록
 - 현재 API, 저장 모델, 비동기 처리, 검색, 인증, 외부 의존성 기준선 기록
 - 장기 기획안의 B2C·가격 중심 결론을 오픈소스 엔진 중심 방향으로 현행화하되, 역사적 결정이 필요한 내용은 함부로 삭제하지 말고 변경 이유를 명시
 - 코드와 문서가 어긋난 항목을 수정
@@ -222,7 +225,7 @@ PRIZM 오픈소스 엔진 전환 계획의 단계 1을 수행해줘.
 
 권장 설정은 5.6 Terra, 추론 강도 높음이다.
 
-AGENTS.md, docs/oss-transition-execution-plan.md, 단계 0 산출물과 현재 git status를 먼저 확인해. 기획안의 Apache License 2.0 결정을 기준으로 오픈소스 거버넌스 파일을 추가하되, 제3자 의존성·Ollama 모델·샘플 자료의 라이선스를 PRIZM 코드 라이선스와 동일하다고 가정하지 마. 공식 라이선스 근거를 확인할 수 없는 항목은 재배포하지 말고 다운로드 절차 또는 확인 필요 상태로 남겨.
+AGENTS.md, docs/archive/oss-transition-execution-plan.md, 단계 0 산출물과 현재 git status를 먼저 확인해. 기획안의 Apache License 2.0 결정을 기준으로 오픈소스 거버넌스 파일을 추가하되, 제3자 의존성·Ollama 모델·샘플 자료의 라이선스를 PRIZM 코드 라이선스와 동일하다고 가정하지 마. 공식 라이선스 근거를 확인할 수 없는 항목은 재배포하지 말고 다운로드 절차 또는 확인 필요 상태로 남겨.
 
 LICENSE, NOTICE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, CHANGELOG.md, issue/PR template, SBOM과 dependency license report 경로를 추가해. .gitignore와 CI를 보완해 local 모델 cache, 평가 산출물, __pycache__, 실제 커리어 문서, .env와 비밀정보가 commit되지 않게 해. 현재 untracked 파일을 임의 삭제하지 마.
 
@@ -675,7 +678,7 @@ PRIZM 오픈소스 엔진 전환 계획의 단계 10 최종 감사를 수행해�
 
 권장 설정은 5.6 Sol, 추론 강도 울트라다. 울트라를 사용할 수 없으면 매우 높음을 사용해.
 
-AGENTS.md, docs/oss-transition-execution-plan.md, README, project-status, architecture 문서, OpenAPI, migration과 현재 git 상태를 먼저 읽어. 구현된 출시 범위를 확정하고, 범위 밖 기능은 감사 대상에서 제외하되 문서가 구현된 것처럼 주장하는지는 검사해.
+AGENTS.md, docs/archive/oss-transition-execution-plan.md, README, project-status, OpenAPI, migration과 현재 git 상태를 먼저 읽어. 구현된 출시 범위를 확정하고, 범위 밖 기능은 감사 대상에서 제외하되 문서가 구현된 것처럼 주장하는지는 검사해.
 
 감사를 다음 독립 관점으로 나눠 수행해:
 - clean clone 설치·Quickstart·Compose 재현성

@@ -50,11 +50,11 @@
 | `FR-002` | document, version, processing job과 chunk의 owner가 API·repository·FK·검색 후보에서 일치해야 한다. |
 | `FR-003` | UTF-8 TXT와 비암호화 text-layer PDF만 기본 10MiB 안에서 등록하고, PDF는 기본 300페이지·추출 문자 2,000,000자 한도를 적용하며 원본 hash와 상대 storage key를 보존해야 한다. |
 | `FR-004` | document와 immutable version을 분리하고 완성된 version만 `active_version_id`로 원자적으로 활성화해야 한다. |
-| `FR-005` | indexing은 lease·heartbeat·최대 3회 retry·1/5/15분 backoff·recovery·claim fencing을 유지해야 한다. |
+| `FR-005` | indexing은 기본 10분 lease·1/3 주기 heartbeat·최대 3회 retry·1/5/15분 backoff·recovery·claim fencing을 유지해야 한다. |
 | `FR-006` | 저장·검색 vector는 1024차원, finite 값과 0보다 큰 L2 norm을 만족해야 한다. |
 | `FR-007` | 최대 500자 query를 pgvector exact cosine `<=>`로 검색하고 owner의 ACTIVE version만 대상으로 해야 한다. 단일 검색은 최대 1개·없으면 404 `SEARCH_NO_RESULT`, Career Evidence는 최대 5개·없으면 HTTP 200 빈 배열을 반환하며 `score = 1 - distance` 계약을 유지해야 한다. |
 | `FR-008` | 문서 목록·필터·상세·metadata 수정·terminal 삭제·다음 version 등록·PDF thumbnail/원본 API를 owner 범위에서 제공해야 한다. |
-| `FR-009` | orphan-file cleanup은 lease·fencing·retry/recovery를 사용하고 지원 filesystem에서 descriptor-relative로 삭제하며, 미지원 환경에서는 fail-closed해야 한다. |
+| `FR-009` | orphan-file cleanup은 기본 5분 lease·fencing·retry/recovery를 사용하고 heartbeat 없이 동작해야 한다. 지원 filesystem에서는 descriptor-relative로 삭제하며, 미지원 환경에서는 fail-closed해야 한다. |
 | `FR-010` | V1~V13 Flyway migration을 순서대로 적용하고 이미 적용된 migration은 수정하지 않아야 한다. |
 | `FR-011` | Career Vault는 로그인, 문서 관리, TXT/PDF 업로드, version/PDF 열람과 최대 5개 근거 검색 흐름을 제공해야 한다. |
 | `FR-012` | 등록 문서에서 근거를 찾지 못하면 찾지 못했다고 표현하고 score를 확률·정확도·합격 가능성으로 표시하지 않아야 한다. |

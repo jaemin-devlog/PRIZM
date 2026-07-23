@@ -18,7 +18,7 @@ PRIZM의 공식 제품 정의는 다음과 같습니다.
 - Reference App: 로그인, 문서 목록·유형/제목/처리상태 필터, TXT·PDF 업로드, 문서 상세·수정·삭제, 새 버전 등록, PDF thumbnail·원본 열람, 관련 원문 근거 최대 5개 표시
 - 현재 API: 로그인·현재 사용자·문서 업로드/목록/상세/수정/삭제·새 버전·PDF thumbnail/원본·단일 검색·Career Evidence 검색·health
 
-CareerFact 구조화, 포트폴리오 생성, `/api/v1`, MCP, 멀티모듈 패키징, 기관용 workspace와 OpenSQL/OpenProxy/OpenHA 실환경 호환성은 계획 범위이며 현재 구현이 아닙니다. 자세한 현재/계획 경계는 [오픈소스 제품 경계](docs/architecture/oss-product-boundary.md)와 [현재 구현 현황](docs/project-status.md)을 참고합니다.
+CareerFact 구조화, 포트폴리오 생성, `/api/v1`, MCP, 멀티모듈 패키징, 기관용 workspace와 OpenSQL/OpenProxy/OpenHA 실환경 호환성은 계획 범위이며 현재 구현이 아닙니다. 자세한 경계는 [현재 구현 현황](docs/project-status.md)을 참고합니다.
 
 ## 실행
 
@@ -41,9 +41,9 @@ docker compose up -d
 docker compose up -d --build
 ```
 
-현재 bootstrap은 `SYSTEM_ADMIN`만 만들 수 있고 해당 역할은 개인 문서 API를 사용할 수 없습니다. 회원가입이나 demo `USER` 생성 경로가 아직 없어 위 절차만으로 신규 사용자의 Career Vault 흐름을 완주할 수 없습니다. 재현 가능한 Quickstart는 [오픈소스 엔진 전환 실행 계획](docs/oss-transition-execution-plan.md)의 후속 단계입니다.
+현재 bootstrap은 `SYSTEM_ADMIN`만 만들 수 있고 해당 역할은 개인 문서 API를 사용할 수 없습니다. 회원가입이나 demo `USER` 생성 경로가 아직 없어 위 절차만으로 신규 사용자의 Career Vault 흐름을 완주할 수 없습니다. 재현 가능한 Quickstart는 [개발 로드맵](docs/roadmap.md)의 후속 단계입니다.
 
-Cleanup Worker는 `SecureDirectoryStream`을 지원하는 filesystem에서만 descriptor-relative 삭제를 수행합니다. 지원하지 않는 filesystem에서는 안전하지 않은 경로 기반 삭제로 fallback하지 않고 fail-closed하므로 자동 cleanup이 동작하지 않을 수 있습니다. 이 운영 제약과 환경 예제 보완은 단계 2의 Quickstart 작업으로 남아 있습니다.
+Cleanup Worker는 `SecureDirectoryStream`을 지원하는 filesystem에서만 descriptor-relative 삭제를 수행합니다. 지원하지 않는 filesystem에서는 안전하지 않은 경로 기반 삭제로 fallback하지 않고 fail-closed하므로 자동 cleanup이 동작하지 않을 수 있습니다. 이 운영 제약과 환경 예제 보완은 clean-clone 작업으로 남아 있습니다.
 
 ## 검증
 
@@ -57,16 +57,9 @@ docker compose config
 
 ## 문서
 
+- [문서 안내](docs/README.md)
 - [현재 구현 현황](docs/project-status.md)
-- [오픈소스 제품 경계](docs/architecture/oss-product-boundary.md)
-- [오픈소스 엔진 전환 실행 계획](docs/oss-transition-execution-plan.md)
+- [개발 로드맵](docs/roadmap.md)
 - [개발 기록](docs/development-log.md)
-- [장기 기획안](docs/PRIZM_최종_기획안.md)
-- [OpenSQL 기술 Gate](docs/opensql-gate.md)
 - [2026 티맥스티베로 지정과제 대응 계획](docs/contest/2026-tmaxtibero-plan.md)
-- [검색 품질 평가](docs/search-evaluation.md)
-- [수치와 구현 근거](docs/portfolio/metrics-and-evidence.md)
-- [대표 문제 해결 사례](docs/portfolio/problem-solving-case-studies.md)
-- [BGE Reranker 비채택 결정](docs/experiments/2026-07-14-bge-reranker-evaluation.md)
-- [브랜치 운영 정책](docs/branch-policy.md)
 - [Spec Registry와 AS_BUILT 기준선](specs/README.md)

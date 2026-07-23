@@ -40,7 +40,7 @@
 - 이유: 업로드·권한 기능을 넣기 전에 실제 로컬 모델과 pgvector가 연결된 가장 작은 검색 경로를 검증하기 위해서다.
 - 검증: 실행 중인 `bge-m3:latest`가 1024차원 벡터를 반환하는 것을 확인했고, 세 문장을 저장한 뒤 휴가 질문에서 연차 신청 문장이 최상위로 반환되는 PostgreSQL 통합 테스트를 통과했다.
 - 다음: 이 검색 경로에 업로드와 문서 상태를 연결하되, `ACTIVE`가 아닌 문서는 검색하지 않는 규칙을 추가한다.
-- 상세 결과: [최소 벡터 검색 구현·검증 기록](verification/2026-07-13-minimal-vector-search.md)
+- 상세 결과: [최소 벡터 검색 구현·검증 기록](archive/verification/2026-07-13-minimal-vector-search.md)
 
 ## 2026-07-13 — 최소 문서 등록 세로 흐름
 
@@ -48,7 +48,7 @@
 - 이유: 임베딩 처리 전에 원본 파일, 버전, 격리 상태를 분리해 안전하게 연결할 최소 기반이 필요했다.
 - 검증: Flyway V1~V3를 빈 개발 DB에 적용하고, 통합 테스트가 문서·버전·청크를 직접 생성해 단위 테스트와 Docker Testcontainers·실제 Ollama 통합 테스트를 통과했다.
 - 다음: QUARANTINED 버전의 TXT 내용 추출과 청크 생성은 비동기 처리 흐름을 설계한 뒤 별도 단계로 추가한다.
-- 상세 결과: [최소 문서 등록 구현·검증 기록](verification/2026-07-13-minimal-document-registration.md)
+- 상세 결과: [최소 문서 등록 구현·검증 기록](archive/verification/2026-07-13-minimal-document-registration.md)
 
 ## 2026-07-13 — 프로젝트 현황 안내 문서
 
@@ -256,7 +256,7 @@
 ## 2026-07-15 — 오픈소스 엔진 전환 실행 계획
 
 - 방향: PRIZM의 본체를 문서 처리·근거 검색·커리어 구조화·포트폴리오 생성을 제공하는 self-hosted 오픈소스 엔진으로 정의하고, 현재 Career Vault는 개인용 참조 애플리케이션으로 역할을 변경했다.
-- 계획: 구현 기준선, 거버넌스, Quickstart, port/adapter 경계, canonical source, CareerFact, portfolio, API v1, 멀티모듈 패키징, 기관 scope, 최종 감사의 11단계 실행 계획을 `docs/oss-transition-execution-plan.md`에 기록했다.
+- 계획: 구현 기준선, 거버넌스, Quickstart, port/adapter 경계, canonical source, CareerFact, portfolio, API v1, 멀티모듈 패키징, 기관 scope, 최종 감사의 11단계 실행 계획을 현재 [보관 문서](archive/oss-transition-execution-plan.md)에 기록했다.
 - 운영: 각 단계에 Codex 권장 모델·추론 강도, 실행 프롬프트, 완료 조건과 독립 검토 프롬프트를 포함했으며 독립 검토가 통과하기 전에는 완료 상태로 바꾸지 않도록 정했다.
 
 ## 2026-07-15 — Engine과 Reference App 제품 경계 기준선
@@ -285,12 +285,6 @@
 - 단계 0 결정: 최종 독립 재검토 PASS에 따라 Engine/Reference App 제품 경계와 단계 8 canonical module graph를 확정하고 단계 0을 `COMPLETE`로 변경했다. 다섯 오래된 TXT 전용 JavaDoc은 단계 3, `.env.example` 불일치는 단계 2 후속 대상으로 남긴다.
 - 남은 경계: OpenSQL profile·조건부 integration test는 실제 OpenSQL/OpenProxy/OpenHA 호환성 증명이 아니며, OpenSQL 단일 migration·vector 검색, OpenProxy runtime, OpenHA 장애전환·검색 복구 순으로 검증한다. V13 CHECK·backfill 회귀 테스트와 SecureDirectoryStream 미지원 filesystem의 fail-closed 운영 문서는 LOW backlog다.
 
-## 2026-07-22 — Career Vault 문서 관리·버전·원본 PDF 열람
-
-- 문서 관리: owner-scoped 목록 필터·상세·제목/DocumentType 수정·안전한 처리 상태를 추가했다. 문서 삭제는 soft-delete 계약이 없는 현재 스키마에 맞춰 소유 문서를 잠그고, 비종료 indexing 작업을 거부하며, 모든 원본 storage key의 Cleanup Job을 동일 트랜잭션에 등록한 뒤 metadata를 하드 삭제한다. 실제 파일 삭제는 요청 트랜잭션 밖의 기존 Cleanup Worker가 수렴시킨다.
-- 버전·미리보기: `POST /api/documents/{documentId}/versions`는 새 TXT/PDF immutable version과 PENDING indexing job을 만들고, 새 색인이 활성화될 때까지 기존 `active_version_id`를 유지한다. owner/document/version을 모두 확인한 PDF 썸네일과 원본 열람 API는 저장 경로·원문·JWT·worker 오류 문구를 노출하지 않는다.
-- 화면: 좁고 반응형인 4:3 카드, 접근 가능한 상세 모달, 버전 이력·ACTIVE 상태·수정본 업로드, PDF 전용 Blob 뷰어, 명시적 삭제 확인과 안전한 오류/재시도 상태를 반영했다.
-- 검증: backend unit 225건 중 211건 성공·환경 조건 14건 skip·실패 0건, PostgreSQL 16+pgvector 문서 관리 통합 5건 성공, frontend lint/build 및 Docker Compose 설정 검증을 통과했다. OpenSQL·OpenProxy·OpenHA·Ollama는 사용하지 않았다.
 ## 2026-07-16 — OpenSQL 단일 환경 SQL 호환성 Gate 준비
 
 - 테스트: PostgreSQL Testcontainers와 opt-in 외부 OpenSQL 실행이 같은 assertion suite를 사용해 V1~V13·schema·pgvector 1024차원·실제 `VectorSearchRepository`·Indexing/Cleanup claim·lease·fencing·recovery·두 connection의 `SKIP LOCKED`를 검증하도록 구성했다.
@@ -304,9 +298,17 @@
 - 회귀 검증: 별도 datasource 정상 경로와 기존 V13 sentinel runtime·서로 다른 빈 runtime 오설정 경로를 Docker PostgreSQL 16+pgvector에서 3건 모두 통과했으며 sentinel 데이터 보존과 marker fail-closed를 확인했다.
 - 상태: 실제 OpenSQL 환경은 사용하지 않아 결과는 계속 `NOT_RUN`이다. OpenProxy·OpenHA·Ollama도 이번 검증에 사용하지 않았다.
 
+## 2026-07-22 — Career Vault 문서 관리·버전·원본 PDF 열람
+
+- 문서 관리: owner-scoped 목록 필터·상세·제목/DocumentType 수정·안전한 처리 상태를 추가했다. 문서 삭제는 soft-delete 계약이 없는 현재 스키마에 맞춰 소유 문서를 잠그고, 비종료 indexing 작업을 거부하며, 모든 원본 storage key의 Cleanup Job을 동일 트랜잭션에 등록한 뒤 metadata를 하드 삭제한다. 실제 파일 삭제는 요청 트랜잭션 밖의 기존 Cleanup Worker가 수렴시킨다.
+- 버전·미리보기: `POST /api/documents/{documentId}/versions`는 새 TXT/PDF immutable version과 PENDING indexing job을 만들고, 새 색인이 활성화될 때까지 기존 `active_version_id`를 유지한다. owner/document/version을 모두 확인한 PDF 썸네일과 원본 열람 API는 저장 경로·원문·JWT·worker 오류 문구를 노출하지 않는다.
+- 화면: 좁고 반응형인 4:3 카드, 접근 가능한 상세 모달, 버전 이력·ACTIVE 상태·수정본 업로드, PDF 전용 Blob 뷰어, 명시적 삭제 확인과 안전한 오류/재시도 상태를 반영했다.
+- 검증: backend unit 225건 중 211건 성공·환경 조건 14건 skip·실패 0건, PostgreSQL 16+pgvector 문서 관리 통합 5건 성공, frontend lint/build 및 Docker Compose 설정 검증을 통과했다. OpenSQL·OpenProxy·OpenHA·Ollama는 사용하지 않았다.
+
 ## 2026-07-23 — 미병합 브랜치 통합과 대회 대응 기준 정리
 
 - 브랜치 판정: `codex/search-evaluation-baseline`과 `test/search-evaluation-pilot`의 Dense 평가 기반·합성 11문서/30질문·단위 테스트를 `main`에 통합했다. main의 V13 Cleanup Worker가 평가 중 실행되지 않도록 평가 profile에서 indexing·cleanup Worker를 모두 비활성화했다.
+- 브랜치 근거: `codex/search-evaluation-baseline` tip `46e24ef`와 `test/search-evaluation-pilot` tip `347d54d`는 통합했다. `experiment/bge-reranker-evaluation` tip `617eacf`의 실행 코드는 비채택하고 실험 근거만 보존했으며, `portfolio/prizm-showcase` tip `377f615`의 오래된 설명은 폐기하고 유효한 근거만 현재 문서로 다시 작성했다.
 - 실험 결정: `experiment/bge-reranker-evaluation`의 CPU Reranker 코드는 직접 근거 Precision 개선 실패와 p95 약 51.86초·peak RSS 약 2.10GB 비용 때문에 채택하지 않았다. 조건·수치·비채택 근거만 별도 결정 문서에 남겼다.
 - 문서 선별: `portfolio/prizm-showcase`의 오래된 README와 V12·Cleanup 미구현 설명은 가져오지 않고, PR #9·#10과 V13 기준의 수치·문제 해결 사례로 다시 작성했다. `main`을 유일한 장기 브랜치로 두는 종료 절차도 문서화했다.
 - 대회 계획: GitHub Spec Kit의 spec→plan→tasks 흐름과 robo-architect의 evidence 분리를 작은 수직 슬라이스에만 적용하도록 정했다. OpenSQL 실환경은 아직 `NOT_RUN`, CareerFact·portfolio는 계획 기능으로 유지하며 2026-08-27 제출일까지 OpenSQL Gate→clean-clone→작은 grounded slice→라이선스·제출 감사 순으로 배치했다.
@@ -318,3 +320,11 @@
 - 추적성: PRZ-000의 현재 계약을 14개 요구사항으로 정리하고 source·V1~V13 migration·unit/integration test와 2026-07-23 실행 결과를 `evidence.md`에 연결했다. PostgreSQL·Docker·Ollama·OpenSQL의 과거 성공·미재실행·`NOT_RUN`을 구분했다.
 - 역사성: 이 기준선은 spec 도입 전 구현의 사후 기록이며, 존재하지 않았던 과거 Issue·PR·review를 생성하거나 사전 명세였던 것처럼 표현하지 않는다. 앞으로 착수하는 작은 수직 슬라이스만 실제 작업 시점의 spec과 Issue·PR에 연결한다.
 - 문서: README, 현재 구현 현황, AGENTS와 대회 대응 계획을 `AS_BUILT_BASELINE` 정책에 맞췄다. 문서 전용 변경이므로 애플리케이션 test를 다시 실행하지 않고 로컬 Markdown 링크와 `git diff --check`를 검증했다.
+
+## 2026-07-23 — 현재 문서·로드맵·보관 기록 구조 정리
+
+- 탐색: `docs/README.md`를 문서 안내판으로 추가하고 현재 구현은 `project-status.md`, 앞으로의 순서는 `roadmap.md`, 대회 일정은 `contest/2026-tmaxtibero-plan.md`에서 확인하도록 기준을 분리했다.
+- 축약·통합: 현재 현황을 핵심 기능·검증·한계 중심으로 축약했다. 제품 경계, 브랜치 정책과 수치·근거 문서의 고유 내용은 `AGENTS.md`, `PRZ-000`, 현재 현황과 이 기록에 흡수하고 중복 파일을 제거했다.
+- 보관: 장기 종합 기획안, 과거 0~10단계 실행 계획, Reranker 비채택 실험과 초기 등록·검색 검증을 `docs/archive/`로 이동했다. Dense 검색 평가와 문제 해결 사례는 각각 `evaluation/`, `showcase/`로 분리했다.
+- OpenSQL: 단일 환경 Gate와 OpenProxy·OpenHA 후속 범위를 분리하고, 실제 환경 결과는 계속 `NOT_RUN`으로 유지했다. 실제 착수 시 체크리스트를 `PRZ-001`로 이전한다.
+- 검증: 문서 전용 변경이므로 애플리케이션 test를 다시 실행하지 않았다. 저장소 Markdown 18개의 로컬 링크 누락 0건, code fence 불균형 0건, trailing whitespace 0건과 `git diff --check` 통과를 확인했다.

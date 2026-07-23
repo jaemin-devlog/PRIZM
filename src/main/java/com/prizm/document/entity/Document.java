@@ -70,6 +70,26 @@ public class Document {
         this.activeVersionId = versionId;
     }
 
+    public void updateMetadata(String title, DocumentType documentType) {
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("title must not be blank");
+        }
+        if (documentType == null) {
+            throw new IllegalArgumentException("documentType must not be null");
+        }
+        this.title = title;
+        this.documentType = documentType;
+    }
+
+    /** Records that a new immutable source version was attached to this document. */
+    public void markVersionAdded() {
+        this.updatedAt = Instant.now();
+    }
+
+    public void clearActiveVersion() {
+        this.activeVersionId = null;
+    }
+
     public Long getId() {
         return id;
     }

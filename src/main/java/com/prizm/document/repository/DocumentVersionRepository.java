@@ -13,6 +13,11 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
 
     List<DocumentVersion> findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(Long ownerUserId, Long documentId);
 
+    Optional<DocumentVersion> findByIdAndOwnerUserIdAndDocumentId(
+            Long id,
+            Long ownerUserId,
+            Long documentId);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select version from DocumentVersion version where version.id = :id")
     Optional<DocumentVersion> findByIdForUpdate(@Param("id") Long id);

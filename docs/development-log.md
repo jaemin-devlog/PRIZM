@@ -270,6 +270,12 @@
 - 단계 0 결정: 최종 독립 재검토 PASS에 따라 Engine/Reference App 제품 경계와 단계 8 canonical module graph를 확정하고 단계 0을 `COMPLETE`로 변경했다. 다섯 오래된 TXT 전용 JavaDoc은 단계 3, `.env.example` 불일치는 단계 2 후속 대상으로 남긴다.
 - 남은 경계: OpenSQL profile·조건부 integration test는 실제 OpenSQL/OpenProxy/OpenHA 호환성 증명이 아니며, OpenSQL 단일 migration·vector 검색, OpenProxy runtime, OpenHA 장애전환·검색 복구 순으로 검증한다. V13 CHECK·backfill 회귀 테스트와 SecureDirectoryStream 미지원 filesystem의 fail-closed 운영 문서는 LOW backlog다.
 
+## 2026-07-22 — Career Vault 문서 관리·버전·원본 PDF 열람
+
+- 문서 관리: owner-scoped 목록 필터·상세·제목/DocumentType 수정·안전한 처리 상태를 추가했다. 문서 삭제는 soft-delete 계약이 없는 현재 스키마에 맞춰 소유 문서를 잠그고, 비종료 indexing 작업을 거부하며, 모든 원본 storage key의 Cleanup Job을 동일 트랜잭션에 등록한 뒤 metadata를 하드 삭제한다. 실제 파일 삭제는 요청 트랜잭션 밖의 기존 Cleanup Worker가 수렴시킨다.
+- 버전·미리보기: `POST /api/documents/{documentId}/versions`는 새 TXT/PDF immutable version과 PENDING indexing job을 만들고, 새 색인이 활성화될 때까지 기존 `active_version_id`를 유지한다. owner/document/version을 모두 확인한 PDF 썸네일과 원본 열람 API는 저장 경로·원문·JWT·worker 오류 문구를 노출하지 않는다.
+- 화면: 좁고 반응형인 4:3 카드, 접근 가능한 상세 모달, 버전 이력·ACTIVE 상태·수정본 업로드, PDF 전용 Blob 뷰어, 명시적 삭제 확인과 안전한 오류/재시도 상태를 반영했다.
+- 검증: backend unit 225건 중 211건 성공·환경 조건 14건 skip·실패 0건, PostgreSQL 16+pgvector 문서 관리 통합 5건 성공, frontend lint/build 및 Docker Compose 설정 검증을 통과했다. OpenSQL·OpenProxy·OpenHA·Ollama는 사용하지 않았다.
 ## 2026-07-16 — OpenSQL 단일 환경 SQL 호환성 Gate 준비
 
 - 테스트: PostgreSQL Testcontainers와 opt-in 외부 OpenSQL 실행이 같은 assertion suite를 사용해 V1~V13·schema·pgvector 1024차원·실제 `VectorSearchRepository`·Indexing/Cleanup claim·lease·fencing·recovery·두 connection의 `SKIP LOCKED`를 검증하도록 구성했다.

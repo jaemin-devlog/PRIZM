@@ -6,6 +6,8 @@ import com.prizm.document.exception.DocumentVersionNotFoundException;
 import com.prizm.document.exception.InvalidDocumentVersionStateException;
 import com.prizm.document.exception.DocumentUploadErrorCode;
 import com.prizm.document.exception.DocumentUploadException;
+import com.prizm.document.exception.DocumentThumbnailException;
+import com.prizm.document.exception.DocumentManagementException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -34,10 +36,31 @@ public class DocumentExceptionHandler {
                 .body(new ErrorResponse("DOCUMENT_VERSION_NOT_FOUND", exception.getMessage()));
     }
 
+    @ExceptionHandler(DocumentThumbnailException.class)
+    public ResponseEntity<ErrorResponse> handleThumbnail(DocumentThumbnailException exception) {
+        HttpStatus status = switch (exception.code()) {
+            case UNSUPPORTED_FILE_TYPE, UNREADABLE_PDF -> HttpStatus.UNSUPPORTED_MEDIA_TYPE;
+            case ORIGINAL_FILE_NOT_FOUND -> HttpStatus.NOT_FOUND;
+            case ORIGINAL_FILE_READ_FAILED -> HttpStatus.SERVICE_UNAVAILABLE;
+        };
+        return ResponseEntity.status(status)
+                .body(new ErrorResponse(exception.code().name(), exception.getMessage()));
+    }
+
     @ExceptionHandler(InvalidDocumentVersionStateException.class)
     public ResponseEntity<ErrorResponse> handleConflict(RuntimeException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ErrorResponse("DOCUMENT_VERSION_CONFLICT", exception.getMessage()));
+    }
+
+    @ExceptionHandler(DocumentManagementException.class)
+    public ResponseEntity<ErrorResponse> handleManagement(DocumentManagementException exception) {
+        HttpStatus status = switch (exception.code()) {
+            case DOCUMENT_PROCESSING -> HttpStatus.CONFLICT;
+            case INVALID_TITLE, INVALID_DOCUMENT_TYPE -> HttpStatus.BAD_REQUEST;
+        };
+        return ResponseEntity.status(status)
+                .body(new ErrorResponse(exception.code().name(), exception.getMessage()));
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)

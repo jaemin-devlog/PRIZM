@@ -90,6 +90,69 @@ class LocalFileStorageTest {
     }
 
     @Test
+    void rejectsParentSymlinkWhenReadingAnExternalFile() throws Exception {
+        Path externalFile = outsideRoot.resolve("external.txt");
+        Files.writeString(externalFile, "external", StandardCharsets.UTF_8);
+        createSymbolicLinkOrSkip(storageRoot.resolve("documents"), outsideRoot);
+        LocalFileStorage storage = new LocalFileStorage(storageRoot.toString());
+
+        assertThatThrownBy(() -> storage.read("documents/external.txt"))
+                .isInstanceOf(PermanentFileStorageException.class)
+                .hasMessageContaining("safe directory");
+
+        assertThat(externalFile).exists().hasContent("external");
+    }
+
+    @Test
+    void rejectsNestedParentSymlinkWhenReadingAnExternalFile() throws Exception {
+        Path externalFile = outsideRoot.resolve("external.txt");
+        Files.writeString(externalFile, "external", StandardCharsets.UTF_8);
+        Path documents = storageRoot.resolve("documents");
+        Files.createDirectories(documents);
+        createSymbolicLinkOrSkip(documents.resolve("versions"), outsideRoot);
+        LocalFileStorage storage = new LocalFileStorage(storageRoot.toString());
+
+        assertThatThrownBy(() -> storage.read("documents/versions/external.txt"))
+                .isInstanceOf(PermanentFileStorageException.class)
+                .hasMessageContaining("safe directory");
+
+        assertThat(externalFile).exists().hasContent("external");
+    }
+
+    @Test
+    void rejectsFinalSymbolicLinkWhenReadingAnExternalFile() throws Exception {
+        Path externalFile = outsideRoot.resolve("external.txt");
+        Files.writeString(externalFile, "external", StandardCharsets.UTF_8);
+        Path symbolicLink = storageRoot.resolve("documents/1/2/link.txt");
+        Files.createDirectories(symbolicLink.getParent());
+        createSymbolicLinkOrSkip(symbolicLink, externalFile);
+        LocalFileStorage storage = new LocalFileStorage(storageRoot.toString());
+
+        assertThatThrownBy(() -> storage.read("documents/1/2/link.txt"))
+                .isInstanceOf(PermanentFileStorageException.class)
+                .hasMessageContaining("not a regular file");
+
+        assertThat(externalFile).exists().hasContent("external");
+    }
+
+    @Test
+    void rejectsSymbolicLinkConfiguredAsStorageRootWhenReading() throws Exception {
+        Path realStorageRoot = storageRoot.resolve("real-storage");
+        Path source = realStorageRoot.resolve("documents/1/2/source.txt");
+        Files.createDirectories(source.getParent());
+        Files.writeString(source, "source", StandardCharsets.UTF_8);
+        Path linkedStorageRoot = storageRoot.resolve("linked-storage");
+        createSymbolicLinkOrSkip(linkedStorageRoot, realStorageRoot);
+        LocalFileStorage storage = new LocalFileStorage(linkedStorageRoot.toString());
+
+        assertThatThrownBy(() -> storage.read("documents/1/2/source.txt"))
+                .isInstanceOf(PermanentFileStorageException.class)
+                .hasMessageContaining("safe directory");
+
+        assertThat(source).exists().hasContent("source");
+    }
+
+    @Test
     void deletesExistingFileAndTreatsMissingFileAsSuccess() throws Exception {
         assumeSecureDirectoryStreamSupported();
         Path source = storageRoot.resolve("documents/1/2/source.txt");

@@ -3,9 +3,12 @@ package com.prizm.infrastructure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -14,6 +17,8 @@ import com.prizm.auth.dto.request.LoginRequest;
 import com.prizm.auth.bootstrap.BootstrapSystemAdminProperties;
 import com.prizm.auth.bootstrap.SystemAdminBootstrapRunner;
 import com.prizm.auth.service.AuthService;
+import com.prizm.cleanup.service.FileCleanupCoordinator;
+import com.prizm.document.dto.response.DocumentUploadResponse;
 import com.prizm.document.entity.DocumentType;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.document.service.DocumentUploadService;
@@ -24,6 +29,7 @@ import com.prizm.ingestion.repository.ProcessingJobRepository;
 import com.prizm.user.entity.UserAccount;
 import com.prizm.user.entity.UserRole;
 import com.prizm.user.repository.UserAccountRepository;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -35,6 +41,11 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.DefaultApplicationArguments;
@@ -117,6 +128,9 @@ class AuthenticationIntegrationTest {
     FileStorage fileStorage;
 
     @Autowired
+    FileCleanupCoordinator fileCleanupCoordinator;
+
+    @Autowired
     Validator validator;
 
     private MockMvc mockMvc;
@@ -130,15 +144,13 @@ class AuthenticationIntegrationTest {
 
     @AfterEach
     void cleanUp() {
-        List<String> storedPaths = jdbcTemplate.queryForList(
-                "SELECT stored_file_path FROM document_versions", String.class);
+        jdbcTemplate.update("DELETE FROM file_cleanup_jobs");
         jdbcTemplate.update("DELETE FROM processing_jobs");
         jdbcTemplate.update("DELETE FROM document_chunks");
         jdbcTemplate.update("UPDATE documents SET active_version_id = NULL");
         jdbcTemplate.update("DELETE FROM document_versions");
         jdbcTemplate.update("DELETE FROM documents");
         userAccountRepository.deleteAll();
-        storedPaths.forEach(fileStorage::delete);
     }
 
     @Test
@@ -184,7 +196,7 @@ class AuthenticationIntegrationTest {
     }
 
     @Test
-    void rejectsSystemAdminDocumentUploadListDetailAndSearchAccessWith403() throws Exception {
+    void rejectsSystemAdminDocumentUploadListDetailThumbnailAndSearchAccessWith403() throws Exception {
         String token = tokenFor(UserRole.SYSTEM_ADMIN);
         MockMultipartFile file = new MockMultipartFile(
                 "file", "system-admin-upload.txt", "text/plain", "document content".getBytes(StandardCharsets.UTF_8));
@@ -201,6 +213,10 @@ class AuthenticationIntegrationTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
         mockMvc.perform(get("/api/documents/1")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+        mockMvc.perform(get("/api/documents/1/versions/1/thumbnail")
                         .header(HttpHeaders.AUTHORIZATION, bearer(token)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
@@ -364,6 +380,67 @@ class AuthenticationIntegrationTest {
     }
 
     @Test
+    void protectsPdfThumbnailByAuthenticationAndDocumentOwnership() throws Exception {
+        UserAccount owner = createUser("thumbnail-owner@prizm.local", UserRole.USER, true);
+        UserAccount otherUser = createUser("thumbnail-other@prizm.local", UserRole.USER, true);
+        String ownerToken = login(owner.getEmail());
+        String otherToken = login(otherUser.getEmail());
+        DocumentUploadResponse upload = documentUploadService.upload(
+                owner.getId(),
+                "Thumbnail source",
+                DocumentType.PORTFOLIO,
+                new MockMultipartFile(
+                        "file",
+                        "thumbnail-source.pdf",
+                        MediaType.APPLICATION_PDF_VALUE,
+                        textPdf("PRIZM thumbnail integration test")));
+        String thumbnailPath = "/api/documents/%d/versions/%d/thumbnail"
+                .formatted(upload.documentId(), upload.versionId());
+
+        mockMvc.perform(get(thumbnailPath))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+
+        byte[] response = mockMvc.perform(get(thumbnailPath)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(ownerToken)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.IMAGE_PNG))
+                .andExpect(header().string(HttpHeaders.CACHE_CONTROL,
+                        "private, max-age=3600, must-revalidate, no-transform"))
+                .andExpect(header().exists(HttpHeaders.ETAG))
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray();
+        assertThat(response).startsWith((byte) 0x89, (byte) 0x50, (byte) 0x4e, (byte) 0x47);
+
+        mockMvc.perform(get(thumbnailPath)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(otherToken)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("DOCUMENT_NOT_FOUND"));
+    }
+
+    @Test
+    void rejectsTxtThumbnailWith415() throws Exception {
+        UserAccount owner = createUser("thumbnail-txt@prizm.local", UserRole.USER, true);
+        String token = login(owner.getEmail());
+        DocumentUploadResponse upload = documentUploadService.upload(
+                owner.getId(),
+                "Text thumbnail source",
+                DocumentType.OTHER,
+                new MockMultipartFile(
+                        "file",
+                        "thumbnail-source.txt",
+                        MediaType.TEXT_PLAIN_VALUE,
+                        "Text documents do not have PDF thumbnails.".getBytes(StandardCharsets.UTF_8)));
+
+        mockMvc.perform(get("/api/documents/{documentId}/versions/{versionId}/thumbnail",
+                        upload.documentId(), upload.versionId())
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isUnsupportedMediaType())
+                .andExpect(jsonPath("$.code").value("UNSUPPORTED_FILE_TYPE"));
+    }
+
+    @Test
     void filtersDocumentListByTypeWithinAuthenticatedUserBoundary() throws Exception {
         UserAccount userA = createUser("filter-a@prizm.local", UserRole.USER, true);
         UserAccount userB = createUser("filter-b@prizm.local", UserRole.USER, true);
@@ -403,6 +480,96 @@ class AuthenticationIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].documentId").value(portfolioB.documentId()))
                 .andExpect(jsonPath("$[1]").doesNotExist());
+    }
+
+    @Test
+    void managesOnlyOwnersDocumentsAndQueuesCleanupAfterTerminalDeletion() throws Exception {
+        UserAccount owner = createUser("document-manager-owner@prizm.local", UserRole.USER, true);
+        UserAccount otherUser = createUser("document-manager-other@prizm.local", UserRole.USER, true);
+        String ownerToken = login(owner.getEmail());
+        String otherUserToken = login(otherUser.getEmail());
+        DocumentUploadResponse ownerUpload = documentUploadService.upload(
+                owner.getId(),
+                "Owner document",
+                DocumentType.OTHER,
+                new MockMultipartFile(
+                        "file", "owner-document.txt", "text/plain", "owner document body".getBytes(StandardCharsets.UTF_8)));
+        DocumentUploadResponse otherUpload = documentUploadService.upload(
+                otherUser.getId(),
+                "Other document",
+                DocumentType.OTHER,
+                new MockMultipartFile(
+                        "file", "other-document.txt", "text/plain", "other document body".getBytes(StandardCharsets.UTF_8)));
+        String storageKey = jdbcTemplate.queryForObject(
+                "SELECT stored_file_path FROM document_versions WHERE id = ?", String.class, ownerUpload.versionId());
+
+        mockMvc.perform(get("/api/documents")
+                        .param("title", "Owner")
+                        .param("processingStatus", "PENDING")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(ownerToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].documentId").value(ownerUpload.documentId()))
+                .andExpect(jsonPath("$[1]").doesNotExist());
+
+        mockMvc.perform(patch("/api/documents/{documentId}", ownerUpload.documentId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"Updated owner document\",\"documentType\":\"RESUME\"}")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(ownerToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Updated owner document"))
+                .andExpect(jsonPath("$.documentType").value("RESUME"));
+        mockMvc.perform(patch("/api/documents/{documentId}", ownerUpload.documentId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"Not allowed\",\"documentType\":\"RESUME\"}")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(otherUserToken)))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(patch("/api/documents/{documentId}", ownerUpload.documentId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\" \",\"documentType\":\"RESUME\"}")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(ownerToken)))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(delete("/api/documents/{documentId}", ownerUpload.documentId())
+                        .header(HttpHeaders.AUTHORIZATION, bearer(ownerToken)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("DOCUMENT_PROCESSING"));
+        mockMvc.perform(delete("/api/documents/{documentId}", ownerUpload.documentId())
+                        .header(HttpHeaders.AUTHORIZATION, bearer(otherUserToken)))
+                .andExpect(status().isNoContent());
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM documents WHERE id = ?", Long.class, ownerUpload.documentId())).isEqualTo(1L);
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM documents WHERE id = ?", Long.class, otherUpload.documentId())).isEqualTo(1L);
+
+        jdbcTemplate.update(
+                "UPDATE processing_jobs SET status = 'FAILED', completed_at = now(), lease_expires_at = NULL WHERE document_version_id = ?",
+                ownerUpload.versionId());
+        jdbcTemplate.update("UPDATE document_versions SET status = 'ACTIVE' WHERE id = ?", ownerUpload.versionId());
+        jdbcTemplate.update(
+                "UPDATE documents SET active_version_id = ? WHERE id = ?", ownerUpload.versionId(), ownerUpload.documentId());
+
+        mockMvc.perform(delete("/api/documents/{documentId}", ownerUpload.documentId())
+                        .header(HttpHeaders.AUTHORIZATION, bearer(ownerToken)))
+                .andExpect(status().isNoContent());
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM documents WHERE id = ?", Long.class, ownerUpload.documentId())).isZero();
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM document_versions WHERE id = ?", Long.class, ownerUpload.versionId())).isZero();
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT status FROM file_cleanup_jobs WHERE storage_key = ?", String.class, storageKey))
+                .isEqualTo("PENDING");
+        if (System.getProperty("os.name").toLowerCase(java.util.Locale.ROOT).contains("linux")) {
+            assertThat(fileCleanupCoordinator.processNext()).isTrue();
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT status FROM file_cleanup_jobs WHERE storage_key = ?", String.class, storageKey))
+                    .isEqualTo("COMPLETED");
+            org.assertj.core.api.Assertions.assertThatThrownBy(() -> fileStorage.read(storageKey))
+                    .isInstanceOf(RuntimeException.class);
+        }
+
+        mockMvc.perform(delete("/api/documents/{documentId}", ownerUpload.documentId())
+                        .header(HttpHeaders.AUTHORIZATION, bearer(ownerToken)))
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -452,6 +619,36 @@ class AuthenticationIntegrationTest {
 
         mockMvc.perform(get("/api/users/me")
                         .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+    }
+
+    @Test
+    void rejectsDisabledAndExpiredTokensBeforeDocumentManagementRoutes() throws Exception {
+        UserAccount disabledUser = createUser("disabled-document-manager@prizm.local", UserRole.USER, true);
+        String disabledToken = login(disabledUser.getEmail());
+        disabledUser.disable();
+        userAccountRepository.saveAndFlush(disabledUser);
+
+        mockMvc.perform(patch("/api/documents/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"Blocked\",\"documentType\":\"RESUME\"}")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(disabledToken)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+
+        UserAccount expiredUser = createUser("expired-document-manager@prizm.local", UserRole.USER, true);
+        Instant now = Instant.now();
+        String expiredToken = signedToken(
+                expiredUser,
+                expiredUser.getEmail(),
+                "USER",
+                "prizm",
+                now.minusSeconds(300),
+                now.minusSeconds(120));
+
+        mockMvc.perform(delete("/api/documents/1")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(expiredToken)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
     }
@@ -701,6 +898,25 @@ class AuthenticationIntegrationTest {
 
     private String bearer(String token) {
         return "Bearer " + token;
+    }
+
+    private byte[] textPdf(String text) {
+        try (PDDocument document = new PDDocument(); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            PDPage page = new PDPage();
+            document.addPage(page);
+            try (PDPageContentStream stream = new PDPageContentStream(document, page)) {
+                stream.beginText();
+                stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+                stream.newLineAtOffset(72, 720);
+                stream.showText(text);
+                stream.endText();
+            }
+            document.save(output);
+            return output.toByteArray();
+        }
+        catch (IOException exception) {
+            throw new UncheckedIOException(exception);
+        }
     }
 
     private record ActiveDocument(Long documentId, Long versionId) {

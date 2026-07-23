@@ -14,6 +14,8 @@ export type DocumentType =
   | 'INTERVIEW_FEEDBACK'
   | 'OTHER'
 
+export type DocumentFileType = 'TXT' | 'PDF'
+
 export type DocumentSummary = {
   documentId: number
   title: string
@@ -21,7 +23,50 @@ export type DocumentSummary = {
   activeVersionId: number | null
   latestVersionId: number | null
   latestVersionStatus: string | null
+  latestOriginalFileName: string | null
+  latestFileType: DocumentFileType | null
+  latestProcessingStatus: ProcessingJobStatus | null
+  latestProcessingErrorCode: string | null
+  activeVersionStatus: string | null
+  versionCount: number
   createdAt: string
+  updatedAt: string
+}
+
+export type ProcessingJobStatus =
+  | 'PENDING'
+  | 'PROCESSING'
+  | 'RETRY_WAIT'
+  | 'COMPLETED'
+  | 'FAILED'
+
+export type DocumentVersion = {
+  versionId: number
+  versionNo: number
+  originalFileName: string
+  fileType: DocumentFileType
+  status: string
+  processingStatus: ProcessingJobStatus | null
+  processingErrorCode: string | null
+  retryScheduled: boolean
+  createdAt: string
+}
+
+export type DocumentDetail = {
+  documentId: number
+  title: string
+  documentType: DocumentType
+  ownerConfirmed: boolean
+  activeVersionId: number | null
+  createdAt: string
+  updatedAt: string
+  versions: DocumentVersion[]
+}
+
+export type DocumentListFilters = {
+  documentType?: DocumentType
+  title?: string
+  processingStatus?: ProcessingJobStatus
 }
 
 export type DocumentUploadResponse = {
@@ -45,7 +90,7 @@ export class DocumentApiError extends Error {
   }
 }
 
-export async function getDocuments(documentType?: DocumentType): Promise<DocumentSummary[]> {
+export async function getDocuments(filters: DocumentListFilters = {}): Promise<DocumentSummary[]> {
   const accessToken = getAccessToken()
 
   if (accessToken === null) {
@@ -53,8 +98,14 @@ export async function getDocuments(documentType?: DocumentType): Promise<Documen
   }
 
   const parameters = new URLSearchParams()
-  if (documentType !== undefined) {
-    parameters.set('documentType', documentType)
+  if (filters.documentType !== undefined) {
+    parameters.set('documentType', filters.documentType)
+  }
+  if (filters.title !== undefined && filters.title.trim() !== '') {
+    parameters.set('title', filters.title.trim())
+  }
+  if (filters.processingStatus !== undefined) {
+    parameters.set('processingStatus', filters.processingStatus)
   }
   const query = parameters.toString()
   const response = await fetch(query === '' ? '/api/documents' : `/api/documents?${query}`, {
@@ -68,6 +119,28 @@ export async function getDocuments(documentType?: DocumentType): Promise<Documen
   }
 
   return (await response.json()) as DocumentSummary[]
+}
+
+export async function getDocument(documentId: number): Promise<DocumentDetail> {
+  const response = await documentRequest(`/api/documents/${documentId}`)
+  return (await response.json()) as DocumentDetail
+}
+
+export async function updateDocumentMetadata(
+  documentId: number,
+  title: string,
+  documentType: DocumentType,
+): Promise<DocumentDetail> {
+  const response = await documentRequest(`/api/documents/${documentId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, documentType }),
+  })
+  return (await response.json()) as DocumentDetail
+}
+
+export async function deleteDocument(documentId: number): Promise<void> {
+  await documentRequest(`/api/documents/${documentId}`, { method: 'DELETE' })
 }
 
 export async function uploadDocument(
@@ -101,6 +174,69 @@ export async function uploadDocument(
   return (await response.json()) as DocumentUploadResponse
 }
 
+export async function uploadDocumentVersion(
+  documentId: number,
+  file: File,
+): Promise<DocumentUploadResponse> {
+  const formData = new FormData()
+  formData.set('file', file)
+  const response = await documentRequest(`/api/documents/${documentId}/versions`, {
+    method: 'POST',
+    body: formData,
+  })
+  return (await response.json()) as DocumentUploadResponse
+}
+
+export async function getDocumentThumbnail(
+  documentId: number,
+  versionId: number,
+  signal?: AbortSignal,
+): Promise<Blob> {
+  const accessToken = getAccessToken()
+
+  if (accessToken === null) {
+    throw new DocumentApiError(401)
+  }
+
+  const response = await fetch(
+    `/api/documents/${documentId}/versions/${versionId}/thumbnail`,
+    {
+      headers: {
+        Accept: 'image/png, application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      signal,
+    },
+  )
+
+  if (!response.ok) {
+    throw new DocumentApiError(response.status, await responseErrorCode(response))
+  }
+
+  return response.blob()
+}
+
+export async function getDocumentPdf(
+  documentId: number,
+  versionId: number,
+  signal?: AbortSignal,
+): Promise<Blob> {
+  const response = await documentRequest(
+    `/api/documents/${documentId}/versions/${versionId}/original`,
+    {
+      headers: { Accept: 'application/pdf, application/json' },
+      signal,
+    },
+  )
+
+  const contentType = response.headers.get('Content-Type') ?? ''
+  if (!contentType.toLowerCase().startsWith('application/pdf')) {
+    throw new DocumentApiError(502, 'INVALID_PDF_RESPONSE')
+  }
+
+  return response.blob()
+}
+
 async function responseErrorCode(response: Response): Promise<string | null> {
   try {
     const body: unknown = await response.json()
@@ -112,4 +248,19 @@ async function responseErrorCode(response: Response): Promise<string | null> {
   }
 
   return null
+}
+
+async function documentRequest(path: string, init: RequestInit = {}): Promise<Response> {
+  const accessToken = getAccessToken()
+  if (accessToken === null) {
+    throw new DocumentApiError(401)
+  }
+
+  const headers = new Headers(init.headers)
+  headers.set('Authorization', `Bearer ${accessToken}`)
+  const response = await fetch(path, { ...init, headers })
+  if (!response.ok) {
+    throw new DocumentApiError(response.status, await responseErrorCode(response))
+  }
+  return response
 }

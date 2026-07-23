@@ -1,0 +1,20 @@
+spring:
+  flyway:
+    enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: none
+  ai:
+    model:
+      chat: none
+      embedding: ollama
+
+prizm:
+  jwt:
+    secret: search-evaluation-jwt-secret-at-least-32-characters-long
+    expiration-seconds: 3600
+    issuer: prizm
+  ingestion:
+    worker-enabled: false
+  cleanup:
+    worker-enabled: false

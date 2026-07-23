@@ -15,8 +15,8 @@ PRIZM의 공식 제품 정의는 다음과 같습니다.
 ## 현재 제공 범위
 
 - Engine 기반: JWT 인증, 사용자별 문서·버전·작업·청크 격리, 로컬 원본 저장, TXT·텍스트 PDF 처리, Flyway schema, lease·retry·fencing 기반 비동기 색인, PostgreSQL pgvector exact cosine 검색, 고아 원본 파일 Cleanup Worker
-- Reference App: 로그인, 문서 목록·12개 유형 필터, TXT·PDF 업로드, 관련 원문 근거 최대 5개 표시
-- 현재 API: 로그인·현재 사용자·문서 업로드/목록/상세·단일 검색·Career Evidence 검색·health
+- Reference App: 로그인, 문서 목록·유형/제목/처리상태 필터, TXT·PDF 업로드, 문서 상세·수정·삭제, 새 버전 등록, PDF thumbnail·원본 열람, 관련 원문 근거 최대 5개 표시
+- 현재 API: 로그인·현재 사용자·문서 업로드/목록/상세/수정/삭제·새 버전·PDF thumbnail/원본·단일 검색·Career Evidence 검색·health
 
 CareerFact 구조화, 포트폴리오 생성, `/api/v1`, MCP, 멀티모듈 패키징, 기관용 workspace와 OpenSQL/OpenProxy/OpenHA 실환경 호환성은 계획 범위이며 현재 구현이 아닙니다. 자세한 현재/계획 경계는 [오픈소스 제품 경계](docs/architecture/oss-product-boundary.md)와 [현재 구현 현황](docs/project-status.md)을 참고합니다.
 
@@ -63,3 +63,9 @@ docker compose config
 - [개발 기록](docs/development-log.md)
 - [장기 기획안](docs/PRIZM_최종_기획안.md)
 - [OpenSQL 기술 Gate](docs/opensql-gate.md)
+- [2026 티맥스티베로 지정과제 대응 계획](docs/contest/2026-tmaxtibero-plan.md)
+- [검색 품질 평가](docs/search-evaluation.md)
+- [수치와 구현 근거](docs/portfolio/metrics-and-evidence.md)
+- [대표 문제 해결 사례](docs/portfolio/problem-solving-case-studies.md)
+- [BGE Reranker 비채택 결정](docs/experiments/2026-07-14-bge-reranker-evaluation.md)
+- [브랜치 운영 정책](docs/branch-policy.md)

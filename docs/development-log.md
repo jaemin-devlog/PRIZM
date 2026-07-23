@@ -218,6 +218,21 @@
 - 표시: 문서 제목·버전·출처 라벨·원문·원래 score를 보여주며, 빈 배열은 근거를 찾지 못했다는 중립 문구로 처리한다. score는 `1 - distance` 계약이므로 퍼센트로 단정하지 않는다.
 - 보존: 기존 문서 목록·유형 필터·TXT/PDF 업로드·인증 만료 처리를 유지하며, AI 답변·근거 저장·백엔드 변경은 추가하지 않았다.
 
+## 2026-07-14 — 검색 품질 평가 기반
+
+- 변경: 합성 `corpus.json`·`questions.jsonl` 형식과 개인 데이터가 Git에서 제외되는 `local/search-evaluation/` 경계를 추가했다.
+- 측정: 별도 `searchEvaluation` task가 실제 PostgreSQL·pgvector와 Ollama `bge-m3`, 현재 청킹·owner·ACTIVE 조건을 사용해 Dense top 5·20을 조회하고 Recall@20, Precision@5, MRR@20, nDCG@5, 중복률과 지연을 로컬 JSON·CSV로 기록한다.
+- 범위: 프로덕션 검색 API, score 임계값, Reranker, Hybrid Search, 청킹과 프런트엔드는 변경하지 않았다.
+- 검증: 단위 테스트 162개, PostgreSQL·pgvector·실제 Ollama 통합 테스트 49개와 합성 기준선 평가를 통과했다. OpenSQL 실환경 테스트 1개는 기존 정책대로 제외했다.
+
+## 2026-07-14 — 검색 평가 파일럿 데이터 확장
+
+- 데이터: 기존 합성 사례를 보존하면서 가상 문서 11개, 질문 30개로 확장했다. 기술 8개, 문제 해결 6개, 협업 4개, 정확한 수치·표현 6개, 무근거 6개이며 hard negative 질문은 11개다.
+- 분리: 질문을 TUNING 20개와 TEST 10개로 구분하고, 동일 정규화 질문 중복·잘못된 split·누락된 fixture 근거·무근거 라벨 충돌을 실행 전에 차단한다. 의미가 같은 패러프레이즈의 split 간 중복은 수동 검토했다.
+- 출력: Dense 기준선 보고서에 전체·split·category별 Precision@5, Recall@20, MRR@20, nDCG@5, 중복률, score 분포와 지연을 추가했다.
+- 기준선: 실제 PostgreSQL 16.14·pgvector와 Ollama `bge-m3` 최종 실행에서 전체 Recall@20 1.0000, Precision@5 0.1933, MRR@20 0.6556, nDCG@5 0.8543, 중복률 0.0067, 평균/p95 864.20/999ms를 기록했다. 합성 결과는 실제 서비스 성능을 보장하지 않는다.
+- 범위: 운영 검색, 임계값, Reranker, Hybrid Search, 청킹, 프런트엔드와 DB migration은 변경하지 않았다.
+
 ## 2026-07-15 — 고아 원본 파일 Cleanup Worker
 
 - 변경: V13에서 cleanup 작업을 `PENDING`, `PROCESSING`, `RETRY_WAIT`, `COMPLETED`, `FAILED` 상태로 확장하고, PostgreSQL `FOR UPDATE SKIP LOCKED`와 lease·claim version으로 짧게 선점한 뒤 파일 삭제를 DB 트랜잭션 밖에서 실행하도록 구현했다.
@@ -288,3 +303,11 @@
 - 안전성: Flyway와 runtime을 migration 전에 각각 빈 대상으로 확인하고, migration 뒤 Flyway가 만든 비활성 UUID marker를 runtime이 읽어야만 fixture를 시작하도록 했다. 전역 domain 삭제를 제거하고 실행별 UUID·생성 ID만 정리한다.
 - 회귀 검증: 별도 datasource 정상 경로와 기존 V13 sentinel runtime·서로 다른 빈 runtime 오설정 경로를 Docker PostgreSQL 16+pgvector에서 3건 모두 통과했으며 sentinel 데이터 보존과 marker fail-closed를 확인했다.
 - 상태: 실제 OpenSQL 환경은 사용하지 않아 결과는 계속 `NOT_RUN`이다. OpenProxy·OpenHA·Ollama도 이번 검증에 사용하지 않았다.
+
+## 2026-07-23 — 미병합 브랜치 통합과 대회 대응 기준 정리
+
+- 브랜치 판정: `codex/search-evaluation-baseline`과 `test/search-evaluation-pilot`의 Dense 평가 기반·합성 11문서/30질문·단위 테스트를 `main`에 통합했다. main의 V13 Cleanup Worker가 평가 중 실행되지 않도록 평가 profile에서 indexing·cleanup Worker를 모두 비활성화했다.
+- 실험 결정: `experiment/bge-reranker-evaluation`의 CPU Reranker 코드는 직접 근거 Precision 개선 실패와 p95 약 51.86초·peak RSS 약 2.10GB 비용 때문에 채택하지 않았다. 조건·수치·비채택 근거만 별도 결정 문서에 남겼다.
+- 문서 선별: `portfolio/prizm-showcase`의 오래된 README와 V12·Cleanup 미구현 설명은 가져오지 않고, PR #9·#10과 V13 기준의 수치·문제 해결 사례로 다시 작성했다. `main`을 유일한 장기 브랜치로 두는 종료 절차도 문서화했다.
+- 대회 계획: GitHub Spec Kit의 spec→plan→tasks 흐름과 robo-architect의 evidence 분리를 작은 수직 슬라이스에만 적용하도록 정했다. OpenSQL 실환경은 아직 `NOT_RUN`, CareerFact·portfolio는 계획 기능으로 유지하며 2026-08-27 제출일까지 OpenSQL Gate→clean-clone→작은 grounded slice→라이선스·제출 감사 순으로 배치했다.
+- 검증: `cleanTest test --no-daemon --rerun-tasks`에서 backend 242건 중 228건 성공·환경 조건 14건 skip·실패/오류 0건, frontend lint/build를 통과했다. 현재 환경에는 Docker 실행 파일이 없어 `docker compose config`, PostgreSQL·pgvector 통합 테스트와 `searchEvaluation`을 재실행하지 못했고 Ollama·OpenSQL·OpenProxy·OpenHA도 사용하지 않았다.

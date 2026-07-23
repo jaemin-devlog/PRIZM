@@ -1,7 +1,7 @@
 # PRIZM 현재 구현 현황
 
-> 기준일: 2026-07-16
-> 상태: source·Flyway·test·frontend 재조사와 최종 독립 재검토 PASS 기준, 단계 0 기준선 확정
+> 기준일: 2026-07-23
+> 상태: PR #9 Docker 개발 스택·PR #10 문서 관리 수직 슬라이스와 검색 평가 파일럿 통합 기준
 > 이 문서는 현재 구현의 요약이며 최종 판단은 항상 실행 가능한 코드와 테스트를 기준으로 합니다.
 
 PRIZM의 공식 제품 정의는 다음과 같습니다.
@@ -47,11 +47,15 @@ PRIZM의 공식 제품 정의는 다음과 같습니다.
 - 12개 문서 유형 중 하나를 적용하는 목록 필터
 - TXT·PDF 단일 파일 업로드와 최대 10MB 클라이언트 사전 검사
 - 업로드 성공 후 현재 필터를 유지한 목록 재조회
+- 제목 부분 검색과 최신 처리 상태 필터
+- 문서 상세 modal, 제목·문서 유형 수정과 명시적 삭제 확인
+- 전체 version 이력, ACTIVE 표시와 같은 문서의 새 TXT/PDF version 등록
+- owner-scoped PDF 첫 페이지 thumbnail과 원본 Blob viewer
 - `POST /api/career-evidence/search`를 사용하는 자연어 검색
 - 관련도 순 최대 5개 문서 제목·version·출처 라벨·원문·원래 score 표시
 - 빈 배열을 `현재 PRIZM에 등록된 문서에서는 관련 근거를 찾지 못했습니다`라는 중립 문구로 안내
 
-프런트엔드는 문서 상세·삭제·수정, 처리상태 자동 갱신, PDF 미리보기, CareerFact 확인·저장, portfolio를 제공하지 않습니다. 프런트엔드 test suite는 없고 lint와 production build만 구성되어 있습니다.
+프런트엔드는 처리상태 자동 polling, CareerFact 확인·저장과 portfolio 생성을 제공하지 않습니다. 프런트엔드 test suite는 없고 lint와 production build만 구성되어 있습니다.
 
 ### 문서 등록과 원본 저장
 
@@ -138,14 +142,19 @@ OCR, image-only PDF, PDF 좌표와 이미지 추출은 지원하지 않습니다
 | `POST /api/auth/login` | 공개 | 로그인과 Access Token 발급 |
 | `GET /api/users/me` | 인증 | 현재 인증 사용자 조회 |
 | `POST /api/documents` | `USER` | `title`, 선택적 `documentType`, TXT·PDF `file` 최초 업로드 |
-| `GET /api/documents` | `USER` | 내 문서 목록 |
+| `GET /api/documents` | `USER` | 내 문서 목록; 선택적 `documentType`, 제목, 최신 처리 상태 필터 |
 | `GET /api/documents?documentType=PORTFOLIO` | `USER` | 내 문서 유형별 목록 |
 | `GET /api/documents/{documentId}` | `USER` | 내 문서와 version metadata 상세 조회 |
+| `PATCH /api/documents/{documentId}` | `USER` | 제목과 12개 `DocumentType` metadata 수정 |
+| `DELETE /api/documents/{documentId}` | `USER` | terminal 문서 metadata 삭제와 모든 원본 cleanup job 등록 |
+| `POST /api/documents/{documentId}/versions` | `USER` | 같은 문서에 immutable TXT/PDF 다음 version 등록 |
+| `GET /api/documents/{documentId}/versions/{versionId}/thumbnail` | `USER` | owner-scoped PDF 첫 페이지 PNG |
+| `GET /api/documents/{documentId}/versions/{versionId}/original` | `USER` | owner-scoped PDF 원본 inline 응답 |
 | `POST /api/search` | `USER` | 내 ACTIVE 청크 중 단일 검색 결과 |
 | `POST /api/career-evidence/search` | `USER` | 내 ACTIVE 청크 중 최대 5개 근거 배열 |
 | `GET /actuator/health` | 공개 | 애플리케이션 health |
 
-현재 endpoint는 `/api/v1` versioned public API나 OpenAPI 계약이 아닙니다. 처리 job 조회·재시도, 기존 document에 새 version 추가, 삭제 API도 없습니다.
+현재 endpoint는 `/api/v1` versioned public API나 OpenAPI 계약이 아닙니다. 처리 job의 직접 조회·수동 재시도와 idempotency key는 없습니다.
 
 ## 데이터베이스와 migration
 
@@ -171,7 +180,7 @@ V13 Cleanup Worker는 `86387e7c227ede3be96c538aafc48b0205bc5e18` (`feat: add res
 
 - Java 17, Spring Boot 4.1, Gradle Wrapper 9.5.1
 - Spring MVC·Security·JPA·JdbcTemplate·Flyway
-- PostgreSQL 16+pgvector 0.8.2; `compose.yaml`은 DB만 실행
+- PostgreSQL 16+pgvector 0.8.2; `compose.yaml`은 DB·backend·frontend 3개 service 실행
 - Apache PDFBox 3.0.3
 - Spring AI Ollama와 host `bge-m3`; model 자동 다운로드 안 함
 - 로컬 filesystem 원본 저장; object storage와 분산 durable storage 아님
@@ -191,9 +200,7 @@ V13 Cleanup Worker는 `86387e7c227ede3be96c538aafc48b0205bc5e18` (`feat: add res
 
 `src/main/java`의 JavaDoc과 일반 주석을 전수 검색한 결과, TXT/PDF 지원 범위를 잘못 한정하는 설명은 위 다섯 곳입니다. `PdfExtractionProperties`의 PDF 페이지 추출 한도 설명과 TXT UTF-8 decode·빈 TXT 오류·`TEXT_CHUNK` 분기처럼 특정 형식의 실제 동작만 설명하는 코드와 메시지는 현재 구현에 맞으므로 기술 부채에서 제외합니다.
 
-- `.env.example`의 `# TXT indexing worker` 설명은 아직 TXT 전용으로 남아 있지만 실제 Worker는 TXT와 PDF를 처리합니다.
-- `.env.example`에는 현재 PDF 처리 제한의 `PRIZM_DOCUMENT_PDF_MAX_PAGES`, `PRIZM_DOCUMENT_PDF_MAX_EXTRACTED_CHARACTERS`가 없습니다. 재현 가능한 실행환경을 만드는 단계 2에서 실제 `application.yml`과 동기화할 대상입니다.
-- V13 Cleanup Worker가 사용하는 `PRIZM_CLEANUP_WORKER_ENABLED`, `PRIZM_CLEANUP_POLL_DELAY_MS`, `PRIZM_CLEANUP_RECOVERY_DELAY_MS`, `PRIZM_CLEANUP_BATCH_SIZE`, `PRIZM_CLEANUP_LEASE_DURATION`도 `.env.example`에 없습니다. 구현 완료 상태와 별개로 단계 2에서 환경 예제와 Quickstart·운영 제약을 실제 `application.yml`에 맞게 반영해야 합니다.
+`.env.example`은 2026-07-23에 TXT/PDF 처리 제한과 V13 Cleanup Worker 설정을 `application.yml` 기본값에 맞춰 동기화했습니다.
 
 ## 검증 기준
 
@@ -216,7 +223,7 @@ Integration test는 Testcontainers PostgreSQL 16+pgvector, Flyway, 실제 host O
 - 재사용 가능한 Engine module, Spring Boot starter와 adapter contract test kit
 - clean-clone Docker Quickstart와 안전한 demo USER 생성 경로
 - canonical SourceLocator, quote hash, parser/chunker/model provenance
-- 같은 document에 새 version 추가, idempotency key, 처리상태 조회 API
+- idempotency key와 처리상태 직접 조회·재시도 API
 - CareerFact 후보·확인·거절과 `INSUFFICIENT_EVIDENCE`
 - 검증된 CareerFact만 사용하는 JSON·Markdown portfolio와 source manifest
 - `/api/v1` OpenAPI, capability/provider 조회, MCP, webhook/outbox
@@ -233,4 +240,8 @@ Integration test는 Testcontainers PostgreSQL 16+pgvector, Flyway, 실제 host O
 - [최종 기획안](PRIZM_최종_기획안.md): 장기 목표와 보존된 제품·시장 가설
 - [개발 기록](development-log.md): 날짜별 변경·검증 이력
 - [OpenSQL 기술 Gate](opensql-gate.md): 실제 OpenSQL 환경 검증 체크리스트
+- [2026 티맥스티베로 지정과제 대응 계획](contest/2026-tmaxtibero-plan.md): 검증 우선순위와 제출 일정
+- [검색 품질 평가](search-evaluation.md): 합성 Dense 검색 평가 방법과 재현 절차
+- [브랜치 운영 정책](branch-policy.md): `main` 단일 장기 브랜치와 실험 보존 기준
+- [수치와 구현 근거](portfolio/metrics-and-evidence.md): 현재 코드·검증·실험 수치의 상태 분리
 - `docs/verification/`: 특정 초기 구현 시점의 역사적 상세 기록

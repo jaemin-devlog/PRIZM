@@ -86,9 +86,9 @@ Codex 공식 모델 선택 지침을 기준으로 다음 원칙을 사용한다.
 
 | 단계 | 이름 | 상태 | 완료 증거 |
 |---|---|---|---|
-| 0 | 구현 기준선과 제품 경계 확정 | COMPLETE | 최종 독립 재검토 PASS: 제품 경계·단계 8 canonical module graph·다섯 JavaDoc 및 `.env.example` 기술 부채 기록 확인 |
+| 0 | 구현 기준선과 제품 경계 확정 | COMPLETE | 최종 독립 재검토 PASS; PR #9·#10 이후 현재 기능 문서 재동기화 |
 | 1 | 오픈소스 거버넌스와 저장소 위생 | NOT_STARTED | |
-| 2 | 재현 가능한 Quickstart와 참조 실행환경 | NOT_STARTED | |
+| 2 | 재현 가능한 Quickstart와 참조 실행환경 | IN_PROGRESS | PR #9의 DB·backend·frontend Compose와 Dockerfile, `.env.example` 동기화 완료; demo USER·합성 E2E 미완료 |
 | 3 | 코어 포트와 어댑터 경계 정리 | NOT_STARTED | |
 | 4 | Canonical Source와 처리 이력 계약 | NOT_STARTED | |
 | 5 | 근거 연결 CareerFact 수직 슬라이스 | NOT_STARTED | |
@@ -162,9 +162,9 @@ commit, push, PR 생성은 하지 마.
 - 2026-07-15 2차 독립 재검토는 `DocumentIndexingProcessor`, `IngestionProperties`, `TextChunker`의 오래된 TXT 전용 JavaDoc이 기술 부채 목록에서 빠진 점을 Medium finding으로 판정해 FAIL했다.
 - `src/main/java` 전체 JavaDoc·일반 주석 전수 검사에서 확인한 다섯 개의 부정확한 설명을 기준선과 단계 3 후속 범위에 반영했으며, 실제 JavaDoc은 아직 수정하지 않았다.
 - 이 수정은 문서 기준선 보완이며 애플리케이션 코드, migration, build 설정과 V13 Cleanup Worker를 변경하지 않는다.
-- 2026-07-16 최종 독립 재검토는 위 세 지적사항을 모두 RESOLVED로 판정하고 PASS했다. 제품 경계, Career Vault의 Reference App 역할, 단계 8의 유일한 canonical module graph, 다섯 JavaDoc과 `.env.example` 기술 부채의 단계 3·단계 2 후속 연결을 확인했다.
+- 2026-07-16 최종 독립 재검토는 위 세 지적사항을 모두 RESOLVED로 판정하고 PASS했다. 제품 경계, Career Vault의 Reference App 역할, 단계 8의 유일한 canonical module graph, 다섯 JavaDoc과 당시 `.env.example` 기술 부채의 단계 3·단계 2 후속 연결을 확인했다.
 - V13 Cleanup Worker는 별도 보안·동시성 감사에서 CRITICAL/HIGH/MEDIUM finding 없이 통과했고 `86387e7c227ede3be96c538aafc48b0205bc5e18`로 main에 병합됐다. 단계 0에 추가 문서 감사는 필요하지 않다.
-- 단계 0은 `COMPLETE`다. JavaDoc은 단계 3, `.env.example`은 단계 2의 후속 수정 대상으로 유지한다.
+- 단계 0은 `COMPLETE`다. JavaDoc은 단계 3 후속 대상으로 유지한다. `.env.example`의 TXT/PDF 처리 제한과 Cleanup Worker 설정은 2026-07-23에 현재 `application.yml`과 동기화했다.
 
 ### 실행 프롬프트
 
@@ -258,6 +258,13 @@ LICENSE, NOTICE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, CHANGELOG.md,
 - `docker compose config`가 성공한다.
 - 가능한 환경에서는 업로드→ACTIVE→검색까지 실제로 검증한다.
 - Docker, PostgreSQL, pgvector, Ollama를 실제 사용했는지 보고서에 구분한다.
+
+### 현재 부분 구현
+
+- PR #9에서 PostgreSQL·pgvector, Spring Boot API/Worker, React 정적 Web을 실행하는 3-service Compose와 backend/frontend Dockerfile을 추가했다.
+- Flyway owner와 runtime DML role을 분리하고 backend container를 non-root 사용자로 실행한다.
+- `.env.example`은 PDF 처리 제한과 V13 Cleanup Worker 설정을 현재 기본값에 맞췄다.
+- 로그인 가능한 demo `USER`, 재배포 가능한 합성 업로드 fixture와 clean-clone E2E는 아직 없어 단계 2는 `IN_PROGRESS`다.
 
 ### 실행 프롬프트
 

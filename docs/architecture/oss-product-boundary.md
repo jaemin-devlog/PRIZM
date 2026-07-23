@@ -1,7 +1,7 @@
 # PRIZM 오픈소스 제품 경계와 구현 기준선
 
-> 기준일: 2026-07-16
-> 상태: 단계 0 최종 독립 재검토 PASS, 기준선 확정
+> 기준일: 2026-07-23
+> 상태: 단계 0 기준선과 PR #9·#10 수직 슬라이스 반영
 > 구현 판단 기준: source code, Flyway migration, executable test, `frontend/`
 
 이 문서는 PRIZM Engine과 Career Vault Reference App의 책임을 구분하고, 이후 리팩터링이 보존해야 할 현재 실행 기준선을 기록합니다. 장기 목표가 현재 구현을 뜻하지 않으며, 상세 현재 기능은 [현재 구현 현황](../project-status.md), 전환 순서는 [오픈소스 엔진 전환 실행 계획](../oss-transition-execution-plan.md)을 기준으로 합니다.
@@ -34,10 +34,11 @@
 | 문서·버전·청크·processing job owner 격리 | 구현 | V8 composite FK, repository 조건, 통합 테스트 |
 | 자동 비동기 색인과 원자적 ACTIVE 전환 | 구현 | processing job claim, heartbeat, completion transaction |
 | 단일 검색·최대 5개 Career Evidence 검색 | 구현 | `/api/search`, `/api/career-evidence/search` |
-| Career Vault 로그인·목록·필터·업로드·다중 근거 UI | 구현 | `frontend/src/App.tsx` |
+| Career Vault 로그인·목록·필터·업로드·문서 관리·PDF 열람·다중 근거 UI | 구현 | `frontend/src/App.tsx` |
 | 문서 상세 API | 구현 | `GET /api/documents/{documentId}` |
-| 문서 상세 UI | 미구현 | Reference App에 route와 호출 없음 |
-| 같은 논리문서의 새 버전 추가 API | 미구현 | 최초 등록 endpoint만 존재 |
+| 문서 상세·수정·삭제 UI와 API | 구현 | `GET/PATCH/DELETE /api/documents/{documentId}` |
+| 같은 논리문서의 새 버전 추가 | 구현 | `POST /api/documents/{documentId}/versions`; 성공 전 기존 ACTIVE 유지 |
+| PDF thumbnail·원본 열람 | 구현 | owner/document/version scoped PNG·PDF endpoint와 Blob viewer |
 | CareerFact와 사용자 확인 상태 | 미구현 | domain, table, API 없음 |
 | 검증된 portfolio 생성 | 미구현 | composer, renderer, artifact table/API 없음 |
 | MCP·OpenAPI `/api/v1`·webhook/outbox | 미구현 | endpoint와 contract 없음 |
@@ -52,8 +53,13 @@
 | `POST /api/auth/login` | 공개 | 이메일·비밀번호를 받아 HS256 Access Token과 사용자 요약 반환 |
 | `GET /api/users/me` | 인증 사용자 | DB에서 다시 확인된 현재 사용자 반환 |
 | `POST /api/documents` | `USER` | multipart `title`, 선택적 `documentType`, TXT/PDF `file`; 새 document와 version 1을 `QUARANTINED`로 등록 |
-| `GET /api/documents` | `USER` | owner의 문서 목록; 선택적 단일 `documentType` 필터 |
+| `GET /api/documents` | `USER` | owner의 문서 목록; 선택적 `documentType`, 제목, 최신 처리 상태 필터 |
 | `GET /api/documents/{documentId}` | `USER` | owner의 문서와 버전 메타데이터 목록 |
+| `PATCH /api/documents/{documentId}` | `USER` | owner 문서의 제목과 `DocumentType` 수정 |
+| `DELETE /api/documents/{documentId}` | `USER` | terminal 문서 metadata 삭제와 원본 cleanup 등록 |
+| `POST /api/documents/{documentId}/versions` | `USER` | owner 문서의 다음 immutable TXT/PDF version 등록 |
+| `GET /api/documents/{documentId}/versions/{versionId}/thumbnail` | `USER` | owner-scoped PDF 첫 페이지 PNG |
+| `GET /api/documents/{documentId}/versions/{versionId}/original` | `USER` | owner-scoped PDF 원본 inline 응답 |
 | `POST /api/search` | `USER` | 최대 500자 query; 가장 가까운 한 청크, 없으면 404 `SEARCH_NO_RESULT` |
 | `POST /api/career-evidence/search` | `USER` | 같은 query; 거리순 최대 5개 배열, 없으면 HTTP 200 빈 배열 |
 | `GET /actuator/health` | 공개 | Spring Boot health |
@@ -128,7 +134,7 @@ Cleanup Worker도 PostgreSQL `FOR UPDATE SKIP LOCKED`로 짧게 claim하고 leas
 | React 19, TypeScript 6, Vite 8 | Career Vault Reference App | lint와 production build; frontend test suite 없음 |
 | OpenSQL/OpenProxy/OpenHA | 목표 운영환경 | 실환경 미검증; [OpenSQL 기술 Gate](../opensql-gate.md) 분리 |
 
-`compose.yaml`은 database만 정의합니다. API, Worker, Web, Ollama를 모두 묶는 배포 또는 clean-clone Quickstart는 아직 없습니다.
+`compose.yaml`은 PostgreSQL·pgvector, API/Worker backend와 정적 Web frontend 3개 service를 정의하고 host Ollama에 연결합니다. 다만 안전한 demo `USER` 생성과 합성 문서 end-to-end 절차가 없어 clean-clone Quickstart는 아직 완성되지 않았습니다.
 
 OpenSQL profile과 조건부 integration test는 존재하지만 PostgreSQL 성공은 OpenSQL 성공이 아닙니다. OpenSQL, OpenProxy, OpenHA는 실제 환경에서 아직 검증되지 않았으며, 다음 기술 작업 순서는 (1) OpenSQL 단일 환경의 migration·vector 검색 검증, (2) OpenProxy runtime 연결 검증, (3) OpenHA 장애전환과 검색 복구 검증입니다.
 

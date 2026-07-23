@@ -65,7 +65,9 @@ Do not implement the full career product unless a later task explicitly requests
 - text-layer PDF validation, page extraction, and configured processing limits
 - embedding dimension, finite-value, and non-zero-norm validation
 - the existing single-result search and five-result Career Evidence API contracts
-- frontend login, Career Vault list/filter, TXT/PDF upload, and up-to-five-result Career Evidence search flows
+- frontend login, Career Vault list/filter, TXT/PDF upload, document detail/edit/delete,
+  immutable version upload, PDF thumbnail/original viewing, and up-to-five-result Career
+  Evidence search flows
 
 ## Do not assume
 
@@ -103,7 +105,11 @@ platform value.
 - Do not commit `.env`, credentials, tokens, uploaded originals, database volumes,
   model files, IDE metadata, build output, or frontend dependency output.
 - Keep the frontend honest about its current scope. Login, list/filter, TXT/PDF upload,
-  and up-to-five-result Career Evidence search are implemented; document detail is not.
+  document detail/edit/delete, immutable version upload, PDF thumbnail/original viewing,
+  and up-to-five-result Career Evidence search are implemented. CareerFact and portfolio
+  generation are not.
+- Keep `main` as the only long-lived branch. Temporary branches must be integrated,
+  documented as rejected experiments, or discarded with evidence, then deleted.
 - Record meaningful implementation, refactoring, design, and infrastructure
   verification work briefly in `docs/development-log.md`.
 

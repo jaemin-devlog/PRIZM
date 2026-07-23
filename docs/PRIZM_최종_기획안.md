@@ -3,7 +3,7 @@
 **부제:** 커리어 문서의 근거를 구조화하는 오픈소스 Career Intelligence Engine
 **문서 버전:** 1.1
 **작성 기준일:** 2026-07-13
-**방향 현행화:** 2026-07-15
+**방향 현행화:** 2026-07-23
 **개발 목표일:** 2026-08-27
 **대상 과제:** 2026 공개SW 개발자대회 티맥스티베로 지정과제 — OpenSQL 기반 AI 검색 및 벡터 데이터 플랫폼 개발
 
@@ -15,14 +15,14 @@
 - 이전 문서의 B2C 사용자·가격·전환율 검토는 당시 제품가설의 근거를 보존하기 위해 삭제하지 않습니다. 다만 현재 구현 우선순위나 확정 수익모델이 아니며, 오픈소스 엔진의 활용 사례를 검증할 때 다시 평가할 역사적 가설로 내립니다.
 - 현재 코드는 아직 단일 Spring Boot project이며 독립 엔진 artifact, CareerFact, portfolio, MCP, OpenSQL HA가 구현된 상태가 아닙니다. 물리적 분리는 [오픈소스 엔진 전환 실행 계획](oss-transition-execution-plan.md)의 후속 단계입니다.
 
-### 2026-07-16 구현 기준선 반영 요약
+### 2026-07-23 구현 기준선 반영 요약
 
 - 구현됨: JWT 로그인, 사용자별 문서·버전·작업·청크 격리, 12개 문서 유형과 필터, TXT·텍스트 PDF 업로드, PDF 페이지 출처, 비동기 색인과 원자적 ACTIVE 전환, 단일 검색, 최대 5개 Career Evidence 검색 API
 - 안전장치: 임베딩 차원·유한값·0-norm 검증, PDF 최대 300페이지·추출 텍스트 2,000,000자 제한
-- 프런트엔드: 로그인, Career Vault 목록·단일 유형 필터, TXT·PDF 업로드, 최대 5개 Career Evidence 결과 표시
+- 프런트엔드: 로그인, Career Vault 목록·유형/제목/처리상태 필터, TXT·PDF 업로드, 문서 상세·수정·삭제, 새 version, PDF thumbnail·원본 열람, 최대 5개 Career Evidence 결과 표시
 - 추가 기반: 전체 처리 구간 lease heartbeat, rollback 보상 삭제 실패용 V12 cleanup job 등록과 V13 Cleanup Worker
 - Cleanup Worker: `PENDING/PROCESSING/RETRY_WAIT/COMPLETED/FAILED`, PostgreSQL `FOR UPDATE SKIP LOCKED`, lease·claim-version fencing, 1분·5분·15분 retry/backoff·recovery, descriptor-relative `SecureDirectoryStream` 삭제와 부모 symlink·TOCTOU 방어. 삭제 성공 뒤 DB 완료 갱신 실패도 recovery가 멱등 수렴시킨다. `86387e7c227ede3be96c538aafc48b0205bc5e18`가 main에 병합되었고 최종 감사에 CRITICAL/HIGH/MEDIUM finding은 없었다.
-- 미구현: 새 문서 version 업로드 API, CareerFact, portfolio, 공고 분석·매칭, MCP, `/api/v1`, OpenSQL·OpenProxy·OpenHA 실환경 검증
+- 미구현: 처리상태 자동 polling·직접 job 재시도, CareerFact, portfolio, 공고 분석·매칭, MCP, `/api/v1`, OpenSQL·OpenProxy·OpenHA 실환경 검증
 
 OpenSQL profile과 조건부 integration test는 있으나 PostgreSQL 성공은 OpenSQL 성공이 아니다. OpenSQL·OpenProxy·OpenHA는 실제 환경 미검증이며, 다음 기술 우선순위는 OpenSQL 단일 환경 migration·vector 검색, OpenProxy runtime 연결, OpenHA 장애전환·검색 복구 검증 순서다. V13의 `claim_version >= 0` CHECK, populated V12 row V13 backfill 전용 회귀 테스트, `SecureDirectoryStream` 미지원 filesystem의 fail-closed Quickstart·운영 제약 표기는 LOW backlog로 남는다.
 
@@ -40,7 +40,7 @@ PRIZM은 **커리어 문서의 분석, 정보 구조화, 근거 검색 및 포�
 
 ### 30초 피치
 
-> PRIZM은 커리어 문서의 version과 원본을 보존하고, 비동기 추출·embedding과 owner-scoped 검색으로 실제 경험의 원문 근거를 찾는 오픈소스 엔진을 지향합니다. 현재 Career Vault Reference App은 개인용 업로드와 최대 5개 근거 검색을 보여줍니다. CareerFact와 portfolio, MCP, OpenSQL HA는 다음 단계에서 증명할 계획입니다.
+> PRIZM은 커리어 문서의 version과 원본을 보존하고, 비동기 추출·embedding과 owner-scoped 검색으로 실제 경험의 원문 근거를 찾는 오픈소스 엔진을 지향합니다. 현재 Career Vault Reference App은 개인용 문서 관리·version·PDF 열람과 최대 5개 근거 검색을 보여줍니다. CareerFact와 portfolio, MCP, OpenSQL HA는 다음 단계에서 증명할 계획입니다.
 
 ### 핵심 결정 7개
 
@@ -921,7 +921,7 @@ PRIZM의 가장 큰 제품위험은 실제 성과근거가 회사 기밀문서�
 
 ## 15. 목표 MVP 4화면·UX 기획
 
-현재 Reference App은 로그인, Career Vault 목록·단일 유형 필터, TXT/PDF 업로드, 최대 5개 원문 근거 검색만 제공합니다. 아래 4화면은 구현 완료 목록이 아닙니다.
+현재 Reference App은 로그인, Career Vault 목록·유형/제목/처리상태 필터, TXT/PDF 업로드, 문서 상세·수정·삭제, 새 version, PDF thumbnail·원본 열람과 최대 5개 원문 근거 검색을 제공합니다. 아래 4화면 전체는 구현 완료 목록이 아닙니다.
 
 ### 화면 1. Career Vault·업로드
 
@@ -1465,7 +1465,7 @@ database, deploy, benchmark, test, docs와 거버넌스 파일은 이 module gra
 
 ### 25.3 제출용 500자 요약
 
-PRIZM은 커리어 문서를 version과 원본 출처를 보존한 채 처리하고 검색하는 self-hosted 오픈소스 엔진을 지향합니다. 현재 Spring Boot 기반은 JWT owner 격리, TXT·텍스트 PDF 원본 저장, 비동기 추출·청킹·BGE-M3 embedding, lease·heartbeat·fencing 복구, PostgreSQL pgvector exact 검색과 원자적 ACTIVE 전환을 제공합니다. React Career Vault Reference App은 개인용 목록·필터·업로드와 최대 5개 원문 근거 검색을 보여줍니다. 등록 문서에서 확인되지 않은 경력·기술·성과·수치는 만들지 않습니다. CareerFact, 검증된 portfolio, `/api/v1`, MCP, 교체 가능한 adapter와 OpenSQL HA는 향후 구현·검증 범위입니다.
+PRIZM은 커리어 문서를 version과 원본 출처를 보존한 채 처리하고 검색하는 self-hosted 오픈소스 엔진을 지향합니다. 현재 Spring Boot 기반은 JWT owner 격리, TXT·텍스트 PDF 원본 저장, 비동기 추출·청킹·BGE-M3 embedding, lease·heartbeat·fencing 복구, PostgreSQL pgvector exact 검색과 원자적 ACTIVE 전환을 제공합니다. React Career Vault Reference App은 개인용 목록·필터·업로드, 상세·수정·삭제, 새 version·PDF 열람과 최대 5개 원문 근거 검색을 보여줍니다. 등록 문서에서 확인되지 않은 경력·기술·성과·수치는 만들지 않습니다. CareerFact, 검증된 portfolio, `/api/v1`, MCP, 교체 가능한 adapter와 OpenSQL HA는 향후 구현·검증 범위입니다.
 
 ### 25.4 최종 결정표
 

@@ -8,6 +8,7 @@ public record DocumentDetailResponse(
         Long documentId,
         String title,
         DocumentType documentType,
+        boolean ownerConfirmed,
         Long activeVersionId,
         Instant createdAt,
         Instant updatedAt,

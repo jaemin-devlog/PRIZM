@@ -5,6 +5,9 @@ import com.prizm.document.entity.Document;
 import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.entity.DocumentType;
 import com.prizm.document.entity.DocumentVersion;
+import com.prizm.document.exception.DocumentManagementErrorCode;
+import com.prizm.document.exception.DocumentManagementException;
+import com.prizm.document.exception.DocumentNotFoundException;
 import com.prizm.document.exception.DocumentUploadErrorCode;
 import com.prizm.document.exception.DocumentUploadException;
 import com.prizm.document.repository.DocumentRepository;
@@ -13,6 +16,7 @@ import com.prizm.cleanup.service.FileCleanupJobService;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.infrastructure.storage.FileStorageException;
 import com.prizm.ingestion.entity.ProcessingJob;
+import com.prizm.ingestion.entity.ProcessingJobStatus;
 import com.prizm.ingestion.exception.DocumentTextExtractionException;
 import com.prizm.ingestion.repository.ProcessingJobRepository;
 import com.prizm.ingestion.service.DocumentTextExtractor;
@@ -20,6 +24,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,9 +88,36 @@ public class DocumentUploadService {
         DocumentType resolvedDocumentType = documentType == null ? DocumentType.OTHER : documentType;
 
         Document document = documentRepository.save(Document.create(ownerUserId, normalizedTitle, resolvedDocumentType));
+        return persistVersion(ownerUserId, document, 1, content);
+    }
+
+    /**
+     * Adds an immutable TXT/PDF source as the next version of an owner-scoped document.
+     * The current active version remains searchable until the new indexing job activates atomically.
+     */
+    @Transactional
+    public DocumentUploadResponse uploadVersion(Long ownerUserId, Long documentId, MultipartFile file) {
+        Document document = documentRepository.findByIdAndOwnerUserIdForUpdate(documentId, ownerUserId)
+                .orElseThrow(() -> new DocumentNotFoundException(documentId));
+        List<DocumentVersion> versions = documentVersionRepository
+                .findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(ownerUserId, documentId);
+        requireNoInFlightVersion(ownerUserId, versions);
+
+        UploadContent content = validateAndRead(file);
+        int nextVersionNo = versions.isEmpty() ? 1 : Math.addExact(versions.get(0).getVersionNo(), 1);
+        document.markVersionAdded();
+        return persistVersion(ownerUserId, document, nextVersionNo, content);
+    }
+
+    private DocumentUploadResponse persistVersion(
+            Long ownerUserId,
+            Document document,
+            int versionNo,
+            UploadContent content) {
         DocumentVersion version = documentVersionRepository.save(DocumentVersion.quarantined(
                 ownerUserId,
                 document.getId(),
+                versionNo,
                 content.originalFileName(),
                 content.fileType(),
                 content.contentHash()));
@@ -116,6 +148,29 @@ public class DocumentUploadService {
                 document.getDocumentType(),
                 version.getStatus(),
                 version.getCreatedAt());
+    }
+
+    private void requireNoInFlightVersion(Long ownerUserId, List<DocumentVersion> versions) {
+        List<Long> versionIds = versions.stream().map(DocumentVersion::getId).toList();
+        if (versionIds.isEmpty()) {
+            return;
+        }
+        boolean hasInFlightVersion = processingJobRepository
+                .findByOwnerUserIdAndDocumentVersionIdIn(ownerUserId, versionIds)
+                .stream()
+                .map(ProcessingJob::getStatus)
+                .anyMatch(this::isNonTerminal);
+        if (hasInFlightVersion) {
+            throw new DocumentManagementException(
+                    DocumentManagementErrorCode.DOCUMENT_PROCESSING,
+                    "A new version can be added after current document processing finishes.");
+        }
+    }
+
+    private boolean isNonTerminal(ProcessingJobStatus status) {
+        return status == ProcessingJobStatus.PENDING
+                || status == ProcessingJobStatus.RETRY_WAIT
+                || status == ProcessingJobStatus.PROCESSING;
     }
 
     private String validateTitle(String title) {

@@ -55,12 +55,16 @@ public class DocumentVersion {
     private DocumentVersion(
             Long ownerUserId,
             Long documentId,
+            int versionNo,
             String originalFileName,
             DocumentFileType fileType,
             String contentHash) {
+        if (versionNo < 1) {
+            throw new IllegalArgumentException("versionNo must be positive");
+        }
         this.ownerUserId = ownerUserId;
         this.documentId = documentId;
-        this.versionNo = 1;
+        this.versionNo = versionNo;
         this.originalFileName = originalFileName;
         this.storedFilePath = "pending";
         this.fileType = fileType;
@@ -84,7 +88,17 @@ public class DocumentVersion {
             String originalFileName,
             DocumentFileType fileType,
             String contentHash) {
-        return new DocumentVersion(ownerUserId, documentId, originalFileName, fileType, contentHash);
+        return quarantined(ownerUserId, documentId, 1, originalFileName, fileType, contentHash);
+    }
+
+    public static DocumentVersion quarantined(
+            Long ownerUserId,
+            Long documentId,
+            int versionNo,
+            String originalFileName,
+            DocumentFileType fileType,
+            String contentHash) {
+        return new DocumentVersion(ownerUserId, documentId, versionNo, originalFileName, fileType, contentHash);
     }
 
     /** 파일 저장이 성공한 뒤 임시 경로를 실제 서버 저장 경로로 교체한다. */

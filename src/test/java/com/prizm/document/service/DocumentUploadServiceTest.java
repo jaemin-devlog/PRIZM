@@ -17,6 +17,9 @@ import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.entity.DocumentType;
 import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.entity.DocumentVersionStatus;
+import com.prizm.document.exception.DocumentManagementErrorCode;
+import com.prizm.document.exception.DocumentManagementException;
+import com.prizm.document.exception.DocumentNotFoundException;
 import com.prizm.document.exception.DocumentUploadErrorCode;
 import com.prizm.document.exception.DocumentUploadException;
 import com.prizm.document.repository.DocumentRepository;
@@ -33,6 +36,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -143,6 +147,77 @@ class DocumentUploadServiceTest {
         var documentCaptor = org.mockito.ArgumentCaptor.forClass(Document.class);
         verify(documentRepository).save(documentCaptor.capture());
         assertThat(documentCaptor.getValue().getDocumentType()).isEqualTo(DocumentType.PORTFOLIO);
+    }
+
+    @Test
+    void addsTheNextVersionWithoutReplacingTheCurrentActiveVersion() {
+        byte[] content = "revised".getBytes(StandardCharsets.UTF_8);
+        MockMultipartFile file = new MockMultipartFile("file", "guide-v2.txt", "text/plain", content);
+        Document document = Document.create(7L, "Guide", DocumentType.PROJECT_REPORT);
+        ReflectionTestUtils.setField(document, "id", 11L);
+        document.activateVersion(21L);
+        DocumentVersion currentVersion = DocumentVersion.quarantined(
+                7L, 11L, "guide-v1.txt", DocumentFileType.TXT, "a".repeat(64));
+        ReflectionTestUtils.setField(currentVersion, "id", 21L);
+        ReflectionTestUtils.setField(currentVersion, "status", DocumentVersionStatus.ACTIVE);
+        ProcessingJob completedJob = ProcessingJob.pendingIndexing(7L, 21L);
+        ReflectionTestUtils.setField(completedJob, "status", ProcessingJobStatus.COMPLETED);
+        when(documentRepository.findByIdAndOwnerUserIdForUpdate(11L, 7L)).thenReturn(Optional.of(document));
+        when(documentVersionRepository.findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(7L, 11L))
+                .thenReturn(List.of(currentVersion));
+        when(processingJobRepository.findByOwnerUserIdAndDocumentVersionIdIn(7L, List.of(21L)))
+                .thenReturn(List.of(completedJob));
+        when(fileStorage.store(11L, 22L, "guide-v2.txt", content))
+                .thenReturn("documents/11/22/guide-v2.txt");
+
+        DocumentUploadResponse response = documentUploadService.uploadVersion(7L, 11L, file);
+
+        assertThat(response.documentId()).isEqualTo(11L);
+        assertThat(response.versionId()).isEqualTo(22L);
+        assertThat(document.getActiveVersionId()).isEqualTo(21L);
+        var versionCaptor = org.mockito.ArgumentCaptor.forClass(DocumentVersion.class);
+        verify(documentVersionRepository).save(versionCaptor.capture());
+        assertThat(versionCaptor.getValue().getVersionNo()).isEqualTo(2);
+        assertThat(versionCaptor.getValue().getStatus()).isEqualTo(DocumentVersionStatus.QUARANTINED);
+        var jobCaptor = org.mockito.ArgumentCaptor.forClass(ProcessingJob.class);
+        verify(processingJobRepository).save(jobCaptor.capture());
+        assertThat(jobCaptor.getValue().getDocumentVersionId()).isEqualTo(22L);
+        assertThat(jobCaptor.getValue().getStatus()).isEqualTo(ProcessingJobStatus.PENDING);
+    }
+
+    @Test
+    void rejectsANewVersionWhileAnotherVersionIsStillProcessing() {
+        MockMultipartFile file = new MockMultipartFile("file", "guide-v2.txt", "text/plain", "revised".getBytes());
+        Document document = Document.create(7L, "Guide", DocumentType.PROJECT_REPORT);
+        ReflectionTestUtils.setField(document, "id", 11L);
+        DocumentVersion currentVersion = DocumentVersion.quarantined(
+                7L, 11L, "guide-v1.txt", DocumentFileType.TXT, "a".repeat(64));
+        ReflectionTestUtils.setField(currentVersion, "id", 21L);
+        ProcessingJob pendingJob = ProcessingJob.pendingIndexing(7L, 21L);
+        when(documentRepository.findByIdAndOwnerUserIdForUpdate(11L, 7L)).thenReturn(Optional.of(document));
+        when(documentVersionRepository.findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(7L, 11L))
+                .thenReturn(List.of(currentVersion));
+        when(processingJobRepository.findByOwnerUserIdAndDocumentVersionIdIn(7L, List.of(21L)))
+                .thenReturn(List.of(pendingJob));
+
+        assertThatThrownBy(() -> documentUploadService.uploadVersion(7L, 11L, file))
+                .isInstanceOf(DocumentManagementException.class)
+                .extracting(exception -> ((DocumentManagementException) exception).code())
+                .isEqualTo(DocumentManagementErrorCode.DOCUMENT_PROCESSING);
+
+        verify(documentVersionRepository, never()).save(any(DocumentVersion.class));
+        verifyNoInteractions(fileStorage);
+    }
+
+    @Test
+    void hidesAnotherOwnersDocumentWhenAddingAVersion() {
+        MockMultipartFile file = new MockMultipartFile("file", "guide-v2.txt", "text/plain", "revised".getBytes());
+        when(documentRepository.findByIdAndOwnerUserIdForUpdate(11L, 7L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> documentUploadService.uploadVersion(7L, 11L, file))
+                .isInstanceOf(DocumentNotFoundException.class);
+
+        verifyNoInteractions(documentVersionRepository, processingJobRepository, fileStorage);
     }
 
     @Test

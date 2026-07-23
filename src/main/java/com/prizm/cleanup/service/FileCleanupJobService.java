@@ -23,6 +23,13 @@ public class FileCleanupJobService {
         fileCleanupJobRepository.registerPending(storageKey);
     }
 
+    /** Registers cleanup as part of a successful metadata deletion transaction. */
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void registerPendingCleanupInCurrentTransaction(String storageKey) {
+        validateStorageKey(storageKey);
+        fileCleanupJobRepository.registerPending(storageKey);
+    }
+
     private void validateStorageKey(String storageKey) {
         if (storageKey == null || storageKey.isBlank() || storageKey.contains("\\") || storageKey.contains(":")) {
             throw new IllegalArgumentException("storageKey must be a relative storage key");

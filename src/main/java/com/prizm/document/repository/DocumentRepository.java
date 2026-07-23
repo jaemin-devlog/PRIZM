@@ -20,6 +20,12 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     Optional<Document> findByIdAndOwnerUserId(Long id, Long ownerUserId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select document from Document document where document.id = :id and document.ownerUserId = :ownerUserId")
+    Optional<Document> findByIdAndOwnerUserIdForUpdate(
+            @Param("id") Long id,
+            @Param("ownerUserId") Long ownerUserId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select document from Document document where document.id = :id")
     Optional<Document> findByIdForUpdate(@Param("id") Long id);
 }

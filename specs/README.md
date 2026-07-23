@@ -29,7 +29,11 @@
 
 - ID는 `PRZ-###` 형식을 사용하고 [이 registry](#registry)에서 유일하게 관리한다.
 - 기존 기능은 `AS_BUILT_BASELINE`으로만 backfill한다.
-- 새 기능은 구현 전에 `spec.md`를 작성하고 필요할 때만 `plan.md`, `tasks.md`, `contracts/`, `quickstart.md`를 추가한다.
+- 새 기능과 observable contract 변경은 구현 전에 `spec.md`를 작성한다.
+- 대회 범위 product code에는 구현 전에 `plan.md`와 `tasks.md`가 필수다.
+  제품 동작을 바꾸지 않는 문서 전용 수정은 생략 사유를
+  `docs/development-log.md`에 기록하고 이 두 파일을 생략할 수 있다.
+- `contracts/`와 `quickstart.md`는 해당 수직 슬라이스에 필요할 때만 추가한다.
 - 모든 기능은 `evidence.md`에서 요구사항을 source·migration·test·실행 환경·결과와 연결한다.
 - `AGENTS.md`가 프로젝트 불변식과 구현 판단 기준의 규범 원본이다. spec에 같은 규칙을 복제해 별도 헌법처럼 운영하지 않는다.
 - PostgreSQL 성공을 OpenSQL·OpenProxy·OpenHA 성공으로 바꾸어 표현하지 않는다.

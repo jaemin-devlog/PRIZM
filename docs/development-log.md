@@ -328,3 +328,12 @@
 - 보관: 장기 종합 기획안, 과거 0~10단계 실행 계획, Reranker 비채택 실험과 초기 등록·검색 검증을 `docs/archive/`로 이동했다. Dense 검색 평가와 문제 해결 사례는 각각 `evaluation/`, `showcase/`로 분리했다.
 - OpenSQL: 단일 환경 Gate와 OpenProxy·OpenHA 후속 범위를 분리하고, 실제 환경 결과는 계속 `NOT_RUN`으로 유지했다. 실제 착수 시 체크리스트를 `PRZ-001`로 이전한다.
 - 검증: 문서 전용 변경이므로 애플리케이션 test를 다시 실행하지 않았다. 저장소 Markdown 18개의 로컬 링크 누락 0건, code fence 불균형 0건, trailing whitespace 0건과 `git diff --check` 통과를 확인했다.
+
+## 2026-07-24 — 공식 지정과제·평가기준과 단계별 개발 Gate 반영
+
+- 공식 기준: KOSSA 티맥스티베로 지정과제 원문, 오픈소스 개발자대회 일정과 제공받은 오리엔테이션 슬라이드를 대조해 OpenSQL 기반 업로드·자동 임베딩·메타데이터/버전, 변경 로그 동기화, MCP 검색과 DB 장애복구 목표를 정규화했다. 슬라이드 캡처는 공식 배포 URL과 재배포 조건이 확인되지 않아 저장소에 복사하지 않았고 추적표를 `CONTENT_EXTRACTED_SOURCE_PENDING`으로 표시했다.
+- 추적성: 지정과제 항목을 `PRZ-000` 요구사항, 정확한 source·test, 환경과 다음 제출 증거에 연결하고 1차 30점, 기능·라이선스 15점, 2차 70점, 멘토링과 제출·후속 산출물 상태를 `docs/contest/2026-requirements-traceability.md`에 기록했다. 실제 OpenSQL·DB 장애전환은 계속 `NOT_RUN`, 동기화·MCP는 미구현이다.
+- 우선순위: 대회 개발 순서를 라이선스·거버넌스 → OpenSQL·clean-clone → DB 장애복구 → 변경 로그 동기화·MCP → 조건부 CareerFact → 제출 감사로 변경했다. Portfolio는 검증된 CareerFact 이후 계획으로 유지했다.
+- 작업 규칙: `AGENTS.md`에 `ORIENT → SPEC → PLAN → IMPLEMENT → VERIFY → AUDIT → INTEGRATE` Gate, 상태 전이, 문서별 갱신 시점, 실제 GitHub 기록만 증거로 사용하는 원칙과 `main`만 남기는 성공·보류·비채택 경로를 추가했다. 실제 reviewer가 없는 개인 작업은 독립 감사, 사용자 승인과 `REVIEW_NOT_AVAILABLE_SOLO`를 요구하도록 분리했다.
+- 독립 감사: 공식 기준, 현재 저장소 준비도와 Agent workflow를 세 갈래로 읽기 전용 검토해 추적표 완료 과장, 제출 3분 영상과 2차 demo 혼합, MCP 빈 결과 계약 혼합, 단계 번호 충돌과 review 막힘을 수정했다.
+- 검증: 문서 전용 변경이므로 애플리케이션 test는 실행하지 않았다. 변경된 Markdown 7개의 로컬 링크 누락·code fence 불균형·trailing whitespace·EOF 여분 공백이 모두 0건이고 `git diff --check`를 통과했다.

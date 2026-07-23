@@ -311,3 +311,10 @@
 - 문서 선별: `portfolio/prizm-showcase`의 오래된 README와 V12·Cleanup 미구현 설명은 가져오지 않고, PR #9·#10과 V13 기준의 수치·문제 해결 사례로 다시 작성했다. `main`을 유일한 장기 브랜치로 두는 종료 절차도 문서화했다.
 - 대회 계획: GitHub Spec Kit의 spec→plan→tasks 흐름과 robo-architect의 evidence 분리를 작은 수직 슬라이스에만 적용하도록 정했다. OpenSQL 실환경은 아직 `NOT_RUN`, CareerFact·portfolio는 계획 기능으로 유지하며 2026-08-27 제출일까지 OpenSQL Gate→clean-clone→작은 grounded slice→라이선스·제출 감사 순으로 배치했다.
 - 검증: `cleanTest test --no-daemon --rerun-tasks`에서 backend 242건 중 228건 성공·환경 조건 14건 skip·실패/오류 0건, frontend lint/build를 통과했다. 현재 환경에는 Docker 실행 파일이 없어 `docker compose config`, PostgreSQL·pgvector 통합 테스트와 `searchEvaluation`을 재실행하지 못했고 Ollama·OpenSQL·OpenProxy·OpenHA도 사용하지 않았다.
+
+## 2026-07-23 — AS_BUILT spec registry 기준선
+
+- registry: `specs/README.md`에 `PRZ-###` ID, 기능 상태와 환경별 검증 상태를 정의하고 `PRZ-000-platform-baseline`을 `AS_BUILT_BASELINE`으로 등록했다.
+- 추적성: PRZ-000의 현재 계약을 14개 요구사항으로 정리하고 source·V1~V13 migration·unit/integration test와 2026-07-23 실행 결과를 `evidence.md`에 연결했다. PostgreSQL·Docker·Ollama·OpenSQL의 과거 성공·미재실행·`NOT_RUN`을 구분했다.
+- 역사성: 이 기준선은 spec 도입 전 구현의 사후 기록이며, 존재하지 않았던 과거 Issue·PR·review를 생성하거나 사전 명세였던 것처럼 표현하지 않는다. 앞으로 착수하는 작은 수직 슬라이스만 실제 작업 시점의 spec과 Issue·PR에 연결한다.
+- 문서: README, 현재 구현 현황, AGENTS와 대회 대응 계획을 `AS_BUILT_BASELINE` 정책에 맞췄다. 문서 전용 변경이므로 애플리케이션 test를 다시 실행하지 않고 로컬 Markdown 링크와 `git diff --check`를 검증했다.

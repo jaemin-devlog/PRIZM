@@ -69,3 +69,4 @@ docker compose config
 - [대표 문제 해결 사례](docs/portfolio/problem-solving-case-studies.md)
 - [BGE Reranker 비채택 결정](docs/experiments/2026-07-14-bge-reranker-evaluation.md)
 - [브랜치 운영 정책](docs/branch-policy.md)
+- [Spec Registry와 AS_BUILT 기준선](specs/README.md)

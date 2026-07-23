@@ -1,7 +1,7 @@
 # PRIZM 현재 구현 현황
 
 > 기준일: 2026-07-23
-> 상태: PR #9 Docker 개발 스택·PR #10 문서 관리 수직 슬라이스와 검색 평가 파일럿 통합 기준
+> 상태: PR #9 Docker 개발 스택·PR #10 문서 관리·검색 평가 파일럿과 `PRZ-000` AS_BUILT 기준선
 > 이 문서는 현재 구현의 요약이며 최종 판단은 항상 실행 가능한 코드와 테스트를 기준으로 합니다.
 
 PRIZM의 공식 제품 정의는 다음과 같습니다.
@@ -41,7 +41,7 @@ PRIZM의 공식 제품 정의는 다음과 같습니다.
 
 ### Career Vault Reference App
 
-- `/login` 로그인과 `/career-vault` 단일 화면
+- `/login`과 Career Vault shell의 `/career-vault/documents`, `/career-vault/evidence`, `/career-vault/upload` 세 화면
 - 현재 사용자 email 표시와 로그아웃
 - 내 문서 목록, 로딩·빈 목록·오류 상태
 - 12개 문서 유형 중 하나를 적용하는 목록 필터
@@ -216,7 +216,7 @@ docker compose config
 
 Integration test는 Testcontainers PostgreSQL 16+pgvector, Flyway, 실제 host Ollama를 사용하며 `OpenSqlInfrastructureTest`만 `RUN_OPENSQL_TESTS` 환경변수가 있어야 실행됩니다. PostgreSQL 결과를 OpenSQL, OpenProxy, OpenHA 검증 결과로 표현하지 않습니다. 실제 환경 Gate는 [OpenSQL 기술 Gate](opensql-gate.md)에 분리되어 있습니다.
 
-단계 0 최종 독립 재검토는 제품 경계, canonical module graph, JavaDoc·`.env.example` 기술 부채 기록을 PASS로 판정했습니다. 이번 문서 마감에서는 애플리케이션 test를 다시 실행하지 않고 Markdown local link, code fence 균형과 `git diff --check`를 검증합니다. Cleanup Worker의 감사·병합 기록은 [개발 기록](development-log.md)에 남깁니다.
+단계 0 최종 독립 재검토는 제품 경계, canonical module graph와 당시 기술 부채 기록을 PASS로 판정했습니다. 현재 환경별 실행 결과는 [PRZ-000 evidence](../specs/PRZ-000-platform-baseline/evidence.md), 시간순 변경·검증 이력은 [개발 기록](development-log.md)을 기준으로 확인합니다.
 
 ## 계획 기능: 현재 구현 아님
 
@@ -244,4 +244,5 @@ Integration test는 Testcontainers PostgreSQL 16+pgvector, Flyway, 실제 host O
 - [검색 품질 평가](search-evaluation.md): 합성 Dense 검색 평가 방법과 재현 절차
 - [브랜치 운영 정책](branch-policy.md): `main` 단일 장기 브랜치와 실험 보존 기준
 - [수치와 구현 근거](portfolio/metrics-and-evidence.md): 현재 코드·검증·실험 수치의 상태 분리
+- [Spec Registry](../specs/README.md): 기존 구현의 `AS_BUILT_BASELINE`과 이후 기능 spec 상태
 - `docs/verification/`: 특정 초기 구현 시점의 역사적 상세 기록

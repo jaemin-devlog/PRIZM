@@ -80,7 +80,7 @@ specs/
 └── PRZ-005-submission-audit/
 ```
 
-`PRZ-000`은 과거 작업을 사전 명세로 꾸미지 않고 `BASELINE_BACKFILL`임을 표시한다. 각 spec은 `Status`, `Source commit`, `Last verified`와 PostgreSQL·OpenSQL·Ollama·Docker별 `PASS | FAIL | NOT_RUN`을 기록한다. branch 이름은 식별자로 사용하지 않는다.
+`PRZ-000`은 과거 작업을 사전 명세로 꾸미지 않고 `AS_BUILT_BASELINE`임을 표시한다. 이 상태는 현재 구현의 사후 기준선이며, 존재하지 않았던 과거 Issue·PR을 만들지 않는다. 각 spec은 `Status`, `Source commit`, `Last verified`와 PostgreSQL·OpenSQL·Ollama·Docker별 `PASS | FAIL | NOT_RUN | HISTORICAL_PASS_NOT_RERUN`을 기록한다. branch 이름은 식별자로 사용하지 않는다.
 
 ## 제출 전 우선순위
 

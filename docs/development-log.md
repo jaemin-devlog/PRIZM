@@ -276,3 +276,15 @@
 - 버전·미리보기: `POST /api/documents/{documentId}/versions`는 새 TXT/PDF immutable version과 PENDING indexing job을 만들고, 새 색인이 활성화될 때까지 기존 `active_version_id`를 유지한다. owner/document/version을 모두 확인한 PDF 썸네일과 원본 열람 API는 저장 경로·원문·JWT·worker 오류 문구를 노출하지 않는다.
 - 화면: 좁고 반응형인 4:3 카드, 접근 가능한 상세 모달, 버전 이력·ACTIVE 상태·수정본 업로드, PDF 전용 Blob 뷰어, 명시적 삭제 확인과 안전한 오류/재시도 상태를 반영했다.
 - 검증: backend unit 225건 중 211건 성공·환경 조건 14건 skip·실패 0건, PostgreSQL 16+pgvector 문서 관리 통합 5건 성공, frontend lint/build 및 Docker Compose 설정 검증을 통과했다. OpenSQL·OpenProxy·OpenHA·Ollama는 사용하지 않았다.
+## 2026-07-16 — OpenSQL 단일 환경 SQL 호환성 Gate 준비
+
+- 테스트: PostgreSQL Testcontainers와 opt-in 외부 OpenSQL 실행이 같은 assertion suite를 사용해 V1~V13·schema·pgvector 1024차원·실제 `VectorSearchRepository`·Indexing/Cleanup claim·lease·fencing·recovery·두 connection의 `SKIP LOCKED`를 검증하도록 구성했다.
+- 격리: 외부 실행은 `RUN_OPENSQL_TESTS=true`와 새 검증 전용 DB/schema 확인이 필요하며 runtime/Flyway 접속을 별도 환경변수로 받는다. Spring context, Scheduler, 파일 삭제, Ollama·Reranker·GPU는 사용하지 않고 실패 출력은 Migration·SQLState·SQL 기능으로 제한한다.
+- PostgreSQL 검증: Docker Desktop 28.2.2의 PostgreSQL 16+pgvector 컨테이너에서 공통 suite 1개를 통과했고, 전체 unit test 186개는 176개 성공·환경 조건 10개 skip·실패 0개였다. OpenSQL 환경변수 없이 외부 Gate 1개가 실제 접속 없이 skip되는 것도 확인했다.
+- 상태: 테스트 준비는 OpenSQL 호환성 통과가 아니다. 실제 OpenSQL 환경이 없어 현재 결과는 `NOT_RUN`이며 PostgreSQL 기준 검증과 분리한다. OpenProxy와 OpenHA도 계속 미검증이다.
+
+## 2026-07-21 — OpenSQL Gate 대상 동일성·데이터 안전성 보강
+
+- 안전성: Flyway와 runtime을 migration 전에 각각 빈 대상으로 확인하고, migration 뒤 Flyway가 만든 비활성 UUID marker를 runtime이 읽어야만 fixture를 시작하도록 했다. 전역 domain 삭제를 제거하고 실행별 UUID·생성 ID만 정리한다.
+- 회귀 검증: 별도 datasource 정상 경로와 기존 V13 sentinel runtime·서로 다른 빈 runtime 오설정 경로를 Docker PostgreSQL 16+pgvector에서 3건 모두 통과했으며 sentinel 데이터 보존과 marker fail-closed를 확인했다.
+- 상태: 실제 OpenSQL 환경은 사용하지 않아 결과는 계속 `NOT_RUN`이다. OpenProxy·OpenHA·Ollama도 이번 검증에 사용하지 않았다.

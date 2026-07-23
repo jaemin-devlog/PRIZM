@@ -1,37 +1,67 @@
 package com.prizm.infrastructure;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import javax.sql.DataSource;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.logging.LogLevel;
+import org.springframework.boot.logging.LoggingSystem;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 /**
- * 설정된 runtime/migration endpoint의 PostgreSQL·pgvector 연결만 확인한다.
- * 실제 운영 OpenSQL/OpenProxy/OpenHA 환경의 장애 복구까지 검증한 테스트는 아니다.
+ * Runs the SQL compatibility suite against a fresh, dedicated OpenSQL verification database or schema.
+ *
+ * <p>This test deliberately does not start the Spring application context, indexing scheduler, cleanup
+ * scheduler, or Ollama. Runtime and Flyway credentials are read separately, and no supplied value is logged
+ * or included in a failure message.</p>
  */
 @EnabledIfEnvironmentVariable(named = "RUN_OPENSQL_TESTS", matches = "(?i:true|1)")
-@ActiveProfiles("opensql")
-@SpringBootTest
 class OpenSqlInfrastructureTest {
 
-    @Autowired
-    JdbcTemplate jdbcTemplate;
+    private static final String TARGET_CONFIRMATION = "PRIZM_OPENSQL_VERIFICATION_TARGET_CONFIRMED";
+
+    @BeforeAll
+    static void suppressConnectionDetailsFromLibraryLogs() {
+        LoggingSystem loggingSystem = LoggingSystem.get(OpenSqlInfrastructureTest.class.getClassLoader());
+        loggingSystem.setLogLevel("org.flywaydb", LogLevel.OFF);
+        loggingSystem.setLogLevel("org.postgresql", LogLevel.OFF);
+        loggingSystem.setLogLevel("org.springframework.jdbc.datasource", LogLevel.OFF);
+    }
 
     @Test
-    @Transactional
-    void providesPostgres16AndPgVectorThroughConfiguredRuntimeEndpoint() {
-        Integer serverVersion = jdbcTemplate.queryForObject(
-                "SELECT current_setting('server_version_num')::integer", Integer.class);
+    void verifiesMigrationsVectorSearchAndWorkerSqlAgainstDedicatedOpenSqlTarget() {
+        requireDedicatedVerificationTarget();
 
-        PgVectorSmokeAssertions.SmokeResult result =
-                PgVectorSmokeAssertions.verifyExactCosineSearch(jdbcTemplate);
+        DataSource runtimeDataSource = dataSource(
+                required("PRIZM_DB_URL"),
+                required("PRIZM_DB_USERNAME"),
+                required("PRIZM_DB_PASSWORD"));
+        DataSource flywayDataSource = dataSource(
+                required("PRIZM_FLYWAY_URL"),
+                required("PRIZM_FLYWAY_USERNAME"),
+                required("PRIZM_FLYWAY_PASSWORD"));
 
-        assertThat(serverVersion).isBetween(160000, 169999);
-        assertThat(result.extensionVersion()).isNotBlank();
+        OpenSqlCompatibilityAssertions.verify(runtimeDataSource, flywayDataSource);
+    }
+
+    private void requireDedicatedVerificationTarget() {
+        String confirmed = System.getenv(TARGET_CONFIRMATION);
+        if (!"true".equalsIgnoreCase(confirmed)) {
+            throw new AssertionError(
+                    "OpenSQL verification requires " + TARGET_CONFIRMATION
+                            + "=true for a fresh, dedicated database or schema.");
+        }
+    }
+
+    private String required(String name) {
+        String value = System.getenv(name);
+        if (value == null || value.isBlank()) {
+            throw new AssertionError("OpenSQL verification configuration is missing " + name + ".");
+        }
+        return value;
+    }
+
+    private DataSource dataSource(String url, String username, String password) {
+        return new DriverManagerDataSource(url, username, password);
     }
 }

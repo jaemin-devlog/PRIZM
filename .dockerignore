@@ -1,0 +1,13 @@
+.git
+.gradle
+.env
+.env.*
+build/
+frontend/
+local/
+outputs/
+tools/
+uploads/
+var/
+models/
+*.log

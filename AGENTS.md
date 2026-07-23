@@ -164,6 +164,51 @@ Use these lifecycle transitions:
 - paused or declined work -> `DEFERRED` or `REJECTED`
 - after integration -> update the registry source commit and last-verified date
 
+### First-round evaluation evidence discipline
+
+Use these stable first-round evaluation IDs:
+
+- `EVAL-R1-01`: project structure and code completeness
+- `EVAL-R1-02`: open-source project potential
+- `EVAL-R1-03`: development-document specificity
+- `EVAL-R1-04`: project innovation
+- `EVAL-R1-05`: project teamwork; for this solo project, stable and systematic
+  project management
+
+Treat them as evidence lenses, not as a requirement to change all five in every task.
+The current internal estimate and each category's next evidence Gate live only in
+`docs/contest/2026-requirements-traceability.md`.
+
+- During `ORIENT`, declare exactly one primary evaluation ID and at most two secondary
+  IDs that the task can materially affect. If none applies, use `NONE`; `NONE` is
+  exclusive and permits no secondary IDs. Do not expand scope merely to claim an
+  evaluation benefit. Report the current gap and leave unrelated categories unchanged.
+- During `SPEC` and `PLAN`, connect each intended evaluation improvement to a measurable
+  acceptance criterion and to the source, test, environment, document, demo, license, or
+  real GitHub evidence that would prove it. A predicted point increase is not an
+  acceptance criterion.
+- During `IMPLEMENT`, do not change an internal score. Plans, dependency declarations,
+  unchecked boxes, unexecuted tests, and documentation alone do not prove code
+  completeness or innovation.
+- During `VERIFY`, record only evidence produced by the actual task. `NOT_RUN`,
+  `HISTORICAL_PASS_NOT_RERUN`, missing external feedback, and unavailable environments
+  cannot support a score increase.
+- During `AUDIT`, independently judge whether the affected category's published next
+  Gate is satisfied. Report positive evidence and remaining deductions separately.
+  Any score is `INTERNAL_ESTIMATE_NOT_OFFICIAL`, may decrease after a regression, and is
+  never a promise of the official result.
+- During `INTEGRATE`, update only affected evaluation rows after the verified change is
+  on `main`. Pin the assessment to the verified source commit, append its change history,
+  and leave every unrelated row unchanged.
+- For `EVAL-R1-05`, genuine Issues, commits, PRs, CI runs, merges, third-party reviews,
+  and community activity are distinct evidence. `REVIEW_NOT_AVAILABLE_SOLO` is an honest
+  process record, not review evidence; self-created volume is not community participation.
+  Never create GitHub artifacts solely to raise an estimated score.
+
+If the user asks for the "next score-improvement task" without naming a stage, perform
+only `ORIENT` for the first unmet item in `docs/roadmap.md`, report its primary and
+secondary evaluation IDs and measurable Gate, then wait.
+
 ### Document update matrix
 
 | Artifact | Update rule |
@@ -172,7 +217,7 @@ Use these lifecycle transitions:
 | `docs/README.md` | When documents are added, moved, renamed, archived, or removed. |
 | `docs/project-status.md` | Only when source plus executable evidence changes the current implemented or verified state. |
 | `docs/roadmap.md` | When priority, order, gate, or stage state changes; do not describe implementation here. |
-| `docs/contest/2026-requirements-traceability.md` | When an official source changes or a mapped implementation, environment, evaluation, or submission state changes. |
+| `docs/contest/2026-requirements-traceability.md` | After integration, and only when merged evidence changes an official-source mapping, a first-round evaluation row, an environment result, or a submission state. Link the responsible spec evidence and verified source commit, keep unchanged rows unchanged, and mark an outdated internal assessment `STALE`. |
 | `docs/contest/2026-tmaxtibero-plan.md` | When the contest schedule, scope, priority, or stop condition changes. |
 | `specs/PRZ-###/spec.md` | Define intent before implementation; update when approved scope or acceptance criteria change. |
 | `specs/PRZ-###/plan.md` and `tasks.md` | Write before implementation; maintain design decisions, task state, and deviations while work proceeds. |

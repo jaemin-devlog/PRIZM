@@ -337,3 +337,11 @@
 - 작업 규칙: `AGENTS.md`에 `ORIENT → SPEC → PLAN → IMPLEMENT → VERIFY → AUDIT → INTEGRATE` Gate, 상태 전이, 문서별 갱신 시점, 실제 GitHub 기록만 증거로 사용하는 원칙과 `main`만 남기는 성공·보류·비채택 경로를 추가했다. 실제 reviewer가 없는 개인 작업은 독립 감사, 사용자 승인과 `REVIEW_NOT_AVAILABLE_SOLO`를 요구하도록 분리했다.
 - 독립 감사: 공식 기준, 현재 저장소 준비도와 Agent workflow를 세 갈래로 읽기 전용 검토해 추적표 완료 과장, 제출 3분 영상과 2차 demo 혼합, MCP 빈 결과 계약 혼합, 단계 번호 충돌과 review 막힘을 수정했다.
 - 검증: 문서 전용 변경이므로 애플리케이션 test는 실행하지 않았다. 변경된 Markdown 7개의 로컬 링크 누락·code fence 불균형·trailing whitespace·EOF 여분 공백이 모두 0건이고 `git diff --check`를 통과했다.
+
+## 2026-07-24 — 1차 평가 evidence Gate와 내부 기준점
+
+- 단일 원본: 1차 평가 다섯 항목에 `EVAL-R1-01`~`05`를 부여하고, source·test·문서·GitHub 이력을 기준으로 한 `INTERNAL_ESTIMATE_NOT_OFFICIAL` 스냅샷을 요구사항 추적표에만 기록했다.
+- 작업 규칙: 모든 contest 작업은 primary 평가 ID 하나와 secondary 최대 두 개, 측정 가능한 완료 evidence를 선언한다. 계획·문서·미실행 test만으로 점수를 올리지 않고 `VERIFY → AUDIT → INTEGRATE` 뒤 영향받은 행만 갱신하도록 `AGENTS.md`와 Spec Registry를 연결했다.
+- 개인 관리: 실제 Issue·PR·CI·merge·제3자 review를 서로 다른 근거로 취급한다. `REVIEW_NOT_AVAILABLE_SOLO`나 Agent 감사는 GitHub review로 계산하지 않고, 과거 GitHub 기록을 점수 목적으로 소급 생성하지 않는다.
+- 독립 감사: workflow 일관성, 공식 점수 오인·artifact gaming 방지, 현재 준비도와 Gate 정합성을 세 갈래로 재검토해 모두 차단 문제 없음으로 통과했다.
+- 검증: 문서 전용 변경이므로 애플리케이션 test는 실행하지 않았다. 변경된 Markdown 4개의 로컬 링크 누락·code fence 불균형·trailing whitespace·EOF 문제가 모두 0건이고 `git diff --check`를 통과했다.

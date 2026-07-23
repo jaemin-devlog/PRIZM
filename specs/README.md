@@ -35,6 +35,20 @@
   `docs/development-log.md`에 기록하고 이 두 파일을 생략할 수 있다.
 - `contracts/`와 `quickstart.md`는 해당 수직 슬라이스에 필요할 때만 추가한다.
 - 모든 기능은 `evidence.md`에서 요구사항을 source·migration·test·실행 환경·결과와 연결한다.
+- 새 contest spec의 `spec.md`에는 `평가 영향`을 두고 primary
+  `EVAL-R1-##` 하나와 secondary 최대 두 개만 선언한다. 각 ID에는 이번 작업의
+  의도와 완료에 필요한 측정 가능한 evidence를 연결한다. 관련 항목이 없으면
+  `NONE`으로만 기록하고 secondary ID를 함께 쓰지 않으며 목표 점수를 쓰지 않는다.
+- 해당 `evidence.md`에는 `평가 evidence`를 두고 평가 ID별 실제 claim,
+  source·test·environment·document·license·GitHub 근거, 판정과 남은 감점을
+  기록한다. 계획된 근거와 실제 근거를 분리하고 실행하지 않은 항목은
+  `NOT_RUN`으로 남긴다.
+- 내부 추정 점수의 단일 원본은
+  `docs/contest/2026-requirements-traceability.md`다. Spec에서는 점수 변경을
+  확정하지 않고 `AUDIT` 대상인 candidate Gate 충족 여부만 기록한다.
+- Issue, PR, CI, merge와 review URL은 실제로 존재할 때만 기록한다.
+  `REVIEW_NOT_AVAILABLE_SOLO`는 review evidence가 아니며, 제3자 활동이 없으면
+  community evidence를 주장하지 않는다.
 - `AGENTS.md`가 프로젝트 불변식과 구현 판단 기준의 규범 원본이다. spec에 같은 규칙을 복제해 별도 헌법처럼 운영하지 않는다.
 - PostgreSQL 성공을 OpenSQL·OpenProxy·OpenHA 성공으로 바꾸어 표현하지 않는다.
 - 안정 상태에서 장기 브랜치는 `main`만 유지한다. branch 이름은 spec ID나 보존 수단이 아니다.

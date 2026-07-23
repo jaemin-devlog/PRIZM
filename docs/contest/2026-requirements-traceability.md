@@ -64,16 +64,53 @@
 - 자료: 결과보고서, 소스코드, 시연 영상
 - 합격 발표: 2026-09-09(수) 예정
 
-| 평가항목 | 배점 | 현재 준비도 | 남은 핵심 증거 |
-|---|---:|---|---|
-| 프로젝트 구조 및 코드 완성도 | 6 | `PARTIAL` — 인증·ownership·version·비동기 복구·검색과 test가 있음 | 실제 OpenSQL, clean-clone, demo `USER`, 처리 완료 확인, browser E2E 또는 고정 수동 UI 시험표 |
-| 오픈소스 프로젝트 발전 가능성 | 6 | `PARTIAL` — Engine·Reference App 방향과 일부 교체 interface가 있음 | LICENSE·거버넌스, 기여자 Quickstart, 안정된 확장 경계 |
-| 개발 문서의 구체성 | 6 | `PARTIAL` — 현황·roadmap·spec·evidence·이 추적표가 있음 | 검증된 설치·운영·troubleshooting, architecture/data flow |
-| 프로젝트 혁신성 | 6 | `PARTIAL` — 원문 출처 검색, version fencing, 안전한 복구가 있음 | 공식 과제의 동기화·MCP·가용성 증거와 PRIZM 차별 slice |
-| 프로젝트 팀워크 | 6 | `PARTIAL` — 실제 과거 PR·commit과 현재 관리 규칙이 있음 | 앞으로의 실제 Issue→spec→branch→PR→review→merge 증거 |
+| ID | 평가항목 | 배점 | 증거 기반 준비도(공식 점수 아님) | 남은 핵심 증거 |
+|---|---|---:|---|---|
+| `EVAL-R1-01` | 프로젝트 구조 및 코드 완성도 | 6 | `PARTIAL` — 인증·ownership·version·비동기 복구·검색과 test가 있음 | 실제 OpenSQL, clean-clone, demo `USER`, 처리 완료 확인, browser E2E 또는 고정 수동 UI 시험표 |
+| `EVAL-R1-02` | 오픈소스 프로젝트 발전 가능성 | 6 | `PARTIAL` — Engine·Reference App 방향과 일부 교체 interface가 있음 | LICENSE·거버넌스, 기여자 Quickstart, 안정된 확장 경계 |
+| `EVAL-R1-03` | 개발 문서의 구체성 | 6 | `PARTIAL` — 현황·roadmap·spec·evidence·이 추적표가 있음 | 검증된 설치·운영·troubleshooting, architecture/data flow |
+| `EVAL-R1-04` | 프로젝트 혁신성 | 6 | `PARTIAL` — 원문 출처 검색, version fencing, 안전한 복구가 있음 | 공식 과제의 동기화·MCP·가용성 증거와 PRIZM 차별 slice |
+| `EVAL-R1-05` | 프로젝트 팀워크 | 6 | `PARTIAL` — 개인 참가자의 실제 과거 PR·commit과 현재 관리 규칙이 있음 | 앞으로의 실제 Issue→spec→branch→PR→CI→review→merge와 community 증거 |
 
-팀워크 증거를 위해 과거 Issue·PR·review를 소급 생성하지 않는다. 이후 실제
-작업에서 만들어진 GitHub 기록만 사용한다.
+준비도는 공식 점수가 아니며 `PARTIAL`을 특정 점수로 자동 환산하지 않는다.
+팀워크 증거를 위해 과거 Issue·PR·review를 소급 생성하지 않는다. 개인 참가자의
+`REVIEW_NOT_AVAILABLE_SOLO`는 절차적 투명성일 뿐 GitHub review 증거가 아니다.
+Community는 실제 제3자의 Issue, discussion, review, feedback 또는 contribution이
+있을 때만 기록한다.
+
+### 내부 평가 스냅샷
+
+| 항목 | 값 |
+|---|---|
+| Assessment ID | `ASSESS-2026-07-24-01` |
+| Type | `INTERNAL_ESTIMATE_NOT_OFFICIAL` |
+| Scope | `PRE_SUBMISSION_REPOSITORY_ONLY` |
+| Official score | `N/A` |
+| Assessment target commit | `2cb1bc49c4bfdf40c51a0adb347367e0f4602491` |
+| Assessment date | 2026-07-24 |
+| Confidence | `LOW_TO_MEDIUM` |
+| Status | `CURRENT` |
+
+| ID | 보수적 내부 추정 | 다음 재평가 evidence Gate |
+|---|---:|---|
+| `EVAL-R1-01` | 4/6 | 실제 OpenSQL과 clean-clone에서 전체 사용자 흐름과 UI 시험 `PASS` |
+| `EVAL-R1-02` | 3/6 | 라이선스 감사 뒤 실제 LICENSE·NOTICE·CONTRIBUTING·SECURITY와 clean-clone 기여자 Quickstart 검증 완료 |
+| `EVAL-R1-03` | 4/6 | 별도의 깨끗한 환경에서 문서만 보고 설치·demo·검증 재현 `PASS` |
+| `EVAL-R1-04` | 3/6 | OpenSQL에서 DB failover·변경 로그 동기화·MCP 중 하나의 실제 수직 slice `PASS` |
+| `EVAL-R1-05` | 3/6 | 실제 신규 작업에서 Issue→spec→PR→CI→merge 흐름이 반복 재현되고, 가능한 경우 genuine third-party review가 별도 증거로 연결됨 |
+| **합계** | **17/30** | 공식 점수나 수상 가능성 예측이 아님 |
+
+표의 Gate는 재평가를 가능하게 하는 누적 증거이지 점수 상승을 보장하지 않으며,
+여러 Gate를 하나의 큰 spec으로 합치라는 뜻이 아니다. 계획·문서 추가만으로
+숫자를 바꾸지 않는다. `VERIFY` 뒤 독립 `AUDIT`가 Gate 충족 여부를 제안하고,
+같은 evidence가 `main`에 통합된 뒤에만 새 Assessment ID를 발급해 이 단일
+스냅샷과 아래 이력을 갱신한다. 긍정적이든 부정적이든 관련 evidence가
+target commit 이후 바뀌면 재평가 전까지 상태를 `STALE`로 둔다. 회귀, test 실패,
+라이선스 충돌, 문서·source 불일치나 공식 기준 변경은 점수를 낮출 수 있다.
+
+| 날짜 | Assessment ID | Target commit | 변경 | 근거 | 판정 |
+|---|---|---|---|---|---|
+| 2026-07-24 | `ASSESS-2026-07-24-01` | `2cb1bc49c4bfdf40c51a0adb347367e0f4602491` | 기준선 `N/A → 17/30` | source·test·문서·GitHub 이력에 대한 세 갈래 읽기 전용 평가 | `CURRENT` |
 
 ## 멘토링
 

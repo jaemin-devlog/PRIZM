@@ -22,20 +22,23 @@ CareerFact 구조화, 포트폴리오 생성, `/api/v1`, MCP, 멀티모듈 패�
 
 ## 실행
 
-현재 `compose.yaml`은 PostgreSQL 16+pgvector만 실행합니다. 백엔드, 프런트엔드와 Ollama는 호스트에서 별도로 실행해야 합니다.
+한 번의 Docker Compose 명령으로 PostgreSQL, Spring Boot 백엔드, Career Vault 프런트엔드를 함께 실행합니다. 프런트엔드는 백엔드 API를 내부 프록시하므로 브라우저에서는 프런트 주소만 열면 됩니다. Ollama는 호스트에서 실행해야 하며, 문서 색인을 사용하려면 모델을 준비해야 합니다.
 
 ```powershell
 Copy-Item .env.example .env
 ollama pull bge-m3
 docker compose up -d
-.\gradlew.bat bootRun
 ```
 
-프런트엔드:
+접속 주소:
+
+- Career Vault: `http://localhost:5173`
+- Backend health: `http://localhost:8080/actuator/health`
+
+코드를 바꿔 이미지를 다시 만들 때는 다음 명령을 사용합니다.
 
 ```powershell
-npm --prefix frontend ci
-npm --prefix frontend run dev
+docker compose up -d --build
 ```
 
 현재 bootstrap은 `SYSTEM_ADMIN`만 만들 수 있고 해당 역할은 개인 문서 API를 사용할 수 없습니다. 회원가입이나 demo `USER` 생성 경로가 아직 없어 위 절차만으로 신규 사용자의 Career Vault 흐름을 완주할 수 없습니다. 재현 가능한 Quickstart는 [오픈소스 엔진 전환 실행 계획](docs/oss-transition-execution-plan.md)의 후속 단계입니다.

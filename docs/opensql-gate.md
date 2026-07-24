@@ -3,8 +3,8 @@
 > 상태: `NOT_RUN` (2026-07-23)
 
 이 문서는 실제 OpenSQL 환경을 확보하기 전까지 사용하는 임시 체크리스트다. 실제
-작업을 시작하면 내용을 `PRZ-001-opensql-vector-gate`의 `spec.md`, `plan.md`,
-`tasks.md`, `evidence.md`로 옮기고 이 파일은 제거한다.
+작업을 시작하면 다음 available spec ID의 OpenSQL Gate `spec.md`, `plan.md`,
+`tasks.md`, `evidence.md`로 내용을 옮기고 이 파일은 제거한다.
 
 PostgreSQL 성공을 OpenSQL 성공으로 바꾸어 표현하지 않는다.
 

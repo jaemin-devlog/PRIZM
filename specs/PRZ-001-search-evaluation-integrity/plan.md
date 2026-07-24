@@ -1,4 +1,4 @@
-# PRZ-003 계획
+# PRZ-001 계획
 
 ## 변경 경로
 
@@ -22,7 +22,10 @@
 2. Docker·PostgreSQL·pgvector·Ollama가 준비된 경우에만 `searchEvaluation`을 별도로 실행한다.
 3. Markdown 링크, code fence, `git diff --check`와 ignore 결과를 점검한다.
 
-## Git 계획
+## Git 기록
 
-- 임시 브랜치: `PRZ-003-search-evaluation-integrity`
-- Issue, commit, push, PR은 이번 사용자 요청에 포함되지 않으므로 생성하지 않는다.
+- 구현 당시 임시 브랜치: `PRZ-003-search-evaluation-integrity`
+- source commit: `36c8610` (`테스트: 검색 평가 정합성 강화`)
+- 병합 commit: `9e4d96f` (`검색 평가 정합성 강화 병합`)
+- 병합 뒤 번호 정책을 정정해 이 spec의 canonical ID는 `PRZ-001`로 현행화한다.
+  과거 branch·commit·PR의 `PRZ-003` 표기는 실제 이력으로 보존한다.

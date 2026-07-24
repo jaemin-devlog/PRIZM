@@ -33,9 +33,9 @@
    라이선스를 `docs/contest/2026-license-audit.md`에 감사한다.
 2. 감사 결과에 따라 LICENSE, NOTICE, CONTRIBUTING, SECURITY와 GitHub
    template을 추가한다.
-3. 실제 착수 시 `PRZ-001-opensql-vector-gate`를 만들고, GitHub 쓰기가
-   승인된 경우 현재 Issue와 연결해 OpenSQL 실환경을 검증한다.
-4. `PRZ-002-clean-clone-demo`에서 안전한 demo `USER`와 재현 절차를 완성한다.
+3. 실제 착수 시 다음 available spec ID로 OpenSQL 단일 환경 Gate를 만들고,
+   GitHub 쓰기가 승인된 경우 현재 Issue와 연결해 OpenSQL 실환경을 검증한다.
+4. Clean Clone Demo spec에서 안전한 demo `USER`와 재현 절차를 완성한다.
 5. 실제 다중 노드 구성을 확보해 DB 장애전환·검색 복구 Gate를 수행한다.
 6. 변경 로그 기반 동기화의 최소 수직 슬라이스를 구현·검증한다.
 7. 기존 검색을 재사용하는 owner-scoped 읽기 전용 MCP 도구를 구현·검증한다.

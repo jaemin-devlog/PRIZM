@@ -87,14 +87,13 @@ public class SearchEvaluationMetrics {
                 if (top20.stream().anyMatch(candidate -> candidate.relevance() == 2)) {
                     directRecallHits++;
                 }
+                reciprocalRankSum += reciprocalRank(top20);
             }
 
             long relevantTop5 = top5.stream().filter(candidate -> candidate.relevance() >= 1).count();
             long directTop5 = top5.stream().filter(candidate -> candidate.relevance() == 2).count();
             precisionSum += relevantTop5 / (double) FINAL_RESULT_LIMIT;
             directPrecisionSum += directTop5 / (double) FINAL_RESULT_LIMIT;
-            reciprocalRankSum += reciprocalRank(top20);
-
             Set<String> seenGroups = new HashSet<>();
             for (CandidateResult candidate : top5) {
                 returnedTop5Count++;
@@ -111,7 +110,7 @@ public class SearchEvaluationMetrics {
                 divide(directRecallHits, directEvidenceQuestionCount),
                 precisionSum / results.size(),
                 directPrecisionSum / results.size(),
-                reciprocalRankSum / results.size(),
+                divide(reciprocalRankSum, directEvidenceQuestionCount),
                 divide(ndcgSum, ndcgQuestionCount),
                 divide(duplicateCount, returnedTop5Count),
                 latencies.stream().mapToLong(Long::longValue).average().orElse(0.0d),

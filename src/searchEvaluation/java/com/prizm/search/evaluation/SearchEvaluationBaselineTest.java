@@ -431,8 +431,8 @@ class SearchEvaluationBaselineTest {
                     question.duplicateEvidence(),
                     question.searchTimeMillis());
         }
-        System.out.println("결과 JSON: " + files.report());
-        System.out.println("후보 CSV: " + files.rawCandidates());
+        System.out.println("결과 JSON 파일: " + files.report().getFileName());
+        System.out.println("후보 CSV 파일: " + files.rawCandidates().getFileName());
     }
 
     private void printSummary(String label, Summary summary) {
@@ -442,7 +442,7 @@ class SearchEvaluationBaselineTest {
                 summary.recallAt20(), summary.directRecallAt20());
         System.out.printf(Locale.ROOT, "Precision@5: %.4f (direct %.4f)%n",
                 summary.precisionAt5(), summary.directPrecisionAt5());
-        System.out.printf(Locale.ROOT, "MRR@20: %.4f%n", summary.mrr());
+        System.out.printf(Locale.ROOT, "Direct MRR@20: %.4f%n", summary.directMrrAt20());
         System.out.printf(Locale.ROOT, "nDCG@5: %.4f%n", summary.ndcgAt5());
         System.out.printf(Locale.ROOT, "중복 결과 비율: %.4f%n", summary.duplicateResultRatio());
         System.out.printf(Locale.ROOT, "검색 지연 평균/p95: %.2fms/%dms%n",

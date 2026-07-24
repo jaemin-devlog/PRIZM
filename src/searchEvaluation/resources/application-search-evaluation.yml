@@ -8,6 +8,10 @@ spring:
     model:
       chat: none
       embedding: ollama
+    ollama:
+      # Do not inherit a potentially remote general-purpose .env endpoint during
+      # personal evaluation. An explicit evaluation-only override is required.
+      base-url: ${PRIZM_SEARCH_EVALUATION_OLLAMA_BASE_URL:http://localhost:11434}
 
 prizm:
   jwt:

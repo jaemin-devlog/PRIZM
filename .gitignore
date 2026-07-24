@@ -44,7 +44,13 @@ var/
 uploads/
 models/
 *.log
-local/search-evaluation/
+/local/
+/outputs/
+/tools/search-evaluation/reranker/.venv/
+/tools/search-evaluation/reranker/model-cache/
+/tools/search-evaluation/reranker/__pycache__/
+**/__pycache__/
+*.pyc
 
 ### Frontend ###
 frontend/node_modules/

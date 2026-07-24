@@ -12,6 +12,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
@@ -36,9 +37,10 @@ public class SearchEvaluationReportWriter {
     public ReportFiles write(Path outputDirectory, Report report) {
         try {
             Files.createDirectories(outputDirectory);
-            String timestamp = FILE_TIMESTAMP.format(Instant.now(clock));
-            Path reportPath = outputDirectory.resolve("dense-baseline-" + timestamp + ".json");
-            Path rawPath = outputDirectory.resolve("dense-baseline-candidates-" + timestamp + ".csv");
+            String runToken = FILE_TIMESTAMP.format(Instant.now(clock)) + "-"
+                    + UUID.randomUUID().toString().substring(0, 8);
+            Path reportPath = outputDirectory.resolve("dense-baseline-" + runToken + ".json");
+            Path rawPath = outputDirectory.resolve("dense-baseline-candidates-" + runToken + ".csv");
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(reportPath.toFile(), report);
             Files.writeString(rawPath, rawCandidates(report), StandardCharsets.UTF_8);
             return new ReportFiles(reportPath, rawPath);

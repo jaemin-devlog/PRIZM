@@ -95,6 +95,20 @@ class SearchEvaluationDatasetLoaderTest {
     }
 
     @Test
+    void rejectsPositiveEvidenceReusedAcrossTuningAndTest() throws IOException {
+        writeCorpus();
+        writeQuestions(
+                validQuestion("q-1"),
+                """
+                        {"questionId":"q-2","query":"A separate evaluation query","expectedEvidence":[{"fixtureEvidenceId":"spring-evidence","relevance":1,"evidenceGroupId":"spring-secondary-group"}],"noEvidence":false,"split":"TEST","category":"TECHNICAL_EXPERIENCE"}
+                        """.strip());
+
+        assertThatThrownBy(() -> loader.load(temporaryDirectory))
+                .isInstanceOf(SearchEvaluationDataException.class)
+                .hasMessageContaining("Positive fixture evidence cannot be reused");
+    }
+
+    @Test
     void rejectsEmptyQuestionsFile() throws IOException {
         writeCorpus();
         writeQuestions();

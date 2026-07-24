@@ -221,7 +221,7 @@
 ## 2026-07-14 — 검색 품질 평가 기반
 
 - 변경: 합성 `corpus.json`·`questions.jsonl` 형식과 개인 데이터가 Git에서 제외되는 `local/search-evaluation/` 경계를 추가했다.
-- 측정: 별도 `searchEvaluation` task가 실제 PostgreSQL·pgvector와 Ollama `bge-m3`, 현재 청킹·owner·ACTIVE 조건을 사용해 Dense top 5·20을 조회하고 Recall@20, Precision@5, MRR@20, nDCG@5, 중복률과 지연을 로컬 JSON·CSV로 기록한다.
+- 측정: 별도 `searchEvaluation` task가 실제 PostgreSQL·pgvector와 Ollama `bge-m3`, 현재 청킹·owner·ACTIVE 조건을 사용해 Dense top 5·20을 조회하고 Recall@20, Precision@5, 당시 `MRR@20`으로 표시한 legacy aggregate direct-rank score, nDCG@5, 중복률과 지연을 로컬 JSON·CSV로 기록한다.
 - 범위: 프로덕션 검색 API, score 임계값, Reranker, Hybrid Search, 청킹과 프런트엔드는 변경하지 않았다.
 - 검증: 단위 테스트 162개, PostgreSQL·pgvector·실제 Ollama 통합 테스트 49개와 합성 기준선 평가를 통과했다. OpenSQL 실환경 테스트 1개는 기존 정책대로 제외했다.
 
@@ -229,8 +229,8 @@
 
 - 데이터: 기존 합성 사례를 보존하면서 가상 문서 11개, 질문 30개로 확장했다. 기술 8개, 문제 해결 6개, 협업 4개, 정확한 수치·표현 6개, 무근거 6개이며 hard negative 질문은 11개다.
 - 분리: 질문을 TUNING 20개와 TEST 10개로 구분하고, 동일 정규화 질문 중복·잘못된 split·누락된 fixture 근거·무근거 라벨 충돌을 실행 전에 차단한다. 의미가 같은 패러프레이즈의 split 간 중복은 수동 검토했다.
-- 출력: Dense 기준선 보고서에 전체·split·category별 Precision@5, Recall@20, MRR@20, nDCG@5, 중복률, score 분포와 지연을 추가했다.
-- 기준선: 실제 PostgreSQL 16.14·pgvector와 Ollama `bge-m3` 최종 실행에서 전체 Recall@20 1.0000, Precision@5 0.1933, MRR@20 0.6556, nDCG@5 0.8543, 중복률 0.0067, 평균/p95 864.20/999ms를 기록했다. 합성 결과는 실제 서비스 성능을 보장하지 않는다.
+- 출력: Dense 기준선 보고서에 전체·split·category별 Precision@5, Recall@20, 당시 `MRR@20`으로 표시한 legacy aggregate direct-rank score, nDCG@5, 중복률, score 분포와 지연을 추가했다.
+- 기준선: 실제 PostgreSQL 16.14·pgvector와 Ollama `bge-m3` 최종 실행에서 전체 Recall@20 1.0000, Precision@5 0.1933, legacy aggregate direct-rank score 0.6556(Direct MRR@20 재실행 필요), nDCG@5 0.8543, 중복률 0.0067, 평균/p95 864.20/999ms를 기록했다. 합성 결과는 실제 서비스 성능을 보장하지 않는다.
 - 범위: 운영 검색, 임계값, Reranker, Hybrid Search, 청킹, 프런트엔드와 DB migration은 변경하지 않았다.
 
 ## 2026-07-15 — 고아 원본 파일 Cleanup Worker
@@ -345,3 +345,12 @@
 - 개인 관리: 실제 Issue·PR·CI·merge·제3자 review를 서로 다른 근거로 취급한다. `REVIEW_NOT_AVAILABLE_SOLO`나 Agent 감사는 GitHub review로 계산하지 않고, 과거 GitHub 기록을 점수 목적으로 소급 생성하지 않는다.
 - 독립 감사: workflow 일관성, 공식 점수 오인·artifact gaming 방지, 현재 준비도와 Gate 정합성을 세 갈래로 재검토해 모두 차단 문제 없음으로 통과했다.
 - 검증: 문서 전용 변경이므로 애플리케이션 test는 실행하지 않았다. 변경된 Markdown 4개의 로컬 링크 누락·code fence 불균형·trailing whitespace·EOF 문제가 모두 0건이고 `git diff --check`를 통과했다.
+
+## 2026-07-24 — PRZ-003 검색 평가 기준선 정합성
+
+- 교정: TUNING/TEST 사이에서 양성 fixture evidence가 반복되면 로더가 실행 전에 거부하도록 하고, 샘플 30문항의 split을 다시 배치했다. Direct MRR@20은 직접 근거 질문만 분모로 사용하며, 이전 0.6556 수치는 legacy aggregate로 분리했다.
+- 안전성: 평가 profile은 일반 `.env`의 Ollama endpoint를 상속하지 않고 localhost 기본값 또는 명시적 평가 전용 endpoint만 사용한다. 결과 파일은 run token으로 구분하고, `local/`·`outputs/`·Python virtual environment, Python cache와 reranker model cache는 ignore로 보호한다. 실제 생성물은 삭제하지 않았다.
+- 검증: `./gradlew.bat test --no-daemon`에서 245개 중 231개 성공·환경 조건 14개 skip·실패/오류 0개를 확인했다. 이후 Docker Desktop 29.6.2, Testcontainers PostgreSQL 16.14·pgvector와 로컬 Ollama `bge-m3`로 `searchEvaluation`을 재실행해 TEST 10문항의 Direct MRR@20 `0.7917`을 기록했다. OpenSQL·OpenProxy·OpenHA는 이번 교정에서 사용하거나 검증하지 않았다.
+- 1차 감사 보완: OpenSQL에 예약된 PRZ-001과의 충돌을 피하도록 검색 평가를 임시로 PRZ-002로 재번호화하고, JSON 필드를 `directMrrAt20`으로 명시했다. model cache ignore와 7월 14일 legacy 지표명도 정정했다.
+- 2차 감사 보완: PRZ-002가 clean-clone demo에 이미 예약된 사실을 확인해, OpenSQL `PRZ-001`과 clean-clone demo `PRZ-002`를 보존하고 검색 평가만 사용되지 않은 `PRZ-003`으로 재번호화했다. 독립 재감사 전 상태는 `IN_PROGRESS`로 유지한다.
+- 최종 독립 재감사: ID 예약, registry 링크, spec 디렉터리·브랜치, 현재·계획·역사 문맥을 다시 확인해 blocking finding 없이 `PASS`했다. 검색 평가 기준선 정합성 상태를 `VERIFIED`로 갱신했으며 commit·push·PR은 수행하지 않았다.

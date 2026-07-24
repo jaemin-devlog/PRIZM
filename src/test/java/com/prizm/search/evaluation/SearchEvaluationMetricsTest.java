@@ -57,7 +57,22 @@ class SearchEvaluationMetricsTest {
                         candidate(2, 1, "partial"),
                         candidate(3, 2, "direct-group")));
 
-        assertThat(metrics.calculate(List.of(result)).mrr()).isEqualTo(1.0d / 3.0d);
+        assertThat(metrics.calculate(List.of(result)).directMrrAt20()).isEqualTo(1.0d / 3.0d);
+    }
+
+    @Test
+    void calculatesDirectMrrOnlyAcrossQuestionsWithDirectEvidence() {
+        QuestionResult directHit = result(
+                List.of(expected("direct-hit", 2, "direct-hit-group")),
+                List.of(candidate(1, 0, "irrelevant"), candidate(2, 2, "direct-hit-group")));
+        QuestionResult directMiss = result(
+                List.of(expected("direct-miss", 2, "direct-miss-group")),
+                List.of(candidate(1, 0, "irrelevant")));
+        QuestionResult partialOnly = result(
+                List.of(expected("partial", 1, "partial-group")),
+                List.of(candidate(1, 1, "partial-group")));
+
+        assertThat(metrics.calculate(List.of(directHit, directMiss, partialOnly)).directMrrAt20()).isEqualTo(0.25d);
     }
 
     @Test

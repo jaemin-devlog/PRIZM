@@ -1,0 +1,314 @@
+# PRZ-002 작업 목록
+
+## 상태
+
+| 항목 | 값 |
+|---|---|
+| Spec | [spec.md](spec.md) |
+| Plan | [plan.md](plan.md) |
+| Spec status | `PLANNED` |
+| PLAN | `COMPLETE` |
+| IMPLEMENT | `NOT_STARTED` |
+| GitHub Issue | `NOT_CREATED` |
+
+체크박스는 계획의 존재가 아니라 실제 file·명령·환경·결과 evidence가 확인된
+경우에만 완료한다. `UNKNOWN`, `CONFLICT`, `NOT_RUN`을 임의로 PASS로 바꾸지
+않는다.
+
+## P-00 — PLAN
+
+- [x] 현재 source, Gradle/npm lockfile, Docker, application profile, CI,
+  fixture·asset 경로와 Git 상태를 읽기 전용으로 확인한다.
+- [x] 공식 source register, license/provenance 감사와 배포 경계를 정의한다.
+- [x] outgoing license, SECURITY 신고 채널과 GitHub 쓰기를 사용자 Gate로 둔다.
+- [x] IMPLEMENT 10단계의 완료 조건, 검증·감사와 중단 조건을 정의한다.
+- [x] 이번 PLAN에서는 plan·tasks·development log 외 파일을 변경하지 않는다.
+
+## G-03A — IMPLEMENT 전 GitHub Issue·branch 권한
+
+- [ ] 사용자가 GitHub Issue 생성 권한을 명시적으로 승인한다.
+- [ ] 실제 Issue를 생성한 뒤 spec의 `NOT_CREATED`를 실제 URL로 바꾼다.
+- [ ] 최신 main, staged 0건, 기존 user change 보존을 확인한다.
+- [ ] 안전할 때만 `PRZ-002-open-source-readiness` 임시 branch를 만든다.
+- [ ] branch 기준 commit과 `origin/main` 관계를 evidence에 기록한다.
+
+**중단 조건:** 권한이 없거나 기존 user change 때문에 안전한 branch 전환이
+불가능하면 reset·stash로 우회하지 않고 IMPLEMENT를 시작하지 않는다.
+
+## T-01 — 공식 source register
+
+**선행 조건:** G-03A 완료, IMPLEMENT 시작 승인, 공식 URL 접근 가능
+
+- [ ] 대회 홈페이지·개요 URL과 수집일을 기록한다.
+- [ ] 운영 규정 PDF의 공식 URL, 15쪽, SHA-256, media type·byte 크기를
+  사용자 제공본과 교차 검증한다.
+- [ ] 운영 규정 제8~10조·별표 2와 원문 재배포 조건을 조항·쪽 단위로
+  PRZ-002 요구사항에 연결한다.
+- [ ] 결과보고서 양식 ZIP의 공식 URL·SHA-256과 SBOM·AI 모델 명세 필드를
+  정확한 양식 위치에 연결한다.
+- [ ] OT 공지와 사용자 제공 캡처를 `OT_AUXILIARY_USER_PROVIDED`로 등록하고
+  공개 원본 URL 부재·재배포 불명을 기록한다.
+- [ ] source별 authority, title, canonical/artifact URL, 발행·수집일,
+  hash, claim, rights, redistribution, supersession, 검증일을 채운다.
+- [ ] 공식 PDF·ZIP·캡처 원본이 tracked file이나 제출 source ZIP에 없음을
+  확인한다.
+
+**완료 evidence:** source register 경로, 원본 hash 검증 명령·결과, local
+link 검사, 원문 비포함 `git ls-files` 결과
+
+## T-02 — 전체 license·provenance 감사
+
+**선행 조건:** T-01
+
+### Java·Gradle
+
+- [ ] `build.gradle` 선언과 resolved `runtimeClasspath`,
+  `testRuntimeClasspath`, `buildEnvironment`를 별도 inventory로 생성한다.
+- [ ] Gradle Wrapper 9.5.1 JAR·distribution URL·공식 checksum·license와
+  `distributionSha256Sum`·verification metadata 상태를 기록한다.
+- [ ] Spring Boot·dependency-management plugin과 plugin 전이를 감사한다.
+- [ ] Spring Boot, Spring AI Ollama, PDFBox, Flyway, PostgreSQL JDBC와
+  모든 runtime 전이의 exact version·artifact hash·license·NOTICE를 확인한다.
+- [ ] PDFBox `META-INF/NOTICE`, PostgreSQL JDBC BSD-2-Clause, Logback
+  복수 라이선스를 우선 판정한다.
+- [ ] Testcontainers, H2, JUnit·Mockito와 모든 test 전이를 production
+  비포함 여부와 함께 기록한다.
+
+### frontend·npm
+
+- [ ] package manifest와 lockfile 183 entry를 direct/transitive,
+  runtime/dev/optional로 분류한다.
+- [ ] React·React DOM·scheduler가 실제 `dist`에 포함되는지 확인한다.
+- [ ] MPL-2.0, CC-BY-4.0, BlueOak-1.0.0, BSD·ISC 항목의 license 원문과
+  산출물 포함 여부를 판정한다.
+- [ ] 모든 tarball integrity·upstream·license와 clean bundle을 대조한다.
+- [ ] Node 22.17.0, npm 10.9.2와 Docker builder tag의 재현성 차이를 기록한다.
+
+### container·database·CI
+
+- [ ] Temurin JDK/JRE, Node, Nginx, PostgreSQL·pgvector image의 tag,
+  manifest/platform digest, base package SBOM, license·NOTICE를 확인한다.
+- [ ] backend·frontend·database image가 배포되는지 사용자에게 확인한다.
+- [ ] GitHub Actions, runner, Java setup과 Ollama install script·model pull의
+  upstream, license, exact revision과 공급망 위험을 기록한다.
+- [ ] 도입 후보 SBOM·license·link tool 자체를 먼저 감사한다.
+
+### model·fixture·asset
+
+- [ ] Ollama source와 실제 binary/release의 version·license·약관을 구분한다.
+- [ ] `bge-m3` upstream revision, model card·LICENSE, Ollama manifest/blob
+  digest, 사용 목적, cache·가중치 재배포 여부를 기록한다.
+- [ ] Codex를 authoring assistant로만 기록하고 근거 없는 사용 비율을 쓰지
+  않는다.
+- [ ] 검색 평가 fixture의 합성·작성 경위·재배포 권리와 개인정보 부재를 확인한다.
+- [ ] tracked test/frontend/docs asset·binary 전수를 file signature와
+  provenance로 확인한다.
+- [ ] Gamium 참고 저장소는 `DESIGN_REFERENCE_ONLY`로 기록하고 복사된
+  code·문구·asset이 있는지 확인한다.
+
+### 감사 종료
+
+- [ ] component마다 version/digest, upstream, SPDX, purpose, scope,
+  distribution, NOTICE, decision, status, verified date가 있다.
+- [ ] 배포 범위의 `UNKNOWN`, `CONFLICT`, `BLOCKED`가 0건이거나 작업 전체를
+  `BLOCKED`로 유지한다.
+
+**완료 evidence:** license audit 경로, machine inventory hash, fat JAR·bundle·
+image 대조 결과, unresolved component count
+
+## G-01 — 배포 경계 사용자 결정
+
+**선행 조건:** T-02 inventory 초안
+
+- [ ] source ZIP, fat JAR, frontend `dist`, backend/frontend/database image,
+  Ollama binary, model cache 중 제출·배포 대상을 사용자가 확정한다.
+- [ ] 배포 경계 변경 뒤 NOTICE·SBOM 범위를 다시 계산한다.
+
+**중단 조건:** 경계가 확정되지 않으면 T-03 이후를 시작하지 않는다.
+
+## T-03 — MIT·Apache-2.0 후보 비교와 승인
+
+**선행 조건:** T-02, G-01
+
+- [ ] OSI 공식 목록과 두 license의 canonical 원문·checksum을 확인한다.
+- [ ] permissive 조건, explicit patent grant, 고지·수정 표시, NOTICE 운영,
+  contributor·release 부담을 비교한다.
+- [ ] 모든 dependency·container·model·asset과 후보 license의 호환성을
+  배포 산출물별로 확인한다.
+- [ ] 복수 라이선스 선택, 예외 허가와 충돌 해소 근거를 기록한다.
+- [ ] 사용자에게 추천안과 남은 위험을 제시한다.
+- [ ] 사용자가 outgoing license를 명시적으로 승인한다.
+
+**중단 조건:** 미승인 또는 배포 범위 `UNKNOWN/CONFLICT` 존재 시 `BLOCKED`
+
+**완료 evidence:** 승인된 license 이름·canonical URL, 결정일, 승인 근거와
+audit snapshot hash
+
+## T-04 — `LICENSE`·`NOTICE`
+
+**선행 조건:** T-03 승인
+
+- [ ] 승인된 표준 license 원문을 변형 없이 루트 `LICENSE`에 적용한다.
+- [ ] 저작권자를 `Jaemin Jeong`으로 기록한다.
+- [ ] dependency·model·asset 감사 결과에서 필요한 third-party 고지를
+  `NOTICE`에 반영한다.
+- [ ] PDFBox 등 upstream NOTICE가 fat JAR/image에서 보존되는지 확인한다.
+- [ ] source/JAR/`dist`/image별 license·NOTICE 배치와 전달 방식을 검증한다.
+- [ ] Codex를 저작권자·공동 기여자·runtime dependency로 잘못 기록하지 않는다.
+
+**완료 evidence:** canonical license 대조 결과, NOTICE coverage report,
+배포물별 포함 검사
+
+## T-05 — SBOM·AI 모델 명세
+
+**선행 조건:** T-02, G-01, 감사된 도구 승인
+
+- [ ] machine-readable SBOM format·schema와 audited generator를 확정한다.
+- [ ] backend runtime/test/build, frontend runtime/dev, CI, container,
+  model, fixture·asset component를 구분한다.
+- [ ] 사람용 license audit와 machine SBOM component set을 상호 검증한다.
+- [ ] clean checkout에서 재생성 가능한 local 명령을 만든다.
+- [ ] Ollama·`bge-m3`·Codex의 source, version/revision/digest, license·terms,
+  purpose, execution·distribution boundary를 AI 명세에 기록한다.
+- [ ] 모델 파일·cache가 Git과 기본 제출물에 포함되지 않음을 검사한다.
+- [ ] credential, JWT, JDBC URL, host, 로컬 경로, 실제 업로드 문서가
+  SBOM·명세에 없는지 검사한다.
+- [ ] 제출 시점 commit·환경·생성 시각·결과 hash를 고정한다.
+
+**완료 evidence:** 재생성 명령, schema validation, human/machine diff,
+AI model provenance와 secret scan 결과
+
+## G-02 — SECURITY 신고 채널 결정
+
+**선행 조건:** repository 설정 확인 권한
+
+- [ ] GitHub Private Vulnerability Reporting을 활성화하고 접수 경로를
+  실제 확인하거나, 사용자가 검증 가능한 전용 연락처를 제공한다.
+- [ ] 선택한 경로의 maintainer 수신·응답 가능성을 확인한다.
+- [ ] Issues·Discussions 지원 기능의 실제 활성화 상태를 확인한다.
+
+**중단 조건:** 비공개 신고 채널이 없으면 `SECURITY.md` 게시 금지
+
+## T-06 — 기여·행동강령·보안·지원·maintainer 정책
+
+**선행 조건:** T-05, G-02
+
+- [ ] CONTRIBUTING에 setup, test, Flyway forward-only, 문서·license,
+  sensitive data, AI assistance disclosure 규칙을 기록한다.
+- [ ] 실제 집행 가능한 CODE_OF_CONDUCT와 신고 경로를 연결한다.
+- [ ] SECURITY에 지원 버전, 비공개 신고, 금지 정보, 응답 흐름을 기록한다.
+- [ ] SUPPORT에 일반 질문·버그·보안 경로를 구분한다.
+- [ ] maintainer 정책에 triage, release, dependency update, security,
+  review·merge 책임과 solo 한계를 기록한다.
+- [ ] 모든 링크와 실제 연락 경로를 검증한다.
+
+**완료 evidence:** 운영 가능한 contact test, 문서 링크 검사, maintainer 승인
+
+## T-07 — Issue Form·PR Template
+
+**선행 조건:** T-06
+
+- [ ] Bug Issue Form에 환경·version·재현·기대/실제·로그 정제·민감정보 금지를
+  포함한다.
+- [ ] Feature Issue Form에 문제·사용자·범위·대안·호환성·license 영향을
+  포함한다.
+- [ ] Documentation Issue Form에 위치·문제·현재/계획/`NOT_RUN` 정합성을
+  포함한다.
+- [ ] Issue config의 blank issue와 security contact link 정책을 정한다.
+- [ ] PR Template에 spec/Issue, 변경 범위, test·환경, migration, owner/security,
+  dependency/license, docs, `NOT_RUN`, reviewer 상태를 포함한다.
+- [ ] GitHub schema validation과 실제 preview를 확인한다.
+
+**완료 evidence:** GitHub preview URL 또는 캡처 hash, schema validation,
+secret-safe field review
+
+## T-08 — README·Quickstart·docs index
+
+**선행 조건:** T-04~T-07
+
+- [ ] README 첫 화면에 문제, Engine/Reference App 경계, 현재 기능, Quickstart,
+  docs·license·contribution·security 경로를 배치한다.
+- [ ] clean-clone Quickstart를 실제로 재현하고 필요한 환경·초기 사용자
+  blocker를 정직하게 기록한다.
+- [ ] 구현됨·계획됨·미검증을 표로 분리한다.
+- [ ] OpenSQL·OpenProxy·OpenHA를 `NOT_RUN`으로 유지한다.
+- [ ] CareerFact·portfolio·MCP·`/api/v1`·멀티모듈을 계획 상태로 유지한다.
+- [ ] docs index, contest traceability, roadmap와 중복·깨진 링크를 정리한다.
+
+**완료 evidence:** clean-clone log, Markdown link report, 현재/계획 표현 audit
+
+## T-09 — Markdown·link·license/SBOM CI
+
+**선행 조건:** T-05, T-08, CI tool 감사 완료
+
+- [ ] required OSS file, local link, code fence, trailing whitespace 검사 명령을
+  로컬에서 재현한다.
+- [ ] external link의 일시 network 오류와 영구 404를 분리해 보고한다.
+- [ ] dependency inventory coverage, forbidden/unknown/conflict license,
+  SBOM schema·재생성 drift를 검사한다.
+- [ ] model/cache·credential·업로드 원본·로컬 경로가 tracked/generated
+  artifact에 없는지 검사한다.
+- [ ] 모든 third-party Action을 검증된 full commit SHA와 version 주석으로
+  사용한다.
+- [ ] Ollama 설치와 model pull의 mutable identity를 허용하지 않는 Gate를 둔다.
+- [ ] clean checkout local 결과와 GitHub Actions 결과를 대조한다.
+
+**완료 evidence:** local command·exit code, GitHub check URL, pinned Action
+inventory, SBOM diff report
+
+## T-10 — 독립 읽기 전용 감사
+
+**선행 조건:** T-01~T-09 VERIFY 완료
+
+- [ ] source register의 공식 URL·hash·권리 상태를 재검증한다.
+- [ ] lockfile/resolved graph/JAR/bundle/image/model과 audit·SBOM을 재대조한다.
+- [ ] `LICENSE`, `NOTICE`, SBOM, AI 명세의 license·version·배포 경계를
+  상호 확인한다.
+- [ ] SECURITY·SUPPORT·Issue·PR 경로의 실제 동작을 확인한다.
+- [ ] 공개 저장소와 generated artifact의 민감정보·모델 cache·로컬 경로
+  부재를 확인한다.
+- [ ] GitHub repository visibility가 실제 `PUBLIC`인지 API와 UI에서 확인한다.
+- [ ] clean clone에 빌드에 필요한 직접 작성 backend·frontend source,
+  V1~V13 migration, wrapper, 공개 config와 문서가 모두 있는지 확인한다.
+- [ ] 제출 source의 commit·tree hash가 감사한 공개 commit과 일치하는지
+  확인한다.
+- [ ] README의 현재/계획/`NOT_RUN` 표현을 source와 대조한다.
+- [ ] CRITICAL/HIGH/MEDIUM finding을 심각도·파일·근거로 보고한다.
+- [ ] finding이 있으면 `IN_PROGRESS`, 외부 결정이 필요하면 `BLOCKED`로 둔다.
+- [ ] finding이 0건일 때만 audit `PASS`를 기록한다.
+
+**완료 evidence:** 독립 audit report, finding count, 검증 명령·환경,
+repository visibility와 clean-clone inventory, 제출 commit·tree hash,
+OpenSQL·OpenProxy·OpenHA `NOT_RUN`
+
+## G-03B — AUDIT 후 PR·review·integration 권한
+
+- [ ] IMPLEMENT·VERIFY·AUDIT가 끝난 뒤 PR을 만든다.
+- [ ] 실제 reviewer가 없으면 `REVIEW_NOT_AVAILABLE_SOLO`를 기록하고
+  Agent audit를 GitHub review로 주장하지 않는다.
+- [ ] merge 뒤 source·merge commit, CI·audit evidence를 기록한다.
+- [ ] main 포함 여부와 working tree를 확인한 뒤에만 임시 branch를 정리한다.
+
+## VERIFY 실행표
+
+| 검증 | IMPLEMENT 후 기대 | 미실행 처리 |
+|---|---|---|
+| Markdown local/external link·code fence·trailing whitespace | 필수 | `NOT_RUN` 불가 |
+| `git diff --check`와 변경 범위 | 필수 | `NOT_RUN` 불가 |
+| Gradle 전체 unit test | build/CI 영향 시 필수 | 이유·환경을 `NOT_RUN` |
+| PostgreSQL·pgvector integration | dependency/container/Quickstart 영향 시 필수 | PostgreSQL 미사용을 명시 |
+| frontend lint·build | frontend package/README Quickstart 영향 시 필수 | 이유를 `NOT_RUN` |
+| `docker compose config`, runtime image SBOM | container audit 시 필수 | Docker 미사용을 명시 |
+| Ollama·`bge-m3` identity·runtime smoke | model/Quickstart audit 시 필수 | Ollama 미사용을 명시 |
+| OpenSQL·OpenProxy·OpenHA | 이번 범위 제외 | 항상 별도 `NOT_RUN` |
+
+## 최종 완료 조건
+
+- [ ] T-01~T-10이 evidence와 함께 완료됐다.
+- [ ] G-01~G-03의 사용자·권한 결정이 실제로 기록됐다.
+- [ ] 배포 범위에 `UNKNOWN`, `CONFLICT`, `BLOCKED`가 없다.
+- [ ] 독립 감사에 CRITICAL/HIGH/MEDIUM finding이 없다.
+- [ ] 실제 GitHub Issue·PR·CI·review 상태를 과장하지 않았다.
+- [ ] PRZ-002 evidence와 registry가 실제 source·merge commit을 가리킨다.
+
+현재는 PLAN만 완료됐으며 위 IMPLEMENT task는 모두 미착수다.

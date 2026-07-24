@@ -363,3 +363,9 @@
 - 출처 기준: 공식 홈페이지, 2026 운영 규정, 결과보고서 양식과 공식 OT 보조 캡처를 대조해 P0의 핵심을 출처 등록·라이선스 감사·SBOM·AI 모델 명세·기여/보안 경로로 확정했다. 운영 규정 원문과 OT 이미지는 재배포 제한 또는 공개 원본 부재 때문에 저장소에 복사하지 않고 메타데이터·해시·필요 최소 인용만 기록한다.
 - 저작권 경계: 직접 작성 코드의 저작권 표기는 `Jaemin Jeong`으로 준비하고, Codex는 개발 보조도구 사용으로 분리한다. 외부 코드·모델·자산의 출처와 라이선스는 후속 감사로 확인하며, 검증 전에는 무결성이나 호환성을 보증하지 않는다.
 - 상태: 이번 단계는 `SPEC`만 완료했다. 라이선스 선택, GitHub Issue, 구현·CI·검증·감사·PR은 아직 수행하지 않았다.
+
+## 2026-07-24 — PRZ-002 오픈소스 준비 PLAN
+
+- 범위: 공식 source register부터 전체 Gradle/npm/container/model/CI/asset 감사, outgoing license 승인, 고지·SBOM·AI 명세, 기여·보안 체계, GitHub template·문서·CI와 독립 감사까지 10단계 실행 순서를 정했다.
+- Gate: 감사 전에는 MIT·Apache-2.0을 확정하지 않고 사용자 승인을 받으며, 실제 Private Vulnerability Reporting 또는 검증된 연락처가 없으면 SECURITY 게시를 중단한다. `UNKNOWN`·`CONFLICT` 구성요소도 release 통합을 막는다.
+- 상태: PLAN만 완료했다. LICENSE·NOTICE·governance·template·CI, GitHub Issue·branch·commit·PR은 아직 만들지 않았고, OpenSQL·OpenProxy·OpenHA는 계속 `NOT_RUN`이다.

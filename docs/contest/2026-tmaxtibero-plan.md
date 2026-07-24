@@ -81,16 +81,12 @@ test가 최종 진실이다. 기존 저장소에 `specify init --here --force`�
 않고 `AGENTS.md`를 유일한 작업 규칙 원본으로 유지한다.
 
 `PRZ-000-platform-baseline`은 과거 구현을 사전 명세처럼 꾸미지 않은
-`AS_BUILT_BASELINE`이다. 이후 ID는 실제 작업을 시작하는 `SPEC` 단계에서
-하나씩 할당한다. 현재 예정된 첫 두 작업은 다음과 같다.
+`AS_BUILT_BASELINE`이다. `PRZ-001-search-evaluation-integrity`는 실제로
+착수·검증·병합한 첫 신규 spec이다. 이후 ID는 실제 작업을 시작하는 `SPEC`
+단계에서 하나씩 할당하며, roadmap이나 장기 계획에서 미래 번호를 예약하지 않는다.
 
-```text
-PRZ-001-opensql-vector-gate
-PRZ-002-clean-clone-demo
-```
-
-그다음 ID는 실제 착수 순서에 따라 DB 가용성 Gate, 변경 로그 동기화,
-MCP 검색, CareerFact, portfolio, 제출 감사를 각각 작은 spec으로 만든다.
+OpenSQL Gate, clean-clone demo, DB 가용성 Gate, 변경 로그 동기화, MCP 검색,
+CareerFact, portfolio와 제출 감사는 실제 착수 순서에 따라 각각 작은 spec으로 만든다.
 존재하지 않았던 과거 Issue·PR·review는 만들지 않는다.
 
 ## 제출 전 개발 순서
@@ -107,10 +103,10 @@ MCP 검색, CareerFact, portfolio, 제출 감사를 각각 작은 spec으로 만
 
 ### P1. OpenSQL·clean-clone — 7월 28일~8월 3일
 
-- 실제 착수 시 `PRZ-001-opensql-vector-gate`와 실제 GitHub Issue 생성
+- 실제 착수 시 다음 available spec ID의 OpenSQL Gate와 실제 GitHub Issue 생성
 - 전용 OpenSQL DB/schema에서 Flyway와 `vector(1024)` 검색 실행
 - owner·ACTIVE, claim·lease·fencing·`SKIP LOCKED` 결과를 PostgreSQL과 분리
-- `PRZ-002-clean-clone-demo`에서 안전한 demo `USER`와 합성 TXT/PDF 준비
+- 별도 clean-clone demo spec에서 안전한 demo `USER`와 합성 TXT/PDF 준비
 - 두 번째 깨끗한 환경에서 로그인→업로드→ACTIVE→검색 재현
 - 처리 완료 확인 절차와 browser E2E 또는 고정 수동 UI 시험표 작성
 

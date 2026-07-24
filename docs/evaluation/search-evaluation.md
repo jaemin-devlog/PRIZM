@@ -61,7 +61,7 @@ Docker Desktop, PostgreSQL·pgvector Testcontainer와 로컬 Ollama `bge-m3`가 
 
 전체 원문은 결과에 복사하지 않습니다. JSON에는 질문, 예상 근거, 반환 chunk ID, relevance 순서, top1 score·distance, 중복 여부와 지연이 기록됩니다. CSV에는 split·category와 후보 rank, score, distance, relevance, evidence group이 기록됩니다.
 
-지표는 전체, TUNING, TEST, category별로 구분합니다. 각 구분에서 Recall@20, direct Recall@20, Precision@5, direct Precision@5, Direct MRR@20, evidence-group 기준 nDCG@5, 중복 결과 비율, 평균·p95 검색 지연을 기록합니다. JSON의 machine-readable 필드는 `directMrrAt20`이며, PRZ-003 이전 결과의 `mrr` 필드와 직접 비교하지 않습니다. 근거 있음/없음 질문의 top1 score·distance 분포도 별도로 기록합니다.
+지표는 전체, TUNING, TEST, category별로 구분합니다. 각 구분에서 Recall@20, direct Recall@20, Precision@5, direct Precision@5, Direct MRR@20, evidence-group 기준 nDCG@5, 중복 결과 비율, 평균·p95 검색 지연을 기록합니다. JSON의 machine-readable 필드는 `directMrrAt20`이며, PRZ-001 교정 이전 결과의 `mrr` 필드와 직접 비교하지 않습니다. 근거 있음/없음 질문의 top1 score·distance 분포도 별도로 기록합니다.
 
 합성 파일럿 기준선은 실제 개인 문서나 서비스 전체 검색 성능을 보장하지 않습니다. 이 수치는 이후 Reranker, Hybrid Search, 청킹 실험의 비교 기준입니다. 현재 score에 운영 임계값을 적용하거나 정답 확률로 해석하지 않습니다.
 
@@ -74,14 +74,14 @@ Docker Desktop, PostgreSQL·pgvector Testcontainer와 로컬 Ollama `bge-m3`가 
 | Recall@20 | 1.0000 |
 | Precision@5 | 0.1933 |
 | Direct Precision@5 | 0.1600 |
-| Legacy aggregate direct-rank score (PRZ-003 이전 전체 질문 분모, Direct MRR@20과 비교 불가) | 0.6556 |
+| Legacy aggregate direct-rank score (PRZ-001 교정 이전 전체 질문 분모, Direct MRR@20과 비교 불가) | 0.6556 |
 | nDCG@5 | 0.8543 |
 | 중복 결과 비율 | 0.0067 |
 | 평균 / p95 검색 지연 | 864.20ms / 999ms |
 
 합성 corpus가 실제로 만든 청크는 14개이므로 Recall@20은 사실상 작은 corpus의 hit-rate 성격이며 운영 규모 회수 성능을 증명하지 않습니다. 이 결과는 평가 파이프라인의 재현 가능한 기준선이지 제품 품질 보증이 아닙니다.
 
-## 2026-07-24 PRZ-003 정합성 교정 후 재측정
+## 2026-07-24 PRZ-001 정합성 교정 후 재측정
 
 Docker Desktop 29.6.2, Testcontainers PostgreSQL 16.14·pgvector, 로컬 Ollama
 `bge-m3`로 `./gradlew.bat searchEvaluation --no-daemon`을 실행한 결과입니다.

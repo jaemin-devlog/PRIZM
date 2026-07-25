@@ -7,7 +7,7 @@
 | PRZ 작업 | [`PRZ-002-open-source-readiness`](../../specs/PRZ-002-open-source-readiness/spec.md) |
 | 범위 | T-02 inventory와 G-01·outgoing license 결정·자산 감사 자료 |
 | 기준 commit | `a5f5cd53525d1e759d558ce0c09e2b1cc42544a1` |
-| 검증일 | 2026-07-24 |
+| 검증일 | 2026-07-25 |
 | 상태 | `IN_PROGRESS_BLOCKED` |
 | 직접 작성 코드 저작권자 | `Jaemin Jeong` |
 | 공동 개발자·코드 기여자 | 확인된 사람 없음 |
@@ -19,8 +19,15 @@ G-01 배포 경계는 2026-07-24 사용자 승인으로 source-only로 확정했
 `Apache-2.0`을 승인했다. 이 결정은 표준 `LICENSE`·`NOTICE` 파일을 이미
 적용했다는 뜻이 아니다. [`2026-asset-provenance-audit.md`](2026-asset-provenance-audit.md)는
 외부 design token 교체까지 완료해 자산 blocker가 없지만, 아래 비자산
-`UNKNOWN`, `CONFLICT`, `BLOCKED`가 남아 있으므로 두 파일은 아직 만들지
-않는다.
+`UNKNOWN`, `BLOCKED`와 future 배포 제한이 남아 있으므로 두 파일은 아직
+만들지 않는다.
+
+2026-07-25 공급망 IMPLEMENT에서는 Gradle Wrapper와 resolved dependency
+artifact의 checksum Gate, GitHub Actions full SHA, Ollama release archive와
+`bge-m3` manifest digest Gate를 추가했다. 이 작업은 artifact identity와
+무결성을 고정하지만, Gradle artifact publisher 서명이나 Ollama 변환
+lineage를 새로 증명하지는 않는다. GitHub Actions의 실제 실행 결과는 아직
+`NOT_RUN`이다.
 
 ## 감사 방법과 상태
 
@@ -51,15 +58,16 @@ G-01 배포 경계는 2026-07-24 사용자 승인으로 source-only로 확정했
 |---|---|
 | `build.gradle` | `1FAB00EBBB2100510FDA89517384BF08145D7E7B49FC972D4C028990835AB642` |
 | `settings.gradle` | `AA627D19F54C16B1F89060449EEEFE3660F20392748789E628D796C6B180E7C5` |
-| `gradle/wrapper/gradle-wrapper.properties` | `E0846BD420BF1543F500E0C9B35C01D84611B0F1AFE01E24A82D0ECA53C33CCB` |
+| `gradle/wrapper/gradle-wrapper.properties` | `735B1FFB51D53B1FFAAAD7ECAF66B36014D758AEDAA35EC354CB2B2717B8EE7C` |
 | `gradle/wrapper/gradle-wrapper.jar` | `497C8C2A7E5031F6AA847F88104AA80A93532EC32EE17BDB8D1D2F67A194A9C7` |
+| `gradle/verification-metadata.xml` | `7EDDC373493C56B2B7FB36BDC05C8DFF7D1426519687A43A42271911DDB111C5` |
 | `frontend/package.json` | `ED40AD99488120CF5A4928050AB4FAC4F69CE4D62CACBD92578EC3F80DDF1725` |
 | `frontend/package-lock.json` | `967063C8B12574A1467D492AD5FEC7C6E080E89A6250F153E49ED1F1714FB66C` |
 | `.nvmrc` | `157C2EB0DE1187AC028E89BCFF580F1FEAB7EEA2A280B110998C9472E19B4D98` |
 | `compose.yaml` | `4B0D8957D993E963888DA2FD539952A5ADBDE5031FBD8152971F3184447673AC` |
 | backend Dockerfile | `D7919AF879015F78114DDD1E03A909D51D29895ACBD694536243557120B90DEC` |
 | frontend Dockerfile | `C2859300EC00F750BB7E7525F78E7556E3BF9D5F075F64070DF5066A8FA4AF98` |
-| `.github/workflows/ci.yml` | `DD09517905019329DC549A56CF4F864AFE7D3B98294AB55A960B12BF6B4C32BC` |
+| `.github/workflows/ci.yml` | `8A686095B7879B7B639CB2E1ADEF4EBC5FCFDCAD6697BF7ED06C4900C4BA444A` |
 
 실제 Java graph는 다음 명령이 2026-07-24에 성공한 결과를 사용했다.
 애플리케이션 테스트는 실행하지 않았다.
@@ -111,9 +119,11 @@ G-01 배포 경계는 2026-07-24 사용자 승인으로 source-only로 확정했
 | `JVM-TESTCONTAINERS` | Testcontainers `2.0.5` family; core JAR hash `0466F481…C2E1` | [Testcontainers](https://github.com/testcontainers/testcontainers-java), POM | `MIT` | test | `NOT_DISTRIBUTED` | `VERIFIED` | 2026-07-24 |
 | `JVM-TEST` | JUnit `6.0.3`, Mockito `5.23.0`, AssertJ `3.27.7`, Hamcrest `3.0`, XMLUnit `2.11.0`, JSONassert `1.5.3`, Awaitility `4.3.0` 등 | resolved `testRuntimeClasspath`, 각 POM | EPL/MIT/Apache/BSD family | test | `NOT_DISTRIBUTED` | identity·declared license `VERIFIED` | 2026-07-24 |
 | `JVM-H2` | H2 `2.4.240`; JAR hash `29B70E42…7CE0` | [H2](https://github.com/h2database/h2database), POM | `MPL-2.0 OR EPL-1.0` | test | `NOT_DISTRIBUTED` | 복수 license `VERIFIED`; production 포함 시 재판정 | 2026-07-24 |
-| `GRADLE-WRAPPER` | Gradle Wrapper·distribution `9.5.1`; wrapper JAR hash 위 표 참조 | [Gradle 9.5.1 release](https://github.com/gradle/gradle-distributions/releases/tag/v9.5.1), embedded license | `Apache-2.0` | build | wrapper scripts·JAR는 source와 함께 배포 | release의 bin checksum은 `bafc141b619ad6350fd975fc903156dd5c151998cc8b058e8c1044ab5f7b031f`; repository에 `distributionSha256Sum`과 `gradle/verification-metadata.xml` 없음, 공급망 `BLOCKED` | 2026-07-24 |
+| `GRADLE-WRAPPER` | Gradle Wrapper·distribution `9.5.1`; wrapper JAR hash 위 표 참조 | [Gradle 9.5.1 release](https://github.com/gradle/gradle-distributions/releases/tag/v9.5.1), embedded license | `Apache-2.0` | build | wrapper scripts·JAR는 source와 함께 배포 | official bin SHA-256 `bafc141b619ad6350fd975fc903156dd5c151998cc8b058e8c1044ab5f7b031f`를 `distributionSha256Sum`에 고정; `VERIFIED` | 2026-07-25 |
 | `GRADLE-BOOT-PLUGIN` | Spring Boot Gradle plugin `4.1.0`; JAR hash `861FD80B…5AAC` | plugin POM·JAR LICENSE/NOTICE | `Apache-2.0` | build | source 사용자가 내려받음 | `VERIFIED`; build transitive NOTICE는 SBOM에서 분리 | 2026-07-24 |
-| `GRADLE-DM-PLUGIN` | `io.spring.dependency-management` `1.1.7`; JAR hash `9E885EEC…E4C` | local JAR/POM에는 license 근거 없음 | `UNKNOWN` | build | source 사용자가 내려받음 | official upstream license 근거 추가 전 `UNKNOWN` | 2026-07-24 |
+| `GRADLE-DM-PLUGIN` | `io.spring.dependency-management` `1.1.7`; JAR hash `9E885EEC…E4C` | [Maven Central 1.1.7 POM](https://central.sonatype.com/artifact/io.spring.gradle/dependency-management-plugin/1.1.7) | `Apache-2.0` | build | source 사용자가 내려받음 | exact POM의 license 선언 확인; `VERIFIED` | 2026-07-25 |
+| `GRADLE-TOMLJ` | `org.tomlj:tomlj:1.0.0`; JAR SHA-256 `32697c7567b2921c473678a820b13fc64700aa87bb14576eeb48d0ed5847cfd4` | [Maven Central 1.0.0 POM](https://central.sonatype.com/artifact/org.tomlj/tomlj/1.0.0), [tagged LICENSE](https://github.com/tomlj/tomlj/blob/1.0.0/LICENSE) | `Apache-2.0` | build transitive | source 사용자가 내려받음 | exact POM과 tagged LICENSE 교차 확인; `VERIFIED` | 2026-07-25 |
+| `GRADLE-DEPENDENCY-VERIFICATION` | [`gradle/verification-metadata.xml`](../../gradle/verification-metadata.xml); 377 components, 738 artifacts·SHA-256 | [Gradle dependency verification](https://docs.gradle.org/9.5.1/userguide/dependency_verification.html) | 해당 없음 | build integrity | metadata는 source와 함께 배포 | `verify-metadata=true`, default strict mode에서 Gradle `help` 성공하고 CI도 `--dependency-verification=strict`를 명시. 현재 repository에서 resolve한 graph로 bootstrap했으므로 artifact publisher 서명·진위를 독립 증명하지 않음; `INTEGRITY_BASELINE_VERIFIED` | 2026-07-25 |
 
 현재 성공한 resolved graph에는 Spring AI pgvector store 5 module과
 `com.pgvector:pgvector:0.1.6`이 없다. 로컬 Gradle 실행 이력에는 과거 흔적이
@@ -127,9 +137,10 @@ release는 아직 `BLOCKED`다.
   보존 여부를 확인하지 않았다.
 - Logback·Jakarta·HdrHistogram·JNA 같은 복수 license의 선택 경로를 NOTICE에
   기록하지 않았다.
-- dependency-management plugin의 공식 license 근거가 아직 `UNKNOWN`이다.
-- Gradle distribution의 공식 checksum은 확인했지만 wrapper 설정에 고정하지
-  않았다.
+- generated dependency verification metadata는 checksum 변경을 fail-closed
+  하지만 publisher signature 검증을 켜지 않았다. 따라서 checksum은
+  reproducible integrity 기준선이며 독립적인 publisher authenticity 증거는
+  아니다.
 
 ## frontend·npm inventory
 
@@ -238,11 +249,11 @@ registry publish 설정은 없다. G-01은 Dockerfile·Compose 정의만 source�
 | ID | Identity | Upstream / evidence | SPDX | Purpose·scope | Distribution | Status / unresolved | Verified |
 |---|---|---|---|---|---|---|---|
 | `CI-RUNNER` | `ubuntu-latest` | GitHub-hosted runner | image package composite | CI | `NOT_DISTRIBUTED` | runner revision floating `UNKNOWN` | 2026-07-24 |
-| `CI-CHECKOUT` | `actions/checkout@v6` | [actions/checkout](https://github.com/actions/checkout) | `MIT` | CI source checkout | `NOT_DISTRIBUTED` | major tag, full SHA 미고정 `BLOCKED` | 2026-07-24 |
-| `CI-JAVA` | `actions/setup-java@v5`, Temurin Java `17` | [actions/setup-java](https://github.com/actions/setup-java) | `MIT` | CI JDK setup | `NOT_DISTRIBUTED` | Action·JDK patch 미고정 `BLOCKED` | 2026-07-24 |
-| `CI-NODE` | `actions/setup-node@v6`, `.nvmrc` Node `22.17.0` | [actions/setup-node](https://github.com/actions/setup-node) | `MIT` | CI Node setup | `NOT_DISTRIBUTED` | Action major tag 미고정 `BLOCKED` | 2026-07-24 |
-| `CI-OLLAMA-INSTALL` | `https://ollama.com/install.sh` | [Ollama Linux install](https://docs.ollama.com/linux) | script·binary 대응 `UNKNOWN` | CI runtime setup | `NOT_DISTRIBUTED` | mutable script, `OLLAMA_VERSION`·hash·signature 없음 `BLOCKED` | 2026-07-24 |
-| `CI-BGE-PULL` | `ollama pull bge-m3` | Ollama registry | model license는 아래 별도 기록 | CI model pull | model bytes를 GitHub cache·artifact로 배포하지 않음 | `latest` alias와 manifest 미고정 `BLOCKED` | 2026-07-24 |
+| `CI-CHECKOUT` | `actions/checkout` `v6.1.0`; commit `d23441a48e516b6c34aea4fa41551a30e30af803` | [actions/checkout](https://github.com/actions/checkout) | `MIT` | CI source checkout | `NOT_DISTRIBUTED` | full commit SHA와 version 주석 고정; `IMPLEMENTED`, GitHub 실행 `NOT_RUN` | 2026-07-25 |
+| `CI-JAVA` | `actions/setup-java` `v5.6.0`; commit `03ad4de0992f5dab5e18fcb136590ce7c4a0ac95`; Temurin Java `17` | [actions/setup-java](https://github.com/actions/setup-java) | `MIT` | CI JDK setup | `NOT_DISTRIBUTED` | Action full SHA 고정; JDK patch는 setup 시점에 결정되는 환경 재현성 제한으로 분리. GitHub 실행 `NOT_RUN` | 2026-07-25 |
+| `CI-NODE` | `actions/setup-node` `v6.5.0`; commit `249970729cb0ef3589644e2896645e5dc5ba9c38`; `.nvmrc` Node `22.17.0` | [actions/setup-node](https://github.com/actions/setup-node) | `MIT` | CI Node setup | `NOT_DISTRIBUTED` | Action full SHA와 Node exact version 고정; GitHub 실행 `NOT_RUN` | 2026-07-25 |
+| `CI-OLLAMA-INSTALL` | Ollama `v0.32.3` Linux amd64 archive; SHA-256 `2597d74fbe654ef6a37db56f771cf37d4a85c6bde4018127874e3927d3113800` | [Ollama v0.32.3 release](https://github.com/ollama/ollama/releases/tag/v0.32.3), release asset digest | source `MIT`; binary archive는 외부 제공물 | CI runtime setup | `NOT_DISTRIBUTED` | mutable install script 제거, exact release archive checksum과 runtime API version fail-closed Gate 구현; GitHub 실행 `NOT_RUN` | 2026-07-25 |
+| `CI-BGE-PULL` | `bge-m3:latest`; registry manifest SHA-256 `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab` | [Ollama model page](https://ollama.com/library/bge-m3:latest), registry manifest | model license는 아래 별도 기록 | CI model pull | model bytes를 GitHub cache·artifact로 배포하지 않음 | pull 전 registry manifest와 pull 후 local manifest를 같은 digest로 검증하고 model·license blob 존재를 검사. mutable alias drift는 fail-closed; GitHub 실행 `NOT_RUN` | 2026-07-25 |
 
 PostgreSQL 성공이나 일반 CI 성공은 OpenSQL·OpenProxy·OpenHA 성공이 아니다.
 세 환경은 이번 감사에서 모두 `NOT_RUN`이다.
@@ -253,15 +264,16 @@ PRIZM 코드의 outgoing license와 external runtime·model license를 합치지
 
 | ID | Identity | Upstream / evidence | License | Purpose·scope | Distribution | NOTICE / status | Verified |
 |---|---|---|---|---|---|---|---|
-| `AI-OLLAMA-SOURCE` | Ollama source, exact runtime version 미고정 | [Ollama source](https://github.com/ollama/ollama), official LICENSE | source `MIT`; downloaded binary와 current terms의 적용 경계는 별도 | local·CI model runtime | `NOT_DISTRIBUTED`; 사용자가 공식 upstream에서 설치 | source license `VERIFIED`; 실제 binary identity·bundled deps는 AI 명세에 `UNKNOWN` | 2026-07-24 |
-| `AI-BGE-M3-UPSTREAM` | BAAI `bge-m3`, repository는 revision 미고정 | [BAAI/bge-m3](https://huggingface.co/BAAI/bge-m3) | model card `MIT` | 1024-d embedding model | `NOT_DISTRIBUTED`; 사용자가 Ollama registry에서 pull | upstream revision·Ollama conversion 대응 `UNKNOWN` | 2026-07-24 |
-| `AI-BGE-M3-OLLAMA` | `bge-m3:latest`; 관찰 manifest SHA-256 `7907646426070047A77226AC3E684FBBE8410524F7B4A74D02837E43F2146BAB`; model blob `DAEC91FFB5DD0C27411BD71F29932917C49CF529A641D0168496C3A501E3062C`; license blob `A406579CD136771C705C521DB86CA7D60A6F3DE7C9B5460E6193A2DF27861BDE` | [Ollama model page](https://ollama.com/library/bge-m3:latest), registry manifest | license blob은 MIT 형식이나 저작권자 placeholder 포함 | local·CI embedding | `NOT_DISTRIBUTED`; model/cache를 Git·release에 포함하지 않음 | alias mutable·upstream mapping 불명·license placeholder로 사용 provenance `CONFLICT`; future 재배포는 `BLOCKED` | 2026-07-24 |
+| `AI-OLLAMA-SOURCE` | Ollama source와 CI runtime `v0.32.3`; Linux amd64 archive SHA-256 `2597d74fbe654ef6a37db56f771cf37d4a85c6bde4018127874e3927d3113800` | [Ollama source](https://github.com/ollama/ollama), [v0.32.3 release](https://github.com/ollama/ollama/releases/tag/v0.32.3), official LICENSE·asset digest | source `MIT`; downloaded binary archive는 외부 제공물 | local·CI model runtime | `NOT_DISTRIBUTED`; 사용자가 공식 upstream에서 설치 | CI identity·checksum Gate `IMPLEMENTED`; bundled dependency 전체 provenance는 future binary 재배포 전 별도 감사 | 2026-07-25 |
+| `AI-BGE-M3-UPSTREAM` | BAAI `bge-m3`; 2026-07-25 upstream reference revision `5617a9f61b028005a4858fdac845db406aefb181` | [BAAI/bge-m3](https://huggingface.co/BAAI/bge-m3), model repository metadata | model card `MIT` | 1024-d embedding model | `NOT_DISTRIBUTED`; 사용자가 Ollama registry에서 pull | 이 revision은 감사 시점 upstream reference일 뿐 Ollama 변환 원본임을 증명하지 않음; `UNVERIFIED_LINEAGE` | 2026-07-25 |
+| `AI-BGE-M3-OLLAMA` | `bge-m3:latest`; manifest SHA-256 `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`; model blob `daec91ffb5dd0c27411bd71f29932917c49cf529a641d0168496c3a501e3062c`; license blob `a406579cd136771c705c521db86ca7d60a6f3de7c9b5460e6193a2df27861bde` | [Ollama model page](https://ollama.com/library/bge-m3:latest), registry manifest | license blob은 MIT 형식이나 저작권자 placeholder 포함 | local·CI embedding | `NOT_DISTRIBUTED`; model/cache를 Git·release에 포함하지 않음 | exact manifest Gate `IMPLEMENTED`, GitHub 실행 `NOT_RUN`; BAAI revision→Ollama 변환 lineage와 placeholder는 `UNVERIFIED_LINEAGE`로 남아 future model 재배포·정확한 lineage 주장을 차단하지만 PRIZM source distribution의 license 충돌로 간주하지 않음 | 2026-07-25 |
 | `AI-CODEX` | Codex; exact 사용 비율 없음 | 사용자 확인과 개발 기록 | runtime component의 license로 분류하지 않음 | authoring assistant | code·model 자체를 PRIZM과 함께 배포하지 않음 | 보조도구 사용 사실만 공개; 저작권자·공동 기여자·runtime dependency로 기록하지 않음 | 2026-07-24 |
 
 모델 파일과 cache는 Git·기본 제출 source에 넣지 않는다. G-01은 Ollama와
-모델을 PRIZM이 재배포하지 않도록 확정했다. 정확한 model revision,
-Ollama manifest/blob, license·terms는 사용 구성요소 명세를 위해 계속
-확인하되, future 재배포는 별도 사용자 결정과 재감사 없이는 허용하지 않는다.
+모델을 PRIZM이 재배포하지 않도록 확정했다. Ollama manifest/blob identity는
+CI에서 fail-closed로 확인하지만, BAAI upstream에서 Ollama artifact로
+변환된 lineage는 확인하지 못했다. 이 제한을 숨기지 않으며 future 재배포는
+별도 사용자 결정과 재감사 없이는 허용하지 않는다.
 
 ## Fixture·sample·asset·binary provenance
 
@@ -271,7 +283,7 @@ Ollama manifest/blob, license·terms는 사용 구성요소 명세를 위해 계
 | `DATA-SEARCH-QUESTIONS` | `src/test/resources/search-evaluation/sample/questions.jsonl`; 30 questions; SHA-256 `A42A356628E577722BC62A65C8157EC79A9917CA033C6B6CBD1D7BEE80FA07B5` | tracked JSONL, Git history와 2026-07-24 사용자 직접·Codex 보조 제작 확인; [자산 감사](2026-asset-provenance-audit.md) | `Apache-2.0` 사용자 승인, 적용 전 | search evaluation fixture | source와 함께 배포 후보 | corpus와 같은 제3자 비파생·공개 권리 확인으로 `VERIFIED_DIRECT` | 2026-07-24 |
 | `DATA-EVALUATION-CONFIG` | `src/searchEvaluation/resources/application-search-evaluation.yml`; SHA-256 `06A36041A79D5DE3AF428C7F9B72017E12815438932BC1672EA3191731DF8CA8` | tracked project configuration | `Apache-2.0` 사용자 승인, 적용 전 | search evaluation configuration | source와 함께 배포 후보 | 외부 asset이 아닌 설정임을 `VERIFIED`; 표준 license 파일 적용 전 | 2026-07-24 |
 | `ASSET-TRACKED` | tracked frontend/search 이미지·PDF·office·archive·model 0개 | `git ls-files`와 extension·signature scan | 해당 없음 | asset audit | 해당 없음 | `VERIFIED` | 2026-07-24 |
-| `BINARY-WRAPPER` | tracked binary는 `gradle-wrapper.jar` 1개 | 위 Gradle row | `Apache-2.0` | build bootstrap | source와 함께 배포 | `VERIFIED`; distribution checksum pin은 별도 blocker | 2026-07-24 |
+| `BINARY-WRAPPER` | tracked binary는 `gradle-wrapper.jar` 1개 | 위 Gradle row | `Apache-2.0` | build bootstrap | source와 함께 배포 | `VERIFIED`; Gradle 9.5.1 distribution checksum pin 적용 | 2026-07-25 |
 | `REF-SPEC-KIT` | GitHub Spec Kit의 spec·plan·tasks 구조, 확인 commit `4d3a4281bc63bd2af9f2515bb1036fc38da1294e` | [upstream](https://github.com/github/spec-kit), [MIT](https://github.com/github/spec-kit/blob/main/LICENSE), 사용자 제공 화면과 확인 | `MIT`; PRIZM에 upstream 원문·template·code 미포함 | 일반적인 작업 흐름 참고 | `NOT_DISTRIBUTED` | upstream template과 비자명한 동일 문구 0건, PRIZM 문서는 개념만 독자 작성, `VERIFIED_EXTERNAL_REFERENCE` | 2026-07-24 |
 | `REF-ROBO-ARCHITECT` | uEngine Robo Architect의 spec별 보조 문서 구조, 확인 commit `bb4b24addc301062e06f983e25c8e5f76877b9cd` | [repository](https://github.com/uengine-oss/robo-architect), [제품 소개](https://www.uengine.org/contents/roboarchitect.html), 사용자 제공 화면과 확인 | root license 파일·GitHub license metadata 없음; README의 `MIT License` 문구만 확인. PRIZM에 upstream 원문·code·asset 미포함 | 일반적인 문서 배치 참고 | `NOT_DISTRIBUTED` | upstream에는 `evidence.md`가 없으며 PRIZM evidence 분리는 독자 적용. future copy 전 license 재확인 | 2026-07-24 |
 | `REF-GAMIUM` | Gamium·samples·docs 구조 | PRZ-002 plan/tasks와 2026-07-24 사용자 확인 | 향후 참고 시 exact repository·commit·license 재감사 | 공개 저장소 정리의 미래 참고 후보 | 현재 code·문구·asset 반영 0 | `NOT_DISTRIBUTED`; 현재 provenance Gate 대상 아님 | 2026-07-24 |
@@ -382,17 +394,17 @@ token 이름을 제거하고 독립 PRIZM 체계로 교체했다. 따라서
 | Group | Exact component identities | SPDX / evidence | NOTICE | Status·purpose |
 |---|---|---|---|---|
 | Spring Boot plugin | `org.springframework.boot:org.springframework.boot.gradle.plugin:4.1.0`, `spring-boot-gradle-plugin:4.1.0`, `spring-boot-buildpack-platform:4.1.0`, `spring-boot-loader-tools:4.1.0`, `org.springframework:spring-core:7.0.8` | `Apache-2.0`; G/P/J | Y | `VERIFIED`; build |
-| Dependency management plugin | `io.spring.dependency-management:io.spring.dependency-management.gradle.plugin:1.1.7`, `io.spring.gradle:dependency-management-plugin:1.1.7` | `UNKNOWN`; G, local POM/JAR에 license 근거 없음 | N | `UNKNOWN/BLOCKED`; 공식 upstream 근거 필요 |
+| Dependency management plugin | `io.spring.dependency-management:io.spring.dependency-management.gradle.plugin:1.1.7`, `io.spring.gradle:dependency-management-plugin:1.1.7` | `Apache-2.0`; exact Maven Central POM | N | `VERIFIED`; build |
 | Build JNA | `net.java.dev.jna:jna:5.17.0`, `jna-platform:5.17.0` | `Apache-2.0 OR LGPL-2.1-or-later`; G/J | Y | `VERIFIED`; build native access, 선택 경로 기록 필요 |
 | Build Commons | `org.apache.commons:commons-compress:1.27.1`, `commons-lang3:3.16.0`, `commons-codec:commons-codec:1.17.1`, `commons-io:commons-io:2.16.1`, `commons-logging:commons-logging:1.3.5` | `Apache-2.0`; G/P/J | Y | `VERIFIED`; build utilities |
 | HTTP Components | `org.apache.httpcomponents.client5:httpclient5:5.6.1`, `org.apache.httpcomponents.core5:httpcore5:5.4`, `httpcore5-h2:5.4` | `Apache-2.0`; G/J/parent POM | Y | `VERIFIED`; buildpack HTTP |
 | Build ANTLR | `org.antlr:antlr4-runtime:4.7.2` | `BSD-3-Clause`; G/J | N | `VERIFIED`; TOML parser dependency |
 | JSR-305 | `com.google.code.findbugs:jsr305:3.0.2` | `Apache-2.0`; G/P | N | `VERIFIED`; build annotation |
-| TOML | `org.tomlj:tomlj:1.0.0` | `UNKNOWN`; G, local POM/JAR 근거 없음 | N | `UNKNOWN/BLOCKED`; 공식 upstream 근거 필요 |
+| TOML | `org.tomlj:tomlj:1.0.0` | `Apache-2.0`; exact Maven Central POM·tagged LICENSE | N | `VERIFIED`; build parser |
 | Build SLF4J·JSpecify | `org.slf4j:slf4j-api:1.7.36`, `org.jspecify:jspecify:1.0.0` | `MIT`; `Apache-2.0`; G/P | N | `VERIFIED`; build logging·annotation |
 | Build Jackson | `com.fasterxml.jackson.core:jackson-annotations:2.21`, `tools.jackson:jackson-bom:3.1.4`, `tools.jackson.core:jackson-core:3.1.4`, `jackson-databind:3.1.4` | `Apache-2.0`; G/P/J | Y for JARs | `VERIFIED`; build JSON, BOM은 metadata |
 | Annotation processor | `org.springframework.boot:spring-boot-configuration-processor:4.1.0` | `Apache-2.0`; declaration/P/J | Y | `VERIFIED`; direct build component, `NOT_DISTRIBUTED` |
-| Gradle Wrapper | Gradle distribution `9.5.1`, wrapper JAR SHA-256 `497C8C2A7E5031F6AA847F88104AA80A93532EC32EE17BDB8D1D2F67A194A9C7` | `Apache-2.0`; embedded license·official release | Y | component `VERIFIED`; source에 배포, `distributionSha256Sum` 부재로 supply-chain `BLOCKED` |
+| Gradle Wrapper | Gradle distribution `9.5.1`, wrapper JAR SHA-256 `497C8C2A7E5031F6AA847F88104AA80A93532EC32EE17BDB8D1D2F67A194A9C7` | `Apache-2.0`; embedded license·official release | Y | component `VERIFIED`; official `distributionSha256Sum` 고정 및 dependency verification metadata 적용 |
 
 2026-07-24에 `buildEnvironment`를 다시 실행해 고유 coordinate 26개를
 확인했다. 그중 test graph와 같은 identity·version인 6개는
@@ -660,9 +672,10 @@ registry tarball URL이고, license 근거는 그 entry의 `license` 필드이�
 
 G-01은 `COMPLETE`다. 사용자는 아래 비교를 검토한 뒤 2026-07-24
 Apache-2.0을 outgoing license로 승인했다. fixture·asset 권리와 외부 design
-token blocker는 해소됐지만 build component 근거·model provenance가 남아
-있으므로 T-03 전체 Gate와 실제 `LICENSE`·`NOTICE` 구현은 아직 완료하지
-않는다.
+token blocker는 해소됐고 build·CI artifact identity Gate도 구현했다.
+Ollama 변환 lineage는 source-only 배포 경계 밖의 제한으로 분리했다. 다만
+T-02의 전체 dependency·future 산출물 고지 검증과 T-03 전체 Gate가 남아
+실제 `LICENSE`·`NOTICE` 구현은 아직 완료하지 않는다.
 
 ## MIT와 Apache-2.0 비교와 사용자 선택
 
@@ -688,7 +701,8 @@ token blocker는 해소됐지만 build component 근거·model provenance가 남
 2. 완료: fixture 작성자·제3자 비파생·Apache-2.0 재배포 권리 확인
 3. 완료: 외부 Toss reference token 제거와 독립 PRIZM frontend design
    token 교체
-4. dependency-management plugin 근거와 복수 license 선택 경로 확인
+4. 완료: dependency-management plugin과 `org.tomlj`의 Apache-2.0 근거 확인
+   및 Gradle checksum Gate 구현
 5. 선택한 binary·bundle·image의 NOTICE coverage 확인
 6. Ollama binary와 `bge-m3`를 재배포한다면 exact identity와 license 충돌 해소
 7. audit snapshot과 결정일 기록
@@ -708,26 +722,34 @@ token blocker는 해소됐지만 build component 근거·model provenance가 남
 - Spec Kit·Robo Architect의 외부 참고 경계와 외부 file 미포함
 - 독립 PRIZM color·spacing·radius token과 외부 Toss reference token 제거
 - Pretendard 공식 `OFL-1.1` 확인과 font binary·CDN 미포함 경계
+- Gradle 9.5.1 distribution checksum, 377-component dependency verification
+  metadata와 dependency-management plugin·`org.tomlj`의 Apache-2.0 근거
+- 모든 third-party GitHub Action의 full commit SHA와 version 주석
+- Ollama `v0.32.3` archive checksum과 `bge-m3` registry/local manifest
+  fail-closed Gate 구현
 
 ### UNKNOWN
 
-- dependency-management plugin의 현재 감사 근거상 official license
 - future `bootJar`·frontend bundle의 최종 component·NOTICE coverage
 - 각 container의 platform digest와 base package SBOM
-- Ollama binary의 exact release와 `bge-m3` upstream 변환 대응
+- Ollama `bge-m3`와 BAAI upstream revision 사이의 변환 lineage. 이 제한은
+  model 재배포와 정확한 lineage 주장을 막지만 source-only PRIZM 배포물에는
+  model bytes가 포함되지 않는다.
 
 ### CONFLICT
 
-- Ollama `bge-m3` license blob에 저작권자 placeholder가 남아 있어 사용
-  provenance가 불완전함. initial source 배포에는 model을 포함하지 않는다.
+- 현재 source-only 배포 범위에서 확인된 license 충돌은 없다. Ollama
+  `bge-m3` license blob의 저작권자 placeholder는 위 `UNVERIFIED_LINEAGE`와
+  future model 재배포 blocker로 유지한다.
 
 ### BLOCKED
 
 - 승인된 Apache-2.0 `LICENSE`와 `NOTICE`의 실제 생성·적용
-- 남은 license 근거가 해결되기 전 source release 확정
+- 남은 전체 dependency·NOTICE·SBOM Gate가 해결되기 전 source release 확정
 - fat JAR·`dist`·container image·Ollama binary·model weight의 future release
 - T-03 이후 IMPLEMENT
 
-`UNKNOWN`·`CONFLICT`가 0이 아니므로 T-02는 inventory 작성까지 진행했지만
-완료 Gate는 통과하지 않았다. 문제를 PostgreSQL 성공이나 OpenSQL 결과로
+현재 source 배포 범위의 build·CI·model identity blocker는 좁혀졌지만 T-02의
+전체 dependency·NOTICE·SBOM Gate는 통과하지 않았다. model lineage 제한은
+`NOT_DISTRIBUTED` 경계와 함께 명시하며 PostgreSQL 성공이나 OpenSQL 결과로
 대체하지 않는다.

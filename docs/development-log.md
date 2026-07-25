@@ -398,3 +398,16 @@
 - 구현: frontend의 외부 Toss reference 계열 color·spacing·radius와 legacy action token을 제거하고, 문서 관리 화면을 위한 독립 `--prizm-*` palette·spacing·radius·state token으로 교체했다. 기능·API·문구는 변경하지 않았다.
 - font: Pretendard 공식 license가 `OFL-1.1`임을 확인했다. CSS family 이름과 system fallback만 사용하며 font binary·npm package·CDN·`@font-face`·`@import`는 포함하지 않는다.
 - 상태: `BLOCKED_EXTERNAL_DESIGN_RIGHTS`는 해소됐다. 다른 component·model `UNKNOWN`·`CONFLICT`·`BLOCKED`가 남아 있어 전체 license readiness는 계속 `IN_PROGRESS_BLOCKED`이고 `LICENSE`·`NOTICE`는 아직 만들지 않았다.
+
+## 2026-07-25 — PRZ-002 build·CI·model supply-chain Gate IMPLEMENT
+
+- 구현: Gradle 9.5.1 distribution checksum과 resolved dependency verification metadata를 추가하고, 모든 third-party Action을 full commit SHA로 고정했다. CI의 mutable Ollama install script는 `v0.32.3` archive checksum 검사로 교체했으며 `bge-m3`는 pull 전 registry manifest와 pull 후 local manifest·blob을 검증한다.
+- provenance: dependency-management plugin과 `org.tomlj`의 Apache-2.0 근거를 exact POM·tagged LICENSE로 확인했다. Ollama 변환물과 BAAI upstream revision의 대응은 증명하지 못했으므로 `UNVERIFIED_LINEAGE`로 유지하며, 모델을 배포하지 않는 source-only 경계와 future 재배포 blocker를 분리했다.
+- 검증: `test --rerun-tasks --dependency-verification=strict`에서 245건 중 231건 성공·환경 조건 14건 skip·실패/오류 0건을 확인했고, `compileIntegrationTestJava`도 strict mode에서 통과했다. workflow YAML과 run block 10개의 Bash 문법, Docker Compose 설정과 `git diff --check`도 통과했다.
+- 상태: 실제 GitHub Actions와 Ollama archive·model download는 아직 `NOT_RUN`이며, 전체 license audit은 다른 dependency·NOTICE·SBOM Gate 때문에 `IN_PROGRESS_BLOCKED`다. `LICENSE`·`NOTICE`는 만들지 않았다.
+
+## 2026-07-25 — PRZ-002 supply-chain 감사 지적 보완
+
+- 문서 정합성: 현재 Wrapper·CI·verification metadata SHA-256을 license audit 입력 표에 다시 고정하고, build appendix의 dependency-management plugin·`org.tomlj`·Wrapper 상태를 현재 검증 결과와 일치시켰다. PRZ-002 lifecycle은 실제 IMPLEMENT 착수 상태인 `IN_PROGRESS`로 통일했다.
+- 테스트 격리: Windows에서 운영 `SecureDirectoryStream` 삭제가 fail-closed하는 계약은 유지했다. PostgreSQL 통합 테스트가 생성한 격리 임시 파일은 test root containment를 확인하는 teardown으로 정리하고, 파일 정리 결과와 무관하게 DB fixture 정리를 실행하도록 해 후속 테스트 오염을 막았다.
+- 검증: strict dependency verification으로 단위 테스트 245건 중 231건 성공·14건 환경 조건 skip·실패 0건, PostgreSQL 16 + pgvector 통합 테스트 68건 중 65건 성공·3건 환경 조건 skip·실패 0건을 확인했다. 실제 GitHub Actions와 Ollama archive·model download는 계속 `NOT_RUN`이며 독립 읽기 전용 재감사 전까지 변경을 통합하지 않는다.

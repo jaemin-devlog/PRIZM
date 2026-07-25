@@ -61,6 +61,6 @@
 |---|---|---|---|---|
 | [PRZ-000](PRZ-000-platform-baseline/spec.md) | Platform foundation and Career Vault baseline | `AS_BUILT_BASELINE` | `e995a5f` | 2026-07-23 |
 | [PRZ-001](PRZ-001-search-evaluation-integrity/spec.md) | Search evaluation split and metric integrity | `VERIFIED` | `36c8610` | 2026-07-24 |
-| [PRZ-002](PRZ-002-open-source-readiness/spec.md) | Open-source readiness: source, license, and contribution baseline | `PLANNED` | `9279d51` | `NOT_RUN` |
+| [PRZ-002](PRZ-002-open-source-readiness/spec.md) | Open-source readiness: source, license, and contribution baseline | `IN_PROGRESS` | `9279d51` | `NOT_RUN` |
 
 다음 신규 spec의 우선순위는 [2026 티맥스티베로 지정과제 대응 계획](../docs/contest/2026-tmaxtibero-plan.md)을 따른다. registry에 디렉터리를 미리 대량 생성하지 않고 실제로 착수하는 작은 수직 슬라이스만 추가한다.

@@ -5,9 +5,9 @@
 | 항목 | 값 |
 |---|---|
 | Spec | [PRZ-002](spec.md) |
-| Spec status | `PLANNED` |
+| Spec status | `IN_PROGRESS` |
 | PLAN | `COMPLETE` |
-| IMPLEMENT | `NOT_STARTED` |
+| IMPLEMENT | `IN_PROGRESS_LOCAL_ONLY` |
 | GitHub Issue | `NOT_CREATED` |
 | Primary evaluation | `EVAL-R1-02` |
 | Secondary evaluation | `EVAL-R1-03`, `EVAL-R1-05` |

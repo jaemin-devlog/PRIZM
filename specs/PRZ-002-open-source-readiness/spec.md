@@ -3,7 +3,7 @@
 | 항목 | 값 |
 |---|---|
 | Spec ID | `PRZ-002` |
-| Status | `PLANNED` |
+| Status | `IN_PROGRESS` |
 | 성격 | 2026 오픈소스 개발자대회 P0의 출처·라이선스·기여 준비 문서 |
 | 시작 기준 commit | `9279d51b298765058fcf6f883f6e9701460ccacd` |
 | GitHub Issue | `NOT_CREATED` — 외부 Issue 생성 권한을 아직 요청하지 않음 |

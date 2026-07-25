@@ -6,7 +6,7 @@
 |---|---|
 | Spec | [spec.md](spec.md) |
 | Plan | [plan.md](plan.md) |
-| Spec status | `PLANNED` — 이번 제한 범위에서 `spec.md` metadata는 변경하지 않음 |
+| Spec status | `IN_PROGRESS` |
 | PLAN | `COMPLETE` |
 | IMPLEMENT | `IN_PROGRESS_LOCAL_ONLY` |
 | GitHub Issue | `NOT_CREATED` |
@@ -85,7 +85,12 @@ bytes·SHA-256 기록, local link 누락 0건, tracked 공식 원문·OT artifac
   `testRuntimeClasspath`, `buildEnvironment`를 별도 inventory로 생성한다.
 - [x] Gradle Wrapper 9.5.1 JAR·distribution URL·공식 checksum·license와
   `distributionSha256Sum`·verification metadata 상태를 기록한다.
+- [x] 공식 Gradle 9.5.1 bin SHA-256을 Wrapper 설정에 고정하고, resolved
+  graph 377 components·738 artifacts의 SHA-256 verification metadata를
+  추가해 default strict mode Gradle 실행을 확인한다.
 - [x] Spring Boot·dependency-management plugin과 plugin 전이를 감사한다.
+- [x] dependency-management plugin `1.1.7`과 `org.tomlj:tomlj:1.0.0`의
+  exact Maven Central POM·tagged LICENSE를 확인한다.
 - [ ] Spring Boot, Spring AI Ollama, PDFBox, Flyway, PostgreSQL JDBC와
   모든 runtime 전이의 exact version·artifact hash·license·NOTICE를 확인한다.
 - [x] PDFBox `META-INF/NOTICE`, PostgreSQL JDBC BSD-2-Clause, Logback
@@ -110,6 +115,13 @@ bytes·SHA-256 기록, local link 누락 0건, tracked 공식 원문·OT artifac
 - [ ] backend·frontend·database image가 배포되는지 사용자에게 확인한다.
 - [x] GitHub Actions, runner, Java setup과 Ollama install script·model pull의
   upstream, license, exact revision과 공급망 위험을 기록한다.
+- [x] 모든 third-party Action을 검증한 full commit SHA와 version 주석으로
+  고정한다.
+- [x] mutable Ollama install script를 exact `v0.32.3` Linux amd64 archive와
+  SHA-256 검사로 교체한다.
+- [x] `bge-m3` pull 전 registry manifest와 pull 후 local manifest를 exact
+  digest로 검사하고 model·license blob 존재를 확인하는 fail-closed Gate를
+  구현한다.
 - [ ] 도입 후보 SBOM·license·link tool 자체를 먼저 감사한다.
 
 ### model·fixture·asset
@@ -117,6 +129,10 @@ bytes·SHA-256 기록, local link 누락 0건, tracked 공식 원문·OT artifac
 - [x] Ollama source와 실제 binary/release의 version·license·약관을 구분한다.
 - [x] `bge-m3` upstream revision, model card·LICENSE, Ollama manifest/blob
   digest, 사용 목적, cache·가중치 재배포 여부를 기록한다.
+- [x] BAAI upstream reference revision과 Ollama 변환 lineage를 구분하고,
+  확인되지 않은 대응은 `UNVERIFIED_LINEAGE`로 유지한다. 모델 bytes를
+  배포하지 않는 source-only 경계상 PRIZM source license 충돌로 과장하지
+  않되 future model 재배포와 정확한 lineage 주장은 차단한다.
 - [x] Codex를 authoring assistant로만 기록하고 근거 없는 사용 비율을 쓰지
   않는다.
 - [x] 검색 평가 fixture의 합성·작성 경위·재배포 권리와 개인정보 부재를 확인한다.
@@ -160,9 +176,11 @@ reference에서 가져온 사실을 확인한 뒤 2026-07-24 frontend source에�
 제거하고 독립 `--prizm-*` 체계로 교체했다. Pretendard는 공식
 `OFL-1.1`을 확인했으며 font binary·CDN 없이 system font preference로만
 사용한다. 따라서 `BLOCKED_EXTERNAL_DESIGN_RIGHTS`는 해소됐다. G-01은
-source-only로 확정했지만 일부 build component 근거, model provenance와
-future binary·image 검증에
-`UNKNOWN`·`CONFLICT`·`BLOCKED`가 남아 있어 T-02는
+source-only로 확정했고 2026-07-25 Wrapper·dependency checksum, Action SHA,
+Ollama archive와 `bge-m3` manifest Gate를 구현했다. 확인되지 않은 Ollama
+변환 lineage는 model 미배포 경계와 함께 별도 제한으로 남겼다. 전체
+dependency·NOTICE와 future binary·image 검증에
+`UNKNOWN`·`BLOCKED`가 남아 있어 T-02는
 `IN_PROGRESS_BLOCKED`다.
 
 ## G-01 — 배포 경계 사용자 결정
@@ -315,13 +333,20 @@ secret-safe field review
   SBOM schema·재생성 drift를 검사한다.
 - [ ] model/cache·credential·업로드 원본·로컬 경로가 tracked/generated
   artifact에 없는지 검사한다.
-- [ ] 모든 third-party Action을 검증된 full commit SHA와 version 주석으로
+- [x] 모든 third-party Action을 검증된 full commit SHA와 version 주석으로
   사용한다.
-- [ ] Ollama 설치와 model pull의 mutable identity를 허용하지 않는 Gate를 둔다.
+- [x] Ollama 설치와 model pull의 mutable identity를 허용하지 않는 Gate를 둔다.
 - [ ] clean checkout local 결과와 GitHub Actions 결과를 대조한다.
 
 **완료 evidence:** local command·exit code, GitHub check URL, pinned Action
 inventory, SBOM diff report
+
+**현재 supply-chain evidence (2026-07-25):** Action 4개 full SHA 고정,
+Ollama `v0.32.3` archive checksum과 `bge-m3` pre/post manifest Gate 구현,
+workflow YAML과 run block 10개 Bash 문법 통과. Gradle strict verification
+단위 테스트 245건 중 231건 성공·14건 skip·실패/오류 0건,
+`compileIntegrationTestJava` 성공. 실제 GitHub check URL은 아직 없고
+Ollama archive·model download는 `NOT_RUN`이므로 T-09 전체는 완료가 아니다.
 
 ## T-10 — 독립 읽기 전용 감사
 
@@ -380,6 +405,11 @@ OpenSQL·OpenProxy·OpenHA `NOT_RUN`
 
 현재는 T-01 source register, T-02 component inventory와 G-01 비교 자료가
 구현됐고 G-01 source-only 배포 경계도 사용자 승인으로 확정됐다. IMPLEMENT는
-`IN_PROGRESS_LOCAL_ONLY`다. 외부 design token blocker는 해소됐지만 T-02의
-다른 미확정 항목 때문에 T-03 이후는 `BLOCKED`이며, GitHub
-Issue·LICENSE·NOTICE·SBOM·governance·template·CI는 아직 구현하지 않았다.
+`IN_PROGRESS_LOCAL_ONLY`다. 외부 design token blocker와 build·CI artifact
+identity blocker는 해소됐지만 T-02의 다른 미확정 항목 때문에 T-03 이후는
+`BLOCKED`다. GitHub Issue·LICENSE·NOTICE·SBOM·governance·template과
+license/SBOM 검사 CI는 아직 구현하지 않았다. 기존 CI의 supply-chain pin
+변경은 local worktree에만 있으며 실제 GitHub Actions 결과는 `NOT_RUN`이다.
+2026-07-25 보완 검증에서는 strict dependency verification으로 단위 테스트
+245건 중 231건 성공·14건 환경 조건 skip·실패 0건, PostgreSQL 16 + pgvector
+통합 테스트 68건 중 65건 성공·3건 환경 조건 skip·실패 0건을 확인했다.

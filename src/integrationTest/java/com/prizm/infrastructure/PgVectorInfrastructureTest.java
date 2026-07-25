@@ -476,8 +476,12 @@ class PgVectorInfrastructureTest {
             assertThat(result.score()).isEqualTo(1.0d - result.distance());
         }
         finally {
-            fileStorage.delete(storedFilePath);
-            deleteCommittedDocumentData();
+            try {
+                deleteTestStoredFile(storedFilePath);
+            }
+            finally {
+                deleteCommittedDocumentData();
+            }
         }
     }
 
@@ -541,8 +545,12 @@ class PgVectorInfrastructureTest {
             assertThat(result.sourceLabel()).isEqualTo("3페이지");
         }
         finally {
-            fileStorage.delete(storedFilePath);
-            deleteCommittedDocumentData();
+            try {
+                deleteTestStoredFile(storedFilePath);
+            }
+            finally {
+                deleteCommittedDocumentData();
+            }
         }
     }
 
@@ -1248,6 +1256,19 @@ class PgVectorInfrastructureTest {
         jdbcTemplate.update("DELETE FROM document_versions");
         jdbcTemplate.update("DELETE FROM documents");
         jdbcTemplate.update("DELETE FROM users");
+    }
+
+    private void deleteTestStoredFile(String storedFilePath) {
+        Path target = STORAGE_ROOT.resolve(storedFilePath).normalize();
+        if (!target.startsWith(STORAGE_ROOT)) {
+            throw new IllegalArgumentException("Test storage path escapes the isolated test root.");
+        }
+        try {
+            Files.deleteIfExists(target);
+        }
+        catch (IOException exception) {
+            throw new UncheckedIOException("Failed to remove an isolated test storage file.", exception);
+        }
     }
 
     private String cleanupStatus(String storageKey) {

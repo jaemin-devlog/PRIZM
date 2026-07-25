@@ -363,3 +363,56 @@
 - 출처 기준: 공식 홈페이지, 2026 운영 규정, 결과보고서 양식과 공식 OT 보조 캡처를 대조해 P0의 핵심을 출처 등록·라이선스 감사·SBOM·AI 모델 명세·기여/보안 경로로 확정했다. 운영 규정 원문과 OT 이미지는 재배포 제한 또는 공개 원본 부재 때문에 저장소에 복사하지 않고 메타데이터·해시·필요 최소 인용만 기록한다.
 - 저작권 경계: 직접 작성 코드의 저작권 표기는 `Jaemin Jeong`으로 준비하고, Codex는 개발 보조도구 사용으로 분리한다. 외부 코드·모델·자산의 출처와 라이선스는 후속 감사로 확인하며, 검증 전에는 무결성이나 호환성을 보증하지 않는다.
 - 상태: 이번 단계는 `SPEC`만 완료했다. 라이선스 선택, GitHub Issue, 구현·CI·검증·감사·PR은 아직 수행하지 않았다.
+
+## 2026-07-24 — PRZ-002 오픈소스 준비 PLAN
+
+- 범위: 공식 source register부터 전체 Gradle/npm/container/model/CI/asset 감사, outgoing license 승인, 고지·SBOM·AI 명세, 기여·보안 체계, GitHub template·문서·CI와 독립 감사까지 10단계 실행 순서를 정했다.
+- Gate: 감사 전에는 MIT·Apache-2.0을 확정하지 않고 사용자 승인을 받으며, 실제 Private Vulnerability Reporting 또는 검증된 연락처가 없으면 SECURITY 게시를 중단한다. `UNKNOWN`·`CONFLICT` 구성요소도 release 통합을 막는다.
+- 상태: PLAN만 완료했다. LICENSE·NOTICE·governance·template·CI, GitHub Issue·branch·commit·PR은 아직 만들지 않았고, OpenSQL·OpenProxy·OpenHA는 계속 `NOT_RUN`이다.
+
+## 2026-07-24 — PRZ-002 공식 근거·license inventory IMPLEMENT
+
+- 근거: 대회 공식 홈페이지·개요와 운영규정 PDF·결과보고서 ZIP의 URL·크기·SHA-256·재배포 조건을 등록했다. 원문과 사용자 제공 OT 캡처는 저장소에 복사하지 않는다.
+- 감사: 실제 Gradle runtime/test/build graph, npm lock 183개, container·CI·Ollama·`bge-m3`, fixture·tracked asset을 구분해 기록했다. frontend runtime 고지, image·Action·model identity, fixture 권리가 미확정이라 outgoing license와 NOTICE는 계속 `BLOCKED`다.
+- 상태: MIT·Apache-2.0 비교 자료만 준비했고 선택하지 않았다. GitHub Issue·push·PR·merge를 수행하지 않았으며 OpenSQL·OpenProxy·OpenHA는 계속 `NOT_RUN`이다.
+
+## 2026-07-24 — PRZ-002 G-01 source-only 배포 경계 확정
+
+- 결정: 초기 release는 PRIZM source·문서·실행 설정만 배포한다. PostgreSQL·pgvector, Ollama와 `bge-m3`는 사용자가 공식 upstream에서 직접 받고, PRIZM은 JAR·frontend `dist`·container image·Ollama binary·model weights/cache를 재배포하지 않는다.
+- 영향: source SBOM은 실제 포함 component와 `external/provided` 실행 의존성을 분리한다. G-01은 완료했지만 fixture 권리와 남은 license·model provenance가 해결되기 전에는 outgoing LICENSE·NOTICE를 구현하지 않는다.
+
+## 2026-07-24 — PRZ-002 저장소 자산 provenance 감사
+
+- 결정: 사용자는 PRIZM 직접 작성 source의 outgoing license로 Apache-2.0을 승인했다. 다만 표준 `LICENSE`·`NOTICE`는 자산과 기존 component Gate가 끝난 뒤 적용한다.
+- 감사: Git 추적 273개를 검사해 Gradle Wrapper family 4개를 `VERIFIED_EXTERNAL`, tracked image·PDF·Office·font·model 0개를 확인했다. 검색 평가 corpus·질문 2개는 합성 표기와 Git 이력은 확인했지만 제3자 비파생·Apache-2.0 공개 허락을 기술적으로 확정할 수 없어 `UNKNOWN`으로 유지했다. 초기 ZIP·generator 경계, Toss Design System token에 정확히 대응하는 frontend palette와 inline Mermaid diagram의 출처도 사용자 확인 대상으로 분리했다.
+- 상태: fixture·source 사용자 확인 전 전체 자산 Gate는 `BLOCKED_USER_ATTESTATION`이다. 파일 제거·교체, 애플리케이션 test, Docker·PostgreSQL·pgvector·Ollama·OpenSQL·OpenProxy·OpenHA 실행, GitHub Issue·commit·push·PR·merge는 수행하지 않았다.
+
+## 2026-07-24 — PRZ-002 자산 사용자 확인과 외부 design token 판정
+
+- 확인: 사용자는 검색 fixture·초기 PRIZM 골격·inline Mermaid를 본인 지휘 아래 Codex로 새로 작성했고 외부 자료를 복사·각색하지 않았으며 Apache-2.0 공개에 동의했다고 확인했다. 이 범위는 `VERIFIED_DIRECT`로 갱신했다.
+- 외부 참고: Spec Kit는 spec·plan·tasks 흐름, Robo Architect는 spec별 보조 문서 배치의 참고 자료로만 확인했다. upstream 원문·code·asset과 동일한 비자명 문구는 없고 화면 자산도 Git에 포함되지 않았다. Robo upstream에는 `evidence.md`가 없어 PRIZM evidence 분리는 독자 적용이다. Gamium은 아직 반영되지 않았다.
+- 차단: frontend color·spacing·radius token은 oh-my-design의 Toss reference에서 가져온 사실을 확인했다. oh-my-design의 MIT는 company reference를 재허가하지 않고 공식 TDS 사용 범위도 PRIZM에 적용되지 않으므로, 독립 PRIZM token으로 교체하거나 명시적 허락을 얻기 전 자산 Gate는 `BLOCKED_EXTERNAL_DESIGN_RIGHTS`다. 이번에는 source·CSS·`LICENSE`·`NOTICE`를 수정하지 않았다.
+
+## 2026-07-24 — PRZ-002 독립 frontend design token 교체
+
+- 구현: frontend의 외부 Toss reference 계열 color·spacing·radius와 legacy action token을 제거하고, 문서 관리 화면을 위한 독립 `--prizm-*` palette·spacing·radius·state token으로 교체했다. 기능·API·문구는 변경하지 않았다.
+- font: Pretendard 공식 license가 `OFL-1.1`임을 확인했다. CSS family 이름과 system fallback만 사용하며 font binary·npm package·CDN·`@font-face`·`@import`는 포함하지 않는다.
+- 상태: `BLOCKED_EXTERNAL_DESIGN_RIGHTS`는 해소됐다. 다른 component·model `UNKNOWN`·`CONFLICT`·`BLOCKED`가 남아 있어 전체 license readiness는 계속 `IN_PROGRESS_BLOCKED`이고 `LICENSE`·`NOTICE`는 아직 만들지 않았다.
+
+## 2026-07-25 — PRZ-002 build·CI·model supply-chain Gate IMPLEMENT
+
+- 구현: Gradle 9.5.1 distribution checksum과 resolved dependency verification metadata를 추가하고, 모든 third-party Action을 full commit SHA로 고정했다. CI의 mutable Ollama install script는 `v0.32.3` archive checksum 검사로 교체했으며 `bge-m3`는 pull 전 registry manifest와 pull 후 local manifest·blob을 검증한다.
+- provenance: dependency-management plugin과 `org.tomlj`의 Apache-2.0 근거를 exact POM·tagged LICENSE로 확인했다. Ollama 변환물과 BAAI upstream revision의 대응은 증명하지 못했으므로 `UNVERIFIED_LINEAGE`로 유지하며, 모델을 배포하지 않는 source-only 경계와 future 재배포 blocker를 분리했다.
+- 검증: `test --rerun-tasks --dependency-verification=strict`에서 245건 중 231건 성공·환경 조건 14건 skip·실패/오류 0건을 확인했고, `compileIntegrationTestJava`도 strict mode에서 통과했다. workflow YAML과 run block 10개의 Bash 문법, Docker Compose 설정과 `git diff --check`도 통과했다.
+- 상태: 실제 GitHub Actions와 Ollama archive·model download는 아직 `NOT_RUN`이며, 전체 license audit은 다른 dependency·NOTICE·SBOM Gate 때문에 `IN_PROGRESS_BLOCKED`다. `LICENSE`·`NOTICE`는 만들지 않았다.
+
+## 2026-07-25 — PRZ-002 supply-chain 감사 지적 보완
+
+- 문서 정합성: 현재 Wrapper·CI·verification metadata SHA-256을 license audit 입력 표에 다시 고정하고, build appendix의 dependency-management plugin·`org.tomlj`·Wrapper 상태를 현재 검증 결과와 일치시켰다. PRZ-002 lifecycle은 실제 IMPLEMENT 착수 상태인 `IN_PROGRESS`로 통일했다.
+- 테스트 격리: Windows에서 운영 `SecureDirectoryStream` 삭제가 fail-closed하는 계약은 유지했다. PostgreSQL 통합 테스트가 생성한 격리 임시 파일은 test root containment를 확인하는 teardown으로 정리하고, 파일 정리 결과와 무관하게 DB fixture 정리를 실행하도록 해 후속 테스트 오염을 막았다.
+- 검증: strict dependency verification으로 단위 테스트 245건 중 231건 성공·14건 환경 조건 skip·실패 0건, PostgreSQL 16 + pgvector 통합 테스트 68건 중 65건 성공·3건 환경 조건 skip·실패 0건을 확인했다. 실제 GitHub Actions와 Ollama archive·model download는 계속 `NOT_RUN`이며 독립 읽기 전용 재감사 전까지 변경을 통합하지 않는다.
+
+## 2026-07-25 — PRZ-002 GitHub Actions strict dependency verification 보완
+
+- 원인과 수정: GitHub의 깨끗한 Gradle cache에서 `junit-bom:5.13.3.module`과 `opentelemetry-bom:1.49.0.module` SHA-256이 verification metadata에 없어 backend CI가 중단됐다. Gradle Plugin Portal에서 두 module metadata의 SHA-256을 다시 계산해 `gradle/verification-metadata.xml`에만 추가했다.
+- 검증: `./gradlew.bat check --no-daemon --dependency-verification=strict`가 성공했다. 실제 GitHub 재실행은 이 보완 commit이 push된 뒤에만 판단하며, 그 전에는 `NOT_RUN`이다.

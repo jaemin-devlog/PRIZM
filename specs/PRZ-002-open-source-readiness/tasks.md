@@ -6,9 +6,9 @@
 |---|---|
 | Spec | [spec.md](spec.md) |
 | Plan | [plan.md](plan.md) |
-| Spec status | `PLANNED` |
+| Spec status | `PLANNED` — 이번 제한 범위에서 `spec.md` metadata는 변경하지 않음 |
 | PLAN | `COMPLETE` |
-| IMPLEMENT | `NOT_STARTED` |
+| IMPLEMENT | `IN_PROGRESS_LOCAL_ONLY` |
 | GitHub Issue | `NOT_CREATED` |
 
 체크박스는 계획의 존재가 아니라 실제 file·명령·환경·결과 evidence가 확인된
@@ -28,33 +28,52 @@
 
 - [ ] 사용자가 GitHub Issue 생성 권한을 명시적으로 승인한다.
 - [ ] 실제 Issue를 생성한 뒤 spec의 `NOT_CREATED`를 실제 URL로 바꾼다.
-- [ ] 최신 main, staged 0건, 기존 user change 보존을 확인한다.
-- [ ] 안전할 때만 `PRZ-002-open-source-readiness` 임시 branch를 만든다.
-- [ ] branch 기준 commit과 `origin/main` 관계를 evidence에 기록한다.
+- [x] 최신 main 관계, staged 0건, 기존 user change 보존을 확인한다.
+- [x] 기존 `PRZ-002-open-source-readiness` branch에서 안전하게 작업한다.
+- [x] branch 기준 commit과 `origin/main` 관계를 evidence에 기록한다.
 
 **중단 조건:** 권한이 없거나 기존 user change 때문에 안전한 branch 전환이
-불가능하면 reset·stash로 우회하지 않고 IMPLEMENT를 시작하지 않는다.
+불가능하면 reset·stash로 우회하지 않고 GitHub Issue·PR evidence를 만들지
+않는다. 사용자가 local-only IMPLEMENT를 명시적으로 승인한 경우 그 작업은
+별도로 기록하되 GitHub evidence나 G-03A 통과로 계산하지 않는다.
+
+**현재 판정:** `BLOCKED_GITHUB_WRITE`, `LOCAL_ONLY_IMPLEMENT_AUTHORIZED`.
+사용자가 이번 요청에서 같은 컴퓨터의 현재 branch에서 T-01·T-02·G-01 자료만
+구현하도록 명시적으로 승인했다. GitHub Issue 생성 권한은 승인하지 않았으므로
+G-03A는 완료 처리하지 않으며 이 로컬 작업을 Issue·PR·review evidence로
+계산하지 않는다. 기준은 `HEAD a5f5cd53525d1e759d558ce0c09e2b1cc42544a1`,
+`origin/main a1b60224c5f6a952bc17ca6da1def1bcb20e393b`, ahead 1·behind 0,
+staged 0건이다. 기존 `AGENTS.md` 사용자 변경은 보존했다.
 
 ## T-01 — 공식 source register
 
-**선행 조건:** G-03A 완료, IMPLEMENT 시작 승인, 공식 URL 접근 가능
+**로컬 선행 조건:** IMPLEMENT 시작 승인, 안전한 기존 branch, staged 0건,
+공식 URL 접근 가능. GitHub Issue·PR evidence를 만들기 전에는 별도로 G-03A를
+완료해야 한다.
 
-- [ ] 대회 홈페이지·개요 URL과 수집일을 기록한다.
-- [ ] 운영 규정 PDF의 공식 URL, 15쪽, SHA-256, media type·byte 크기를
+- [x] 대회 홈페이지·개요 URL과 수집일을 기록한다.
+- [x] 운영 규정 PDF의 공식 URL, 15쪽, SHA-256, media type·byte 크기를
   사용자 제공본과 교차 검증한다.
-- [ ] 운영 규정 제8~10조·별표 2와 원문 재배포 조건을 조항·쪽 단위로
+- [x] 운영 규정 제8~10조·별표 2와 원문 재배포 조건을 조항·쪽 단위로
   PRZ-002 요구사항에 연결한다.
-- [ ] 결과보고서 양식 ZIP의 공식 URL·SHA-256과 SBOM·AI 모델 명세 필드를
+- [x] 결과보고서 양식 ZIP의 공식 URL·SHA-256과 SBOM·AI 모델 명세 필드를
   정확한 양식 위치에 연결한다.
-- [ ] OT 공지와 사용자 제공 캡처를 `OT_AUXILIARY_USER_PROVIDED`로 등록하고
+- [x] OT 공지와 사용자 제공 캡처를 `OT_AUXILIARY_USER_PROVIDED`로 등록하고
   공개 원본 URL 부재·재배포 불명을 기록한다.
-- [ ] source별 authority, title, canonical/artifact URL, 발행·수집일,
+- [x] source별 authority, title, canonical/artifact URL, 발행·수집일,
   hash, claim, rights, redistribution, supersession, 검증일을 채운다.
-- [ ] 공식 PDF·ZIP·캡처 원본이 tracked file이나 제출 source ZIP에 없음을
+- [x] 공식 PDF·ZIP·캡처 원본이 tracked file이나 제출 source ZIP에 없음을
   확인한다.
 
 **완료 evidence:** source register 경로, 원본 hash 검증 명령·결과, local
 link 검사, 원문 비포함 `git ls-files` 결과
+
+**실제 evidence (2026-07-24):**
+[`2026-source-register.md`](../../docs/contest/2026-source-register.md),
+사용자 보관 PDF 170,020 bytes·SHA-256 `5C129E…1DA1`, ZIP 142,434
+bytes·SHA-256 `9A5D29…62D95` 대조 일치, OT 보조 캡처 3개의 local
+bytes·SHA-256 기록, local link 누락 0건, tracked 공식 원문·OT artifact
+0건. T-01은 `COMPLETE`다.
 
 ## T-02 — 전체 license·provenance 감사
 
@@ -62,67 +81,108 @@ link 검사, 원문 비포함 `git ls-files` 결과
 
 ### Java·Gradle
 
-- [ ] `build.gradle` 선언과 resolved `runtimeClasspath`,
+- [x] `build.gradle` 선언과 resolved `runtimeClasspath`,
   `testRuntimeClasspath`, `buildEnvironment`를 별도 inventory로 생성한다.
-- [ ] Gradle Wrapper 9.5.1 JAR·distribution URL·공식 checksum·license와
+- [x] Gradle Wrapper 9.5.1 JAR·distribution URL·공식 checksum·license와
   `distributionSha256Sum`·verification metadata 상태를 기록한다.
-- [ ] Spring Boot·dependency-management plugin과 plugin 전이를 감사한다.
+- [x] Spring Boot·dependency-management plugin과 plugin 전이를 감사한다.
 - [ ] Spring Boot, Spring AI Ollama, PDFBox, Flyway, PostgreSQL JDBC와
   모든 runtime 전이의 exact version·artifact hash·license·NOTICE를 확인한다.
-- [ ] PDFBox `META-INF/NOTICE`, PostgreSQL JDBC BSD-2-Clause, Logback
+- [x] PDFBox `META-INF/NOTICE`, PostgreSQL JDBC BSD-2-Clause, Logback
   복수 라이선스를 우선 판정한다.
-- [ ] Testcontainers, H2, JUnit·Mockito와 모든 test 전이를 production
+- [x] Testcontainers, H2, JUnit·Mockito와 모든 test 전이를 production
   비포함 여부와 함께 기록한다.
 
 ### frontend·npm
 
-- [ ] package manifest와 lockfile 183 entry를 direct/transitive,
+- [x] package manifest와 lockfile 183 entry를 direct/transitive,
   runtime/dev/optional로 분류한다.
-- [ ] React·React DOM·scheduler가 실제 `dist`에 포함되는지 확인한다.
+- [x] React·React DOM·scheduler가 실제 `dist`에 포함되는지 확인한다.
 - [ ] MPL-2.0, CC-BY-4.0, BlueOak-1.0.0, BSD·ISC 항목의 license 원문과
   산출물 포함 여부를 판정한다.
 - [ ] 모든 tarball integrity·upstream·license와 clean bundle을 대조한다.
-- [ ] Node 22.17.0, npm 10.9.2와 Docker builder tag의 재현성 차이를 기록한다.
+- [x] Node 22.17.0, npm 10.9.2와 Docker builder tag의 재현성 차이를 기록한다.
 
 ### container·database·CI
 
 - [ ] Temurin JDK/JRE, Node, Nginx, PostgreSQL·pgvector image의 tag,
   manifest/platform digest, base package SBOM, license·NOTICE를 확인한다.
 - [ ] backend·frontend·database image가 배포되는지 사용자에게 확인한다.
-- [ ] GitHub Actions, runner, Java setup과 Ollama install script·model pull의
+- [x] GitHub Actions, runner, Java setup과 Ollama install script·model pull의
   upstream, license, exact revision과 공급망 위험을 기록한다.
 - [ ] 도입 후보 SBOM·license·link tool 자체를 먼저 감사한다.
 
 ### model·fixture·asset
 
-- [ ] Ollama source와 실제 binary/release의 version·license·약관을 구분한다.
-- [ ] `bge-m3` upstream revision, model card·LICENSE, Ollama manifest/blob
+- [x] Ollama source와 실제 binary/release의 version·license·약관을 구분한다.
+- [x] `bge-m3` upstream revision, model card·LICENSE, Ollama manifest/blob
   digest, 사용 목적, cache·가중치 재배포 여부를 기록한다.
-- [ ] Codex를 authoring assistant로만 기록하고 근거 없는 사용 비율을 쓰지
+- [x] Codex를 authoring assistant로만 기록하고 근거 없는 사용 비율을 쓰지
   않는다.
-- [ ] 검색 평가 fixture의 합성·작성 경위·재배포 권리와 개인정보 부재를 확인한다.
-- [ ] tracked test/frontend/docs asset·binary 전수를 file signature와
+- [x] 검색 평가 fixture의 합성·작성 경위·재배포 권리와 개인정보 부재를 확인한다.
+- [x] tracked test/frontend/docs asset·binary 전수를 file signature와
   provenance로 확인한다.
-- [ ] Gamium 참고 저장소는 `DESIGN_REFERENCE_ONLY`로 기록하고 복사된
+- [x] 초기 commit `b633f469`의 ZIP 생성 경위와 Spring Initializr·create-vite
+  등 generator·template의 정확한 upstream·version·license를 확인한다.
+- [x] frontend design token이 Toss Design System 또는 다른 외부 UI
+  source에서 파생됐는지 확인하고, 파생됐다면 license·교체 결정을 기록한다.
+  - [x] oh-my-design Toss reference 파생 사실과 권리 미확인 `BLOCKED` 판정
+  - [x] 독립 PRIZM palette·spacing·radius 교체
+- [x] archive 기획안의 inline Mermaid diagram 5개가 직접·Codex 보조
+  제작인지, 외부 diagram·template에서 파생됐는지 확인한다.
+- [x] Gamium 참고 저장소는 `DESIGN_REFERENCE_ONLY`로 기록하고 복사된
   code·문구·asset이 있는지 확인한다.
 
 ### 감사 종료
 
-- [ ] component마다 version/digest, upstream, SPDX, purpose, scope,
+- [x] component마다 version/digest, upstream, SPDX, purpose, scope,
   distribution, NOTICE, decision, status, verified date가 있다.
-- [ ] 배포 범위의 `UNKNOWN`, `CONFLICT`, `BLOCKED`가 0건이거나 작업 전체를
+- [x] 배포 범위의 `UNKNOWN`, `CONFLICT`, `BLOCKED`가 0건이거나 작업 전체를
   `BLOCKED`로 유지한다.
 
 **완료 evidence:** license audit 경로, machine inventory hash, fat JAR·bundle·
 image 대조 결과, unresolved component count
 
+**현재 evidence (2026-07-24):**
+[`2026-license-audit.md`](../../docs/contest/2026-license-audit.md),
+[`2026-asset-provenance-audit.md`](../../docs/contest/2026-asset-provenance-audit.md),
+Gradle runtime 167개·test 전체 217개·build environment 26개를 전수 기록했고
+annotation processor를 포함한 Maven union은 238개다. npm lock 183/183의
+version·resolved·integrity·license와 component별 scope·decision을 기록했다.
+tracked binary 1개(wrapper JAR), tracked image·PDF·font·model 0개와 검색
+평가 fixture 2개를 확인했다. Wrapper family 4개는 `VERIFIED_EXTERNAL`이다.
+사용자는 fixture·초기 PRIZM 골격·Mermaid diagram을 본인 지휘 아래 Codex로
+새로 작성했고 외부 자료를 복사·각색하지 않았으며 Apache-2.0 공개에
+동의했다고 확인했다. 따라서 이 범위는 `VERIFIED_DIRECT`다. Spec Kit와
+Robo Architect는 문서 구조의 외부 reference로만 기록했고 Gamium은 아직
+반영되지 않았다. frontend color·spacing·radius token은 oh-my-design Toss
+reference에서 가져온 사실을 확인한 뒤 2026-07-24 frontend source에서
+제거하고 독립 `--prizm-*` 체계로 교체했다. Pretendard는 공식
+`OFL-1.1`을 확인했으며 font binary·CDN 없이 system font preference로만
+사용한다. 따라서 `BLOCKED_EXTERNAL_DESIGN_RIGHTS`는 해소됐다. G-01은
+source-only로 확정했지만 일부 build component 근거, model provenance와
+future binary·image 검증에
+`UNKNOWN`·`CONFLICT`·`BLOCKED`가 남아 있어 T-02는
+`IN_PROGRESS_BLOCKED`다.
+
 ## G-01 — 배포 경계 사용자 결정
 
 **선행 조건:** T-02 inventory 초안
 
-- [ ] source ZIP, fat JAR, frontend `dist`, backend/frontend/database image,
+- [x] source ZIP, fat JAR, frontend `dist`, backend/frontend/database image,
+  Ollama binary, model cache의 현재 사실·추가 검증·결정 항목 비교표를 만든다.
+- [x] source ZIP, fat JAR, frontend `dist`, backend/frontend/database image,
   Ollama binary, model cache 중 제출·배포 대상을 사용자가 확정한다.
-- [ ] 배포 경계 변경 뒤 NOTICE·SBOM 범위를 다시 계산한다.
+- [x] 배포 경계 변경 뒤 NOTICE·SBOM 범위를 다시 계산한다.
+
+**사용자 승인 evidence (2026-07-24):**
+PRIZM은 우선 source·문서·실행 설정만 배포한다. PostgreSQL·pgvector,
+Ollama와 `bge-m3`는 사용자가 공식 upstream에서 직접 내려받는다. PRIZM은
+fat JAR, frontend `dist`, container image/archive, Ollama binary, model
+weights·cache를 initial release에서 재배포하지 않는다. source SBOM은
+실제 포함 component와 `external/provided` 실행 의존성을 분리한다.
+
+**현재 판정:** `COMPLETE`
 
 **중단 조건:** 경계가 확정되지 않으면 T-03 이후를 시작하지 않는다.
 
@@ -137,12 +197,19 @@ image 대조 결과, unresolved component count
   배포 산출물별로 확인한다.
 - [ ] 복수 라이선스 선택, 예외 허가와 충돌 해소 근거를 기록한다.
 - [ ] 사용자에게 추천안과 남은 위험을 제시한다.
-- [ ] 사용자가 outgoing license를 명시적으로 승인한다.
+- [x] 사용자가 outgoing license를 명시적으로 승인한다.
 
 **중단 조건:** 미승인 또는 배포 범위 `UNKNOWN/CONFLICT` 존재 시 `BLOCKED`
 
 **완료 evidence:** 승인된 license 이름·canonical URL, 결정일, 승인 근거와
 audit snapshot hash
+
+**사용자 승인 evidence (2026-07-24):** PRIZM 직접 작성 source의 outgoing
+license로 `Apache-2.0`을 선택했다. 이는 license 이름에 대한 승인이고,
+fixture·design token 권리는 확인됐지만 나머지 T-02 blocker가 해소되기
+전에는 루트 `LICENSE`·`NOTICE` 파일을 만들지 않는다.
+
+**현재 판정:** `IN_PROGRESS_BLOCKED`
 
 ## T-04 — `LICENSE`·`NOTICE`
 
@@ -311,4 +378,8 @@ OpenSQL·OpenProxy·OpenHA `NOT_RUN`
 - [ ] 실제 GitHub Issue·PR·CI·review 상태를 과장하지 않았다.
 - [ ] PRZ-002 evidence와 registry가 실제 source·merge commit을 가리킨다.
 
-현재는 PLAN만 완료됐으며 위 IMPLEMENT task는 모두 미착수다.
+현재는 T-01 source register, T-02 component inventory와 G-01 비교 자료가
+구현됐고 G-01 source-only 배포 경계도 사용자 승인으로 확정됐다. IMPLEMENT는
+`IN_PROGRESS_LOCAL_ONLY`다. 외부 design token blocker는 해소됐지만 T-02의
+다른 미확정 항목 때문에 T-03 이후는 `BLOCKED`이며, GitHub
+Issue·LICENSE·NOTICE·SBOM·governance·template·CI는 아직 구현하지 않았다.

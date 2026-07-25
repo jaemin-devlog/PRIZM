@@ -369,3 +369,32 @@
 - 범위: 공식 source register부터 전체 Gradle/npm/container/model/CI/asset 감사, outgoing license 승인, 고지·SBOM·AI 명세, 기여·보안 체계, GitHub template·문서·CI와 독립 감사까지 10단계 실행 순서를 정했다.
 - Gate: 감사 전에는 MIT·Apache-2.0을 확정하지 않고 사용자 승인을 받으며, 실제 Private Vulnerability Reporting 또는 검증된 연락처가 없으면 SECURITY 게시를 중단한다. `UNKNOWN`·`CONFLICT` 구성요소도 release 통합을 막는다.
 - 상태: PLAN만 완료했다. LICENSE·NOTICE·governance·template·CI, GitHub Issue·branch·commit·PR은 아직 만들지 않았고, OpenSQL·OpenProxy·OpenHA는 계속 `NOT_RUN`이다.
+
+## 2026-07-24 — PRZ-002 공식 근거·license inventory IMPLEMENT
+
+- 근거: 대회 공식 홈페이지·개요와 운영규정 PDF·결과보고서 ZIP의 URL·크기·SHA-256·재배포 조건을 등록했다. 원문과 사용자 제공 OT 캡처는 저장소에 복사하지 않는다.
+- 감사: 실제 Gradle runtime/test/build graph, npm lock 183개, container·CI·Ollama·`bge-m3`, fixture·tracked asset을 구분해 기록했다. frontend runtime 고지, image·Action·model identity, fixture 권리가 미확정이라 outgoing license와 NOTICE는 계속 `BLOCKED`다.
+- 상태: MIT·Apache-2.0 비교 자료만 준비했고 선택하지 않았다. GitHub Issue·push·PR·merge를 수행하지 않았으며 OpenSQL·OpenProxy·OpenHA는 계속 `NOT_RUN`이다.
+
+## 2026-07-24 — PRZ-002 G-01 source-only 배포 경계 확정
+
+- 결정: 초기 release는 PRIZM source·문서·실행 설정만 배포한다. PostgreSQL·pgvector, Ollama와 `bge-m3`는 사용자가 공식 upstream에서 직접 받고, PRIZM은 JAR·frontend `dist`·container image·Ollama binary·model weights/cache를 재배포하지 않는다.
+- 영향: source SBOM은 실제 포함 component와 `external/provided` 실행 의존성을 분리한다. G-01은 완료했지만 fixture 권리와 남은 license·model provenance가 해결되기 전에는 outgoing LICENSE·NOTICE를 구현하지 않는다.
+
+## 2026-07-24 — PRZ-002 저장소 자산 provenance 감사
+
+- 결정: 사용자는 PRIZM 직접 작성 source의 outgoing license로 Apache-2.0을 승인했다. 다만 표준 `LICENSE`·`NOTICE`는 자산과 기존 component Gate가 끝난 뒤 적용한다.
+- 감사: Git 추적 273개를 검사해 Gradle Wrapper family 4개를 `VERIFIED_EXTERNAL`, tracked image·PDF·Office·font·model 0개를 확인했다. 검색 평가 corpus·질문 2개는 합성 표기와 Git 이력은 확인했지만 제3자 비파생·Apache-2.0 공개 허락을 기술적으로 확정할 수 없어 `UNKNOWN`으로 유지했다. 초기 ZIP·generator 경계, Toss Design System token에 정확히 대응하는 frontend palette와 inline Mermaid diagram의 출처도 사용자 확인 대상으로 분리했다.
+- 상태: fixture·source 사용자 확인 전 전체 자산 Gate는 `BLOCKED_USER_ATTESTATION`이다. 파일 제거·교체, 애플리케이션 test, Docker·PostgreSQL·pgvector·Ollama·OpenSQL·OpenProxy·OpenHA 실행, GitHub Issue·commit·push·PR·merge는 수행하지 않았다.
+
+## 2026-07-24 — PRZ-002 자산 사용자 확인과 외부 design token 판정
+
+- 확인: 사용자는 검색 fixture·초기 PRIZM 골격·inline Mermaid를 본인 지휘 아래 Codex로 새로 작성했고 외부 자료를 복사·각색하지 않았으며 Apache-2.0 공개에 동의했다고 확인했다. 이 범위는 `VERIFIED_DIRECT`로 갱신했다.
+- 외부 참고: Spec Kit는 spec·plan·tasks 흐름, Robo Architect는 spec별 보조 문서 배치의 참고 자료로만 확인했다. upstream 원문·code·asset과 동일한 비자명 문구는 없고 화면 자산도 Git에 포함되지 않았다. Robo upstream에는 `evidence.md`가 없어 PRIZM evidence 분리는 독자 적용이다. Gamium은 아직 반영되지 않았다.
+- 차단: frontend color·spacing·radius token은 oh-my-design의 Toss reference에서 가져온 사실을 확인했다. oh-my-design의 MIT는 company reference를 재허가하지 않고 공식 TDS 사용 범위도 PRIZM에 적용되지 않으므로, 독립 PRIZM token으로 교체하거나 명시적 허락을 얻기 전 자산 Gate는 `BLOCKED_EXTERNAL_DESIGN_RIGHTS`다. 이번에는 source·CSS·`LICENSE`·`NOTICE`를 수정하지 않았다.
+
+## 2026-07-24 — PRZ-002 독립 frontend design token 교체
+
+- 구현: frontend의 외부 Toss reference 계열 color·spacing·radius와 legacy action token을 제거하고, 문서 관리 화면을 위한 독립 `--prizm-*` palette·spacing·radius·state token으로 교체했다. 기능·API·문구는 변경하지 않았다.
+- font: Pretendard 공식 license가 `OFL-1.1`임을 확인했다. CSS family 이름과 system fallback만 사용하며 font binary·npm package·CDN·`@font-face`·`@import`는 포함하지 않는다.
+- 상태: `BLOCKED_EXTERNAL_DESIGN_RIGHTS`는 해소됐다. 다른 component·model `UNKNOWN`·`CONFLICT`·`BLOCKED`가 남아 있어 전체 license readiness는 계속 `IN_PROGRESS_BLOCKED`이고 `LICENSE`·`NOTICE`는 아직 만들지 않았다.

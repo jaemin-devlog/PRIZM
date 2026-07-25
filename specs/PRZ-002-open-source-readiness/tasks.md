@@ -86,7 +86,7 @@ bytes·SHA-256 기록, local link 누락 0건, tracked 공식 원문·OT artifac
 - [x] Gradle Wrapper 9.5.1 JAR·distribution URL·공식 checksum·license와
   `distributionSha256Sum`·verification metadata 상태를 기록한다.
 - [x] 공식 Gradle 9.5.1 bin SHA-256을 Wrapper 설정에 고정하고, resolved
-  graph 377 components·738 artifacts의 SHA-256 verification metadata를
+  graph 377 components·740 artifacts의 SHA-256 verification metadata를
   추가해 default strict mode Gradle 실행을 확인한다.
 - [x] Spring Boot·dependency-management plugin과 plugin 전이를 감사한다.
 - [x] dependency-management plugin `1.1.7`과 `org.tomlj:tomlj:1.0.0`의

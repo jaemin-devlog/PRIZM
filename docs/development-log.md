@@ -411,3 +411,8 @@
 - 문서 정합성: 현재 Wrapper·CI·verification metadata SHA-256을 license audit 입력 표에 다시 고정하고, build appendix의 dependency-management plugin·`org.tomlj`·Wrapper 상태를 현재 검증 결과와 일치시켰다. PRZ-002 lifecycle은 실제 IMPLEMENT 착수 상태인 `IN_PROGRESS`로 통일했다.
 - 테스트 격리: Windows에서 운영 `SecureDirectoryStream` 삭제가 fail-closed하는 계약은 유지했다. PostgreSQL 통합 테스트가 생성한 격리 임시 파일은 test root containment를 확인하는 teardown으로 정리하고, 파일 정리 결과와 무관하게 DB fixture 정리를 실행하도록 해 후속 테스트 오염을 막았다.
 - 검증: strict dependency verification으로 단위 테스트 245건 중 231건 성공·14건 환경 조건 skip·실패 0건, PostgreSQL 16 + pgvector 통합 테스트 68건 중 65건 성공·3건 환경 조건 skip·실패 0건을 확인했다. 실제 GitHub Actions와 Ollama archive·model download는 계속 `NOT_RUN`이며 독립 읽기 전용 재감사 전까지 변경을 통합하지 않는다.
+
+## 2026-07-25 — PRZ-002 GitHub Actions strict dependency verification 보완
+
+- 원인과 수정: GitHub의 깨끗한 Gradle cache에서 `junit-bom:5.13.3.module`과 `opentelemetry-bom:1.49.0.module` SHA-256이 verification metadata에 없어 backend CI가 중단됐다. Gradle Plugin Portal에서 두 module metadata의 SHA-256을 다시 계산해 `gradle/verification-metadata.xml`에만 추가했다.
+- 검증: `./gradlew.bat check --no-daemon --dependency-verification=strict`가 성공했다. 실제 GitHub 재실행은 이 보완 commit이 push된 뒤에만 판단하며, 그 전에는 `NOT_RUN`이다.

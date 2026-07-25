@@ -416,3 +416,9 @@
 
 - 원인과 수정: GitHub의 깨끗한 Gradle cache에서 `junit-bom:5.13.3.module`과 `opentelemetry-bom:1.49.0.module` SHA-256이 verification metadata에 없어 backend CI가 중단됐다. Gradle Plugin Portal에서 두 module metadata의 SHA-256을 다시 계산해 `gradle/verification-metadata.xml`에만 추가했다.
 - 검증: `./gradlew.bat check --no-daemon --dependency-verification=strict`가 성공했다. 실제 GitHub 재실행은 이 보완 commit이 push된 뒤에만 판단하며, 그 전에는 `NOT_RUN`이다.
+
+## 2026-07-25 — PRZ-002 source-only license 결정 snapshot 현행화
+
+- 기준선: 병합된 PR #13의 GitHub Actions backend·frontend push/PR check 4건이 모두 성공한 사실과 현재 `verification-metadata.xml` SHA-256을 감사 기록에 반영했다. 이 CI는 Docker·PostgreSQL/pgvector Testcontainers·Ollama `bge-m3`를 사용했지만 OpenSQL·OpenProxy·OpenHA는 계속 `NOT_RUN`이다.
+- 범위: Apache-2.0 canonical 원문과 SHA-256을 확인하고, 현재 source-only 배포에는 직접 작성 source·문서·실행 설정·Gradle Wrapper·검증된 synthetic fixture만 포함된다고 확정했다. future JAR·frontend bundle·image·Ollama/model 재배포의 NOTICE·SBOM·provenance는 별도 release gate로 분리했다.
+- 다음: 이 snapshot으로 T-04의 root `LICENSE`와 source-only `NOTICE`를 구현할 수 있지만, 이번 단계에서는 파일을 생성하지 않았다.

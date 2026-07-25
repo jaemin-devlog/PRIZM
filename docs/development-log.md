@@ -422,3 +422,9 @@
 - 기준선: 병합된 PR #13의 GitHub Actions backend·frontend push/PR check 4건이 모두 성공한 사실과 현재 `verification-metadata.xml` SHA-256을 감사 기록에 반영했다. 이 CI는 Docker·PostgreSQL/pgvector Testcontainers·Ollama `bge-m3`를 사용했지만 OpenSQL·OpenProxy·OpenHA는 계속 `NOT_RUN`이다.
 - 범위: Apache-2.0 canonical 원문과 SHA-256을 확인하고, 현재 source-only 배포에는 직접 작성 source·문서·실행 설정·Gradle Wrapper·검증된 synthetic fixture만 포함된다고 확정했다. future JAR·frontend bundle·image·Ollama/model 재배포의 NOTICE·SBOM·provenance는 별도 release gate로 분리했다.
 - 다음: 이 snapshot으로 T-04의 root `LICENSE`와 source-only `NOTICE`를 구현할 수 있지만, 이번 단계에서는 파일을 생성하지 않았다.
+
+## 2026-07-25 — PRZ-002 Apache-2.0 source-only `LICENSE`·`NOTICE`
+
+- 적용: Apache Software Foundation canonical Apache-2.0 원문과 SHA-256이 일치하는 root `LICENSE`를 추가하고, `NOTICE`에 `Copyright 2026 Jaemin Jeong`과 실제 source-only 배포 범위를 기록했다.
+- 경계: 현재 포함되는 Gradle Wrapper JAR의 embedded `META-INF/LICENSE`와 NOTICE 부재만 다뤘다. 외부 JAR·npm package·`dist`·image·Ollama binary·`bge-m3` bytes는 재배포하지 않으므로 고지를 추측해 넣지 않았고, 해당 artifact의 future release gate로 남긴다.
+- 검증: canonical `LICENSE` SHA-256 일치, `NOTICE` scope 대조와 Markdown·diff 검증을 수행한다. Codex는 저작권자·공동 기여자·runtime dependency로 기록하지 않았다.

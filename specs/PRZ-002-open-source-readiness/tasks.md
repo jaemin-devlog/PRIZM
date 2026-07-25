@@ -242,16 +242,27 @@ Apache-2.0 Gradle Wrapper scripts/JAR 및 `VERIFIED_DIRECT` fixture만 포함한
 
 **선행 조건:** T-03 승인
 
-- [ ] 승인된 표준 license 원문을 변형 없이 루트 `LICENSE`에 적용한다.
-- [ ] 저작권자를 `Jaemin Jeong`으로 기록한다.
-- [ ] dependency·model·asset 감사 결과에서 필요한 third-party 고지를
-  `NOTICE`에 반영한다.
+- [x] 승인된 표준 license 원문을 변형 없이 루트 `LICENSE`에 적용한다.
+- [x] 저작권자를 `Jaemin Jeong`으로 기록한다.
+- [x] 현재 source-only 배포물에 필요한 third-party 고지를 `NOTICE`에 반영한다.
 - [ ] PDFBox 등 upstream NOTICE가 fat JAR/image에서 보존되는지 확인한다.
-- [ ] source/JAR/`dist`/image별 license·NOTICE 배치와 전달 방식을 검증한다.
-- [ ] Codex를 저작권자·공동 기여자·runtime dependency로 잘못 기록하지 않는다.
+  - future fat JAR/image release 전 별도 gate; 현재 source-only 배포물에는 없음
+- [x] 현재 source-only의 license·NOTICE 배치과 전달 방식을 검증한다.
+  - JAR/`dist`/image별 검증은 future artifact release 전 별도 gate
+- [x] Codex를 저작권자·공동 기여자·runtime dependency로 잘못 기록하지 않는다.
 
 **완료 evidence:** canonical license 대조 결과, NOTICE coverage report,
 배포물별 포함 검사
+
+**현재 evidence (2026-07-25):** root `LICENSE`는 canonical Apache-2.0 원문과
+SHA-256 `CFC7749B96F63BD31C3C42B5C471BF756814053E847C10F3EB003417BC523D30`이
+일치한다. root `NOTICE`는 `Copyright 2026 Jaemin Jeong`, source-only 범위와
+Gradle Wrapper의 embedded license/NOTICE 부재만 기록한다. 외부 JAR·npm package·
+generated `dist`·image·Ollama binary·model bytes는 배포하지 않으므로 고지를
+추측해 포함하지 않았다. future artifact 고지는 T-02 재개 조건이다.
+
+**현재 판정:** `COMPLETE_FOR_INITIAL_SOURCE_ONLY`; future artifact coverage는
+`BLOCKED_FUTURE_RELEASE`
 
 ## T-05 — SBOM·AI 모델 명세
 

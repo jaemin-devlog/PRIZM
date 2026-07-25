@@ -747,6 +747,24 @@ Ollama 변환 lineage와 binary·image 고지 범위는 source-only 배포 경�
 이 snapshot은 현재 source-only 배포 경계의 license 선택 기록이다. Apache-2.0이
 모든 미래 산출물·컨테이너·모델에 대한 검증을 대신한다는 뜻은 아니다.
 
+## T-04 source-only `LICENSE`·`NOTICE` 적용
+
+| 항목 | 확인 결과 |
+|---|---|
+| outgoing license | [repository `LICENSE`](../../LICENSE), Apache License 2.0 원문을 변형 없이 적용 |
+| `LICENSE` SHA-256 | `CFC7749B96F63BD31C3C42B5C471BF756814053E847C10F3EB003417BC523D30`; canonical 원문과 일치 |
+| 저작권자 | [repository `NOTICE`](../../NOTICE)에 `Copyright 2026 Jaemin Jeong` 기록 |
+| 현재 NOTICE 대상 | PRIZM 직접 작성 source와 포함되는 Gradle Wrapper scripts/JAR |
+| Wrapper 고지 | JAR의 `META-INF/LICENSE` 확인, 별도 `NOTICE` entry 없음 |
+| 제외한 고지 | Java/npm package, generated `dist`, image, Ollama binary, `bge-m3` bytes는 source-only 배포물에 없음 |
+| `NOTICE` SHA-256 | `155665012F4D119B5929061150DA6147E77151D29CD1020464800AA8789EE1F6` |
+
+따라서 현재 `NOTICE`에는 포함하지 않는 artifact의 third-party attribution을
+추측해 복사하지 않는다. PDFBox를 포함한 runtime JAR, frontend bundle, image와
+model을 실제로 배포할 때는 각 artifact의 license·NOTICE·SBOM coverage를
+다시 확인하고 해당 release의 `NOTICE`를 확장한다. Codex는 개발 보조도구이며
+저작권자·공동 기여자·runtime dependency로 이 파일들에 기록하지 않았다.
+
 ## Blocker 요약
 
 ### VERIFIED
@@ -784,7 +802,6 @@ Ollama 변환 lineage와 binary·image 고지 범위는 source-only 배포 경�
 
 ### BLOCKED / next gate
 
-- T-04의 승인된 Apache-2.0 `LICENSE`와 source-only `NOTICE` 실제 생성·적용
 - machine-readable SBOM과 AI model 명세, 이를 생성·검증하는 도구 감사
 - fat JAR·`dist`·container image·Ollama binary·model weight의 future release
 

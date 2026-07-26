@@ -34,8 +34,8 @@ evidence to make that conclusion.
 
 ## Current implementation phase
 
-The current phase is 2026 TmaxTibero contest P0/P1: official-source and license
-readiness, followed by actual OpenSQL and clean-clone evidence.
+The current phase is 2026 TmaxTibero contest P0: official-source and license
+readiness. P1 OpenSQL and clean-clone evidence begins after its P0 gates are met.
 
 For contest work, prioritize actual OpenSQL, DB failover evidence, change-log
 synchronization, and MCP search before CareerFact or portfolio work. Do not implement
@@ -138,7 +138,7 @@ stage complete while its gate is unmet.
 | `ORIENT` | Read `AGENTS.md`, `docs/README.md`, `docs/project-status.md`, `docs/roadmap.md`, `specs/README.md`, the related spec, source, migrations, and tests. For contest work also read `docs/contest/2026-tmaxtibero-plan.md`, `docs/contest/2026-requirements-traceability.md`, and the license audit when it exists. Report current behavior, scope, risks, affected files, and verification plan. Do not modify files. |
 | `SPEC` | Allocate a new `PRZ-###` for a new capability, observable contract change, or material corrective work against an `AS_BUILT_BASELINE` or `VERIFIED` spec. Corrective work inside an active spec stays in that spec. Create `spec.md` with scenarios, requirements, preserved contracts, exclusions, and measurable acceptance criteria. A documentation-only correction with no product behavior change may omit a new spec when the reason is recorded in the development log. For contest implementation, create or identify a real current GitHub Issue only when that external write is authorized, then record its URL. Never create an Issue for completed work. |
 | `PLAN` | For contest-scoped product code, create `plan.md` and `tasks.md` before implementation. Record expected file and API changes, Flyway strategy, ownership and security effects, dependency and license effects, test environments, recovery approach, and the temporary branch and PR plan. A documentation-only correction may omit them with the reason recorded in the development log. |
-| `IMPLEMENT` | Start a temporary `codex/PRZ-###-<slug>` branch from updated `main`, implement only the approved vertical slice, add or update executable tests, keep commits focused, and update `tasks.md`. Material scope changes return to `SPEC` or `PLAN`. |
+| `IMPLEMENT` | Start a temporary `PRZ-###-<slug>` branch from updated `main`, implement only the approved vertical slice, add or update executable tests, keep commits focused, and update `tasks.md`. Material scope changes return to `SPEC` or `PLAN`. |
 | `VERIFY` | Run the applicable commands below and all spec-specific tests. Record exact commands, commit, environment, pass/fail/skip counts, PostgreSQL, pgvector, Docker, Ollama, and OpenSQL usage, and any existing Issue URL in `evidence.md`. Unavailable required evidence is `NOT_RUN`, never `PASS`. |
 | `AUDIT` | Perform an independent read-only review of the diff against the spec, preserved contracts, ownership and security rules, migrations, tests, documentation, and licenses. Resolve blocking findings or return to an earlier stage. An agent audit is evidence, but it is not a GitHub review. |
 | `INTEGRATE` | When GitHub writes are authorized, open a real PR containing the actual change and link its Issue, spec, tasks, and evidence. Add the real PR URL to `evidence.md`, run required checks, and request genuine review when a reviewer is available; never manufacture approval. For a solo project with no reviewer, integration requires a completed independent audit, explicit user approval, and `REVIEW_NOT_AVAILABLE_SOLO` recorded in evidence. After merge, add the merge/source commit and last-verified date, update and push `main`, then apply the existing branch-inspection and deletion rules so `main` remains the only long-lived branch. |

@@ -283,6 +283,12 @@ generated `dist`·image·Ollama binary·model bytes는 배포하지 않으므로
 
 **현재 구현 기록 (2026-07-26):** [`SBOM·AI 모델 명세`](../../docs/contest/2026-sbom-model-manifest.md)를 추가했다. backend와 frontend 모두 external SBOM plugin/CLI를 추가하지 않는 first-party Gradle·lockfile generator를 사용한다. `@cyclonedx/cyclonedx-npm` 6.0.0은 high finding 10건으로, 4.0.1은 full audit endpoint가 신뢰 가능한 판정을 만들지 못해 채택하지 않았다. 구현 commit·명령·환경·hash는 [evidence.md](evidence.md)에 고정했다. T-05는 reconciliation·독립 감사 전까지 `IMPLEMENTED_UNVERIFIED`다.
 
+**audit 기록 (2026-07-26):** `main...232915e` read-only audit은 SBOM source-only
+경계, sensitive-data scan, regeneration/checksum, frontend 183-entry와 backend
+169-component structural reconciliation에서 CRITICAL/HIGH/MEDIUM finding 없이
+`PASS_FOR_IMPLEMENTED_SCOPE`였다. formal schema CI와 human/machine license
+reconciliation은 미완료 gate이므로 T-05는 계속 `IMPLEMENTED_UNVERIFIED`다.
+
 **완료 evidence:** 재생성 명령, schema validation, human/machine diff,
 AI model provenance와 secret scan 결과
 

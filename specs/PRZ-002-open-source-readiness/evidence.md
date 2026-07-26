@@ -69,3 +69,27 @@ a claim that those issues are resolved by this spec.
 - Do not create `SECURITY.md` until an actual confidential reporting channel is
   enabled or a monitored contact is supplied.
 - No real GitHub Issue, PR, review, push, or merge evidence exists yet.
+
+## Read-only audit — 2026-07-26
+
+**Scope:** `main...232915e` on `PRZ-002-sbom-model-manifest`; implementation
+commits `c28416e` and `232915e`.
+
+| Audit check | Result |
+|---|---|
+| Changed-file scope | PASS — build task, frontend script entry, SBOM/manifests, verifier, PRZ-002/license documentation only; no Java application source, Flyway migration, production config, Docker Compose, or frontend feature changes |
+| Source-only boundary | PASS — no model/cache/upload/DB volume/generated build output tracked; all model bytes remain `NOT_DISTRIBUTED` |
+| Sensitive data | PASS — SBOM/manifests contain no local path, JDBC URL, or credential-shaped field |
+| Reproducibility | PASS — regenerate then checksum verification passed; deterministic timestamp/serial policy held |
+| Machine/source reconciliation | PASS within implemented scope — frontend lockfile count `183` equals SBOM count `183`; all 169 backend components have Maven PURLs and SHA-256 artifact hashes |
+| Documentation honesty | PASS — `UNVERIFIED_LINEAGE`, source-only boundary, and OpenSQL/OpenProxy/OpenHA `NOT_RUN` are preserved |
+| Diff hygiene | PASS — `git diff --check main...HEAD`, local Markdown-link/code-fence/trailing-whitespace checks, and `git show --check` for both implementation commits passed |
+
+**Findings:** no CRITICAL, HIGH, or MEDIUM finding in the reviewed implementation
+scope. Formal full-schema validation/CI and the broader human license-audit
+reconciliation are explicit unimplemented T-09/T-05 follow-up gates, not
+evidence of completion. This audit is an agent read-only review, not a GitHub
+review.
+
+**Audit conclusion:** `PASS_FOR_IMPLEMENTED_SCOPE`; T-05 remains
+`IMPLEMENTED_UNVERIFIED` until its remaining reconciliation gate is complete.

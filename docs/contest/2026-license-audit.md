@@ -6,9 +6,9 @@
 |---|---|
 | PRZ 작업 | [`PRZ-002-open-source-readiness`](../../specs/PRZ-002-open-source-readiness/spec.md) |
 | 범위 | T-02 inventory와 G-01·outgoing license 결정·자산 감사 자료 |
-| 기준 commit | `a5f5cd53525d1e759d558ce0c09e2b1cc42544a1` |
+| 기준 commit | `846bd06e59aeb1cab88134f02c43ff9731f360fd` (`PR #13` merge) |
 | 검증일 | 2026-07-25 |
-| 상태 | `IN_PROGRESS_BLOCKED` |
+| 상태 | `IN_PROGRESS` |
 | 직접 작성 코드 저작권자 | `Jaemin Jeong` |
 | 공동 개발자·코드 기여자 | 확인된 사람 없음 |
 | 정부 지원금·상금·개발비 | 없음 |
@@ -18,16 +18,18 @@ G-01 배포 경계는 2026-07-24 사용자 승인으로 source-only로 확정했
 같은 날 사용자는 PRIZM 직접 작성 source의 outgoing license로
 `Apache-2.0`을 승인했다. 이 결정은 표준 `LICENSE`·`NOTICE` 파일을 이미
 적용했다는 뜻이 아니다. [`2026-asset-provenance-audit.md`](2026-asset-provenance-audit.md)는
-외부 design token 교체까지 완료해 자산 blocker가 없지만, 아래 비자산
-`UNKNOWN`, `BLOCKED`와 future 배포 제한이 남아 있으므로 두 파일은 아직
-만들지 않는다.
+외부 design token 교체까지 완료해 현재 source-only 배포물의 자산 blocker가
+없음을 확인했다. 따라서 미래 binary·image·model 재배포의 미해결 사항은
+현재 source-only `LICENSE`·`NOTICE` 생성을 막지 않으며, 해당 산출물을 실제로
+배포하려는 시점의 별도 release gate로 유지한다.
 
 2026-07-25 공급망 IMPLEMENT에서는 Gradle Wrapper와 resolved dependency
 artifact의 checksum Gate, GitHub Actions full SHA, Ollama release archive와
 `bge-m3` manifest digest Gate를 추가했다. 이 작업은 artifact identity와
 무결성을 고정하지만, Gradle artifact publisher 서명이나 Ollama 변환
-lineage를 새로 증명하지는 않는다. GitHub Actions의 실제 실행 결과는 아직
-`NOT_RUN`이다.
+lineage를 새로 증명하지는 않는다. 이 변경은 `PR #13`으로 main에 병합됐고,
+해당 commit을 대상으로 한 GitHub Actions backend·frontend push/PR check 4건이
+성공했다. OpenSQL·OpenProxy·OpenHA 결과는 이 CI와 별개이며 계속 `NOT_RUN`이다.
 
 ## 감사 방법과 상태
 
@@ -60,7 +62,7 @@ lineage를 새로 증명하지는 않는다. GitHub Actions의 실제 실행 결
 | `settings.gradle` | `AA627D19F54C16B1F89060449EEEFE3660F20392748789E628D796C6B180E7C5` |
 | `gradle/wrapper/gradle-wrapper.properties` | `735B1FFB51D53B1FFAAAD7ECAF66B36014D758AEDAA35EC354CB2B2717B8EE7C` |
 | `gradle/wrapper/gradle-wrapper.jar` | `497C8C2A7E5031F6AA847F88104AA80A93532EC32EE17BDB8D1D2F67A194A9C7` |
-| `gradle/verification-metadata.xml` | `7EDDC373493C56B2B7FB36BDC05C8DFF7D1426519687A43A42271911DDB111C5` |
+| `gradle/verification-metadata.xml` | `24B43A1FC2319C7C87475192BDEA62A860BCAD20D0B68F0C60A4EA1730380D71` |
 | `frontend/package.json` | `ED40AD99488120CF5A4928050AB4FAC4F69CE4D62CACBD92578EC3F80DDF1725` |
 | `frontend/package-lock.json` | `967063C8B12574A1467D492AD5FEC7C6E080E89A6250F153E49ED1F1714FB66C` |
 | `.nvmrc` | `157C2EB0DE1187AC028E89BCFF580F1FEAB7EEA2A280B110998C9472E19B4D98` |
@@ -68,6 +70,26 @@ lineage를 새로 증명하지는 않는다. GitHub Actions의 실제 실행 결
 | backend Dockerfile | `D7919AF879015F78114DDD1E03A909D51D29895ACBD694536243557120B90DEC` |
 | frontend Dockerfile | `C2859300EC00F750BB7E7525F78E7556E3BF9D5F075F64070DF5066A8FA4AF98` |
 | `.github/workflows/ci.yml` | `8A686095B7879B7B639CB2E1ADEF4EBC5FCFDCAD6697BF7ED06C4900C4BA444A` |
+
+## GitHub Actions 실행 증거
+
+공급망 고정이 포함된 `636402a`는 `PR #13`으로 `846bd06`에 병합됐다. 다음
+check는 GitHub-hosted Ubuntu runner에서 실제로 성공했다. backend job은
+Docker Compose 설정·Docker engine, 고정된 Ollama archive checksum 및 `bge-m3`
+manifest/blob Gate를 거친 뒤 `./gradlew check --no-daemon
+--dependency-verification=strict`를 실행한다. `check`는 integration test를
+포함한다.
+
+| Event | Job | 결과 | 실행 증거 |
+|---|---|---|---|
+| pull request | backend | `SUCCESS` | [job 89638572505](https://github.com/jaemin-devlog/PRIZM/actions/runs/30142592707/job/89638572505) |
+| pull request | frontend | `SUCCESS` | [job 89638572499](https://github.com/jaemin-devlog/PRIZM/actions/runs/30142592707/job/89638572499) |
+| push | backend | `SUCCESS` | [job 89638570023](https://github.com/jaemin-devlog/PRIZM/actions/runs/30142591688/job/89638570023) |
+| push | frontend | `SUCCESS` | [job 89638570030](https://github.com/jaemin-devlog/PRIZM/actions/runs/30142591688/job/89638570030) |
+
+이 결과는 PostgreSQL·pgvector Testcontainers, Docker, Ollama와 `bge-m3`를
+사용한 CI 성공 근거다. 실제 OpenSQL, OpenProxy, OpenHA 환경은 사용하지
+않았으므로 호환성 결과는 각각 `NOT_RUN`이다.
 
 실제 Java graph는 다음 명령이 2026-07-24에 성공한 결과를 사용했다.
 애플리케이션 테스트는 실행하지 않았다.
@@ -661,9 +683,11 @@ registry tarball URL이고, license 근거는 그 entry의 `license` 필드이�
   Wrapper, synthetic fixture.
 - source distribution에서 제외: `bootJar`, frontend `dist`, container
   image/archive, Ollama binary, model weights·cache, DB volume.
-- NOTICE는 PRIZM outgoing license, 저작권자, source에 실제 포함되는 wrapper와
-  fixture 권리부터 다룬다. 외부 dependency는 binary 포함 여부와 별개로
-  사람용 감사·SBOM에서 출처와 license를 계속 공개한다.
+- NOTICE는 PRIZM outgoing license와 저작권자, source에 실제 포함되는 Gradle
+  Wrapper의 Apache-2.0 고지만 다룬다. Wrapper JAR에는 `META-INF/LICENSE`가
+  있고 별도 `NOTICE` entry는 없다. 외부 JAR, npm tarball, 생성된 `dist`,
+  image, Ollama binary, model bytes는 현재 source ZIP에 포함되지 않으므로 그
+  고지를 현재 `NOTICE`에 대신 넣거나 재배포한다고 주장하지 않는다.
 - SBOM은 `included`와 `external/provided`를 분리한다. Java/npm dependency,
   PostgreSQL·pgvector, Ollama와 `bge-m3`는 실행에 필요한 외부 구성요소로
   기록하지만 initial source archive에 포함됐다고 표시하지 않는다.
@@ -673,9 +697,9 @@ registry tarball URL이고, license 근거는 그 entry의 `license` 필드이�
 G-01은 `COMPLETE`다. 사용자는 아래 비교를 검토한 뒤 2026-07-24
 Apache-2.0을 outgoing license로 승인했다. fixture·asset 권리와 외부 design
 token blocker는 해소됐고 build·CI artifact identity Gate도 구현했다.
-Ollama 변환 lineage는 source-only 배포 경계 밖의 제한으로 분리했다. 다만
-T-02의 전체 dependency·future 산출물 고지 검증과 T-03 전체 Gate가 남아
-실제 `LICENSE`·`NOTICE` 구현은 아직 완료하지 않는다.
+Ollama 변환 lineage와 binary·image 고지 범위는 source-only 배포 경계 밖의
+미래 release 제한으로 분리했다. 이 제한은 현재 source-only의 Apache-2.0
+적용을 막지 않지만, 해당 산출물을 실제로 추가하는 release는 막는다.
 
 ## MIT와 Apache-2.0 비교와 사용자 선택
 
@@ -695,7 +719,7 @@ T-02의 전체 dependency·future 산출물 고지 검증과 T-03 전체 Gate가
 **사용자 결정:** PRIZM 직접 작성 source의 outgoing license는
 `Apache-2.0`으로 승인됐다. 이 결정으로 candidate 선택은 끝났지만, 아직
 표준 원문을 생성하거나 저장소 자산에 적용하지 않았다. 다음 조건을 모두
-충족해야 T-03 전체 Gate와 T-04 구현으로 이동한다.
+충족해 T-03의 **현재 source-only 범위**를 마감하고 T-04 구현으로 이동한다.
 
 1. 완료: G-01의 배포 후보별 `배포/미배포` 결정
 2. 완료: fixture 작성자·제3자 비파생·Apache-2.0 재배포 권리 확인
@@ -703,9 +727,43 @@ T-02의 전체 dependency·future 산출물 고지 검증과 T-03 전체 Gate가
    token 교체
 4. 완료: dependency-management plugin과 `org.tomlj`의 Apache-2.0 근거 확인
    및 Gradle checksum Gate 구현
-5. 선택한 binary·bundle·image의 NOTICE coverage 확인
-6. Ollama binary와 `bge-m3`를 재배포한다면 exact identity와 license 충돌 해소
+5. 완료: 현재 source-only release에는 third-party JAR·npm bundle·container·model
+   bytes를 포함하지 않으며, 포함되는 Wrapper는 Apache-2.0과 호환됨
+6. future fat JAR·bundle·image·Ollama binary·`bge-m3` 재배포의 exact identity,
+   NOTICE 및 compatibility는 해당 release 전 별도 gate로 유지
 7. audit snapshot과 결정일 기록
+
+### Apache-2.0 canonical 원문·결정 snapshot
+
+| 항목 | 확인 결과 |
+|---|---|
+| canonical URL | [Apache License 2.0 text](https://www.apache.org/licenses/LICENSE-2.0.txt) |
+| canonical SHA-256 | `CFC7749B96F63BD31C3C42B5C471BF756814053E847C10F3EB003417BC523D30` |
+| 원문 적용 방식 | T-04에서 원문을 변형하지 않고 repository root `LICENSE`에 복사 |
+| PRIZM 저작권자 | `Jaemin Jeong` |
+| 현재 호환성 결론 | 직접 작성 source와 source에 포함되는 Apache-2.0 Gradle Wrapper에 대해 `COMPATIBLE` |
+| future 제한 | JAR, frontend bundle, image, Ollama binary/model 재배포에는 적용하지 않으며 각 artifact별 재감사 필요 |
+
+이 snapshot은 현재 source-only 배포 경계의 license 선택 기록이다. Apache-2.0이
+모든 미래 산출물·컨테이너·모델에 대한 검증을 대신한다는 뜻은 아니다.
+
+## T-04 source-only `LICENSE`·`NOTICE` 적용
+
+| 항목 | 확인 결과 |
+|---|---|
+| outgoing license | [repository `LICENSE`](../../LICENSE), Apache License 2.0 원문을 변형 없이 적용 |
+| `LICENSE` SHA-256 | `CFC7749B96F63BD31C3C42B5C471BF756814053E847C10F3EB003417BC523D30`; canonical 원문과 일치 |
+| 저작권자 | [repository `NOTICE`](../../NOTICE)에 `Copyright 2026 Jaemin Jeong` 기록 |
+| 현재 NOTICE 대상 | PRIZM 직접 작성 source와 포함되는 Gradle Wrapper scripts/JAR |
+| Wrapper 고지 | JAR의 `META-INF/LICENSE` 확인, 별도 `NOTICE` entry 없음 |
+| 제외한 고지 | Java/npm package, generated `dist`, image, Ollama binary, `bge-m3` bytes는 source-only 배포물에 없음 |
+| `NOTICE` SHA-256 | `155665012F4D119B5929061150DA6147E77151D29CD1020464800AA8789EE1F6` |
+
+따라서 현재 `NOTICE`에는 포함하지 않는 artifact의 third-party attribution을
+추측해 복사하지 않는다. PDFBox를 포함한 runtime JAR, frontend bundle, image와
+model을 실제로 배포할 때는 각 artifact의 license·NOTICE·SBOM coverage를
+다시 확인하고 해당 release의 `NOTICE`를 확장한다. Codex는 개발 보조도구이며
+저작권자·공동 기여자·runtime dependency로 이 파일들에 기록하지 않았다.
 
 ## Blocker 요약
 
@@ -742,14 +800,12 @@ T-02의 전체 dependency·future 산출물 고지 검증과 T-03 전체 Gate가
   `bge-m3` license blob의 저작권자 placeholder는 위 `UNVERIFIED_LINEAGE`와
   future model 재배포 blocker로 유지한다.
 
-### BLOCKED
+### BLOCKED / next gate
 
-- 승인된 Apache-2.0 `LICENSE`와 `NOTICE`의 실제 생성·적용
-- 남은 전체 dependency·NOTICE·SBOM Gate가 해결되기 전 source release 확정
+- machine-readable SBOM과 AI model 명세, 이를 생성·검증하는 도구 감사
 - fat JAR·`dist`·container image·Ollama binary·model weight의 future release
-- T-03 이후 IMPLEMENT
 
-현재 source 배포 범위의 build·CI·model identity blocker는 좁혀졌지만 T-02의
-전체 dependency·NOTICE·SBOM Gate는 통과하지 않았다. model lineage 제한은
+현재 source-only 범위의 T-02와 T-03 결정은 마감됐다. model lineage 제한은
 `NOT_DISTRIBUTED` 경계와 함께 명시하며 PostgreSQL 성공이나 OpenSQL 결과로
-대체하지 않는다.
+대체하지 않는다. 전체 PRZ-002가 완료된 것은 아니며, 현재 상태는 후속
+IMPLEMENT가 가능한 `IN_PROGRESS`다.

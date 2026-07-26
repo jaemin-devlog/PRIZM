@@ -1,0 +1,16 @@
+PRIZM
+Copyright 2026 Jaemin Jeong
+
+This initial distribution is source-only. It contains PRIZM source code,
+documentation, execution configuration, Gradle Wrapper scripts and JAR, and
+synthetic fixtures that were verified as PRIZM-created and redistributable.
+
+The included Gradle Wrapper JAR is distributed under Apache License, Version
+2.0 and retains its embedded META-INF/LICENSE. The JAR contains no NOTICE
+entry.
+
+This distribution does not redistribute third-party Java or npm packages,
+generated frontend assets, container images, database volumes, the Ollama
+binary, or bge-m3 model weights and caches. Redistributing any of those
+artifacts requires a separate component, license, NOTICE, SBOM, and
+provenance review before release.

@@ -178,10 +178,11 @@ reference에서 가져온 사실을 확인한 뒤 2026-07-24 frontend source에�
 사용한다. 따라서 `BLOCKED_EXTERNAL_DESIGN_RIGHTS`는 해소됐다. G-01은
 source-only로 확정했고 2026-07-25 Wrapper·dependency checksum, Action SHA,
 Ollama archive와 `bge-m3` manifest Gate를 구현했다. 확인되지 않은 Ollama
-변환 lineage는 model 미배포 경계와 함께 별도 제한으로 남겼다. 전체
-dependency·NOTICE와 future binary·image 검증에
-`UNKNOWN`·`BLOCKED`가 남아 있어 T-02는
-`IN_PROGRESS_BLOCKED`다.
+변환 lineage는 model 미배포 경계와 함께 별도 제한으로 남겼다. 현재
+source-only 배포에 실제 포함되는 component의 provenance·NOTICE 범위는
+확정했으므로 T-02는 `COMPLETE_FOR_INITIAL_SOURCE_ONLY`다. future
+binary·image·model release의 `UNKNOWN`·`BLOCKED`는 해당 release 전 재개할
+별도 gate로 유지한다.
 
 ## G-01 — 배포 경계 사용자 결정
 
@@ -208,41 +209,60 @@ weights·cache를 initial release에서 재배포하지 않는다. source SBOM�
 
 **선행 조건:** T-02, G-01
 
-- [ ] OSI 공식 목록과 두 license의 canonical 원문·checksum을 확인한다.
-- [ ] permissive 조건, explicit patent grant, 고지·수정 표시, NOTICE 운영,
+- [x] OSI 공식 목록과 두 license의 canonical 원문·checksum을 확인한다.
+- [x] permissive 조건, explicit patent grant, 고지·수정 표시, NOTICE 운영,
   contributor·release 부담을 비교한다.
-- [ ] 모든 dependency·container·model·asset과 후보 license의 호환성을
-  배포 산출물별로 확인한다.
-- [ ] 복수 라이선스 선택, 예외 허가와 충돌 해소 근거를 기록한다.
-- [ ] 사용자에게 추천안과 남은 위험을 제시한다.
+- [x] 현재 source-only 배포물에 실제 포함되는 direct source·Wrapper·fixture와
+  후보 license의 호환성을 확인한다.
+- [x] 현재 source-only의 복수 라이선스 선택, 예외 허가와 충돌 해소 근거를 기록한다.
+- [x] 사용자에게 추천안과 남은 위험을 제시한다.
 - [x] 사용자가 outgoing license를 명시적으로 승인한다.
+
+> future JAR·bundle·image·Ollama/model 재배포의 호환성은 현재 source-only
+> T-03 범위가 아니다. 해당 artifact를 배포하려는 release 전에 T-02를 다시 열어
+> 별도 compatibility·NOTICE·SBOM gate를 통과해야 한다.
 
 **중단 조건:** 미승인 또는 배포 범위 `UNKNOWN/CONFLICT` 존재 시 `BLOCKED`
 
 **완료 evidence:** 승인된 license 이름·canonical URL, 결정일, 승인 근거와
 audit snapshot hash
 
-**사용자 승인 evidence (2026-07-24):** PRIZM 직접 작성 source의 outgoing
-license로 `Apache-2.0`을 선택했다. 이는 license 이름에 대한 승인이고,
-fixture·design token 권리는 확인됐지만 나머지 T-02 blocker가 해소되기
-전에는 루트 `LICENSE`·`NOTICE` 파일을 만들지 않는다.
+**결정 snapshot (2026-07-25):** PRIZM 직접 작성 source의 outgoing license로
+`Apache-2.0`을 선택했다. [canonical 원문](https://www.apache.org/licenses/LICENSE-2.0.txt)의
+SHA-256 `CFC7749B96F63BD31C3C42B5C471BF756814053E847C10F3EB003417BC523D30`을
+확인했다. 현재 source-only 배포물은 직접 작성 source·문서·실행 설정,
+Apache-2.0 Gradle Wrapper scripts/JAR 및 `VERIFIED_DIRECT` fixture만 포함한다.
+따라서 future JAR·`dist`·image·Ollama/model 재배포 제한은 별도 release gate로
+분리하며 T-04를 막지 않는다.
 
-**현재 판정:** `IN_PROGRESS_BLOCKED`
+**현재 판정:** `COMPLETE_FOR_INITIAL_SOURCE_ONLY`; future artifact compatibility는
+`BLOCKED_FUTURE_RELEASE`로 유지
 
 ## T-04 — `LICENSE`·`NOTICE`
 
 **선행 조건:** T-03 승인
 
-- [ ] 승인된 표준 license 원문을 변형 없이 루트 `LICENSE`에 적용한다.
-- [ ] 저작권자를 `Jaemin Jeong`으로 기록한다.
-- [ ] dependency·model·asset 감사 결과에서 필요한 third-party 고지를
-  `NOTICE`에 반영한다.
+- [x] 승인된 표준 license 원문을 변형 없이 루트 `LICENSE`에 적용한다.
+- [x] 저작권자를 `Jaemin Jeong`으로 기록한다.
+- [x] 현재 source-only 배포물에 필요한 third-party 고지를 `NOTICE`에 반영한다.
 - [ ] PDFBox 등 upstream NOTICE가 fat JAR/image에서 보존되는지 확인한다.
-- [ ] source/JAR/`dist`/image별 license·NOTICE 배치와 전달 방식을 검증한다.
-- [ ] Codex를 저작권자·공동 기여자·runtime dependency로 잘못 기록하지 않는다.
+  - future fat JAR/image release 전 별도 gate; 현재 source-only 배포물에는 없음
+- [x] 현재 source-only의 license·NOTICE 배치과 전달 방식을 검증한다.
+  - JAR/`dist`/image별 검증은 future artifact release 전 별도 gate
+- [x] Codex를 저작권자·공동 기여자·runtime dependency로 잘못 기록하지 않는다.
 
 **완료 evidence:** canonical license 대조 결과, NOTICE coverage report,
 배포물별 포함 검사
+
+**현재 evidence (2026-07-25):** root `LICENSE`는 canonical Apache-2.0 원문과
+SHA-256 `CFC7749B96F63BD31C3C42B5C471BF756814053E847C10F3EB003417BC523D30`이
+일치한다. root `NOTICE`는 `Copyright 2026 Jaemin Jeong`, source-only 범위와
+Gradle Wrapper의 embedded license/NOTICE 부재만 기록한다. 외부 JAR·npm package·
+generated `dist`·image·Ollama binary·model bytes는 배포하지 않으므로 고지를
+추측해 포함하지 않았다. future artifact 고지는 T-02 재개 조건이다.
+
+**현재 판정:** `COMPLETE_FOR_INITIAL_SOURCE_ONLY`; future artifact coverage는
+`BLOCKED_FUTURE_RELEASE`
 
 ## T-05 — SBOM·AI 모델 명세
 
@@ -345,8 +365,10 @@ inventory, SBOM diff report
 Ollama `v0.32.3` archive checksum과 `bge-m3` pre/post manifest Gate 구현,
 workflow YAML과 run block 10개 Bash 문법 통과. Gradle strict verification
 단위 테스트 245건 중 231건 성공·14건 skip·실패/오류 0건,
-`compileIntegrationTestJava` 성공. 실제 GitHub check URL은 아직 없고
-Ollama archive·model download는 `NOT_RUN`이므로 T-09 전체는 완료가 아니다.
+`compileIntegrationTestJava` 성공. `PR #13` 병합 전후 backend·frontend push/PR
+check 4건은 모두 성공했으며, backend job에서 Ollama archive·model Gate도 실제
+실행됐다. SBOM·README/Quickstart·OSS file 검증 CI가 아직 없으므로 T-09 전체는
+완료가 아니다.
 
 ## T-10 — 독립 읽기 전용 감사
 
@@ -403,13 +425,14 @@ OpenSQL·OpenProxy·OpenHA `NOT_RUN`
 - [ ] 실제 GitHub Issue·PR·CI·review 상태를 과장하지 않았다.
 - [ ] PRZ-002 evidence와 registry가 실제 source·merge commit을 가리킨다.
 
-현재는 T-01 source register, T-02 component inventory와 G-01 비교 자료가
-구현됐고 G-01 source-only 배포 경계도 사용자 승인으로 확정됐다. IMPLEMENT는
-`IN_PROGRESS_LOCAL_ONLY`다. 외부 design token blocker와 build·CI artifact
-identity blocker는 해소됐지만 T-02의 다른 미확정 항목 때문에 T-03 이후는
-`BLOCKED`다. GitHub Issue·LICENSE·NOTICE·SBOM·governance·template과
-license/SBOM 검사 CI는 아직 구현하지 않았다. 기존 CI의 supply-chain pin
-변경은 local worktree에만 있으며 실제 GitHub Actions 결과는 `NOT_RUN`이다.
-2026-07-25 보완 검증에서는 strict dependency verification으로 단위 테스트
-245건 중 231건 성공·14건 환경 조건 skip·실패 0건, PostgreSQL 16 + pgvector
-통합 테스트 68건 중 65건 성공·3건 환경 조건 skip·실패 0건을 확인했다.
+현재는 T-01 source register, T-02 component inventory와 G-01 source-only
+배포 경계, T-03 Apache-2.0 결정 snapshot이 현재 source-only 범위에서
+완료됐다. IMPLEMENT는 `IN_PROGRESS`다. 외부 design token blocker와 build·CI
+artifact identity blocker는 해소됐고, future artifact 제한은 현재
+`LICENSE`·`NOTICE` 생성을 막지 않는다. GitHub Issue·LICENSE·NOTICE·SBOM·
+governance·template과 license/SBOM 검사 CI는 아직 구현하지 않았다.
+공급망 pin은 PR #13으로 병합됐고 GitHub Actions backend·frontend push/PR
+check 4건이 성공했다. 2026-07-25 보완 검증에서는 strict dependency
+verification으로 단위 테스트 245건 중 231건 성공·14건 환경 조건 skip·실패
+0건, PostgreSQL 16 + pgvector 통합 테스트 68건 중 65건 성공·3건 환경 조건
+skip·실패 0건을 확인했다.

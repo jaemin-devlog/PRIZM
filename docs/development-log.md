@@ -428,3 +428,8 @@
 - 적용: Apache Software Foundation canonical Apache-2.0 원문과 SHA-256이 일치하는 root `LICENSE`를 추가하고, `NOTICE`에 `Copyright 2026 Jaemin Jeong`과 실제 source-only 배포 범위를 기록했다.
 - 경계: 현재 포함되는 Gradle Wrapper JAR의 embedded `META-INF/LICENSE`와 NOTICE 부재만 다뤘다. 외부 JAR·npm package·`dist`·image·Ollama binary·`bge-m3` bytes는 재배포하지 않으므로 고지를 추측해 넣지 않았고, 해당 artifact의 future release gate로 남긴다.
 - 검증: canonical `LICENSE` SHA-256 일치, `NOTICE` scope 대조와 Markdown·diff 검증을 수행한다. Codex는 저작권자·공동 기여자·runtime dependency로 기록하지 않았다.
+
+## 2026-07-26 — P0/P1 운영 규칙 명확화
+
+- 결정: P0은 공식 근거·라이선스 준비를 완료하는 단계로, P1 OpenSQL 및 clean-clone 증거는 P0 gate 충족 뒤에 시작한다고 `AGENTS.md`에 명확히 기록했다. 임시 브랜치 표기에서도 도구 이름 접두어를 제거하고 `PRZ-###-<slug>` 형식으로 통일했다.
+- 범위: 프로젝트 전반의 작업 순서와 브랜치 명명 규칙만 변경했으며, 애플리케이션 코드·테스트·배포 설정은 변경하지 않았다.

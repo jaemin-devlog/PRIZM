@@ -40,6 +40,7 @@
 **현재 판정:** `BLOCKED_GITHUB_WRITE`, `LOCAL_ONLY_IMPLEMENT_AUTHORIZED`.
 사용자는 PRZ-002 작업을 승인했지만 2026-07-26 GitHub connector의 실제 Issue
 생성 요청은 HTTP 403 (`Resource not accessible by integration`)으로 거부됐다.
+같은 환경의 `gh auth status`도 authenticated GitHub host가 없다고 보고했다.
 따라서 G-03A는 완료 처리하지 않으며 이 로컬 작업을 Issue·PR·review evidence로
 계산하지 않는다. 현재 SBOM implementation branch의 기준은 `main`·`origin/main`
 `0ad549a8641b2b6ef18a8011dac93286052b65c0`이며, 실제 Issue 생성 권한이

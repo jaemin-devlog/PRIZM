@@ -68,7 +68,18 @@ a claim that those issues are resolved by this spec.
 - Add formal schema/structural SBOM enforcement to CI only in T-09.
 - Do not create `SECURITY.md` until an actual confidential reporting channel is
   enabled or a monitored contact is supplied.
-- No real GitHub Issue, PR, review, push, or merge evidence exists yet.
+- A branch push exists, but no real GitHub Issue, PR, review, or merge evidence
+  exists yet.
+
+## External GitHub gate — 2026-07-26
+
+The branch was published to `origin/PRZ-002-sbom-model-manifest`, but this
+environment cannot create the required real Issue or PR evidence: the GitHub
+connector Issue-create request returned HTTP 403 (`Resource not accessible by
+integration`), and `gh auth status` reported no authenticated GitHub host.
+The branch's remote push is not treated as an Issue, review, or merge record.
+Private Vulnerability Reporting was not inspected or enabled from this
+environment, so G-02 remains `BLOCKED_EXTERNAL_CONFIGURATION`.
 
 ## Read-only audit — 2026-07-26
 

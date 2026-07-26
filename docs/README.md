@@ -11,6 +11,8 @@
 | 앞으로 개발할 순서 | [개발 로드맵](roadmap.md) |
 | 대회 제출 전 우선순위 | [2026 티맥스티베로 과제 대응 계획](contest/2026-tmaxtibero-plan.md) |
 | 공식 과제·평가기준별 현재 준비도 | [요구사항·평가기준 추적표](contest/2026-requirements-traceability.md) |
+| source-only license·provenance 판단 | [2026 license audit](contest/2026-license-audit.md) |
+| 기계 판독용 공급망·AI 모델 기록 | [SBOM 및 AI 모델 명세](contest/2026-sbom-model-manifest.md) |
 | 지금까지 진행한 작업 | [개발 기록](development-log.md) |
 | 기존 구현의 코드·test 근거 | [PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md) |
 

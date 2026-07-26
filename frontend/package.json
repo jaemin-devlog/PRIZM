@@ -13,7 +13,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "typecheck": "tsc -b --pretty false",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sbom": "node ../scripts/generate-frontend-sbom.mjs"
   },
   "dependencies": {
     "react": "19.2.7",

@@ -433,3 +433,9 @@
 
 - 결정: P0은 공식 근거·라이선스 준비를 완료하는 단계로, P1 OpenSQL 및 clean-clone 증거는 P0 gate 충족 뒤에 시작한다고 `AGENTS.md`에 명확히 기록했다. 임시 브랜치 표기에서도 도구 이름 접두어를 제거하고 `PRZ-###-<slug>` 형식으로 통일했다.
 - 범위: 프로젝트 전반의 작업 순서와 브랜치 명명 규칙만 변경했으며, 애플리케이션 코드·테스트·배포 설정은 변경하지 않았다.
+
+## 2026-07-26 — PRZ-002 SBOM·AI 모델 명세 구현
+
+- 구현: source-only 배포 경계에 맞춰 Java runtime CycloneDX SBOM, frontend lockfile CycloneDX SBOM, scope manifest, Ollama·`bge-m3` AI model manifest와 checksum verifier를 추가했다. backend·frontend 모두 external SBOM plugin/CLI를 새 의존성으로 넣지 않고, resolved graph 또는 versioned lockfile을 읽는 first-party generator를 사용한다.
+- 경계: Ollama binary·model weights/cache·container image·DB volume·업로드 원본은 배포물에 포함하지 않는다. BAAI revision과 Ollama registry artifact의 변환은 `UNVERIFIED_LINEAGE`로 유지하며 OpenSQL·OpenProxy·OpenHA는 계속 `NOT_RUN`이다.
+- 상태: 생성·structural verification은 IMPLEMENT 단계다. human/machine inventory 대조, clean checkout evidence, CI gate와 독립 읽기 전용 감사 전까지 T-05와 PRZ-002 전체는 `IMPLEMENTED_UNVERIFIED`/`IN_PROGRESS` 상태다.

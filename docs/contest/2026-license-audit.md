@@ -802,10 +802,36 @@ model을 실제로 배포할 때는 각 artifact의 license·NOTICE·SBOM covera
 
 ### BLOCKED / next gate
 
-- machine-readable SBOM과 AI model 명세, 이를 생성·검증하는 도구 감사
+- machine-readable SBOM·AI model 명세의 human/machine inventory 대조, clean
+  checkout 재현 evidence와 독립 감사
 - fat JAR·`dist`·container image·Ollama binary·model weight의 future release
 
 현재 source-only 범위의 T-02와 T-03 결정은 마감됐다. model lineage 제한은
 `NOT_DISTRIBUTED` 경계와 함께 명시하며 PostgreSQL 성공이나 OpenSQL 결과로
 대체하지 않는다. 전체 PRZ-002가 완료된 것은 아니며, 현재 상태는 후속
 IMPLEMENT가 가능한 `IN_PROGRESS`다.
+
+## T-05 SBOM·AI 모델 명세 구현 기록
+
+2026-07-26에 source-only 배포 경계를 위한 기계 판독용 SBOM과 AI model
+manifest를 구현했다. 상세 범위·재생성 명령·현재 `NOT_RUN` 환경은
+[SBOM 및 AI 모델 명세](2026-sbom-model-manifest.md)를 기준으로 한다.
+
+| 항목 | 현재 기록 | tool/license 판정 | 배포 경계 |
+|---|---|---|---|
+| backend runtime | CycloneDX 1.6, Gradle `runtimeClasspath` | first-party `generateBackendSbom` Gradle task, Apache-2.0; existing verification metadata의 resolved artifact SHA-256을 record | resolved JAR은 `EXTERNAL_PROVIDED_NOT_DISTRIBUTED` |
+| frontend lockfile | CycloneDX 1.6, 183 versioned `package-lock.json` entries | first-party `scripts/generate-frontend-sbom.mjs`, Apache-2.0, Node standard-library only | npm packages는 `EXTERNAL_PROVIDED_NOT_DISTRIBUTED` |
+| model record | Ollama v0.32.3, BAAI `bge-m3` revision, Ollama registry manifest/blob hashes | model bytes와 PRIZM source license 분리; registry lineage `UNVERIFIED_LINEAGE` 유지 | Ollama binary·weights·cache `NOT_DISTRIBUTED` |
+| scope·integrity | runtime/test-build/CI/container/model/asset scope manifest와 `SHA256SUMS` | first-party structural verifier가 local path·JDBC URL·credential-shaped data와 checksum drift 검사 | source-only record 자체는 Git tracked |
+
+`@cyclonedx/cyclonedx-npm`은 frontend generator로 채택하지 않았다. 6.0.0 후보는
+당시 full npm audit에서 high finding 10건이 있었고, 4.0.1 후보는 full audit
+endpoint가 package tree를 거부하여 신뢰 가능한 전이 취약점 판정을 만들지 못했다.
+따라서 외부 npm SBOM tool을 새로 배포·개발 의존성으로 넣지 않고, lockfile만
+읽는 first-party generator를 선택했다. 이것은 npm ecosystem 전체 license
+판단을 자동으로 완결한다는 주장이 아니며, 누락·충돌 판단은 위 human audit과
+후속 독립 대조에서 계속 확인한다.
+
+**T-05 상태:** `IMPLEMENTED_UNVERIFIED`. formal-schema/CI gate, clean checkout
+evidence, human/machine reconciliation 및 독립 읽기 전용 감사 전에는
+`VERIFIED` 또는 PRZ-002 전체 완료로 표시하지 않는다.

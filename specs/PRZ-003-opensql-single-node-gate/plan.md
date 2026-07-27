@@ -1,4 +1,4 @@
-# PRZ-001 계획
+# PRZ-003 계획
 
 ## 외부 의존성과 권한
 
@@ -56,5 +56,5 @@ CPU/core/thread 값을 사용해야 함을 확인했다. 또한 게스트에는 
 
 ## Git 계획
 
-작업은 `codex/PRZ-001-opensql-single-node-gate`에서 수행한다. 실제 GitHub Issue나 PR은
+작업은 `PRZ-003-opensql-single-node-gate`에서 수행한다. 실제 GitHub Issue나 PR은
 외부 쓰기가 승인된 경우에만 생성하며, 과거 기록을 새로 만들지 않는다.

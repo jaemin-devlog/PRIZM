@@ -8,15 +8,18 @@ import com.prizm.search.evaluation.SearchEvaluationData.ExpectedEvidence;
 import com.prizm.search.evaluation.SearchEvaluationData.FixtureDocument;
 import com.prizm.search.evaluation.SearchEvaluationData.FixturePage;
 import com.prizm.search.evaluation.SearchEvaluationData.Question;
+import com.prizm.search.evaluation.SearchEvaluationData.Split;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Locale;
+import java.util.Map;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
@@ -137,6 +140,7 @@ public class SearchEvaluationDatasetLoader {
     private void validateQuestions(List<Question> questions, Set<String> corpusEvidenceIds) {
         Set<String> questionIds = new HashSet<>();
         Set<String> normalizedQueries = new HashSet<>();
+        Map<String, Split> positiveEvidenceSplits = new HashMap<>();
         for (Question question : questions) {
             if (question == null || isBlank(question.questionId()) || isBlank(question.query())
                     || question.query().length() > 500 || question.split() == null
@@ -167,6 +171,14 @@ public class SearchEvaluationDatasetLoader {
                 }
                 if (!corpusEvidenceIds.contains(evidence.fixtureEvidenceId())) {
                     throw new SearchEvaluationDataException("Question references an unknown fixture evidence ID.");
+                }
+                if (evidence.relevance() > 0) {
+                    Split existingSplit = positiveEvidenceSplits.putIfAbsent(
+                            evidence.fixtureEvidenceId(), question.split());
+                    if (existingSplit != null && existingSplit != question.split()) {
+                        throw new SearchEvaluationDataException(
+                                "Positive fixture evidence cannot be reused across TUNING and TEST.");
+                    }
                 }
                 hasPositiveEvidence |= evidence.relevance() > 0;
             }

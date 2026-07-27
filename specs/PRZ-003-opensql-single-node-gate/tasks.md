@@ -1,4 +1,4 @@
-# PRZ-001 작업 목록
+# PRZ-003 작업 목록
 
 - [x] 공급사의 VM 기반 테스트 라이선스 확인 내용을 기록한다.
 - [x] 연구실 Windows 호스트에 Oracle VirtualBox를 설치한다.

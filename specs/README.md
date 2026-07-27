@@ -28,6 +28,8 @@
 ## 문서 규칙
 
 - ID는 `PRZ-###` 형식을 사용하고 [이 registry](#registry)에서 유일하게 관리한다.
+  ID는 실제 `SPEC` 작업을 시작해 registry와 spec 파일을 함께 만들 때만 다음
+  순번으로 발급한다. roadmap·장기 계획에는 미래 ID를 예약하지 않고 작업명만 적는다.
 - 기존 기능은 `AS_BUILT_BASELINE`으로만 backfill한다.
 - 새 기능과 observable contract 변경은 구현 전에 `spec.md`를 작성한다.
 - 대회 범위 product code에는 구현 전에 `plan.md`와 `tasks.md`가 필수다.
@@ -57,7 +59,9 @@
 
 | Spec ID | 이름 | 상태 | Source commit | Last verified |
 |---|---|---|---|---|
-| [PRZ-000](PRZ-000-platform-baseline/spec.md) | Platform foundation and Career Vault baseline | `AS_BUILT_BASELINE` | `e995a5f` | 2026-07-23 |
-| [PRZ-001](PRZ-001-opensql-single-node-gate/spec.md) | OpenSQL single-node verification environment | `IN_PROGRESS` | `PENDING_INTEGRATION` | `NOT_RUN` |
+| [PRZ-000](PRZ-000-platform-baseline/spec.md) | 플랫폼 기반 및 Career Vault 기준선 | `AS_BUILT_BASELINE` | `e995a5f` | 2026-07-23 |
+| [PRZ-001](PRZ-001-search-evaluation-integrity/spec.md) | 검색 평가 분할 및 지표 정합성 | `VERIFIED` | `36c8610` | 2026-07-24 |
+| [PRZ-002](PRZ-002-open-source-readiness/spec.md) | 오픈소스 준비: 출처·라이선스·기여 기준선 | `IN_PROGRESS` | `9279d51` | `NOT_RUN` |
+| [PRZ-003](PRZ-003-opensql-single-node-gate/spec.md) | OpenSQL 단일 노드 검증 환경 | `IN_PROGRESS` | `PENDING_INTEGRATION` | `NOT_RUN` |
 
 다음 신규 spec의 우선순위는 [2026 티맥스티베로 지정과제 대응 계획](../docs/contest/2026-tmaxtibero-plan.md)을 따른다. registry에 디렉터리를 미리 대량 생성하지 않고 실제로 착수하는 작은 수직 슬라이스만 추가한다.

@@ -221,7 +221,7 @@
 ## 2026-07-14 — 검색 품질 평가 기반
 
 - 변경: 합성 `corpus.json`·`questions.jsonl` 형식과 개인 데이터가 Git에서 제외되는 `local/search-evaluation/` 경계를 추가했다.
-- 측정: 별도 `searchEvaluation` task가 실제 PostgreSQL·pgvector와 Ollama `bge-m3`, 현재 청킹·owner·ACTIVE 조건을 사용해 Dense top 5·20을 조회하고 Recall@20, Precision@5, MRR@20, nDCG@5, 중복률과 지연을 로컬 JSON·CSV로 기록한다.
+- 측정: 별도 `searchEvaluation` task가 실제 PostgreSQL·pgvector와 Ollama `bge-m3`, 현재 청킹·owner·ACTIVE 조건을 사용해 Dense top 5·20을 조회하고 Recall@20, Precision@5, 당시 `MRR@20`으로 표시한 legacy aggregate direct-rank score, nDCG@5, 중복률과 지연을 로컬 JSON·CSV로 기록한다.
 - 범위: 프로덕션 검색 API, score 임계값, Reranker, Hybrid Search, 청킹과 프런트엔드는 변경하지 않았다.
 - 검증: 단위 테스트 162개, PostgreSQL·pgvector·실제 Ollama 통합 테스트 49개와 합성 기준선 평가를 통과했다. OpenSQL 실환경 테스트 1개는 기존 정책대로 제외했다.
 
@@ -229,8 +229,8 @@
 
 - 데이터: 기존 합성 사례를 보존하면서 가상 문서 11개, 질문 30개로 확장했다. 기술 8개, 문제 해결 6개, 협업 4개, 정확한 수치·표현 6개, 무근거 6개이며 hard negative 질문은 11개다.
 - 분리: 질문을 TUNING 20개와 TEST 10개로 구분하고, 동일 정규화 질문 중복·잘못된 split·누락된 fixture 근거·무근거 라벨 충돌을 실행 전에 차단한다. 의미가 같은 패러프레이즈의 split 간 중복은 수동 검토했다.
-- 출력: Dense 기준선 보고서에 전체·split·category별 Precision@5, Recall@20, MRR@20, nDCG@5, 중복률, score 분포와 지연을 추가했다.
-- 기준선: 실제 PostgreSQL 16.14·pgvector와 Ollama `bge-m3` 최종 실행에서 전체 Recall@20 1.0000, Precision@5 0.1933, MRR@20 0.6556, nDCG@5 0.8543, 중복률 0.0067, 평균/p95 864.20/999ms를 기록했다. 합성 결과는 실제 서비스 성능을 보장하지 않는다.
+- 출력: Dense 기준선 보고서에 전체·split·category별 Precision@5, Recall@20, 당시 `MRR@20`으로 표시한 legacy aggregate direct-rank score, nDCG@5, 중복률, score 분포와 지연을 추가했다.
+- 기준선: 실제 PostgreSQL 16.14·pgvector와 Ollama `bge-m3` 최종 실행에서 전체 Recall@20 1.0000, Precision@5 0.1933, legacy aggregate direct-rank score 0.6556(Direct MRR@20 재실행 필요), nDCG@5 0.8543, 중복률 0.0067, 평균/p95 864.20/999ms를 기록했다. 합성 결과는 실제 서비스 성능을 보장하지 않는다.
 - 범위: 운영 검색, 임계값, Reranker, Hybrid Search, 청킹, 프런트엔드와 DB migration은 변경하지 않았다.
 
 ## 2026-07-15 — 고아 원본 파일 Cleanup Worker
@@ -326,7 +326,7 @@
 - 탐색: `docs/README.md`를 문서 안내판으로 추가하고 현재 구현은 `project-status.md`, 앞으로의 순서는 `roadmap.md`, 대회 일정은 `contest/2026-tmaxtibero-plan.md`에서 확인하도록 기준을 분리했다.
 - 축약·통합: 현재 현황을 핵심 기능·검증·한계 중심으로 축약했다. 제품 경계, 브랜치 정책과 수치·근거 문서의 고유 내용은 `AGENTS.md`, `PRZ-000`, 현재 현황과 이 기록에 흡수하고 중복 파일을 제거했다.
 - 보관: 장기 종합 기획안, 과거 0~10단계 실행 계획, Reranker 비채택 실험과 초기 등록·검색 검증을 `docs/archive/`로 이동했다. Dense 검색 평가와 문제 해결 사례는 각각 `evaluation/`, `showcase/`로 분리했다.
-- OpenSQL: 단일 환경 Gate와 OpenProxy·OpenHA 후속 범위를 분리하고, 실제 환경 결과는 계속 `NOT_RUN`으로 유지했다. 실제 착수 시 체크리스트를 `PRZ-001`로 이전한다.
+- OpenSQL: 단일 환경 Gate와 OpenProxy·OpenHA 후속 범위를 분리하고, 실제 환경 결과는 계속 `NOT_RUN`으로 유지했다. 실제 착수 시 체크리스트를 다음 available spec ID로 이전한다.
 - 검증: 문서 전용 변경이므로 애플리케이션 test를 다시 실행하지 않았다. 저장소 Markdown 18개의 로컬 링크 누락 0건, code fence 불균형 0건, trailing whitespace 0건과 `git diff --check` 통과를 확인했다.
 
 ## 2026-07-24 — 공식 지정과제·평가기준과 단계별 개발 Gate 반영
@@ -346,8 +346,96 @@
 - 독립 감사: workflow 일관성, 공식 점수 오인·artifact gaming 방지, 현재 준비도와 Gate 정합성을 세 갈래로 재검토해 모두 차단 문제 없음으로 통과했다.
 - 검증: 문서 전용 변경이므로 애플리케이션 test는 실행하지 않았다. 변경된 Markdown 4개의 로컬 링크 누락·code fence 불균형·trailing whitespace·EOF 문제가 모두 0건이고 `git diff --check`를 통과했다.
 
-## 2026-07-27 — PRZ-001 OpenSQL 단일 검증 VM 착수
+## 2026-07-24 — PRZ-003 검색 평가 기준선 정합성 (병합 당시 ID)
+
+- 교정: TUNING/TEST 사이에서 양성 fixture evidence가 반복되면 로더가 실행 전에 거부하도록 하고, 샘플 30문항의 split을 다시 배치했다. Direct MRR@20은 직접 근거 질문만 분모로 사용하며, 이전 0.6556 수치는 legacy aggregate로 분리했다.
+- 안전성: 평가 profile은 일반 `.env`의 Ollama endpoint를 상속하지 않고 localhost 기본값 또는 명시적 평가 전용 endpoint만 사용한다. 결과 파일은 run token으로 구분하고, `local/`·`outputs/`·Python virtual environment, Python cache와 reranker model cache는 ignore로 보호한다. 실제 생성물은 삭제하지 않았다.
+- 검증: `./gradlew.bat test --no-daemon`에서 245개 중 231개 성공·환경 조건 14개 skip·실패/오류 0개를 확인했다. 이후 Docker Desktop 29.6.2, Testcontainers PostgreSQL 16.14·pgvector와 로컬 Ollama `bge-m3`로 `searchEvaluation`을 재실행해 TEST 10문항의 Direct MRR@20 `0.7917`을 기록했다. OpenSQL·OpenProxy·OpenHA는 이번 교정에서 사용하거나 검증하지 않았다.
+- 감사·번호 정책: 초기 감사에서 지표·cache·역사 기록을 정정했고, 당시 미래 OpenSQL·clean-clone 작업에 번호를 미리 예약한 탓에 이 작업이 임시로 `PRZ-003`까지 재번호화됐다. source commit `36c8610`, PR #11과 merge commit `9e4d96f`의 `PRZ-003` 표기는 실제 역사로 보존한다.
+
+## 2026-07-24 — Spec ID 할당 정책 정정
+
+- 결정: 외부 사용자가 `specs/`를 보았을 때 실제 작업 순서를 바로 이해할 수 있도록, 미래 작업에는 ID를 미리 예약하지 않고 실제 `SPEC` 시작 시 다음 순번을 발급한다.
+- 현행화: 병합된 검색 평가 spec의 canonical ID를 `PRZ-001`로 바꾸고, OpenSQL·clean-clone은 ID 없이 roadmap과 대회 계획에 작업명으로만 남겼다. 이 문서 전용 정정은 검색 평가 코드 검증과 독립 감사의 `PASS` 결과를 바꾸지 않는다.
+
+## 2026-07-24 — PRZ-002 오픈소스 준비 SPEC
+
+- 출처 기준: 공식 홈페이지, 2026 운영 규정, 결과보고서 양식과 공식 OT 보조 캡처를 대조해 P0의 핵심을 출처 등록·라이선스 감사·SBOM·AI 모델 명세·기여/보안 경로로 확정했다. 운영 규정 원문과 OT 이미지는 재배포 제한 또는 공개 원본 부재 때문에 저장소에 복사하지 않고 메타데이터·해시·필요 최소 인용만 기록한다.
+- 저작권 경계: 직접 작성 코드의 저작권 표기는 `Jaemin Jeong`으로 준비하고, Codex는 개발 보조도구 사용으로 분리한다. 외부 코드·모델·자산의 출처와 라이선스는 후속 감사로 확인하며, 검증 전에는 무결성이나 호환성을 보증하지 않는다.
+- 상태: 이번 단계는 `SPEC`만 완료했다. 라이선스 선택, GitHub Issue, 구현·CI·검증·감사·PR은 아직 수행하지 않았다.
+
+## 2026-07-24 — PRZ-002 오픈소스 준비 PLAN
+
+- 범위: 공식 source register부터 전체 Gradle/npm/container/model/CI/asset 감사, outgoing license 승인, 고지·SBOM·AI 명세, 기여·보안 체계, GitHub template·문서·CI와 독립 감사까지 10단계 실행 순서를 정했다.
+- Gate: 감사 전에는 MIT·Apache-2.0을 확정하지 않고 사용자 승인을 받으며, 실제 Private Vulnerability Reporting 또는 검증된 연락처가 없으면 SECURITY 게시를 중단한다. `UNKNOWN`·`CONFLICT` 구성요소도 release 통합을 막는다.
+- 상태: PLAN만 완료했다. LICENSE·NOTICE·governance·template·CI, GitHub Issue·branch·commit·PR은 아직 만들지 않았고, OpenSQL·OpenProxy·OpenHA는 계속 `NOT_RUN`이다.
+
+## 2026-07-24 — PRZ-002 공식 근거·license inventory IMPLEMENT
+
+- 근거: 대회 공식 홈페이지·개요와 운영규정 PDF·결과보고서 ZIP의 URL·크기·SHA-256·재배포 조건을 등록했다. 원문과 사용자 제공 OT 캡처는 저장소에 복사하지 않는다.
+- 감사: 실제 Gradle runtime/test/build graph, npm lock 183개, container·CI·Ollama·`bge-m3`, fixture·tracked asset을 구분해 기록했다. frontend runtime 고지, image·Action·model identity, fixture 권리가 미확정이라 outgoing license와 NOTICE는 계속 `BLOCKED`다.
+- 상태: MIT·Apache-2.0 비교 자료만 준비했고 선택하지 않았다. GitHub Issue·push·PR·merge를 수행하지 않았으며 OpenSQL·OpenProxy·OpenHA는 계속 `NOT_RUN`이다.
+
+## 2026-07-24 — PRZ-002 G-01 source-only 배포 경계 확정
+
+- 결정: 초기 release는 PRIZM source·문서·실행 설정만 배포한다. PostgreSQL·pgvector, Ollama와 `bge-m3`는 사용자가 공식 upstream에서 직접 받고, PRIZM은 JAR·frontend `dist`·container image·Ollama binary·model weights/cache를 재배포하지 않는다.
+- 영향: source SBOM은 실제 포함 component와 `external/provided` 실행 의존성을 분리한다. G-01은 완료했지만 fixture 권리와 남은 license·model provenance가 해결되기 전에는 outgoing LICENSE·NOTICE를 구현하지 않는다.
+
+## 2026-07-24 — PRZ-002 저장소 자산 provenance 감사
+
+- 결정: 사용자는 PRIZM 직접 작성 source의 outgoing license로 Apache-2.0을 승인했다. 다만 표준 `LICENSE`·`NOTICE`는 자산과 기존 component Gate가 끝난 뒤 적용한다.
+- 감사: Git 추적 273개를 검사해 Gradle Wrapper family 4개를 `VERIFIED_EXTERNAL`, tracked image·PDF·Office·font·model 0개를 확인했다. 검색 평가 corpus·질문 2개는 합성 표기와 Git 이력은 확인했지만 제3자 비파생·Apache-2.0 공개 허락을 기술적으로 확정할 수 없어 `UNKNOWN`으로 유지했다. 초기 ZIP·generator 경계, Toss Design System token에 정확히 대응하는 frontend palette와 inline Mermaid diagram의 출처도 사용자 확인 대상으로 분리했다.
+- 상태: fixture·source 사용자 확인 전 전체 자산 Gate는 `BLOCKED_USER_ATTESTATION`이다. 파일 제거·교체, 애플리케이션 test, Docker·PostgreSQL·pgvector·Ollama·OpenSQL·OpenProxy·OpenHA 실행, GitHub Issue·commit·push·PR·merge는 수행하지 않았다.
+
+## 2026-07-24 — PRZ-002 자산 사용자 확인과 외부 design token 판정
+
+- 확인: 사용자는 검색 fixture·초기 PRIZM 골격·inline Mermaid를 본인 지휘 아래 Codex로 새로 작성했고 외부 자료를 복사·각색하지 않았으며 Apache-2.0 공개에 동의했다고 확인했다. 이 범위는 `VERIFIED_DIRECT`로 갱신했다.
+- 외부 참고: Spec Kit는 spec·plan·tasks 흐름, Robo Architect는 spec별 보조 문서 배치의 참고 자료로만 확인했다. upstream 원문·code·asset과 동일한 비자명 문구는 없고 화면 자산도 Git에 포함되지 않았다. Robo upstream에는 `evidence.md`가 없어 PRIZM evidence 분리는 독자 적용이다. Gamium은 아직 반영되지 않았다.
+- 차단: frontend color·spacing·radius token은 oh-my-design의 Toss reference에서 가져온 사실을 확인했다. oh-my-design의 MIT는 company reference를 재허가하지 않고 공식 TDS 사용 범위도 PRIZM에 적용되지 않으므로, 독립 PRIZM token으로 교체하거나 명시적 허락을 얻기 전 자산 Gate는 `BLOCKED_EXTERNAL_DESIGN_RIGHTS`다. 이번에는 source·CSS·`LICENSE`·`NOTICE`를 수정하지 않았다.
+
+## 2026-07-24 — PRZ-002 독립 frontend design token 교체
+
+- 구현: frontend의 외부 Toss reference 계열 color·spacing·radius와 legacy action token을 제거하고, 문서 관리 화면을 위한 독립 `--prizm-*` palette·spacing·radius·state token으로 교체했다. 기능·API·문구는 변경하지 않았다.
+- font: Pretendard 공식 license가 `OFL-1.1`임을 확인했다. CSS family 이름과 system fallback만 사용하며 font binary·npm package·CDN·`@font-face`·`@import`는 포함하지 않는다.
+- 상태: `BLOCKED_EXTERNAL_DESIGN_RIGHTS`는 해소됐다. 다른 component·model `UNKNOWN`·`CONFLICT`·`BLOCKED`가 남아 있어 전체 license readiness는 계속 `IN_PROGRESS_BLOCKED`이고 `LICENSE`·`NOTICE`는 아직 만들지 않았다.
+
+## 2026-07-25 — PRZ-002 build·CI·model supply-chain Gate IMPLEMENT
+
+- 구현: Gradle 9.5.1 distribution checksum과 resolved dependency verification metadata를 추가하고, 모든 third-party Action을 full commit SHA로 고정했다. CI의 mutable Ollama install script는 `v0.32.3` archive checksum 검사로 교체했으며 `bge-m3`는 pull 전 registry manifest와 pull 후 local manifest·blob을 검증한다.
+- provenance: dependency-management plugin과 `org.tomlj`의 Apache-2.0 근거를 exact POM·tagged LICENSE로 확인했다. Ollama 변환물과 BAAI upstream revision의 대응은 증명하지 못했으므로 `UNVERIFIED_LINEAGE`로 유지하며, 모델을 배포하지 않는 source-only 경계와 future 재배포 blocker를 분리했다.
+- 검증: `test --rerun-tasks --dependency-verification=strict`에서 245건 중 231건 성공·환경 조건 14건 skip·실패/오류 0건을 확인했고, `compileIntegrationTestJava`도 strict mode에서 통과했다. workflow YAML과 run block 10개의 Bash 문법, Docker Compose 설정과 `git diff --check`도 통과했다.
+- 상태: 실제 GitHub Actions와 Ollama archive·model download는 아직 `NOT_RUN`이며, 전체 license audit은 다른 dependency·NOTICE·SBOM Gate 때문에 `IN_PROGRESS_BLOCKED`다. `LICENSE`·`NOTICE`는 만들지 않았다.
+
+## 2026-07-25 — PRZ-002 supply-chain 감사 지적 보완
+
+- 문서 정합성: 현재 Wrapper·CI·verification metadata SHA-256을 license audit 입력 표에 다시 고정하고, build appendix의 dependency-management plugin·`org.tomlj`·Wrapper 상태를 현재 검증 결과와 일치시켰다. PRZ-002 lifecycle은 실제 IMPLEMENT 착수 상태인 `IN_PROGRESS`로 통일했다.
+- 테스트 격리: Windows에서 운영 `SecureDirectoryStream` 삭제가 fail-closed하는 계약은 유지했다. PostgreSQL 통합 테스트가 생성한 격리 임시 파일은 test root containment를 확인하는 teardown으로 정리하고, 파일 정리 결과와 무관하게 DB fixture 정리를 실행하도록 해 후속 테스트 오염을 막았다.
+- 검증: strict dependency verification으로 단위 테스트 245건 중 231건 성공·14건 환경 조건 skip·실패 0건, PostgreSQL 16 + pgvector 통합 테스트 68건 중 65건 성공·3건 환경 조건 skip·실패 0건을 확인했다. 실제 GitHub Actions와 Ollama archive·model download는 계속 `NOT_RUN`이며 독립 읽기 전용 재감사 전까지 변경을 통합하지 않는다.
+
+## 2026-07-25 — PRZ-002 GitHub Actions strict dependency verification 보완
+
+- 원인과 수정: GitHub의 깨끗한 Gradle cache에서 `junit-bom:5.13.3.module`과 `opentelemetry-bom:1.49.0.module` SHA-256이 verification metadata에 없어 backend CI가 중단됐다. Gradle Plugin Portal에서 두 module metadata의 SHA-256을 다시 계산해 `gradle/verification-metadata.xml`에만 추가했다.
+- 검증: `./gradlew.bat check --no-daemon --dependency-verification=strict`가 성공했다. 실제 GitHub 재실행은 이 보완 commit이 push된 뒤에만 판단하며, 그 전에는 `NOT_RUN`이다.
+
+## 2026-07-25 — PRZ-002 source-only license 결정 snapshot 현행화
+
+- 기준선: 병합된 PR #13의 GitHub Actions backend·frontend push/PR check 4건이 모두 성공한 사실과 현재 `verification-metadata.xml` SHA-256을 감사 기록에 반영했다. 이 CI는 Docker·PostgreSQL/pgvector Testcontainers·Ollama `bge-m3`를 사용했지만 OpenSQL·OpenProxy·OpenHA는 계속 `NOT_RUN`이다.
+- 범위: Apache-2.0 canonical 원문과 SHA-256을 확인하고, 현재 source-only 배포에는 직접 작성 source·문서·실행 설정·Gradle Wrapper·검증된 synthetic fixture만 포함된다고 확정했다. future JAR·frontend bundle·image·Ollama/model 재배포의 NOTICE·SBOM·provenance는 별도 release gate로 분리했다.
+- 다음: 이 snapshot으로 T-04의 root `LICENSE`와 source-only `NOTICE`를 구현할 수 있지만, 이번 단계에서는 파일을 생성하지 않았다.
+
+## 2026-07-25 — PRZ-002 Apache-2.0 source-only `LICENSE`·`NOTICE`
+
+- 적용: Apache Software Foundation canonical Apache-2.0 원문과 SHA-256이 일치하는 root `LICENSE`를 추가하고, `NOTICE`에 `Copyright 2026 Jaemin Jeong`과 실제 source-only 배포 범위를 기록했다.
+- 경계: 현재 포함되는 Gradle Wrapper JAR의 embedded `META-INF/LICENSE`와 NOTICE 부재만 다뤘다. 외부 JAR·npm package·`dist`·image·Ollama binary·`bge-m3` bytes는 재배포하지 않으므로 고지를 추측해 넣지 않았고, 해당 artifact의 future release gate로 남긴다.
+- 검증: canonical `LICENSE` SHA-256 일치, `NOTICE` scope 대조와 Markdown·diff 검증을 수행한다. Codex는 저작권자·공동 기여자·runtime dependency로 기록하지 않았다.
+
+## 2026-07-26 — P0/P1 운영 규칙 명확화
+
+- 결정: P0은 공식 근거·라이선스 준비를 완료하는 단계로, P1 OpenSQL 및 clean-clone 증거는 P0 gate 충족 뒤에 시작한다고 `AGENTS.md`에 명확히 기록했다. 임시 브랜치 표기에서도 도구 이름 접두어를 제거하고 `PRZ-###-<slug>` 형식으로 통일했다.
+- 범위: 프로젝트 전반의 작업 순서와 브랜치 명명 규칙만 변경했으며, 애플리케이션 코드·테스트·배포 설정은 변경하지 않았다.
+
+## 2026-07-27 — PRZ-003 OpenSQL 단일 검증 VM 착수
 
 - 공식 확인: 티맥스티베로 담당자가 VirtualBox 기반 Rocky Linux 9 VM에서 OpenSQL 테스트 라이선스를 사용할 수 있다고 회신했다. 신청서에는 Windows 호스트가 아니라 VM 내부 hostname 및 vCPU/core/thread 값을 쓰고, VM은 고정 IP와 시간 동기화를 갖춰야 한다.
-- 범위: `PRZ-001`은 OpenSQL 전용 Rocky Linux 9 VM 한 대와 단일 환경 Gate까지만 다룬다. App VM, OpenProxy/OpenHA, Worker/Ollama 통합과 다중 노드는 제외한다.
+- 범위: `PRZ-003`은 OpenSQL 전용 Rocky Linux 9 VM 한 대와 단일 환경 Gate까지만 다룬다. App VM, OpenProxy/OpenHA, Worker/Ollama 통합과 다중 노드는 제외한다.
 - 구현: 연구실 Windows 호스트에 Oracle VirtualBox 7.2.12를 설치하고 Rocky Linux 9.8 VM을 4 vCPU·12 GiB RAM·동적 120 GiB 디스크로 구성했다. Host-only 고정 IP, NTP 동기화, 재부팅 후 `jaemin`의 관리자 권한을 확인하고 VM 값으로 테스트 라이선스 신청을 제출했다. OpenSQL Gate는 라이선스 발급·OpenSQL 설치 전이므로 계속 `NOT_RUN`이며, PostgreSQL 결과를 OpenSQL 결과로 기록하지 않는다.

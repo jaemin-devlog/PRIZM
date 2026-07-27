@@ -110,7 +110,7 @@ public final class SearchEvaluationData {
             double directRecallAt20,
             double precisionAt5,
             double directPrecisionAt5,
-            double mrr,
+            double directMrrAt20,
             double ndcgAt5,
             double duplicateResultRatio,
             double averageSearchTimeMillis,

@@ -1,0 +1,59 @@
+{
+  "format": "PRIZM-SBOM-SCOPE-MANIFEST",
+  "formatVersion": "1.0",
+  "releaseProfile": "source-only",
+  "licenseAudit": "../docs/contest/2026-license-audit.md",
+  "assetAudit": "../docs/contest/2026-asset-provenance-audit.md",
+  "scopeRecords": [
+    {
+      "id": "backend-runtime",
+      "scope": "runtime",
+      "record": "prizm-backend-runtime.cdx.json",
+      "source": "Gradle runtimeClasspath",
+      "distribution": "EXTERNAL_PROVIDED_NOT_DISTRIBUTED"
+    },
+    {
+      "id": "backend-test-build",
+      "scope": "test-and-build",
+      "record": "../docs/contest/2026-license-audit.md",
+      "source": "Gradle testRuntimeClasspath and buildEnvironment",
+      "distribution": "DEVELOPMENT_ONLY_NOT_DISTRIBUTED"
+    },
+    {
+      "id": "frontend-runtime-dev-optional",
+      "scope": "runtime-dev-optional",
+      "record": "prizm-frontend.cdx.json",
+      "source": "frontend/package-lock.json",
+      "distribution": "EXTERNAL_PROVIDED_NOT_DISTRIBUTED"
+    },
+    {
+      "id": "ci-and-github-actions",
+      "scope": "ci",
+      "record": "../docs/contest/2026-license-audit.md",
+      "source": ".github/workflows/ci.yml",
+      "distribution": "CI_ONLY_NOT_DISTRIBUTED"
+    },
+    {
+      "id": "containers-and-database",
+      "scope": "container-and-database",
+      "record": "../docs/contest/2026-license-audit.md",
+      "source": "Dockerfile and compose.yaml",
+      "distribution": "UPSTREAM_IMAGES_NOT_REDISTRIBUTED"
+    },
+    {
+      "id": "ai-model-runtime",
+      "scope": "model",
+      "record": "prizm-ai-model-manifest.json",
+      "source": "Ollama and bge-m3",
+      "distribution": "MODEL_WEIGHTS_AND_CACHE_NOT_DISTRIBUTED"
+    },
+    {
+      "id": "fixtures-and-assets",
+      "scope": "data-and-asset",
+      "record": "../docs/contest/2026-asset-provenance-audit.md",
+      "source": "tracked fixtures, documentation, and static assets",
+      "distribution": "SOURCE_INCLUDED_WHEN_TRACKED"
+    }
+  ],
+  "futureReleaseGate": "Before redistributing a JAR, frontend bundle, image, Ollama binary, or model bytes, reopen the license audit and create artifact-specific SBOM and NOTICE coverage."
+}

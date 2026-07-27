@@ -439,3 +439,9 @@
 - 공식 확인: 티맥스티베로 담당자가 VirtualBox 기반 Rocky Linux 9 VM에서 OpenSQL 테스트 라이선스를 사용할 수 있다고 회신했다. 신청서에는 Windows 호스트가 아니라 VM 내부 hostname 및 vCPU/core/thread 값을 쓰고, VM은 고정 IP와 시간 동기화를 갖춰야 한다.
 - 범위: `PRZ-003`은 OpenSQL 전용 Rocky Linux 9 VM 한 대와 단일 환경 Gate까지만 다룬다. App VM, OpenProxy/OpenHA, Worker/Ollama 통합과 다중 노드는 제외한다.
 - 구현: 연구실 Windows 호스트에 Oracle VirtualBox 7.2.12를 설치하고 Rocky Linux 9.8 VM을 4 vCPU·12 GiB RAM·동적 120 GiB 디스크로 구성했다. Host-only 고정 IP, NTP 동기화, 재부팅 후 `jaemin`의 관리자 권한을 확인하고 VM 값으로 테스트 라이선스 신청을 제출했다. OpenSQL Gate는 라이선스 발급·OpenSQL 설치 전이므로 계속 `NOT_RUN`이며, PostgreSQL 결과를 OpenSQL 결과로 기록하지 않는다.
+
+## 2026-07-26 — PRZ-002 SBOM·AI 모델 명세 구현
+
+- 구현: source-only 배포 경계에 맞춰 Java runtime CycloneDX SBOM, frontend lockfile CycloneDX SBOM, scope manifest, Ollama·`bge-m3` AI model manifest와 checksum verifier를 추가했다. backend·frontend 모두 external SBOM plugin/CLI를 새 의존성으로 넣지 않고, resolved graph 또는 versioned lockfile을 읽는 first-party generator를 사용한다.
+- 경계: Ollama binary·model weights/cache·container image·DB volume·업로드 원본은 배포물에 포함하지 않는다. BAAI revision과 Ollama registry artifact의 변환은 `UNVERIFIED_LINEAGE`로 유지하며 OpenSQL·OpenProxy·OpenHA는 계속 `NOT_RUN`이다.
+- 상태: 생성·structural verification은 IMPLEMENT 단계다. human/machine inventory 대조, clean checkout evidence, CI gate와 독립 읽기 전용 감사 전까지 T-05와 PRZ-002 전체는 `IMPLEMENTED_UNVERIFIED`/`IN_PROGRESS` 상태다.

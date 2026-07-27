@@ -36,6 +36,7 @@ Run from the repository root with Java 17, Node 22.17.0, and npm 10.9.2:
 npm --prefix frontend run sbom
 node scripts/verify-sbom.mjs --write-checksums
 node scripts/verify-sbom.mjs
+node --test scripts/verify-sbom.test.mjs
 ```
 
 `--write-checksums` is an intentional update step. Review the JSON and checksum
@@ -49,11 +50,15 @@ SBOM CLI to the source release. It deterministically maps every versioned
 license fields, integrity hashes, resolved tarball URLs, and dependency scope.
 The backend generator is a first-party Gradle task that reads the resolved
 `runtimeClasspath`; it uses Gradle plus Groovy/JDK classes already present in
-the build and adds no SBOM plugin. The repository structural verifier checks
-both files' format, schema version, primary component, reproducibility fields,
-checksum, and prohibited
-local/secret-shaped data. Full license/SBOM CI enforcement is tracked by
-`PRZ-002` T-09 and has not been added yet.
+the build and adds no SBOM plugin. It emits LF on every operating system and
+adds a Maven `classifier` PURL qualifier when one module resolves to multiple
+platform artifacts. The repository structural verifier checks both files'
+format, schema version, primary component, reproducibility fields, globally
+unique `bom-ref` values, canonical CycloneDX hash algorithm names, checksum,
+and prohibited local/secret-shaped data. The Node regression tests prove that
+non-canonical hash names and duplicate references are rejected. Full
+license/SBOM CI enforcement is tracked by `PRZ-002` T-09 and has not been added
+yet.
 
 ## Generator provenance
 

@@ -270,11 +270,17 @@ generated `dist`·image·Ollama binary·model bytes는 배포하지 않으므로
 **선행 조건:** T-02, G-01, 감사된 도구 승인
 
 - [x] machine-readable CycloneDX 1.6 format과 backend/frontend first-party
-  lockfile·resolved-graph generator를 구현한다. full formal-schema CI는 T-09로 남긴다.
+  lockfile·resolved-graph generator를 구현한다. 2026-07-27 보완에서 frontend
+  표준 hash algorithm, backend classifier-aware `bom-ref`, 운영체제 독립 LF
+  출력을 구현했다. full formal-schema CI는 T-09로 남긴다.
 - [x] backend runtime/test/build, frontend runtime/dev, CI, container,
   model, fixture·asset component를 구분한다.
-- [ ] 사람용 license audit와 machine SBOM component set을 상호 검증한다.
-- [x] clean checkout에서 재생성 가능한 local 명령을 만든다.
+- [x] 사람용 license audit와 machine SBOM component set을 상호 조정한다.
+  Java module identity 167개에서 metadata-only 2개를 제외하고 Netty 한 module의
+  classifier artifact 5개를 펼치면 machine artifact 169개가 됨을 기록했다.
+- [ ] clean checkout에서 재생성 가능한 local 명령과 checksum 검증을 완료한다.
+  generator 보완 후 로컬 강제 재생성은 결정적이었지만, 깨끗한 checkout 증거는
+  다음 VERIFY에서 다시 고정한다.
 - [x] Ollama·`bge-m3`·Codex의 source, version/revision/digest, license·terms,
   purpose, execution·distribution boundary를 AI 명세에 기록한다.
 - [x] 모델 파일·cache가 Git과 기본 제출물에 포함되지 않음을 검사한다.
@@ -289,6 +295,24 @@ generated `dist`·image·Ollama binary·model bytes는 배포하지 않으므로
 169-component structural reconciliation에서 CRITICAL/HIGH/MEDIUM finding 없이
 `PASS_FOR_IMPLEMENTED_SCOPE`였다. formal schema CI와 human/machine license
 reconciliation은 미완료 gate이므로 T-05는 계속 `IMPLEMENTED_UNVERIFIED`다.
+
+**최종 VERIFY 기록 (2026-07-27):** 병합된 `main`
+`b36f6b236c2f70d26e243013df296b4dad1a54d9`의 깨끗한 archive와 JDK 17에서
+재검증했다. frontend 183개 license cohort는 사람용 감사와 일치했지만,
+깨끗한 checkout의 checksum 불일치, frontend 183개 hash algorithm의 공식
+CycloneDX 1.6 schema 위반, Netty classifier 5개의 중복 `bom-ref`, 사람용 Java
+runtime 167개와 machine 169개·고유 reference 165개의 미조정 차이가 확인됐다.
+따라서 T-05는 `VERIFY_FAILED_RETURN_TO_IMPLEMENT`이며 위 결함을 수정하고
+재검증하기 전에는 완료할 수 없다.
+
+**IMPLEMENT 보완 기록 (2026-07-27):** `PRZ-002-sbom-conformance-fix`에서
+backend 고정 LF·classifier-qualified PURL, frontend 표준 `SHA-512`, verifier의
+hash algorithm·`bom-ref` 검사와 Node 회귀 테스트를 구현했다. 생성 결과는
+backend 169개/고유 reference 169개, frontend 183개/`SHA-512`였고 로컬
+재생성 hash는 결정적이었다. 이전 VERIFY 실패는 역사적 근거로 유지하며,
+clean checkout·공식 schema·독립 AUDIT를 다시 통과하기 전에는 완료하지 않는다.
+
+**현재 판정:** `IMPLEMENTED_UNVERIFIED`
 
 **완료 evidence:** 재생성 명령, schema validation, human/machine diff,
 AI model provenance와 secret scan 결과

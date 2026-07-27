@@ -3,10 +3,14 @@
 | 항목 | 값 |
 |---|---|
 | Spec | [PRZ-002](spec.md) |
-| Evidence status | `VERIFY_COMPLETE_AUDIT_PENDING` |
+| Evidence status | `IMPLEMENTED_UNVERIFIED` |
 | Implementation commit | `c28416e` — `추가: source-only SBOM과 AI 모델 명세` |
 | Branch | `PRZ-002-sbom-model-manifest` |
 | Baseline | `main` / `origin/main` `0ad549a8641b2b6ef18a8011dac93286052b65c0` |
+| Integrated PR | [#16](https://github.com/jaemin-devlog/PRIZM/pull/16), merge commit `68f2183` |
+| Final VERIFY baseline | `main` / `origin/main` `b36f6b236c2f70d26e243013df296b4dad1a54d9` |
+| Final VERIFY branch | local-only `PRZ-002-sbom-final-verification` |
+| Corrective IMPLEMENT branch | local-only `PRZ-002-sbom-conformance-fix` |
 | GitHub Issue | `NOT_CREATED`; connector write was blocked with HTTP 403 on 2026-07-26 |
 | Primary / secondary evaluation IDs | `EVAL-R1-02` / `EVAL-R1-03`, `EVAL-R1-05` |
 
@@ -68,16 +72,19 @@ a claim that those issues are resolved by this spec.
 - Add formal schema/structural SBOM enforcement to CI only in T-09.
 - Do not create `SECURITY.md` until an actual confidential reporting channel is
   enabled or a monitored contact is supplied.
-- A branch push exists, but no real GitHub Issue, PR, review, or merge evidence
-  exists yet.
+- 2026-07-26 검증 시점에는 branch push만 있었고 실제 GitHub Issue, PR,
+  review, merge evidence는 아직 없었다. 이후 PR #16과 merge commit
+  `68f2183`이 생성됐지만 GitHub Issue와 제3자 review는 여전히 없다.
 
 ## External GitHub gate — 2026-07-26
 
 The branch was published to `origin/PRZ-002-sbom-model-manifest`, but this
-environment cannot create the required real Issue or PR evidence: the GitHub
-connector Issue-create request returned HTTP 403 (`Resource not accessible by
-integration`), and `gh auth status` reported no authenticated GitHub host.
-The branch's remote push is not treated as an Issue, review, or merge record.
+environment could not create the required real Issue or PR evidence at that
+time: the GitHub connector Issue-create request returned HTTP 403
+(`Resource not accessible by integration`), and `gh auth status` reported no
+authenticated GitHub host. The later PR #16 and merge are recorded separately;
+the earlier remote push itself is not treated as an Issue, review, or merge
+record.
 Private Vulnerability Reporting was not inspected or enabled from this
 environment, so G-02 remains `BLOCKED_EXTERNAL_CONFIGURATION`.
 
@@ -104,3 +111,76 @@ review.
 
 **Audit conclusion:** `PASS_FOR_IMPLEMENTED_SCOPE`; T-05 remains
 `IMPLEMENTED_UNVERIFIED` until its remaining reconciliation gate is complete.
+
+## 최종 VERIFY — 2026-07-27
+
+**대상:** 병합된 `main`·`origin/main`
+`b36f6b236c2f70d26e243013df296b4dad1a54d9`. Git archive로 만든 깨끗한
+HEAD 복제본과 로컬 작업 트리 양쪽을 사용했다. 기존 2026-07-26 감사는
+formal schema와 사람용 license audit 대조를 범위 밖 후속 Gate로 남긴
+역사적 결과이며, 아래 최종 VERIFY가 현재 판정을 대체한다.
+
+| 검증 | 결과 |
+|---|---|
+| 깨끗한 HEAD에서 `node scripts/verify-sbom.mjs` | **FAIL** — tracked backend SBOM SHA-256은 `42bc9674f04a54c45166ce5e5f0bec6983619e9621f21375524dfb1ee2aecbfb`이나 `SHA256SUMS`는 `cd94a260e010a104ae2d994426630585baa6c183b3fd4bb51cfc9f8cdfe88a36`을 기대 |
+| JDK 17.0.12에서 `gradlew.bat generateBackendSbom --no-daemon --dependency-verification=strict` | PASS — 169개 component 재생성, 생성 직후 hash `cd94a260…a36` |
+| Node 22.17.0·npm 10.9.2에서 `npm --prefix frontend run sbom` | PASS — package-lock SHA-256 `967063c8…b66c`, 183개 component |
+| 재생성 직후 `node scripts/verify-sbom.mjs` | PASS — 기존 structural·scope·sensitive-data·checksum 검사 |
+| 공식 CycloneDX 1.6 JSON Schema 검증 | backend PASS, frontend **FAIL** — 183개 component 모두 hash algorithm `SHA512`를 사용하지만 공식 enum은 `SHA-512` |
+| `bom-ref` 고유성 검사 | **FAIL** — `pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final`이 Linux x86_64·aarch64, macOS x86_64·aarch64, Windows x86_64 artifact 5개에 중복 |
+| 사람용·machine frontend 대조 | PASS — 183개, 누락 license 0; MIT 135, Apache-2.0 15, MPL-2.0 12, ISC 10, BSD-2-Clause 6, BSD-3-Clause 2, BlueOak-1.0.0 1, CC-BY-4.0 1, 0BSD 1 |
+| 사람용·machine backend 대조 | **FAIL** — 사람용 runtime exact set 167개, machine artifact 169개, 고유 `bom-ref` 165개로 동일 집합임을 증명하지 못함 |
+| 민감정보·배포 경계 | PASS — 네 SBOM/manifest에 local user path, JDBC URL, password·authorization·access/refresh token 형태의 값 없음; model weight·cache는 배포하지 않는 경계 유지 |
+
+backend 파일의 tracked LF 내용과 Windows JDK 17 재생성 CRLF 내용은 줄바꿈을
+정규화하면 동일했다. 생성기가 `System.lineSeparator()`를 사용하고 Git은
+JSON을 LF로 저장하기 때문에 생성 직후 작성한 checksum이 clean checkout
+bytes와 달라진다. 단순히 `SHA256SUMS`만 다시 쓰면 운영체제에 따라 문제가
+반복되므로 generator의 고정 LF 출력과 checksum 대상 bytes를 함께 바로잡아야
+한다.
+
+공식 schema는 검증 시점에
+[`https://cyclonedx.org/schema/bom-1.6.schema.json`](https://cyclonedx.org/schema/bom-1.6.schema.json)에서
+임시로 받아 사용했으며 SHA-256은
+`1EBCB88A2C845ECB6FF7BEE7AEABDFF9422CB0347F3D6875B241BD444B7E098F`였다.
+schema 파일은 저장소에 추가하지 않았다. CycloneDX의 `bom-ref`는 BOM 내부에서
+고유해야 하므로 classifier를 PURL qualifier 또는 동등한 고유 identity에
+반영해야 한다.
+
+이번 VERIFY에서는 Java source, Flyway migration, frontend 기능, production
+config와 Docker Compose를 변경하지 않았다. 애플리케이션 동작을 바꾸지 않은
+SBOM 산출물 검증이므로 unit·integration·frontend lint/build는 재실행하지
+않았다. Docker, PostgreSQL, pgvector, Ollama, OpenSQL, OpenProxy, OpenHA도
+사용하지 않았으며 모두 이번 검증에서 `NOT_RUN`이다.
+
+**최종 판정:** `FAIL`. T-05를 `VERIFY_COMPLETE`로 올리지 않고
+`IMPLEMENT`로 되돌린다. 수정 대상은 backend 고정 LF·classifier identity,
+frontend `SHA-512`, clean-checkout checksum 검증과 이 세 조건을 놓치지 않는
+verifier test다. 수정 후 같은 명령과 공식 schema 검증을 다시 실행해야 한다.
+
+## 결함 보완 IMPLEMENT — 2026-07-27
+
+이 절은 위 최종 VERIFY 실패를 삭제하거나 PASS로 바꾸지 않는다. 지적된 세
+생성기·검증기 결함을 보완한 구현 기록이며, 독립 VERIFY·AUDIT 전 상태는
+`IMPLEMENTED_UNVERIFIED`다.
+
+| 보완 항목 | 구현 및 집중 검사 결과 |
+|---|---|
+| backend 줄바꿈 | `generateBackendSbom`이 운영체제와 무관하게 LF로 끝나는 JSON을 생성한다. 재생성 파일의 CRLF 수 0, 마지막 byte LF |
+| backend artifact identity | Netty native classifier 5개를 Maven PURL `classifier` qualifier와 property로 구분한다. backend component 169개와 고유 `bom-ref` 169개 |
+| frontend hash enum | npm SRI `sha512`를 CycloneDX 1.6 표준 `SHA-512`로 변환한다. frontend 183개 hash algorithm은 모두 `SHA-512` |
+| verifier | 모든 `bom-ref`의 전역 고유성과 CycloneDX hash algorithm enum을 검사한다 |
+| regression test | `node --test scripts/verify-sbom.test.mjs`: 4개 통과, 실패·skip 0 |
+| local checksum | backend `5809282a3f3ac5fcf7eaa2f484513195f19e243a7d73a1282332114dbc569b7d`; frontend `af0dfc4891ec7adfcb282614edabc0791f2afdfd34a561337aae0c90d838285c`; verifier 통과 |
+| human/machine 조정 | Java module 167개에서 metadata-only platform/BOM 2개를 제외하고 Netty 한 module의 classifier JAR 5개를 펼쳐 machine artifact 169개가 됨을 기록 |
+
+로컬 집중 검사에서는 Gradle backend 강제 재생성, frontend 재생성, checksum
+갱신·무변경 검증과 회귀 테스트를 실행했다. Java 애플리케이션 source, Flyway
+migration, frontend 기능, production config, Docker Compose는 변경하지 않았다.
+애플리케이션 동작 변경이 없는 IMPLEMENT 보완이므로 전체 unit·integration·lint·
+build는 이 단계에서 다시 실행하지 않았다. Docker, PostgreSQL, pgvector,
+Ollama, OpenSQL, OpenProxy, OpenHA는 모두 `NOT_RUN`이다.
+
+다음 VERIFY에서는 깨끗한 checkout 재생성, 공식 CycloneDX 1.6 schema,
+checksum·human/machine 대조를 독립적으로 다시 실행해야 한다. 그 뒤 blocking
+finding이 없을 때만 AUDIT로 진행한다.

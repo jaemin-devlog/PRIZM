@@ -345,3 +345,9 @@
 - 개인 관리: 실제 Issue·PR·CI·merge·제3자 review를 서로 다른 근거로 취급한다. `REVIEW_NOT_AVAILABLE_SOLO`나 Agent 감사는 GitHub review로 계산하지 않고, 과거 GitHub 기록을 점수 목적으로 소급 생성하지 않는다.
 - 독립 감사: workflow 일관성, 공식 점수 오인·artifact gaming 방지, 현재 준비도와 Gate 정합성을 세 갈래로 재검토해 모두 차단 문제 없음으로 통과했다.
 - 검증: 문서 전용 변경이므로 애플리케이션 test는 실행하지 않았다. 변경된 Markdown 4개의 로컬 링크 누락·code fence 불균형·trailing whitespace·EOF 문제가 모두 0건이고 `git diff --check`를 통과했다.
+
+## 2026-07-27 — PRZ-001 OpenSQL 단일 검증 VM 착수
+
+- 공식 확인: 티맥스티베로 담당자가 VirtualBox 기반 Rocky Linux 9 VM에서 OpenSQL 테스트 라이선스를 사용할 수 있다고 회신했다. 신청서에는 Windows 호스트가 아니라 VM 내부 hostname 및 vCPU/core/thread 값을 쓰고, VM은 고정 IP와 시간 동기화를 갖춰야 한다.
+- 범위: `PRZ-001`은 OpenSQL 전용 Rocky Linux 9 VM 한 대와 단일 환경 Gate까지만 다룬다. App VM, OpenProxy/OpenHA, Worker/Ollama 통합과 다중 노드는 제외한다.
+- 구현: 연구실 Windows 호스트에 Oracle VirtualBox 7.2.12를 설치하고 Rocky Linux 9.8 VM을 4 vCPU·12 GiB RAM·동적 120 GiB 디스크로 구성했다. Host-only 고정 IP, NTP 동기화, 재부팅 후 `jaemin`의 관리자 권한을 확인하고 VM 값으로 테스트 라이선스 신청을 제출했다. OpenSQL Gate는 라이선스 발급·OpenSQL 설치 전이므로 계속 `NOT_RUN`이며, PostgreSQL 결과를 OpenSQL 결과로 기록하지 않는다.

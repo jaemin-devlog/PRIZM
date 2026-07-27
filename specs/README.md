@@ -58,5 +58,6 @@
 | Spec ID | 이름 | 상태 | Source commit | Last verified |
 |---|---|---|---|---|
 | [PRZ-000](PRZ-000-platform-baseline/spec.md) | Platform foundation and Career Vault baseline | `AS_BUILT_BASELINE` | `e995a5f` | 2026-07-23 |
+| [PRZ-001](PRZ-001-opensql-single-node-gate/spec.md) | OpenSQL single-node verification environment | `IN_PROGRESS` | `PENDING_INTEGRATION` | `NOT_RUN` |
 
 다음 신규 spec의 우선순위는 [2026 티맥스티베로 지정과제 대응 계획](../docs/contest/2026-tmaxtibero-plan.md)을 따른다. registry에 디렉터리를 미리 대량 생성하지 않고 실제로 착수하는 작은 수직 슬라이스만 추가한다.

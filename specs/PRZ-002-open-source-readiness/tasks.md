@@ -9,7 +9,7 @@
 | Spec status | `IN_PROGRESS` |
 | PLAN | `COMPLETE` |
 | IMPLEMENT | `IN_PROGRESS_LOCAL_ONLY` |
-| GitHub Issue | `NOT_CREATED` |
+| GitHub Issue | `NOT_CREATED` (`BLOCKED_GITHUB_WRITE`: 2026-07-26 connector write returned HTTP 403) |
 
 체크박스는 계획의 존재가 아니라 실제 file·명령·환경·결과 evidence가 확인된
 경우에만 완료한다. `UNKNOWN`, `CONFLICT`, `NOT_RUN`을 임의로 PASS로 바꾸지
@@ -38,12 +38,13 @@
 별도로 기록하되 GitHub evidence나 G-03A 통과로 계산하지 않는다.
 
 **현재 판정:** `BLOCKED_GITHUB_WRITE`, `LOCAL_ONLY_IMPLEMENT_AUTHORIZED`.
-사용자가 이번 요청에서 같은 컴퓨터의 현재 branch에서 T-01·T-02·G-01 자료만
-구현하도록 명시적으로 승인했다. GitHub Issue 생성 권한은 승인하지 않았으므로
-G-03A는 완료 처리하지 않으며 이 로컬 작업을 Issue·PR·review evidence로
-계산하지 않는다. 기준은 `HEAD a5f5cd53525d1e759d558ce0c09e2b1cc42544a1`,
-`origin/main a1b60224c5f6a952bc17ca6da1def1bcb20e393b`, ahead 1·behind 0,
-staged 0건이다. 기존 `AGENTS.md` 사용자 변경은 보존했다.
+사용자는 PRZ-002 작업을 승인했지만 2026-07-26 GitHub connector의 실제 Issue
+생성 요청은 HTTP 403 (`Resource not accessible by integration`)으로 거부됐다.
+같은 환경의 `gh auth status`도 authenticated GitHub host가 없다고 보고했다.
+따라서 G-03A는 완료 처리하지 않으며 이 로컬 작업을 Issue·PR·review evidence로
+계산하지 않는다. 현재 SBOM implementation branch의 기준은 `main`·`origin/main`
+`0ad549a8641b2b6ef18a8011dac93286052b65c0`이며, 실제 Issue 생성 권한이
+확보되기 전에는 URL이나 번호를 만들지 않는다.
 
 ## T-01 — 공식 source register
 
@@ -268,17 +269,26 @@ generated `dist`·image·Ollama binary·model bytes는 배포하지 않으므로
 
 **선행 조건:** T-02, G-01, 감사된 도구 승인
 
-- [ ] machine-readable SBOM format·schema와 audited generator를 확정한다.
-- [ ] backend runtime/test/build, frontend runtime/dev, CI, container,
+- [x] machine-readable CycloneDX 1.6 format과 backend/frontend first-party
+  lockfile·resolved-graph generator를 구현한다. full formal-schema CI는 T-09로 남긴다.
+- [x] backend runtime/test/build, frontend runtime/dev, CI, container,
   model, fixture·asset component를 구분한다.
 - [ ] 사람용 license audit와 machine SBOM component set을 상호 검증한다.
-- [ ] clean checkout에서 재생성 가능한 local 명령을 만든다.
-- [ ] Ollama·`bge-m3`·Codex의 source, version/revision/digest, license·terms,
+- [x] clean checkout에서 재생성 가능한 local 명령을 만든다.
+- [x] Ollama·`bge-m3`·Codex의 source, version/revision/digest, license·terms,
   purpose, execution·distribution boundary를 AI 명세에 기록한다.
-- [ ] 모델 파일·cache가 Git과 기본 제출물에 포함되지 않음을 검사한다.
-- [ ] credential, JWT, JDBC URL, host, 로컬 경로, 실제 업로드 문서가
+- [x] 모델 파일·cache가 Git과 기본 제출물에 포함되지 않음을 검사한다.
+- [x] credential, JWT, JDBC URL, host, 로컬 경로, 실제 업로드 문서가
   SBOM·명세에 없는지 검사한다.
 - [ ] 제출 시점 commit·환경·생성 시각·결과 hash를 고정한다.
+
+**현재 구현 기록 (2026-07-26):** [`SBOM·AI 모델 명세`](../../docs/contest/2026-sbom-model-manifest.md)를 추가했다. backend와 frontend 모두 external SBOM plugin/CLI를 추가하지 않는 first-party Gradle·lockfile generator를 사용한다. `@cyclonedx/cyclonedx-npm` 6.0.0은 high finding 10건으로, 4.0.1은 full audit endpoint가 신뢰 가능한 판정을 만들지 못해 채택하지 않았다. 구현 commit·명령·환경·hash는 [evidence.md](evidence.md)에 고정했다. T-05는 reconciliation·독립 감사 전까지 `IMPLEMENTED_UNVERIFIED`다.
+
+**audit 기록 (2026-07-26):** `main...232915e` read-only audit은 SBOM source-only
+경계, sensitive-data scan, regeneration/checksum, frontend 183-entry와 backend
+169-component structural reconciliation에서 CRITICAL/HIGH/MEDIUM finding 없이
+`PASS_FOR_IMPLEMENTED_SCOPE`였다. formal schema CI와 human/machine license
+reconciliation은 미완료 gate이므로 T-05는 계속 `IMPLEMENTED_UNVERIFIED`다.
 
 **완료 evidence:** 재생성 명령, schema validation, human/machine diff,
 AI model provenance와 secret scan 결과

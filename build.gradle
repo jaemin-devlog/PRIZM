@@ -121,3 +121,67 @@ tasks.register('searchEvaluation', Test) {
 tasks.named('check') {
     dependsOn tasks.named('integrationTest')
 }
+
+// Produces a deterministic CycloneDX 1.6 runtime dependency inventory for the
+// source-only release. This task uses Gradle's resolved runtimeClasspath and
+// Groovy/JDK classes already present in the build; it does not add an external
+// SBOM plugin or package to the distributed source tree.
+tasks.register('generateBackendSbom') {
+    inputs.files(configurations.runtimeClasspath)
+    outputs.file(layout.projectDirectory.file('sbom/prizm-backend-runtime.cdx.json'))
+
+    doLast {
+        def encodePurlSegment = { value ->
+            java.net.URLEncoder.encode(value.toString(), 'UTF-8').replace('+', '%20')
+        }
+        def sha256 = { candidate ->
+            java.security.MessageDigest.getInstance('SHA-256')
+                    .digest(candidate.bytes)
+                    .encodeHex()
+                    .toString()
+        }
+        def components = configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts
+                .collect { artifact ->
+                    def module = artifact.moduleVersion.id
+                    def purl = "pkg:maven/${encodePurlSegment(module.group)}/${encodePurlSegment(module.name)}@${encodePurlSegment(module.version)}"
+                    [
+                            type              : 'library',
+                            'bom-ref'         : purl,
+                            group             : module.group,
+                            name              : module.name,
+                            version           : module.version,
+                            purl              : purl,
+                            scope             : 'required',
+                            hashes            : [[alg: 'SHA-256', content: sha256(artifact.file)]],
+                            externalReferences: [[
+                                    type: 'distribution',
+                                    url : "https://repo1.maven.org/maven2/${module.group.replace('.', '/')}/${module.name}/${module.version}/${artifact.file.name}"
+                            ]],
+                            properties        : [[name: 'prizm:configuration', value: 'runtimeClasspath']]
+                    ]
+                }
+                .sort { left, right -> left.purl <=> right.purl }
+
+        def rootPurl = "pkg:maven/${encodePurlSegment(project.group)}/${encodePurlSegment('prizm')}@${encodePurlSegment(project.version)}"
+        def bom = [
+                bomFormat  : 'CycloneDX',
+                specVersion: '1.6',
+                version    : 1,
+                metadata   : [
+                        component : [
+                                type     : 'application',
+                                'bom-ref': rootPurl,
+                                group    : project.group,
+                                name     : 'prizm',
+                                version  : project.version.toString(),
+                                purl     : rootPurl
+                        ],
+                        properties: [[name: 'prizm:source', value: 'Gradle runtimeClasspath']]
+                ],
+                components : components
+        ]
+        def target = layout.projectDirectory.file('sbom/prizm-backend-runtime.cdx.json').asFile
+        target.parentFile.mkdirs()
+        target.setText(groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(bom)) + System.lineSeparator(), 'UTF-8')
+    }
+}

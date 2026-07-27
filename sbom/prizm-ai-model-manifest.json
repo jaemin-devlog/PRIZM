@@ -1,0 +1,84 @@
+{
+  "format": "PRIZM-AI-MODEL-MANIFEST",
+  "formatVersion": "1.0",
+  "project": {
+    "name": "PRIZM",
+    "sourceLicense": "Apache-2.0",
+    "sourceLicenseFile": "../LICENSE"
+  },
+  "distributionBoundary": {
+    "releaseProfile": "source-only",
+    "included": [
+      "PRIZM source, documentation, configuration, Gradle Wrapper, and synthetic fixtures"
+    ],
+    "notDistributed": [
+      "Ollama binary",
+      "bge-m3 model weights",
+      "Ollama model cache",
+      "container images",
+      "database volumes",
+      "uploaded user documents"
+    ],
+    "consumerResponsibility": "Install Ollama and obtain model bytes directly from the relevant upstream or registry under that component's own terms."
+  },
+  "components": [
+    {
+      "id": "ollama-runtime",
+      "kind": "runtime",
+      "name": "Ollama",
+      "version": "0.32.3",
+      "upstream": "https://github.com/ollama/ollama",
+      "sourceLicense": "MIT",
+      "licenseEvidence": "https://github.com/ollama/ollama/blob/v0.32.3/LICENSE",
+      "purpose": "Local embedding runtime used by PRIZM when an operator configures Ollama.",
+      "identity": {
+        "ciLinuxAmd64ArchiveSha256": "2597d74fbe654ef6a37db56f771cf37d4a85c6bde4018127874e3927d3113800"
+      },
+      "distribution": "EXTERNAL_PREREQUISITE_NOT_DISTRIBUTED"
+    },
+    {
+      "id": "baai-bge-m3-upstream",
+      "kind": "model-upstream",
+      "name": "BAAI/bge-m3",
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "upstream": "https://huggingface.co/BAAI/bge-m3",
+      "sourceLicense": "MIT",
+      "licenseEvidence": "https://huggingface.co/BAAI/bge-m3/blob/main/LICENSE",
+      "purpose": "Embedding model family selected for PRIZM document and Career Evidence search.",
+      "distribution": "MODEL_WEIGHTS_NOT_DISTRIBUTED"
+    },
+    {
+      "id": "ollama-bge-m3-registry-artifact",
+      "kind": "model-registry-artifact",
+      "name": "bge-m3:latest",
+      "registry": "https://ollama.com/library/bge-m3",
+      "purpose": "Externally retrieved Ollama registry artifact used by the configured embedding runtime.",
+      "identity": {
+        "manifestSha256": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+        "modelBlobSha256": "daec91ffb5dd0c27411bd71f29932917c49cf529a641d0168496c3a501e3062c",
+        "licenseBlobSha256": "a406579cd136771c705c521db86ca7d60a6f3de7c9b5460e6193a2df27861bde"
+      },
+      "licenseStatus": "REGISTRY_LICENSE_BLOB_PRESENT",
+      "upstreamToRegistryLineage": "UNVERIFIED_LINEAGE",
+      "lineageStatement": "PRIZM does not claim that the BAAI revision is an exact source of the Ollama registry artifact without separately verifiable conversion evidence.",
+      "distribution": "MODEL_WEIGHTS_AND_CACHE_NOT_DISTRIBUTED"
+    },
+    {
+      "id": "openai-codex-authoring-assistance",
+      "kind": "development-assistance",
+      "name": "Codex",
+      "upstream": "https://openai.com/codex/",
+      "purpose": "Code, test, and documentation authoring assistance under the maintainer's direction.",
+      "distribution": "NOT_A_PRIZM_RUNTIME_OR_REDISTRIBUTED_COMPONENT",
+      "copyrightOrLicenseClaim": "No model license, output ownership percentage, or third-party provenance is inferred from this record. The repository audit remains the source of truth for tracked content."
+    }
+  ],
+  "verification": {
+    "lastVerifiedDate": "2026-07-26",
+    "modelWeightsTrackedByGit": false,
+    "modelCacheTrackedByGit": false,
+    "openSqlStatus": "NOT_RUN",
+    "openProxyStatus": "NOT_RUN",
+    "openHaStatus": "NOT_RUN"
+  }
+}

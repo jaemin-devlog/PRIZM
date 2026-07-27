@@ -20,6 +20,28 @@ synchronization.
 | Adapter 1 | NAT for guest package access |
 | Adapter 2 | Host-only, fixed IP chosen after adapter creation |
 
+## Environment selection rationale
+
+- **Supported Linux target:** Rocky Linux 9 x86_64 was selected because it is in the
+  supplied OpenSQL 3.0 support matrix. This records an installation target, not a
+  successful OpenSQL installation or compatibility result.
+- **Isolated VM:** VirtualBox keeps the OpenSQL target separate from the laboratory
+  Windows development environment. An installation, license-application, or database
+  recovery failure can therefore be investigated without changing the ordinary PRIZM
+  PostgreSQL development setup.
+- **Functional verification baseline:** 1 socket x 4 cores x 1 thread (4 total vCPU),
+  12 GiB RAM, and a dynamically allocated 120 GiB disk were chosen as a bounded
+  single-node baseline for migration, vector, and Worker SQL compatibility checks.
+  They are not an OpenSQL vendor sizing recommendation, a performance benchmark, or an
+  OpenHA multi-node capacity claim.
+- **Network separation:** NAT is limited to guest package/vendor-install access. The
+  fixed Host-only network gives the Windows host a repeatable private route to the VM
+  without public port forwarding. `192.168.56.10/24` is environment evidence only; no
+  public Quickstart or deployment contract depends on it.
+- **Future HA prerequisite:** Asia/Seoul and time synchronization are verified now so
+  that a later, separately scoped OpenHA experiment can start from a known time-sync
+  baseline. They do not prove OpenHA configuration or failover behavior.
+
 ## Steps
 
 1. Install and verify Oracle VirtualBox on the laboratory Windows host.

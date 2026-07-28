@@ -469,3 +469,8 @@
 - 감사: source-only SBOM·AI 모델 명세의 독립 읽기 전용 AUDIT에서 CRITICAL/HIGH/MEDIUM finding은 없었다. 과거 완료 gate가 남은 작업처럼 보인 문서 표현과 LF 회귀 검증 부재의 LOW 두 건을 확인했다.
 - 보완: T-05 상태를 현재 source-only 범위의 `VERIFIED`로 현행화하고, verifier가 generated JSON의 CRLF와 마지막 LF 누락을 fail-closed로 거부하도록 Node 회귀 테스트를 추가했다.
 - 범위: T-09 CI·제출 직전 snapshot·PRZ-002의 나머지 공개 저장소 운영 작업은 계속 별도 gate다. Docker, PostgreSQL, pgvector, Ollama, OpenSQL, OpenProxy, OpenHA는 사용하지 않았다.
+
+## 2026-07-28 — AI 에이전트 작업 방식 보완 기준
+
+- 결정: 기존 `AGENTS.md`의 staged delivery workflow를 유지하면서, AI의 조용한 가정·과잉 구현·무관한 수정·검증 없는 완료 선언을 줄이기 위한 보조 판단 기준을 문서화했다.
+- 경계: Karpathy-inspired guidelines는 개발 환경의 로컬 Codex skill로만 사용한다. PRIZM 배포물·런타임 dependency·대회 구현 증거가 아니며, 프로젝트 공통 규칙은 계속 `AGENTS.md`를 단일 원본으로 한다.

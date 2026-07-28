@@ -824,6 +824,26 @@ manifest를 구현했다. 상세 범위·재생성 명령·현재 `NOT_RUN` 환�
 | model record | Ollama v0.32.3, BAAI `bge-m3` revision, Ollama registry manifest/blob hashes | model bytes와 PRIZM source license 분리; registry lineage `UNVERIFIED_LINEAGE` 유지 | Ollama binary·weights·cache `NOT_DISTRIBUTED` |
 | scope·integrity | runtime/test-build/CI/container/model/asset scope manifest와 `SHA256SUMS` | first-party structural verifier가 local path·JDBC URL·credential-shaped data와 checksum drift 검사 | source-only record 자체는 Git tracked |
 
+### T-05 human/machine component 조정
+
+사람용 Java runtime exact set은 Gradle dependency graph의 module identity
+167개를 기록한다. 기계 SBOM은 실제로 해소된 runtime artifact JAR을 기록하므로
+다음 두 차이를 명시적으로 조정한다.
+
+- `org.hibernate.orm:hibernate-platform:7.4.1.Final`과
+  `tools.jackson:jackson-bom:3.1.4`는 dependency constraint를 제공하는
+  metadata-only component라 runtime JAR artifact가 없다.
+- `io.netty:netty-codec-native-quic:4.2.15.Final` 한 module identity는
+  Linux x86_64·aarch64, macOS x86_64·aarch64, Windows x86_64의 classifier
+  JAR 5개로 해소된다. 기계 SBOM은 각 classifier를 PURL qualifier에 포함한다.
+
+따라서 machine artifact 수는 `167 - 2 + (5 - 1) = 169`개다. frontend는
+사람용·기계용 모두 `package-lock.json`의 183개 versioned entry를 기준으로 한다.
+이 기록은 수량 차이를 숨기지 않고 module graph와 physical artifact inventory의
+관계를 설명한다. commit `8dd57c4`의 clean-checkout VERIFY와 독립 읽기 전용
+AUDIT는 통과했다. AUDIT에서 지적한 문서 gate 현행화와 LF 회귀 검증은 후속
+보완 commit에서 반영했으며, 이것은 현재 source-only T-05 판정을 바꾸지 않는다.
+
 `@cyclonedx/cyclonedx-npm`은 frontend generator로 채택하지 않았다. 6.0.0 후보는
 당시 full npm audit에서 high finding 10건이 있었고, 4.0.1 후보는 full audit
 endpoint가 package tree를 거부하여 신뢰 가능한 전이 취약점 판정을 만들지 못했다.
@@ -832,6 +852,8 @@ endpoint가 package tree를 거부하여 신뢰 가능한 전이 취약점 판�
 판단을 자동으로 완결한다는 주장이 아니며, 누락·충돌 판단은 위 human audit과
 후속 독립 대조에서 계속 확인한다.
 
-**T-05 상태:** `IMPLEMENTED_UNVERIFIED`. formal-schema/CI gate, clean checkout
-evidence, human/machine reconciliation 및 독립 읽기 전용 감사 전에는
-`VERIFIED` 또는 PRZ-002 전체 완료로 표시하지 않는다.
+**T-05 상태:** 현재 source-only 배포 범위에서 `VERIFIED`. 생성기의 고정 LF,
+표준 hash algorithm, classifier-aware identity와 위 human/machine 조정 규칙을
+구현하고 clean checkout·공식 CycloneDX 1.6 schema·checksum·독립 읽기 전용
+AUDIT를 통과했다. T-09 CI, 제출 직전 snapshot 고정, PRZ-002 전체 완료는 별도
+후속 gate이며 완료로 표시하지 않는다.

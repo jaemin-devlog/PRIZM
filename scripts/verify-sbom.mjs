@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 const root = resolve(import.meta.dirname, '..')
 const sbomDirectory = resolve(root, 'sbom')
@@ -12,12 +13,37 @@ const generatedFiles = [
   'prizm-scope-manifest.json',
 ]
 
+const cycloneDxHashAlgorithms = new Set([
+  'MD5',
+  'SHA-1',
+  'SHA-256',
+  'SHA-384',
+  'SHA-512',
+  'SHA3-256',
+  'SHA3-384',
+  'SHA3-512',
+  'BLAKE2b-256',
+  'BLAKE2b-384',
+  'BLAKE2b-512',
+  'BLAKE3',
+])
+
 function fail(message) {
   throw new Error(`SBOM verification failed: ${message}`)
 }
 
+export function assertCanonicalLf(fileName, content) {
+  if (content.includes('\r')) {
+    fail(`${fileName} must use LF line endings`)
+  }
+  if (!content.endsWith('\n')) {
+    fail(`${fileName} must end with LF`)
+  }
+}
+
 function readJson(fileName) {
   const content = readFileSync(resolve(sbomDirectory, fileName), 'utf8')
+  assertCanonicalLf(fileName, content)
 
   try {
     return { content, value: JSON.parse(content) }
@@ -38,10 +64,22 @@ function assertNoSensitiveLocalData(fileName, content) {
   }
 }
 
-function assertCycloneDx(fileName, expectedName) {
-  const { content, value } = readJson(fileName)
+function visitObjects(value, visitor, path = '$') {
+  if (Array.isArray(value)) {
+    value.forEach((entry, index) => visitObjects(entry, visitor, `${path}[${index}]`))
+    return
+  }
+  if (!value || typeof value !== 'object') {
+    return
+  }
 
-  assertNoSensitiveLocalData(fileName, content)
+  visitor(value, path)
+  for (const [key, entry] of Object.entries(value)) {
+    visitObjects(entry, visitor, `${path}.${key}`)
+  }
+}
+
+export function assertCycloneDxValue(fileName, expectedName, value) {
   if (value.bomFormat !== 'CycloneDX' || value.specVersion !== '1.6') {
     fail(`${fileName} must be a CycloneDX 1.6 BOM`)
   }
@@ -54,6 +92,35 @@ function assertCycloneDx(fileName, expectedName) {
   if (value.serialNumber || value.metadata?.timestamp) {
     fail(`${fileName} must not contain a non-reproducible serial number or timestamp`)
   }
+
+  const references = new Map()
+  visitObjects(value, (entry, path) => {
+    if (Object.hasOwn(entry, 'bom-ref')) {
+      const reference = entry['bom-ref']
+      if (typeof reference !== 'string' || !reference) {
+        fail(`${fileName} contains an empty bom-ref at ${path}`)
+      }
+      if (references.has(reference)) {
+        fail(`${fileName} contains duplicate bom-ref ${reference}`)
+      }
+      references.set(reference, path)
+    }
+
+    if (Array.isArray(entry.hashes)) {
+      for (const hash of entry.hashes) {
+        if (!cycloneDxHashAlgorithms.has(hash?.alg)) {
+          fail(`${fileName} contains unsupported CycloneDX hash algorithm ${hash?.alg}`)
+        }
+      }
+    }
+  })
+}
+
+function assertCycloneDx(fileName, expectedName) {
+  const { content, value } = readJson(fileName)
+
+  assertNoSensitiveLocalData(fileName, content)
+  assertCycloneDxValue(fileName, expectedName, value)
 }
 
 function assertModelManifest() {
@@ -102,16 +169,30 @@ function expectedChecksums() {
   return generatedFiles.map((fileName) => `${sha256(fileName)}  ${fileName}`).join('\n') + '\n'
 }
 
-assertCycloneDx('prizm-backend-runtime.cdx.json', 'prizm')
-assertCycloneDx('prizm-frontend.cdx.json', 'prizm-frontend')
-assertModelManifest()
-assertScopeManifest()
+export function verifyRepository({ writeChecksums = false } = {}) {
+  assertCycloneDx('prizm-backend-runtime.cdx.json', 'prizm')
+  assertCycloneDx('prizm-frontend.cdx.json', 'prizm-frontend')
+  assertModelManifest()
+  assertScopeManifest()
 
-if (process.argv.includes('--write-checksums')) {
-  writeFileSync(checksumPath, expectedChecksums(), 'utf8')
-  console.log(`Updated ${checksumPath}`)
-} else if (readFileSync(checksumPath, 'utf8') !== expectedChecksums()) {
-  fail('SHA256SUMS does not match the generated SBOM or AI model manifest')
+  if (writeChecksums) {
+    writeFileSync(checksumPath, expectedChecksums(), 'utf8')
+    return { checksumPath }
+  }
+  if (readFileSync(checksumPath, 'utf8') !== expectedChecksums()) {
+    fail('SHA256SUMS does not match the generated SBOM or AI model manifest')
+  }
+  return { checksumPath }
 }
 
-console.log('SBOM and AI model manifest structural checks passed.')
+const isMain = process.argv[1]
+  && import.meta.url === pathToFileURL(resolve(process.argv[1])).href
+
+if (isMain) {
+  const writeChecksums = process.argv.includes('--write-checksums')
+  const result = verifyRepository({ writeChecksums })
+  if (writeChecksums) {
+    console.log(`Updated ${result.checksumPath}`)
+  }
+  console.log('SBOM and AI model manifest structural checks passed.')
+}

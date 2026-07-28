@@ -143,7 +143,13 @@ tasks.register('generateBackendSbom') {
         def components = configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts
                 .collect { artifact ->
                     def module = artifact.moduleVersion.id
-                    def purl = "pkg:maven/${encodePurlSegment(module.group)}/${encodePurlSegment(module.name)}@${encodePurlSegment(module.version)}"
+                    def classifier = artifact.classifier
+                    def qualifier = classifier ? "?classifier=${encodePurlSegment(classifier)}" : ''
+                    def purl = "pkg:maven/${encodePurlSegment(module.group)}/${encodePurlSegment(module.name)}@${encodePurlSegment(module.version)}${qualifier}"
+                    def properties = [[name: 'prizm:configuration', value: 'runtimeClasspath']]
+                    if (classifier) {
+                        properties.add([name: 'prizm:maven-classifier', value: classifier])
+                    }
                     [
                             type              : 'library',
                             'bom-ref'         : purl,
@@ -157,7 +163,7 @@ tasks.register('generateBackendSbom') {
                                     type: 'distribution',
                                     url : "https://repo1.maven.org/maven2/${module.group.replace('.', '/')}/${module.name}/${module.version}/${artifact.file.name}"
                             ]],
-                            properties        : [[name: 'prizm:configuration', value: 'runtimeClasspath']]
+                            properties        : properties
                     ]
                 }
                 .sort { left, right -> left.purl <=> right.purl }
@@ -182,6 +188,6 @@ tasks.register('generateBackendSbom') {
         ]
         def target = layout.projectDirectory.file('sbom/prizm-backend-runtime.cdx.json').asFile
         target.parentFile.mkdirs()
-        target.setText(groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(bom)) + System.lineSeparator(), 'UTF-8')
+        target.setText(groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(bom)) + '\n', 'UTF-8')
     }
 }

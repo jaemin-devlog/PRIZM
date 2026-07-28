@@ -270,11 +270,17 @@ generated `dist`·image·Ollama binary·model bytes는 배포하지 않으므로
 **선행 조건:** T-02, G-01, 감사된 도구 승인
 
 - [x] machine-readable CycloneDX 1.6 format과 backend/frontend first-party
-  lockfile·resolved-graph generator를 구현한다. full formal-schema CI는 T-09로 남긴다.
+  lockfile·resolved-graph generator를 구현한다. 2026-07-27 보완에서 frontend
+  표준 hash algorithm, backend classifier-aware `bom-ref`, 운영체제 독립 LF
+  출력을 구현했다. full formal-schema CI는 T-09로 남긴다.
 - [x] backend runtime/test/build, frontend runtime/dev, CI, container,
   model, fixture·asset component를 구분한다.
-- [ ] 사람용 license audit와 machine SBOM component set을 상호 검증한다.
-- [x] clean checkout에서 재생성 가능한 local 명령을 만든다.
+- [x] 사람용 license audit와 machine SBOM component set을 상호 조정한다.
+  Java module identity 167개에서 metadata-only 2개를 제외하고 Netty 한 module의
+  classifier artifact 5개를 펼치면 machine artifact 169개가 됨을 기록했다.
+- [x] clean checkout에서 재생성 가능한 local 명령과 checksum 검증을 완료한다.
+  commit `8dd57c4`의 별도 local clone에서 backend·frontend를 다시 생성한 뒤
+  Git 변경 0건과 checksum 검증 통과를 확인했다.
 - [x] Ollama·`bge-m3`·Codex의 source, version/revision/digest, license·terms,
   purpose, execution·distribution boundary를 AI 명세에 기록한다.
 - [x] 모델 파일·cache가 Git과 기본 제출물에 포함되지 않음을 검사한다.
@@ -289,6 +295,42 @@ generated `dist`·image·Ollama binary·model bytes는 배포하지 않으므로
 169-component structural reconciliation에서 CRITICAL/HIGH/MEDIUM finding 없이
 `PASS_FOR_IMPLEMENTED_SCOPE`였다. formal schema CI와 human/machine license
 reconciliation은 미완료 gate이므로 T-05는 계속 `IMPLEMENTED_UNVERIFIED`다.
+
+**최종 VERIFY 기록 (2026-07-27):** 병합된 `main`
+`b36f6b236c2f70d26e243013df296b4dad1a54d9`의 깨끗한 archive와 JDK 17에서
+재검증했다. frontend 183개 license cohort는 사람용 감사와 일치했지만,
+깨끗한 checkout의 checksum 불일치, frontend 183개 hash algorithm의 공식
+CycloneDX 1.6 schema 위반, Netty classifier 5개의 중복 `bom-ref`, 사람용 Java
+runtime 167개와 machine 169개·고유 reference 165개의 미조정 차이가 확인됐다.
+따라서 T-05는 `VERIFY_FAILED_RETURN_TO_IMPLEMENT`이며 위 결함을 수정하고
+재검증하기 전에는 완료할 수 없다.
+
+**IMPLEMENT 보완 기록 (2026-07-27):** `PRZ-002-sbom-conformance-fix`에서
+backend 고정 LF·classifier-qualified PURL, frontend 표준 `SHA-512`, verifier의
+hash algorithm·`bom-ref` 검사와 Node 회귀 테스트를 구현했다. 생성 결과는
+backend 169개/고유 reference 169개, frontend 183개/`SHA-512`였고 로컬
+재생성 hash는 결정적이었다. 이전 VERIFY 실패는 역사적 근거로 유지하며,
+clean checkout·공식 schema·독립 AUDIT를 다시 통과하기 전에는 완료하지 않는다.
+
+**최종 재VERIFY 기록 (2026-07-27):** commit `8dd57c4`의 별도 깨끗한 local
+clone에서 checked-in verifier, 강제 backend 재생성, frontend 재생성, checksum,
+Node 회귀 테스트를 실행했다. 재생성 뒤 Git 변경은 0건이었다. SHA-256
+`1ebcb88a…e098f`의 공식 CycloneDX 1.6 BOM schema와 공식 SPDX·JSF schema를
+사용한 validation은 backend·frontend 모두 통과했다. human/machine 조정은
+167 module identity에서 metadata-only 2개를 제외하고 Netty classifier artifact
+5개를 펼쳐 169개 artifact·169개 고유 reference가 됨을 다시 확인했다.
+
+**독립 읽기 전용 AUDIT (2026-07-28):** corrective commit `8dd57c4`와 최종
+VERIFY evidence를 수정자와 분리된 관점에서 검토했다. CycloneDX schema,
+clean-checkout 재생성, checksum, human/machine 조정, 민감정보 검사, 생성기·검증기
+범위를 확인한 결과 CRITICAL/HIGH/MEDIUM finding은 없었다. LOW 두 건은 (1) 이미
+완료한 clean checkout·독립 감사 gate가 남은 작업처럼 보이던 문서 표현, (2) LF와
+마지막 LF를 명시적으로 막는 Node 회귀 검증 부재였다. 이 후속 보완은 문서 현행화와
+`scripts/verify-sbom.mjs`·Node 회귀 테스트로 반영한다. 이 agent AUDIT는 GitHub
+review 증거가 아니다.
+
+**현재 판정:** 현재 source-only 범위의 T-05 `VERIFIED`. 제출 직전 snapshot,
+T-09 CI, 그리고 PRZ-002의 나머지 T-06~T-10은 별도 후속 작업이다.
 
 **완료 evidence:** 재생성 명령, schema validation, human/machine diff,
 AI model provenance와 secret scan 결과

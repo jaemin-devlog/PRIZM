@@ -37,9 +37,15 @@ function integrityHash(integrity) {
     return undefined
   }
 
-  const algorithm = integrity.slice(0, separator).toUpperCase()
+  const integrityAlgorithm = integrity.slice(0, separator).toUpperCase()
+  const algorithms = {
+    SHA256: 'SHA-256',
+    SHA384: 'SHA-384',
+    SHA512: 'SHA-512',
+  }
+  const algorithm = algorithms[integrityAlgorithm]
   const encoded = integrity.slice(separator + 1)
-  if (!['SHA256', 'SHA384', 'SHA512'].includes(algorithm) || !encoded) {
+  if (!algorithm || !encoded) {
     return undefined
   }
   return { alg: algorithm, content: Buffer.from(encoded, 'base64').toString('hex') }

@@ -750,38 +750,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final",
+            "bom-ref": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final?classifier=linux-aarch_64",
             "group": "io.netty",
             "name": "netty-codec-native-quic",
             "version": "4.2.15.Final",
-            "purl": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final",
-            "scope": "required",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "850ed59fac6679b5e205bf53187b45dbaf2d105ee5f669440645d2acd89524ec"
-                }
-            ],
-            "externalReferences": [
-                {
-                    "type": "distribution",
-                    "url": "https://repo1.maven.org/maven2/io/netty/netty-codec-native-quic/4.2.15.Final/netty-codec-native-quic-4.2.15.Final-linux-x86_64.jar"
-                }
-            ],
-            "properties": [
-                {
-                    "name": "prizm:configuration",
-                    "value": "runtimeClasspath"
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final",
-            "group": "io.netty",
-            "name": "netty-codec-native-quic",
-            "version": "4.2.15.Final",
-            "purl": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final",
+            "purl": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final?classifier=linux-aarch_64",
             "scope": "required",
             "hashes": [
                 {
@@ -799,43 +772,51 @@
                 {
                     "name": "prizm:configuration",
                     "value": "runtimeClasspath"
+                },
+                {
+                    "name": "prizm:maven-classifier",
+                    "value": "linux-aarch_64"
                 }
             ]
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final",
+            "bom-ref": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final?classifier=linux-x86_64",
             "group": "io.netty",
             "name": "netty-codec-native-quic",
             "version": "4.2.15.Final",
-            "purl": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final",
+            "purl": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final?classifier=linux-x86_64",
             "scope": "required",
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "10999923bf08ff5e3a75106bd8dbc5b5e4d06b5e614f8c135981ecb4377c944a"
+                    "content": "850ed59fac6679b5e205bf53187b45dbaf2d105ee5f669440645d2acd89524ec"
                 }
             ],
             "externalReferences": [
                 {
                     "type": "distribution",
-                    "url": "https://repo1.maven.org/maven2/io/netty/netty-codec-native-quic/4.2.15.Final/netty-codec-native-quic-4.2.15.Final-osx-x86_64.jar"
+                    "url": "https://repo1.maven.org/maven2/io/netty/netty-codec-native-quic/4.2.15.Final/netty-codec-native-quic-4.2.15.Final-linux-x86_64.jar"
                 }
             ],
             "properties": [
                 {
                     "name": "prizm:configuration",
                     "value": "runtimeClasspath"
+                },
+                {
+                    "name": "prizm:maven-classifier",
+                    "value": "linux-x86_64"
                 }
             ]
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final",
+            "bom-ref": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final?classifier=osx-aarch_64",
             "group": "io.netty",
             "name": "netty-codec-native-quic",
             "version": "4.2.15.Final",
-            "purl": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final",
+            "purl": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final?classifier=osx-aarch_64",
             "scope": "required",
             "hashes": [
                 {
@@ -853,16 +834,51 @@
                 {
                     "name": "prizm:configuration",
                     "value": "runtimeClasspath"
+                },
+                {
+                    "name": "prizm:maven-classifier",
+                    "value": "osx-aarch_64"
                 }
             ]
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final",
+            "bom-ref": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final?classifier=osx-x86_64",
             "group": "io.netty",
             "name": "netty-codec-native-quic",
             "version": "4.2.15.Final",
-            "purl": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final",
+            "purl": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final?classifier=osx-x86_64",
+            "scope": "required",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "10999923bf08ff5e3a75106bd8dbc5b5e4d06b5e614f8c135981ecb4377c944a"
+                }
+            ],
+            "externalReferences": [
+                {
+                    "type": "distribution",
+                    "url": "https://repo1.maven.org/maven2/io/netty/netty-codec-native-quic/4.2.15.Final/netty-codec-native-quic-4.2.15.Final-osx-x86_64.jar"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "prizm:configuration",
+                    "value": "runtimeClasspath"
+                },
+                {
+                    "name": "prizm:maven-classifier",
+                    "value": "osx-x86_64"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final?classifier=windows-x86_64",
+            "group": "io.netty",
+            "name": "netty-codec-native-quic",
+            "version": "4.2.15.Final",
+            "purl": "pkg:maven/io.netty/netty-codec-native-quic@4.2.15.Final?classifier=windows-x86_64",
             "scope": "required",
             "hashes": [
                 {
@@ -880,6 +896,10 @@
                 {
                     "name": "prizm:configuration",
                     "value": "runtimeClasspath"
+                },
+                {
+                    "name": "prizm:maven-classifier",
+                    "value": "windows-x86_64"
                 }
             ]
         },
@@ -1020,11 +1040,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.netty/netty-resolver-dns-native-macos@4.2.15.Final",
+            "bom-ref": "pkg:maven/io.netty/netty-resolver-dns-native-macos@4.2.15.Final?classifier=osx-x86_64",
             "group": "io.netty",
             "name": "netty-resolver-dns-native-macos",
             "version": "4.2.15.Final",
-            "purl": "pkg:maven/io.netty/netty-resolver-dns-native-macos@4.2.15.Final",
+            "purl": "pkg:maven/io.netty/netty-resolver-dns-native-macos@4.2.15.Final?classifier=osx-x86_64",
             "scope": "required",
             "hashes": [
                 {
@@ -1042,6 +1062,10 @@
                 {
                     "name": "prizm:configuration",
                     "value": "runtimeClasspath"
+                },
+                {
+                    "name": "prizm:maven-classifier",
+                    "value": "osx-x86_64"
                 }
             ]
         },
@@ -1128,11 +1152,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.netty/netty-transport-native-epoll@4.2.15.Final",
+            "bom-ref": "pkg:maven/io.netty/netty-transport-native-epoll@4.2.15.Final?classifier=linux-x86_64",
             "group": "io.netty",
             "name": "netty-transport-native-epoll",
             "version": "4.2.15.Final",
-            "purl": "pkg:maven/io.netty/netty-transport-native-epoll@4.2.15.Final",
+            "purl": "pkg:maven/io.netty/netty-transport-native-epoll@4.2.15.Final?classifier=linux-x86_64",
             "scope": "required",
             "hashes": [
                 {
@@ -1150,6 +1174,10 @@
                 {
                     "name": "prizm:configuration",
                     "value": "runtimeClasspath"
+                },
+                {
+                    "name": "prizm:maven-classifier",
+                    "value": "linux-x86_64"
                 }
             ]
         },

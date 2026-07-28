@@ -4,9 +4,10 @@
 |---|---|
 | 관련 spec | [PRZ-002](../../specs/PRZ-002-open-source-readiness/spec.md) |
 | 구현 단위 | T-05 — SBOM·AI 모델 명세 |
-| 상태 | `IMPLEMENTED_UNVERIFIED` |
+| 상태 | 현재 source-only T-05 `VERIFIED`; PRZ-002 전체는 `IN_PROGRESS` |
 | 기준 배포물 | source-only Git repository / source ZIP |
-| 마지막 생성일 | 2026-07-26 |
+| 마지막 생성일 | 2026-07-27 |
+| 마지막 검증 commit | `8dd57c4897ff746db41df489201cacfc82c99f1b` |
 
 이 문서는 PRIZM의 현재 source-only 배포물을 위한 기계 판독용 공급망
 기록의 범위와 재현 방법을 설명한다. 이것은 OpenSQL, OpenProxy 또는 OpenHA
@@ -38,9 +39,12 @@ model bytes를 실제로 배포하려면 해당 산출물별 SBOM·NOTICE·licen
 CycloneDX record의 `specVersion`은 `1.6`으로 고정한다. repository
 [`scripts/verify-sbom.mjs`](../../scripts/verify-sbom.mjs)는 JSON parse,
 필수 구조, primary component, component 존재, timestamp/serial 부재,
-checksum drift, local path/JDBC URL/credential-shaped field 부재를 검사한다.
-이는 repository의 structural conformance gate이며, 제3자 full-schema validator
-도입과 CI gate는 T-09에서 별도로 검증한다.
+`bom-ref` 전역 고유성, CycloneDX hash algorithm 표준 이름, checksum drift,
+local path/JDBC URL/credential-shaped field 부재를 검사한다.
+[`verify-sbom.test.mjs`](../../scripts/verify-sbom.test.mjs)는 비표준 `SHA512`와
+중복 `bom-ref`를 거부하는 회귀 테스트를 제공한다. 이는 repository의
+structural conformance gate이며, 제3자 full-schema validator 도입과 CI gate는
+T-09에서 별도로 검증한다.
 
 ## 생성기·license 감사
 
@@ -54,14 +58,22 @@ frontend 생성기는 registry 또는 `node_modules`를 읽거나 요청하지 �
 version·integrity·resolved URL·명시된 license·dev/optional scope만 옮기며,
 없는 license를 추론하지 않는다. backend generator는 existing Gradle dependency
 verification metadata로 이미 검증되는 resolved runtime artifact의 SHA-256을
-CycloneDX record에 적는다. 이 선택은 외부 generator의 전이 의존성을 source-only
-개발 도구에 새로 도입하지 않으면서도 Gradle/npm의 exact resolved inventory를
-재현하기 위한 것이다.
+CycloneDX record에 적는다. backend JSON은 운영체제와 무관하게 LF로 끝나며,
+동일 Maven module의 platform별 JAR은 `classifier` PURL qualifier와
+`prizm:maven-classifier` property로 구분한다. frontend integrity algorithm은
+CycloneDX enum인 `SHA-256`·`SHA-384`·`SHA-512`로 변환한다. 이 선택은 외부
+generator의 전이 의존성을 source-only 개발 도구에 새로 도입하지 않으면서도
+Gradle/npm의 exact resolved inventory를 재현하기 위한 것이다.
 
 사람이 읽는 license·provenance 판단은 계속
-[2026 license audit](2026-license-audit.md)가 기준이다. 기계 SBOM의 component
-목록과 human audit의 Java/npm component·scope·distribution 판단을 최종 대조하는
-작업은 T-05 VERIFY/AUDIT gate로 남아 있다.
+[2026 license audit](2026-license-audit.md)가 기준이다. frontend는 human
+audit과 machine SBOM 모두 183개 lockfile entry다. backend human audit의
+167개 module identity에는 물리 JAR이 없는 platform/BOM 2개가 포함되고,
+`netty-codec-native-quic` 한 module은 platform classifier JAR 5개로 해소된다.
+따라서 artifact SBOM은 `167 - 2 + (5 - 1) = 169`개이고, 모두 고유한
+classifier-aware `bom-ref`를 가진다. 이 조정 규칙은 commit `8dd57c4`의
+깨끗한 복제본에서 다시 검증했고, 후속 독립 읽기 전용 AUDIT에서
+CRITICAL/HIGH/MEDIUM finding 없이 통과했다.
 
 ## AI model 명세와 source license 경계
 
@@ -89,6 +101,7 @@ Java 17, Node 22.17.0, npm 10.9.2에서 repository root 기준으로 실행한�
 npm --prefix frontend run sbom
 node scripts/verify-sbom.mjs --write-checksums
 node scripts/verify-sbom.mjs
+node --test scripts/verify-sbom.test.mjs
 ```
 
 `--write-checksums`는 의도적인 inventory 변경을 검토한 뒤에만 사용한다. 일반
@@ -101,8 +114,7 @@ OpenSQL 관련 결과는 존재하지 않는다.
 
 ## 남은 gate
 
-- T-05: human license audit와 machine component set의 독립 대조, clean checkout
-  재현 결과·commit·환경·hash evidence 고정, 독립 읽기 전용 감사
+- submission: 실제 제출 직전 공개 commit·tree·환경·결과 hash 재고정
 - T-09: SBOM formal-schema/structural validation과 regeneration drift를 CI에서
   실행하고, tool·workflow provenance를 다시 검증
 - future artifact: JAR, `dist`, image, Ollama binary, model bytes 재배포 전

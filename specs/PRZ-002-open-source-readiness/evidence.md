@@ -72,8 +72,12 @@ a claim that those issues are resolved by this spec.
 - T-05의 사람용 감사와 Java/npm machine SBOM 대조, clean checkout 재생성,
   공식 schema 검사와 독립 읽기 전용 감사는 완료됐다.
 - formal schema·구조·재생성 drift를 자동화하는 CI는 T-09에서 구현한다.
-- 실제 비공개 신고 채널이 활성화되거나 운영 가능한 연락처가 정해지기 전에는
-  `SECURITY.md`를 완료하지 않는다.
+- G-02·T-06은 실제 외부 기여 운영 또는 첫 지원 release·외부 배포 전까지,
+  T-07은 외부 Issue·PR 접수를 공식 지원하기 전까지 `DEFERRED`다. 비공개
+  신고 채널이 활성화되거나 운영 가능한 연락처가 정해지기 전에는
+  `SECURITY.md`를 만들지 않는다.
+- 현재 활성 잔여 Gate는 T-08 README·Quickstart·문서 색인, T-09
+  라이선스·SBOM 검증 CI와 T-10 최종 독립 감사다.
 - 2026-07-26 검증 시점에는 branch push만 있었고 실제 GitHub Issue, PR,
   review, merge evidence는 아직 없었다. 이후 PR #16과 merge commit
   `68f2183`, PR #18과 merge commit `04afe7c`가 생성됐지만 GitHub Issue와
@@ -89,7 +93,45 @@ authenticated GitHub host. The later PR #16 and merge are recorded separately;
 the earlier remote push itself is not treated as an Issue, review, or merge
 record.
 Private Vulnerability Reporting was not inspected or enabled from this
-environment, so G-02 remains `BLOCKED_EXTERNAL_CONFIGURATION`.
+environment. G-02 was later changed to `DEFERRED` for the current source-only
+P0 scope; it must be reopened before the first supported release, external
+deployment, or officially supported external-contribution intake.
+
+## P0 governance deferral decision — 2026-07-28
+
+- **결정:** G-02, T-06, T-07을 완료로 표시하지 않고 `DEFERRED`로 둔다.
+- **이유:** 현재 공식 제출 근거에서 직접 요구되는 source 공개, OSI license,
+  component·model provenance, SBOM·AI 모델 명세를 먼저 마감한다. 실제
+  외부 운영이 없는 상태에서 가짜 연락처·형식적인 템플릿을 만드는 것은
+  운영 가능성이나 review evidence를 증명하지 못한다.
+- **재개 조건:** G-02·T-06은 외부 기여 접수 또는 첫 지원 release·외부 배포를
+  준비하는 시점 중 먼저 도래하는 때, T-07은 외부 Issue·PR 접수를 공식
+  지원하기 전이다.
+- **재개 Gate:** 실제 Private Vulnerability Reporting 또는 검증 가능한
+  비공개 연락 경로를 먼저 확정하고, 그 뒤 운영 문서와 템플릿을 구현·검증한다.
+- **현재 활성 Gate:** T-08 README·Quickstart·문서 색인, T-09
+  라이선스·SBOM 검증 CI, T-10 최종 독립 감사.
+- **환경:** 문서 범위 결정이므로 Docker, PostgreSQL, pgvector, Ollama,
+  OpenSQL, OpenProxy, OpenHA는 모두 `NOT_RUN`이다.
+
+## 공개 저장소 거버넌스 범위 조정 독립 AUDIT — 2026-07-28
+
+- **대상:** `origin/main` commit `be39aa5`를 기준으로 한 문서 7개의 working
+  tree diff. 감사자는 파일·staging·Git history를 변경하지 않았다.
+- **판정:** `PASS`. 두 차례의 LOW 문구 정합성 보완 뒤
+  CRITICAL/HIGH/MEDIUM/LOW finding은 0건이다.
+- **확인:** G-02·T-06은 외부 기여 접수 또는 첫 지원 release·외부 배포 전,
+  T-07은 외부 Issue·PR 접수 공식 지원 전 재개하는 것으로 문서가 일치한다.
+  PRZ-002는 `IN_PROGRESS`, OpenSQL·OpenProxy·OpenHA는 `NOT_RUN`으로
+  유지하며 현재 활성 잔여 Gate는 T-08·T-09·T-10이다.
+- **검증:** 변경 Markdown 7개, 로컬 링크 누락 0, code fence 불균형 0,
+  trailing whitespace 0, `git diff --check` 통과, application source·migration·
+  config 변경 0.
+- **미실행:** 문서 전용 범위 조정이므로 application unit·integration test와
+  frontend lint·build는 재실행하지 않았다.
+- **review 경계:** 이 Agent audit는 GitHub review가 아니다. 실제 PR을
+  reviewer 없이 병합하려면 그 전에 사용자 승인을 받고
+  `REVIEW_NOT_AVAILABLE_SOLO`를 별도로 기록해야 한다.
 
 ## Read-only audit — 2026-07-26
 

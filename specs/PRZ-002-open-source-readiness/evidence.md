@@ -6,12 +6,13 @@
 | Evidence status | 현재 source-only T-05 `VERIFIED`; PRZ-002 전체는 `IN_PROGRESS` |
 | Implementation commit | `c28416e` — `추가: source-only SBOM과 AI 모델 명세` |
 | Corrective implementation commit | `8dd57c4897ff746db41df489201cacfc82c99f1b` — `수정: SBOM 생성기 정합성 보완` |
-| Branch | `PRZ-002-sbom-model-manifest` |
+| Implementation branch | `PRZ-002-sbom-model-manifest` — PR #16 병합 후 삭제 |
 | Baseline | `main` / `origin/main` `0ad549a8641b2b6ef18a8011dac93286052b65c0` |
 | Integrated PR | [#16](https://github.com/jaemin-devlog/PRIZM/pull/16), merge commit `68f2183` |
 | Final VERIFY baseline | `main` / `origin/main` `b36f6b236c2f70d26e243013df296b4dad1a54d9` |
-| Final VERIFY branch | local-only `PRZ-002-sbom-final-verification` |
-| Corrective IMPLEMENT branch | local-only `PRZ-002-sbom-conformance-fix` |
+| Final VERIFY branch | local-only `PRZ-002-sbom-final-verification` — 검증 후 삭제 |
+| Corrective IMPLEMENT branch | `PRZ-002-sbom-conformance-fix` — PR #18 병합 후 삭제 |
+| Corrective integrated PR | [#18](https://github.com/jaemin-devlog/PRIZM/pull/18), source commit `203c892`, merge commit `04afe7c` |
 | GitHub Issue | `NOT_CREATED`; connector write was blocked with HTTP 403 on 2026-07-26 |
 | Primary / secondary evaluation IDs | `EVAL-R1-02` / `EVAL-R1-03`, `EVAL-R1-05` |
 
@@ -66,16 +67,17 @@ a claim that those issues are resolved by this spec.
 | OpenProxy | `NOT_RUN` |
 | OpenHA | `NOT_RUN` |
 
-## Remaining verification and audit gates
+## 남은 PRZ-002 Gate
 
-- Reconcile the human license audit with the generated Java/npm component sets.
-- Run the independent read-only audit for the complete branch diff.
-- Add formal schema/structural SBOM enforcement to CI only in T-09.
-- Do not create `SECURITY.md` until an actual confidential reporting channel is
-  enabled or a monitored contact is supplied.
+- T-05의 사람용 감사와 Java/npm machine SBOM 대조, clean checkout 재생성,
+  공식 schema 검사와 독립 읽기 전용 감사는 완료됐다.
+- formal schema·구조·재생성 drift를 자동화하는 CI는 T-09에서 구현한다.
+- 실제 비공개 신고 채널이 활성화되거나 운영 가능한 연락처가 정해지기 전에는
+  `SECURITY.md`를 완료하지 않는다.
 - 2026-07-26 검증 시점에는 branch push만 있었고 실제 GitHub Issue, PR,
   review, merge evidence는 아직 없었다. 이후 PR #16과 merge commit
-  `68f2183`이 생성됐지만 GitHub Issue와 제3자 review는 여전히 없다.
+  `68f2183`, PR #18과 merge commit `04afe7c`가 생성됐지만 GitHub Issue와
+  제3자 review는 여전히 없다.
 
 ## External GitHub gate — 2026-07-26
 
@@ -253,8 +255,9 @@ checksum, schema 검증 기록, human/machine 조정, 민감정보 노출 여부
 | source-only 경계와 OpenSQL 미검증 표현 | PASS |
 | LOW 후속 보완 | 문서의 과거 gate 현행화, generated JSON의 LF·마지막 LF 회귀 검증 추가 |
 
-감사 당시의 LOW 두 건은 현재 follow-up commit에서 수정한다. 독립 AUDIT는
-T-05의 현재 source-only 범위를 `VERIFIED`로 판정했지만, GitHub review가 아니며
+감사 당시의 LOW 두 건은 follow-up source commit `203c892`에서 수정했고
+PR #18, merge commit `04afe7c`로 `main`에 병합됐다. 독립 AUDIT는 T-05의
+현재 source-only 범위를 `VERIFIED`로 판정했지만, GitHub review가 아니며
 T-09 CI, 제출 직전 snapshot, PRZ-002의 나머지 작업은 아직 완료되지 않았다.
 
 ## AUDIT 후속 보완 VERIFY — 2026-07-28

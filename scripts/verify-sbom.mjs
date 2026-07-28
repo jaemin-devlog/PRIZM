@@ -32,8 +32,18 @@ function fail(message) {
   throw new Error(`SBOM verification failed: ${message}`)
 }
 
+export function assertCanonicalLf(fileName, content) {
+  if (content.includes('\r')) {
+    fail(`${fileName} must use LF line endings`)
+  }
+  if (!content.endsWith('\n')) {
+    fail(`${fileName} must end with LF`)
+  }
+}
+
 function readJson(fileName) {
   const content = readFileSync(resolve(sbomDirectory, fileName), 'utf8')
+  assertCanonicalLf(fileName, content)
 
   try {
     return { content, value: JSON.parse(content) }

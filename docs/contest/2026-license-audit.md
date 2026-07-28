@@ -840,8 +840,9 @@ manifest를 구현했다. 상세 범위·재생성 명령·현재 `NOT_RUN` 환�
 따라서 machine artifact 수는 `167 - 2 + (5 - 1) = 169`개다. frontend는
 사람용·기계용 모두 `package-lock.json`의 183개 versioned entry를 기준으로 한다.
 이 기록은 수량 차이를 숨기지 않고 module graph와 physical artifact inventory의
-관계를 설명한다. 최종 clean-checkout VERIFY와 독립 AUDIT 전에는 T-05를
-`VERIFIED`로 올리지 않는다.
+관계를 설명한다. commit `8dd57c4`의 clean-checkout VERIFY와 독립 읽기 전용
+AUDIT는 통과했다. AUDIT에서 지적한 문서 gate 현행화와 LF 회귀 검증은 후속
+보완 commit에서 반영했으며, 이것은 현재 source-only T-05 판정을 바꾸지 않는다.
 
 `@cyclonedx/cyclonedx-npm`은 frontend generator로 채택하지 않았다. 6.0.0 후보는
 당시 full npm audit에서 high finding 10건이 있었고, 4.0.1 후보는 full audit
@@ -851,7 +852,8 @@ endpoint가 package tree를 거부하여 신뢰 가능한 전이 취약점 판�
 판단을 자동으로 완결한다는 주장이 아니며, 누락·충돌 판단은 위 human audit과
 후속 독립 대조에서 계속 확인한다.
 
-**T-05 상태:** `IMPLEMENTED_UNVERIFIED`. 생성기의 고정 LF, 표준 hash algorithm,
-classifier-aware identity와 위 human/machine 조정 규칙은 구현했지만,
-formal-schema/CI gate, clean checkout evidence 및 독립 읽기 전용 감사 전에는
-`VERIFIED` 또는 PRZ-002 전체 완료로 표시하지 않는다.
+**T-05 상태:** 현재 source-only 배포 범위에서 `VERIFIED`. 생성기의 고정 LF,
+표준 hash algorithm, classifier-aware identity와 위 human/machine 조정 규칙을
+구현하고 clean checkout·공식 CycloneDX 1.6 schema·checksum·독립 읽기 전용
+AUDIT를 통과했다. T-09 CI, 제출 직전 snapshot 고정, PRZ-002 전체 완료는 별도
+후속 gate이며 완료로 표시하지 않는다.

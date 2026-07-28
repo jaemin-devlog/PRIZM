@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { assertCycloneDxValue, verifyRepository } from './verify-sbom.mjs'
+import { assertCanonicalLf, assertCycloneDxValue, verifyRepository } from './verify-sbom.mjs'
 
 function minimalBom(componentOverrides = {}) {
   return {
@@ -54,6 +54,17 @@ test('rejects duplicate bom-ref values', () => {
   assert.throws(
     () => assertCycloneDxValue('fixture.cdx.json', 'prizm', bom),
     /duplicate bom-ref pkg:maven\/example\/library@1\.0\.0/,
+  )
+})
+
+test('rejects CRLF output and a missing terminal LF', () => {
+  assert.throws(
+    () => assertCanonicalLf('fixture.cdx.json', '{}\r\n'),
+    /must use LF line endings/,
+  )
+  assert.throws(
+    () => assertCanonicalLf('fixture.cdx.json', '{}'),
+    /must end with LF/,
   )
 })
 

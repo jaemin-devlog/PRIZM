@@ -457,3 +457,15 @@
 - 구현: backend 생성기를 고정 LF와 Maven classifier-aware PURL로 수정하고, frontend npm integrity hash를 CycloneDX 표준 `SHA-512`로 변환했다. verifier에는 hash enum·`bom-ref` 고유성 검사와 Node 회귀 테스트를 추가했다.
 - 조정: 사람용 Java module 167개에서 metadata-only 2개를 제외하고 Netty classifier JAR 5개를 펼치면 machine artifact 169개가 되는 관계를 문서화했다.
 - 상태: 로컬 생성·회귀 검사는 통과했지만 clean checkout·공식 schema의 독립 VERIFY와 AUDIT 전이므로 T-05는 `IMPLEMENTED_UNVERIFIED`다. Docker, PostgreSQL, pgvector, Ollama, OpenSQL, OpenProxy, OpenHA는 사용하지 않았다.
+
+## 2026-07-27 — PRZ-002 SBOM 최종 재VERIFY 통과
+
+- 검증: corrective commit `8dd57c4`의 별도 깨끗한 local clone에서 backend·frontend SBOM을 재생성했다. checksum과 Git 무변경, 회귀 테스트 4건, 공식 CycloneDX 1.6 BOM/SPDX/JSF schema, 169개 고유 backend reference와 183개 frontend `SHA-512`를 확인했다.
+- 조정: human Java module 167개와 machine artifact 169개의 차이는 metadata-only platform/BOM 2개와 Netty classifier JAR 5개로 정확히 설명됨을 재확인했다.
+- 판정: T-05는 `VERIFY_COMPLETE_AUDIT_PENDING`이다. 독립 읽기 전용 AUDIT와 T-09 CI는 아직 남아 있으며 Docker, PostgreSQL, pgvector, Ollama, OpenSQL, OpenProxy, OpenHA는 이번 검증에서 `NOT_RUN`이다.
+
+## 2026-07-28 — PRZ-002 T-05 독립 AUDIT 후속 보완
+
+- 감사: source-only SBOM·AI 모델 명세의 독립 읽기 전용 AUDIT에서 CRITICAL/HIGH/MEDIUM finding은 없었다. 과거 완료 gate가 남은 작업처럼 보인 문서 표현과 LF 회귀 검증 부재의 LOW 두 건을 확인했다.
+- 보완: T-05 상태를 현재 source-only 범위의 `VERIFIED`로 현행화하고, verifier가 generated JSON의 CRLF와 마지막 LF 누락을 fail-closed로 거부하도록 Node 회귀 테스트를 추가했다.
+- 범위: T-09 CI·제출 직전 snapshot·PRZ-002의 나머지 공개 저장소 운영 작업은 계속 별도 gate다. Docker, PostgreSQL, pgvector, Ollama, OpenSQL, OpenProxy, OpenHA는 사용하지 않았다.

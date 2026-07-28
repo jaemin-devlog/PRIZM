@@ -4,9 +4,10 @@
 |---|---|
 | 관련 spec | [PRZ-002](../../specs/PRZ-002-open-source-readiness/spec.md) |
 | 구현 단위 | T-05 — SBOM·AI 모델 명세 |
-| 상태 | `IMPLEMENTED_UNVERIFIED` |
+| 상태 | 현재 source-only T-05 `VERIFIED`; PRZ-002 전체는 `IN_PROGRESS` |
 | 기준 배포물 | source-only Git repository / source ZIP |
 | 마지막 생성일 | 2026-07-27 |
+| 마지막 검증 commit | `8dd57c4897ff746db41df489201cacfc82c99f1b` |
 
 이 문서는 PRIZM의 현재 source-only 배포물을 위한 기계 판독용 공급망
 기록의 범위와 재현 방법을 설명한다. 이것은 OpenSQL, OpenProxy 또는 OpenHA
@@ -70,8 +71,9 @@ audit과 machine SBOM 모두 183개 lockfile entry다. backend human audit의
 167개 module identity에는 물리 JAR이 없는 platform/BOM 2개가 포함되고,
 `netty-codec-native-quic` 한 module은 platform classifier JAR 5개로 해소된다.
 따라서 artifact SBOM은 `167 - 2 + (5 - 1) = 169`개이고, 모두 고유한
-classifier-aware `bom-ref`를 가진다. 이 조정 규칙의 독립 재검증은 T-05
-VERIFY/AUDIT gate로 남아 있다.
+classifier-aware `bom-ref`를 가진다. 이 조정 규칙은 commit `8dd57c4`의
+깨끗한 복제본에서 다시 검증했고, 후속 독립 읽기 전용 AUDIT에서
+CRITICAL/HIGH/MEDIUM finding 없이 통과했다.
 
 ## AI model 명세와 source license 경계
 
@@ -112,8 +114,7 @@ OpenSQL 관련 결과는 존재하지 않는다.
 
 ## 남은 gate
 
-- T-05: 수정된 human/machine 조정 규칙과 clean checkout 재현의 독립 검증,
-  commit·환경·hash evidence 고정, 독립 읽기 전용 감사
+- submission: 실제 제출 직전 공개 commit·tree·환경·결과 hash 재고정
 - T-09: SBOM formal-schema/structural validation과 regeneration drift를 CI에서
   실행하고, tool·workflow provenance를 다시 검증
 - future artifact: JAR, `dist`, image, Ollama binary, model bytes 재배포 전

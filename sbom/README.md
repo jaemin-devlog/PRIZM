@@ -54,9 +54,11 @@ the build and adds no SBOM plugin. It emits LF on every operating system and
 adds a Maven `classifier` PURL qualifier when one module resolves to multiple
 platform artifacts. The repository structural verifier checks both files'
 format, schema version, primary component, reproducibility fields, globally
-unique `bom-ref` values, canonical CycloneDX hash algorithm names, checksum,
-and prohibited local/secret-shaped data. The Node regression tests prove that
-non-canonical hash names and duplicate references are rejected. Full
+unique `bom-ref` values, canonical CycloneDX hash algorithm names, canonical
+LF line endings with a terminal LF, checksum, and prohibited
+local/secret-shaped data. The Node regression tests prove that non-canonical
+hash names, duplicate references, CRLF output, and a missing terminal LF are
+rejected. Full
 license/SBOM CI enforcement is tracked by `PRZ-002` T-09 and has not been added
 yet.
 

@@ -16,7 +16,8 @@
 | 설치 후 재부팅 및 관리자 확인 | `PASS` | 설치 매체 제거 뒤 Rocky Linux 재부팅, `jaemin@prizm-opensql-01`의 `sudo -v` 성공 확인. |
 | OpenSQL 설치/라이선스 적용 | `NOT_RUN` | 라이선스 자산과 게스트 설치 근거 대기. |
 | OpenSQL Gate | `NOT_RUN` | OpenSQL 대상과 전용 credential이 아직 없음. |
-| GitHub Issue / PR | `NOT_CREATED` | 환경 준비 단계에서는 GitHub Issue/PR을 생성하지 않음. |
+| GitHub Issue | `NOT_CREATED` | 환경 준비 작업을 소급해 설명하는 Issue는 생성하지 않음. |
+| GitHub PR | `MERGED` | [PR #17](https://github.com/jaemin-devlog/PRIZM/pull/17), source commit `8a633e8`, merge commit `b36f6b2`. |
 
 ## 검증 경계
 

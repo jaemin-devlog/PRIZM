@@ -479,10 +479,13 @@ OpenSQL·OpenProxy·OpenHA `NOT_RUN`
 
 현재는 T-01 source register, T-02 component inventory와 G-01 source-only
 배포 경계, T-03 Apache-2.0 결정 snapshot이 현재 source-only 범위에서
-완료됐다. IMPLEMENT는 `IN_PROGRESS`다. 외부 design token blocker와 build·CI
-artifact identity blocker는 해소됐고, future artifact 제한은 현재
-`LICENSE`·`NOTICE` 생성을 막지 않는다. GitHub Issue·LICENSE·NOTICE·SBOM·
-governance·template과 license/SBOM 검사 CI는 아직 구현하지 않았다.
+완료됐다. T-04 Apache-2.0 `LICENSE`·source-only `NOTICE`와 T-05
+machine-readable SBOM·AI 모델 명세도 구현됐으며, T-05는 PR #18 병합 기준
+`VERIFIED`다. PRZ-002 전체 IMPLEMENT는 `IN_PROGRESS`다. 외부 design token
+blocker와 build·CI artifact identity blocker는 해소됐고, future artifact
+제한은 현재 source-only 배포를 막지 않는다. GitHub Issue와 T-06~T-10의
+governance·template·README/Quickstart·license/SBOM 검사 CI·전체 독립 감사는
+아직 완료하지 않았다.
 공급망 pin은 PR #13으로 병합됐고 GitHub Actions backend·frontend push/PR
 check 4건이 성공했다. 2026-07-25 보완 검증에서는 strict dependency
 verification으로 단위 테스트 245건 중 231건 성공·14건 환경 조건 skip·실패

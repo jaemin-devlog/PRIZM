@@ -97,9 +97,13 @@ CareerFact, portfolio와 제출 감사는 실제 착수 순서에 따라 각각 
   `CONTENT_EXTRACTED_SOURCE_PENDING`
 - 공식 오리엔테이션 PDF의 URL·버전·hash 확보 후 추적표 source 고정
 - dependency, `bge-m3`, 합성 데이터, asset, OpenSQL 구성요소 라이선스를
-  `docs/contest/2026-license-audit.md`에 감사
-- 감사 결과에 맞는 root LICENSE, NOTICE, CONTRIBUTING, SECURITY 결정
-- Issue·PR template과 실제 신규 작업용 GitHub 흐름 준비
+  `docs/contest/2026-license-audit.md`에 감사 — 완료
+- Apache-2.0 root LICENSE, source-only NOTICE, SBOM·AI 모델 명세 — 완료
+- README·Quickstart·문서 색인, 라이선스·SBOM 검증 CI와 최종 독립 감사 — 진행 중
+- CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT와 maintainer 정책은
+  외부 기여 접수 또는 첫 지원 release·외부 배포 전까지 `DEFERRED`. 재개 시
+  실제 비공개 보안 신고 경로를 먼저 확정
+- Issue·PR template은 외부 Issue·PR 접수를 공식 지원하기 전까지 `DEFERRED`
 
 ### P1. OpenSQL·clean-clone — 7월 28일~8월 3일
 

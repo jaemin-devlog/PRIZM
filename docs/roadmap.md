@@ -1,6 +1,6 @@
 # PRIZM 개발 로드맵
 
-> 기준일: 2026-07-24
+> 기준일: 2026-07-28
 >
 > 현재 단계: 기존 구현 기준선 완료, 대회 대응 P0 진행 중
 
@@ -15,8 +15,8 @@
 | 단계 | 상태 | 완료 기준 |
 |---|---|---|
 | 기존 구현 기준선 | `COMPLETE` | `PRZ-000 AS_BUILT_BASELINE`, `main` 단일 장기 브랜치, 핵심 문서 동기화 |
-| P0 공식 기준·오픈소스 준비 | `IN_PROGRESS` | 공식 내용 초기 매핑 완료; 오리엔테이션 원본 고정, 라이선스 감사와 거버넌스 문서 남음 |
-| P1 OpenSQL·clean-clone | `NOT_STARTED` | 실제 OpenSQL 단일 환경 Gate와 새 환경 재현 |
+| P0 공식 기준·오픈소스 준비 | `IN_PROGRESS` | source register·Apache-2.0·NOTICE·SBOM·AI 명세 완료; Quickstart·검증 CI·최종 감사 남음 |
+| P1 OpenSQL·clean-clone | `IN_PROGRESS_ENVIRONMENT_READY` | PRZ-003 Rocky Linux VM·라이선스 신청 완료; 실제 OpenSQL Gate와 clean-clone은 `NOT_RUN` |
 | P2 DB 장애복구 Gate | `NOT_STARTED` | 실제 다중 노드 장애전환과 서비스 연속성 evidence |
 | P3 변경 로그 동기화·MCP | `NOT_STARTED` | 멱등 동기화와 owner-scoped 읽기 전용 MCP 검색 |
 | P4 PRIZM 차별 slice | `NOT_STARTED` | 앞선 Gate 통과 뒤 source가 연결된 최소 CareerFact |
@@ -29,12 +29,12 @@
 
 ## 다음 작업 순서
 
-1. dependency, `bge-m3`, 합성 데이터, asset과 OpenSQL 구성요소의
-   라이선스를 `docs/contest/2026-license-audit.md`에 감사한다.
-2. 감사 결과에 따라 LICENSE, NOTICE, CONTRIBUTING, SECURITY와 GitHub
-   template을 추가한다.
-3. 실제 착수 시 다음 available spec ID로 OpenSQL 단일 환경 Gate를 만들고,
-   GitHub 쓰기가 승인된 경우 현재 Issue와 연결해 OpenSQL 실환경을 검증한다.
+1. PRZ-002 T-08에서 README·Quickstart·문서 색인을 현재 source-only
+   Apache-2.0·NOTICE·SBOM·AI 모델 명세와 맞춘다.
+2. T-09에서 라이선스·SBOM 재생성·구조·drift 검증을 CI로 고정하고,
+   T-10에서 최종 독립 감사를 통과한다.
+3. 실제 착수한 PRZ-003 OpenSQL 단일 환경 Gate에서 라이선스 발급 뒤
+   OpenSQL을 설치하고 migration·vector·검색·Worker SQL을 검증한다.
 4. Clean Clone Demo spec에서 안전한 demo `USER`와 재현 절차를 완성한다.
 5. 실제 다중 노드 구성을 확보해 DB 장애전환·검색 복구 Gate를 수행한다.
 6. 변경 로그 기반 동기화의 최소 수직 슬라이스를 구현·검증한다.
@@ -46,6 +46,12 @@
 
 Portfolio는 검증된 CareerFact 이후의 제품 계획이다. 대회 핵심 Gate가
 미완료인 상태에서는 먼저 개발하지 않는다.
+
+CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT와 maintainer 정책은
+미구현 상태로 `DEFERRED`한다. 외부 기여 접수 또는 첫 지원 release·외부 배포를
+준비하는 시점 중 먼저 도래하는 때 실제 비공개 보안 신고 경로부터 확정한 뒤
+재개한다. GitHub Issue Form·PR Template은 외부 Issue·PR 접수를 공식
+지원하기 전에 재개한다.
 
 ## 2차 발표 이후 제품 확장 후보
 

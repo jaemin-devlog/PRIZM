@@ -474,3 +474,9 @@
 
 - 결정: 기존 `AGENTS.md`의 staged delivery workflow를 유지하면서, AI의 조용한 가정·과잉 구현·무관한 수정·검증 없는 완료 선언을 줄이기 위한 보조 판단 기준을 문서화했다.
 - 경계: Karpathy-inspired guidelines는 개발 환경의 로컬 Codex skill로만 사용한다. PRIZM 배포물·런타임 dependency·대회 구현 증거가 아니며, 프로젝트 공통 규칙은 계속 `AGENTS.md`를 단일 원본으로 한다.
+
+## 2026-07-28 — PRZ-002 공개 저장소 거버넌스 범위 조정
+
+- 결정: 실제 외부 운영이 시작되지 않은 현재는 G-02 보안 신고 채널, CONTRIBUTING·CODE_OF_CONDUCT·SECURITY·SUPPORT·maintainer 정책과 Issue·PR template을 완료로 꾸미지 않고 `DEFERRED`로 둔다.
+- 재개: G-02와 운영 문서는 외부 기여 접수 또는 첫 지원 release·외부 배포를 준비하는 시점 중 먼저 도래하는 때 실제 비공개 신고 경로부터 확정한다. Issue·PR template은 외부 Issue·PR 접수를 공식 지원하기 전에 재개한다.
+- 현재 Gate: source-only Apache-2.0·NOTICE·SBOM·AI 모델 명세는 유지하고, README·Quickstart·문서 색인, 라이선스·SBOM 검증 CI와 최종 독립 감사를 P0 잔여 작업으로 둔다. 문서 전용 범위 조정이므로 새 spec이나 애플리케이션 검증은 추가하지 않았다.

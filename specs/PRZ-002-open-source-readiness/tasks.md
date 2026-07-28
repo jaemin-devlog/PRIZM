@@ -330,7 +330,8 @@ clean-checkout 재생성, checksum, human/machine 조정, 민감정보 검사, �
 review 증거가 아니다.
 
 **현재 판정:** 현재 source-only 범위의 T-05 `VERIFIED`. 제출 직전 snapshot,
-T-09 CI, 그리고 PRZ-002의 나머지 T-06~T-10은 별도 후속 작업이다.
+T-09 CI와 PRZ-002의 활성 T-08~T-10은 별도 후속 작업이다. T-06·T-07은
+아래 재개 조건까지 `DEFERRED`다.
 
 **완료 evidence:** 재생성 명령, schema validation, human/machine diff,
 AI model provenance와 secret scan 결과
@@ -339,16 +340,22 @@ AI model provenance와 secret scan 결과
 
 **선행 조건:** repository 설정 확인 권한
 
+**상태:** `DEFERRED`. 첫 지원 release·외부 배포 또는 외부 기여 접수 중 먼저
+도래하는 시점에 재개한다. 현재 source-only P0 제출 Gate를 막지 않는다.
+
 - [ ] GitHub Private Vulnerability Reporting을 활성화하고 접수 경로를
   실제 확인하거나, 사용자가 검증 가능한 전용 연락처를 제공한다.
 - [ ] 선택한 경로의 maintainer 수신·응답 가능성을 확인한다.
 - [ ] Issues·Discussions 지원 기능의 실제 활성화 상태를 확인한다.
 
-**중단 조건:** 비공개 신고 채널이 없으면 `SECURITY.md` 게시 금지
+**중단 조건:** 재개 뒤 비공개 신고 채널이 없으면 `SECURITY.md` 게시 금지
 
-## T-06 — 기여·행동강령·보안·지원·maintainer 정책
+## T-06 — 기여·행동강령·보안·지원·maintainer 정책 — `DEFERRED`
 
 **선행 조건:** T-05, G-02
+
+**재개 조건:** 외부 기여 접수를 공식 지원하거나 첫 지원 release·외부 배포를
+준비하는 시점 중 먼저 도래하는 때 재개한다. 아래 체크박스는 미완료로 유지한다.
 
 - [ ] CONTRIBUTING에 setup, test, Flyway forward-only, 문서·license,
   sensitive data, AI assistance disclosure 규칙을 기록한다.
@@ -361,9 +368,12 @@ AI model provenance와 secret scan 결과
 
 **완료 evidence:** 운영 가능한 contact test, 문서 링크 검사, maintainer 승인
 
-## T-07 — Issue Form·PR Template
+## T-07 — Issue Form·PR Template — `DEFERRED`
 
 **선행 조건:** T-06
+
+**재개 조건:** 외부 Issue·PR 접수를 공식 지원하기 전에 재개한다. 아래
+체크박스는 미완료로 유지한다.
 
 - [ ] Bug Issue Form에 환경·version·재현·기대/실제·로그 정제·민감정보 금지를
   포함한다.
@@ -381,10 +391,11 @@ secret-safe field review
 
 ## T-08 — README·Quickstart·docs index
 
-**선행 조건:** T-04~T-07
+**선행 조건:** T-04·T-05 완료와 G-02·T-06·T-07 deferral 결정 기록
 
 - [ ] README 첫 화면에 문제, Engine/Reference App 경계, 현재 기능, Quickstart,
-  docs·license·contribution·security 경로를 배치한다.
+  docs·license·SBOM 경로와 현재 외부 기여·보안 운영 상태를 배치한다.
+- [ ] 존재하지 않는 contribution·security 문서나 미검증 연락 경로를 링크하지 않는다.
 - [ ] clean-clone Quickstart를 실제로 재현하고 필요한 환경·초기 사용자
   blocker를 정직하게 기록한다.
 - [ ] 구현됨·계획됨·미검증을 표로 분리한다.
@@ -424,13 +435,16 @@ check 4건은 모두 성공했으며, backend job에서 Ollama archive·model Ga
 
 ## T-10 — 독립 읽기 전용 감사
 
-**선행 조건:** T-01~T-09 VERIFY 완료
+**선행 조건:** 활성 작업 T-01~T-05·T-08·T-09 VERIFY 완료와
+G-02·T-06·T-07 deferral 결정 기록
 
 - [ ] source register의 공식 URL·hash·권리 상태를 재검증한다.
 - [ ] lockfile/resolved graph/JAR/bundle/image/model과 audit·SBOM을 재대조한다.
 - [ ] `LICENSE`, `NOTICE`, SBOM, AI 명세의 license·version·배포 경계를
   상호 확인한다.
-- [ ] SECURITY·SUPPORT·Issue·PR 경로의 실제 동작을 확인한다.
+- [ ] G-02·T-06·T-07이 미구현·`DEFERRED`로 정직하게 표시되고 재개 조건이
+  문서 사이에서 일치하는지 확인한다.
+- [ ] 가짜 SECURITY·SUPPORT 연락처나 존재하지 않는 Issue·PR 경로가 없는지 확인한다.
 - [ ] 공개 저장소와 generated artifact의 민감정보·모델 cache·로컬 경로
   부재를 확인한다.
 - [ ] GitHub repository visibility가 실제 `PUBLIC`인지 API와 UI에서 확인한다.
@@ -470,8 +484,9 @@ OpenSQL·OpenProxy·OpenHA `NOT_RUN`
 
 ## 최종 완료 조건
 
-- [ ] T-01~T-10이 evidence와 함께 완료됐다.
-- [ ] G-01~G-03의 사용자·권한 결정이 실제로 기록됐다.
+- [ ] 활성 작업 T-01~T-05·T-08~T-10이 evidence와 함께 완료됐다.
+- [ ] G-01·G-03의 사용자·권한 결정과 G-02·T-06·T-07의 `DEFERRED`
+  결정·각 재개 조건이 실제로 기록됐다.
 - [ ] 배포 범위에 `UNKNOWN`, `CONFLICT`, `BLOCKED`가 없다.
 - [ ] 독립 감사에 CRITICAL/HIGH/MEDIUM finding이 없다.
 - [ ] 실제 GitHub Issue·PR·CI·review 상태를 과장하지 않았다.
@@ -483,9 +498,11 @@ OpenSQL·OpenProxy·OpenHA `NOT_RUN`
 machine-readable SBOM·AI 모델 명세도 구현됐으며, T-05는 PR #18 병합 기준
 `VERIFIED`다. PRZ-002 전체 IMPLEMENT는 `IN_PROGRESS`다. 외부 design token
 blocker와 build·CI artifact identity blocker는 해소됐고, future artifact
-제한은 현재 source-only 배포를 막지 않는다. GitHub Issue와 T-06~T-10의
-governance·template·README/Quickstart·license/SBOM 검사 CI·전체 독립 감사는
-아직 완료하지 않았다.
+제한은 현재 source-only 배포를 막지 않는다. GitHub Issue는 만들지 않았고
+G-02·T-06의 governance는 외부 기여 접수 또는 첫 지원 release·외부 배포
+전까지, T-07 template은 외부 Issue·PR 접수를 공식 지원하기 전까지
+`DEFERRED`다. 현재 활성 잔여 작업은 T-08 README/Quickstart, T-09
+license/SBOM 검사 CI, T-10 전체 독립 감사다.
 공급망 pin은 PR #13으로 병합됐고 GitHub Actions backend·frontend push/PR
 check 4건이 성공했다. 2026-07-25 보완 검증에서는 strict dependency
 verification으로 단위 테스트 245건 중 231건 성공·14건 환경 조건 skip·실패

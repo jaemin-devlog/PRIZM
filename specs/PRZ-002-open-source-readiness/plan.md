@@ -11,7 +11,7 @@
 | GitHub Issue | `NOT_CREATED` |
 | Primary evaluation | `EVAL-R1-02` |
 | Secondary evaluation | `EVAL-R1-03`, `EVAL-R1-05` |
-| 계획 기준일 | 2026-07-24 |
+| 계획 기준일 | 2026-07-24, 범위 조정 2026-07-28 |
 
 이 문서는 8월 27일 출품작 제출과 10월 라이선스 검증 전에 수행할
 오픈소스 준비 작업의 순서와 증거 Gate를 정의한다. 점수를 예측하지 않으며,
@@ -26,8 +26,10 @@
   제3자 저작물 부재를 추정하지 않는다.
 - 외부 코드·이미지·fixture·샘플 데이터가 없다고 아직 확정하지 않는다.
   전체 provenance 감사로 확인한다.
-- 현재 저장소에는 루트 `LICENSE`, `NOTICE`, 공개 기여·행동강령·보안·지원
-  문서와 GitHub Issue Form·PR Template이 없다.
+- 현재 저장소에는 루트 Apache-2.0 `LICENSE`, source-only `NOTICE`,
+  machine-readable SBOM과 AI 모델 명세가 있다. 공개 기여·행동강령·보안·
+  지원 문서와 GitHub Issue Form·PR Template은 아직 없으며 아래 재개
+  조건까지 `DEFERRED`다.
 - PostgreSQL 검증 결과를 OpenSQL·OpenProxy·OpenHA 결과로 바꾸어 표현하지
   않는다. 세 환경은 계속 `NOT_RUN`이다.
 - Java source, frontend, Flyway V1~V13, production config, Docker Compose와
@@ -229,16 +231,19 @@ non-redistributable component가 배포 경계에 하나라도 남으면 `BLOCKE
 
 ### G-02 — SECURITY 신고 채널
 
-실제로 운영 가능한 비공개 신고 채널이 확인되기 전에는 `SECURITY.md`를
-게시하지 않는다.
+**현재 상태:** `DEFERRED`. 현재 source-only P0 제출 Gate를 막지 않으며,
+첫 지원 release·외부 배포 또는 외부 기여 접수 중 먼저 도래하는 시점에
+재개한다. 실제로 운영 가능한 비공개 신고 채널이 확인되기 전에는
+`SECURITY.md`를 게시하지 않는다.
 
 1. GitHub Private Vulnerability Reporting을 사용자가 활성화하고 실제
    advisory 접수 화면을 검증하거나,
 2. 사용자가 전용 연락처를 제공하고 수신 가능성을 검증한다.
 
-둘 중 하나가 충족되지 않으면 `BLOCKED`다. 가짜 이메일, 사용자가 확인하지 않은
-개인 주소, 공개 Issue를 보안 신고 기본 경로로 쓰지 않는다. `SUPPORT.md`의
-Issues·Discussions 경로도 repository 기능이 실제 활성화됐는지 확인한다.
+재개 뒤 둘 중 하나가 충족되지 않으면 해당 거버넌스 release를 `BLOCKED`한다.
+가짜 이메일, 사용자가 확인하지 않은 개인 주소, 공개 Issue를 보안 신고 기본
+경로로 쓰지 않는다. `SUPPORT.md`의 Issues·Discussions 경로도 repository
+기능이 실제 활성화됐는지 확인한다.
 
 ### G-03 — 도구·GitHub 쓰기 권한
 
@@ -302,9 +307,12 @@ version/revision/digest·license·약관·용도·탑재/호출 방식·가중�
 credential·로컬 경로·원문 문서·모델 cache가 결과에 없다. 제출 시점에는 명령,
 환경, 생성 시각, commit, 결과 hash를 evidence에 고정한다.
 
-### 6. 기여·행동강령·보안·지원·maintainer 정책
+### 6. 기여·행동강령·보안·지원·maintainer 정책 — `DEFERRED`
 
-**작업:** `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`,
+**재개 조건:** 외부 기여 접수를 공식 지원하거나 첫 지원 release·외부 배포를
+준비하는 시점 중 먼저 도래하는 때 G-02와 함께 재개한다.
+
+**재개 후 작업:** `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`,
 `SUPPORT.md`와 최소 maintainer 정책을 작성한다. 개발 명령, test Gate,
 Flyway forward-only, owner/security, dependency/license, sensitive data와
 AI 보조도구 disclosure 원칙을 포함한다.
@@ -313,9 +321,11 @@ AI 보조도구 disclosure 원칙을 포함한다.
 권한·release·dependency update·취약점 처리 책임과 solo project의 review
 한계가 정직하게 기록된다.
 
-### 7. Issue Form·PR Template
+### 7. Issue Form·PR Template — `DEFERRED`
 
-**작업:** Bug, Feature, Documentation Issue Form과 PR Template을 만든다.
+**재개 조건:** 외부 Issue·PR 접수를 공식 지원하기 전에 재개한다.
+
+**재개 후 작업:** Bug, Feature, Documentation Issue Form과 PR Template을 만든다.
 환경·재현·범위·test·migration·security/ownership·dependency/license·문서·
 `NOT_RUN`을 구조화하되 secret·JWT·문서 원문 업로드를 막는다.
 
@@ -325,8 +335,9 @@ contact link 정책이 의도대로 동작한다. template 존재를 실제 issu
 
 ### 8. README·Quickstart·docs index 현행화
 
-**작업:** 문제·제품 경계·현재 기능·Quickstart·검증 환경·제약·roadmap·기여·
-보안·license·SBOM 링크 순서로 첫 진입 경로를 정리한다.
+**작업:** 문제·제품 경계·현재 기능·Quickstart·검증 환경·제약·roadmap·
+license·SBOM 링크와 현재 외부 기여·보안 운영 상태 순서로 첫 진입 경로를
+정리한다. 존재하지 않는 기여·보안 문서 링크는 만들지 않는다.
 
 **완료 조건:** 현재 구현, 계획, 환경 미검증을 표로 분리하고 OpenSQL·OpenProxy·
 OpenHA는 `NOT_RUN`, CareerFact·portfolio·MCP·멀티모듈은 계획으로 유지한다.
@@ -348,10 +359,10 @@ evidence에 남긴다.
 ### 10. 독립 읽기 전용 감사
 
 **작업:** 구현자가 아닌 별도 검토 관점에서 source·artifact·generated SBOM·
-templates·CI·Git diff를 직접 확인한다.
+CI·Git diff와 G-02·T-06·T-07의 deferral 기록을 직접 확인한다.
 
-**완료 조건:** 라이선스 충돌, source 누락, 민감정보 노출, 미작동 신고 경로,
-구현 과장에 CRITICAL/HIGH/MEDIUM finding이 0건이다. finding이 있으면
+**완료 조건:** 라이선스 충돌, source 누락, 민감정보 노출, 가짜 신고 경로,
+deferral 누락과 구현 과장에 CRITICAL/HIGH/MEDIUM finding이 0건이다. finding이 있으면
 `IN_PROGRESS`, 외부 결정 없이는 해결할 수 없으면 `BLOCKED`로 유지한다.
 GitHub repository visibility가 실제 `PUBLIC`인지 확인하고, 감사한 commit의
 clean clone에 빌드에 필요한 직접 작성 backend·frontend source, V1~V13
@@ -364,9 +375,9 @@ hash가 감사한 공개 commit과 일치해야 한다.
 | 반영할 구조 | 적용 방법 |
 |---|---|
 | README 진입 구조 | PRIZM 문제·현재 범위·Quickstart·문서 링크를 앞에서 찾게 한다. |
-| CONTRIBUTING | 실제 개발·test·license·보안·문서 절차를 PRIZM 명령으로 새로 쓴다. |
+| CONTRIBUTING | 외부 기여 접수를 시작할 때 실제 개발·test·license·보안·문서 절차를 PRIZM 명령으로 새로 쓴다. |
 | LICENSE와 고지 | 표준 license 원문과 PRIZM 감사 결과만 사용한다. |
-| Issue Form·PR Template | PRIZM 상태·owner·migration·`NOT_RUN` Gate에 맞게 새로 설계한다. |
+| Issue Form·PR Template | 외부 Issue·PR 운영을 열 때 PRIZM 상태·owner·migration·`NOT_RUN` Gate에 맞게 새로 설계한다. |
 | 문서 Quickstart | clean clone에서 재현할 수 있는 최소 경로와 알려진 blocker를 둔다. |
 | 링크 검증 | local hard fail과 외부 network 오류 보고를 분리한다. |
 | release 정책 | tag·commit·SBOM·NOTICE·지원 범위와 rollback evidence를 연결한다. |
@@ -398,8 +409,9 @@ hash가 감사한 공개 commit과 일치해야 한다.
   `git diff --check`
 - 전체 unit test, PostgreSQL integration test, frontend lint/build,
   `docker compose config`는 실제 변경 영향에 따라 실행한다.
-- SBOM/license verification, clean build, fat JAR·frontend bundle·runtime
-  image 내용 대조를 실행한다.
+- 현재 source-only SBOM/license verification과 clean checkout 대조를
+  실행한다. fat JAR·frontend bundle·runtime image 내용 대조는 해당 산출물을
+  실제 배포 범위에 넣을 때의 별도 release Gate다.
 - 필요한 Docker·PostgreSQL·pgvector·Ollama를 실제로 사용했는지, 미실행
   test와 이유를 evidence에 남긴다. 환경 부재는 PASS가 아니라 `NOT_RUN`이다.
 
@@ -411,12 +423,14 @@ hash가 감사한 공개 commit과 일치해야 한다.
 - public repository에서 secret·사용자 문서·local path·model cache 부재 확인
 - GitHub visibility `PUBLIC`, clean clone의 전체 빌드 source와 제출
   commit·tree hash 일치 확인
-- GitHub 신고·Issue·PR·CI 링크의 실제 동작과 권한 확인
+- 존재하는 GitHub PR·CI 링크의 실제 동작과 권한 확인. deferred 신고·Issue
+  경로는 존재하는 것처럼 링크하지 않았는지와 재개 조건을 확인
 
 ## 평가 evidence Gate
 
 - `EVAL-R1-02`가 primary다. outgoing license 승인, 전체 감사, 실제 NOTICE,
-  기여·보안 경로와 blocking unknown 0건이 evidence다.
+  SBOM·AI 모델 명세와 현재 source-only 배포 범위의 blocking unknown 0건이
+  evidence다. deferred 기여·보안 경로는 구현된 evidence로 계산하지 않는다.
 - `EVAL-R1-03`은 secondary다. source register, SBOM·AI 명세, Quickstart,
   재현 명령과 현재/계획/`NOT_RUN` 구분이 evidence다.
 - `EVAL-R1-05`는 secondary다. 실제 future Issue·PR·CI·merge가 생겼을 때만
@@ -433,13 +447,12 @@ hash가 감사한 공개 commit과 일치해야 한다.
 - `docs/contest/2026-sbom.md`
 - `docs/contest/2026-ai-model-provenance.md`
 - `LICENSE`, `NOTICE`
-- `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `SUPPORT.md`,
-  `MAINTAINERS.md`
-- `.github/ISSUE_TEMPLATE/bug_report.yml`
-- `.github/ISSUE_TEMPLATE/feature_request.yml`
-- `.github/ISSUE_TEMPLATE/documentation.yml`
-- `.github/ISSUE_TEMPLATE/config.yml`
-- `.github/pull_request_template.md`
+- 재개 조건 충족 뒤 `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`,
+  `SUPPORT.md`, `MAINTAINERS.md`
+- 재개 조건 충족 뒤 `.github/ISSUE_TEMPLATE/bug_report.yml`,
+  `.github/ISSUE_TEMPLATE/feature_request.yml`,
+  `.github/ISSUE_TEMPLATE/documentation.yml`,
+  `.github/ISSUE_TEMPLATE/config.yml`, `.github/pull_request_template.md`
 - `README.md`, `docs/README.md`, `docs/development-log.md`
 - `docs/contest/2026-requirements-traceability.md`
 - `docs/contest/2026-tmaxtibero-plan.md`, `docs/roadmap.md`
@@ -472,7 +485,7 @@ hash가 감사한 공개 commit과 일치해야 한다.
 | 모델 revision·Ollama manifest 식별 실패 | model Gate 실패, PostgreSQL test 성공으로 대체 금지 |
 | 배포 산출물 범위 미확정 | NOTICE·SBOM 확정 중단, 사용자에게 제출·배포 형태 결정 요청 |
 | outgoing license 미승인 | `LICENSE`·`NOTICE` 생성 금지 |
-| 비공개 security channel 미확정 | `SECURITY.md` 게시 금지 |
+| 비공개 security channel 미확정 | 현재 source-only P0에서는 G-02·T-06을 `DEFERRED`; 첫 지원 release·외부 배포 또는 외부 기여 접수 전에 재개하고, 그때까지 `SECURITY.md` 게시 금지 |
 | 감사 도구의 license·출력이 불명 | 도구 채택 금지, 수동 inventory 유지 |
 | 공식 자료 변경·hash 불일치 | source register를 `CONFLICT`로 바꾸고 원인 확인 |
 | 기존 dirty user change와 branch 전환 충돌 | reset·stash로 우회하지 않고 중단 |
@@ -482,7 +495,8 @@ hash가 감사한 공개 commit과 일치해야 한다.
 사용자가 IMPLEMENT 전에 결정해야 할 항목은 다음과 같다.
 
 1. 감사 결과를 본 뒤 MIT 또는 Apache-2.0 outgoing license 선택
-2. GitHub Private Vulnerability Reporting 또는 검증 가능한 전용 신고 채널
+2. 첫 지원 release·외부 배포 또는 외부 기여 접수 전 GitHub Private
+   Vulnerability Reporting 또는 검증 가능한 전용 신고 채널
 3. 실제 제출·배포 산출물: source, JAR, `dist`, image, model 포함 여부
 4. 감사된 SBOM/license 도구의 변경 범위
 5. GitHub Issue·branch·PR 생성 권한과 가능한 실제 reviewer

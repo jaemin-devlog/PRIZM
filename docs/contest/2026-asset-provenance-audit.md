@@ -41,7 +41,7 @@ Career Vault의 차분한 문서 관리 화면을 위해 독립적으로 선택�
 
 2026-07-24 현재 다음을 읽기 전용으로 대조했다.
 
-1. `git ls-files`의 273개 추적 파일 전체를 확장자, 크기와 NUL byte
+1. `git ls-files`의 274개 추적 파일 전체를 확장자, 크기와 NUL byte
    signature로 검사했다.
 2. `frontend/public`, `frontend/assets`, test resource, `README.md`,
    `docs/`, Dockerfile, Compose와 GitHub Actions의 로컬 파일 참조를
@@ -70,19 +70,20 @@ Git commit author는 파일을 저장소에 추가한 사람을 보여줄 뿐, �
 
 | 조사 범위 | 추적 파일 수 | 결과 |
 |---|---:|---|
-| 전체 저장소 | 273 | 누락된 추적 파일 0 |
+| 전체 저장소 | 274 | 누락된 추적 파일 0 |
 | test·evaluation resource | 5 | 설정 YAML 3개, 검색 평가 fixture 2개 |
 | 검색 평가 fixture | 2 | 아래 provenance 확인 대상 |
 | NUL byte가 있는 binary | 1 | `gradle-wrapper.jar` |
-| image·PDF·Office·font·media·model | 0 | Git에 포함된 파일 없음 |
-| frontend `public`·`assets` | 0 | 디렉터리 자산 없음 |
+| image·PDF·Office·font·media·model | 1 | 직접 제작 SVG 1개, 그 외 파일 없음 |
+| frontend `public`·`assets` | 1 | 로그인 배경 SVG 1개 |
 | docs의 비-Markdown 첨부 | 0 | 로컬 image·attachment 없음 |
 | Markdown image 참조 | 0 | 저장소 이미지에 대한 참조 없음 |
 | inline Mermaid block | 5 | Markdown source로 직접 렌더링되며 별도 binary 자산은 아님 |
 
 `frontend/src/App.tsx`의 `<img>`는 Git에 저장한 그림을 가리키지 않고,
 인증된 API 응답으로 실행 중 생성한 문서 thumbnail object URL을 표시한다.
-따라서 별도 배포 자산으로 분류하지 않는다. test resource의 나머지 세
+따라서 별도 배포 자산으로 분류하지 않는다. 반면 로그인 배경 SVG는 아래
+`ASSET-LOGIN-EVIDENCE-VISUAL`로 별도 추적한다. test resource의 나머지 세
 파일도 실행 설정이며 TXT/PDF 원문 sample은 추적되지 않는다.
 
 ## 배포 자산 판정
@@ -91,6 +92,7 @@ Git commit author는 파일을 저장소에 추가한 사람을 보여줄 뿐, �
 |---|---|---|---|---|---|---|
 | `ASSET-SEARCH-CORPUS` | [`corpus.json`](../../src/test/resources/search-evaluation/sample/corpus.json), 1개 | 합성 검색 corpus: 11개 virtual document, 13 pages, 27 evidence anchors | SHA-256 `0E9981C4BFCEA39ED7DFCA3F156EC9BCBF7E425DE9F29E966BB5F6D7D0494D86`; 최초 commit `46e24eff85f055740f7397190bb1e6266aa742a8`, 확장 commit `347d54db406f0377bb443ae7ff42aaf2bfa8e704`; 사용자는 2026-07-24 모든 문장·수치·프로젝트명을 본인과 Codex가 PRIZM용으로 새로 작성했고 외부 자료를 복사·각색하지 않았다고 확인함 | 개인정보·기밀이 없는 합성 자료이며 사용자가 PRIZM과 함께 Apache-2.0으로 공개하는 데 동의함 | `VERIFIED_DIRECT` | Apache-2.0 적용 시 fixture도 동일 배포 범위로 명시 |
 | `ASSET-SEARCH-QUESTIONS` | [`questions.jsonl`](../../src/test/resources/search-evaluation/sample/questions.jsonl), 1개 | 검색 질문·정답 label: 30문항, TUNING 20·TEST 10 | SHA-256 `A42A356628E577722BC62A65C8157EC79A9917CA033C6B6CBD1D7BEE80FA07B5`; 최초·확장 commit은 위와 같고 정합성 commit은 `36c8610aabbe5753a823c38f5456d7a5348a8b9e`; 사용자는 corpus와 같은 직접·Codex 보조 제작 범위를 확인함 | 제3자 benchmark·서비스 문구 비파생 및 Apache-2.0 공개 동의를 사용자 확인으로 기록함 | `VERIFIED_DIRECT` | corpus와 같은 배포·고지 범위 유지 |
+| `ASSET-LOGIN-EVIDENCE-VISUAL` | [`career-evidence-network.svg`](../../frontend/src/assets/career-evidence-network.svg), 1개 | 로그인 소개 영역의 장식용 문서·근거 연결 SVG | SHA-256 `73286127EB42CDA3C7E667CD3A3711D9DD8ED9E6A5CA8FDD79584599DE03F5A5`; 2026-07-29 사용자의 로그인 배경 요청에 따라 PRIZM용으로 새로 작성했다. 외부 사진·일러스트·아이콘·폰트·로고·CDN을 포함하지 않는다. | Apache-2.0 PRIZM source와 함께 배포 가능한 직접 제작 SVG다. 장식용으로만 표시하며 사용자 문서·실제 경력 정보는 포함하지 않는다. | `VERIFIED_DIRECT` | 외부 시각 자산을 추가하거나 SVG에 third-party 요소를 넣으면 provenance를 다시 감사 |
 | `ASSET-GRADLE-WRAPPER` | `gradlew`, `gradlew.bat`, `gradle/wrapper/gradle-wrapper.properties`, `gradle/wrapper/gradle-wrapper.jar`, 4개 | 외부 build bootstrap | wrapper는 Gradle `9.5.1`을 지정한다. JAR SHA-256 `497C8C2A7E5031F6AA847F88104AA80A93532EC32EE17BDB8D1D2F67A194A9C7`가 [Gradle 공식 checksum](https://gradle.org/release-checksums/)과 일치하고, JAR manifest·내장 LICENSE 및 두 script header가 `Apache-2.0`을 명시한다. | Apache License 2.0 원문과 저작권 고지 보존. source와 함께 재배포 가능 | `VERIFIED_EXTERNAL` | `NOTICE` coverage에서 포함 여부를 재확인. distribution ZIP checksum pin은 별도 공급망 backlog |
 
 `src/searchEvaluation/resources/application-search-evaluation.yml`과 일반

@@ -493,3 +493,27 @@
 - 실행: PostgreSQL 16+pgvector, backend, frontend image를 clean clone에서 빌드했다. 빈 schema에 Flyway V1~V13이 적용됐고 DB health, backend health HTTP 200, frontend HTTP 200을 확인했다.
 - 제한 재현: 사용자 행은 0건이었다. Ollama CLI와 `bge-m3`가 준비되지 않아 model pull과 로그인→업로드→ACTIVE→검색 전체 흐름은 `NOT_RUN`이다. OpenSQL·OpenProxy·OpenHA도 사용하지 않았다.
 - 문서 검사: Markdown 38개에서 로컬 링크 258개, code fence, trailing whitespace를 검사해 누락·불균형·위반 0건을 확인했고 `git diff --check`도 통과했다. 애플리케이션 기능 변경이 없는 문서 작업이므로 전체 unit·integration test는 재실행하지 않았다.
+## 2026-07-29 — PRZ-002 라이선스·SBOM CI 로컬 VERIFY
+
+- 구현: GitHub Actions와 로컬에서 같은 `node scripts/verify-oss-readiness.mjs`를 실행해 OSS 필수 파일, Markdown, source-only license Gate, tracked-file 안전성, strict dependency verification, SBOM 재생성·checksum·구조를 검사하도록 했다.
+- 검증: Markdown 37개·local link 243개, tracked file 295개, backend 169개·frontend 183개 SBOM 무변경과 Node 회귀 테스트 11건을 확인했다. 외부 링크는 91개 성공, 대회 사이트 1개 HTTP 403을 `INDETERMINATE`로 분리했고 반복 404·410은 없었다.
+- 상태: 로컬 Gate는 통과했지만 GitHub Actions는 branch 미push로 `NOT_RUN`이다. clean checkout과 실제 check 대조, 독립 AUDIT 전까지 T-09는 `IMPLEMENTED_UNVERIFIED`다. Docker, PostgreSQL, pgvector, Ollama, OpenSQL, OpenProxy, OpenHA는 사용하지 않았다.
+
+## 2026-07-29 — PRZ-002 OSS Readiness CI 오탐 보완
+
+- 실패: 최초 GitHub Actions push run은 secret 검사 정규식이 tracked된 검증기 자신의 `github_pat_` 접두사를 token으로 오탐해 실패했다. 실제 credential 노출은 없었다.
+- 수정: GitHub token은 접두사 뒤 최소 길이의 token-shaped value가 있을 때만 탐지하도록 제한하고, 정규식 선언은 허용하면서 fake token은 차단하는 회귀 테스트를 추가했다.
+- 검증: corrective local Gate는 tracked file 298개, Node 회귀 테스트 12건, 외부 링크 92개 성공·1개 `INDETERMINATE`·반복 404/410 0개로 통과했다.
+- 상태: Linux clean-clone·GitHub 재검증과 재감사 전까지 T-09는 `IMPLEMENTED_UNVERIFIED`다.
+
+## 2026-07-29 — PRZ-002 T-09 최종 VERIFY·AUDIT 통과
+
+- 재현: corrective commit `1922952`를 Linux/JDK 17/Node 22.17 clean clone에서 검증했고, GitHub OSS Readiness run `30443185952`와 기존 CI run `30443184506`이 모두 성공했다. 최종 증거 문서를 포함한 Windows local Gate도 외부 링크 94개 성공·1개 `INDETERMINATE`로 통과했다.
+- 감사: 독립 읽기 전용 재감사에서 CRITICAL/HIGH/MEDIUM finding은 없었다. source-only license Gate, SBOM 재생성·drift·구조, tracked 민감 파일과 외부 링크 분류가 요구 범위와 일치했다.
+- 상태: T-09 구현·VERIFY·AUDIT는 통과했다. GitHub 앱 쓰기 권한 부족으로 PR 생성은 HTTP 403에서 멈췄으며, 실제 PR·병합·최종 source commit 기록은 `INTEGRATE`에 남아 있다.
+
+## 2026-07-29 — 로그인 근거 연결 배경 시각 요소
+
+- 변경: 로그인 소개 영역에 문서 카드·근거 연결·검증 표시를 담은 직접 제작 SVG 배경을 추가했다. 텍스트는 배경보다 위에 두고, 장식 요소는 pointer event를 받지 않으며 모바일에서는 숨긴다.
+- 이유: 빈 왼쪽 영역에 PRIZM의 문서 기반 근거 탐색 성격을 전달하되, 외부 사진·일러스트를 도입하지 않고 사용자 입력이나 로그인 흐름을 바꾸지 않기 위해서다.
+- 검증: frontend lint·production build·SVG XML 파싱·`git diff --check`를 통과했다. SVG의 출처·SHA-256과 source-only 배포 경계는 자산 provenance 감사에 기록했다.

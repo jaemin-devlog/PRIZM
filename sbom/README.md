@@ -32,16 +32,31 @@ does not redistribute those model bytes or claim that lineage as verified.
 Run from the repository root with Java 17, Node 22.17.0, and npm 10.9.2:
 
 ```powershell
+node scripts/verify-oss-readiness.mjs
+```
+
+This is the same command used by GitHub Actions. It checks required OSS files,
+Markdown links and formatting, tracked-file safety, the source-only license
+Gate, strict Gradle dependency verification, deterministic SBOM regeneration,
+checksums, CycloneDX structure, and regression tests. Repeated `404` or `410`
+responses fail the external-link check. Authentication failures, rate limits,
+server errors, timeouts, and other network failures are reported separately as
+indeterminate so a temporary upstream outage is not misreported as a deleted
+document.
+
+When an intentional dependency or manifest change updates an SBOM, regenerate
+and review the files before refreshing the checksums:
+
+```powershell
 .\gradlew.bat generateBackendSbom --no-daemon --dependency-verification=strict
 npm --prefix frontend run sbom
 node scripts/verify-sbom.mjs --write-checksums
-node scripts/verify-sbom.mjs
-node --test scripts/verify-sbom.test.mjs
+node scripts/verify-oss-readiness.mjs
 ```
 
-`--write-checksums` is an intentional update step. Review the JSON and checksum
-diff before committing it. Normal verification must omit that option and fails
-when the generated files drift from [`SHA256SUMS`](SHA256SUMS).
+`--write-checksums` is an intentional maintenance step and is never run by CI.
+Normal verification fails when regenerated files drift from
+[`SHA256SUMS`](SHA256SUMS).
 
 The frontend generator is a first-party, lockfile-only script. It does not
 install packages, call a registry, infer missing licenses, or add a third-party
@@ -57,10 +72,9 @@ format, schema version, primary component, reproducibility fields, globally
 unique `bom-ref` values, canonical CycloneDX hash algorithm names, canonical
 LF line endings with a terminal LF, checksum, and prohibited
 local/secret-shaped data. The Node regression tests prove that non-canonical
-hash names, duplicate references, CRLF output, and a missing terminal LF are
-rejected. Full
-license/SBOM CI enforcement is tracked by `PRZ-002` T-09 and has not been added
-yet.
+hash names, malformed component fields and hashes, duplicate references, CRLF
+output, a missing terminal LF, Markdown defects, and a blocked source-only
+license Gate are rejected.
 
 ## Generator provenance
 

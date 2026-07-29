@@ -4,10 +4,11 @@
 |---|---|
 | 관련 spec | [PRZ-002](../../specs/PRZ-002-open-source-readiness/spec.md) |
 | 구현 단위 | T-05 — SBOM·AI 모델 명세 |
-| 상태 | 현재 source-only T-05 `VERIFIED`; PRZ-002 전체는 `IN_PROGRESS` |
+| 상태 | PRZ-002 현재 source-only 범위 `VERIFIED`; 모델·binary·image 재배포는 별도 미래 Gate |
 | 기준 배포물 | source-only Git repository / source ZIP |
-| 마지막 생성일 | 2026-07-27 |
-| 마지막 검증 commit | `8dd57c4897ff746db41df489201cacfc82c99f1b` |
+| 마지막 생성·검증일 | 2026-07-30 |
+| 마지막 검증 source commit | `777e184f206d2a2770d055940ddabf139abfed9d` |
+| 검증 CI | [OSS Readiness `30477035697`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30477035697)·[CI `30477035700`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30477035700) `PASS` |
 
 이 문서는 PRIZM의 현재 source-only 배포물을 위한 기계 판독용 공급망
 기록의 범위와 재현 방법을 설명한다. 이것은 OpenSQL, OpenProxy 또는 OpenHA
@@ -108,14 +109,17 @@ node --test scripts/verify-sbom.test.mjs
 검증은 마지막 명령처럼 checksum을 갱신하지 않아야 하며, source input 또는 생성물이
 달라지면 실패해야 한다.
 
-이번 구현은 Ollama runtime/model pull, Docker, PostgreSQL, pgvector, OpenSQL,
-OpenProxy, OpenHA를 실행하지 않는다. 해당 환경 결과는 각각 `NOT_RUN`이며
-OpenSQL 관련 결과는 존재하지 않는다.
+T-05 최초 구현 실행은 Ollama runtime/model pull, Docker, PostgreSQL,
+pgvector, OpenSQL, OpenProxy, OpenHA를 사용하지 않아 당시 모두 `NOT_RUN`이었다.
+이후 T-09 GitHub CI에서 고정 Ollama·`bge-m3` identity Gate가 통과했고,
+PRZ-003에서 실제 OpenSQL single-node SQL Gate가 별도로 통과했다. OpenProxy·
+OpenHA·DB failover와 OpenSQL+Ollama 전체 사용자 흐름은 계속 `NOT_RUN` 또는
+`NOT_VERIFIED`다.
 
 ## 남은 gate
 
 - submission: 실제 제출 직전 공개 commit·tree·환경·결과 hash 재고정
-- T-09: SBOM formal-schema/structural validation과 regeneration drift를 CI에서
-  실행하고, tool·workflow provenance를 다시 검증
+- T-09 CI: SBOM structure·regeneration drift, tool·workflow provenance 검증
+  `COMPLETE`
 - future artifact: JAR, `dist`, image, Ollama binary, model bytes 재배포 전
   artifact-specific NOTICE·SBOM·license coverage

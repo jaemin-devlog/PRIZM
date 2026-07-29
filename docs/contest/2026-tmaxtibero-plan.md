@@ -99,7 +99,8 @@ CareerFact, portfolio와 제출 감사는 실제 착수 순서에 따라 각각 
 - dependency, `bge-m3`, 합성 데이터, asset, OpenSQL 구성요소 라이선스를
   `docs/contest/2026-license-audit.md`에 감사 — 완료
 - Apache-2.0 root LICENSE, source-only NOTICE, SBOM·AI 모델 명세 — 완료
-- README·Quickstart·문서 색인, 라이선스·SBOM 검증 CI와 최종 독립 감사 — 진행 중
+- README·Quickstart·문서 색인, 라이선스·SBOM 검증 CI와 최종 독립 감사 —
+  현재 source-only 범위 완료
 - CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT와 maintainer 정책은
   외부 기여 접수 또는 첫 지원 release·외부 배포 전까지 `DEFERRED`. 재개 시
   실제 비공개 보안 신고 경로를 먼저 확정
@@ -107,9 +108,11 @@ CareerFact, portfolio와 제출 감사는 실제 착수 순서에 따라 각각 
 
 ### P1. OpenSQL·clean-clone — 7월 28일~8월 3일
 
-- 실제 착수 시 다음 available spec ID의 OpenSQL Gate와 실제 GitHub Issue 생성
-- 전용 OpenSQL DB/schema에서 Flyway와 `vector(1024)` 검색 실행
-- owner·ACTIVE, claim·lease·fencing·`SKIP LOCKED` 결과를 PostgreSQL과 분리
+- PRZ-003 실제 OpenSQL single-node SQL Gate — 완료. GitHub Issue는 소급
+  생성하지 않았고 실제 PR·CI·merge를 기록
+- 전용 OpenSQL DB/schema에서 Flyway V1~V13과 `vector(1024)` 검색 — 완료
+- owner·ACTIVE, claim·lease·fencing·`SKIP LOCKED` 결과를 PostgreSQL과
+  분리해 검증 — 완료
 - 별도 clean-clone demo spec에서 안전한 demo `USER`와 합성 TXT/PDF 준비
 - 두 번째 깨끗한 환경에서 로그인→업로드→ACTIVE→검색 재현
 - 처리 완료 확인 절차와 browser E2E 또는 고정 수동 UI 시험표 작성

@@ -3,10 +3,10 @@
 | 항목 | 값 |
 |---|---|
 | Spec ID | `PRZ-002` |
-| Status | `IN_PROGRESS` |
+| Status | `VERIFIED` |
 | 성격 | 2026 오픈소스 개발자대회 P0의 출처·라이선스·source-only 공개 준비 문서 |
 | 시작 기준 commit | `9279d51b298765058fcf6f883f6e9701460ccacd` |
-| GitHub Issue | `NOT_CREATED` — 외부 Issue 생성 권한을 아직 요청하지 않음 |
+| GitHub Issue | `NOT_CREATED` — 2026-07-26 쓰기 제한 뒤 완료 작업을 설명하는 Issue를 소급 생성하지 않음 |
 | 관련 기준선 | [PRZ-000](../PRZ-000-platform-baseline/spec.md) |
 
 ## 목적
@@ -56,8 +56,9 @@ PRIZM을 재사용 가능한 Career Intelligence Engine과 Career Vault Referenc
 1. 개발자가 README에서 PRIZM Engine과 Career Vault Reference App의 경계, 현재
    지원 범위, 미구현 기능과 환경 한계를 확인한다.
 2. 개발자는 루트 라이선스와 NOTICE에서 자신의 사용·수정·재배포 조건을 확인한다.
-3. 개발자는 OpenSQL, OpenProxy, OpenHA가 아직 실제 환경에서 검증되지 않았음을
-   확인하고 PostgreSQL 성공을 호환성 보증으로 오해하지 않는다.
+3. 개발자는 실제 OpenSQL single-node SQL Gate만 검증됐고 OpenProxy·OpenHA·
+   DB failover와 전체 사용자 흐름은 아직 검증되지 않았음을 확인하며,
+   PostgreSQL 성공을 OpenSQL 호환성 보증으로 오해하지 않는다.
 
 ### 시나리오 2 — 대회 라이선스 검증
 
@@ -86,7 +87,7 @@ PRIZM을 재사용 가능한 Career Intelligence Engine과 Career Vault Referenc
 | `OR-004` | PRIZM의 직접 작성 코드 저작권자를 `Jaemin Jeong`으로 기록하고, Codex는 개발 보조도구 사용으로만 분리한다. AI 생성물이 특정 제3자 코드·자산을 복사하지 않았다는 보증으로 바꾸지 않으며, 외부 구성요소 감사로 검증한다. |
 | `OR-005` | CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT 및 최소 maintainer 정책은 외부 기여 접수 또는 첫 지원 release·외부 배포 중 먼저 도래하는 시점에 재개한다. 구현할 때는 실제로 운영 가능한 연락·신고 경로만 사용하고, 개인 문서·JWT·비밀정보·로컬 경로를 공개 Issue에 올리지 않도록 안내해야 한다. |
 | `OR-006` | Bug, feature, documentation Issue form과 PR template은 외부 Issue·PR 접수를 공식 지원하기 전에 재개한다. 문제·범위·테스트 환경·migration·ownership/security·dependency/license·문서·`NOT_RUN`을 구조화하며, 템플릿 자체를 review 증거로 주장하지 않는다. |
-| `OR-007` | README와 문서 인덱스는 Quickstart, 현재/계획 기능, 검증 환경, 한계, 라이선스·SBOM 문서와 현재 운영 상태를 제공하고 구현되지 않은 OpenSQL/OpenProxy/OpenHA, CareerFact, portfolio, MCP를 구현된 것처럼 표현하지 않아야 한다. 기여·보안 문서 링크는 해당 문서와 실제 운영 경로가 마련된 뒤에만 추가한다. |
+| `OR-007` | README와 문서 인덱스는 Quickstart, 현재/계획 기능, 검증 환경, 한계, 라이선스·SBOM 문서와 현재 운영 상태를 제공하고 실제 OpenSQL single-node SQL Gate `PASS`를 OpenProxy·OpenHA·DB failover 또는 전체 사용자 흐름 성공으로 확대하지 않아야 한다. CareerFact, portfolio, MCP도 구현된 것처럼 표현하지 않는다. 기여·보안 문서 링크는 해당 문서와 실제 운영 경로가 마련된 뒤에만 추가한다. |
 | `OR-008` | SBOM과 AI 모델 명세에 재사용할 수 있는 provenance 구조를 만들되, 실제 업로드 문서, credential, 모델 cache, 데이터베이스 volume, 사용자 로컬 경로를 저장소에 포함하지 않아야 한다. |
 
 ## 현재 범위 결정
@@ -96,8 +97,8 @@ PRIZM을 재사용 가능한 Career Intelligence Engine과 Career Vault Referenc
 - G-02와 T-06은 미구현 상태를 숨기지 않고 `DEFERRED`로 둔다. 외부 기여
   접수 또는 첫 지원 release·외부 배포를 준비하는 시점 중 먼저 도래하는 때
   재개한다. T-07은 외부 Issue·PR 접수를 공식 지원하기 전에 재개한다.
-- 현재 P0의 활성 잔여 Gate는 T-08 README·Quickstart·문서 색인, T-09
-  라이선스·SBOM 검증 CI, T-10 최종 독립 감사다.
+- 현재 P0의 T-08 README·Quickstart·문서 색인, T-09 라이선스·SBOM 검증 CI,
+  T-10 최종 독립 감사는 완료됐다.
 - 이 범위 조정은 대회 공식 자료에서 직접 요구한 source 공개·라이선스·SBOM·
   AI 모델 명세를 우선하기 위한 것이며, 미구현 거버넌스를 완료로 간주하지 않는다.
 
@@ -112,7 +113,8 @@ PRIZM을 재사용 가능한 Career Intelligence Engine과 Career Vault Referenc
 
 ## 제외 범위
 
-- OpenSQL 단일 환경 실행, OpenProxy runtime, OpenHA 장애전환 검증
+- PRZ-002 자체의 OpenSQL 실행은 범위 밖이다. 실제 single-node SQL Gate는
+  PRZ-003에서 완료했고 OpenProxy runtime·OpenHA 장애전환 검증은 계속 제외한다.
 - CareerFact, portfolio, MCP, `/api/v1`, 독립 Engine artifact 구현
 - 검색 알고리즘·Reranker·Hybrid Search·embedding 모델 교체
 - Flyway migration, production source/config, frontend 기능 변경
@@ -135,7 +137,7 @@ PRIZM을 재사용 가능한 Career Intelligence Engine과 Career Vault Referenc
 
 ## 다음 단계
 
-현재는 T-08 README·Quickstart·문서 색인, T-09 라이선스·SBOM 검증 CI,
-T-10 최종 독립 감사를 순서대로 진행한다. G-02·T-06·T-07은 위 재개 조건이
-충족될 때 별도 IMPLEMENT로 돌아오며, GitHub Issue·PR과 외부 review는 실제로
-발생한 경우에만 evidence로 기록한다.
+현재 source-only P0 범위는 완료됐다. 다음 제품 작업은 별도 clean-clone demo
+spec이며, G-02·T-06·T-07은 위 재개 조건이 충족될 때 별도 IMPLEMENT로
+돌아온다. GitHub Issue·PR과 외부 review는 실제로 발생한 경우에만 evidence로
+기록한다.

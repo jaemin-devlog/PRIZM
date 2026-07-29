@@ -6,10 +6,10 @@
 |---|---|
 | Spec | [spec.md](spec.md) |
 | Plan | [plan.md](plan.md) |
-| Spec status | `IN_PROGRESS` |
+| Spec status | `VERIFIED` |
 | PLAN | `COMPLETE` |
-| IMPLEMENT | `IN_PROGRESS_LOCAL_ONLY` |
-| GitHub Issue | `NOT_CREATED` (`BLOCKED_GITHUB_WRITE`: 2026-07-26 connector write returned HTTP 403) |
+| IMPLEMENT | `COMPLETE_FOR_CURRENT_SOURCE_ONLY_SCOPE` |
+| GitHub Issue | `NOT_CREATED` (2026-07-26 쓰기 제한은 역사적 사실이며 완료 작업을 위한 Issue는 소급 생성하지 않음) |
 
 체크박스는 계획의 존재가 아니라 실제 file·명령·환경·결과 evidence가 확인된
 경우에만 완료한다. `UNKNOWN`, `CONFLICT`, `NOT_RUN`을 임의로 PASS로 바꾸지
@@ -37,7 +37,8 @@
 않는다. 사용자가 local-only IMPLEMENT를 명시적으로 승인한 경우 그 작업은
 별도로 기록하되 GitHub evidence나 G-03A 통과로 계산하지 않는다.
 
-**현재 판정:** `BLOCKED_GITHUB_WRITE`, `LOCAL_ONLY_IMPLEMENT_AUTHORIZED`.
+**당시 판정:** `HISTORICAL_BLOCKED_GITHUB_WRITE`,
+`LOCAL_ONLY_IMPLEMENT_AUTHORIZED`.
 사용자는 PRZ-002 작업을 승인했지만 2026-07-26 GitHub connector의 실제 Issue
 생성 요청은 HTTP 403 (`Resource not accessible by integration`)으로 거부됐다.
 같은 환경의 `gh auth status`도 authenticated GitHub host가 없다고 보고했다.
@@ -272,7 +273,7 @@ generated `dist`·image·Ollama binary·model bytes는 배포하지 않으므로
 - [x] machine-readable CycloneDX 1.6 format과 backend/frontend first-party
   lockfile·resolved-graph generator를 구현한다. 2026-07-27 보완에서 frontend
   표준 hash algorithm, backend classifier-aware `bom-ref`, 운영체제 독립 LF
-  출력을 구현했다. full formal-schema CI는 T-09로 남긴다.
+  출력을 구현했다. 당시 후속이던 full formal-schema CI는 T-09에서 완료했다.
 - [x] backend runtime/test/build, frontend runtime/dev, CI, container,
   model, fixture·asset component를 구분한다.
 - [x] 사람용 license audit와 machine SBOM component set을 상호 조정한다.
@@ -329,8 +330,9 @@ clean-checkout 재생성, checksum, human/machine 조정, 민감정보 검사, �
 `scripts/verify-sbom.mjs`·Node 회귀 테스트로 반영한다. 이 agent AUDIT는 GitHub
 review 증거가 아니다.
 
-**현재 판정:** 현재 source-only 범위의 T-05 `VERIFIED`. 제출 직전 snapshot,
-T-09 CI와 PRZ-002의 활성 T-08~T-10은 별도 후속 작업이다. T-06·T-07은
+**2026-07-28 당시 판정:** source-only 범위의 T-05 `VERIFIED`. 제출 직전
+snapshot, T-09 CI와 PRZ-002의 T-08~T-10은 당시 별도 후속 작업이었다.
+T-06·T-07은
 아래 재개 조건까지 `DEFERRED`다.
 
 **완료 evidence:** 재생성 명령, schema validation, human/machine diff,
@@ -399,7 +401,9 @@ secret-safe field review
 - [x] clean-clone Quickstart를 실제로 재현하고 필요한 환경·초기 사용자
   blocker를 정직하게 기록한다.
 - [x] 구현됨·계획됨·미검증을 표로 분리한다.
-- [x] OpenSQL·OpenProxy·OpenHA를 `NOT_RUN`으로 유지한다.
+- [x] 외부 DB 상태를 정직하게 구분한다. 현재는 실제 OpenSQL single-node SQL
+  Gate만 `PASS`이고 OpenProxy·OpenHA·DB failover는 `NOT_RUN` 또는
+  `NOT_VERIFIED`다.
 - [x] CareerFact·portfolio·MCP·`/api/v1`·멀티모듈을 계획 상태로 유지한다.
 - [x] docs index, contest traceability, roadmap와 중복·깨진 링크를 정리한다.
 
@@ -450,44 +454,47 @@ clean clone에서 같은 단일 명령으로 재현했고, GitHub
 [`OSS Readiness` push run](https://github.com/jaemin-devlog/PRIZM/actions/runs/30443185952)과
 기존 [`CI` push run](https://github.com/jaemin-devlog/PRIZM/actions/runs/30443184506)이
 모두 성공했다. 독립 읽기 전용 재감사에서 CRITICAL/HIGH/MEDIUM finding은
-없었다. T-09 구현·VERIFY·AUDIT는 통과했으며 실제 PR 생성·병합과 최종 source
-commit 기록은 `INTEGRATE`에 남아 있다.
+없었다. T-09 구현·VERIFY·AUDIT는 통과했고,
+[PR #22](https://github.com/jaemin-devlog/PRIZM/pull/22)가 source
+`5c31305`, merge `42876b6`으로 병합됐다. requested reviewer와 review는 없어
+`REVIEW_NOT_AVAILABLE_SOLO`이며, 이를 GitHub review로 계산하지 않는다.
 
 ## T-10 — 독립 읽기 전용 감사
 
 **선행 조건:** 활성 작업 T-01~T-05·T-08·T-09 VERIFY 완료와
 G-02·T-06·T-07 deferral 결정 기록
 
-- [ ] source register의 공식 URL·hash·권리 상태를 재검증한다.
-- [ ] lockfile/resolved graph/JAR/bundle/image/model과 audit·SBOM을 재대조한다.
-- [ ] `LICENSE`, `NOTICE`, SBOM, AI 명세의 license·version·배포 경계를
+- [x] source register의 공식 URL·hash·권리 상태를 재검증한다.
+- [x] lockfile/resolved graph/JAR/bundle/image/model과 audit·SBOM을 재대조한다.
+- [x] `LICENSE`, `NOTICE`, SBOM, AI 명세의 license·version·배포 경계를
   상호 확인한다.
-- [ ] G-02·T-06·T-07이 미구현·`DEFERRED`로 정직하게 표시되고 재개 조건이
+- [x] G-02·T-06·T-07이 미구현·`DEFERRED`로 정직하게 표시되고 재개 조건이
   문서 사이에서 일치하는지 확인한다.
-- [ ] 가짜 SECURITY·SUPPORT 연락처나 존재하지 않는 Issue·PR 경로가 없는지 확인한다.
-- [ ] 공개 저장소와 generated artifact의 민감정보·모델 cache·로컬 경로
+- [x] 가짜 SECURITY·SUPPORT 연락처나 존재하지 않는 Issue·PR 경로가 없는지 확인한다.
+- [x] 공개 저장소와 generated artifact의 민감정보·모델 cache·로컬 경로
   부재를 확인한다.
-- [ ] GitHub repository visibility가 실제 `PUBLIC`인지 API와 UI에서 확인한다.
-- [ ] clean clone에 빌드에 필요한 직접 작성 backend·frontend source,
+- [x] GitHub repository visibility가 실제 `PUBLIC`인지 API와 UI에서 확인한다.
+- [x] clean clone에 빌드에 필요한 직접 작성 backend·frontend source,
   V1~V13 migration, wrapper, 공개 config와 문서가 모두 있는지 확인한다.
-- [ ] 제출 source의 commit·tree hash가 감사한 공개 commit과 일치하는지
+- [x] 현재 공개 감사 source의 commit·tree hash가 실제 `main`과 일치하는지
   확인한다.
-- [ ] README의 현재/계획/`NOT_RUN` 표현을 source와 대조한다.
-- [ ] CRITICAL/HIGH/MEDIUM finding을 심각도·파일·근거로 보고한다.
-- [ ] finding이 있으면 `IN_PROGRESS`, 외부 결정이 필요하면 `BLOCKED`로 둔다.
-- [ ] finding이 0건일 때만 audit `PASS`를 기록한다.
+- [x] README의 현재/계획/`NOT_RUN` 표현을 source와 대조한다.
+- [x] CRITICAL/HIGH/MEDIUM finding을 심각도·파일·근거로 보고한다.
+- [x] 최초 finding 2건을 `IN_PROGRESS`에서 교정하고 재감사한다.
+- [x] 재감사 finding이 0건일 때만 audit `PASS`를 기록한다.
 
 **완료 evidence:** 독립 audit report, finding count, 검증 명령·환경,
-repository visibility와 clean-clone inventory, 제출 commit·tree hash,
-OpenSQL·OpenProxy·OpenHA `NOT_RUN`
+repository visibility와 clean-clone inventory, 감사 commit·tree hash,
+OpenSQL single-node SQL Gate `PASS`와 OpenProxy·OpenHA `NOT_RUN` 경계
 
 ## G-03B — AUDIT 후 PR·review·integration 권한
 
-- [ ] IMPLEMENT·VERIFY·AUDIT가 끝난 뒤 PR을 만든다.
-- [ ] 실제 reviewer가 없으면 `REVIEW_NOT_AVAILABLE_SOLO`를 기록하고
+- [x] IMPLEMENT·VERIFY·AUDIT가 끝난 뒤 실제 PR #22를 확인한다.
+- [x] 실제 reviewer가 없으므로 `REVIEW_NOT_AVAILABLE_SOLO`를 기록하고
   Agent audit를 GitHub review로 주장하지 않는다.
-- [ ] merge 뒤 source·merge commit, CI·audit evidence를 기록한다.
-- [ ] main 포함 여부와 working tree를 확인한 뒤에만 임시 branch를 정리한다.
+- [x] merge 뒤 source `5c31305`, merge `42876b6`, CI·audit evidence를 기록한다.
+- [x] main 포함 여부와 working tree를 확인한 뒤 PRZ-002 임시 branch가 남지
+  않았음을 확인한다.
 
 ## VERIFY 실행표
 
@@ -500,31 +507,26 @@ OpenSQL·OpenProxy·OpenHA `NOT_RUN`
 | frontend lint·build | frontend package/README Quickstart 영향 시 필수 | 이유를 `NOT_RUN` |
 | `docker compose config`, runtime image SBOM | container audit 시 필수 | Docker 미사용을 명시 |
 | Ollama·`bge-m3` identity·runtime smoke | model/Quickstart audit 시 필수 | Ollama 미사용을 명시 |
-| OpenSQL·OpenProxy·OpenHA | 이번 범위 제외 | 항상 별도 `NOT_RUN` |
+| OpenSQL·OpenProxy·OpenHA | 이번 PRZ-002 실행 범위 제외 | PRZ-003의 실제 OpenSQL single-node SQL Gate `PASS`와 OpenProxy·OpenHA `NOT_RUN`을 분리 |
 
 ## 최종 완료 조건
 
-- [ ] 활성 작업 T-01~T-05·T-08~T-10이 evidence와 함께 완료됐다.
-- [ ] G-01·G-03의 사용자·권한 결정과 G-02·T-06·T-07의 `DEFERRED`
+- [x] 활성 작업 T-01~T-05·T-08~T-10이 evidence와 함께 완료됐다.
+- [x] G-01·G-03의 사용자·권한 결정과 G-02·T-06·T-07의 `DEFERRED`
   결정·각 재개 조건이 실제로 기록됐다.
-- [ ] 배포 범위에 `UNKNOWN`, `CONFLICT`, `BLOCKED`가 없다.
-- [ ] 독립 감사에 CRITICAL/HIGH/MEDIUM finding이 없다.
-- [ ] 실제 GitHub Issue·PR·CI·review 상태를 과장하지 않았다.
-- [ ] PRZ-002 evidence와 registry가 실제 source·merge commit을 가리킨다.
+- [x] 현재 source-only 배포 범위에 `UNKNOWN`, `CONFLICT`, `BLOCKED`가 없다.
+- [x] 최종 독립 재감사에 CRITICAL/HIGH/MEDIUM finding이 없다.
+- [x] 실제 GitHub Issue·PR·CI·review 상태를 과장하지 않았다.
+- [x] PRZ-002 evidence와 registry가 실제 source·merge commit을 가리킨다.
 
 현재는 T-01 source register, T-02 component inventory와 G-01 source-only
 배포 경계, T-03 Apache-2.0 결정 snapshot이 현재 source-only 범위에서
-완료됐다. T-04 Apache-2.0 `LICENSE`·source-only `NOTICE`와 T-05
-machine-readable SBOM·AI 모델 명세도 구현됐으며, T-05는 PR #18 병합 기준
-`VERIFIED`다. PRZ-002 전체 IMPLEMENT는 `IN_PROGRESS`다. 외부 design token
-blocker와 build·CI artifact identity blocker는 해소됐고, future artifact
-제한은 현재 source-only 배포를 막지 않는다. GitHub Issue는 만들지 않았고
-G-02·T-06의 governance는 외부 기여 접수 또는 첫 지원 release·외부 배포
-전까지, T-07 template은 외부 Issue·PR 접수를 공식 지원하기 전까지
-`DEFERRED`다. 현재 활성 잔여 작업은 T-08 README/Quickstart, T-09
-license/SBOM 검사 CI, T-10 전체 독립 감사다.
-공급망 pin은 PR #13으로 병합됐고 GitHub Actions backend·frontend push/PR
-check 4건이 성공했다. 2026-07-25 보완 검증에서는 strict dependency
-verification으로 단위 테스트 245건 중 231건 성공·14건 환경 조건 skip·실패
-0건, PostgreSQL 16 + pgvector 통합 테스트 68건 중 65건 성공·3건 환경 조건
-skip·실패 0건을 확인했다.
+완료됐다. T-04 Apache-2.0 `LICENSE`·source-only `NOTICE`, T-05
+machine-readable SBOM·AI 모델 명세, T-08 문서·Compose health 범위, T-09
+license/SBOM CI와 T-10 최종 독립 감사도 완료됐다. 따라서 PRZ-002의 현재
+source-only 범위는 `VERIFIED`다. GitHub Issue는 만들지 않았고 완료 작업을
+설명하기 위해 소급 생성하지 않는다. G-02·T-06의 governance는 외부 기여 접수
+또는 첫 지원 release·외부 배포 전까지, T-07 template은 외부 Issue·PR 접수를
+공식 지원하기 전까지 `DEFERRED`다. JAR·`dist`·container image·Ollama binary·
+모델 가중치를 실제 배포하는 미래 Gate와 제출 직전 source snapshot은 별도
+후속 범위이며 현재 source-only 검증 결과로 대신하지 않는다.

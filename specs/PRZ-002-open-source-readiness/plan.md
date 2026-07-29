@@ -5,9 +5,11 @@
 | 항목 | 값 |
 |---|---|
 | Spec | [PRZ-002](spec.md) |
-| Spec status | `IN_PROGRESS` |
+| Spec status | `VERIFIED` |
 | PLAN | `COMPLETE` |
-| IMPLEMENT | `IN_PROGRESS_LOCAL_ONLY` |
+| IMPLEMENT | `COMPLETE_FOR_CURRENT_SOURCE_ONLY_SCOPE` |
+| VERIFY / AUDIT | `PASS` — T-09 GitHub CI와 T-10 독립 읽기 전용 감사 |
+| INTEGRATE | `IN_PROGRESS` — T-08 solo main 통합, T-09 PR #22 merge `42876b6`; T-10 교정 commit·push 기록 대기 |
 | GitHub Issue | `NOT_CREATED` |
 | Primary evaluation | `EVAL-R1-02` |
 | Secondary evaluation | `EVAL-R1-03`, `EVAL-R1-05` |
@@ -31,7 +33,8 @@
   지원 문서와 GitHub Issue Form·PR Template은 아직 없으며 아래 재개
   조건까지 `DEFERRED`다.
 - PostgreSQL 검증 결과를 OpenSQL·OpenProxy·OpenHA 결과로 바꾸어 표현하지
-  않는다. 세 환경은 계속 `NOT_RUN`이다.
+  않는다. PRZ-003의 실제 OpenSQL single-node SQL Gate만 별도 `PASS`이며,
+  OpenProxy·OpenHA와 전체 사용자 흐름은 계속 `NOT_RUN` 또는 `NOT_VERIFIED`다.
 - Java source, frontend, Flyway V1~V13, production config, Docker Compose와
   Career Vault 동작 계약은 이 작업에서 변경하지 않는다.
 - 공식 규정·양식 원본, OT 캡처, credential, 실제 업로드 문서, DB volume,
@@ -171,8 +174,9 @@ SBOM은 backend, frontend, database를 구분한다.
    결과 검토 방식만 쓰고, 근거 없는 model version·코드 비율·독창성 보증은
    만들지 않는다. Codex는 PRIZM runtime 모델이나 배포 dependency로 계산하지
    않는다.
-6. OpenSQL·OpenProxy·OpenHA는 이 감사의 실행 대상이 아니며 `NOT_RUN`으로
-   남긴다.
+6. OpenSQL·OpenProxy·OpenHA는 이 PRZ-002 감사의 실행 대상이 아니므로
+   `NOT_RUN_IN_THIS_TASK`로 남긴다. 저장소 전체 상태는 PRZ-003의 실제 OpenSQL
+   single-node SQL Gate `PASS`와 OpenProxy·OpenHA 미검증을 별도로 기록한다.
 
 ### CI·자동화
 
@@ -339,9 +343,10 @@ contact link 정책이 의도대로 동작한다. template 존재를 실제 issu
 license·SBOM 링크와 현재 외부 기여·보안 운영 상태 순서로 첫 진입 경로를
 정리한다. 존재하지 않는 기여·보안 문서 링크는 만들지 않는다.
 
-**완료 조건:** 현재 구현, 계획, 환경 미검증을 표로 분리하고 OpenSQL·OpenProxy·
-OpenHA는 `NOT_RUN`, CareerFact·portfolio·MCP·멀티모듈은 계획으로 유지한다.
-clean-clone Quickstart가 재현되거나 blocker가 정확히 기록된다.
+**완료 조건:** 현재 구현, 계획, 환경 미검증을 표로 분리하고 실제 OpenSQL
+single-node SQL Gate `PASS`를 OpenProxy·OpenHA·DB failover·전체 사용자 흐름
+성공으로 확대하지 않는다. CareerFact·portfolio·MCP·멀티모듈은 계획으로
+유지하고 clean-clone Quickstart는 재현되거나 blocker가 정확히 기록된다.
 
 ### 9. Markdown·링크·license/SBOM CI
 
@@ -401,7 +406,9 @@ hash가 감사한 공개 commit과 일치해야 한다.
 - dependency graph와 image/model metadata를 조사할 때 사용한 OS, Java,
   Node/npm, Gradle, Docker, PostgreSQL·pgvector, Ollama의 실제 사용 여부를
   구분한다.
-- OpenSQL·OpenProxy·OpenHA를 호출하지 않으며 모두 `NOT_RUN`으로 기록한다.
+- PRZ-002 구현·감사 자체에서는 OpenSQL·OpenProxy·OpenHA를 호출하지 않고
+  `NOT_RUN_IN_THIS_TASK`로 기록한다. 저장소 전체 현재 상태는 PRZ-003의 실제
+  OpenSQL single-node SQL Gate `PASS`와 OpenProxy·OpenHA `NOT_RUN`을 분리한다.
 
 ### VERIFY
 
@@ -510,6 +517,7 @@ hash가 감사한 공개 commit과 일치해야 한다.
 - [x] 예상 IMPLEMENT 파일과 PLAN 허용 파일을 분리했다.
 - [x] 위험·중단 조건·단계별 `NOT_RUN` 기록 방식을 정의했다.
 
-다음 단계는 `IMPLEMENT`다. 실제 LICENSE·NOTICE·SBOM·governance·template·CI
-파일, GitHub Issue·branch·commit·PR은 별도 승인과 Gate 확인 전에는 만들지
-않는다.
+이 계획의 현재 source-only IMPLEMENT·VERIFY·AUDIT는 완료됐다. INTEGRATE는
+T-10 교정 commit·push와 실제 commit·tree 기록을 기다린다. governance·template은
+기록된 재개 조건까지 `DEFERRED`이며, binary·image·model 배포와 제출 직전
+snapshot은 별도 후속 Gate에서 다시 감사한다.

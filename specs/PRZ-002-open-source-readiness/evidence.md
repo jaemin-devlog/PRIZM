@@ -3,7 +3,7 @@
 | 항목 | 값 |
 |---|---|
 | Spec | [PRZ-002](spec.md) |
-| Evidence status | 현재 source-only T-05 `VERIFIED`; PRZ-002 전체는 `IN_PROGRESS` |
+| Evidence status | PRZ-002 현재 source-only 범위 `VERIFIED` — T-10 최종 독립 감사 PASS |
 | Implementation commit | `c28416e` — `추가: source-only SBOM과 AI 모델 명세` |
 | Corrective implementation commit | `8dd57c4897ff746db41df489201cacfc82c99f1b` — `수정: SBOM 생성기 정합성 보완` |
 | Implementation branch | `PRZ-002-sbom-model-manifest` — PR #16 병합 후 삭제 |
@@ -13,11 +13,15 @@
 | Final VERIFY branch | local-only `PRZ-002-sbom-final-verification` — 검증 후 삭제 |
 | Corrective IMPLEMENT branch | `PRZ-002-sbom-conformance-fix` — PR #18 병합 후 삭제 |
 | Corrective integrated PR | [#18](https://github.com/jaemin-devlog/PRIZM/pull/18), source commit `203c892`, merge commit `04afe7c` |
+| T-09 integrated PR | [#22](https://github.com/jaemin-devlog/PRIZM/pull/22), source commit `5c31305`, merge commit `42876b6` |
+| Initial public audit baseline | `main` `777e184f206d2a2770d055940ddabf139abfed9d`, tree `a6e9cb96cb4dc93d657397241d99d4367c7d2902`, 2026-07-30 |
+| Final correction target | 위 공개 baseline의 문서 전용 교정 worktree; 검증·감사 뒤 실제 integration commit과 tree를 후속 기록 |
 | GitHub Issue | `NOT_CREATED`; connector write was blocked with HTTP 403 on 2026-07-26 |
 | Primary / secondary evaluation IDs | `EVAL-R1-02` / `EVAL-R1-03`, `EVAL-R1-05` |
 
-This evidence covers the T-05 SBOM and AI-model-manifest implementation only.
-It does not claim that PRZ-002, OpenSQL, OpenProxy, or OpenHA is verified.
+The early sections preserve the T-05 SBOM and AI-model-manifest implementation
+history. The final sections close PRZ-002's current source-only scope; they do
+not claim redistribution of model, container, or OpenSQL vendor artifacts.
 
 ## Generated records
 
@@ -67,16 +71,16 @@ a claim that those issues are resolved by this spec.
 | OpenProxy | `NOT_RUN` |
 | OpenHA | `NOT_RUN` |
 
-## 남은 PRZ-002 Gate
+## 2026-07-26 당시 남은 PRZ-002 Gate
 
 - T-05의 사람용 감사와 Java/npm machine SBOM 대조, clean checkout 재생성,
   공식 schema 검사와 독립 읽기 전용 감사는 완료됐다.
-- formal schema·구조·재생성 drift를 자동화하는 CI는 T-09에서 구현한다.
+- 당시 formal schema·구조·재생성 drift를 자동화하는 CI는 T-09 후속이었다.
 - G-02·T-06은 실제 외부 기여 운영 또는 첫 지원 release·외부 배포 전까지,
   T-07은 외부 Issue·PR 접수를 공식 지원하기 전까지 `DEFERRED`다. 비공개
   신고 채널이 활성화되거나 운영 가능한 연락처가 정해지기 전에는
   `SECURITY.md`를 만들지 않는다.
-- 현재 활성 잔여 Gate는 T-08 README·Quickstart·문서 색인, T-09
+- 당시 활성 잔여 Gate는 T-08 README·Quickstart·문서 색인, T-09
   라이선스·SBOM 검증 CI와 T-10 최종 독립 감사다.
 - 2026-07-26 검증 시점에는 branch push만 있었고 실제 GitHub Issue, PR,
   review, merge evidence는 아직 없었다. 이후 PR #16과 merge commit
@@ -109,7 +113,7 @@ deployment, or officially supported external-contribution intake.
   지원하기 전이다.
 - **재개 Gate:** 실제 Private Vulnerability Reporting 또는 검증 가능한
   비공개 연락 경로를 먼저 확정하고, 그 뒤 운영 문서와 템플릿을 구현·검증한다.
-- **현재 활성 Gate:** T-08 README·Quickstart·문서 색인, T-09
+- **당시 활성 Gate:** T-08 README·Quickstart·문서 색인, T-09
   라이선스·SBOM 검증 CI, T-10 최종 독립 감사.
 - **환경:** 문서 범위 결정이므로 Docker, PostgreSQL, pgvector, Ollama,
   OpenSQL, OpenProxy, OpenHA는 모두 `NOT_RUN`이다.
@@ -122,8 +126,8 @@ deployment, or officially supported external-contribution intake.
   CRITICAL/HIGH/MEDIUM/LOW finding은 0건이다.
 - **확인:** G-02·T-06은 외부 기여 접수 또는 첫 지원 release·외부 배포 전,
   T-07은 외부 Issue·PR 접수 공식 지원 전 재개하는 것으로 문서가 일치한다.
-  PRZ-002는 `IN_PROGRESS`, OpenSQL·OpenProxy·OpenHA는 `NOT_RUN`으로
-  유지하며 현재 활성 잔여 Gate는 T-08·T-09·T-10이다.
+  당시 PRZ-002는 `IN_PROGRESS`, OpenSQL·OpenProxy·OpenHA는 `NOT_RUN`으로
+  유지하며 활성 잔여 Gate는 T-08·T-09·T-10이었다.
 - **검증:** 변경 Markdown 7개, 로컬 링크 누락 0, code fence 불균형 0,
   trailing whitespace 0, `git diff --check` 통과, application source·migration·
   config 변경 0.
@@ -465,3 +469,68 @@ T-08 evidence/task 변경을 수정자가 아닌 관점에서 읽기 전용으�
 최신 `main` 통합과 병합된 임시 브랜치 정리를 명시 승인했으므로,
 `REVIEW_NOT_AVAILABLE_SOLO`로 기록한다. 이 기록은 실제 GitHub review나
 제3자 승인을 뜻하지 않는다.
+
+## T-09 실제 GitHub 통합 — 2026-07-30 확인
+
+- 실제 통합 PR은 [#22](https://github.com/jaemin-devlog/PRIZM/pull/22)이며
+  source `5c31305`, merge commit `42876b6`으로 병합됐다.
+- T-09 구현의
+  [OSS Readiness run `30443185952`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30443185952)과
+  [CI run `30443184506`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30443184506)은
+  성공했다. 현재 공개 `main` `777e184f206d2a2770d055940ddabf139abfed9d`에서도
+  [OSS Readiness run `30477035697`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30477035697)과
+  [CI run `30477035700`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30477035700)이
+  성공했다.
+- PR #22의 requested reviewer·comment·review는 없었다.
+  `REVIEW_NOT_AVAILABLE_SOLO`는 정직한 절차 기록이며 GitHub review 또는
+  제3자 승인 증거가 아니다.
+- 2026-07-26의 GitHub Issue 쓰기 제한은 역사적 사실로 남긴다. 완료 작업을
+  설명하는 Issue는 소급 생성하지 않았다.
+
+## T-10 최종 독립 읽기 전용 AUDIT — 2026-07-30
+
+**최초 공개 감사 기준:** commit
+`777e184f206d2a2770d055940ddabf139abfed9d`, tree
+`a6e9cb96cb4dc93d657397241d99d4367c7d2902`. GitHub repository는
+`PUBLIC`, 기본 branch는 `main`이며 익명 원격 조회가 가능했다. 이 commit의
+tracked file 300개에 backend·frontend source, Gradle Wrapper, 공개 config와
+Flyway V1~V13이 모두 있었다.
+
+첫 읽기 전용 감사는 CRITICAL 0·HIGH 0·MEDIUM 2·LOW 0을 보고하고 PRZ-002를
+`IN_PROGRESS`로 유지했다.
+
+| Finding | 교정 |
+|---|---|
+| `M-01` 현재 문서가 실제 OpenSQL single-node SQL Gate `PASS`를 과거 `NOT_RUN`으로 표시 | README, roadmap, 추적표, PRZ-002·PRZ-003의 현재 상태를 `PASS` 범위와 OpenProxy·OpenHA·DB failover `NOT_RUN`·`NOT_VERIFIED` 경계로 교정 |
+| `M-02` PRZ-002 T-09가 실제 PR #22·CI·merge 뒤에도 통합 대기 상태 | PR #22, source `5c31305`, merge `42876b6`, 성공 CI와 `REVIEW_NOT_AVAILABLE_SOLO`를 evidence·registry·tasks에 반영 |
+
+교정 뒤 `node scripts/verify-oss-readiness.mjs`를 다시 실행했다.
+
+| 최종 Gate | 결과 |
+|---|---|
+| 필수 OSS 파일 | PASS — 9개 |
+| Markdown·로컬 링크 | PASS — 38개, 264개 |
+| tracked-file 안전성 | PASS — 300개; credential·model/cache·업로드 원본·금지 공급 binary 0개 |
+| LICENSE·NOTICE·source-only 정책 | PASS |
+| backend/frontend SBOM | PASS — backend 169개, frontend 183개; strict dependency verification, 재생성·구조·checksum drift 없음 |
+| 회귀 테스트 | PASS — Node 12건, 실패·skip 0건 |
+| 외부 링크 | 100개 성공, 1개 HTTP 403 `INDETERMINATE`, 영구 실패 0개 |
+| `git diff --check` | PASS |
+
+저장소 root에 있던 미추적 공급사 archive 1개는 내용을 열지 않고 Git 밖의
+비공개 보관 위치로 옮겼다. 삭제하지 않았으며 tracked/generated artifact에는
+포함되지 않는다. 모델 가중치·cache, container image, OpenSQL 공급 파일과
+개별 테스트 라이선스는 계속 저장소에 넣지 않는다.
+
+문서 전용 교정 worktree의 최종 독립 재감사에서 CRITICAL/HIGH/MEDIUM
+finding은 0건이다. 교정 worktree의 실제 integration commit·tree는 검증된
+commit을 만든 뒤 위 표와 registry에 고정한다. 이 감사는
+GitHub review 또는 제3자 review가 아니다. 현재 source-only 공개 범위와 P0를
+`VERIFIED`로 닫는다. JAR·frontend `dist`·container image·Ollama binary·모델
+가중치를 배포하는 미래 Gate, 제출 직전 source snapshot, 외부 기여·보안 운영
+문서는 각 재개 조건에 따라 별도로 감사한다.
+
+이번 교정은 문서만 변경하며 제품 source, Flyway migration, dependency,
+`LICENSE`, `NOTICE`와 SBOM JSON은 바꾸지 않았다. 따라서 Gradle unit·integration,
+frontend lint·build와 Compose는 재실행하지 않았고, 병합된 `main`의 성공
+CI 결과와 이번 OSS readiness 재검증을 사용했다.

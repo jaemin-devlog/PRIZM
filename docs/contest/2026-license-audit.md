@@ -7,8 +7,8 @@
 | PRZ 작업 | [`PRZ-002-open-source-readiness`](../../specs/PRZ-002-open-source-readiness/spec.md) |
 | 범위 | T-02 inventory와 G-01·outgoing license 결정·자산 감사 자료 |
 | 기준 commit | `846bd06e59aeb1cab88134f02c43ff9731f360fd` (`PR #13` merge) |
-| 검증일 | 2026-07-25 |
-| 상태 | `IN_PROGRESS` |
+| 최종 source-only 검증 기준 | `777e184f206d2a2770d055940ddabf139abfed9d`, 2026-07-30 |
+| 상태 | `VERIFIED_FOR_CURRENT_SOURCE_ONLY_SCOPE` |
 | 직접 작성 코드 저작권자 | `Jaemin Jeong` |
 | 공동 개발자·코드 기여자 | 확인된 사람 없음 |
 | 정부 지원금·상금·개발비 | 없음 |
@@ -16,8 +16,8 @@
 
 G-01 배포 경계는 2026-07-24 사용자 승인으로 source-only로 확정했다.
 같은 날 사용자는 PRIZM 직접 작성 source의 outgoing license로
-`Apache-2.0`을 승인했다. 이 결정은 표준 `LICENSE`·`NOTICE` 파일을 이미
-적용했다는 뜻이 아니다. [`2026-asset-provenance-audit.md`](2026-asset-provenance-audit.md)는
+`Apache-2.0`을 승인했고, 현재 root `LICENSE`와 source-only `NOTICE`가
+적용돼 있다. [`2026-asset-provenance-audit.md`](2026-asset-provenance-audit.md)는
 외부 design token 교체까지 완료해 현재 source-only 배포물의 자산 blocker가
 없음을 확인했다. 따라서 미래 binary·image·model 재배포의 미해결 사항은
 현재 source-only `LICENSE`·`NOTICE` 생성을 막지 않으며, 해당 산출물을 실제로
@@ -29,7 +29,9 @@ artifact의 checksum Gate, GitHub Actions full SHA, Ollama release archive와
 무결성을 고정하지만, Gradle artifact publisher 서명이나 Ollama 변환
 lineage를 새로 증명하지는 않는다. 이 변경은 `PR #13`으로 main에 병합됐고,
 해당 commit을 대상으로 한 GitHub Actions backend·frontend push/PR check 4건이
-성공했다. OpenSQL·OpenProxy·OpenHA 결과는 이 CI와 별개이며 계속 `NOT_RUN`이다.
+성공했다. 이 CI 자체는 OpenSQL·OpenProxy·OpenHA 검증이 아니다. 이후
+PRZ-003에서 실제 OpenSQL single-node SQL Gate만 별도 `PASS`했으며
+OpenProxy·OpenHA는 계속 `NOT_RUN` 또는 `NOT_VERIFIED`다.
 
 ## 감사 방법과 상태
 
@@ -271,14 +273,16 @@ registry publish 설정은 없다. G-01은 Dockerfile·Compose 정의만 source�
 | ID | Identity | Upstream / evidence | SPDX | Purpose·scope | Distribution | Status / unresolved | Verified |
 |---|---|---|---|---|---|---|---|
 | `CI-RUNNER` | `ubuntu-latest` | GitHub-hosted runner | image package composite | CI | `NOT_DISTRIBUTED` | runner revision floating `UNKNOWN` | 2026-07-24 |
-| `CI-CHECKOUT` | `actions/checkout` `v6.1.0`; commit `d23441a48e516b6c34aea4fa41551a30e30af803` | [actions/checkout](https://github.com/actions/checkout) | `MIT` | CI source checkout | `NOT_DISTRIBUTED` | full commit SHA와 version 주석 고정; `IMPLEMENTED`, GitHub 실행 `NOT_RUN` | 2026-07-25 |
-| `CI-JAVA` | `actions/setup-java` `v5.6.0`; commit `03ad4de0992f5dab5e18fcb136590ce7c4a0ac95`; Temurin Java `17` | [actions/setup-java](https://github.com/actions/setup-java) | `MIT` | CI JDK setup | `NOT_DISTRIBUTED` | Action full SHA 고정; JDK patch는 setup 시점에 결정되는 환경 재현성 제한으로 분리. GitHub 실행 `NOT_RUN` | 2026-07-25 |
-| `CI-NODE` | `actions/setup-node` `v6.5.0`; commit `249970729cb0ef3589644e2896645e5dc5ba9c38`; `.nvmrc` Node `22.17.0` | [actions/setup-node](https://github.com/actions/setup-node) | `MIT` | CI Node setup | `NOT_DISTRIBUTED` | Action full SHA와 Node exact version 고정; GitHub 실행 `NOT_RUN` | 2026-07-25 |
-| `CI-OLLAMA-INSTALL` | Ollama `v0.32.3` Linux amd64 archive; SHA-256 `2597d74fbe654ef6a37db56f771cf37d4a85c6bde4018127874e3927d3113800` | [Ollama v0.32.3 release](https://github.com/ollama/ollama/releases/tag/v0.32.3), release asset digest | source `MIT`; binary archive는 외부 제공물 | CI runtime setup | `NOT_DISTRIBUTED` | mutable install script 제거, exact release archive checksum과 runtime API version fail-closed Gate 구현; GitHub 실행 `NOT_RUN` | 2026-07-25 |
-| `CI-BGE-PULL` | `bge-m3:latest`; registry manifest SHA-256 `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab` | [Ollama model page](https://ollama.com/library/bge-m3:latest), registry manifest | model license는 아래 별도 기록 | CI model pull | model bytes를 GitHub cache·artifact로 배포하지 않음 | pull 전 registry manifest와 pull 후 local manifest를 같은 digest로 검증하고 model·license blob 존재를 검사. mutable alias drift는 fail-closed; GitHub 실행 `NOT_RUN` | 2026-07-25 |
+| `CI-CHECKOUT` | `actions/checkout` `v6.1.0`; commit `d23441a48e516b6c34aea4fa41551a30e30af803` | [actions/checkout](https://github.com/actions/checkout) | `MIT` | CI source checkout | `NOT_DISTRIBUTED` | full commit SHA와 version 주석 고정; GitHub 실행 `PASS` | 2026-07-30 |
+| `CI-JAVA` | `actions/setup-java` `v5.6.0`; commit `03ad4de0992f5dab5e18fcb136590ce7c4a0ac95`; Temurin Java `17` | [actions/setup-java](https://github.com/actions/setup-java) | `MIT` | CI JDK setup | `NOT_DISTRIBUTED` | Action full SHA 고정; JDK patch는 setup 시점에 결정되는 환경 재현성 제한으로 분리. GitHub 실행 `PASS` | 2026-07-30 |
+| `CI-NODE` | `actions/setup-node` `v6.5.0`; commit `249970729cb0ef3589644e2896645e5dc5ba9c38`; `.nvmrc` Node `22.17.0` | [actions/setup-node](https://github.com/actions/setup-node) | `MIT` | CI Node setup | `NOT_DISTRIBUTED` | Action full SHA와 Node exact version 고정; GitHub 실행 `PASS` | 2026-07-30 |
+| `CI-OLLAMA-INSTALL` | Ollama `v0.32.3` Linux amd64 archive; SHA-256 `2597d74fbe654ef6a37db56f771cf37d4a85c6bde4018127874e3927d3113800` | [Ollama v0.32.3 release](https://github.com/ollama/ollama/releases/tag/v0.32.3), release asset digest | source `MIT`; binary archive는 외부 제공물 | CI runtime setup | `NOT_DISTRIBUTED` | mutable install script 제거, exact release archive checksum과 runtime API version fail-closed Gate 구현; GitHub 실행 `PASS` | 2026-07-30 |
+| `CI-BGE-PULL` | `bge-m3:latest`; registry manifest SHA-256 `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab` | [Ollama model page](https://ollama.com/library/bge-m3:latest), registry manifest | model license는 아래 별도 기록 | CI model pull | model bytes를 GitHub cache·artifact로 배포하지 않음 | pull 전 registry manifest와 pull 후 local manifest를 같은 digest로 검증하고 model·license blob 존재를 검사. mutable alias drift는 fail-closed; GitHub 실행 `PASS` | 2026-07-30 |
 
 PostgreSQL 성공이나 일반 CI 성공은 OpenSQL·OpenProxy·OpenHA 성공이 아니다.
-세 환경은 이번 감사에서 모두 `NOT_RUN`이다.
+이 component 감사 자체에서는 세 환경을 실행하지 않았다. 별도 PRZ-003
+실행에서 실제 OpenSQL single-node SQL Gate만 `PASS`했고 OpenProxy·OpenHA는
+`NOT_RUN` 또는 `NOT_VERIFIED`다.
 
 ## Ollama·bge-m3·Codex
 
@@ -286,9 +290,9 @@ PRIZM 코드의 outgoing license와 external runtime·model license를 합치지
 
 | ID | Identity | Upstream / evidence | License | Purpose·scope | Distribution | NOTICE / status | Verified |
 |---|---|---|---|---|---|---|---|
-| `AI-OLLAMA-SOURCE` | Ollama source와 CI runtime `v0.32.3`; Linux amd64 archive SHA-256 `2597d74fbe654ef6a37db56f771cf37d4a85c6bde4018127874e3927d3113800` | [Ollama source](https://github.com/ollama/ollama), [v0.32.3 release](https://github.com/ollama/ollama/releases/tag/v0.32.3), official LICENSE·asset digest | source `MIT`; downloaded binary archive는 외부 제공물 | local·CI model runtime | `NOT_DISTRIBUTED`; 사용자가 공식 upstream에서 설치 | CI identity·checksum Gate `IMPLEMENTED`; bundled dependency 전체 provenance는 future binary 재배포 전 별도 감사 | 2026-07-25 |
+| `AI-OLLAMA-SOURCE` | Ollama source와 CI runtime `v0.32.3`; Linux amd64 archive SHA-256 `2597d74fbe654ef6a37db56f771cf37d4a85c6bde4018127874e3927d3113800` | [Ollama source](https://github.com/ollama/ollama), [v0.32.3 release](https://github.com/ollama/ollama/releases/tag/v0.32.3), official LICENSE·asset digest | source `MIT`; downloaded binary archive는 외부 제공물 | local·CI model runtime | `NOT_DISTRIBUTED`; 사용자가 공식 upstream에서 설치 | CI identity·checksum Gate와 실제 GitHub 실행 `PASS`; bundled dependency 전체 provenance는 future binary 재배포 전 별도 감사 | 2026-07-30 |
 | `AI-BGE-M3-UPSTREAM` | BAAI `bge-m3`; 2026-07-25 upstream reference revision `5617a9f61b028005a4858fdac845db406aefb181` | [BAAI/bge-m3](https://huggingface.co/BAAI/bge-m3), model repository metadata | model card `MIT` | 1024-d embedding model | `NOT_DISTRIBUTED`; 사용자가 Ollama registry에서 pull | 이 revision은 감사 시점 upstream reference일 뿐 Ollama 변환 원본임을 증명하지 않음; `UNVERIFIED_LINEAGE` | 2026-07-25 |
-| `AI-BGE-M3-OLLAMA` | `bge-m3:latest`; manifest SHA-256 `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`; model blob `daec91ffb5dd0c27411bd71f29932917c49cf529a641d0168496c3a501e3062c`; license blob `a406579cd136771c705c521db86ca7d60a6f3de7c9b5460e6193a2df27861bde` | [Ollama model page](https://ollama.com/library/bge-m3:latest), registry manifest | license blob은 MIT 형식이나 저작권자 placeholder 포함 | local·CI embedding | `NOT_DISTRIBUTED`; model/cache를 Git·release에 포함하지 않음 | exact manifest Gate `IMPLEMENTED`, GitHub 실행 `NOT_RUN`; BAAI revision→Ollama 변환 lineage와 placeholder는 `UNVERIFIED_LINEAGE`로 남아 future model 재배포·정확한 lineage 주장을 차단하지만 PRIZM source distribution의 license 충돌로 간주하지 않음 | 2026-07-25 |
+| `AI-BGE-M3-OLLAMA` | `bge-m3:latest`; manifest SHA-256 `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`; model blob `daec91ffb5dd0c27411bd71f29932917c49cf529a641d0168496c3a501e3062c`; license blob `a406579cd136771c705c521db86ca7d60a6f3de7c9b5460e6193a2df27861bde` | [Ollama model page](https://ollama.com/library/bge-m3:latest), registry manifest | license blob은 MIT 형식이나 저작권자 placeholder 포함 | local·CI embedding | `NOT_DISTRIBUTED`; model/cache를 Git·release에 포함하지 않음 | exact manifest Gate와 GitHub 실행 `PASS`; BAAI revision→Ollama 변환 lineage와 placeholder는 `UNVERIFIED_LINEAGE`로 남아 future model 재배포·정확한 lineage 주장을 차단하지만 PRIZM source distribution의 license 충돌로 간주하지 않음 | 2026-07-30 |
 | `AI-CODEX` | Codex; exact 사용 비율 없음 | 사용자 확인과 개발 기록 | runtime component의 license로 분류하지 않음 | authoring assistant | code·model 자체를 PRIZM과 함께 배포하지 않음 | 보조도구 사용 사실만 공개; 저작권자·공동 기여자·runtime dependency로 기록하지 않음 | 2026-07-24 |
 
 모델 파일과 cache는 Git·기본 제출 source에 넣지 않는다. G-01은 Ollama와
@@ -301,15 +305,15 @@ CI에서 fail-closed로 확인하지만, BAAI upstream에서 Ollama artifact로
 
 | ID | Identity | Upstream / evidence | License | Purpose·scope | Distribution | Status / unresolved | Verified |
 |---|---|---|---|---|---|---|---|
-| `DATA-SEARCH-CORPUS` | `src/test/resources/search-evaluation/sample/corpus.json`; `prizm-synthetic-dense-pilot-v2`, 11 virtual docs; SHA-256 `0E9981C4BFCEA39ED7DFCA3F156EC9BCBF7E425DE9F29E966BB5F6D7D0494D86` | tracked JSON self-description, Git history와 2026-07-24 사용자 직접·Codex 보조 제작 확인; [자산 감사](2026-asset-provenance-audit.md) | `Apache-2.0` 사용자 승인, 적용 전 | search evaluation fixture | source와 함께 배포 후보 | 외부 dataset·실제 문서 비파생, 개인정보·기밀 부재와 공개 권리를 사용자 확인해 `VERIFIED_DIRECT` | 2026-07-24 |
-| `DATA-SEARCH-QUESTIONS` | `src/test/resources/search-evaluation/sample/questions.jsonl`; 30 questions; SHA-256 `A42A356628E577722BC62A65C8157EC79A9917CA033C6B6CBD1D7BEE80FA07B5` | tracked JSONL, Git history와 2026-07-24 사용자 직접·Codex 보조 제작 확인; [자산 감사](2026-asset-provenance-audit.md) | `Apache-2.0` 사용자 승인, 적용 전 | search evaluation fixture | source와 함께 배포 후보 | corpus와 같은 제3자 비파생·공개 권리 확인으로 `VERIFIED_DIRECT` | 2026-07-24 |
-| `DATA-EVALUATION-CONFIG` | `src/searchEvaluation/resources/application-search-evaluation.yml`; SHA-256 `06A36041A79D5DE3AF428C7F9B72017E12815438932BC1672EA3191731DF8CA8` | tracked project configuration | `Apache-2.0` 사용자 승인, 적용 전 | search evaluation configuration | source와 함께 배포 후보 | 외부 asset이 아닌 설정임을 `VERIFIED`; 표준 license 파일 적용 전 | 2026-07-24 |
+| `DATA-SEARCH-CORPUS` | `src/test/resources/search-evaluation/sample/corpus.json`; `prizm-synthetic-dense-pilot-v2`, 11 virtual docs; SHA-256 `0E9981C4BFCEA39ED7DFCA3F156EC9BCBF7E425DE9F29E966BB5F6D7D0494D86` | tracked JSON self-description, Git history와 2026-07-24 사용자 직접·Codex 보조 제작 확인; [자산 감사](2026-asset-provenance-audit.md) | `Apache-2.0` 적용 | search evaluation fixture | source와 함께 배포 후보 | 외부 dataset·실제 문서 비파생, 개인정보·기밀 부재와 공개 권리를 사용자 확인해 `VERIFIED_DIRECT` | 2026-07-30 |
+| `DATA-SEARCH-QUESTIONS` | `src/test/resources/search-evaluation/sample/questions.jsonl`; 30 questions; SHA-256 `A42A356628E577722BC62A65C8157EC79A9917CA033C6B6CBD1D7BEE80FA07B5` | tracked JSONL, Git history와 2026-07-24 사용자 직접·Codex 보조 제작 확인; [자산 감사](2026-asset-provenance-audit.md) | `Apache-2.0` 적용 | search evaluation fixture | source와 함께 배포 후보 | corpus와 같은 제3자 비파생·공개 권리 확인으로 `VERIFIED_DIRECT` | 2026-07-30 |
+| `DATA-EVALUATION-CONFIG` | `src/searchEvaluation/resources/application-search-evaluation.yml`; SHA-256 `06A36041A79D5DE3AF428C7F9B72017E12815438932BC1672EA3191731DF8CA8` | tracked project configuration | `Apache-2.0` 적용 | search evaluation configuration | source와 함께 배포 후보 | 외부 asset이 아닌 설정임을 `VERIFIED`; root license·source-only NOTICE 적용 | 2026-07-30 |
 | `ASSET-TRACKED` | tracked frontend/search 이미지·PDF·office·archive·model 0개 | `git ls-files`와 extension·signature scan | 해당 없음 | asset audit | 해당 없음 | `VERIFIED` | 2026-07-24 |
 | `BINARY-WRAPPER` | tracked binary는 `gradle-wrapper.jar` 1개 | 위 Gradle row | `Apache-2.0` | build bootstrap | source와 함께 배포 | `VERIFIED`; Gradle 9.5.1 distribution checksum pin 적용 | 2026-07-25 |
 | `REF-SPEC-KIT` | GitHub Spec Kit의 spec·plan·tasks 구조, 확인 commit `4d3a4281bc63bd2af9f2515bb1036fc38da1294e` | [upstream](https://github.com/github/spec-kit), [MIT](https://github.com/github/spec-kit/blob/main/LICENSE), 사용자 제공 화면과 확인 | `MIT`; PRIZM에 upstream 원문·template·code 미포함 | 일반적인 작업 흐름 참고 | `NOT_DISTRIBUTED` | upstream template과 비자명한 동일 문구 0건, PRIZM 문서는 개념만 독자 작성, `VERIFIED_EXTERNAL_REFERENCE` | 2026-07-24 |
 | `REF-ROBO-ARCHITECT` | uEngine Robo Architect의 spec별 보조 문서 구조, 확인 commit `bb4b24addc301062e06f983e25c8e5f76877b9cd` | [repository](https://github.com/uengine-oss/robo-architect), [제품 소개](https://www.uengine.org/contents/roboarchitect.html), 사용자 제공 화면과 확인 | root license 파일·GitHub license metadata 없음; README의 `MIT License` 문구만 확인. PRIZM에 upstream 원문·code·asset 미포함 | 일반적인 문서 배치 참고 | `NOT_DISTRIBUTED` | upstream에는 `evidence.md`가 없으며 PRIZM evidence 분리는 독자 적용. future copy 전 license 재확인 | 2026-07-24 |
 | `REF-GAMIUM` | Gamium·samples·docs 구조 | PRZ-002 plan/tasks와 2026-07-24 사용자 확인 | 향후 참고 시 exact repository·commit·license 재감사 | 공개 저장소 정리의 미래 참고 후보 | 현재 code·문구·asset 반영 0 | `NOT_DISTRIBUTED`; 현재 provenance Gate 대상 아님 | 2026-07-24 |
-| `SOURCE-UI-DESIGN-TOKENS` | [`frontend/src/styles.css`](../../frontend/src/styles.css)의 독립 `--prizm-*` color·spacing·radius·state token | 2026-07-24 external-token 제거 구현과 [자산 감사](2026-asset-provenance-audit.md) | `Apache-2.0` 사용자 승인, 적용 전 | frontend visual system | source와 함께 배포 후보 | 외부 token 값·문구·asset 미포함, `VERIFIED_DIRECT` | 2026-07-24 |
+| `SOURCE-UI-DESIGN-TOKENS` | [`frontend/src/styles.css`](../../frontend/src/styles.css)의 독립 `--prizm-*` color·spacing·radius·state token | 2026-07-24 external-token 제거 구현과 [자산 감사](2026-asset-provenance-audit.md) | `Apache-2.0` 적용 | frontend visual system | source와 함께 배포 후보 | 외부 token 값·문구·asset 미포함, `VERIFIED_DIRECT` | 2026-07-30 |
 | `REF-OH-MY-DESIGN-TOSS` | oh-my-design의 Toss design reference | [reference](https://oh-my-design.kr/design-systems/toss), [tool repository](https://github.com/kwakseongjae/oh-my-design), [Toss TDS 사용 범위](https://developers-apps-in-toss.toss.im/design/components.html) | tool은 `MIT`이나 company reference는 각 회사 소유로 분리되고, 공식 TDS 사용 허가는 앱인토스 범위로 제한됨 | 과거 frontend token 출처를 설명하는 감사 이력 | 외부 file·token·문구 0개 | 재사용 권리를 가정하지 않고 source token을 제거해 `NOT_DISTRIBUTED`; URL은 역사적 근거로만 유지 | 2026-07-24 |
 
 검색 평가의 ignored real-data 경로, `local/`, `outputs/`, model cache는 감사 입력
@@ -800,21 +804,21 @@ model을 실제로 배포할 때는 각 artifact의 license·NOTICE·SBOM covera
   `bge-m3` license blob의 저작권자 placeholder는 위 `UNVERIFIED_LINEAGE`와
   future model 재배포 blocker로 유지한다.
 
-### BLOCKED / next gate
+### 다음 release Gate
 
-- machine-readable SBOM·AI model 명세의 human/machine inventory 대조, clean
-  checkout 재현 evidence와 독립 감사
+- 실제 제출 직전 공개 commit·tree·환경·결과 hash 재고정
 - fat JAR·`dist`·container image·Ollama binary·model weight의 future release
 
 현재 source-only 범위의 T-02와 T-03 결정은 마감됐다. model lineage 제한은
-`NOT_DISTRIBUTED` 경계와 함께 명시하며 PostgreSQL 성공이나 OpenSQL 결과로
-대체하지 않는다. 전체 PRZ-002가 완료된 것은 아니며, 현재 상태는 후속
-IMPLEMENT가 가능한 `IN_PROGRESS`다.
+`NOT_DISTRIBUTED` 경계와 함께 명시하며 PostgreSQL 성공이나 실제 OpenSQL
+single-node SQL Gate 결과로 대체하지 않는다. T-09 CI와 T-10 최종 감사까지
+통과한 PRZ-002의 현재 source-only 범위는 `VERIFIED`다.
 
 ## T-05 SBOM·AI 모델 명세 구현 기록
 
 2026-07-26에 source-only 배포 경계를 위한 기계 판독용 SBOM과 AI model
-manifest를 구현했다. 상세 범위·재생성 명령·현재 `NOT_RUN` 환경은
+manifest를 구현했다. 상세 범위·재생성 명령, T-05 당시 `NOT_RUN` 환경과 이후
+repository-level 검증 경계는
 [SBOM 및 AI 모델 명세](2026-sbom-model-manifest.md)를 기준으로 한다.
 
 | 항목 | 현재 기록 | tool/license 판정 | 배포 경계 |
@@ -855,8 +859,8 @@ endpoint가 package tree를 거부하여 신뢰 가능한 전이 취약점 판�
 **T-05 상태:** 현재 source-only 배포 범위에서 `VERIFIED`. 생성기의 고정 LF,
 표준 hash algorithm, classifier-aware identity와 위 human/machine 조정 규칙을
 구현하고 clean checkout·공식 CycloneDX 1.6 schema·checksum·독립 읽기 전용
-AUDIT를 통과했다. T-09 CI, 제출 직전 snapshot 고정, PRZ-002 전체 완료는 별도
-후속 gate이며 완료로 표시하지 않는다.
+AUDIT를 통과했다. 이후 T-09 CI와 T-10 최종 감사도 통과했다. 제출 직전
+snapshot 고정과 future binary/image/model 배포는 별도 후속 Gate다.
 
 ## T-09 source-only license Gate 자동 검사
 
@@ -882,9 +886,10 @@ weights를 향후 재배포할 때 필요한 별도 감사를 통과시킨 것�
 corrective commit `192295227f566815fa026259d2053b1c73e641f2`에서 Windows local,
 Linux clean clone과 GitHub
 [`OSS Readiness` push run](https://github.com/jaemin-devlog/PRIZM/actions/runs/30443185952)이
-같은 단일 명령으로 통과했다. 이 결과는 현재 source-only T-09 Gate에 한정되며
-future binary/image/model 배포 감사, OpenSQL 검증 또는 PRZ-002 전체 완료를
-의미하지 않는다.
+같은 단일 명령으로 통과했다. 이후 현재 `main`의 동일 OSS Readiness·CI와 T-10
+최종 감사까지 통과해 PRZ-002의 source-only 범위를 닫았다. 이 결과는 future
+binary/image/model 배포 감사나 OpenSQL 공급 bundle의 재배포 권리를 뜻하지
+않으며, 실제 OpenSQL single-node SQL Gate는 PRZ-003의 별도 실행 근거다.
 
 ## OpenSQL 대회용 외부 runtime 경계
 

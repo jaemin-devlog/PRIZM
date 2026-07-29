@@ -23,7 +23,8 @@ Agent가 지켜야 할 규칙은 [AGENTS.md](../AGENTS.md), 기능별 spec 상�
 
 ## 보조 문서
 
-- [OpenSQL 기술 Gate](opensql-gate.md): 실제 OpenSQL 환경 검증 전 체크리스트
+- [OpenSQL 기술 Gate](opensql-gate.md): 실제 single-node SQL Gate의 실행
+  계약·결과와 재실행 경계
 - [검색 품질 평가](evaluation/search-evaluation.md): Dense 검색 평가 방법과 합성 기준선
 - [대표 문제 해결 사례](showcase/problem-solving-case-studies.md): 대회·포트폴리오용 기술 설명
 - [AI 에이전트 작업 방식](ai-agent-workflow.md): AI 작업 원칙의 선택 이유·적용 범위·제한

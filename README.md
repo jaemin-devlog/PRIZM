@@ -34,7 +34,7 @@ PRIZM은 흩어진 기록의 근거를 분석해, 거짓 없이 개인의 경험
 | 구현됨 | Career Vault Reference App | 로그인, 목록·유형/제목/상태 필터, TXT·PDF 업로드, 상세·수정·삭제, 새 version 등록, PDF thumbnail·원본 열람, 최대 5개 Career Evidence 검색 |
 | 구현됨 | 현재 API | 로그인·현재 사용자·문서 업로드/목록/상세/수정/삭제·새 version·PDF thumbnail/원본·단일 검색·Career Evidence 검색·health |
 | 계획됨 | 제품 확장 | CareerFact, 근거 기반 portfolio, `/api/v1`, MCP, 멀티모듈 Engine 패키징, 기관용 workspace |
-| 미검증 | 외부 DB 환경 | OpenSQL, OpenProxy, OpenHA 실환경 호환성은 모두 `NOT_RUN` |
+| 부분 검증 | 외부 DB 환경 | 실제 OpenSQL single-node에서 Flyway V1~V13·`vector(1024)`·검색·ownership·Worker SQL Gate `PASS`; OpenProxy·OpenHA·DB failover와 OpenSQL+Ollama 전체 흐름은 `NOT_RUN` 또는 `NOT_VERIFIED` |
 
 구체적인 구현 근거와 제한은 [현재 구현 현황](docs/project-status.md)을 기준으로
 합니다.
@@ -88,8 +88,9 @@ npm --prefix frontend run build
 docker compose config
 ```
 
-PostgreSQL·pgvector 결과와 OpenSQL 결과는 구분합니다. OpenSQL·OpenProxy·OpenHA
-결과는 현재 `NOT_RUN`입니다.
+PostgreSQL·pgvector 결과와 OpenSQL 결과는 구분합니다. 실제 OpenSQL
+single-node SQL Gate만 검증됐으며, OpenProxy·OpenHA·DB failover와
+OpenSQL+Ollama 전체 사용자 흐름은 아직 `NOT_RUN` 또는 `NOT_VERIFIED`입니다.
 
 ## 라이선스와 공급망
 

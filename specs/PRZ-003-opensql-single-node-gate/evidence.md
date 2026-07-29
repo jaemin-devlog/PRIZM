@@ -18,11 +18,13 @@
 | 지원 service 기본 상태 | `PASS_INSTALLATION_ONLY` | 설치 직후 single-node DB를 유지하는 지원 service의 실행 상태와 primary health를 확인했다. 세부 port·unit·내부 구성은 공개 근거에서 제외한다. |
 | OpenProxy 기능 검증 | `NOT_VERIFIED` | 설치 과정에서 관찰된 component 여부와 관계없이 인증·runtime 연결·호환성 Gate는 이 범위에서 완료하지 않았다. readiness claim을 하지 않는다. |
 | 설치 후 재부팅 지속성 | `NOT_RUN` | 설치 완료 뒤 전체 service의 재부팅 지속성을 검증하지 않았다. |
-| PRIZM OpenSQL Gate | `NOT_RUN` | PRIZM Flyway migration, `vector(1024)`, cosine 검색, ownership, lease/fencing과 Worker SQL을 이 대상에서 실행하지 않았다. |
+| PRIZM OpenSQL Gate | `PASS` | 실제 OpenSQL single-node의 fresh target에서 Flyway V1~V13, `vector(1024)`·cosine 검색, owner·ACTIVE 격리와 processing/cleanup job의 claim·lease·fencing·recovery·`SKIP LOCKED` SQL을 검증했다. OpenProxy·OpenHA·DB failover, Ollama 색인과 browser 흐름은 포함하지 않았다. |
 | 공개 저장소 안전 Gate | `PASS` | `node scripts/verify-oss-readiness.mjs`: 필수 파일, Markdown 38개·로컬 링크 262개, tracked file 300개 안전성, source-only license, SBOM 재생성·구조·checksum, 회귀 test 12건, `git diff --check` 통과. 외부 링크는 94개 성공, 1개 `INDETERMINATE`, 영구 실패 0개. |
 | 독립 공개 감사 | `PASS` | 공급 자산·라이선스·VM/개인 식별값·내부 설치 정보의 공개 여부와 상태 표현을 독립적으로 재검사했으며 차단 항목이 없었다. 이는 전체 PRZ-003 기술 감사나 GitHub review가 아니다. |
 | GitHub Issue | `NOT_CREATED` | 환경 준비 작업을 소급해 설명하는 Issue는 생성하지 않음. |
-| GitHub PR | `MERGED` | [PR #17](https://github.com/jaemin-devlog/PRIZM/pull/17), source commit `8a633e8`, merge commit `b36f6b2`. |
+| 환경 준비 GitHub PR | `MERGED` | [PR #17](https://github.com/jaemin-devlog/PRIZM/pull/17), source commit `8a633e8`, merge commit `b36f6b2`. |
+| 최종 Gate GitHub PR | `MERGED` | [PR #24](https://github.com/jaemin-devlog/PRIZM/pull/24), source commit `bb6f9406bbabf924df62962b8e767d7b66c67104`, merge commit `777e184f206d2a2770d055940ddabf139abfed9d`, 2026-07-30 KST. |
+| Review 상태 | `REVIEW_NOT_AVAILABLE_SOLO` | PR #24의 requested reviewer·review·review thread는 없었다. 독립 agent audit과 사용자 병합 승인을 GitHub review로 주장하지 않는다. |
 
 ## 2026-07-29 통합 전 합본 검증
 
@@ -186,12 +188,31 @@ docker run --rm --volume "${PWD}:/workspace" `
   링크 262개·tracked file 300개, SBOM 구조·checksum과 회귀 12건을 통과했고,
   외부 링크는 94개 성공·1개 `INDETERMINATE`·영구 실패 0개다.
 - 판정: blocking finding 0건이다. OpenSQL 단일 SQL Gate는 `VERIFIED`; OpenProxy,
-  OpenHA·DB failover, Ollama 색인, clean-clone 사용자 흐름, GitHub PR/review/merge는
-  별도 범위로 남는다.
+  OpenHA·DB failover, Ollama 색인과 clean-clone 사용자 흐름은 별도 범위로
+  남는다. 이 감사 당시 GitHub 통합은 대기 중이었고 아래 실제 통합 기록으로
+  완료했다.
 - 세션 정리: Gate 동안만 사용한 VM `authorized_keys` 임시 항목 2개와 Windows
   임시 key pair를 제거하고 양쪽 부재를 확인했다. 이어서 Windows `%TEMP%`의 Gate
   전용 실행기·상태·출력 파일 7개를 제거했다. 사용자 SSH key, 저장소 파일, 공급
   자산과 VM 기본 설정은 변경하지 않았다.
+
+## 2026-07-30 GitHub 통합
+
+- 실제 최종 PR은 [#24](https://github.com/jaemin-devlog/PRIZM/pull/24)이며 head
+  `bb6f9406bbabf924df62962b8e767d7b66c67104`, merge commit
+  `777e184f206d2a2770d055940ddabf139abfed9d`로 `main`에 병합됐다.
+- PR head의
+  [OSS Readiness run `30477029567`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30477029567)과
+  [CI run `30477029251`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30477029251),
+  병합된 `main`의
+  [OSS Readiness run `30477035697`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30477035697)과
+  [CI run `30477035700`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30477035700)이
+  모두 성공했다.
+- PR #24에 requested reviewer·comment·review thread가 없어
+  `REVIEW_NOT_AVAILABLE_SOLO`로 기록한다. 사용자의 실제 병합 승인과 독립 agent
+  audit은 GitHub review 또는 제3자 승인으로 계산하지 않는다.
+- 과거 완료 작업을 설명하는 Issue는 소급 생성하지 않았다. 최종 검증일은
+  2026-07-30이다.
 
 ## 검증 경계
 
@@ -203,7 +224,8 @@ PostgreSQL-container, Docker와 Ollama 결과도 이후 OpenSQL Gate 결과와 �
 ## 공개 경계
 
 - 공개 가능: Rocky Linux 9.7 VM의 OpenSQL `single` 설치 완료, 비공개
-  Host-only 네트워크와 시간 동기화, 기본 DB 질의 결과와 `NOT_RUN` 경계.
+  Host-only 네트워크와 시간 동기화, 기본 DB 질의와 실제 PRIZM 단일 SQL Gate
+  `PASS`, OpenProxy·OpenHA·DB failover 등의 `NOT_RUN`·`NOT_VERIFIED` 경계.
 - 공개 금지: 공급 archive·추출물, 테스트 라이선스, correspondence 원문,
   package/license fingerprint, 비공개 build metadata, 내부 installer command·
   log·설정, credential·key, hostname·IP·CPU 귀속값과 사용자 절대 경로.
@@ -219,5 +241,6 @@ PostgreSQL-container, Docker와 Ollama 결과도 이후 OpenSQL Gate 결과와 �
 - Windows UTF-8 교정의 주 평가 렌즈는 `EVAL-R1-01`, 보조 렌즈는
   `EVAL-R1-03`, `EVAL-R1-05`다. 기본 명령의 실패를 제거하고 환경별 skip을
   실행 가능한 근거와 `NOT_RUN` 경계로 분리했다.
-- 설치 전용 근거만으로 내부 추정 점수를 변경하지 않는다. `EVAL-R1-01`의
-  다음 Gate인 PRIZM OpenSQL 실행 검증은 계속 `NOT_RUN`이다.
+- 실제 OpenSQL 단일 SQL Gate는 `EVAL-R1-01`의 긍정 근거지만 전체 사용자
+  흐름·OpenProxy·OpenHA·DB failover를 증명하지 않는다. 이 근거만으로 내부
+  추정 점수를 자동 변경하지 않는다.

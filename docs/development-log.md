@@ -568,3 +568,38 @@
 - 안전성: `git diff --check`, 식별값·credential pattern 검사, `node scripts/verify-oss-readiness.mjs`를 통과했다. Markdown 38개·로컬 링크 262개·tracked file 300개, SBOM 구조·checksum과 회귀 12건이 통과했고 외부 링크는 94개 성공·1개 `INDETERMINATE`·영구 실패 0개다.
 - 판정: blocking finding 0건으로 PRZ-003 OpenSQL 단일 SQL Gate를 `VERIFIED`로 기록한다. 이는 GitHub 또는 제3자 review가 아니며 OpenProxy·OpenHA·DB failover, Ollama 색인, clean-clone 사용자 흐름과 GitHub 통합은 별도 범위다.
 - 세션 정리: VM `authorized_keys`의 Gate 전용 임시 key 2개와 Windows 임시 key pair를 제거하고, Windows `%TEMP%`의 Gate 전용 실행기·상태·출력 파일 7개도 제거했다. 사용자 key, 저장소 파일, 공급 자산과 VM 기본 설정은 변경하지 않았다.
+
+## 2026-07-30 — PRZ-003 실제 GitHub 통합 기록
+
+- 통합: 실제 [PR #24](https://github.com/jaemin-devlog/PRIZM/pull/24)의 source
+  `bb6f9406bbabf924df62962b8e767d7b66c67104`를 merge commit
+  `777e184f206d2a2770d055940ddabf139abfed9d`로 `main`에 병합했다.
+- CI: PR head와 병합된 `main`의 OSS Readiness·backend·frontend GitHub Actions가
+  모두 성공했다. 최종 검증일은 2026-07-30이다.
+- review: requested reviewer·comment·review thread가 없어
+  `REVIEW_NOT_AVAILABLE_SOLO`로 기록한다. 독립 agent audit과 사용자 병합 승인은
+  GitHub review 또는 제3자 승인으로 계산하지 않는다.
+- 경계: 공급 OpenSQL archive·라이선스·모델 파일·container image는 Git에
+  추가하지 않았고, OpenProxy·OpenHA·DB failover와 OpenSQL+Ollama 전체 흐름은
+  계속 별도 Gate다.
+
+## 2026-07-30 — PRZ-002 current source-only 범위 최종 AUDIT
+
+- 첫 감사: 공개 `main` `777e184`와 tree `a6e9cb9`를 기준으로 source register,
+  Apache-2.0 `LICENSE`·`NOTICE`, backend 169개·frontend 183개 SBOM, AI 모델
+  명세, public visibility와 clean-clone source inventory를 대조했다. 제품·
+  라이선스 finding은 없었고 현재 OpenSQL 상태와 PR #22 통합 기록의 문서 불일치
+  MEDIUM 2건을 확인해 `IN_PROGRESS`에서 교정했다.
+- 재검증: `node scripts/verify-oss-readiness.mjs`가 필수 파일 9개, Markdown
+  38개·로컬 링크 264개, tracked file 300개 안전성, source-only license,
+  SBOM 재생성·구조·checksum, Node 회귀 12건과 `git diff --check`를 통과했다.
+  외부 링크는 100개 성공·1개 `INDETERMINATE`·영구 실패 0개다.
+- 통합 증거: 실제 [PR #22](https://github.com/jaemin-devlog/PRIZM/pull/22)는
+  source `5c31305`, merge `42876b6`이며 관련 OSS Readiness·CI와 현재 `main`의
+  동일 workflow가 성공했다. reviewer는 없어 `REVIEW_NOT_AVAILABLE_SOLO`다.
+- 판정: 교정 뒤 독립 재감사 blocking finding은 0건이며 PRZ-002의 현재
+  source-only 범위와 P0를 `VERIFIED`로 닫는다. 외부 기여·보안 운영 문서와
+  binary·image·model 배포, 제출 직전 snapshot은 재개 조건이 있는 후속 Gate다.
+- 범위: 이번 교정은 문서 전용이다. 제품 source·Flyway·dependency·LICENSE·
+  NOTICE·SBOM JSON은 변경하지 않아 Gradle·frontend·Compose를 재실행하지
+  않았고, 병합된 `main`의 성공 CI와 OSS readiness 재검증을 근거로 사용했다.

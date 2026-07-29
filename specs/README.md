@@ -61,7 +61,7 @@
 |---|---|---|---|---|
 | [PRZ-000](PRZ-000-platform-baseline/spec.md) | 플랫폼 기반 및 Career Vault 기준선 | `AS_BUILT_BASELINE` | `e995a5f` | 2026-07-23 |
 | [PRZ-001](PRZ-001-search-evaluation-integrity/spec.md) | 검색 평가 분할 및 지표 정합성 | `VERIFIED` | `36c8610` | 2026-07-24 |
-| [PRZ-002](PRZ-002-open-source-readiness/spec.md) | 오픈소스 준비: 출처·라이선스·기여 기준선 | `IN_PROGRESS` | `203c892` | 2026-07-28 (source-only T-05) |
-| [PRZ-003](PRZ-003-opensql-single-node-gate/spec.md) | OpenSQL 단일 노드 검증 환경 | `VERIFIED` | `8a633e8` | 2026-07-30 (실제 OpenSQL 단일 SQL Gate 및 AUDIT PASS) |
+| [PRZ-002](PRZ-002-open-source-readiness/spec.md) | 오픈소스 준비: 출처·라이선스·기여 기준선 | `VERIFIED` | `777e184` | 2026-07-30 (현재 source-only 범위 T-10 AUDIT PASS) |
+| [PRZ-003](PRZ-003-opensql-single-node-gate/spec.md) | OpenSQL 단일 노드 검증 환경 | `VERIFIED` | `777e184` | 2026-07-30 (PR #24, 실제 OpenSQL 단일 SQL Gate 및 AUDIT PASS) |
 
 다음 신규 spec의 우선순위는 [2026 티맥스티베로 지정과제 대응 계획](../docs/contest/2026-tmaxtibero-plan.md)을 따른다. registry에 디렉터리를 미리 대량 생성하지 않고 실제로 착수하는 작은 수직 슬라이스만 추가한다.

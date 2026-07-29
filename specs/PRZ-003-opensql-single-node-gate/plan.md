@@ -80,8 +80,9 @@ metadata·설정·log를 공개 저장소에 기록하지 않는다.
 - 로컬 dependency 조정이 필요했던 상세 진단은 공급사 지원을 위한 비공개 근거로
   남겼다. 공개 문서에는 비공개 build의 내부 경로·오류·우회 명령을 싣지 않는다.
 - OpenSQL `single` 설치와 직접 인증 기본 SQL 질의는 완료했다.
-- OpenProxy 기능 검증, 설치 후 재부팅 지속성, PRIZM Flyway·vector·검색·Worker
-  SQL Gate는 아직 실행하지 않았다.
+- PRIZM Flyway V1~V13·`vector(1024)`·검색·ownership·Worker SQL Gate는 실제
+  OpenSQL single-node에서 통과했다. OpenProxy 기능 검증과 설치 후 재부팅
+  지속성, OpenHA·DB failover는 아직 실행하지 않았다.
 
 ## 첫 OpenSQL Gate 계획
 

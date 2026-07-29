@@ -29,4 +29,4 @@
 - [x] 첫 OpenSQL Gate를 실행하고 결과를 기록한다.
 - [x] 검증 근거를 확보한 뒤 전용 Gate DB·역할·보조 파일이 남지 않음을 확인한다.
 - [x] 실제 Gate 결과·문서·공개 경계를 독립 읽기 전용으로 감사한다.
-- [ ] GitHub 인증과 사용자 승인 후 실제 PR·review 상태·merge 근거를 통합 기록한다.
+- [x] 실제 PR #24·CI·review 부재·merge commit과 검증일을 통합 기록한다.

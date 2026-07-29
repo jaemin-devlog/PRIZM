@@ -499,3 +499,9 @@
 - 재현: corrective commit `1922952`를 Linux/JDK 17/Node 22.17 clean clone에서 검증했고, GitHub OSS Readiness run `30443185952`와 기존 CI run `30443184506`이 모두 성공했다. 최종 증거 문서를 포함한 Windows local Gate도 외부 링크 94개 성공·1개 `INDETERMINATE`로 통과했다.
 - 감사: 독립 읽기 전용 재감사에서 CRITICAL/HIGH/MEDIUM finding은 없었다. source-only license Gate, SBOM 재생성·drift·구조, tracked 민감 파일과 외부 링크 분류가 요구 범위와 일치했다.
 - 상태: T-09 구현·VERIFY·AUDIT는 통과했다. GitHub 앱 쓰기 권한 부족으로 PR 생성은 HTTP 403에서 멈췄으며, 실제 PR·병합·최종 source commit 기록은 `INTEGRATE`에 남아 있다.
+
+## 2026-07-29 — 로그인 근거 연결 배경 시각 요소
+
+- 변경: 로그인 소개 영역에 문서 카드·근거 연결·검증 표시를 담은 직접 제작 SVG 배경을 추가했다. 텍스트는 배경보다 위에 두고, 장식 요소는 pointer event를 받지 않으며 모바일에서는 숨긴다.
+- 이유: 빈 왼쪽 영역에 PRIZM의 문서 기반 근거 탐색 성격을 전달하되, 외부 사진·일러스트를 도입하지 않고 사용자 입력이나 로그인 흐름을 바꾸지 않기 위해서다.
+- 검증: frontend lint·production build·SVG XML 파싱·`git diff --check`를 통과했다. SVG의 출처·SHA-256과 source-only 배포 경계는 자산 provenance 감사에 기록했다.

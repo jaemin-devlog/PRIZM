@@ -374,7 +374,9 @@ class PgVectorInfrastructureTest {
                 .resolve(response.documentId().toString())
                 .resolve(response.versionId().toString())
                 .resolve("leave-guide.txt");
-        assertThat(storedFile).exists().hasContent(new String(content, StandardCharsets.UTF_8));
+        assertThat(storedFile).exists();
+        assertThat(Files.readString(storedFile, StandardCharsets.UTF_8))
+                .isEqualTo(new String(content, StandardCharsets.UTF_8));
     }
 
     @Test

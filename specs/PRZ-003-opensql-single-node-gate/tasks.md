@@ -13,5 +13,10 @@
 - [x] Rocky Linux 9.7에서 OpenSQL `single` 설치와 라이선스 적용을 완료한다.
 - [x] 직접 인증 기본 SQL 질의와 설치 직후 지원 service health를 확인한다.
 - [x] 공개 문서에서 공급 자산 식별자·fingerprint·내부 log와 host 귀속값을 제거한다.
+- [x] Windows 기본 문자셋에서 발생한 UTF-8 통합 테스트 실패와 도입 이력을 확인한다.
+- [x] TXT 저장 통합 테스트가 실제 파일을 UTF-8로 명시해 읽도록 교정한다.
+- [x] 별도 JVM 인코딩 강제 없이 대상 테스트와 전체 통합 테스트를 재실행한다.
+- [x] OpenSQL opt-in 1건과 Windows `SecureDirectoryStream` 제한 2건을 재감사한다.
+- [x] 단위·프런트엔드·Compose·오픈소스 준비 Gate를 다시 실행하고 근거를 기록한다.
 - [ ] 첫 OpenSQL Gate를 실행하고 결과를 기록한다.
 - [ ] 모든 Gate가 충족된 뒤 독립 감사와 통합을 수행한다.

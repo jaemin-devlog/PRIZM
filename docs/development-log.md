@@ -534,3 +534,12 @@
 - 통과: backend unit test, frontend lint·production build, Compose config, OSS readiness가 통과했다. UTF-8을 일시 지정한 PostgreSQL·pgvector·Ollama 전체 통합 테스트도 68건 중 실패 0건·건너뜀 3건이었다. OpenSQL은 사용하지 않았다.
 - 차단: 문서화된 기본 Windows 통합 테스트 명령은 기존 UTF-8 TXT 비교가 기본 문자셋을 사용해 68건 중 1건 실패했다. 이 줄은 7월 13일 기존 commit에서 도입되어 최신 노트북 변경이나 PRZ-003 문서 변경의 회귀는 아니지만, 정확한 기본 명령이 실패하므로 `INTEGRATION_BLOCKED_RETURN_TO_SPEC`으로 판정했다.
 - 통합: `main` 병합과 push는 수행하지 않았다. 교차 플랫폼 문자셋 교정을 별도 승인 범위에서 spec·plan에 반영하고 정확한 명령을 다시 통과시켜야 한다. 게시 절차에 필요한 GitHub CLI도 현재 설치되어 있지 않다.
+
+## 2026-07-30 — Windows UTF-8 통합 차단 교정과 skip 재감사
+
+- 교정: 기존 TXT 저장 통합 테스트가 실제 파일을 Windows 기본 문자셋이 아니라 UTF-8로 명시해 읽도록 수정했다. 제품 source, Flyway, API, 보안 계약, dependency와 license는 변경하지 않았다.
+- Windows 검증: 인코딩 환경변수 없이 대상 테스트와 전체 통합 테스트를 실행했다. 전체 결과는 68건 중 실패 0건·오류 0건·건너뜀 3건이다. 단위 테스트는 캐시 없이 245건을 재실행해 실패 0건·오류 0건·플랫폼 건너뜀 14건이었다. 프런트엔드 lint/build, Compose config와 OSS readiness도 통과했다.
+- skip 감사: cleanup 통합 테스트 2건은 Windows의 `SecureDirectoryStream` 부재 때문이었다. Linux JDK 컨테이너에서 두 테스트를 재실행해 2건 모두 통과했고, 파일 저장 단위 테스트 23건도 Linux에서 건너뜀 없이 통과했다. Windows fail-closed 회귀 테스트도 실제 실행되어 통과했다.
+- 남은 경계: OpenSQL 통합 테스트 1건은 실행 플래그, 전용 대상 확인과 runtime/Flyway 자격정보가 준비되지 않아 의도대로 건너뛰었다. 결과는 `NOT_RUN`이며 PostgreSQL·pgvector 결과로 대체하지 않는다.
+- 감사: 최종 diff의 scope, 보존 계약, 공개 경계와 실행 결과를 읽기 전용으로 대조해 blocking finding 0건을 확인했다. 이는 GitHub 또는 제3자 review가 아니다.
+- 상태: Windows UTF-8 합본 차단은 해소됐다. 이번 작업은 활성 PRZ-003 안의 corrective work이며 전체 OpenSQL Gate와 PRZ-003 통합 완료를 뜻하지 않는다.

@@ -71,6 +71,23 @@ metadata·설정·log를 공개 저장소에 기록하지 않는다.
 - OpenProxy 기능 검증, 설치 후 재부팅 지속성, PRIZM Flyway·vector·검색·Worker
   SQL Gate는 아직 실행하지 않았다.
 
+## Windows UTF-8 회귀 교정 계획
+
+- 기존 통합 테스트는 UTF-8로 저장한 TXT를 AssertJ의 기본 문자셋으로 읽어
+  Windows에서 `MalformedInputException`을 발생시킨다. 애플리케이션 저장 동작이
+  아니라 검증 코드의 문자셋 의존 문제이므로 기존 PRZ-003 안에서 교정한다.
+- 실제 저장 파일과 기대값을 모두 `StandardCharsets.UTF_8`로 명시해 비교한다.
+  Gradle 또는 JVM 전체의 기본 문자셋은 강제하지 않는다.
+- 수정 뒤 문제를 재현한 단일 테스트와 전체 `integrationTest`를 Windows에서
+  정확한 기본 명령으로 다시 실행한다. Docker, PostgreSQL·pgvector와 Ollama
+  사용 여부 및 전체 실패·건너뜀 수를 기록한다.
+- OpenSQL opt-in 테스트는 전용 endpoint와 credential 없이 실행하지 않는다.
+  Windows가 제공하지 않는 `SecureDirectoryStream` 기반 삭제 성공 경로는
+  보안 전제를 낮춰 실행하지 않으며, Windows에서 실행되는 fail-closed 단위
+  테스트와 현재 Linux 재실행 가능 여부를 별도로 감사한다.
+- 이 교정은 제품 source, API, Flyway, ownership/security 계약, dependency와
+  license를 변경하지 않는다. 복구가 필요하면 해당 테스트 assertion만 되돌린다.
+
 ## Git 계획
 
 환경 준비는 기존 PR로 병합됐다. 설치 근거의 공개 안전성 보완은 최신 `main`에서

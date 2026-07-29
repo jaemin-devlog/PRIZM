@@ -15,6 +15,7 @@ PRIZM의 전용 OpenSQL 검증 대상으로 사용한다. 공급사의 서면 �
 
 - 주: `EVAL-R1-01` — 재현 가능하고 격리된 OpenSQL 검증 대상
 - 보조: `EVAL-R1-03` — 설정 과정, 명령, 환경 근거의 문서화
+- 보조: `EVAL-R1-05` — 실패와 건너뜀을 숨기지 않는 단계별 검증 기록
 
 ## 요구사항
 
@@ -32,6 +33,9 @@ PRIZM의 전용 OpenSQL 검증 대상으로 사용한다. 공급사의 서면 �
    검증한다. 이 Gate는 OpenProxy 또는 OpenHA 호환성을 주장하지 않는다.
 7. 공급된 OpenSQL 자산은 허가된 `single` 구성에만 사용한다. 설치 파일,
    라이선스, fingerprint, 내부 metadata·설정·log를 복제하거나 Git에 넣지 않는다.
+8. 통합 전 Windows 회귀 Gate는 JVM 기본 문자셋에 기대지 않고 저장된 TXT를
+   UTF-8로 명시해 검증한다. 실행되지 않은 테스트는 이유와 필요한 환경을
+   분류하며, `NOT_RUN` 또는 플랫폼 제약을 `PASS`로 기록하지 않는다.
 
 ## 보존 계약
 
@@ -58,3 +62,7 @@ PRIZM의 전용 OpenSQL 검증 대상으로 사용한다. 공급사의 서면 �
    PRIZM 호환성 성공으로 표현하지 않는다.
 6. `OpenSqlInfrastructureTest`는 OpenSQL과 전용 test credential이 준비된 뒤에만
    실행한다. 그 전까지 결과는 `NOT_RUN`으로 기록한다.
+7. 별도 `JAVA_TOOL_OPTIONS`나 `file.encoding` 강제 없이 문서화된 Windows
+   통합 테스트 명령이 UTF-8 TXT 저장 검증을 포함해 통과한다.
+8. 전체 통합 테스트의 실패와 건너뜀 수를 다시 확인하고, OpenSQL opt-in Gate와
+   `SecureDirectoryStream` 의존 경로를 실행 환경별로 구분해 근거에 기록한다.

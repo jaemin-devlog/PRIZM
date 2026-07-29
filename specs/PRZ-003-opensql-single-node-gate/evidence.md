@@ -46,6 +46,75 @@
   않으므로 상태는 `INTEGRATION_BLOCKED_RETURN_TO_SPEC`이며 `main` 병합 근거로
   사용하지 않는다.
 
+## 2026-07-30 Windows UTF-8 교정 VERIFY
+
+- 대상: `origin/main` `3be415a`와 PRZ-003 공개 경계 commit `33208b9`,
+  통합 차단 근거 commit `0fdc2c3` 위의 교정 worktree.
+- 수정: TXT 저장 통합 테스트가 실제 저장 파일을
+  `StandardCharsets.UTF_8`로 명시해 읽도록 바꿨다. 제품 source, API,
+  Flyway migration, ownership/security 계약, dependency와 license는
+  변경하지 않았다.
+- Windows 환경: Java 17, Docker Engine 29.6.2, Testcontainers
+  PostgreSQL·pgvector, Ollama 0.32.3과 `bge-m3:latest`를 실제 사용했다.
+  OpenSQL은 이 회귀 검증에 사용하지 않았다.
+- `.\gradlew.bat integrationTest --no-daemon --rerun-tasks --tests
+  "com.prizm.infrastructure.PgVectorInfrastructureTest.uploadsTxtAsQuarantinedDocumentAndStoresFile"`:
+  `PASS`. `JAVA_TOOL_OPTIONS`와 `file.encoding` 강제 없이 실행했다.
+- `.\gradlew.bat integrationTest --no-daemon --rerun-tasks`: 68건,
+  실패 0건, 오류 0건, 건너뜀 3건으로 `PASS`.
+- `.\gradlew.bat test --no-daemon`: `PASS`; 이어서
+  `.\gradlew.bat test --no-daemon --rerun-tasks`로 실제 245건을 재실행해
+  실패 0건, 오류 0건, Windows 플랫폼 건너뜀 14건을 확인했다.
+- `npm.cmd --prefix frontend run lint`, `npm.cmd --prefix frontend run build`,
+  `docker compose config --quiet`: 모두 `PASS`.
+- `node scripts/verify-oss-readiness.mjs`: 필수 파일, Markdown 38개와
+  로컬 링크 262개, tracked file 300개, source-only license, SBOM 재생성·
+  구조·checksum, 회귀 테스트 12건, `git diff --check`를 통과했다.
+  외부 링크는 94개 성공, 1개 HTTP 403 `INDETERMINATE`, 영구 실패 0개였다.
+
+### 건너뜀 재감사
+
+| 범위 | Windows 결과 | 재감사 결과 |
+|---|---|---|
+| OpenSQL 전용 Gate 1건 | `SKIPPED` | `RUN_OPENSQL_TESTS`, 전용 대상 확인, runtime/Flyway endpoint·credential이 현재 프로세스에 모두 없음을 값 노출 없이 확인했다. 공급 OpenSQL 대상에서 실행하지 않았으므로 결과는 계속 `NOT_RUN`이다. |
+| cleanup 통합 테스트 2건 | `SKIPPED` | Windows가 `SecureDirectoryStream`을 제공하지 않아 보안 전제에서 중단됐다. `eclipse-temurin:17-jdk-jammy` Linux 컨테이너와 Docker Testcontainers에서 두 테스트만 현재 source로 재실행해 2건, 실패 0건, 오류 0건, 건너뜀 0건으로 `PASS`했다. OpenSQL은 사용하지 않았다. |
+| 파일 저장 단위 테스트 14건 | `SKIPPED` | Windows의 symbolic-link 권한 또는 `SecureDirectoryStream` 부재 때문이며, fail-closed 회귀 테스트는 Windows에서도 실행되어 통과했다. 같은 Linux 컨테이너에서 `LocalFileStorageTest` 23건을 재실행해 실패 0건, 오류 0건, 건너뜀 0건으로 `PASS`했다. |
+
+Linux 재검증 명령은 다음 두 종류였다.
+
+```powershell
+docker run --rm --env TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal `
+  --volume "${PWD}:/workspace" `
+  --volume '/var/run/docker.sock:/var/run/docker.sock' `
+  --volume 'prizm-gradle-cache:/root/.gradle' --workdir /workspace `
+  eclipse-temurin:17-jdk-jammy bash -lc `
+  "./gradlew integrationTest --no-daemon --rerun-tasks --tests 'com.prizm.infrastructure.PgVectorInfrastructureTest.cleanupWorkerDeletesPendingFilesTreatsMissingFilesAsCompletedAndDoesNotReclaimCompletedJobs' --tests 'com.prizm.infrastructure.PgVectorInfrastructureTest.cleanupWorkerConvergesToCompletedAfterCompletionUpdateFailureAndLeaseRecovery'"
+
+docker run --rm --volume "${PWD}:/workspace" `
+  --volume 'prizm-gradle-cache:/root/.gradle' --workdir /workspace `
+  eclipse-temurin:17-jdk-jammy bash -lc `
+  "./gradlew test --no-daemon --rerun-tasks --tests 'com.prizm.infrastructure.storage.LocalFileStorageTest'"
+```
+
+이 교정으로 기존 Windows UTF-8 차단은 해소됐다. 다만 OpenSQL 전용 Gate,
+설치 후 재부팅 지속성, OpenProxy와 OpenHA는 계속 `NOT_RUN` 또는
+`NOT_VERIFIED`이며 PostgreSQL·pgvector나 Linux cleanup 결과로 대체하지 않는다.
+
+## 2026-07-30 corrective AUDIT
+
+- `LOCAL_READ_ONLY_AUDIT_PASS`: 최종 diff 전체를 spec, 보존 계약, 실행 결과,
+  공개 경계와 대조했다. 이는 GitHub review 또는 제3자 review가 아니다.
+- 변경 파일은 기존 통합 테스트 1개와 PRZ-003 spec·plan·tasks·evidence,
+  development log뿐이다. 제품 source, migration, dependency manifest,
+  `LICENSE`, `NOTICE`와 배포 자산에는 변경이 없다.
+- UTF-8 assertion은 실제 파일 읽기에만 문자셋을 명시하며 전역 JVM 설정을
+  바꾸지 않는다. 기존 업로드·격리·ownership 계약도 변경하지 않는다.
+- 비공개 OpenSQL 자산·식별값·credential·내부 log·사용자 절대 경로가 새 diff에
+  포함되지 않았고 `git diff --check`와 OSS readiness가 통과했다.
+- blocking finding은 0건이다. Windows UTF-8 회귀와 cleanup 플랫폼 경로에는
+  실행 근거가 있다. 남은 감점 요인은 OpenSQL 전용 Gate와 설치 후 재부팅,
+  OpenProxy/OpenHA가 아직 실행되지 않은 점이며 내부 평가 점수는 변경하지 않는다.
+
 ## 검증 경계
 
 직접 `SELECT 1` 성공은 설치된 OpenSQL DB endpoint가 기본 인증 질의를 처리했다는
@@ -66,8 +135,11 @@ PostgreSQL-container, Docker와 Ollama 결과도 이후 OpenSQL Gate 결과와 �
 
 ## 평가 evidence
 
-- 이번 공개 안전성 작업의 주 평가 렌즈는 `EVAL-R1-03`, 보조 렌즈는
+- 공개 안전성 작업의 주 평가 렌즈는 `EVAL-R1-03`, 보조 렌즈는
   `EVAL-R1-02`다.
 - 설치 사실과 미실행 Gate를 구분하고 비공개 공급물의 고유값을 제거했다.
+- Windows UTF-8 교정의 주 평가 렌즈는 `EVAL-R1-01`, 보조 렌즈는
+  `EVAL-R1-03`, `EVAL-R1-05`다. 기본 명령의 실패를 제거하고 환경별 skip을
+  실행 가능한 근거와 `NOT_RUN` 경계로 분리했다.
 - 설치 전용 근거만으로 내부 추정 점수를 변경하지 않는다. `EVAL-R1-01`의
   다음 Gate인 PRIZM OpenSQL 실행 검증은 계속 `NOT_RUN`이다.

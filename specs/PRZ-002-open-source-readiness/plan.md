@@ -9,7 +9,7 @@
 | PLAN | `COMPLETE` |
 | IMPLEMENT | `COMPLETE_FOR_CURRENT_SOURCE_ONLY_SCOPE` |
 | VERIFY / AUDIT | `PASS` — T-09 GitHub CI와 T-10 독립 읽기 전용 감사 |
-| INTEGRATE | `IN_PROGRESS` — T-08 solo main 통합, T-09 PR #22 merge `42876b6`; T-10 교정 commit·push 기록 대기 |
+| INTEGRATE | `COMPLETE` — T-08 solo main 통합, T-09 PR #22 merge `42876b6`, T-10 source `f54e3d9`; `REVIEW_NOT_AVAILABLE_SOLO` |
 | GitHub Issue | `NOT_CREATED` |
 | Primary evaluation | `EVAL-R1-02` |
 | Secondary evaluation | `EVAL-R1-03`, `EVAL-R1-05` |
@@ -517,7 +517,8 @@ hash가 감사한 공개 commit과 일치해야 한다.
 - [x] 예상 IMPLEMENT 파일과 PLAN 허용 파일을 분리했다.
 - [x] 위험·중단 조건·단계별 `NOT_RUN` 기록 방식을 정의했다.
 
-이 계획의 현재 source-only IMPLEMENT·VERIFY·AUDIT는 완료됐다. INTEGRATE는
-T-10 교정 commit·push와 실제 commit·tree 기록을 기다린다. governance·template은
-기록된 재개 조건까지 `DEFERRED`이며, binary·image·model 배포와 제출 직전
-snapshot은 별도 후속 Gate에서 다시 감사한다.
+이 계획의 현재 source-only IMPLEMENT·VERIFY·AUDIT·INTEGRATE는 완료됐다.
+T-10 교정 source commit과 tree를 evidence·registry에 기록했다.
+governance·template은 기록된 재개 조건까지 `DEFERRED`이며,
+binary·image·model 배포와 제출 직전 snapshot은 별도 후속 Gate에서 다시
+감사한다.

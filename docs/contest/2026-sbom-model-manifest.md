@@ -7,7 +7,7 @@
 | 상태 | PRZ-002 현재 source-only 범위 `VERIFIED`; 모델·binary·image 재배포는 별도 미래 Gate |
 | 기준 배포물 | source-only Git repository / source ZIP |
 | 마지막 생성·검증일 | 2026-07-30 |
-| 마지막 검증 source commit | `777e184f206d2a2770d055940ddabf139abfed9d` |
+| 마지막 검증 source commit | `f54e3d98e3eddc20dc3c89d9b3e2b84e1649bea1` |
 | 검증 CI | [OSS Readiness `30477035697`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30477035697)·[CI `30477035700`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30477035700) `PASS` |
 
 이 문서는 PRIZM의 현재 source-only 배포물을 위한 기계 판독용 공급망

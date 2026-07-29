@@ -7,7 +7,7 @@
 | PRZ 작업 | [`PRZ-002-open-source-readiness`](../../specs/PRZ-002-open-source-readiness/spec.md) |
 | 범위 | T-02 inventory와 G-01·outgoing license 결정·자산 감사 자료 |
 | 기준 commit | `846bd06e59aeb1cab88134f02c43ff9731f360fd` (`PR #13` merge) |
-| 최종 source-only 검증 기준 | `777e184f206d2a2770d055940ddabf139abfed9d`, 2026-07-30 |
+| 최종 source-only 검증 기준 | `f54e3d98e3eddc20dc3c89d9b3e2b84e1649bea1`, 2026-07-30 |
 | 상태 | `VERIFIED_FOR_CURRENT_SOURCE_ONLY_SCOPE` |
 | 직접 작성 코드 저작권자 | `Jaemin Jeong` |
 | 공동 개발자·코드 기여자 | 확인된 사람 없음 |

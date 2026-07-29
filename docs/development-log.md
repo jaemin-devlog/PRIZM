@@ -603,3 +603,7 @@
 - 범위: 이번 교정은 문서 전용이다. 제품 source·Flyway·dependency·LICENSE·
   NOTICE·SBOM JSON은 변경하지 않아 Gradle·frontend·Compose를 재실행하지
   않았고, 병합된 `main`의 성공 CI와 OSS readiness 재검증을 근거로 사용했다.
+- 통합 기준: 최종 문서 교정 source는
+  `f54e3d98e3eddc20dc3c89d9b3e2b84e1649bea1`, tree는
+  `7e5f22fdbfbe1f4c87d8cd2c4fb579cba776e047`이다. 이 값을 PRZ-002
+  evidence·registry와 라이선스/SBOM 검증 기준에 고정했다.

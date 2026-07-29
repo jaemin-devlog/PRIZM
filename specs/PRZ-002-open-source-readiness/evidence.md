@@ -15,7 +15,7 @@
 | Corrective integrated PR | [#18](https://github.com/jaemin-devlog/PRIZM/pull/18), source commit `203c892`, merge commit `04afe7c` |
 | T-09 integrated PR | [#22](https://github.com/jaemin-devlog/PRIZM/pull/22), source commit `5c31305`, merge commit `42876b6` |
 | Initial public audit baseline | `main` `777e184f206d2a2770d055940ddabf139abfed9d`, tree `a6e9cb96cb4dc93d657397241d99d4367c7d2902`, 2026-07-30 |
-| Final correction target | 위 공개 baseline의 문서 전용 교정 worktree; 검증·감사 뒤 실제 integration commit과 tree를 후속 기록 |
+| Final correction source | commit `f54e3d98e3eddc20dc3c89d9b3e2b84e1649bea1`, tree `7e5f22fdbfbe1f4c87d8cd2c4fb579cba776e047` |
 | GitHub Issue | `NOT_CREATED`; connector write was blocked with HTTP 403 on 2026-07-26 |
 | Primary / secondary evaluation IDs | `EVAL-R1-02` / `EVAL-R1-03`, `EVAL-R1-05` |
 
@@ -523,8 +523,10 @@ Flyway V1~V13이 모두 있었다.
 개별 테스트 라이선스는 계속 저장소에 넣지 않는다.
 
 문서 전용 교정 worktree의 최종 독립 재감사에서 CRITICAL/HIGH/MEDIUM
-finding은 0건이다. 교정 worktree의 실제 integration commit·tree는 검증된
-commit을 만든 뒤 위 표와 registry에 고정한다. 이 감사는
+finding은 0건이다. 검증된 교정 source commit
+`f54e3d98e3eddc20dc3c89d9b3e2b84e1649bea1`과 tree
+`7e5f22fdbfbe1f4c87d8cd2c4fb579cba776e047`를 위 표와 registry에 고정했다.
+이 감사는
 GitHub review 또는 제3자 review가 아니다. 현재 source-only 공개 범위와 P0를
 `VERIFIED`로 닫는다. JAR·frontend `dist`·container image·Ollama binary·모델
 가중치를 배포하는 미래 Gate, 제출 직전 source snapshot, 외부 기여·보안 운영

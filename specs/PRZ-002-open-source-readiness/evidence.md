@@ -320,3 +320,92 @@ LOW 후속 보완은 generated JSON의 LF·마지막 LF 검증과 문서 gate �
 애플리케이션 동작을 변경하지 않은 generator/verifier·문서 보완이므로 전체 unit,
 integration, frontend lint/build는 재실행하지 않았다. Docker, PostgreSQL,
 pgvector, Ollama, OpenSQL, OpenProxy, OpenHA는 모두 `NOT_RUN`이다.
+
+## T-09 OSS readiness local VERIFY — 2026-07-29
+
+**대상:** `PRZ-002-license-sbom-ci` 작업 branch의 미커밋 IMPLEMENT 결과.
+T-08 README·Quickstart 변경이 남아 있는 원래 작업 트리를 건드리지 않기 위해
+`origin/main` `9b6352e75d1b56191322147a3953d5624739f58b`에서 별도 worktree를
+만들었다.
+
+**단일 검증 명령:** `node scripts/verify-oss-readiness.mjs`
+
+| 항목 | 결과 |
+|---|---|
+| required OSS file | PASS — `LICENSE`, `NOTICE`, audit·manifest·SBOM·checksum 9개 |
+| Markdown | PASS — 37개 파일, local link 243개, code fence·trailing whitespace 문제 0건 |
+| tracked-file safety | PASS — 295개; 금지 경로·binary, model cache, 업로드 원본, credential, private key, 사용자 로컬 절대 경로 0건 |
+| source-only license Gate | PASS — Apache-2.0 canonical checksum, NOTICE 저작권, blocker 0건, `UNKNOWN`·`CONFLICT`·`BLOCKED` 차단 상태 확인 |
+| dependency verification | PASS — Gradle `generateBackendSbom --no-daemon --dependency-verification=strict` |
+| SBOM 재생성 | PASS — backend 169개, frontend 183개; committed JSON과 drift 0건 |
+| SBOM 구조·checksum | PASS — CycloneDX 1.6 기본 구조, 필수 component field, canonical hash, 고유 `bom-ref`, LF와 SHA-256 |
+| 회귀 테스트 | PASS — Node 11건, 실패·skip 0건 |
+| 외부 링크 | 91개 성공, 1개 `INDETERMINATE` (`https://www.oss.kr/pages/2`, HTTP 403), 반복 404·410 0개 |
+| `git diff --check` | PASS |
+
+외부 링크 검사는 2xx·3xx를 성공으로, 반복 404·410을 영구 삭제로 판정한다.
+403·429·5xx·timeout·network 오류는 일시 장애 또는 접근 정책 가능성이 있어
+명확한 `INDETERMINATE` 경고로 분리하되 삭제로 오판하지 않는다.
+
+Windows host에서 Java 21.0.6으로 검증기를 시작했으며 Gradle project toolchain은
+Java 17을 대상으로 한다. Node 22.17.0, npm 10.9.2를 사용했다. 첫 sandbox
+실행은 Gradle distribution network 접근이 차단돼 실패했고, 네트워크가 허용된
+동일 명령 재실행은 통과했다.
+
+애플리케이션 동작이나 dependency graph를 바꾸지 않은 CI·검증기 범위이므로
+전체 unit, integration, frontend lint/build는 재실행하지 않았다. Docker,
+PostgreSQL, pgvector, Ollama, OpenSQL, OpenProxy, OpenHA는 모두 `NOT_RUN`이다.
+
+이 로컬 VERIFY 시점에는 GitHub Actions가 아직 실제 branch에 실행되지 않아
+`NOT_RUN`이었다. clean checkout 재현, GitHub check URL과 local/GitHub 결과
+대조가 끝나기 전에는 T-09를 `VERIFIED` 또는 완료로 표시하지 않는다.
+
+### 최초 GitHub Actions 실패와 corrective IMPLEMENT
+
+commit `c7d5adec551f4cb237d1edf63123bf2f1ac25eba`의 push run
+[`30442330201`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30442330201)은
+`OSS Readiness`에서 실패했다. 원격 branch를 Linux/JDK 17/Node 22.17
+컨테이너에 clean clone해 재현한 결과, GitHub token 정규식이 실제 값의 길이를
+요구하지 않아 tracked된 검증기 자신의 `github_pat_` 정규식 접두사를
+비밀정보로 오탐한 것이 원인이었다. 실제 token이나 credential이 포함된 것은
+아니다.
+
+정규식을 token-shaped value에만 일치하도록 제한하고, 정규식 선언 자체는
+통과하면서 동적으로 조립한 fake token은 차단하는 회귀 테스트를 추가했다.
+수정 후 동일 로컬 명령은 tracked file 298개, Node 회귀 테스트 12건,
+외부 링크 92개 성공·1개 `INDETERMINATE`·반복 404/410 0개로 통과했다.
+corrective commit과 Linux clean-clone·GitHub 재실행 결과는 후속 VERIFY에서
+기록한다.
+
+## T-09 corrective 최종 VERIFY — 2026-07-29
+
+**대상 commit:** `192295227f566815fa026259d2053b1c73e641f2`
+
+| 환경·검증 | 결과 |
+|---|---|
+| Windows local 단일 명령 | PASS — 최종 증거 문서 포함 tracked 298개, 회귀 테스트 12건, 외부 링크 94 OK·1 `INDETERMINATE`·0 permanent |
+| Linux clean clone | PASS — `gradle:9.5.1-jdk17` 기반, Node 22.17.0; 같은 단일 명령 전체 통과 |
+| GitHub OSS Readiness | [push run `30443185952`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30443185952) PASS |
+| 기존 GitHub CI | [push run `30443184506`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30443184506) backend·frontend PASS |
+| local/GitHub command | PASS — 모두 `node scripts/verify-oss-readiness.mjs` |
+
+Linux clean clone과 GitHub checkout에서는 commit된 검증기 자체도 tracked-file
+검사에 포함됐다. 최초 CI에서 발견된 자기 참조 오탐은 회귀 테스트와 실제
+원격 성공으로 해소됐다.
+
+## T-09 독립 읽기 전용 재AUDIT — 2026-07-29
+
+| 항목 | 판정 |
+|---|---|
+| CRITICAL/HIGH/MEDIUM | 없음 |
+| required OSS file·Markdown·external link 분류 | PASS |
+| source-only license Gate와 future 배포 경계 | PASS |
+| strict dependency verification·SBOM 재생성·drift·구조 | PASS |
+| tracked model/cache·업로드 원본·credential·로컬 경로 차단 | PASS |
+| local Windows·Linux clean clone·GitHub Actions 결과 대조 | PASS |
+| CI 규모와 변경 범위 | PASS — Node 표준 라이브러리 기반 단일 job; 애플리케이션 기능 변경 없음 |
+
+**감사 판정:** `PASS_FOR_T09_SCOPE`. OpenSQL·OpenProxy·OpenHA 검증이나
+PRZ-002 전체 완료를 의미하지 않는다. PR 생성은 연결된 GitHub 앱의 쓰기 권한이
+없어 HTTP 403으로 차단됐으며, 이는 구현 finding이 아니라 남은 `INTEGRATE`
+권한 Gate다.

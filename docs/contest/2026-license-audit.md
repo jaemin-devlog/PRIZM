@@ -857,3 +857,31 @@ endpoint가 package tree를 거부하여 신뢰 가능한 전이 취약점 판�
 구현하고 clean checkout·공식 CycloneDX 1.6 schema·checksum·독립 읽기 전용
 AUDIT를 통과했다. T-09 CI, 제출 직전 snapshot 고정, PRZ-002 전체 완료는 별도
 후속 gate이며 완료로 표시하지 않는다.
+
+## T-09 source-only license Gate 자동 검사
+
+2026-07-29에 외부 license 도구를 추가하지 않는 first-party 검증기
+`scripts/verify-oss-readiness.mjs`를 구현했다. 검증기는 현재 source-only
+배포 경계만 판정하며, JAR·frontend bundle·container image·Ollama binary·model
+weights를 향후 재배포할 때 필요한 별도 감사를 통과시킨 것으로 보지 않는다.
+
+- `sbom/prizm-scope-manifest.json`의 Gate가 `PASS`, blocker가 빈 배열인지와
+  `UNKNOWN`·`CONFLICT`·`BLOCKED`가 차단 상태로 등록됐는지 검사한다.
+- frontend lockfile 183개 entry의 license가 누락됐거나 `NONE`,
+  `NOASSERTION`, `UNLICENSED`, `UNKNOWN`이면 실패한다.
+- backend runtime의 사람용 license inventory는 이 문서의 T-05 조정 결과와
+  machine SBOM 169개 artifact 관계를 유지한다. 이 검증기는 POM에서 license를
+  새로 추론하거나 미확인 항목을 임의로 `VERIFIED`로 바꾸지 않는다.
+- 기존 dependency verification metadata를 strict 모드로 적용하면서 backend
+  SBOM을 재생성하고, frontend lockfile SBOM도 재생성해 committed checksum과
+  달라지면 실패한다.
+- Git tracked path와 text를 검사해 model cache, 업로드 원본, credential,
+  private key와 사용자 로컬 절대 경로가 source 배포물에 들어오는 것을
+  차단한다.
+
+corrective commit `192295227f566815fa026259d2053b1c73e641f2`에서 Windows local,
+Linux clean clone과 GitHub
+[`OSS Readiness` push run](https://github.com/jaemin-devlog/PRIZM/actions/runs/30443185952)이
+같은 단일 명령으로 통과했다. 이 결과는 현재 source-only T-09 Gate에 한정되며
+future binary/image/model 배포 감사, OpenSQL 검증 또는 PRZ-002 전체 완료를
+의미하지 않는다.

@@ -439,9 +439,10 @@ Markdown 37개와 local link 243개, tracked file 295개, Apache-2.0
 `LICENSE`·`NOTICE`, source-only license Gate, Gradle strict verification,
 backend 169개·frontend 183개 SBOM 재생성 무변경, checksum·구조·회귀 테스트
 11건을 확인했다. 외부 링크는 91개 성공, 대회 사이트 1개는 `403`으로
-`INDETERMINATE`, 반복 `404`·`410`은 0개였다. GitHub Actions는 branch가
-push되지 않아 아직 `NOT_RUN`이며, clean checkout 대조와 check URL 기록 전까지
-T-09 전체는 `IMPLEMENTED_UNVERIFIED`다.
+`INDETERMINATE`, 반복 `404`·`410`은 0개였다. 최초 GitHub push run은 secret
+정규식의 자기 참조 오탐으로 실패해 corrective IMPLEMENT로 돌아갔다. Linux
+clean clone·GitHub 재실행과 check URL 기록 전까지 T-09 전체는
+`IMPLEMENTED_UNVERIFIED`다.
 
 ## T-10 — 독립 읽기 전용 감사
 

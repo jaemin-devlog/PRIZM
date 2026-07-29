@@ -486,3 +486,10 @@
 - 구현: GitHub Actions와 로컬에서 같은 `node scripts/verify-oss-readiness.mjs`를 실행해 OSS 필수 파일, Markdown, source-only license Gate, tracked-file 안전성, strict dependency verification, SBOM 재생성·checksum·구조를 검사하도록 했다.
 - 검증: Markdown 37개·local link 243개, tracked file 295개, backend 169개·frontend 183개 SBOM 무변경과 Node 회귀 테스트 11건을 확인했다. 외부 링크는 91개 성공, 대회 사이트 1개 HTTP 403을 `INDETERMINATE`로 분리했고 반복 404·410은 없었다.
 - 상태: 로컬 Gate는 통과했지만 GitHub Actions는 branch 미push로 `NOT_RUN`이다. clean checkout과 실제 check 대조, 독립 AUDIT 전까지 T-09는 `IMPLEMENTED_UNVERIFIED`다. Docker, PostgreSQL, pgvector, Ollama, OpenSQL, OpenProxy, OpenHA는 사용하지 않았다.
+
+## 2026-07-29 — PRZ-002 OSS Readiness CI 오탐 보완
+
+- 실패: 최초 GitHub Actions push run은 secret 검사 정규식이 tracked된 검증기 자신의 `github_pat_` 접두사를 token으로 오탐해 실패했다. 실제 credential 노출은 없었다.
+- 수정: GitHub token은 접두사 뒤 최소 길이의 token-shaped value가 있을 때만 탐지하도록 제한하고, 정규식 선언은 허용하면서 fake token은 차단하는 회귀 테스트를 추가했다.
+- 검증: corrective local Gate는 tracked file 298개, Node 회귀 테스트 12건, 외부 링크 92개 성공·1개 `INDETERMINATE`·반복 404/410 0개로 통과했다.
+- 상태: Linux clean-clone·GitHub 재검증과 재감사 전까지 T-09는 `IMPLEMENTED_UNVERIFIED`다.

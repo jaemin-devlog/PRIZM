@@ -194,6 +194,24 @@ function isBinary(buffer) {
   return sample.includes(0)
 }
 
+export function sensitiveContentFindings(fileName, content) {
+  const findings = []
+  const sensitivePatterns = [
+    { label: 'Windows user absolute path', pattern: /[A-Za-z]:[\\/]+Users[\\/]+[A-Za-z0-9._-]+[\\/]+/ },
+    { label: 'Unix user absolute path', pattern: /\/(?:Users|home)\/[A-Za-z0-9._-]+\// },
+    { label: 'private key', pattern: /-----BEGIN [A-Z ]*PRIVATE KEY-----/ },
+    { label: 'GitHub token', pattern: /(?:github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9]{20,})/ },
+    { label: 'AWS access key', pattern: /AKIA[0-9A-Z]{16}/ },
+  ]
+  for (const { label, pattern } of sensitivePatterns) {
+    const match = pattern.exec(content)
+    if (match) {
+      findings.push(`${fileName}:${lineNumberAt(content, match.index)} contains ${label}`)
+    }
+  }
+  return findings
+}
+
 function assertTrackedSafety() {
   const tracked = gitFileList(['--cached'])
   const pathFindings = []
@@ -218,19 +236,7 @@ function assertTrackedSafety() {
     const buffer = readFileSync(resolve(root, fileName))
     if (isBinary(buffer)) continue
     const content = buffer.toString('utf8')
-    const sensitivePatterns = [
-      { label: 'Windows user absolute path', pattern: /[A-Za-z]:[\\/]+Users[\\/]+[A-Za-z0-9._-]+[\\/]+/ },
-      { label: 'Unix user absolute path', pattern: /\/(?:Users|home)\/[A-Za-z0-9._-]+\// },
-      { label: 'private key', pattern: /-----BEGIN [A-Z ]*PRIVATE KEY-----/ },
-      { label: 'GitHub token', pattern: /(?:github_pat_|gh[pousr]_[A-Za-z0-9]{20,})/ },
-      { label: 'AWS access key', pattern: /AKIA[0-9A-Z]{16}/ },
-    ]
-    for (const { label, pattern } of sensitivePatterns) {
-      const match = pattern.exec(content)
-      if (match) {
-        contentFindings.push(`${fileName}:${lineNumberAt(content, match.index)} contains ${label}`)
-      }
-    }
+    contentFindings.push(...sensitiveContentFindings(fileName, content))
   }
 
   if (pathFindings.length > 0 || contentFindings.length > 0) {

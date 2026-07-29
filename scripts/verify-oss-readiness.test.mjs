@@ -5,6 +5,7 @@ import {
   classifyExternalStatus,
   extractMarkdownLinks,
   markdownFindings,
+  sensitiveContentFindings,
 } from './verify-oss-readiness.mjs'
 
 test('reports trailing whitespace and an unclosed code fence with file and line', () => {
@@ -44,4 +45,14 @@ test('only repeated 404 and 410 statuses are permanent link failures', () => {
   assert.equal(classifyExternalStatus(503), 'indeterminate')
   assert.equal(classifyExternalStatus(404), 'permanent')
   assert.equal(classifyExternalStatus(410), 'permanent')
+})
+
+test('GitHub token detection requires a token-shaped value, not only a prefix', () => {
+  const declaration = String.raw`/(?:github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9]{20,})/`
+  const token = ['github', 'pat', 'A'.repeat(24)].join('_')
+
+  assert.deepEqual(sensitiveContentFindings('scripts/check.mjs', declaration), [])
+  assert.deepEqual(sensitiveContentFindings('fixture.txt', token), [
+    'fixture.txt:1 contains GitHub token',
+  ])
 })

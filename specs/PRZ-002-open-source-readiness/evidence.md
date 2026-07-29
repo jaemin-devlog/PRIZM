@@ -356,6 +356,23 @@ Java 17을 대상으로 한다. Node 22.17.0, npm 10.9.2를 사용했다. 첫 sa
 전체 unit, integration, frontend lint/build는 재실행하지 않았다. Docker,
 PostgreSQL, pgvector, Ollama, OpenSQL, OpenProxy, OpenHA는 모두 `NOT_RUN`이다.
 
-GitHub Actions는 아직 실제 branch가 push되지 않아 `NOT_RUN`이다. clean checkout
-재현, GitHub check URL과 local/GitHub 결과 대조가 끝나기 전에는 T-09를
-`VERIFIED` 또는 완료로 표시하지 않는다.
+이 로컬 VERIFY 시점에는 GitHub Actions가 아직 실제 branch에 실행되지 않아
+`NOT_RUN`이었다. clean checkout 재현, GitHub check URL과 local/GitHub 결과
+대조가 끝나기 전에는 T-09를 `VERIFIED` 또는 완료로 표시하지 않는다.
+
+### 최초 GitHub Actions 실패와 corrective IMPLEMENT
+
+commit `c7d5adec551f4cb237d1edf63123bf2f1ac25eba`의 push run
+[`30442330201`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30442330201)은
+`OSS Readiness`에서 실패했다. 원격 branch를 Linux/JDK 17/Node 22.17
+컨테이너에 clean clone해 재현한 결과, GitHub token 정규식이 실제 값의 길이를
+요구하지 않아 tracked된 검증기 자신의 `github_pat_` 정규식 접두사를
+비밀정보로 오탐한 것이 원인이었다. 실제 token이나 credential이 포함된 것은
+아니다.
+
+정규식을 token-shaped value에만 일치하도록 제한하고, 정규식 선언 자체는
+통과하면서 동적으로 조립한 fake token은 차단하는 회귀 테스트를 추가했다.
+수정 후 동일 로컬 명령은 tracked file 298개, Node 회귀 테스트 12건,
+외부 링크 92개 성공·1개 `INDETERMINATE`·반복 404/410 0개로 통과했다.
+corrective commit과 Linux clean-clone·GitHub 재실행 결과는 후속 VERIFY에서
+기록한다.

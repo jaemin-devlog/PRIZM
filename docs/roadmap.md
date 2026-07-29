@@ -16,7 +16,7 @@
 |---|---|---|
 | 기존 구현 기준선 | `COMPLETE` | `PRZ-000 AS_BUILT_BASELINE`, `main` 단일 장기 브랜치, 핵심 문서 동기화 |
 | P0 공식 기준·오픈소스 준비 | `IN_PROGRESS` | source register·Apache-2.0·NOTICE·SBOM·AI 명세 완료; T-08의 문서화된 Compose·health 범위 `VERIFY` 완료, PRZ-002 최종 독립 감사·검증 CI 남음. demo `USER` 기반 전체 흐름은 `NOT_RUN` |
-| P1 OpenSQL·clean-clone | `IN_PROGRESS_INSTALLATION_READY` | PRZ-003 Rocky Linux 9.7 Single 설치·라이선스 적용·기본 DB 질의 완료; 실제 PRIZM OpenSQL Gate와 demo `USER` 기반 clean-clone 전체 사용자 흐름은 `NOT_RUN` |
+| P1 OpenSQL·clean-clone | `IN_PROGRESS_OPENSQL_GATE_VERIFIED` | PRZ-003 Rocky Linux 9.7 Single 설치·라이선스 적용과 실제 PRIZM OpenSQL 단일 SQL Gate·독립 AUDIT `PASS`; demo `USER` 기반 clean-clone 전체 사용자 흐름과 OpenProxy·OpenHA는 `NOT_RUN` 또는 `NOT_VERIFIED` |
 | P2 DB 장애복구 Gate | `NOT_STARTED` | 실제 다중 노드 장애전환과 서비스 연속성 evidence |
 | P3 변경 로그 동기화·MCP | `NOT_STARTED` | 멱등 동기화와 owner-scoped 읽기 전용 MCP 검색 |
 | P4 PRIZM 차별 slice | `NOT_STARTED` | 앞선 Gate 통과 뒤 source가 연결된 최소 CareerFact |

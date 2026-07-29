@@ -11,8 +11,8 @@
 | 구분 | 현재 상태 |
 |---|---|
 | 구현됨 | 로그인, 사용자별 문서 격리, TXT/PDF 업로드, version 관리, 비동기 색인·복구, pgvector 검색, Career Vault 문서 관리 |
-| 현재 단계 | 기존 구현 기준선 완료, 대회 대응 P0 공식 요구사항·오픈소스 준비 |
-| 미구현 | CareerFact, 근거 기반 portfolio, `/api/v1`, MCP, 독립 Engine package, OpenSQL 실환경 호환성 |
+| 현재 단계 | 기존 구현 기준선·P0 공식 요구사항·오픈소스 준비 완료; P1 OpenSQL 단일 SQL Gate 검증 완료, clean-clone 준비 진행 |
+| 미구현 | CareerFact, 근거 기반 portfolio, `/api/v1`, MCP, 독립 Engine package, OpenProxy·OpenHA 및 DB 장애전환 |
 
 PRIZM의 목표는 커리어 문서 분석·구조화·근거 검색·portfolio 생성을 위한 오픈소스
 Career Intelligence Engine과 Reference App이다. 현재 저장소는 그 목표 전체가 아니라
@@ -120,7 +120,8 @@ OCR, image-only PDF, DOCX, PPTX, 검색 threshold, ANN index와 검색 기록은
 | Dense 검색 평가 | `HISTORICAL_PASS_NOT_RERUN` | 2026-07-14 합성 기준선 보존 |
 | Docker Compose | `PASS` | 2026-07-29 clean-clone에서 config·build·기동과 backend·frontend health 확인. demo `USER` 기반 전체 사용자 흐름은 `NOT_RUN` |
 | Ollama `bge-m3` | `NOT_RUN` | 기준선 문서 작업에서 사용하지 않음 |
-| OpenSQL·OpenProxy·OpenHA | `NOT_RUN` | 실제 대상 환경 검증 없음 |
+| OpenSQL 단일 SQL Gate | `PASS` | 2026-07-30 실제 Rocky Linux 9.7 single-node OpenSQL에서 Flyway·vector·검색·ownership·Worker SQL 통과; 세부 근거는 PRZ-003 evidence |
+| OpenProxy·OpenHA | `NOT_RUN` 또는 `NOT_VERIFIED` | runtime 연결과 DB 장애전환 검증 없음 |
 
 세부 환경별 결과와 코드·test 연결은
 [PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md), T-08 clean-clone
@@ -134,7 +135,7 @@ OCR, image-only PDF, DOCX, PPTX, 검색 threshold, ANN index와 검색 기록은
 - V13에 `claim_version >= 0` CHECK와 populated V12 row backfill 전용 회귀 test가 없다.
 - 일부 JavaDoc이 현재 TXT/PDF 공통 동작을 TXT 전용으로 설명한다.
 - `SecureDirectoryStream` 미지원 filesystem에서는 자동 Cleanup이 동작하지 않을 수 있다.
-- OpenSQL profile과 조건부 test는 있지만 실제 OpenSQL 호환성은 검증하지 않았다.
+- 실제 OpenSQL 단일 SQL Gate는 통과했지만, OpenProxy runtime·OpenHA/DB 장애전환·Ollama 색인과 browser 전체 흐름은 검증하지 않았다.
 
 ## 계획 기능: 현재 구현 아님
 
@@ -146,7 +147,7 @@ OCR, image-only PDF, DOCX, PPTX, 검색 threshold, ANN index와 검색 기록은
 - 독립 Engine artifact, Spring Boot starter와 adapter contract test kit
 - workspace, career profile, membership와 기관 권한
 - 여러 vector DB·embedding·object storage adapter
-- 실제 OpenSQL·OpenProxy·OpenHA 호환성과 장애전환
+- OpenProxy·OpenHA 호환성과 DB 장애전환
 
 앞으로의 순서는 [개발 로드맵](roadmap.md), 대회 일정은
 [티맥스티베로 과제 대응 계획](contest/2026-tmaxtibero-plan.md)을 따른다. 전체 문서

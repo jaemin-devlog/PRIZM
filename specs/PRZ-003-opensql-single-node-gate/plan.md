@@ -47,8 +47,8 @@ metadata·설정·log를 공개 저장소에 기록하지 않는다.
    OpenHA나 두 번째 노드는 구성하지 않는다.
 6. 설치 완료 log와 기본 service 상태는 비공개로 보존하고 공개 문서에는
    비식별 결과와 검증 경계만 기록한다.
-7. 설치와 기본 연결 확인 뒤 멈춘다. runtime과 Flyway credential을 분리한
-   PRIZM OpenSQL Gate는 별도 승인된 후속 VERIFY에서 실행한다.
+7. 설치와 기본 연결 확인 뒤, 사용자가 승인한 후속 Gate에서 runtime과 Flyway
+   credential을 분리한 전용 빈 검증 대상을 구성하고 PRIZM OpenSQL Gate를 실행한다.
 
 ## 보안과 복구
 
@@ -59,6 +59,18 @@ metadata·설정·log를 공개 저장소에 기록하지 않는다.
   installer log는 저장소 또는 source 배포물에 포함하지 않는다.
 - VM snapshot은 운영자 복구 선택지일 뿐 라이선스 허용을 뜻하지 않는다. 공급사가 제약을
   두면 그 지침을 따른다.
+- Gate credential은 실행 중에만 메모리와 환경 변수로 전달하고 명령행, 공개 log,
+  저장소 파일에 남기지 않는다.
+- Windows OpenSSH의 대화형 비밀번호 입력과 표준입력 기반 비밀 전달을 동시에 사용하지
+  않는다. Gate 세션에만 쓰는 일회성 SSH key를 Git 밖에서 생성·등록하고, 정확한 key
+  comment를 기준으로 Gate 종료 시 guest의 `authorized_keys`와 Windows 임시 key를
+  모두 제거한다.
+- 실제 Linux 명령과 출력을 운영자가 VirtualBox console에서 동시에 확인할 수 있도록
+  guest의 일회성 `tmux` 세션을 공유한다. Codex는 SSH로 같은 세션에 명령을 보내고,
+  비밀번호 입력은 운영자가 guest console에서 직접 수행한다. `tmux`는 검증 운영
+  도구이며 PRIZM runtime 또는 배포 dependency로 추가하지 않는다.
+- Gate 실패 시 Flyway가 적용된 대상을 빈 대상으로 간주해 재사용하지 않는다. 실패
+  대상은 원인 확인 전 보존하고, 재시도는 새 전용 데이터베이스와 새 credential로 한다.
 
 ## 실행 기록
 
@@ -70,6 +82,38 @@ metadata·설정·log를 공개 저장소에 기록하지 않는다.
 - OpenSQL `single` 설치와 직접 인증 기본 SQL 질의는 완료했다.
 - OpenProxy 기능 검증, 설치 후 재부팅 지속성, PRIZM Flyway·vector·검색·Worker
   SQL Gate는 아직 실행하지 않았다.
+
+## 첫 OpenSQL Gate 계획
+
+- Windows 호스트에서 OpenSQL 게스트의 직접 데이터베이스 endpoint를 사용한다.
+  OpenProxy와 OpenHA는 이 Gate의 검증 대상이 아니다.
+- 관리자는 기존 기본 데이터베이스를 변경하지 않고 일회성 전용 데이터베이스,
+  Flyway owner, runtime role을 생성한다. 역할 이름, endpoint와 credential은
+  비공개 실행 정보로만 보존한다.
+- 관리자는 전용 데이터베이스에 `vector` extension을 준비한다. Flyway owner는
+  V1~V13 schema migration을 수행하고, runtime role은 `CONNECT`, `TEMPORARY`,
+  `public` schema `USAGE`, 생성된 table의 `SELECT`·`INSERT`·`UPDATE`·`DELETE`,
+  sequence의 `USAGE`·`SELECT`·`UPDATE`만 받는다.
+- Flyway owner의 default privilege를 runtime role에 연결해 migration이 생성하는
+  table과 sequence에 위 권한이 적용되도록 한다. 두 역할은 같은 전용 데이터베이스와
+  schema를 사용하되 서로 다른 credential을 사용한다.
+- 관리 SQL은 OpenSQL OS 계정의 로그인 환경에서 실행한다. root 또는 일반 계정의
+  기본 Unix socket 위치를 OpenSQL client 접속 경로로 가정하지 않는다.
+- 관리자 사전 점검은 서버 연결, 관리자 SQL 접속, `vector` extension 가용성만
+  확인한다. 이는 PRIZM OpenSQL 호환성 성공 근거가 아니다.
+- 성공 조건은 새 빈 대상에서 `OpenSqlInfrastructureTest` 1건이 실행되어 V1~V13,
+  `vector(1024)` exact cosine 검색, 소유자·active-version 제약, processing/cleanup
+  lease·fencing·recovery·`SKIP LOCKED` SQL을 모두 통과하는 것이다.
+- 실행 명령은 아래와 같다. 모든 환경 변수는 비공개 실행 세션에서만 설정한다.
+
+```powershell
+.\gradlew.bat integrationTest --no-daemon --rerun-tasks `
+  --tests com.prizm.infrastructure.OpenSqlInfrastructureTest
+```
+
+- 실패하면 단계명과 비식별 오류만 공개 근거에 기록하고 기존 대상은 재사용하지 않는다.
+  성공해도 검증 대상은 감사 완료 전까지 보존하며, 삭제는 정확한 대상 확인 뒤 별도
+  정리 단계에서 수행한다.
 
 ## Windows UTF-8 회귀 교정 계획
 
@@ -93,3 +137,11 @@ metadata·설정·log를 공개 저장소에 기록하지 않는다.
 환경 준비는 기존 PR로 병합됐다. 설치 근거의 공개 안전성 보완은 최신 `main`에서
 분기한 `codex/PRZ-003-opensql-install-evidence`에서 수행한다. 실제 GitHub Issue나 PR은
 외부 쓰기가 승인된 경우에만 생성하며, 과거 기록을 새로 만들지 않는다.
+
+## 관리자 권한 재계획 (2026-07-30)
+
+- Gate 전용 데이터베이스와 분리된 Flyway/runtime 역할을 만들려면 OpenSQL DB 관리자 역할의 권한이 필요하다.
+- 현재 설치 서비스 역할 `opensql`은 `CREATEROLE`과 `CREATEDB` 권한이 없어, 첫 `CREATE ROLE`에서 중단됨을 확인했다. 이 시도는 역할·데이터베이스·테이블을 만들지 않았다.
+- Linux OS의 `postgres` 계정은 존재하지 않음을 읽기 전용으로 확인했다. 따라서 OS 계정 전환을 관리자 DB 접속 방법으로 가정하지 않는다.
+- 설치 과정에서 설정된 DB 관리자 `postgres`의 인증은 VirtualBox console의 비밀 입력 프롬프트로 직접 확인했다. 다음 provisioning은 비밀번호를 실행 중 메모리에만 두고 전용 DB와 역할 bootstrap에만 사용한다. 비밀번호 추측·재설정이나 권한 강제 변경은 범위에서 제외한다.
+- 첫 provisioning은 전용 대상 구성까지 성공했으나, 비밀 context 전달을 기다리기 전에 VM 명령 전송 SSH가 종료되지 않아 Gradle을 시작하지 못했다. 대상에는 migration·PRIZM 데이터가 없었으며 정확한 임시 DB와 두 역할을 제거했다. 이후 명령 전송은 표준 입력을 닫는 방식으로 재실행한다.

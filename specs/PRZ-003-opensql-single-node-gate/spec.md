@@ -2,7 +2,7 @@
 
 ## 상태
 
-`IN_PROGRESS`
+`VERIFIED`
 
 ## 목적
 

@@ -18,5 +18,15 @@
 - [x] 별도 JVM 인코딩 강제 없이 대상 테스트와 전체 통합 테스트를 재실행한다.
 - [x] OpenSQL opt-in 1건과 Windows `SecureDirectoryStream` 제한 2건을 재감사한다.
 - [x] 단위·프런트엔드·Compose·오픈소스 준비 Gate를 다시 실행하고 근거를 기록한다.
-- [ ] 첫 OpenSQL Gate를 실행하고 결과를 기록한다.
-- [ ] 모든 Gate가 충족된 뒤 독립 감사와 통합을 수행한다.
+- [x] OpenSQL 관리자 접속, 서버 응답과 `vector` extension 가용성을 비공개로 사전 점검한다.
+- [x] 첫 Gate의 전용 빈 데이터베이스, 분리 credential, 최소 권한과 재시도 방식을 확정한다.
+- [x] 일회성 SSH Gate key를 등록하고 종료 시 VM·Windows 양쪽에서 제거한다.
+- [x] VirtualBox console과 Codex가 같은 일회성 `tmux` Gate 세션을 공유한다.
+- [x] 현재 서비스 역할의 관리자 권한 부재와 Linux `postgres` OS 계정 부재를 읽기 전용으로 확인하고, 관리자 인증 방법 확인 전에는 Gate provisioning을 중단한다.
+- [x] VirtualBox console에서 DB 관리자 `postgres` 인증을 비밀값 노출 없이 확인한다.
+- [x] Gradle 시작 전 전송 중단으로 남은 빈 Gate 대상과 임시 보조 파일을 정확한 이름으로 정리한다.
+- [x] 전용 Gate 데이터베이스와 Flyway/runtime role을 구성한다.
+- [x] 첫 OpenSQL Gate를 실행하고 결과를 기록한다.
+- [x] 검증 근거를 확보한 뒤 전용 Gate DB·역할·보조 파일이 남지 않음을 확인한다.
+- [x] 실제 Gate 결과·문서·공개 경계를 독립 읽기 전용으로 감사한다.
+- [ ] GitHub 인증과 사용자 승인 후 실제 PR·review 상태·merge 근거를 통합 기록한다.

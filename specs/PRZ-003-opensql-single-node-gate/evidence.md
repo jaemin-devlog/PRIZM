@@ -115,6 +115,84 @@ docker run --rm --volume "${PWD}:/workspace" `
   실행 근거가 있다. 남은 감점 요인은 OpenSQL 전용 Gate와 설치 후 재부팅,
   OpenProxy/OpenHA가 아직 실행되지 않은 점이며 내부 평가 점수는 변경하지 않는다.
 
+## 2026-07-30 OpenSQL Gate 관리자 권한 계획 재확인
+
+- 목표: PRIZM Gate 전용 데이터베이스와 분리된 Flyway/runtime 역할을 만든 뒤,
+  실제 OpenSQL에서 opt-in 통합 테스트를 실행한다. OpenProxy·OpenHA는 범위 밖이다.
+- 사전 연결: OpenSQL 서비스 OS 계정의 로그인 환경에서 기본 DB에 연결해
+  `current_user=opensql`을 확인했다. 이는 설치 후 기본 연결 확인을 보강할 뿐
+  PRIZM Gate 성공 근거는 아니다.
+- 첫 중단: 일반 계정 또는 root의 기본 Unix socket 경로를 가정한 client 실행은
+  OpenSQL socket을 찾지 못해 SQL 실행 전에 중단됐다. 이후 서비스 OS 계정의
+  로그인 환경을 사용하는 방식으로 계획을 교정했다.
+- 두 번째 중단: 교정된 접속으로 전용 역할 생성을 시도했으나 `opensql` 역할에
+  `CREATEROLE`·`CREATEDB` 권한이 없어 첫 `CREATE ROLE`에서 중단됐다. 역할,
+  데이터베이스, table, migration은 생성하거나 변경하지 않았다.
+- 읽기 전용 진단: 역할 카탈로그에서 관리자 권한은 DB 역할 `postgres`에만 있음을
+  확인했다. Linux OS `postgres` 계정은 없었고, `opensql` 역할은 인증 규칙 파일
+  위치를 열람할 권한도 없다. 이 사실은 서비스 역할의 최소 권한 구조를 뜻하며
+  설치 실패로 표현하지 않는다.
+- 관리자 인증: VirtualBox console의 비밀 입력 프롬프트에서 DB 관리자
+  `postgres` 로그인과 `current_user=postgres`를 확인했다. 비밀번호는 Codex·Git·
+  로그에 저장하거나 전송하지 않았다.
+- 판정: `PRIZM OpenSQL Gate=NOT_RUN`. 다음 단계는 메모리 내 임시 credential로
+  전용 DB와 최소 권한 역할을 bootstrap하는 것이다. 비밀번호 추측·재설정·권한
+  강제 변경은 수행하지 않는다.
+- 전송 복구: 첫 bootstrap은 전용 target·`vector`·최소 권한 확인까지 성공했지만,
+  비밀 context를 전달받기 전에 VM 명령 전송 SSH가 종료되지 않아 Windows Gradle을
+  시작하지 못했다. 이는 DB나 테스트 실패가 아니다. target에는 migration·PRIZM
+  데이터가 없었고, 관리자 비밀 입력을 통해 정확한 임시 DB와 두 역할만 제거했다.
+  첫 정리 보조 스크립트는 변수명 오류로 SQL 실행 전에 중단됐으며, 교정 후 제거를
+  확인했다. 비밀값은 어느 출력·문서·로그에도 기록하지 않았다.
+
+## 2026-07-30 실제 OpenSQL 단일 Gate VERIFY
+
+- 환경: 공급사 라이선스가 적용된 Rocky Linux 9.7 single-node OpenSQL VM의 전용
+  검증 대상에 직접 연결했다. OpenProxy·OpenHA, Docker PostgreSQL·pgvector,
+  Ollama와 Spring application context·scheduler는 사용하지 않았다.
+- 실행: runtime과 Flyway credential을 분리하고 값은 비공개 실행 환경변수로만
+  전달했다. 다음 명령은 Windows host에서 실행했다.
+
+  ```powershell
+  .\gradlew.bat integrationTest --no-daemon --rerun-tasks `
+    --tests com.prizm.infrastructure.OpenSqlInfrastructureTest
+  ```
+
+- 결과: JUnit `OpenSqlInfrastructureTest` 1건, 실패 0건, 오류 0건, 건너뜀 0건;
+  Gradle 종료 코드 0, `BUILD SUCCESSFUL` (21초)이다. 출력 로그에서 JDBC URL과
+  password/secret assignment 형식 값은 0건이었다.
+- 검증 범위: fresh target에서 Flyway V1~V13, `vector(1024)`·CAST·`vector_dims`·
+  cosine 검색, owner·ACTIVE-version 격리, production repository의 processing 및
+  cleanup job claim·lease·fencing·recovery·두 connection의 `SKIP LOCKED` SQL을
+  실행했다. cleanup 대상 파일의 실제 삭제, OpenProxy runtime, OpenHA·DB failover,
+  Ollama 색인과 browser 사용자 흐름은 이 Gate에 포함되지 않는다.
+- 판정: OpenSQL 단일 SQL 호환성 Gate는 `PASS`; PRZ-003 전체는 독립 `AUDIT`과
+  GitHub 통합이 남아 `IMPLEMENTED_UNVERIFIED`다.
+- 정리: 검증 결과를 수집한 뒤 DB 관리자 인증으로 해당 전용 DB와 두 login role을
+  제거했다. 이어서 DB·role count `0|0`과 정리 helper 부재를 읽기 전용으로
+  확인했다. 이 대상은 재사용하지 않으며, 결과는 실행 로그와 JUnit report로만
+  보존한다.
+
+## 2026-07-30 독립 AUDIT
+
+- `LOCAL_READ_ONLY_AUDIT_PASS`: spec, plan, tasks, evidence와 수정 diff를 실제
+  OpenSQL JUnit 결과 및 assertion source와 대조했다. agent audit은 GitHub 또는
+  제3자 review가 아니다.
+- 범위: 수정 파일은 PRZ-003과 현행 상태를 반영하는 문서 8개뿐이다. 제품 source,
+  Flyway migration, dependency manifest, `LICENSE`, `NOTICE`, SBOM과 공급 자산은
+  변경하지 않았다.
+- 안전성: `git diff --check`, 변경 diff의 식별값·credential pattern 검사와
+  `node scripts/verify-oss-readiness.mjs`를 통과했다. 후자는 Markdown 38개·로컬
+  링크 262개·tracked file 300개, SBOM 구조·checksum과 회귀 12건을 통과했고,
+  외부 링크는 94개 성공·1개 `INDETERMINATE`·영구 실패 0개다.
+- 판정: blocking finding 0건이다. OpenSQL 단일 SQL Gate는 `VERIFIED`; OpenProxy,
+  OpenHA·DB failover, Ollama 색인, clean-clone 사용자 흐름, GitHub PR/review/merge는
+  별도 범위로 남는다.
+- 세션 정리: Gate 동안만 사용한 VM `authorized_keys` 임시 항목 2개와 Windows
+  임시 key pair를 제거하고 양쪽 부재를 확인했다. 이어서 Windows `%TEMP%`의 Gate
+  전용 실행기·상태·출력 파일 7개를 제거했다. 사용자 SSH key, 저장소 파일, 공급
+  자산과 VM 기본 설정은 변경하지 않았다.
+
 ## 검증 경계
 
 직접 `SELECT 1` 성공은 설치된 OpenSQL DB endpoint가 기본 인증 질의를 처리했다는

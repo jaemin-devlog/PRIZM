@@ -543,3 +543,28 @@
 - 남은 경계: OpenSQL 통합 테스트 1건은 실행 플래그, 전용 대상 확인과 runtime/Flyway 자격정보가 준비되지 않아 의도대로 건너뛰었다. 결과는 `NOT_RUN`이며 PostgreSQL·pgvector 결과로 대체하지 않는다.
 - 감사: 최종 diff의 scope, 보존 계약, 공개 경계와 실행 결과를 읽기 전용으로 대조해 blocking finding 0건을 확인했다. 이는 GitHub 또는 제3자 review가 아니다.
 - 상태: Windows UTF-8 합본 차단은 해소됐다. 이번 작업은 활성 PRZ-003 안의 corrective work이며 전체 OpenSQL Gate와 PRZ-003 통합 완료를 뜻하지 않는다.
+
+## 2026-07-30 — PRZ-003 OpenSQL Gate 관리자 권한 확인 보류
+
+- 범위: 공급사가 제공한 single-node OpenSQL VM에서 PRIZM 전용 Gate DB와 분리된 Flyway/runtime 역할을 준비하려 했다. OpenProxy·OpenHA와 제품 source·Flyway migration은 변경하지 않았다.
+- 중단: 서비스 역할 `opensql`은 DB 역할·DB 생성 권한이 없어 첫 역할 생성에서 중단됐다. 그 전의 잘못된 기본 socket 가정도 SQL 실행 전에 중단됐고, 두 시도 모두 역할·DB·table·migration을 만들거나 변경하지 않았다.
+- 확인: DB 관리자 권한은 `postgres` 역할에만 있고 Linux OS `postgres` 계정은 없음을 읽기 전용으로 확인했다. 관리자 인증 설정도 서비스 역할에는 열람 권한이 없다.
+- 보안: 관리자 비밀번호는 입력·저장·전송하지 않았으며, 재설정·추측·권한 강제 변경을 하지 않았다. VM 식별값, 접속 경로, 공급사 설치 내부 정보와 one-time SSH key는 공개 문서에 기록하지 않는다.
+- 관리자 인증: VirtualBox console에서 DB 관리자 `postgres` 로그인과 `current_user=postgres`를 확인했다. 비밀번호는 Codex·Git·로그에 저장하거나 전송하지 않았다.
+- 상태: `IMPLEMENT_IN_PROGRESS`, `PRIZM OpenSQL Gate=NOT_RUN`. 다음 단계는 임시 credential로 전용 DB와 최소 권한 역할을 bootstrap하는 것이며, 그 전후로 비밀번호 추측·재설정·권한 강제 변경을 하지 않는다.
+- 복구: 첫 bootstrap은 target 구성까지 성공했지만 명령 전송 SSH가 종료되지 않아 Gradle 실행 전 대기했다. migration·PRIZM 데이터가 없는 정확한 임시 target만 관리자 인증으로 제거했다. 정리 보조 스크립트의 변수명 오류는 SQL 실행 전에 발견·교정됐으며, 교정 후 제거를 확인했다. 전송 방식도 표준 입력을 닫도록 교정했고 OpenSQL Gate 결과는 계속 `NOT_RUN`이다.
+
+## 2026-07-30 — PRZ-003 실제 OpenSQL 단일 SQL Gate 통과
+
+- 실행: 새 전용 target과 분리된 runtime/Flyway credential을 비공개 환경변수로 사용해 `OpenSqlInfrastructureTest`를 실제 Rocky Linux 9.7 single-node OpenSQL에서 실행했다. Spring application context·scheduler, Docker PostgreSQL·pgvector, Ollama, OpenProxy와 OpenHA는 사용하지 않았다.
+- 결과: JUnit 1건이 실패 0·오류 0·건너뜀 0, Gradle 종료 코드 0과 `BUILD SUCCESSFUL`로 통과했다. 출력 로그에 JDBC URL 또는 password/secret assignment 형식 값은 없었다.
+- 범위: Flyway V1~V13, `vector(1024)`·cosine 검색, owner·ACTIVE-version 격리, processing·cleanup job의 claim·lease·fencing·recovery·`SKIP LOCKED` SQL을 검증했다. 실제 파일 삭제, Ollama 색인, OpenProxy runtime, OpenHA·DB failover, clean-clone browser 흐름은 검증하지 않았다.
+- 상태: OpenSQL 단일 SQL Gate는 `PASS`, PRZ-003은 독립 `AUDIT` 및 GitHub 통합 전 `IMPLEMENTED_UNVERIFIED`다.
+- 정리: 실행 근거를 수집한 뒤 전용 Gate DB와 두 login role을 제거했고, DB·role count `0|0` 및 정리 helper 부재를 읽기 전용으로 확인했다. 검증 대상을 재사용하지 않는다.
+
+## 2026-07-30 — PRZ-003 OpenSQL 단일 SQL Gate 독립 AUDIT
+
+- 감사: spec·plan·tasks·evidence와 실제 JUnit 결과·assertion source를 읽기 전용으로 대조했다. 변경 범위는 현행 상태 문서 8개뿐이며 제품 source, Flyway migration, dependency, license, SBOM과 공급 자산은 변경하지 않았다.
+- 안전성: `git diff --check`, 식별값·credential pattern 검사, `node scripts/verify-oss-readiness.mjs`를 통과했다. Markdown 38개·로컬 링크 262개·tracked file 300개, SBOM 구조·checksum과 회귀 12건이 통과했고 외부 링크는 94개 성공·1개 `INDETERMINATE`·영구 실패 0개다.
+- 판정: blocking finding 0건으로 PRZ-003 OpenSQL 단일 SQL Gate를 `VERIFIED`로 기록한다. 이는 GitHub 또는 제3자 review가 아니며 OpenProxy·OpenHA·DB failover, Ollama 색인, clean-clone 사용자 흐름과 GitHub 통합은 별도 범위다.
+- 세션 정리: VM `authorized_keys`의 Gate 전용 임시 key 2개와 Windows 임시 key pair를 제거하고, Windows `%TEMP%`의 Gate 전용 실행기·상태·출력 파일 7개도 제거했다. 사용자 key, 저장소 파일, 공급 자산과 VM 기본 설정은 변경하지 않았다.

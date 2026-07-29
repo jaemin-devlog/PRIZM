@@ -67,7 +67,7 @@
 | ID | 평가항목 | 배점 | 증거 기반 준비도(공식 점수 아님) | 남은 핵심 증거 |
 |---|---|---:|---|---|
 | `EVAL-R1-01` | 프로젝트 구조 및 코드 완성도 | 6 | `PARTIAL` — 인증·ownership·version·비동기 복구·검색과 test가 있음 | 실제 OpenSQL, clean-clone, demo `USER`, 처리 완료 확인, browser E2E 또는 고정 수동 UI 시험표 |
-| `EVAL-R1-02` | 오픈소스 프로젝트 발전 가능성 | 6 | `PARTIAL` — Engine·Reference App 방향과 일부 교체 interface가 있음 | LICENSE·거버넌스, 기여자 Quickstart, 안정된 확장 경계 |
+| `EVAL-R1-02` | 오픈소스 프로젝트 발전 가능성 | 6 | `PARTIAL` — Engine·Reference App 방향, source-only Apache-2.0·NOTICE·SBOM·AI 모델 명세가 있음 | 안전한 demo `USER`를 포함한 clean-clone Quickstart, 안정된 확장 경계; 외부 기여 운영 문서는 실제 접수·지원 release 전까지 `DEFERRED` |
 | `EVAL-R1-03` | 개발 문서의 구체성 | 6 | `PARTIAL` — 현황·roadmap·spec·evidence·이 추적표가 있음 | 검증된 설치·운영·troubleshooting, architecture/data flow |
 | `EVAL-R1-04` | 프로젝트 혁신성 | 6 | `PARTIAL` — 원문 출처 검색, version fencing, 안전한 복구가 있음 | 공식 과제의 동기화·MCP·가용성 증거와 PRIZM 차별 slice |
 | `EVAL-R1-05` | 프로젝트 팀워크 | 6 | `PARTIAL` — 개인 참가자의 실제 과거 PR·commit과 현재 관리 규칙이 있음 | 앞으로의 실제 Issue→spec→branch→PR→CI→review→merge와 community 증거 |
@@ -94,7 +94,7 @@ Community는 실제 제3자의 Issue, discussion, review, feedback 또는 contri
 | ID | 보수적 내부 추정 | 다음 재평가 evidence Gate |
 |---|---:|---|
 | `EVAL-R1-01` | 4/6 | 실제 OpenSQL과 clean-clone에서 전체 사용자 흐름과 UI 시험 `PASS` |
-| `EVAL-R1-02` | 3/6 | 라이선스 감사 뒤 실제 LICENSE·NOTICE·CONTRIBUTING·SECURITY와 clean-clone 기여자 Quickstart 검증 완료 |
+| `EVAL-R1-02` | 3/6 | source-only LICENSE·NOTICE·SBOM의 검증 CI, 안전한 demo `USER`를 포함한 clean-clone Quickstart 검증 완료; CONTRIBUTING·SECURITY는 실제 외부 운영 시작 전 `DEFERRED` |
 | `EVAL-R1-03` | 4/6 | 별도의 깨끗한 환경에서 문서만 보고 설치·demo·검증 재현 `PASS` |
 | `EVAL-R1-04` | 3/6 | OpenSQL에서 DB failover·변경 로그 동기화·MCP 중 하나의 실제 수직 slice `PASS` |
 | `EVAL-R1-05` | 3/6 | 실제 신규 작업에서 Issue→spec→PR→CI→merge 흐름이 반복 재현되고, 가능한 경우 genuine third-party review가 별도 증거로 연결됨 |
@@ -127,7 +127,7 @@ target commit 이후 바뀌면 재평가 전까지 상태를 `STALE`로 둔다. 
 | 항목 | 배점 | 공식 확인 방식 | 현재 준비도 | 다음 증거 |
 |---|---:|---|---|---|
 | 기능테스트 | 10 | 전문기관 온·오프라인 시험, 시스템 소개·구현 환경·소스 확인, 오류·버그·정지·종료 등 비정상 동작 없이 운영되는지 확인 | `PARTIAL` | clean-clone 실행서, 고정 fixture, backend·browser 또는 고정 수동 UI 기능시험표, 처리 완료 확인, OpenSQL·Ollama 실제 결과 |
-| 라이선스 검증 | 5 | 오픈소스SW 역량프라자 의뢰 온라인 검증, 소스 업로드, 사용 OSS와 복수 라이선스 충돌 및 해결 방안 확인 | `NOT_STARTED` | dependency·model·data·asset·OpenSQL 감사표, SBOM, 충돌 해결표, root LICENSE와 NOTICE |
+| 라이선스 검증 | 5 | 오픈소스SW 역량프라자 의뢰 온라인 검증, 소스 업로드, 사용 OSS와 복수 라이선스 충돌 및 해결 방안 확인 | `PARTIAL` — source-only Apache-2.0 `LICENSE`·`NOTICE`, dependency·model·data·asset 감사와 SBOM·AI 모델 명세가 있음 | 검증 CI, 외부 분석 결과, 실제 OpenSQL 구성요소의 license·배포 조건과 충돌 해결표 |
 
 검증 도구에 올릴 소스는 credentials, `.env`, 업로드 원본, DB volume, model,
 IDE·build 산출물을 포함하지 않도록 사전 검사한다. 작업 폴더 전체를 압축하지
@@ -145,10 +145,10 @@ IDE·build 산출물을 포함하지 않도록 사전 검사한다. 작업 폴�
 | 작품발표(PT) | 10 | 개발 계획 수행 수준, 발표자료 완성도, 정보 전달력, 사용 OSS 라이브러리 표기 | `NOT_STARTED` | 평가항목 순서의 PPT, OSS 표기, 10+5분 리허설 |
 | 활용성 | 15 | 출품작의 잠재적 경쟁력 | `PARTIAL` | 대상 사용자 시나리오, 반복 가능한 demo, 경쟁력·사용자 검증 근거 |
 | 작품 데모(완성도) | 10 | 체계적 demo, 결과 표현, 질의응답의 안정적 수행 | `PARTIAL` | clean-clone, 처리 완료 확인, browser E2E 또는 고정 수동 UI 시험표, 오류·근거 없음·복구 시나리오. 제출용 3분 영상 제한과는 별도 |
-| 커뮤니티 확장 가능성 | 10 | 품질관리·개발방법론·roadmap 관리와 커뮤니티 참여·지속적 지식재산 공유 | `NOT_STARTED` | LICENSE·CONTRIBUTING·SECURITY·template, roadmap와 실제 기여 흐름 |
+| 커뮤니티 확장 가능성 | 10 | 품질관리·개발방법론·roadmap 관리와 커뮤니티 참여·지속적 지식재산 공유 | `PARTIAL` — Apache-2.0·NOTICE, SBOM, spec·roadmap·개발 기록이 있음 | 실제 외부 기여 접수 또는 지원 release 전 SECURITY 경로와 CONTRIBUTING·template을 확정하고, 실제 기여 흐름을 남김 |
 | 오픈소스SW 적절성 | 10 | 다른 OSS를 적절히 도입·활용해 정상 운영되는 수준 | `PARTIAL` | 실제 OpenSQL 결과, OSS 선택 이유·버전·용도·라이선스 표 |
 | 기능테스트 | 10 | 외부 기능검증 결과 | `PARTIAL` | 외부 검증 가능한 실행 절차와 정상·예외·장애 test 결과 |
-| 라이선스 검증 | 5 | 외부 라이선스 분석·식별·충돌 검증 결과 | `NOT_STARTED` | 충돌 여부와 해결 방안을 포함한 감사 결과 |
+| 라이선스 검증 | 5 | 외부 라이선스 분석·식별·충돌 검증 결과 | `PARTIAL` — source-only 감사·LICENSE·NOTICE·SBOM·AI 모델 명세가 있음 | 외부 분석 결과와 실제 OpenSQL 구성요소를 포함한 충돌 여부·해결 방안 |
 
 ## 제출·후속 산출물 상태
 

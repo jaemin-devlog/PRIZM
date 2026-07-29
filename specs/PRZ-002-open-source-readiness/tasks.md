@@ -393,15 +393,15 @@ secret-safe field review
 
 **선행 조건:** T-04·T-05 완료와 G-02·T-06·T-07 deferral 결정 기록
 
-- [ ] README 첫 화면에 문제, Engine/Reference App 경계, 현재 기능, Quickstart,
+- [x] README 첫 화면에 문제, Engine/Reference App 경계, 현재 기능, Quickstart,
   docs·license·SBOM 경로와 현재 외부 기여·보안 운영 상태를 배치한다.
-- [ ] 존재하지 않는 contribution·security 문서나 미검증 연락 경로를 링크하지 않는다.
-- [ ] clean-clone Quickstart를 실제로 재현하고 필요한 환경·초기 사용자
+- [x] 존재하지 않는 contribution·security 문서나 미검증 연락 경로를 링크하지 않는다.
+- [x] clean-clone Quickstart를 실제로 재현하고 필요한 환경·초기 사용자
   blocker를 정직하게 기록한다.
-- [ ] 구현됨·계획됨·미검증을 표로 분리한다.
-- [ ] OpenSQL·OpenProxy·OpenHA를 `NOT_RUN`으로 유지한다.
-- [ ] CareerFact·portfolio·MCP·`/api/v1`·멀티모듈을 계획 상태로 유지한다.
-- [ ] docs index, contest traceability, roadmap와 중복·깨진 링크를 정리한다.
+- [x] 구현됨·계획됨·미검증을 표로 분리한다.
+- [x] OpenSQL·OpenProxy·OpenHA를 `NOT_RUN`으로 유지한다.
+- [x] CareerFact·portfolio·MCP·`/api/v1`·멀티모듈을 계획 상태로 유지한다.
+- [x] docs index, contest traceability, roadmap와 중복·깨진 링크를 정리한다.
 
 **완료 evidence:** clean-clone log, Markdown link report, 현재/계획 표현 audit
 

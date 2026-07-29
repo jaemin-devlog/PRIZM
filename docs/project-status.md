@@ -118,12 +118,13 @@ OCR, image-only PDF, DOCX, PPTX, 검색 threshold, ANN index와 검색 기록은
 | Frontend lint·build | `PASS` | ESLint와 production build 통과 |
 | PostgreSQL·pgvector integration | `HISTORICAL_PASS_NOT_RERUN` | 기존 성공 기록은 있으나 2026-07-23 기준선 작업에서 재실행하지 않음 |
 | Dense 검색 평가 | `HISTORICAL_PASS_NOT_RERUN` | 2026-07-14 합성 기준선 보존 |
-| Docker Compose | `NOT_RUN` | 기준선 작업 환경에 Docker 실행 파일 없음 |
+| Docker Compose | `PASS` | 2026-07-29 clean-clone에서 config·build·기동과 backend·frontend health 확인. demo `USER` 기반 전체 사용자 흐름은 `NOT_RUN` |
 | Ollama `bge-m3` | `NOT_RUN` | 기준선 문서 작업에서 사용하지 않음 |
 | OpenSQL·OpenProxy·OpenHA | `NOT_RUN` | 실제 대상 환경 검증 없음 |
 
 세부 환경별 결과와 코드·test 연결은
-[PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md)를 기준으로 한다.
+[PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md), T-08 clean-clone
+결과는 [PRZ-002 Evidence](../specs/PRZ-002-open-source-readiness/evidence.md)를 기준으로 한다.
 
 ## 알려진 한계
 
@@ -137,7 +138,7 @@ OCR, image-only PDF, DOCX, PPTX, 검색 threshold, ANN index와 검색 기록은
 
 ## 계획 기능: 현재 구현 아님
 
-- clean-clone Quickstart와 안전한 demo `USER`
+- 안전한 demo `USER`와 이를 이용한 clean-clone 로그인→업로드→ACTIVE→검색 전체 재현
 - canonical source, quote hash와 처리 provenance
 - CareerFact 후보·확인·거절과 `INSUFFICIENT_EVIDENCE`
 - 검증된 CareerFact만 사용하는 JSON·Markdown portfolio와 source manifest

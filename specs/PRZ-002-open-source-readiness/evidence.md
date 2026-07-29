@@ -320,3 +320,39 @@ LOW 후속 보완은 generated JSON의 LF·마지막 LF 검증과 문서 gate �
 애플리케이션 동작을 변경하지 않은 generator/verifier·문서 보완이므로 전체 unit,
 integration, frontend lint/build는 재실행하지 않았다. Docker, PostgreSQL,
 pgvector, Ollama, OpenSQL, OpenProxy, OpenHA는 모두 `NOT_RUN`이다.
+
+## T-08 README·Quickstart·docs index VERIFY — 2026-07-29
+
+**대상:** 기준 commit `9b6352e75d1b56191322147a3953d5624739f58b`와
+현재 T-08 문서 patch. 원 작업 트리의 dependency·build cache를 재사용하지 않도록
+`build/verification/t08-clean-clone`에 `--no-hardlinks` local clone을 만들고 문서
+patch를 적용했다. 원본과 clone의 변경 문서 7개는 줄바꿈을 정규화한 내용이 모두
+일치했다.
+
+| 검증 | 결과 |
+|---|---|
+| `docker compose config --quiet` | PASS |
+| 격리된 project·port에서 `docker compose up -d --build` | PASS — PostgreSQL 16+pgvector, backend, frontend 기동 |
+| Flyway | PASS — 빈 `public` schema에 V1~V13 13개 적용 |
+| backend health | PASS — HTTP 200, `status=UP` |
+| frontend | PASS — HTTP 200, React root 문서 확인 |
+| 초기 사용자 | PASS — `users` 0건으로 안전한 demo `USER`가 자동 생성되지 않는 현재 제한 재현 |
+| 전체 사용자 흐름 | `NOT_RUN` — 회원가입·demo `USER` 경로와 host Ollama `bge-m3`가 없음 |
+| 저장소 전체 Markdown | PASS — 38개 파일, 로컬 링크 258개, 누락 0개, code fence 불균형 0개, trailing whitespace 0개 |
+| `git diff --check` | PASS |
+| 현재·계획·미검증 표현 | PASS — 구현 endpoint·권한·frontend route와 대조; CareerFact·portfolio·MCP·`/api/v1`·멀티모듈은 계획, OpenSQL·OpenProxy·OpenHA는 `NOT_RUN` 유지 |
+
+첫 Compose 호출이 tool timeout 뒤에도 계속 실행되는 동안 같은 project에 대한
+재호출이 겹쳐 두 번째 호출은 기존 network·container 이름 충돌을 반환했다. 최초
+호출은 정상 완료됐고 최종 container 상태와 health를 별도로 확인했다. 이 중복
+호출 오류는 제품 성공 근거로 사용하지 않았다.
+
+Docker, PostgreSQL 16, pgvector는 실제 사용했다. Ollama 실행 파일과
+`bge-m3`는 이 환경에 없어 `NOT_RUN`이며 OpenSQL, OpenProxy, OpenHA도
+`NOT_RUN`이다. clean-clone Docker build가 backend `bootJar`와 frontend
+production build를 수행했지만, 애플리케이션 source·migration·config 변경이 없는
+문서 작업이므로 전체 unit·integration·frontend lint test는 재실행하지 않았다.
+
+**VERIFY 판정:** 문서가 약속한 Compose 기동·health 범위는 `PASS`다. 신규
+사용자의 로그인→업로드→ACTIVE→검색 전체 demo는 계속 `NOT_RUN`이며 T-08의
+다음 단계는 최종 diff에 대한 독립 읽기 전용 AUDIT다.

@@ -480,3 +480,16 @@
 - 결정: 실제 외부 운영이 시작되지 않은 현재는 G-02 보안 신고 채널, CONTRIBUTING·CODE_OF_CONDUCT·SECURITY·SUPPORT·maintainer 정책과 Issue·PR template을 완료로 꾸미지 않고 `DEFERRED`로 둔다.
 - 재개: G-02와 운영 문서는 외부 기여 접수 또는 첫 지원 release·외부 배포를 준비하는 시점 중 먼저 도래하는 때 실제 비공개 신고 경로부터 확정한다. Issue·PR template은 외부 Issue·PR 접수를 공식 지원하기 전에 재개한다.
 - 현재 Gate: source-only Apache-2.0·NOTICE·SBOM·AI 모델 명세는 유지하고, README·Quickstart·문서 색인, 라이선스·SBOM 검증 CI와 최종 독립 감사를 P0 잔여 작업으로 둔다. 문서 전용 범위 조정이므로 새 spec이나 애플리케이션 검증은 추가하지 않았다.
+
+## 2026-07-29 — PRZ-002 T-08 README·Quickstart 진입점 현행화
+
+- 구현: README에 PRIZM의 문제·Engine/Reference App 경계, 구현됨·계획됨·외부 환경 `NOT_RUN`을 표로 분리하고 Apache-2.0 `LICENSE`·source-only `NOTICE`·license audit·SBOM/AI 모델 명세 경로를 연결했다. `docs/quickstart.md`에는 Docker Compose 기동·health 확인만 가능한 현재 절차와 외부 prerequisite를 기록했다.
+- 제한: 회원가입과 안전한 demo `USER` 생성 경로가 없어 신규 설치자의 로그인→업로드→검색 전체 재현은 아직 `NOT_RUN`이다. `SYSTEM_ADMIN` bootstrap은 개인 문서 API용 계정이 아니며 demo 대체 수단으로 안내하지 않는다.
+- 정합성: 요구사항·평가기준 추적표의 source-only LICENSE·NOTICE·SBOM 상태를 실제 병합 상태와 맞췄다. 실제 OpenSQL·OpenProxy·OpenHA 결과는 계속 `NOT_RUN`이고, 외부 기여·보안 운영 문서는 `DEFERRED`다. clean-clone 실행, Markdown 검증과 독립 감사는 다음 VERIFY/AUDIT 단계에서 수행한다.
+
+## 2026-07-29 — PRZ-002 T-08 clean-clone VERIFY
+
+- 환경: 기준 commit `9b6352e`의 `--no-hardlinks` local clone에 T-08 문서 patch만 적용하고, 기존 환경과 겹치지 않는 Compose project·port·volume을 사용했다.
+- 실행: PostgreSQL 16+pgvector, backend, frontend image를 clean clone에서 빌드했다. 빈 schema에 Flyway V1~V13이 적용됐고 DB health, backend health HTTP 200, frontend HTTP 200을 확인했다.
+- 제한 재현: 사용자 행은 0건이었다. Ollama CLI와 `bge-m3`가 준비되지 않아 model pull과 로그인→업로드→ACTIVE→검색 전체 흐름은 `NOT_RUN`이다. OpenSQL·OpenProxy·OpenHA도 사용하지 않았다.
+- 문서 검사: Markdown 38개에서 로컬 링크 258개, code fence, trailing whitespace를 검사해 누락·불균형·위반 0건을 확인했고 `git diff --check`도 통과했다. 애플리케이션 기능 변경이 없는 문서 작업이므로 전체 unit·integration test는 재실행하지 않았다.

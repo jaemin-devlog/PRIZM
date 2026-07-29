@@ -436,9 +436,9 @@
 
 ## 2026-07-27 — PRZ-003 OpenSQL 단일 검증 VM 착수
 
-- 공식 확인: 티맥스티베로 담당자가 VirtualBox 기반 Rocky Linux 9 VM에서 OpenSQL 테스트 라이선스를 사용할 수 있다고 회신했다. 신청서에는 Windows 호스트가 아니라 VM 내부 hostname 및 vCPU/core/thread 값을 쓰고, VM은 고정 IP와 시간 동기화를 갖춰야 한다.
+- 공식 확인: VM 기반 테스트 라이선스 사용 승인과 필수 환경 조건을 공급사의 서면 답변으로 확인했다. 서신 원문과 정확한 신청값은 Git 밖의 비공개 근거로 보존한다.
 - 범위: `PRZ-003`은 OpenSQL 전용 Rocky Linux 9 VM 한 대와 단일 환경 Gate까지만 다룬다. App VM, OpenProxy/OpenHA, Worker/Ollama 통합과 다중 노드는 제외한다.
-- 구현: 연구실 Windows 호스트에 Oracle VirtualBox 7.2.12를 설치하고 Rocky Linux 9.8 VM을 4 vCPU·12 GiB RAM·동적 120 GiB 디스크로 구성했다. Host-only 고정 IP, NTP 동기화, 재부팅 후 `jaemin`의 관리자 권한을 확인하고 VM 값으로 테스트 라이선스 신청을 제출했다. OpenSQL Gate는 라이선스 발급·OpenSQL 설치 전이므로 계속 `NOT_RUN`이며, PostgreSQL 결과를 OpenSQL 결과로 기록하지 않는다.
+- 구현: 전용 VirtualBox guest에 비공개 host-only 연결과 시간 동기화를 구성하고 guest 기준값으로 테스트 라이선스를 신청했다. 정확한 VM 식별값·자원·계정·주소는 공개 저장소에 기록하지 않는다. 당시 OpenSQL Gate는 설치 전이므로 `NOT_RUN`이었으며, PostgreSQL 결과를 OpenSQL 결과로 기록하지 않았다.
 
 ## 2026-07-26 — PRZ-002 SBOM·AI 모델 명세 구현
 
@@ -517,3 +517,54 @@
 - 변경: 로그인 소개 영역에 문서 카드·근거 연결·검증 표시를 담은 직접 제작 SVG 배경을 추가했다. 텍스트는 배경보다 위에 두고, 장식 요소는 pointer event를 받지 않으며 모바일에서는 숨긴다.
 - 이유: 빈 왼쪽 영역에 PRIZM의 문서 기반 근거 탐색 성격을 전달하되, 외부 사진·일러스트를 도입하지 않고 사용자 입력이나 로그인 흐름을 바꾸지 않기 위해서다.
 - 검증: frontend lint·production build·SVG XML 파싱·`git diff --check`를 통과했다. SVG의 출처·SHA-256과 source-only 배포 경계는 자산 provenance 감사에 기록했다.
+
+## 2026-07-29 — PRZ-003 OpenSQL Single 설치와 공개 경계
+
+- 설치: 공급사가 지정한 Rocky Linux 9.7 VM에서 대회용 OpenSQL `single` 설치와 라이선스 적용을 완료했다. 직접 인증 기본 SQL 질의와 설치 직후 single-node 지원 service health를 확인했다.
+- 제한: 이 결과는 `PASS_INSTALLATION_ONLY`다. PRIZM Flyway·`vector(1024)`·검색·ownership·Worker SQL Gate, OpenProxy 기능 검증, 설치 후 재부팅 지속성과 OpenHA는 `NOT_RUN` 또는 `NOT_VERIFIED`다.
+- 공개 감사: 공개 저장소에 올리기 전 공급 archive·개별 라이선스·fingerprint·비공개 build metadata·installer 내부 오류와 log·설정·credential·key·hostname·IP·CPU 귀속값·사용자 절대 경로를 제거했다. 자산과 상세 진단은 Git 밖의 비공개 근거로만 보존한다.
+- 라이선스 경계: OpenSQL은 `EXTERNAL_PROVIDED_NOT_DISTRIBUTED` runtime으로 기록했다. bundled OSS의 개별 license를 공급사 전용 bundle 전체의 공개 권한으로 간주하지 않는다.
+- 검증: 비공개 식별자와 secret-shaped 값 재검사 결과 0건이었다. `node scripts/verify-oss-readiness.mjs`가 tracked file 안전성, source-only license, SBOM 재생성·checksum·구조, 회귀 test 12건, Markdown과 `git diff --check`를 통과했다. 제품 source 변경이 없어 애플리케이션 test와 PRIZM OpenSQL Gate는 실행하지 않았다.
+- 문서 범위: 활성 `PRZ-003` 안의 설치·공개 경계 교정이므로 새 spec은 만들지 않았다. 제품 source와 Flyway migration은 변경하지 않았다.
+
+## 2026-07-29 — 노트북 `main`과 PRZ-003 합본 검증 중단
+
+- 정합성: 노트북에서 푸시된 `origin/main` `3be415a`는 현재 문서 브랜치의 직접 조상이다. 현재 브랜치는 공개 경계 문서 commit `33208b9`만 한 개 앞서므로 별도의 원격 변경 병합이나 충돌 해결은 필요하지 않았다.
+- 환경 준비: Docker Desktop 연결을 확인하고 저장소 CI와 같은 Ollama 0.32.3 및 `bge-m3:latest`를 로컬에 준비했다. binary와 model cache는 Git에 포함하지 않았다.
+- 통과: backend unit test, frontend lint·production build, Compose config, OSS readiness가 통과했다. UTF-8을 일시 지정한 PostgreSQL·pgvector·Ollama 전체 통합 테스트도 68건 중 실패 0건·건너뜀 3건이었다. OpenSQL은 사용하지 않았다.
+- 차단: 문서화된 기본 Windows 통합 테스트 명령은 기존 UTF-8 TXT 비교가 기본 문자셋을 사용해 68건 중 1건 실패했다. 이 줄은 7월 13일 기존 commit에서 도입되어 최신 노트북 변경이나 PRZ-003 문서 변경의 회귀는 아니지만, 정확한 기본 명령이 실패하므로 `INTEGRATION_BLOCKED_RETURN_TO_SPEC`으로 판정했다.
+- 통합: `main` 병합과 push는 수행하지 않았다. 교차 플랫폼 문자셋 교정을 별도 승인 범위에서 spec·plan에 반영하고 정확한 명령을 다시 통과시켜야 한다. 게시 절차에 필요한 GitHub CLI도 현재 설치되어 있지 않다.
+
+## 2026-07-30 — Windows UTF-8 통합 차단 교정과 skip 재감사
+
+- 교정: 기존 TXT 저장 통합 테스트가 실제 파일을 Windows 기본 문자셋이 아니라 UTF-8로 명시해 읽도록 수정했다. 제품 source, Flyway, API, 보안 계약, dependency와 license는 변경하지 않았다.
+- Windows 검증: 인코딩 환경변수 없이 대상 테스트와 전체 통합 테스트를 실행했다. 전체 결과는 68건 중 실패 0건·오류 0건·건너뜀 3건이다. 단위 테스트는 캐시 없이 245건을 재실행해 실패 0건·오류 0건·플랫폼 건너뜀 14건이었다. 프런트엔드 lint/build, Compose config와 OSS readiness도 통과했다.
+- skip 감사: cleanup 통합 테스트 2건은 Windows의 `SecureDirectoryStream` 부재 때문이었다. Linux JDK 컨테이너에서 두 테스트를 재실행해 2건 모두 통과했고, 파일 저장 단위 테스트 23건도 Linux에서 건너뜀 없이 통과했다. Windows fail-closed 회귀 테스트도 실제 실행되어 통과했다.
+- 남은 경계: OpenSQL 통합 테스트 1건은 실행 플래그, 전용 대상 확인과 runtime/Flyway 자격정보가 준비되지 않아 의도대로 건너뛰었다. 결과는 `NOT_RUN`이며 PostgreSQL·pgvector 결과로 대체하지 않는다.
+- 감사: 최종 diff의 scope, 보존 계약, 공개 경계와 실행 결과를 읽기 전용으로 대조해 blocking finding 0건을 확인했다. 이는 GitHub 또는 제3자 review가 아니다.
+- 상태: Windows UTF-8 합본 차단은 해소됐다. 이번 작업은 활성 PRZ-003 안의 corrective work이며 전체 OpenSQL Gate와 PRZ-003 통합 완료를 뜻하지 않는다.
+
+## 2026-07-30 — PRZ-003 OpenSQL Gate 관리자 권한 확인 보류
+
+- 범위: 공급사가 제공한 single-node OpenSQL VM에서 PRIZM 전용 Gate DB와 분리된 Flyway/runtime 역할을 준비하려 했다. OpenProxy·OpenHA와 제품 source·Flyway migration은 변경하지 않았다.
+- 중단: 서비스 역할 `opensql`은 DB 역할·DB 생성 권한이 없어 첫 역할 생성에서 중단됐다. 그 전의 잘못된 기본 socket 가정도 SQL 실행 전에 중단됐고, 두 시도 모두 역할·DB·table·migration을 만들거나 변경하지 않았다.
+- 확인: DB 관리자 권한은 `postgres` 역할에만 있고 Linux OS `postgres` 계정은 없음을 읽기 전용으로 확인했다. 관리자 인증 설정도 서비스 역할에는 열람 권한이 없다.
+- 보안: 관리자 비밀번호는 입력·저장·전송하지 않았으며, 재설정·추측·권한 강제 변경을 하지 않았다. VM 식별값, 접속 경로, 공급사 설치 내부 정보와 one-time SSH key는 공개 문서에 기록하지 않는다.
+- 관리자 인증: VirtualBox console에서 DB 관리자 `postgres` 로그인과 `current_user=postgres`를 확인했다. 비밀번호는 Codex·Git·로그에 저장하거나 전송하지 않았다.
+- 상태: `IMPLEMENT_IN_PROGRESS`, `PRIZM OpenSQL Gate=NOT_RUN`. 다음 단계는 임시 credential로 전용 DB와 최소 권한 역할을 bootstrap하는 것이며, 그 전후로 비밀번호 추측·재설정·권한 강제 변경을 하지 않는다.
+- 복구: 첫 bootstrap은 target 구성까지 성공했지만 명령 전송 SSH가 종료되지 않아 Gradle 실행 전 대기했다. migration·PRIZM 데이터가 없는 정확한 임시 target만 관리자 인증으로 제거했다. 정리 보조 스크립트의 변수명 오류는 SQL 실행 전에 발견·교정됐으며, 교정 후 제거를 확인했다. 전송 방식도 표준 입력을 닫도록 교정했고 OpenSQL Gate 결과는 계속 `NOT_RUN`이다.
+
+## 2026-07-30 — PRZ-003 실제 OpenSQL 단일 SQL Gate 통과
+
+- 실행: 새 전용 target과 분리된 runtime/Flyway credential을 비공개 환경변수로 사용해 `OpenSqlInfrastructureTest`를 실제 Rocky Linux 9.7 single-node OpenSQL에서 실행했다. Spring application context·scheduler, Docker PostgreSQL·pgvector, Ollama, OpenProxy와 OpenHA는 사용하지 않았다.
+- 결과: JUnit 1건이 실패 0·오류 0·건너뜀 0, Gradle 종료 코드 0과 `BUILD SUCCESSFUL`로 통과했다. 출력 로그에 JDBC URL 또는 password/secret assignment 형식 값은 없었다.
+- 범위: Flyway V1~V13, `vector(1024)`·cosine 검색, owner·ACTIVE-version 격리, processing·cleanup job의 claim·lease·fencing·recovery·`SKIP LOCKED` SQL을 검증했다. 실제 파일 삭제, Ollama 색인, OpenProxy runtime, OpenHA·DB failover, clean-clone browser 흐름은 검증하지 않았다.
+- 상태: OpenSQL 단일 SQL Gate는 `PASS`, PRZ-003은 독립 `AUDIT` 및 GitHub 통합 전 `IMPLEMENTED_UNVERIFIED`다.
+- 정리: 실행 근거를 수집한 뒤 전용 Gate DB와 두 login role을 제거했고, DB·role count `0|0` 및 정리 helper 부재를 읽기 전용으로 확인했다. 검증 대상을 재사용하지 않는다.
+
+## 2026-07-30 — PRZ-003 OpenSQL 단일 SQL Gate 독립 AUDIT
+
+- 감사: spec·plan·tasks·evidence와 실제 JUnit 결과·assertion source를 읽기 전용으로 대조했다. 변경 범위는 현행 상태 문서 8개뿐이며 제품 source, Flyway migration, dependency, license, SBOM과 공급 자산은 변경하지 않았다.
+- 안전성: `git diff --check`, 식별값·credential pattern 검사, `node scripts/verify-oss-readiness.mjs`를 통과했다. Markdown 38개·로컬 링크 262개·tracked file 300개, SBOM 구조·checksum과 회귀 12건이 통과했고 외부 링크는 94개 성공·1개 `INDETERMINATE`·영구 실패 0개다.
+- 판정: blocking finding 0건으로 PRZ-003 OpenSQL 단일 SQL Gate를 `VERIFIED`로 기록한다. 이는 GitHub 또는 제3자 review가 아니며 OpenProxy·OpenHA·DB failover, Ollama 색인, clean-clone 사용자 흐름과 GitHub 통합은 별도 범위다.
+- 세션 정리: VM `authorized_keys`의 Gate 전용 임시 key 2개와 Windows 임시 key pair를 제거하고, Windows `%TEMP%`의 Gate 전용 실행기·상태·출력 파일 7개도 제거했다. 사용자 key, 저장소 파일, 공급 자산과 VM 기본 설정은 변경하지 않았다.

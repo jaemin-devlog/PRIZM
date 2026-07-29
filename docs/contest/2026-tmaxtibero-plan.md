@@ -13,9 +13,9 @@ PRIZM의 현재 기반은 지정과제와 잘 맞지만 아직 출품 요건을 
 
 - 이미 구현: 문서 업로드, 자동 임베딩, 메타데이터·immutable version,
   owner-scoped pgvector 검색, 비동기 작업 복구
-- 준비만 완료: 실제 OpenSQL 호환성 Gate
+- 검증됨: 실제 OpenSQL 단일 SQL 호환성 Gate와 독립 `AUDIT`
 - 미구현: 변경 로그 기반 동기화, MCP 검색 API
-- 미검증: OpenSQL 실환경과 DB 장애전환·서비스 연속성
+- 미검증: OpenProxy runtime, DB 장애전환·서비스 연속성
 - 별도 제품 계획: CareerFact와 근거 기반 portfolio
 
 따라서 CareerFact·portfolio보다 `OpenSQL → 장애복구 → 동기화 → MCP`를

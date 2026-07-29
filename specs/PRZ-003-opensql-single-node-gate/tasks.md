@@ -2,12 +2,31 @@
 
 - [x] 공급사의 VM 기반 테스트 라이선스 확인 내용을 기록한다.
 - [x] 연구실 Windows 호스트에 Oracle VirtualBox를 설치한다.
-- [x] Rocky Linux 9 x86_64 설치 ISO를 내려받고 checksum을 검증한다.
-- [x] 승인된 자원 할당으로 `PRIZM-OpenSQL`을 생성한다.
-- [x] Rocky Linux, 고정 Host-only 네트워크, 시간 동기화를 구성한다.
-- [x] 라이선스 신청서에 사용할 게스트 hostname 및 CPU/core/thread 근거를 기록한다.
+- [x] 지원 대상이 아니었던 초기 guest disk를 OpenSQL 설치 전에 분리해 보존한다.
+- [x] 공식 Rocky Linux 9.7 x86_64 설치 ISO를 내려받고 checksum을 검증한다.
+- [x] 라이선스 귀속값을 고정한 전용 single-node guest를 구성한다.
+- [x] 고정 Host-only 네트워크와 시간 동기화를 구성한다.
+- [x] 라이선스 신청서에 사용할 guest 식별값과 CPU topology를 비공개로 기록한다.
 - [x] 기록된 게스트 값으로 OpenSQL 테스트 라이선스를 신청한다.
 - [x] 가상 디스크로 재부팅하고 의도한 관리자 계정을 확인한다.
-- [ ] OpenSQL을 설치하고 테스트 라이선스를 적용한다.
-- [ ] 첫 OpenSQL Gate를 실행하고 결과를 기록한다.
-- [ ] 모든 Gate가 충족된 뒤 독립 감사와 통합을 수행한다.
+- [x] 공급 package와 발급 라이선스를 Git 밖에서 검증하고 guest에 전달한다.
+- [x] Rocky Linux 9.7에서 OpenSQL `single` 설치와 라이선스 적용을 완료한다.
+- [x] 직접 인증 기본 SQL 질의와 설치 직후 지원 service health를 확인한다.
+- [x] 공개 문서에서 공급 자산 식별자·fingerprint·내부 log와 host 귀속값을 제거한다.
+- [x] Windows 기본 문자셋에서 발생한 UTF-8 통합 테스트 실패와 도입 이력을 확인한다.
+- [x] TXT 저장 통합 테스트가 실제 파일을 UTF-8로 명시해 읽도록 교정한다.
+- [x] 별도 JVM 인코딩 강제 없이 대상 테스트와 전체 통합 테스트를 재실행한다.
+- [x] OpenSQL opt-in 1건과 Windows `SecureDirectoryStream` 제한 2건을 재감사한다.
+- [x] 단위·프런트엔드·Compose·오픈소스 준비 Gate를 다시 실행하고 근거를 기록한다.
+- [x] OpenSQL 관리자 접속, 서버 응답과 `vector` extension 가용성을 비공개로 사전 점검한다.
+- [x] 첫 Gate의 전용 빈 데이터베이스, 분리 credential, 최소 권한과 재시도 방식을 확정한다.
+- [x] 일회성 SSH Gate key를 등록하고 종료 시 VM·Windows 양쪽에서 제거한다.
+- [x] VirtualBox console과 Codex가 같은 일회성 `tmux` Gate 세션을 공유한다.
+- [x] 현재 서비스 역할의 관리자 권한 부재와 Linux `postgres` OS 계정 부재를 읽기 전용으로 확인하고, 관리자 인증 방법 확인 전에는 Gate provisioning을 중단한다.
+- [x] VirtualBox console에서 DB 관리자 `postgres` 인증을 비밀값 노출 없이 확인한다.
+- [x] Gradle 시작 전 전송 중단으로 남은 빈 Gate 대상과 임시 보조 파일을 정확한 이름으로 정리한다.
+- [x] 전용 Gate 데이터베이스와 Flyway/runtime role을 구성한다.
+- [x] 첫 OpenSQL Gate를 실행하고 결과를 기록한다.
+- [x] 검증 근거를 확보한 뒤 전용 Gate DB·역할·보조 파일이 남지 않음을 확인한다.
+- [x] 실제 Gate 결과·문서·공개 경계를 독립 읽기 전용으로 감사한다.
+- [ ] GitHub 인증과 사용자 승인 후 실제 PR·review 상태·merge 근거를 통합 기록한다.

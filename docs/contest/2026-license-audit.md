@@ -885,3 +885,22 @@ Linux clean clone과 GitHub
 같은 단일 명령으로 통과했다. 이 결과는 현재 source-only T-09 Gate에 한정되며
 future binary/image/model 배포 감사, OpenSQL 검증 또는 PRZ-002 전체 완료를
 의미하지 않는다.
+
+## OpenSQL 대회용 외부 runtime 경계
+
+PRZ-003 검증 환경에는 공급사가 별도로 제공한 OpenSQL 대회용 테스트 runtime과
+라이선스를 사용한다. 이 자산은 PRIZM의 Apache-2.0 source 배포물이나 SBOM의
+`included` 범위가 아니다.
+
+| 항목 | 판정 |
+|---|---|
+| 사용 권한 | 별도로 보존한 공급사 승인과 테스트 라이선스의 허가 범위에서만 사용 |
+| 저장소 포함 | archive, 추출물, license, 설정, credential, key, screenshot, log 모두 `NOT_DISTRIBUTED` |
+| 공개 근거 | Rocky Linux 9.7 single-node 설치 여부와 비식별 test 결과만 기록 |
+| 재배포 권리 | 확인하거나 가정하지 않음. bundled OSS의 개별 license가 공급사 전용 bundle 전체의 재배포 권한을 부여한다고 해석하지 않음 |
+| 향후 Gate | OpenSQL binary·설치 image·license를 release 또는 container에 포함하려면 공급사의 명시적 허가와 별도 license·NOTICE·SBOM 감사를 먼저 수행 |
+| 현재 상태 | `EXTERNAL_PROVIDED_NOT_DISTRIBUTED` |
+
+이 경계는 OpenSQL 설치 또는 호환성 결과를 대신하지 않는다. 설치 전용 결과와
+PRIZM 실행 Gate는 [PRZ-003 Evidence](../../specs/PRZ-003-opensql-single-node-gate/evidence.md)에서
+분리해 관리한다.

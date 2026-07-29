@@ -493,3 +493,9 @@
 - 수정: GitHub token은 접두사 뒤 최소 길이의 token-shaped value가 있을 때만 탐지하도록 제한하고, 정규식 선언은 허용하면서 fake token은 차단하는 회귀 테스트를 추가했다.
 - 검증: corrective local Gate는 tracked file 298개, Node 회귀 테스트 12건, 외부 링크 92개 성공·1개 `INDETERMINATE`·반복 404/410 0개로 통과했다.
 - 상태: Linux clean-clone·GitHub 재검증과 재감사 전까지 T-09는 `IMPLEMENTED_UNVERIFIED`다.
+
+## 2026-07-29 — PRZ-002 T-09 최종 VERIFY·AUDIT 통과
+
+- 재현: corrective commit `1922952`를 Linux/JDK 17/Node 22.17 clean clone에서 검증했고, GitHub OSS Readiness run `30443185952`와 기존 CI run `30443184506`이 모두 성공했다. 최종 증거 문서를 포함한 Windows local Gate도 외부 링크 94개 성공·1개 `INDETERMINATE`로 통과했다.
+- 감사: 독립 읽기 전용 재감사에서 CRITICAL/HIGH/MEDIUM finding은 없었다. source-only license Gate, SBOM 재생성·drift·구조, tracked 민감 파일과 외부 링크 분류가 요구 범위와 일치했다.
+- 상태: T-09 구현·VERIFY·AUDIT는 통과했다. GitHub 앱 쓰기 권한 부족으로 PR 생성은 HTTP 403에서 멈췄으며, 실제 PR·병합·최종 source commit 기록은 `INTEGRATE`에 남아 있다.

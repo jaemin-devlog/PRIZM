@@ -879,6 +879,9 @@ weights를 향후 재배포할 때 필요한 별도 감사를 통과시킨 것�
   private key와 사용자 로컬 절대 경로가 source 배포물에 들어오는 것을
   차단한다.
 
-로컬 단일 명령은 통과했지만 GitHub Actions 실행은 아직 `NOT_RUN`이다.
-따라서 이 기록은 T-09 local Gate의 구현·검증 결과이며 CI 완료나 PRZ-002 전체
-완료를 의미하지 않는다.
+corrective commit `192295227f566815fa026259d2053b1c73e641f2`에서 Windows local,
+Linux clean clone과 GitHub
+[`OSS Readiness` push run](https://github.com/jaemin-devlog/PRIZM/actions/runs/30443185952)이
+같은 단일 명령으로 통과했다. 이 결과는 현재 source-only T-09 Gate에 한정되며
+future binary/image/model 배포 감사, OpenSQL 검증 또는 PRZ-002 전체 완료를
+의미하지 않는다.

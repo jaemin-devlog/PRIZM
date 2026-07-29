@@ -376,3 +376,36 @@ commit `c7d5adec551f4cb237d1edf63123bf2f1ac25eba`의 push run
 외부 링크 92개 성공·1개 `INDETERMINATE`·반복 404/410 0개로 통과했다.
 corrective commit과 Linux clean-clone·GitHub 재실행 결과는 후속 VERIFY에서
 기록한다.
+
+## T-09 corrective 최종 VERIFY — 2026-07-29
+
+**대상 commit:** `192295227f566815fa026259d2053b1c73e641f2`
+
+| 환경·검증 | 결과 |
+|---|---|
+| Windows local 단일 명령 | PASS — 최종 증거 문서 포함 tracked 298개, 회귀 테스트 12건, 외부 링크 94 OK·1 `INDETERMINATE`·0 permanent |
+| Linux clean clone | PASS — `gradle:9.5.1-jdk17` 기반, Node 22.17.0; 같은 단일 명령 전체 통과 |
+| GitHub OSS Readiness | [push run `30443185952`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30443185952) PASS |
+| 기존 GitHub CI | [push run `30443184506`](https://github.com/jaemin-devlog/PRIZM/actions/runs/30443184506) backend·frontend PASS |
+| local/GitHub command | PASS — 모두 `node scripts/verify-oss-readiness.mjs` |
+
+Linux clean clone과 GitHub checkout에서는 commit된 검증기 자체도 tracked-file
+검사에 포함됐다. 최초 CI에서 발견된 자기 참조 오탐은 회귀 테스트와 실제
+원격 성공으로 해소됐다.
+
+## T-09 독립 읽기 전용 재AUDIT — 2026-07-29
+
+| 항목 | 판정 |
+|---|---|
+| CRITICAL/HIGH/MEDIUM | 없음 |
+| required OSS file·Markdown·external link 분류 | PASS |
+| source-only license Gate와 future 배포 경계 | PASS |
+| strict dependency verification·SBOM 재생성·drift·구조 | PASS |
+| tracked model/cache·업로드 원본·credential·로컬 경로 차단 | PASS |
+| local Windows·Linux clean clone·GitHub Actions 결과 대조 | PASS |
+| CI 규모와 변경 범위 | PASS — Node 표준 라이브러리 기반 단일 job; 애플리케이션 기능 변경 없음 |
+
+**감사 판정:** `PASS_FOR_T09_SCOPE`. OpenSQL·OpenProxy·OpenHA 검증이나
+PRZ-002 전체 완료를 의미하지 않는다. PR 생성은 연결된 GitHub 앱의 쓰기 권한이
+없어 HTTP 403으로 차단됐으며, 이는 구현 finding이 아니라 남은 `INTEGRATE`
+권한 Gate다.

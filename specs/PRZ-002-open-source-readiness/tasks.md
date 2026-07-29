@@ -419,7 +419,7 @@ secret-safe field review
 - [x] 모든 third-party Action을 검증된 full commit SHA와 version 주석으로
   사용한다.
 - [x] Ollama 설치와 model pull의 mutable identity를 허용하지 않는 Gate를 둔다.
-- [ ] clean checkout local 결과와 GitHub Actions 결과를 대조한다.
+- [x] clean checkout local 결과와 GitHub Actions 결과를 대조한다.
 
 **완료 evidence:** local command·exit code, GitHub check URL, pinned Action
 inventory, SBOM diff report
@@ -443,6 +443,15 @@ backend 169개·frontend 183개 SBOM 재생성 무변경, checksum·구조·회�
 정규식의 자기 참조 오탐으로 실패해 corrective IMPLEMENT로 돌아갔다. Linux
 clean clone·GitHub 재실행과 check URL 기록 전까지 T-09 전체는
 `IMPLEMENTED_UNVERIFIED`다.
+
+**corrective VERIFY·AUDIT (2026-07-29):** corrective commit
+`192295227f566815fa026259d2053b1c73e641f2`를 Linux/JDK 17/Node 22.17
+clean clone에서 같은 단일 명령으로 재현했고, GitHub
+[`OSS Readiness` push run](https://github.com/jaemin-devlog/PRIZM/actions/runs/30443185952)과
+기존 [`CI` push run](https://github.com/jaemin-devlog/PRIZM/actions/runs/30443184506)이
+모두 성공했다. 독립 읽기 전용 재감사에서 CRITICAL/HIGH/MEDIUM finding은
+없었다. T-09 구현·VERIFY·AUDIT는 통과했으며 실제 PR 생성·병합과 최종 source
+commit 기록은 `INTEGRATE`에 남아 있다.
 
 ## T-10 — 독립 읽기 전용 감사
 

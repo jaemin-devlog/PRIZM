@@ -4,6 +4,22 @@
   "releaseProfile": "source-only",
   "licenseAudit": "../docs/contest/2026-license-audit.md",
   "assetAudit": "../docs/contest/2026-asset-provenance-audit.md",
+  "sourceOnlyLicenseGate": {
+    "status": "PASS",
+    "blockingStatuses": [
+      "UNKNOWN",
+      "CONFLICT",
+      "BLOCKED"
+    ],
+    "blockers": [],
+    "forbiddenLicenseIdentifiers": [
+      "NONE",
+      "NOASSERTION",
+      "UNLICENSED",
+      "UNKNOWN"
+    ],
+    "evidence": "../docs/contest/2026-license-audit.md"
+  },
   "scopeRecords": [
     {
       "id": "backend-runtime",

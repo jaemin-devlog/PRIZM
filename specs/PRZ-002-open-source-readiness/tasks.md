@@ -409,12 +409,12 @@ secret-safe field review
 
 **선행 조건:** T-05, T-08, CI tool 감사 완료
 
-- [ ] required OSS file, local link, code fence, trailing whitespace 검사 명령을
+- [x] required OSS file, local link, code fence, trailing whitespace 검사 명령을
   로컬에서 재현한다.
-- [ ] external link의 일시 network 오류와 영구 404를 분리해 보고한다.
-- [ ] dependency inventory coverage, forbidden/unknown/conflict license,
+- [x] external link의 일시 network 오류와 영구 404를 분리해 보고한다.
+- [x] dependency inventory coverage, forbidden/unknown/conflict license,
   SBOM schema·재생성 drift를 검사한다.
-- [ ] model/cache·credential·업로드 원본·로컬 경로가 tracked/generated
+- [x] model/cache·credential·업로드 원본·로컬 경로가 tracked/generated
   artifact에 없는지 검사한다.
 - [x] 모든 third-party Action을 검증된 full commit SHA와 version 주석으로
   사용한다.
@@ -432,6 +432,16 @@ workflow YAML과 run block 10개 Bash 문법 통과. Gradle strict verification
 check 4건은 모두 성공했으며, backend job에서 Ollama archive·model Gate도 실제
 실행됐다. SBOM·README/Quickstart·OSS file 검증 CI가 아직 없으므로 T-09 전체는
 완료가 아니다.
+
+**현재 T-09 로컬 VERIFY (2026-07-29):**
+`node scripts/verify-oss-readiness.mjs` 단일 명령으로 required OSS file 9개,
+Markdown 37개와 local link 243개, tracked file 295개, Apache-2.0
+`LICENSE`·`NOTICE`, source-only license Gate, Gradle strict verification,
+backend 169개·frontend 183개 SBOM 재생성 무변경, checksum·구조·회귀 테스트
+11건을 확인했다. 외부 링크는 91개 성공, 대회 사이트 1개는 `403`으로
+`INDETERMINATE`, 반복 `404`·`410`은 0개였다. GitHub Actions는 branch가
+push되지 않아 아직 `NOT_RUN`이며, clean checkout 대조와 check URL 기록 전까지
+T-09 전체는 `IMPLEMENTED_UNVERIFIED`다.
 
 ## T-10 — 독립 읽기 전용 감사
 

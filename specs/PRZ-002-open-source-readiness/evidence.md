@@ -320,3 +320,42 @@ LOW 후속 보완은 generated JSON의 LF·마지막 LF 검증과 문서 gate �
 애플리케이션 동작을 변경하지 않은 generator/verifier·문서 보완이므로 전체 unit,
 integration, frontend lint/build는 재실행하지 않았다. Docker, PostgreSQL,
 pgvector, Ollama, OpenSQL, OpenProxy, OpenHA는 모두 `NOT_RUN`이다.
+
+## T-09 OSS readiness local VERIFY — 2026-07-29
+
+**대상:** `PRZ-002-license-sbom-ci` 작업 branch의 미커밋 IMPLEMENT 결과.
+T-08 README·Quickstart 변경이 남아 있는 원래 작업 트리를 건드리지 않기 위해
+`origin/main` `9b6352e75d1b56191322147a3953d5624739f58b`에서 별도 worktree를
+만들었다.
+
+**단일 검증 명령:** `node scripts/verify-oss-readiness.mjs`
+
+| 항목 | 결과 |
+|---|---|
+| required OSS file | PASS — `LICENSE`, `NOTICE`, audit·manifest·SBOM·checksum 9개 |
+| Markdown | PASS — 37개 파일, local link 243개, code fence·trailing whitespace 문제 0건 |
+| tracked-file safety | PASS — 295개; 금지 경로·binary, model cache, 업로드 원본, credential, private key, 사용자 로컬 절대 경로 0건 |
+| source-only license Gate | PASS — Apache-2.0 canonical checksum, NOTICE 저작권, blocker 0건, `UNKNOWN`·`CONFLICT`·`BLOCKED` 차단 상태 확인 |
+| dependency verification | PASS — Gradle `generateBackendSbom --no-daemon --dependency-verification=strict` |
+| SBOM 재생성 | PASS — backend 169개, frontend 183개; committed JSON과 drift 0건 |
+| SBOM 구조·checksum | PASS — CycloneDX 1.6 기본 구조, 필수 component field, canonical hash, 고유 `bom-ref`, LF와 SHA-256 |
+| 회귀 테스트 | PASS — Node 11건, 실패·skip 0건 |
+| 외부 링크 | 91개 성공, 1개 `INDETERMINATE` (`https://www.oss.kr/pages/2`, HTTP 403), 반복 404·410 0개 |
+| `git diff --check` | PASS |
+
+외부 링크 검사는 2xx·3xx를 성공으로, 반복 404·410을 영구 삭제로 판정한다.
+403·429·5xx·timeout·network 오류는 일시 장애 또는 접근 정책 가능성이 있어
+명확한 `INDETERMINATE` 경고로 분리하되 삭제로 오판하지 않는다.
+
+Windows host에서 Java 21.0.6으로 검증기를 시작했으며 Gradle project toolchain은
+Java 17을 대상으로 한다. Node 22.17.0, npm 10.9.2를 사용했다. 첫 sandbox
+실행은 Gradle distribution network 접근이 차단돼 실패했고, 네트워크가 허용된
+동일 명령 재실행은 통과했다.
+
+애플리케이션 동작이나 dependency graph를 바꾸지 않은 CI·검증기 범위이므로
+전체 unit, integration, frontend lint/build는 재실행하지 않았다. Docker,
+PostgreSQL, pgvector, Ollama, OpenSQL, OpenProxy, OpenHA는 모두 `NOT_RUN`이다.
+
+GitHub Actions는 아직 실제 branch가 push되지 않아 `NOT_RUN`이다. clean checkout
+재현, GitHub check URL과 local/GitHub 결과 대조가 끝나기 전에는 T-09를
+`VERIFIED` 또는 완료로 표시하지 않는다.

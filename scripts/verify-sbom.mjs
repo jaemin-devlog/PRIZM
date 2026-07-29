@@ -111,6 +111,17 @@ export function assertCycloneDxValue(fileName, expectedName, value) {
         if (!cycloneDxHashAlgorithms.has(hash?.alg)) {
           fail(`${fileName} contains unsupported CycloneDX hash algorithm ${hash?.alg}`)
         }
+        if (typeof hash?.content !== 'string' || !/^[0-9a-f]+$/i.test(hash.content)) {
+          fail(`${fileName} contains a non-hexadecimal hash at ${path}`)
+        }
+      }
+    }
+  })
+
+  value.components.forEach((component, index) => {
+    for (const field of ['type', 'bom-ref', 'name', 'version']) {
+      if (typeof component?.[field] !== 'string' || !component[field]) {
+        fail(`${fileName} component ${index} is missing ${field}`)
       }
     }
   })
@@ -144,11 +155,7 @@ function assertModelManifest() {
   }
 }
 
-function assertScopeManifest() {
-  const fileName = 'prizm-scope-manifest.json'
-  const { content, value } = readJson(fileName)
-
-  assertNoSensitiveLocalData(fileName, content)
+export function assertScopeManifestValue(value) {
   if (value.format !== 'PRIZM-SBOM-SCOPE-MANIFEST' || value.formatVersion !== '1.0') {
     fail('the SBOM scope manifest format is invalid')
   }
@@ -159,6 +166,24 @@ function assertScopeManifest() {
       fail(`the SBOM scope manifest is missing ${required}`)
     }
   }
+
+  const gate = value.sourceOnlyLicenseGate
+  if (gate?.status !== 'PASS' || !Array.isArray(gate.blockers) || gate.blockers.length !== 0) {
+    fail('the source-only license Gate must be PASS with no blockers')
+  }
+  for (const status of ['UNKNOWN', 'CONFLICT', 'BLOCKED']) {
+    if (!gate.blockingStatuses?.includes(status)) {
+      fail(`the source-only license Gate must block ${status}`)
+    }
+  }
+}
+
+function assertScopeManifest() {
+  const fileName = 'prizm-scope-manifest.json'
+  const { content, value } = readJson(fileName)
+
+  assertNoSensitiveLocalData(fileName, content)
+  assertScopeManifestValue(value)
 }
 
 function sha256(fileName) {

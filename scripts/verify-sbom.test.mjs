@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { assertCanonicalLf, assertCycloneDxValue, verifyRepository } from './verify-sbom.mjs'
+import {
+  assertCanonicalLf,
+  assertCycloneDxValue,
+  assertScopeManifestValue,
+  verifyRepository,
+} from './verify-sbom.mjs'
 
 function minimalBom(componentOverrides = {}) {
   return {
@@ -54,6 +59,43 @@ test('rejects duplicate bom-ref values', () => {
   assert.throws(
     () => assertCycloneDxValue('fixture.cdx.json', 'prizm', bom),
     /duplicate bom-ref pkg:maven\/example\/library@1\.0\.0/,
+  )
+})
+
+test('rejects malformed component fields and hash content', () => {
+  assert.throws(
+    () => assertCycloneDxValue('fixture.cdx.json', 'prizm', minimalBom({ name: '' })),
+    /component 0 is missing name/,
+  )
+  assert.throws(
+    () => assertCycloneDxValue('fixture.cdx.json', 'prizm', minimalBom({
+      hashes: [{ alg: 'SHA-512', content: 'not-hex' }],
+    })),
+    /non-hexadecimal hash/,
+  )
+})
+
+test('rejects a source-only license Gate with blockers', () => {
+  assert.throws(
+    () => assertScopeManifestValue({
+      format: 'PRIZM-SBOM-SCOPE-MANIFEST',
+      formatVersion: '1.0',
+      scopeRecords: [
+        { id: 'backend-runtime' },
+        { id: 'backend-test-build' },
+        { id: 'frontend-runtime-dev-optional' },
+        { id: 'ci-and-github-actions' },
+        { id: 'containers-and-database' },
+        { id: 'ai-model-runtime' },
+        { id: 'fixtures-and-assets' },
+      ],
+      sourceOnlyLicenseGate: {
+        status: 'BLOCKED',
+        blockingStatuses: ['UNKNOWN', 'CONFLICT', 'BLOCKED'],
+        blockers: ['example'],
+      },
+    }),
+    /source-only license Gate must be PASS with no blockers/,
   )
 })
 

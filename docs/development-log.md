@@ -480,3 +480,9 @@
 - 결정: 실제 외부 운영이 시작되지 않은 현재는 G-02 보안 신고 채널, CONTRIBUTING·CODE_OF_CONDUCT·SECURITY·SUPPORT·maintainer 정책과 Issue·PR template을 완료로 꾸미지 않고 `DEFERRED`로 둔다.
 - 재개: G-02와 운영 문서는 외부 기여 접수 또는 첫 지원 release·외부 배포를 준비하는 시점 중 먼저 도래하는 때 실제 비공개 신고 경로부터 확정한다. Issue·PR template은 외부 Issue·PR 접수를 공식 지원하기 전에 재개한다.
 - 현재 Gate: source-only Apache-2.0·NOTICE·SBOM·AI 모델 명세는 유지하고, README·Quickstart·문서 색인, 라이선스·SBOM 검증 CI와 최종 독립 감사를 P0 잔여 작업으로 둔다. 문서 전용 범위 조정이므로 새 spec이나 애플리케이션 검증은 추가하지 않았다.
+
+## 2026-07-29 — PRZ-002 라이선스·SBOM CI 로컬 VERIFY
+
+- 구현: GitHub Actions와 로컬에서 같은 `node scripts/verify-oss-readiness.mjs`를 실행해 OSS 필수 파일, Markdown, source-only license Gate, tracked-file 안전성, strict dependency verification, SBOM 재생성·checksum·구조를 검사하도록 했다.
+- 검증: Markdown 37개·local link 243개, tracked file 295개, backend 169개·frontend 183개 SBOM 무변경과 Node 회귀 테스트 11건을 확인했다. 외부 링크는 91개 성공, 대회 사이트 1개 HTTP 403을 `INDETERMINATE`로 분리했고 반복 404·410은 없었다.
+- 상태: 로컬 Gate는 통과했지만 GitHub Actions는 branch 미push로 `NOT_RUN`이다. clean checkout과 실제 check 대조, 독립 AUDIT 전까지 T-09는 `IMPLEMENTED_UNVERIFIED`다. Docker, PostgreSQL, pgvector, Ollama, OpenSQL, OpenProxy, OpenHA는 사용하지 않았다.

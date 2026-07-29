@@ -341,12 +341,34 @@ select:disabled {
 }
 
 .login-intro {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: flex;
   min-height: 100vh;
   flex-direction: column;
   justify-content: space-between;
   padding: 56px clamp(48px, 7vw, 112px);
   background: var(--prizm-color-surface);
+}
+
+.login-intro::before {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  right: clamp(-360px, -20vw, -216px);
+  width: min(720px, 72vw);
+  height: min(960px, 96vh);
+  content: "";
+  background: url("./assets/career-evidence-network.svg") center / contain no-repeat;
+  opacity: 0.72;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.login-intro > * {
+  position: relative;
+  z-index: 1;
 }
 
 .login-intro-copy {
@@ -1720,6 +1742,10 @@ select:disabled {
     min-height: auto;
     padding: var(--prizm-space-xxl) 48px 0;
     background: var(--prizm-color-canvas);
+  }
+
+  .login-intro::before {
+    display: none;
   }
 
   .login-intro-copy,

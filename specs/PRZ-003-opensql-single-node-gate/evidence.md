@@ -24,6 +24,28 @@
 | GitHub Issue | `NOT_CREATED` | 환경 준비 작업을 소급해 설명하는 Issue는 생성하지 않음. |
 | GitHub PR | `MERGED` | [PR #17](https://github.com/jaemin-devlog/PRIZM/pull/17), source commit `8a633e8`, merge commit `b36f6b2`. |
 
+## 2026-07-29 통합 전 합본 검증
+
+- 대상: 노트북에서 푸시된 `origin/main` `3be415a`와 공개 경계를 정리한
+  `33208b9`의 합본. `origin/main`은 현재 브랜치의 직접 조상이며 누락되거나
+  충돌한 원격 변경은 없다.
+- 환경: Windows host, Java 17, Docker Engine 29.6.2,
+  Testcontainers PostgreSQL·pgvector, Ollama 0.32.3과
+  `bge-m3:latest`를 실제 사용했다. OpenSQL은 이 회귀 검증에 사용하지 않았다.
+- `.\gradlew.bat test --no-daemon`: `PASS`.
+- `npm.cmd --prefix frontend run lint`: `PASS`.
+- `npm.cmd --prefix frontend run build`: `PASS`.
+- `docker compose config --quiet`: `PASS`.
+- `.\gradlew.bat integrationTest --no-daemon --rerun-tasks`: 68건 중
+  실패 1건, 건너뜀 3건으로 `FAIL`. 기존 테스트가 UTF-8 원본을 Windows 기본
+  문자셋으로 비교하면서 `MalformedInputException`이 발생했다.
+- 동일한 합본에서 `JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8`을 일시 지정한
+  전체 통합 테스트는 68건 중 실패 0건, 건너뜀 3건으로 `PASS`했다.
+- 실패 줄은 기존 commit `b9f01b04`에서 도입되어 노트북 최신 변경이나
+  `33208b9`의 회귀는 아니다. 그러나 문서화된 기본 명령이 그대로 통과하지
+  않으므로 상태는 `INTEGRATION_BLOCKED_RETURN_TO_SPEC`이며 `main` 병합 근거로
+  사용하지 않는다.
+
 ## 검증 경계
 
 직접 `SELECT 1` 성공은 설치된 OpenSQL DB endpoint가 기본 인증 질의를 처리했다는

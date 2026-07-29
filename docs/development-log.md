@@ -436,9 +436,9 @@
 
 ## 2026-07-27 — PRZ-003 OpenSQL 단일 검증 VM 착수
 
-- 공식 확인: 티맥스티베로 담당자가 VirtualBox 기반 Rocky Linux 9 VM에서 OpenSQL 테스트 라이선스를 사용할 수 있다고 회신했다. 신청서에는 Windows 호스트가 아니라 VM 내부 hostname 및 vCPU/core/thread 값을 쓰고, VM은 고정 IP와 시간 동기화를 갖춰야 한다.
+- 공식 확인: VM 기반 테스트 라이선스 사용 승인과 필수 환경 조건을 공급사의 서면 답변으로 확인했다. 서신 원문과 정확한 신청값은 Git 밖의 비공개 근거로 보존한다.
 - 범위: `PRZ-003`은 OpenSQL 전용 Rocky Linux 9 VM 한 대와 단일 환경 Gate까지만 다룬다. App VM, OpenProxy/OpenHA, Worker/Ollama 통합과 다중 노드는 제외한다.
-- 구현: 연구실 Windows 호스트에 Oracle VirtualBox 7.2.12를 설치하고 Rocky Linux 9.8 VM을 4 vCPU·12 GiB RAM·동적 120 GiB 디스크로 구성했다. Host-only 고정 IP, NTP 동기화, 재부팅 후 `jaemin`의 관리자 권한을 확인하고 VM 값으로 테스트 라이선스 신청을 제출했다. OpenSQL Gate는 라이선스 발급·OpenSQL 설치 전이므로 계속 `NOT_RUN`이며, PostgreSQL 결과를 OpenSQL 결과로 기록하지 않는다.
+- 구현: 전용 VirtualBox guest에 비공개 host-only 연결과 시간 동기화를 구성하고 guest 기준값으로 테스트 라이선스를 신청했다. 정확한 VM 식별값·자원·계정·주소는 공개 저장소에 기록하지 않는다. 당시 OpenSQL Gate는 설치 전이므로 `NOT_RUN`이었으며, PostgreSQL 결과를 OpenSQL 결과로 기록하지 않았다.
 
 ## 2026-07-26 — PRZ-002 SBOM·AI 모델 명세 구현
 
@@ -517,3 +517,12 @@
 - 변경: 로그인 소개 영역에 문서 카드·근거 연결·검증 표시를 담은 직접 제작 SVG 배경을 추가했다. 텍스트는 배경보다 위에 두고, 장식 요소는 pointer event를 받지 않으며 모바일에서는 숨긴다.
 - 이유: 빈 왼쪽 영역에 PRIZM의 문서 기반 근거 탐색 성격을 전달하되, 외부 사진·일러스트를 도입하지 않고 사용자 입력이나 로그인 흐름을 바꾸지 않기 위해서다.
 - 검증: frontend lint·production build·SVG XML 파싱·`git diff --check`를 통과했다. SVG의 출처·SHA-256과 source-only 배포 경계는 자산 provenance 감사에 기록했다.
+
+## 2026-07-29 — PRZ-003 OpenSQL Single 설치와 공개 경계
+
+- 설치: 공급사가 지정한 Rocky Linux 9.7 VM에서 대회용 OpenSQL `single` 설치와 라이선스 적용을 완료했다. 직접 인증 기본 SQL 질의와 설치 직후 single-node 지원 service health를 확인했다.
+- 제한: 이 결과는 `PASS_INSTALLATION_ONLY`다. PRIZM Flyway·`vector(1024)`·검색·ownership·Worker SQL Gate, OpenProxy 기능 검증, 설치 후 재부팅 지속성과 OpenHA는 `NOT_RUN` 또는 `NOT_VERIFIED`다.
+- 공개 감사: 공개 저장소에 올리기 전 공급 archive·개별 라이선스·fingerprint·비공개 build metadata·installer 내부 오류와 log·설정·credential·key·hostname·IP·CPU 귀속값·사용자 절대 경로를 제거했다. 자산과 상세 진단은 Git 밖의 비공개 근거로만 보존한다.
+- 라이선스 경계: OpenSQL은 `EXTERNAL_PROVIDED_NOT_DISTRIBUTED` runtime으로 기록했다. bundled OSS의 개별 license를 공급사 전용 bundle 전체의 공개 권한으로 간주하지 않는다.
+- 검증: 비공개 식별자와 secret-shaped 값 재검사 결과 0건이었다. `node scripts/verify-oss-readiness.mjs`가 tracked file 안전성, source-only license, SBOM 재생성·checksum·구조, 회귀 test 12건, Markdown과 `git diff --check`를 통과했다. 제품 source 변경이 없어 애플리케이션 test와 PRIZM OpenSQL Gate는 실행하지 않았다.
+- 문서 범위: 활성 `PRZ-003` 안의 설치·공개 경계 교정이므로 새 spec은 만들지 않았다. 제품 source와 Flyway migration은 변경하지 않았다.

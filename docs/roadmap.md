@@ -16,7 +16,7 @@
 |---|---|---|
 | 기존 구현 기준선 | `COMPLETE` | `PRZ-000 AS_BUILT_BASELINE`, `main` 단일 장기 브랜치, 핵심 문서 동기화 |
 | P0 공식 기준·오픈소스 준비 | `IN_PROGRESS` | source register·Apache-2.0·NOTICE·SBOM·AI 명세 완료; T-08의 문서화된 Compose·health 범위 `VERIFY` 완료, PRZ-002 최종 독립 감사·검증 CI 남음. demo `USER` 기반 전체 흐름은 `NOT_RUN` |
-| P1 OpenSQL·clean-clone | `IN_PROGRESS_ENVIRONMENT_READY` | PRZ-003 Rocky Linux VM·라이선스 신청 완료; 실제 OpenSQL Gate와 demo `USER` 기반 clean-clone 전체 사용자 흐름은 `NOT_RUN` |
+| P1 OpenSQL·clean-clone | `IN_PROGRESS_INSTALLATION_READY` | PRZ-003 Rocky Linux 9.7 Single 설치·라이선스 적용·기본 DB 질의 완료; 실제 PRIZM OpenSQL Gate와 demo `USER` 기반 clean-clone 전체 사용자 흐름은 `NOT_RUN` |
 | P2 DB 장애복구 Gate | `NOT_STARTED` | 실제 다중 노드 장애전환과 서비스 연속성 evidence |
 | P3 변경 로그 동기화·MCP | `NOT_STARTED` | 멱등 동기화와 owner-scoped 읽기 전용 MCP 검색 |
 | P4 PRIZM 차별 slice | `NOT_STARTED` | 앞선 Gate 통과 뒤 source가 연결된 최소 CareerFact |
@@ -33,8 +33,8 @@
    Apache-2.0·NOTICE·SBOM·AI 모델 명세와 맞춘다.
 2. T-09에서 라이선스·SBOM 재생성·구조·drift 검증을 CI로 고정하고,
    T-10에서 최종 독립 감사를 통과한다.
-3. 실제 착수한 PRZ-003 OpenSQL 단일 환경 Gate에서 라이선스 발급 뒤
-   OpenSQL을 설치하고 migration·vector·검색·Worker SQL을 검증한다.
+3. 설치가 완료된 PRZ-003 OpenSQL 단일 환경에서 전용 credential을 준비하고
+   migration·vector·검색·Worker SQL Gate를 실행한다.
 4. Clean Clone Demo spec에서 안전한 demo `USER`와 재현 절차를 완성한다.
 5. 실제 다중 노드 구성을 확보해 DB 장애전환·검색 복구 Gate를 수행한다.
 6. 변경 로그 기반 동기화의 최소 수직 슬라이스를 구현·검증한다.

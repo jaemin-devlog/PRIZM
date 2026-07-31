@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.prizm.auth.bootstrap.BcryptPasswordPolicy;
 import com.prizm.auth.dto.request.LoginRequest;
 import com.prizm.auth.dto.response.LoginResponse;
 import com.prizm.auth.exception.InvalidCredentialsException;
@@ -23,11 +25,12 @@ class AuthServiceTest {
     private final UserAccountRepository userAccountRepository = mock(UserAccountRepository.class);
     private final JwtTokenService jwtTokenService = mock(JwtTokenService.class);
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(4);
+    private final BcryptPasswordPolicy passwordPolicy = new BcryptPasswordPolicy(passwordEncoder);
     private AuthService authService;
 
     @BeforeEach
     void setUp() {
-        authService = new AuthService(userAccountRepository, passwordEncoder, jwtTokenService);
+        authService = new AuthService(userAccountRepository, passwordPolicy, jwtTokenService);
     }
 
     @Test
@@ -81,5 +84,23 @@ class AuthServiceTest {
         assertThatThrownBy(() -> authService.login(new LoginRequest("disabled@example.com", "correct-password")))
                 .isInstanceOf(InvalidCredentialsException.class)
                 .hasMessage("Email or password is incorrect");
+    }
+
+    @Test
+    void rejectsPasswordOverBcryptUtf8LimitBeforeLookingUpAccount() {
+        assertThatThrownBy(() -> authService.login(
+                        new LoginRequest("user@example.com", "가".repeat(25))))
+                .isInstanceOf(InvalidCredentialsException.class)
+                .hasMessage("Email or password is incorrect");
+        verifyNoInteractions(userAccountRepository, jwtTokenService);
+    }
+
+    @Test
+    void redactsLoginEmailAndPasswordFromToString() {
+        LoginRequest request = new LoginRequest("user@example.com", "strong-password");
+
+        assertThat(request.toString())
+                .doesNotContain("user@example.com", "strong-password")
+                .contains("email=[REDACTED]", "password=[REDACTED]");
     }
 }

@@ -1,13 +1,18 @@
 # PRIZM 현재 구현 현황
 
-> 현재 검증 기준일: 2026-07-30
+> 현재 검증 기준일: 2026-08-01
 >
-> 구현 기준 source commit: `91949f2cabff8e37c6a6210b3641e4a7c37d2910`
+> 공개 기준 main: `936e957132fcf54b5cee1f58d83f8d591e5786e2`
+>
+> PRZ-004 local source commit: 최종 검증 전에 고정 예정
 >
 > 기존 구현 기준선: `PRZ-000 AS_BUILT_BASELINE`
 >
 > 최종 판단 기준: 소스 코드(source code), Flyway 마이그레이션(migration),
 > 실행 가능한 테스트(test)
+>
+> PRZ-004 local 작업 기준: 구현 중이며 최종 source commit과 두 clean clone의
+> 전체 흐름은 아직 검증 전입니다. 공개 main의 `NOT_RUN` 상태와 구분합니다.
 
 ## 한눈에 보는 현재 상태
 
@@ -15,7 +20,7 @@
 |---|---|
 | 현재 제품 | Spring Boot 애플리케이션과 React 기반 Career Vault Reference App |
 | 구현됨 | 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, 비동기 색인·복구, pgvector 검색, Career Vault 문서 관리 |
-| 현재 단계 | P0 소스 전용(source-only) 준비 완료, P1 진행 중 — OpenSQL 단일 SQL Gate 검증 완료, demo `USER` clean-clone 전체 흐름은 `NOT_RUN` |
+| 현재 단계 | P0 소스 전용(source-only) 준비 완료, P1 진행 중 — OpenSQL 단일 SQL Gate 검증 완료, demo `USER` clean-clone은 local 구현·검증 중이며 공개 main 결과는 `NOT_RUN` |
 | 미구현 | CareerFact, 근거 기반 portfolio, `/api/v1`, MCP, 독립 Engine 패키지, OpenProxy·OpenHA와 DB 장애 전환 |
 
 PRIZM의 장기 목표는 재사용 가능한 Career Intelligence Engine과 Reference App을
@@ -35,8 +40,9 @@ Spring Boot 애플리케이션에 주요 기능이 모여 있습니다.
 ```
 
 새 버전 처리가 실패하면 이전 검색 대상 버전을 유지합니다. 다른 사용자의 문서와
-검색 결과는 이 흐름에 포함하지 않습니다. 신규 사용자가 회원가입부터 검색까지
-완주할 수 있는 안전한 demo `USER` 절차는 아직 없습니다.
+검색 결과는 이 흐름에 포함하지 않습니다. PRZ-004 local 작업은 공개 회원가입을
+추가하지 않고, 한 번만 켜는 demo `USER`와 합성 TXT/PDF로 이 흐름을 재현하도록
+구현 중입니다. 최종 판정은 두 fresh clone 검증 뒤 Evidence에 기록합니다.
 
 ## 구현된 기능
 
@@ -84,6 +90,7 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 | Ollama `bge-m3` | `PASS` — PostgreSQL 회귀 범위 | 2026-07-30 Windows PostgreSQL·pgvector 회귀에서 실제 사용. OpenSQL+Ollama 전체 사용자 흐름은 `NOT_RUN` |
 | OpenSQL 단일 SQL Gate | `PASS` | 2026-07-30 Rocky Linux 9.7 single-node OpenSQL에서 Flyway·vector·검색·소유권·Worker SQL 통과 |
 | OpenProxy·OpenHA | `NOT_RUN` 또는 `NOT_VERIFIED` | 애플리케이션 연결과 DB 장애 전환 검증 없음 |
+| PRZ-004 demo `USER` clean-clone | `IMPLEMENTED_UNVERIFIED` — local 작업 | source·script 구현은 존재하지만 최종 commit의 두 fresh clone API·브라우저 검증 전. 공개 main은 `NOT_RUN` |
 
 세부 실행 환경과 명령은 [PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md),
 [PRZ-002 Evidence](../specs/PRZ-002-open-source-readiness/evidence.md),
@@ -92,7 +99,7 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 
 ## 미구현 기능
 
-- 안전한 demo `USER`와 clean-clone 로그인→업로드→ACTIVE→검색 전체 재현
+- 안전한 demo `USER`와 clean-clone 로그인→업로드→ACTIVE→검색의 공개 main 통합
 - OpenSQL과 Ollama를 함께 사용하는 전체 사용자 흐름
 - OpenProxy 애플리케이션 연결, OpenHA와 DB 장애 전환
 - 변경 로그 기반 동기화와 MCP 검색 API
@@ -103,7 +110,8 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 
 ## 알려진 한계
 
-- README 절차만으로 로그인할 수 있는 안전한 demo `USER`가 없습니다.
+- PRZ-004 local 작업의 demo `USER` 절차는 아직 최종 commit의 두 fresh clone에서
+  검증되지 않았고 공개 main에도 통합되지 않았습니다.
 - 전체 처리 시간과 버전당 최대 chunk 수를 제한하지 않습니다.
 - 프런트엔드 자동 UI 테스트가 없습니다.
 - V13의 일부 제약과 기존 데이터 보정 전용 회귀 테스트가 없습니다.
@@ -116,4 +124,4 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 
 제품 개발 순서는 [개발 로드맵](roadmap.md), 대회 일정과 P0~P10 세부 단계는
 [티맥스티베로 과제 대응 계획](contest/2026-tmaxtibero-plan.md)을 따릅니다.
-가장 가까운 작업은 안전한 demo `USER`를 포함한 clean-clone 전체 흐름입니다.
+가장 가까운 작업은 PRZ-004 clean-clone 전체 흐름의 독립 검증과 GitHub 통합입니다.

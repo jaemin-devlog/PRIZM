@@ -15,14 +15,16 @@ PRIZM은 Spring Boot 애플리케이션과 React Career Vault Reference App으�
 
 소스 전용(source-only) 오픈소스 준비와 실제 OpenSQL single-node SQL Gate는
 완료했습니다. 현재 가장 가까운 목표는 안전한 demo `USER`가 포함된 clean-clone
-전체 사용자 흐름입니다.
+전체 사용자 흐름입니다. PRZ-004 local 작업에는 구현이 있지만 최종 source
+commit의 두 fresh clone 검증과 GitHub 통합은 아직 남아 있습니다.
 
 ## 다음
 
 1. **Clean-clone demo**
-   - 새 사용자가 문서만 보고 설치할 수 있게 안전한 demo `USER`와 합성 TXT/PDF를
-     준비합니다.
-   - 로그인→업로드→처리 완료→검색을 두 번째 깨끗한 환경에서 재현합니다.
+   - local 구현을 최종 source commit으로 고정하고, 안전한 demo `USER`와 합성
+     TXT/PDF의 로그인→업로드→처리 완료→검색을 두 fresh clone에서 재현합니다.
+   - 검증된 Evidence를 GitHub에 통합하기 전까지 공개 main 완료로 표시하지
+     않습니다.
 2. **OpenSQL 전체 사용자 흐름**
    - Spring Boot와 Ollama를 실제 OpenSQL에 연결합니다.
    - 업로드→임베딩→검색을 한 환경에서 검증하고 단일 SQL Gate와 구분해 기록합니다.

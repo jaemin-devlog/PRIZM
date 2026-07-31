@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-class SystemAdminBootstrapRunnerTest {
+class DemoUserBootstrapRunnerTest {
 
     private UserAccountRepository repository;
     private PasswordEncoder passwordEncoder;
@@ -45,95 +45,77 @@ class SystemAdminBootstrapRunnerTest {
     void isNotRegisteredWhenBootstrapIsDisabledByDefault() {
         new ApplicationContextRunner()
                 .withUserConfiguration(BootstrapTestConfiguration.class)
-                .run(context -> assertThat(context).doesNotHaveBean(SystemAdminBootstrapRunner.class));
+                .run(context -> assertThat(context).doesNotHaveBean(DemoUserBootstrapRunner.class));
     }
 
     @Test
-    void createsOneEnabledSystemAdminWithNormalizedEmailAndBcryptHash() throws Exception {
-        BootstrapSystemAdminProperties properties = properties("SYSTEM-ADMIN@Prizm.Local", "strong-password");
-        when(repository.existsByRole(UserRole.SYSTEM_ADMIN)).thenReturn(false);
-        when(repository.findByEmail("system-admin@prizm.local")).thenReturn(Optional.empty());
+    void createsOneEnabledUserWithNormalizedEmailAndBcryptHash() throws Exception {
+        when(repository.findByEmail("user@prizm.local")).thenReturn(Optional.empty());
 
-        runner(properties).run(new DefaultApplicationArguments(new String[0]));
+        runner(properties("USER@Prizm.Local", "strong-password"))
+                .run(new DefaultApplicationArguments(new String[0]));
 
         ArgumentCaptor<UserAccount> captor = ArgumentCaptor.forClass(UserAccount.class);
         verify(repository).saveAndFlush(captor.capture());
         UserAccount saved = captor.getValue();
-        assertThat(saved.getEmail()).isEqualTo("system-admin@prizm.local");
-        assertThat(saved.getRole()).isEqualTo(UserRole.SYSTEM_ADMIN);
+        assertThat(saved.getEmail()).isEqualTo("user@prizm.local");
+        assertThat(saved.getRole()).isEqualTo(UserRole.USER);
         assertThat(saved.isEnabled()).isTrue();
         assertThat(saved.getPasswordHash()).isNotEqualTo("strong-password");
         assertThat(passwordEncoder.matches("strong-password", saved.getPasswordHash())).isTrue();
     }
 
     @Test
-    void rejectsCreationWhenSystemAdminAlreadyExists() {
-        when(repository.existsByRole(UserRole.SYSTEM_ADMIN)).thenReturn(true);
-
-        assertThatThrownBy(() -> runner(properties("system-admin@prizm.local", "strong-password"))
-                        .run(new DefaultApplicationArguments(new String[0])))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("SYSTEM_ADMIN account already exists");
-        verify(repository, never()).saveAndFlush(any());
-    }
-
-    @Test
-    void rejectsCreationWhenEmailAlreadyExistsWithoutChangingAccount() {
+    void rejectsExistingEmailWithoutChangingTheAccount() {
         UserAccount existing = UserAccount.create(
-                "system-admin@prizm.local", passwordEncoder.encode("existing-password"), UserRole.USER);
-        when(repository.existsByRole(UserRole.SYSTEM_ADMIN)).thenReturn(false);
-        when(repository.findByEmail("system-admin@prizm.local")).thenReturn(Optional.of(existing));
+                "user@prizm.local", passwordEncoder.encode("existing-password"), UserRole.SYSTEM_ADMIN);
+        String originalPasswordHash = existing.getPasswordHash();
+        when(repository.findByEmail("user@prizm.local")).thenReturn(Optional.of(existing));
 
-        assertThatThrownBy(() -> runner(properties("system-admin@prizm.local", "strong-password"))
+        assertThatThrownBy(() -> runner(properties("user@prizm.local", "strong-password"))
                         .run(new DefaultApplicationArguments(new String[0])))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("email already exists");
         verify(repository, never()).saveAndFlush(any());
-        assertThat(passwordEncoder.matches("existing-password", existing.getPasswordHash())).isTrue();
+        assertThat(existing.getRole()).isEqualTo(UserRole.SYSTEM_ADMIN);
+        assertThat(existing.isEnabled()).isTrue();
+        assertThat(existing.getPasswordHash()).isEqualTo(originalPasswordHash);
     }
 
     @Test
-    void failsSafelyWhenRequiredSettingsAreMissing() {
-        BootstrapSystemAdminProperties properties = new BootstrapSystemAdminProperties(true, "", "");
-
-        assertThatThrownBy(() -> runner(properties).run(new DefaultApplicationArguments(new String[0])))
+    void rejectsMissingSettingsAndPasswordOverBcryptUtf8LimitBeforeSaving() {
+        assertThatThrownBy(() -> runner(new BootstrapDemoUserProperties(true, "", ""))
+                        .run(new DefaultApplicationArguments(new String[0])))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("email")
                 .hasMessageContaining("password");
+        assertThatThrownBy(() -> runner(properties("user@prizm.local", "가".repeat(25)))
+                        .run(new DefaultApplicationArguments(new String[0])))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Invalid bootstrap demo USER settings: password");
         verify(repository, never()).saveAndFlush(any());
     }
 
     @Test
-    void redactsBootstrapPasswordFromToString() {
-        BootstrapSystemAdminProperties properties = properties("system-admin@prizm.local", "strong-password");
+    void redactsEmailAndPasswordFromToString() {
+        BootstrapDemoUserProperties properties = properties("user@prizm.local", "strong-password");
 
         assertThat(properties.toString())
-                .doesNotContain("system-admin@prizm.local", "strong-password")
+                .doesNotContain("user@prizm.local", "strong-password")
                 .contains("email=[REDACTED]", "password=[REDACTED]");
     }
 
-    @Test
-    void rejectsPasswordOverBcryptUtf8LimitBeforeSaving() {
-        BootstrapSystemAdminProperties properties = properties(
-                "system-admin@prizm.local", "가".repeat(25));
-
-        assertThatThrownBy(() -> runner(properties).run(new DefaultApplicationArguments(new String[0])))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Invalid bootstrap SYSTEM_ADMIN settings: password");
-        verify(repository, never()).saveAndFlush(any());
+    private BootstrapDemoUserProperties properties(String email, String password) {
+        return new BootstrapDemoUserProperties(true, email, password);
     }
 
-    private BootstrapSystemAdminProperties properties(String email, String password) {
-        return new BootstrapSystemAdminProperties(true, email, password);
-    }
-
-    private SystemAdminBootstrapRunner runner(BootstrapSystemAdminProperties properties) {
-        return new SystemAdminBootstrapRunner(properties, repository, passwordPolicy, validator);
+    private DemoUserBootstrapRunner runner(BootstrapDemoUserProperties properties) {
+        return new DemoUserBootstrapRunner(properties, repository, passwordPolicy, validator);
     }
 
     @Configuration(proxyBeanMethods = false)
-    @EnableConfigurationProperties(BootstrapSystemAdminProperties.class)
-    @Import(SystemAdminBootstrapRunner.class)
+    @EnableConfigurationProperties(BootstrapDemoUserProperties.class)
+    @Import(DemoUserBootstrapRunner.class)
     static class BootstrapTestConfiguration {
 
         @Bean

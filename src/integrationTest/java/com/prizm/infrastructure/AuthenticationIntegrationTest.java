@@ -13,9 +13,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.prizm.auth.dto.request.LoginRequest;
+import com.jayway.jsonpath.JsonPath;
+import com.prizm.auth.bootstrap.BcryptPasswordPolicy;
+import com.prizm.auth.bootstrap.BootstrapDemoUserProperties;
 import com.prizm.auth.bootstrap.BootstrapSystemAdminProperties;
+import com.prizm.auth.bootstrap.DemoUserBootstrapRunner;
 import com.prizm.auth.bootstrap.SystemAdminBootstrapRunner;
+import com.prizm.auth.dto.request.LoginRequest;
 import com.prizm.auth.service.AuthService;
 import com.prizm.cleanup.service.FileCleanupCoordinator;
 import com.prizm.document.dto.response.DocumentUploadResponse;
@@ -104,6 +108,9 @@ class AuthenticationIntegrationTest {
     PasswordEncoder passwordEncoder;
 
     @Autowired
+    BcryptPasswordPolicy bcryptPasswordPolicy;
+
+    @Autowired
     JwtEncoder jwtEncoder;
 
     @Autowired
@@ -176,7 +183,7 @@ class AuthenticationIntegrationTest {
                 new BootstrapSystemAdminProperties(
                         true, "SYSTEM-ADMIN@Prizm.Local", "integration-password"),
                 userAccountRepository,
-                passwordEncoder,
+                bcryptPasswordPolicy,
                 validator);
 
         runner.run(new DefaultApplicationArguments(new String[0]));
@@ -186,6 +193,38 @@ class AuthenticationIntegrationTest {
         assertThat(systemAdmin.isEnabled()).isTrue();
         assertThat(systemAdmin.getPasswordHash()).isNotEqualTo("integration-password");
         assertThat(passwordEncoder.matches("integration-password", systemAdmin.getPasswordHash())).isTrue();
+    }
+
+    @Test
+    void bootstrappedDemoUserLogsInThroughHttpAndUsesJwtProtectedRoute() throws Exception {
+        DemoUserBootstrapRunner runner = new DemoUserBootstrapRunner(
+                new BootstrapDemoUserProperties(
+                        true, "DEMO-USER@Prizm.Local", "integration-password"),
+                userAccountRepository,
+                bcryptPasswordPolicy,
+                validator);
+        runner.run(new DefaultApplicationArguments(new String[0]));
+
+        String responseBody = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"demo-user@prizm.local","password":"integration-password"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").isNotEmpty())
+                .andExpect(jsonPath("$.user.email").value("demo-user@prizm.local"))
+                .andExpect(jsonPath("$.user.role").value("USER"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        String accessToken = JsonPath.read(responseBody, "$.accessToken");
+
+        mockMvc.perform(get("/api/users/me")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(accessToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("demo-user@prizm.local"))
+                .andExpect(jsonPath("$.role").value("USER"));
+        assertThat(userAccountRepository.existsByRole(UserRole.SYSTEM_ADMIN)).isFalse();
     }
 
     @Test

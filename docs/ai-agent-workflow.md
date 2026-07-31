@@ -82,7 +82,7 @@ INTEGRATE`를 모두 적용한다.
   통과한 뒤 멈춘다.
 - 단계가 바뀔 때 완료한 일, 현재 작업, 남은 단계와 실패 여부를 알린다.
 - 한 단계의 Gate가 충족되지 않으면 다음 단계나 완료 상태로 넘어가지 않는다.
-- `PASS`, `FAIL`, `NOT_RUN`, `NOT_VERIFIED`,
+- `PASS`, `FAIL`, `SKIPPED`, `NOT_RUN`, `NOT_VERIFIED`,
   `HISTORICAL_PASS_NOT_RERUN`을 서로 바꾸어 쓰지 않는다.
 - 관련 `AGENTS.md`와 사용자 지시가 충돌하면 사용자에게 충돌을 설명하고
   임의로 규칙을 약화하지 않는다.
@@ -202,7 +202,7 @@ Spec acceptance criteria와 변경 위험에 해당하는 검증을 실제 환�
 .\gradlew.bat integrationTest --no-daemon --rerun-tasks
 npm --prefix frontend run lint
 npm --prefix frontend run build
-docker compose config
+docker compose config --quiet
 ```
 
 변경에 따라 OpenSQL, Ollama, 브라우저 E2E, 검색 평가, 라이선스·SBOM 검사와

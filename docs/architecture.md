@@ -1,6 +1,8 @@
 # PRIZM Architecture
 
-> 기준 source commit: `91949f2cabff8e37c6a6210b3641e4a7c37d2910`
+> 공개 기준 main: `936e957132fcf54b5cee1f58d83f8d591e5786e2`
+>
+> PRZ-004 local source commit: 최종 검증 전에 고정 예정
 >
 > 범위: 현재 Spring Boot 애플리케이션과 React Career Vault Reference App
 
@@ -39,6 +41,28 @@ Compose 밖의 호스트에서 실행합니다. 색인 Worker와 파일 정리 W
 - [Spring Boot 설정](../src/main/resources/application.yml)
 - [색인 Scheduler](../src/main/java/com/prizm/ingestion/worker/IndexingScheduler.java)
 - [파일 정리 Scheduler](../src/main/java/com/prizm/cleanup/worker/FileCleanupScheduler.java)
+
+## Clean-clone demo 계정 경계
+
+새 설치에는 공개 회원가입 API가 없습니다. 대신 로컬 실행자가 명시적으로 켠 한
+번의 시작에서만 demo `USER`를 생성합니다. 이 bootstrap은 기본적으로 꺼져 있고,
+역할을 바꾸는 설정도 제공하지 않습니다. 기존 email이 있거나 `SYSTEM_ADMIN`
+bootstrap과 동시에 켜지면 기존 계정을 바꾸지 않고 시작을 실패시킵니다.
+
+demo 계정도 일반 사용자의 로그인, JWT와 DB 사용자 재확인, owner-scoped 문서·검색
+경로를 그대로 사용합니다. 별도 우회 권한은 없습니다. 로컬 실행 도구는 고유한
+Compose project와 비밀값을 생성하고, 계정 생성 뒤 bootstrap을 끈 경우에만 합성
+TXT/PDF smoke를 실행합니다.
+
+근거:
+
+- [demo USER bootstrap](../src/main/java/com/prizm/auth/bootstrap/DemoUserBootstrapRunner.java)
+- [bootstrap 충돌 차단](../src/main/java/com/prizm/auth/bootstrap/BootstrapAccountConflictGuard.java)
+- [BCrypt 입력 경계](../src/main/java/com/prizm/auth/bootstrap/BcryptPasswordPolicy.java)
+- [demo 환경 생성](../scripts/prepare-clean-clone-demo-env.mjs)
+- [clean-clone smoke](../scripts/verify-clean-clone-demo.mjs)
+- [인증 통합 테스트](../src/integrationTest/java/com/prizm/infrastructure/AuthenticationIntegrationTest.java)
+- [PRZ-004 Spec](../specs/PRZ-004-clean-clone-demo/spec.md)
 
 ## 문서 등록부터 검색까지
 

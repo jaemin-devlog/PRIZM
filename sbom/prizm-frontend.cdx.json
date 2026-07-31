@@ -2836,10 +2836,10 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/brace-expansion@5.0.7",
+      "bom-ref": "pkg:npm/brace-expansion@5.0.9",
       "name": "brace-expansion",
-      "version": "5.0.7",
-      "purl": "pkg:npm/brace-expansion@5.0.7",
+      "version": "5.0.9",
+      "purl": "pkg:npm/brace-expansion@5.0.9",
       "properties": [
         {
           "name": "prizm:package-lock-path",
@@ -2853,13 +2853,13 @@
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "ee8172ef4dddc5f637fcd2f10b57e1d925024341fdae6018fb91290d57d78d44d3b3e1c4c11da761aa8bbfe196713b2e9b0c4f7e2cfa0b308d9305f0054c2a08"
+          "content": "49c43822ebc8105d533253fb66dfaf8c9ffff7394f6f64837315b13376e4f2ceade8619d27b28ed5d09c4e274e3c929e3d6df42c4ff6713ef00b23e1a3dfd6c6"
         }
       ],
       "externalReferences": [
         {
           "type": "distribution",
-          "url": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.7.tgz"
+          "url": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.9.tgz"
         }
       ],
       "licenses": [
@@ -5248,10 +5248,10 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/nanoid@3.3.15",
+      "bom-ref": "pkg:npm/nanoid@3.3.16",
       "name": "nanoid",
-      "version": "3.3.15",
-      "purl": "pkg:npm/nanoid@3.3.15",
+      "version": "3.3.16",
+      "purl": "pkg:npm/nanoid@3.3.16",
       "properties": [
         {
           "name": "prizm:package-lock-path",
@@ -5265,13 +5265,13 @@
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "cbb5b282fffb9843afc53b8440307c4ad5dd3110567f5911fed961033051505901da37dc2ce0313bf48798e3b6ce0cf5a5580adbdfe4caea67d39f7f6c21dd8c"
+          "content": "6f394a4f2349efe2dd188230cbc8a316922a11022f69f6a157b798ca427c0af878d8474978e0e827a814257a5026f7a3d4175d1fc3aa4d764d13f29f6d602ef1"
         }
       ],
       "externalReferences": [
         {
           "type": "distribution",
-          "url": "https://registry.npmjs.org/nanoid/-/nanoid-3.3.15.tgz"
+          "url": "https://registry.npmjs.org/nanoid/-/nanoid-3.3.16.tgz"
         }
       ],
       "licenses": [
@@ -5608,10 +5608,10 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/postcss@8.5.16",
+      "bom-ref": "pkg:npm/postcss@8.5.25",
       "name": "postcss",
-      "version": "8.5.16",
-      "purl": "pkg:npm/postcss@8.5.16",
+      "version": "8.5.25",
+      "purl": "pkg:npm/postcss@8.5.25",
       "properties": [
         {
           "name": "prizm:package-lock-path",
@@ -5625,13 +5625,13 @@
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "beec22965be28a57ca66c8345468f947f630c1c1f1e122ec20e23fecaea64245b1fa5e5c5074e38f983401ab1305cc97b1b7d382bc2c50d99551be71570c8fc2"
+          "content": "0d33f1dd15924a75b2ccbc509e51f4ac93fe116e5e925d7a654e3fa6c6c8840d1ee779097dd81a379bca33ec4fef226d5d5bbe9df75516696014310a01ee0fcb"
         }
       ],
       "externalReferences": [
         {
           "type": "distribution",
-          "url": "https://registry.npmjs.org/postcss/-/postcss-8.5.16.tgz"
+          "url": "https://registry.npmjs.org/postcss/-/postcss-8.5.25.tgz"
         }
       ],
       "licenses": [

@@ -20,6 +20,10 @@
     "react": "19.2.7",
     "react-dom": "19.2.7"
   },
+  "overrides": {
+    "brace-expansion": "5.0.9",
+    "postcss": "8.5.25"
+  },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@types/node": "22.17.2",

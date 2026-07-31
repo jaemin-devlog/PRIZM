@@ -1,154 +1,119 @@
 # PRIZM 현재 구현 현황
 
-> 기준일: 2026-07-23
+> 현재 검증 기준일: 2026-07-30
 >
-> 기준선: `PRZ-000 AS_BUILT_BASELINE`
+> 기준 commit: `91949f2cabff8e37c6a6210b3641e4a7c37d2910`
 >
-> 최종 판단 기준: source code, Flyway migration과 실행 가능한 test
+> 기존 구현 기준선: `PRZ-000 AS_BUILT_BASELINE`
+>
+> 최종 판단 기준: 소스 코드(source code), Flyway 마이그레이션(migration),
+> 실행 가능한 테스트(test)
 
-## 한눈에 보기
+## 한눈에 보는 현재 상태
 
 | 구분 | 현재 상태 |
 |---|---|
-| 구현됨 | 로그인, 사용자별 문서 격리, TXT/PDF 업로드, version 관리, 비동기 색인·복구, pgvector 검색, Career Vault 문서 관리 |
-| 현재 단계 | 기존 구현 기준선·P0 공식 요구사항·오픈소스 준비 완료; P1 OpenSQL 단일 SQL Gate 검증 완료, clean-clone 준비 진행 |
-| 미구현 | CareerFact, 근거 기반 portfolio, `/api/v1`, MCP, 독립 Engine package, OpenProxy·OpenHA 및 DB 장애전환 |
+| 현재 제품 | Spring Boot 애플리케이션과 React 기반 Career Vault Reference App |
+| 구현됨 | 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, 비동기 색인·복구, pgvector 검색, Career Vault 문서 관리 |
+| 현재 단계 | P0 소스 전용(source-only) 준비 완료, P1 진행 중 — OpenSQL 단일 SQL Gate 검증 완료, demo `USER` clean-clone 전체 흐름은 `NOT_RUN` |
+| 미구현 | CareerFact, 근거 기반 portfolio, `/api/v1`, MCP, 독립 Engine 패키지, OpenProxy·OpenHA와 DB 장애 전환 |
 
-PRIZM의 목표는 커리어 문서 분석·구조화·근거 검색·portfolio 생성을 위한 오픈소스
-Career Intelligence Engine과 Reference App이다. 현재 저장소는 그 목표 전체가 아니라
-하나의 Spring Boot 애플리케이션과 React **Career Vault Reference App**으로 구현된
-플랫폼 기반이다.
-
-`FileStorage`와 `EmbeddingService` 인터페이스는 존재하지만 PDFBox, 고정 chunker,
-Ollama와 pgvector JDBC 경로는 아직 단일 애플리케이션에 직접 결합되어 있다. 공개
-adapter 체계나 독립 SDK가 구현된 상태는 아니다.
+PRIZM의 장기 목표는 재사용 가능한 Career Intelligence Engine과 Reference App을
+제공하는 것입니다. 현재 저장소는 아직 독립 Engine 패키지가 아니며, 하나의
+Spring Boot 애플리케이션에 주요 기능이 모여 있습니다.
 
 ## 현재 사용자 흐름
 
 ```text
 로그인
 → 내 문서 목록 확인
-→ UTF-8 TXT 또는 text-layer PDF 업로드
-→ 원본·QUARANTINED version·processing job 저장
-→ Worker가 추출·청킹·1024차원 embedding 수행
-→ 성공한 version을 ACTIVE로 원자적 전환
-→ 내 ACTIVE 문서에서 원문과 페이지·텍스트 구간 근거 검색
+→ UTF-8 TXT 또는 텍스트가 포함된 PDF 업로드
+→ 원본과 새 문서 버전 저장
+→ Worker가 텍스트 추출·분할·임베딩 수행
+→ 처리가 끝난 버전을 검색 대상으로 전환
+→ 내 문서에서 원문 위치와 함께 검색 결과 확인
 ```
 
-새 version 처리가 실패해도 기존 `active_version_id`는 유지된다. 다른 사용자의
-document, version, job과 chunk는 검색 후보에 포함되지 않는다.
+새 버전 처리가 실패하면 이전 검색 대상 버전을 유지합니다. 다른 사용자의 문서와
+검색 결과는 이 흐름에 포함하지 않습니다. 신규 사용자가 회원가입부터 검색까지
+완주할 수 있는 안전한 demo `USER` 절차는 아직 없습니다.
 
-## 현재 구현된 기능
+## 구현된 기능
 
-### 인증과 사용자 격리
+### 로그인과 사용자 격리
 
-- 이메일·비밀번호 로그인과 HS256 JWT Access Token
-- stateless Bearer 인증과 명시적으로 설정된 HTTP(S) CORS origin
-- 요청마다 DB에서 사용자 활성 상태·email·role 재확인
-- document, version, processing job과 chunk의 owner 일치 보장
-- 일반 `USER`의 owner-scoped API와 `SYSTEM_ADMIN`의 개인 문서 API 접근 차단
+- 이메일·비밀번호 로그인과 JWT 인증
+- 요청마다 DB에서 사용자 활성 상태·이메일·역할 재확인
+- 사용자별 문서·버전·처리 작업·검색 결과 격리
+- 일반 `USER`와 관리 역할인 `SYSTEM_ADMIN`의 API 권한 분리
 
-회원가입, 일반 `USER` bootstrap, refresh token, OIDC와 API key는 없다.
+### 문서와 버전 관리
 
-### Career Vault Reference App
+- UTF-8 TXT와 비암호화 텍스트 PDF 업로드
+- 문서 목록·필터·상세·수정·삭제와 PDF 열람
+- 원본 파일, SHA-256 해시와 변경 불가능한 버전(immutable version) 보존
+- 새 버전 등록과 처리 완료 뒤 검색 대상 버전(active version) 전환
 
-- `/login`
-- `/career-vault/documents`: 목록·유형/제목/상태 필터, 상세·수정·삭제, version 이력
-- `/career-vault/upload`: TXT/PDF 최초 업로드와 새 version 등록
-- `/career-vault/evidence`: 자연어 질문과 최대 5개 원문 근거
-- owner-scoped PDF thumbnail과 원본 viewer
-- 근거 없음은 “현재 PRIZM에 등록된 문서에서는 관련 근거를 찾지 못했습니다”로 안내
+### 색인과 검색
 
-처리상태 자동 polling, CareerFact 확인과 portfolio 생성은 제공하지 않는다.
-
-### 문서·색인·검색
-
-- UTF-8 TXT와 비암호화 text-layer PDF, 최대 10MiB
-- PDF 최대 300페이지·추출 문자 2,000,000자
-- 12개 `DocumentType`, 생략 시 `OTHER`, owner-scoped type filter
-- 원본 로컬 저장, SHA-256 hash와 immutable version
-- TXT `TEXT_CHUNK`, PDF `PAGE`, 1부터 시작하는 source index와 label
-- Ollama `bge-m3`, 1024차원·finite 값·0보다 큰 L2 norm 검증
-- PostgreSQL pgvector exact cosine `<=>`, owner와 ACTIVE version을 SQL 후보 단계에 적용
-- 단일 검색은 최대 1개이며 결과 없음은 404 `SEARCH_NO_RESULT`
-- Career Evidence는 최대 5개이며 결과 없음은 HTTP 200 빈 배열
-- `score = 1 - distance`; 정확도나 확률로 해석하지 않음
-
-OCR, image-only PDF, DOCX, PPTX, 검색 threshold, ANN index와 검색 기록은 지원하지
-않는다.
+- Ollama `bge-m3`를 이용한 1024차원 임베딩
+- PostgreSQL pgvector 기반 원문 근거 검색
+- TXT 텍스트 구간과 PDF 페이지 위치 반환
+- 단일 검색 결과와 최대 5개의 Career Evidence 결과 제공
+- 근거가 없을 때 등록 문서에서 찾지 못했다고 안내
 
 ### 비동기 처리와 파일 정리
 
-- indexing: 기본 10분 lease, 1/3 주기 heartbeat, `FOR UPDATE SKIP LOCKED`
-- indexing: 최대 3회·1/5/15분 retry/backoff, recovery와 `claim_version` fencing
-- chunk 교체, version ACTIVE, `active_version_id`와 job 완료의 원자적 transaction
-- Cleanup: 기본 5분 lease, heartbeat 없이 retry/backoff·recovery·fencing
-- `SecureDirectoryStream` descriptor-relative 삭제와 symlink·TOCTOU 방어
-- 지원하지 않는 filesystem에서는 안전하지 않은 경로 삭제로 fallback하지 않고 fail-closed
+Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. 오래된 Worker가 최신
+결과를 덮어쓰지 못하도록 보호하며, DB 처리와 원본 파일 정리가 어긋난 경우에는
+별도 정리 작업으로 복구를 시도합니다.
 
-## 현재 API 범위
+구성 요소와 내부 보호 방식은 [Architecture](architecture.md), 설계 선택의 배경과
+트레이드오프는 [대표 문제 해결 사례](showcase/problem-solving-case-studies.md)에서
+확인할 수 있습니다.
 
-| 영역 | endpoint |
-|---|---|
-| 인증 | `POST /api/auth/login`, `GET /api/users/me` |
-| 문서 | `POST/GET /api/documents`, `GET/PATCH/DELETE /api/documents/{documentId}` |
-| version·PDF | `POST /api/documents/{documentId}/versions`, thumbnail·original 조회 |
-| 검색 | `POST /api/search`, `POST /api/career-evidence/search` |
-| 상태 | `GET /actuator/health` |
-
-현재 API는 `/api/v1` public API나 OpenAPI 계약이 아니다. 처리 job 직접 조회·수동
-재시도와 idempotency key도 없다.
-
-## 플랫폼 기준선
-
-- Java 17, Spring Boot 4.1, Gradle Wrapper
-- React, TypeScript와 Vite
-- PostgreSQL 16+pgvector, Flyway V1~V13
-- JPA metadata와 JdbcTemplate vector 검색·job claim
-- Apache PDFBox와 host Ollama `bge-m3`
-- 로컬 filesystem 원본 저장
-
-적용된 Flyway migration은 수정하지 않고 이후 변경을 forward migration으로 추가한다.
-
-## 검증 상태
+## 부분 검증과 환경별 상태
 
 | 대상 | 상태 | 최근 기록 |
 |---|---|---|
-| Backend `test` task | `PASS` | 242건 중 228건 성공, 환경 조건 14건 skip, 실패·오류 0건 |
+| Backend `test` task | `PASS` | 2026-07-30 실제 245건 재실행, 환경 조건 14건 skip, 실패·오류 0건 |
 | Frontend lint·build | `PASS` | ESLint와 production build 통과 |
-| PostgreSQL·pgvector integration | `HISTORICAL_PASS_NOT_RERUN` | 기존 성공 기록은 있으나 2026-07-23 기준선 작업에서 재실행하지 않음 |
+| PostgreSQL·pgvector integration | `PASS` | 2026-07-30 Windows에서 68건 재실행, 환경 조건 3건 skip, 실패·오류 0건. OpenSQL 결과가 아님 |
 | Dense 검색 평가 | `HISTORICAL_PASS_NOT_RERUN` | 2026-07-14 합성 기준선 보존 |
-| Docker Compose | `PASS` | 2026-07-29 clean-clone에서 config·build·기동과 backend·frontend health 확인. demo `USER` 기반 전체 사용자 흐름은 `NOT_RUN` |
-| Ollama `bge-m3` | `NOT_RUN` | 기준선 문서 작업에서 사용하지 않음 |
-| OpenSQL 단일 SQL Gate | `PASS` | 2026-07-30 실제 Rocky Linux 9.7 single-node OpenSQL에서 Flyway·vector·검색·ownership·Worker SQL 통과; 세부 근거는 PRZ-003 evidence |
-| OpenProxy·OpenHA | `NOT_RUN` 또는 `NOT_VERIFIED` | runtime 연결과 DB 장애전환 검증 없음 |
+| Docker Compose | `PASS` | 2026-07-29 clean-clone에서 구성·빌드·기동과 backend·frontend 상태 확인. demo `USER` 전체 흐름은 `NOT_RUN` |
+| Ollama `bge-m3` | `PASS` — PostgreSQL 회귀 범위 | 2026-07-30 Windows PostgreSQL·pgvector 회귀에서 실제 사용. OpenSQL+Ollama 전체 사용자 흐름은 `NOT_RUN` |
+| OpenSQL 단일 SQL Gate | `PASS` | 2026-07-30 Rocky Linux 9.7 single-node OpenSQL에서 Flyway·vector·검색·소유권·Worker SQL 통과 |
+| OpenProxy·OpenHA | `NOT_RUN` 또는 `NOT_VERIFIED` | 애플리케이션 연결과 DB 장애 전환 검증 없음 |
 
-세부 환경별 결과와 코드·test 연결은
-[PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md), T-08 clean-clone
-결과는 [PRZ-002 Evidence](../specs/PRZ-002-open-source-readiness/evidence.md)를 기준으로 한다.
+세부 실행 환경과 명령은 [PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md),
+[PRZ-002 Evidence](../specs/PRZ-002-open-source-readiness/evidence.md),
+[PRZ-003 Evidence](../specs/PRZ-003-opensql-single-node-gate/evidence.md)에서
+확인합니다. PostgreSQL·pgvector 결과를 OpenSQL 결과로 바꾸어 표현하지 않습니다.
+
+## 미구현 기능
+
+- 안전한 demo `USER`와 clean-clone 로그인→업로드→ACTIVE→검색 전체 재현
+- OpenSQL과 Ollama를 함께 사용하는 전체 사용자 흐름
+- OpenProxy 애플리케이션 연결, OpenHA와 DB 장애 전환
+- 변경 로그 기반 동기화와 MCP 검색 API
+- CareerFact 후보·확인·거절과 `INSUFFICIENT_EVIDENCE`
+- 검증된 CareerFact를 이용한 JSON·Markdown portfolio와 source manifest
+- `/api/v1`, OpenAPI, webhook/outbox
+- 독립 Engine artifact와 기관용 workspace·권한
 
 ## 알려진 한계
 
-- README 절차만으로 사용할 수 있는 안전한 demo `USER`가 없다.
-- 전체 처리 timeout과 version당 최대 chunk 수 제한이 없다.
-- 프런트엔드 자동 UI test suite가 없다.
-- V13에 `claim_version >= 0` CHECK와 populated V12 row backfill 전용 회귀 test가 없다.
-- 일부 JavaDoc이 현재 TXT/PDF 공통 동작을 TXT 전용으로 설명한다.
-- `SecureDirectoryStream` 미지원 filesystem에서는 자동 Cleanup이 동작하지 않을 수 있다.
-- 실제 OpenSQL 단일 SQL Gate는 통과했지만, OpenProxy runtime·OpenHA/DB 장애전환·Ollama 색인과 browser 전체 흐름은 검증하지 않았다.
+- README 절차만으로 로그인할 수 있는 안전한 demo `USER`가 없습니다.
+- 전체 처리 시간과 버전당 최대 chunk 수를 제한하지 않습니다.
+- 프런트엔드 자동 UI 테스트가 없습니다.
+- V13의 일부 제약과 기존 데이터 보정 전용 회귀 테스트가 없습니다.
+- 일부 JavaDoc이 TXT/PDF 공통 동작을 TXT 전용으로 설명합니다.
+- 일부 파일시스템에서는 안전 조건을 충족하지 못해 자동 파일 정리를 중단합니다.
+- OpenSQL 단일 SQL Gate는 통과했지만 OpenSQL+Ollama·브라우저 전체 흐름과
+  OpenProxy·OpenHA·DB 장애 전환은 검증하지 않았습니다.
 
-## 계획 기능: 현재 구현 아님
+## 다음 우선순위
 
-- 안전한 demo `USER`와 이를 이용한 clean-clone 로그인→업로드→ACTIVE→검색 전체 재현
-- canonical source, quote hash와 처리 provenance
-- CareerFact 후보·확인·거절과 `INSUFFICIENT_EVIDENCE`
-- 검증된 CareerFact만 사용하는 JSON·Markdown portfolio와 source manifest
-- `/api/v1`, OpenAPI, MCP와 webhook/outbox
-- 독립 Engine artifact, Spring Boot starter와 adapter contract test kit
-- workspace, career profile, membership와 기관 권한
-- 여러 vector DB·embedding·object storage adapter
-- OpenProxy·OpenHA 호환성과 DB 장애전환
-
-앞으로의 순서는 [개발 로드맵](roadmap.md), 대회 일정은
-[티맥스티베로 과제 대응 계획](contest/2026-tmaxtibero-plan.md)을 따른다. 전체 문서
-안내는 [문서 안내](README.md)에서 확인한다.
+제품 개발 순서는 [개발 로드맵](roadmap.md), 대회 일정과 P0~P10 세부 단계는
+[티맥스티베로 과제 대응 계획](contest/2026-tmaxtibero-plan.md)을 따릅니다.
+가장 가까운 작업은 안전한 demo `USER`를 포함한 clean-clone 전체 흐름입니다.

@@ -1,5 +1,9 @@
 # PRIZM 2026 license·provenance 감사
 
+> 현재 source-only 배포의 사람이 읽는 최종 결론은
+> [2026 compliance](2026-compliance.md)에 있다. 이 문서는 그 결론의 상세
+> inventory와 판정 근거를 보존한다.
+
 ## 문서 상태
 
 | 항목 | 값 |
@@ -154,8 +158,9 @@ manifest/blob Gate를 거친 뒤 `./gradlew check --no-daemon
 있으나 현재 graph가 아니므로 `STALE_CACHE_EVIDENCE`로 제외했다. 이를 현재
 dependency라고 주장하지 않는다.
 
-Java 쪽에서 즉시 incompatible하다고 확정된 license는 없지만 다음 이유로
-release는 아직 `BLOCKED`다.
+Java 쪽에서 즉시 incompatible하다고 확정된 license는 없다. 다만 다음 이유로
+future fat JAR·binary release는 아직 `BLOCKED`다. 이 판정은 현재 source-only
+배포를 막는 blocker가 아니다.
 
 - 실제 `bootJar`를 만들지 않아 fat JAR의 third-party `LICENSE`·`NOTICE`
   보존 여부를 확인하지 않았다.
@@ -325,338 +330,46 @@ token 이름을 제거하고 독립 PRIZM 체계로 교체했다. 따라서
 [자산 감사](2026-asset-provenance-audit.md)의 외부 design rights blocker는
 해소됐다.
 
-## 전수 component identity 부록
+## Machine inventory 경계
 
-이 부록은 family 요약만으로 개별 component가 빠져 보이지 않도록 실제 해석
-결과를 component identity 단위로 고정한다. 공통 규칙은 다음과 같다.
+패키지별 전체 identity, exact version, PURL, license expression, source URL과
+artifact checksum은 사람용 문서에 복제하지 않는다. 다음 machine file을 단일
+원본으로 사용한다.
 
-- 검증일은 모두 2026-07-24이다.
-- Java의 upstream과 license 근거는 Gradle이 해석한 Maven coordinate의 POM,
-  해당 JAR의 `META-INF` license·NOTICE, 그리고 위 family 표에 연결한 공식
-  upstream을 교차 확인했다. `G`는 성공한 Gradle dependency tree, `P`는
-  POM, `J`는 JAR 내부 근거를 뜻한다.
-- Java runtime component는 initial source-only 경계에서 binary로 배포하지
-  않고 사용자의 build가 upstream에서 내려받는다. test·build component도
-  `NOT_DISTRIBUTED` 대상이다. 단, Gradle Wrapper는 공개 source에 포함된다.
-- 직접 선언은 위 `JAVA-DIRECT-*` 표와 일치하는 component이고, 나머지는
-  transitive이다. Maven BOM·platform은 실행 코드가 아닌 version alignment
-  metadata이다.
-- NOTICE의 `Y`는 artifact에서 NOTICE 또는 THIRD-PARTY 문서를 확인했다는
-  뜻이고, `N`은 확인한 artifact에서 발견하지 못했다는 뜻이다. `N`을
-  “고지 의무 없음”으로 해석하지 않는다. `MIXED`는 같은 family 일부에만
-  고지가 있음을 뜻한다.
+| 기록 | 형식 | 현재 수 |
+|---|---|---:|
+| [backend runtime SBOM](../../sbom/prizm-backend-runtime.cdx.json) | CycloneDX 1.6 | 169 components |
+| [frontend SBOM](../../sbom/prizm-frontend.cdx.json) | CycloneDX 1.6 | 183 components |
+| [AI model manifest](../../sbom/prizm-ai-model-manifest.json) | PRIZM manifest 1.0 | 4 records |
+| [scope manifest](../../sbom/prizm-scope-manifest.json) | PRIZM manifest 1.0 | 7 scope records |
+| [generated-file checksums](../../sbom/SHA256SUMS) | SHA-256 | 위 네 JSON file의 4 checksums |
 
-### Java runtime exact set — 167개
+backend 사람용 감사의 167 module identity에는 물리 JAR이 없는 platform/BOM
+2개가 포함된다. 한편 `netty-codec-native-quic` 한 module은 platform classifier
+JAR 5개로 해소된다. 따라서 artifact SBOM은
+`167 - 2 + (5 - 1) = 169` components다. frontend lockfile과 machine SBOM은
+모두 183 entries다.
 
-| Group | Exact component identities | SPDX / evidence | NOTICE | Status·purpose |
-|---|---|---|---|---|
-| logback | `ch.qos.logback:logback-classic:1.5.34`, `ch.qos.logback:logback-core:1.5.34` | `EPL-2.0 OR LGPL-2.1-only`; G/P | N | `VERIFIED`; logging, 선택 경로 기록 필요 |
-| time | `com.ethlo.time:itu:1.14.0` | `Apache-2.0`; G/P/J | Y | `VERIFIED`; time utility |
-| Jackson 2 annotation support | `com.fasterxml:classmate:1.7.3`, `com.fasterxml.jackson.core:jackson-annotations:2.21` | `Apache-2.0`; G/P/J | Y | `VERIFIED`; reflection·JSON annotation |
-| Victools | `com.github.victools:jsonschema-generator:5.0.0`, `jsonschema-module-jackson:5.0.0`, `jsonschema-module-swagger-2:5.0.0` | `Apache-2.0`; G/P | N | `VERIFIED`; schema generation |
-| token·schema | `com.knuddels:jtokkit:1.1.0`, `com.networknt:json-schema-validator:3.0.1` | `MIT`; `Apache-2.0`; G/P | N | `VERIFIED`; token counting·schema validation |
-| JWT | `com.nimbusds:nimbus-jose-jwt:10.9` | `Apache-2.0`; G/P | N | `VERIFIED`; JWT validation |
-| Istack·pool | `com.sun.istack:istack-commons-runtime:4.1.2`, `com.zaxxer:HikariCP:7.0.2` | EDL text=`BSD-3-Clause`; `Apache-2.0`; G/P | N | `VERIFIED`; JAXB helper·connection pool |
-| Commons logging | `commons-logging:commons-logging:1.3.6` | `Apache-2.0`; G/P/J | Y | `VERIFIED`; logging bridge |
-| Micrometer | `io.micrometer:context-propagation:1.2.1`, `micrometer-commons:1.17.0`, `micrometer-core:1.17.0`, `micrometer-jakarta9:1.17.0`, `micrometer-observation:1.17.0` | `Apache-2.0`; G/P/J | Y | `VERIFIED`; metrics·observation |
-| Netty | `io.netty:netty-buffer:4.2.15.Final`, `netty-codec-base:4.2.15.Final`, `netty-codec-classes-quic:4.2.15.Final`, `netty-codec-compression:4.2.15.Final`, `netty-codec-dns:4.2.15.Final`, `netty-codec-http:4.2.15.Final`, `netty-codec-http2:4.2.15.Final`, `netty-codec-http3:4.2.15.Final`, `netty-codec-native-quic:4.2.15.Final`, `netty-codec-socks:4.2.15.Final`, `netty-common:4.2.15.Final`, `netty-handler:4.2.15.Final`, `netty-handler-proxy:4.2.15.Final`, `netty-resolver:4.2.15.Final`, `netty-resolver-dns:4.2.15.Final`, `netty-resolver-dns-classes-macos:4.2.15.Final`, `netty-resolver-dns-native-macos:4.2.15.Final`, `netty-transport:4.2.15.Final`, `netty-transport-classes-epoll:4.2.15.Final`, `netty-transport-native-epoll:4.2.15.Final`, `netty-transport-native-unix-common:4.2.15.Final` | `Apache-2.0`; G/P/J | MIXED | `VERIFIED`; reactive HTTP transport |
-| Reactor | `io.projectreactor:reactor-core:3.8.6`, `io.projectreactor.netty:reactor-netty-core:1.3.6`, `reactor-netty-http:1.3.6` | `Apache-2.0`; G/P | N | `VERIFIED`; reactive runtime |
-| Swagger | `io.swagger.core.v3:swagger-annotations-jakarta:2.2.38` | `Apache-2.0`; G/P/J | Y | `VERIFIED`; schema annotation |
-| Jakarta API | `jakarta.activation:jakarta.activation-api:2.1.4`, `jakarta.annotation:jakarta.annotation-api:3.0.0`, `jakarta.inject:jakarta.inject-api:2.0.1`, `jakarta.persistence:jakarta.persistence-api:3.2.0`, `jakarta.transaction:jakarta.transaction-api:2.0.1`, `jakarta.validation:jakarta.validation-api:3.1.1`, `jakarta.xml.bind:jakarta.xml.bind-api:4.0.5` | EDL text=`BSD-3-Clause`; `EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0`; `Apache-2.0`; `EPL-2.0 OR BSD-3-Clause`; G/P/J | MIXED | `VERIFIED`; Java APIs, 복수 license 경로 기록 필요 |
-| Byte Buddy | `net.bytebuddy:byte-buddy:1.18.10` | `Apache-2.0`; G/P/J | Y | `VERIFIED`; bytecode |
-| ANTLR | `org.antlr:antlr4-runtime:4.13.2`, `antlr-runtime:3.5.3`, `ST4:4.3.4` | `BSD-3-Clause`; G/P/J | N | `VERIFIED`; parser·template |
-| Log4j bridge | `org.apache.logging.log4j:log4j-api:2.25.4`, `log4j-to-slf4j:2.25.4` | `Apache-2.0`; G/P/J | Y | `VERIFIED`; logging |
-| PDFBox | `org.apache.pdfbox:fontbox:3.0.3`, `pdfbox:3.0.3`, `pdfbox-io:3.0.3` | `Apache-2.0`; G/P/J | Y | `VERIFIED`, `NOTICE_REQUIRED`; PDF ingestion |
-| Tomcat | `org.apache.tomcat.embed:tomcat-embed-core:11.0.22`, `tomcat-embed-el:11.0.22`, `tomcat-embed-websocket:11.0.22` | `Apache-2.0`; G/P/J | Y | `VERIFIED`; servlet server |
-| AspectJ | `org.aspectj:aspectjweaver:1.9.25.1` | `EPL-2.0`; G/P | N | `VERIFIED`; weaving |
-| Angus | `org.eclipse.angus:angus-activation:2.0.3` | EDL text=`BSD-3-Clause`; G/P/J | Y | `VERIFIED`; activation implementation |
-| Flyway | `org.flywaydb:flyway-core:12.4.0`, `flyway-database-postgresql:12.4.0` | `Apache-2.0`; G/P, core J | N | `VERIFIED`; migration, DB module은 parent POM 근거 |
-| JAXB | `org.glassfish.jaxb:jaxb-core:4.0.9`, `jaxb-runtime:4.0.9`, `txw2:4.0.9` | EDL text=`BSD-3-Clause`; G/P/J | Y | `VERIFIED`; XML binding |
-| Histogram | `org.hdrhistogram:HdrHistogram:2.2.2` | `CC0-1.0 OR BSD-2-Clause`; G/P | N | `VERIFIED`; metrics, 선택 경로 기록 필요 |
-| Hibernate | `org.hibernate.models:hibernate-models:1.1.1`, `org.hibernate.orm:hibernate-core:7.4.1.Final`, `hibernate-platform:7.4.1.Final`, `org.hibernate.validator:hibernate-validator:9.1.0.Final` | `Apache-2.0`; G/P | N | `VERIFIED`; ORM·validation, platform은 metadata |
-| JBoss·JSpecify | `org.jboss.logging:jboss-logging:3.6.3.Final`, `org.jspecify:jspecify:1.0.0` | `Apache-2.0`; G/P | N | `VERIFIED`; logging API·nullness annotation |
-| PostgreSQL JDBC | `org.postgresql:postgresql:42.7.11` | `BSD-2-Clause`; G/P/J | Y | `VERIFIED`; DB driver, shaded license 보존 필요 |
-| Reactive Streams | `org.reactivestreams:reactive-streams:1.0.4` | `MIT-0`; G/P | N | `VERIFIED`; reactive API |
-| SLF4J | `org.slf4j:jul-to-slf4j:2.0.18`, `slf4j-api:2.0.18` | `MIT`; G/P | N | `VERIFIED`; logging façade |
-| Spring Framework | `org.springframework:spring-aop:7.0.8`, `spring-aspects:7.0.8`, `spring-beans:7.0.8`, `spring-context:7.0.8`, `spring-core:7.0.8`, `spring-expression:7.0.8`, `spring-jdbc:7.0.8`, `spring-messaging:7.0.8`, `spring-orm:7.0.8`, `spring-tx:7.0.8`, `spring-web:7.0.8`, `spring-webflux:7.0.8`, `spring-webmvc:7.0.8` | `Apache-2.0`; G/P/J | Y | `VERIFIED`; application framework |
-| Spring AI | `org.springframework.ai:spring-ai-autoconfigure-model-chat-client:2.0.0`, `spring-ai-autoconfigure-model-chat-memory:2.0.0`, `spring-ai-autoconfigure-model-chat-observation:2.0.0`, `spring-ai-autoconfigure-model-embedding-observation:2.0.0`, `spring-ai-autoconfigure-model-ollama:2.0.0`, `spring-ai-autoconfigure-model-tool:2.0.0`, `spring-ai-autoconfigure-retry:2.0.0`, `spring-ai-client-chat:2.0.0`, `spring-ai-commons:2.0.0`, `spring-ai-model:2.0.0`, `spring-ai-ollama:2.0.0`, `spring-ai-retry:2.0.0`, `spring-ai-starter-model-ollama:2.0.0`, `spring-ai-template-st:2.0.0` | `Apache-2.0`; G/P | N in inspected starter JAR | `VERIFIED`; Ollama embedding integration |
-| Spring Boot | `org.springframework.boot:spring-boot:4.1.0`, `spring-boot-actuator:4.1.0`, `spring-boot-actuator-autoconfigure:4.1.0`, `spring-boot-autoconfigure:4.1.0`, `spring-boot-data-commons:4.1.0`, `spring-boot-data-jpa:4.1.0`, `spring-boot-flyway:4.1.0`, `spring-boot-health:4.1.0`, `spring-boot-hibernate:4.1.0`, `spring-boot-http-client:4.1.0`, `spring-boot-http-codec:4.1.0`, `spring-boot-http-converter:4.1.0`, `spring-boot-jackson:4.1.0`, `spring-boot-jdbc:4.1.0`, `spring-boot-jpa:4.1.0`, `spring-boot-micrometer-metrics:4.1.0`, `spring-boot-micrometer-observation:4.1.0`, `spring-boot-persistence:4.1.0`, `spring-boot-reactor:4.1.0`, `spring-boot-restclient:4.1.0`, `spring-boot-security:4.1.0`, `spring-boot-security-oauth2-resource-server:4.1.0`, `spring-boot-servlet:4.1.0`, `spring-boot-sql:4.1.0`, `spring-boot-starter:4.1.0`, `spring-boot-starter-actuator:4.1.0`, `spring-boot-starter-data-jpa:4.1.0`, `spring-boot-starter-flyway:4.1.0`, `spring-boot-starter-jackson:4.1.0`, `spring-boot-starter-jdbc:4.1.0`, `spring-boot-starter-logging:4.1.0`, `spring-boot-starter-micrometer-metrics:4.1.0`, `spring-boot-starter-oauth2-resource-server:4.1.0`, `spring-boot-starter-restclient:4.1.0`, `spring-boot-starter-security:4.1.0`, `spring-boot-starter-tomcat:4.1.0`, `spring-boot-starter-tomcat-runtime:4.1.0`, `spring-boot-starter-validation:4.1.0`, `spring-boot-starter-webclient:4.1.0`, `spring-boot-starter-webmvc:4.1.0`, `spring-boot-tomcat:4.1.0`, `spring-boot-transaction:4.1.0`, `spring-boot-validation:4.1.0`, `spring-boot-webclient:4.1.0`, `spring-boot-webmvc:4.1.0`, `spring-boot-web-server:4.1.0` | `Apache-2.0`; G/P/J | Y in inspected JARs | `VERIFIED`; application framework |
-| Spring Data·Security | `org.springframework.data:spring-data-commons:4.1.0`, `spring-data-jpa:4.1.0`, `org.springframework.security:spring-security-config:7.1.0`, `spring-security-core:7.1.0`, `spring-security-crypto:7.1.0`, `spring-security-oauth2-core:7.1.0`, `spring-security-oauth2-jose:7.1.0`, `spring-security-oauth2-resource-server:7.1.0`, `spring-security-web:7.1.0` | `Apache-2.0`; G/P/J | MIXED | `VERIFIED`; persistence·authorization |
-| SnakeYAML | `org.yaml:snakeyaml:2.6` | `Apache-2.0`; G/P | N | `VERIFIED`; YAML parsing |
-| Jackson 3 | `tools.jackson:jackson-bom:3.1.4`, `tools.jackson.core:jackson-core:3.1.4`, `jackson-databind:3.1.4` | `Apache-2.0`; G/P/J | Y for JARs | `VERIFIED`; JSON, BOM은 metadata |
+test·build dependency의 재현 가능한 identity와 checksum은
+[Gradle dependency verification metadata](../../gradle/verification-metadata.xml)가
+단일 원본이다. 전체 component 목록을 확인하거나 변경할 때는
+[SBOM 사용 안내](../../sbom/README.md)에 적힌 생성·검증 절차를 따른다.
 
-### Java test-only delta — 50개
+사람용 감사에서 확인한 수는 runtime module identity 167개,
+`testRuntimeClasspath` 217개(runtime에 test-only 50개 추가)다.
+`buildEnvironment`는 고유 coordinate 26개였고 test graph와 겹치지 않는
+build-only identity는 20개였다. annotation processor 1개까지 합친 중복 제거
+Maven component union은 `217 + 20 + 1 = 238`개다. Gradle Wrapper `9.5.1`은
+별도 non-Maven component다.
 
-아래 목록을 runtime 167개에 더하면 `testRuntimeClasspath` 217개 전부가 된다.
-관계는 모두 test transitive이며, 직접 test 선언에서 시작한 family는 위
-`JAVA-DIRECT-TEST`에 표시했다. 배포 상태는 모두 `NOT_DISTRIBUTED`이다.
-
-| Group | Exact component identities | SPDX / evidence | NOTICE | Status·purpose |
-|---|---|---|---|---|
-| Docker Java | `com.github.docker-java:docker-java-api:3.7.1`, `docker-java-transport:3.7.1`, `docker-java-transport-zerodep:3.7.1` | `Apache-2.0`; G/P/J | MIXED | `VERIFIED`; Testcontainers transport |
-| H2 | `com.h2database:h2:2.4.240` | `MPL-2.0 OR EPL-1.0`; G/P | N | `VERIFIED`; test DB, 선택 경로 기록 필요 |
-| JSON Path | `com.jayway.jsonpath:json-path:2.10.0` | `Apache-2.0`; G/P | N | `VERIFIED`; assertion |
-| Android JSON | `com.vaadin.external.google:android-json:0.0.20131108.vaadin1` | `Apache-2.0`; G/P | N | `VERIFIED`; JSON test |
-| Apache Commons | `commons-codec:commons-codec:1.21.0`, `commons-io:commons-io:2.20.0`, `org.apache.commons:commons-compress:1.28.0`, `commons-lang3:3.20.0` | `Apache-2.0`; G/P/J | Y | `VERIFIED`; test utilities |
-| Byte Buddy agent | `net.bytebuddy:byte-buddy-agent:1.18.10` | `Apache-2.0`; G/P/J | Y | `VERIFIED`; mocking |
-| JNA | `net.java.dev.jna:jna:5.18.1` | `Apache-2.0 OR LGPL-2.1-or-later`; G/P/J | Y | `VERIFIED`; Docker native access, 선택 경로 기록 필요 |
-| JSON Smart | `net.minidev:accessors-smart:2.6.0`, `json-smart:2.6.0` | `Apache-2.0`; G/P | N | `VERIFIED`; JSON test |
-| Assertions | `org.assertj:assertj-core:3.27.7`, `org.awaitility:awaitility:4.3.0` | `Apache-2.0`; G/P | N | `VERIFIED`; assertions·waiting |
-| Hamcrest | `org.hamcrest:hamcrest:3.0` | `BSD-3-Clause`; G/P | N | `VERIFIED`; matcher |
-| JetBrains annotations | `org.jetbrains:annotations:17.0.0` | `Apache-2.0`; G/P | N | `VERIFIED`; annotation |
-| JUnit | `org.junit:junit-bom:6.0.3`, `org.junit.jupiter:junit-jupiter:6.0.3`, `junit-jupiter-api:6.0.3`, `junit-jupiter-engine:6.0.3`, `junit-jupiter-params:6.0.3`, `org.junit.platform:junit-platform-commons:6.0.3`, `junit-platform-engine:6.0.3`, `junit-platform-launcher:6.0.3` | `EPL-2.0`; G/P | N | `VERIFIED`; tests, BOM은 metadata |
-| Mockito | `org.mockito:mockito-core:5.23.0`, `mockito-junit-jupiter:5.23.0` | `MIT`; G/P | N | `VERIFIED`; mocks |
-| Objenesis·OpenTest4J | `org.objenesis:objenesis:3.3`, `org.opentest4j:opentest4j:1.3.0` | `Apache-2.0`; G/P/J | MIXED | `VERIFIED`; object creation·test API |
-| ASM | `org.ow2.asm:asm:9.7.1` | `BSD-3-Clause`; G/P | N | `VERIFIED`; bytecode test support |
-| Duct Tape | `org.rnorth.duct-tape:duct-tape:1.0.8` | `MIT`; G/P | N | `VERIFIED`; Testcontainers retry |
-| JSONassert | `org.skyscreamer:jsonassert:1.5.3` | `Apache-2.0`; G/P | N | `VERIFIED`; JSON assertion |
-| Spring test | `org.springframework:spring-test:7.0.8`, `org.springframework.security:spring-security-test:7.1.0` | `Apache-2.0`; G/P/J | MIXED | `VERIFIED`; Spring security tests |
-| Spring Boot test | `org.springframework.boot:spring-boot-resttestclient:4.1.0`, `spring-boot-starter-jackson-test:4.1.0`, `spring-boot-starter-test:4.1.0`, `spring-boot-starter-webmvc-test:4.1.0`, `spring-boot-test:4.1.0`, `spring-boot-test-autoconfigure:4.1.0`, `spring-boot-testcontainers:4.1.0`, `spring-boot-webmvc-test:4.1.0` | `Apache-2.0`; G/P/J | Y | `VERIFIED`; test framework |
-| Testcontainers | `org.testcontainers:testcontainers:2.0.5`, `testcontainers-bom:2.0.5`, `testcontainers-database-commons:2.0.5`, `testcontainers-jdbc:2.0.5`, `testcontainers-junit-jupiter:2.0.5`, `testcontainers-postgresql:2.0.5` | `MIT`; G/P | N in inspected top JAR | `VERIFIED`; integration tests, BOM은 metadata |
-| XMLUnit | `org.xmlunit:xmlunit-core:2.11.0` | `Apache-2.0`; G/P | N | `VERIFIED`; XML assertion |
-
-### Gradle build environment — 26개와 annotation processor
-
-| Group | Exact component identities | SPDX / evidence | NOTICE | Status·purpose |
-|---|---|---|---|---|
-| Spring Boot plugin | `org.springframework.boot:org.springframework.boot.gradle.plugin:4.1.0`, `spring-boot-gradle-plugin:4.1.0`, `spring-boot-buildpack-platform:4.1.0`, `spring-boot-loader-tools:4.1.0`, `org.springframework:spring-core:7.0.8` | `Apache-2.0`; G/P/J | Y | `VERIFIED`; build |
-| Dependency management plugin | `io.spring.dependency-management:io.spring.dependency-management.gradle.plugin:1.1.7`, `io.spring.gradle:dependency-management-plugin:1.1.7` | `Apache-2.0`; exact Maven Central POM | N | `VERIFIED`; build |
-| Build JNA | `net.java.dev.jna:jna:5.17.0`, `jna-platform:5.17.0` | `Apache-2.0 OR LGPL-2.1-or-later`; G/J | Y | `VERIFIED`; build native access, 선택 경로 기록 필요 |
-| Build Commons | `org.apache.commons:commons-compress:1.27.1`, `commons-lang3:3.16.0`, `commons-codec:commons-codec:1.17.1`, `commons-io:commons-io:2.16.1`, `commons-logging:commons-logging:1.3.5` | `Apache-2.0`; G/P/J | Y | `VERIFIED`; build utilities |
-| HTTP Components | `org.apache.httpcomponents.client5:httpclient5:5.6.1`, `org.apache.httpcomponents.core5:httpcore5:5.4`, `httpcore5-h2:5.4` | `Apache-2.0`; G/J/parent POM | Y | `VERIFIED`; buildpack HTTP |
-| Build ANTLR | `org.antlr:antlr4-runtime:4.7.2` | `BSD-3-Clause`; G/J | N | `VERIFIED`; TOML parser dependency |
-| JSR-305 | `com.google.code.findbugs:jsr305:3.0.2` | `Apache-2.0`; G/P | N | `VERIFIED`; build annotation |
-| TOML | `org.tomlj:tomlj:1.0.0` | `Apache-2.0`; exact Maven Central POM·tagged LICENSE | N | `VERIFIED`; build parser |
-| Build SLF4J·JSpecify | `org.slf4j:slf4j-api:1.7.36`, `org.jspecify:jspecify:1.0.0` | `MIT`; `Apache-2.0`; G/P | N | `VERIFIED`; build logging·annotation |
-| Build Jackson | `com.fasterxml.jackson.core:jackson-annotations:2.21`, `tools.jackson:jackson-bom:3.1.4`, `tools.jackson.core:jackson-core:3.1.4`, `jackson-databind:3.1.4` | `Apache-2.0`; G/P/J | Y for JARs | `VERIFIED`; build JSON, BOM은 metadata |
-| Annotation processor | `org.springframework.boot:spring-boot-configuration-processor:4.1.0` | `Apache-2.0`; declaration/P/J | Y | `VERIFIED`; direct build component, `NOT_DISTRIBUTED` |
-| Gradle Wrapper | Gradle distribution `9.5.1`, wrapper JAR SHA-256 `497C8C2A7E5031F6AA847F88104AA80A93532EC32EE17BDB8D1D2F67A194A9C7` | `Apache-2.0`; embedded license·official release | Y | component `VERIFIED`; official `distributionSha256Sum` 고정 및 dependency verification metadata 적용 |
-
-2026-07-24에 `buildEnvironment`를 다시 실행해 고유 coordinate 26개를
-확인했다. 그중 test graph와 같은 identity·version인 6개는
-`jackson-annotations`, `jspecify`, `spring-core`, Jackson 3 core·databind·BOM이고,
-나머지 20개가 새 identity다. 따라서 Maven component의 중복 제거 union은
-test 전체 217 + build-only 20 + annotation processor 1 = 238개다. Gradle
-Wrapper `9.5.1`은 별도 non-Maven component다.
-
-최신 성공 tree에는 없지만 cache·execution history에만 남은 다음 identity는
-현행 구성요소로 세지 않았다:
+성공한 현행 tree에 없고 cache·execution history에만 남은 identity는 현행
+component로 세지 않는다. 확인된 제외 예시는
 `biz.aQute.bnd:biz.aQute.bnd.annotation:7.1.0`,
 `com.google.errorprone:error_prone_annotations:2.38.0`,
-`com.pgvector:pgvector:0.1.6`,
-`org.antlr:antlr4-runtime:4.13.1`,
-`org.apiguardian:apiguardian-api:1.1.2`, OSGi annotation/service family,
-그리고 Spring AI pgvector store 5개 module. 이 분리는 stale cache를 현행
-dependency로 오인하지 않기 위한 것이다. 예를 들어 local cache에 artifact가
-있더라도 성공한 현행 tree에 없는 `org.checkerframework:checker-qual`은
-component 수에 넣지 않는다.
-
-### npm lock exact set — 183개
-
-아래 표는 `frontend/package-lock.json`의 root를 제외한 183개 package를
-전부 열거한다. 각 package의 upstream은 같은 lock entry의 `resolved`
-registry tarball URL이고, license 근거는 그 entry의 `license` 필드이며,
-모든 entry에 exact version·`resolved`·`integrity`가 있다. 따라서 표의
-검증일은 2026-07-24, metadata 상태는 `VERIFIED`다.
-
-- `D`/`T`: direct/transitive
-- `runtime`/`dev`/`dev+optional`: 실행·개발·optional scope
-- purpose: `UI` React, `DOM` React DOM, `HOOKS` React transform,
-  `ESCFG` ESLint config, `LINT` lint, `TSE` TypeScript ESLint,
-  `VITE` build, `VREACT` Vite React plugin, `TS` compiler,
-  `NODE-T`·`REACT-T`·`DOM-T` type, `REFRESH` HMR, `GLOBALS` lint globals
-- `R-NOT-DISTRIBUTED`: 현재 ignored `dist`에 포함됐지만 initial source-only
-  경계에서는 배포하지 않는다. future `dist` release는 MIT 고지 추가 전
-  `BLOCKED`다.
-- `B-UNKNOWN`: initial source-only 경계에서는 binary로
-  `NOT_DISTRIBUTED`다. future clean bundle에 포함되는지와 그 경우의
-  license·NOTICE 전달 범위는 아직 검증하지 않았다.
-
-| package@version | rel | scope | SPDX | purpose | distribution·NOTICE |
-|---|---|---|---|---|---|
-| @babel/code-frame@7.29.7 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @babel/compat-data@7.29.7 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @babel/core@7.29.7 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @babel/generator@7.29.7 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @babel/helper-compilation-targets@7.29.7 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @babel/helper-globals@7.29.7 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @babel/helper-module-imports@7.29.7 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @babel/helper-module-transforms@7.29.7 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @babel/helper-string-parser@7.29.7 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @babel/helper-validator-identifier@7.29.7 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @babel/helper-validator-option@7.29.7 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @babel/helpers@7.29.7 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @babel/parser@7.29.7 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @babel/template@7.29.7 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @babel/traverse@7.29.7 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @babel/types@7.29.7 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @emnapi/core@1.11.1 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @emnapi/runtime@1.11.1 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @emnapi/wasi-threads@1.2.2 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @eslint-community/eslint-utils@4.9.1 | T | dev | MIT | LINT,TSE | B-UNKNOWN |
-| @eslint-community/regexpp@4.12.2 | T | dev | MIT | LINT,TSE | B-UNKNOWN |
-| @eslint/js@10.0.1 | D | dev | MIT | ESCFG | B-UNKNOWN |
-| @jridgewell/gen-mapping@0.3.13 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @jridgewell/remapping@2.3.5 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @jridgewell/resolve-uri@3.1.2 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @jridgewell/sourcemap-codec@1.5.5 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @jridgewell/trace-mapping@0.3.31 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| @napi-rs/wasm-runtime@1.1.6 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @oxc-project/types@0.139.0 | T | dev | MIT | VITE | B-UNKNOWN |
-| @rolldown/binding-android-arm64@1.1.5 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @rolldown/binding-darwin-arm64@1.1.5 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @rolldown/binding-darwin-x64@1.1.5 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @rolldown/binding-freebsd-x64@1.1.5 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @rolldown/binding-linux-arm-gnueabihf@1.1.5 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @rolldown/binding-linux-arm64-gnu@1.1.5 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @rolldown/binding-linux-arm64-musl@1.1.5 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @rolldown/binding-linux-ppc64-gnu@1.1.5 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @rolldown/binding-linux-s390x-gnu@1.1.5 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @rolldown/binding-linux-x64-gnu@1.1.5 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @rolldown/binding-linux-x64-musl@1.1.5 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @rolldown/binding-openharmony-arm64@1.1.5 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @rolldown/binding-wasm32-wasi@1.1.5 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @rolldown/binding-win32-arm64-msvc@1.1.5 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @rolldown/binding-win32-x64-msvc@1.1.5 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @rolldown/pluginutils@1.0.1 | T | dev | MIT | VITE,VREACT | B-UNKNOWN |
-| @tybys/wasm-util@0.10.3 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| @types/esrecurse@4.3.1 | T | dev | MIT | LINT | B-UNKNOWN |
-| @types/estree@1.0.9 | T | dev | MIT | LINT | B-UNKNOWN |
-| @types/json-schema@7.0.15 | T | dev | MIT | LINT | B-UNKNOWN |
-| @types/node@22.17.2 | D | dev | MIT | NODE-T | B-UNKNOWN |
-| @types/react-dom@19.2.3 | D | dev | MIT | DOM-T | B-UNKNOWN |
-| @types/react@19.2.17 | D | dev | MIT | REACT-T | B-UNKNOWN |
-| @typescript-eslint/eslint-plugin > ignore@7.0.6 | T | dev | MIT | TSE | B-UNKNOWN |
-| @typescript-eslint/eslint-plugin@8.63.0 | T | dev | MIT | TSE | B-UNKNOWN |
-| @typescript-eslint/parser@8.63.0 | T | dev | MIT | TSE | B-UNKNOWN |
-| @typescript-eslint/project-service@8.63.0 | T | dev | MIT | TSE | B-UNKNOWN |
-| @typescript-eslint/scope-manager@8.63.0 | T | dev | MIT | TSE | B-UNKNOWN |
-| @typescript-eslint/tsconfig-utils@8.63.0 | T | dev | MIT | TSE | B-UNKNOWN |
-| @typescript-eslint/type-utils@8.63.0 | T | dev | MIT | TSE | B-UNKNOWN |
-| @typescript-eslint/types@8.63.0 | T | dev | MIT | TSE | B-UNKNOWN |
-| @typescript-eslint/typescript-estree@8.63.0 | T | dev | MIT | TSE | B-UNKNOWN |
-| @typescript-eslint/utils@8.63.0 | T | dev | MIT | TSE | B-UNKNOWN |
-| @typescript-eslint/visitor-keys@8.63.0 | T | dev | MIT | TSE | B-UNKNOWN |
-| @vitejs/plugin-react@6.0.3 | D | dev | MIT | VREACT | B-UNKNOWN |
-| acorn-jsx@5.3.2 | T | dev | MIT | LINT | B-UNKNOWN |
-| acorn@8.17.0 | T | dev | MIT | LINT | B-UNKNOWN |
-| ajv@6.15.0 | T | dev | MIT | LINT | B-UNKNOWN |
-| balanced-match@4.0.4 | T | dev | MIT | LINT,TSE | B-UNKNOWN |
-| brace-expansion@5.0.7 | T | dev | MIT | LINT,TSE | B-UNKNOWN |
-| browserslist@4.28.5 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| convert-source-map@2.0.0 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| cross-spawn@7.0.6 | T | dev | MIT | LINT | B-UNKNOWN |
-| csstype@3.2.3 | T | dev | MIT | REACT-T | B-UNKNOWN |
-| debug@4.4.3 | T | dev | MIT | HOOKS,LINT,TSE | B-UNKNOWN |
-| deep-is@0.1.4 | T | dev | MIT | LINT | B-UNKNOWN |
-| escalade@3.2.0 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| escape-string-regexp@4.0.0 | T | dev | MIT | LINT | B-UNKNOWN |
-| eslint-plugin-react-hooks@7.1.1 | D | dev | MIT | HOOKS | B-UNKNOWN |
-| eslint-plugin-react-refresh@0.5.3 | D | dev | MIT | REFRESH | B-UNKNOWN |
-| eslint@10.7.0 | D | dev | MIT | LINT | B-UNKNOWN |
-| fast-deep-equal@3.1.3 | T | dev | MIT | LINT | B-UNKNOWN |
-| fast-json-stable-stringify@2.1.0 | T | dev | MIT | LINT | B-UNKNOWN |
-| fast-levenshtein@2.0.6 | T | dev | MIT | LINT | B-UNKNOWN |
-| fdir@6.5.0 | T | dev | MIT | TSE,VITE | B-UNKNOWN |
-| file-entry-cache@8.0.0 | T | dev | MIT | LINT | B-UNKNOWN |
-| find-up@5.0.0 | T | dev | MIT | LINT | B-UNKNOWN |
-| flat-cache@4.0.1 | T | dev | MIT | LINT | B-UNKNOWN |
-| fsevents@2.3.3 | T | dev+optional | MIT | VITE | B-UNKNOWN |
-| gensync@1.0.0-beta.2 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| globals@17.7.0 | D | dev | MIT | GLOBALS | B-UNKNOWN |
-| hermes-estree@0.25.1 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| hermes-parser@0.25.1 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| ignore@5.3.2 | T | dev | MIT | LINT | B-UNKNOWN |
-| imurmurhash@0.1.4 | T | dev | MIT | LINT | B-UNKNOWN |
-| is-extglob@2.1.1 | T | dev | MIT | LINT | B-UNKNOWN |
-| is-glob@4.0.3 | T | dev | MIT | LINT | B-UNKNOWN |
-| js-tokens@4.0.0 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| jsesc@3.1.0 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| json-buffer@3.0.1 | T | dev | MIT | LINT | B-UNKNOWN |
-| json-schema-traverse@0.4.1 | T | dev | MIT | LINT | B-UNKNOWN |
-| json-stable-stringify-without-jsonify@1.0.1 | T | dev | MIT | LINT | B-UNKNOWN |
-| json5@2.2.3 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| keyv@4.5.4 | T | dev | MIT | LINT | B-UNKNOWN |
-| levn@0.4.1 | T | dev | MIT | LINT | B-UNKNOWN |
-| locate-path@6.0.0 | T | dev | MIT | LINT | B-UNKNOWN |
-| ms@2.1.3 | T | dev | MIT | HOOKS,LINT,TSE | B-UNKNOWN |
-| nanoid@3.3.15 | T | dev | MIT | VITE | B-UNKNOWN |
-| natural-compare@1.4.0 | T | dev | MIT | LINT,TSE | B-UNKNOWN |
-| node-releases@2.0.51 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| optionator@0.9.4 | T | dev | MIT | LINT | B-UNKNOWN |
-| p-limit@3.1.0 | T | dev | MIT | LINT | B-UNKNOWN |
-| p-locate@5.0.0 | T | dev | MIT | LINT | B-UNKNOWN |
-| path-exists@4.0.0 | T | dev | MIT | LINT | B-UNKNOWN |
-| path-key@3.1.1 | T | dev | MIT | LINT | B-UNKNOWN |
-| picomatch@4.0.5 | T | dev | MIT | TSE,VITE | B-UNKNOWN |
-| postcss@8.5.16 | T | dev | MIT | VITE | B-UNKNOWN |
-| prelude-ls@1.2.1 | T | dev | MIT | LINT | B-UNKNOWN |
-| punycode@2.3.1 | T | dev | MIT | LINT | B-UNKNOWN |
-| react-dom@19.2.7 | D | runtime | MIT | DOM | R-NOT-DISTRIBUTED |
-| react@19.2.7 | D | runtime | MIT | UI | R-NOT-DISTRIBUTED |
-| rolldown@1.1.5 | T | dev | MIT | VITE | B-UNKNOWN |
-| scheduler@0.27.0 | T | runtime | MIT | DOM | R-NOT-DISTRIBUTED |
-| shebang-command@2.0.0 | T | dev | MIT | LINT | B-UNKNOWN |
-| shebang-regex@3.0.0 | T | dev | MIT | LINT | B-UNKNOWN |
-| tinyglobby@0.2.17 | T | dev | MIT | TSE,VITE | B-UNKNOWN |
-| ts-api-utils@2.5.0 | T | dev | MIT | TSE | B-UNKNOWN |
-| type-check@0.4.0 | T | dev | MIT | LINT | B-UNKNOWN |
-| typescript-eslint@8.63.0 | D | dev | MIT | TSE | B-UNKNOWN |
-| undici-types@6.21.0 | T | dev | MIT | NODE-T | B-UNKNOWN |
-| update-browserslist-db@1.2.3 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| vite@8.1.4 | D | dev | MIT | VITE | B-UNKNOWN |
-| word-wrap@1.2.5 | T | dev | MIT | LINT | B-UNKNOWN |
-| yocto-queue@0.1.0 | T | dev | MIT | LINT | B-UNKNOWN |
-| zod-validation-error@4.0.2 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| zod@4.4.3 | T | dev | MIT | HOOKS | B-UNKNOWN |
-| tslib@2.8.1 | T | dev+optional | 0BSD | VITE | B-UNKNOWN |
-| @eslint/config-array@0.23.5 | T | dev | Apache-2.0 | LINT | B-UNKNOWN |
-| @eslint/config-helpers@0.6.0 | T | dev | Apache-2.0 | LINT | B-UNKNOWN |
-| @eslint/core@1.2.1 | T | dev | Apache-2.0 | LINT | B-UNKNOWN |
-| @eslint/object-schema@3.0.5 | T | dev | Apache-2.0 | LINT | B-UNKNOWN |
-| @eslint/plugin-kit@0.7.2 | T | dev | Apache-2.0 | LINT | B-UNKNOWN |
-| @humanfs/core@0.19.2 | T | dev | Apache-2.0 | LINT | B-UNKNOWN |
-| @humanfs/node@0.16.8 | T | dev | Apache-2.0 | LINT | B-UNKNOWN |
-| @humanfs/types@0.15.0 | T | dev | Apache-2.0 | LINT | B-UNKNOWN |
-| @humanwhocodes/module-importer@1.0.1 | T | dev | Apache-2.0 | LINT | B-UNKNOWN |
-| @humanwhocodes/retry@0.4.3 | T | dev | Apache-2.0 | LINT | B-UNKNOWN |
-| baseline-browser-mapping@2.10.42 | T | dev | Apache-2.0 | HOOKS | B-UNKNOWN |
-| detect-libc@2.1.2 | T | dev | Apache-2.0 | VITE | B-UNKNOWN |
-| eslint-visitor-keys@5.0.1 | T | dev | Apache-2.0 | LINT,TSE | B-UNKNOWN |
-| @eslint-community/eslint-utils > eslint-visitor-keys@3.4.3 | T | dev | Apache-2.0 | LINT,TSE | B-UNKNOWN |
-| typescript@6.0.3 | D | dev | Apache-2.0 | TS | B-UNKNOWN |
-| minimatch@10.2.5 | T | dev | BlueOak-1.0.0 | LINT,TSE | B-UNKNOWN |
-| eslint-scope@9.1.2 | T | dev | BSD-2-Clause | LINT | B-UNKNOWN |
-| espree@11.2.0 | T | dev | BSD-2-Clause | LINT | B-UNKNOWN |
-| esrecurse@4.3.0 | T | dev | BSD-2-Clause | LINT | B-UNKNOWN |
-| estraverse@5.3.0 | T | dev | BSD-2-Clause | LINT | B-UNKNOWN |
-| esutils@2.0.3 | T | dev | BSD-2-Clause | LINT | B-UNKNOWN |
-| uri-js@4.4.1 | T | dev | BSD-2-Clause | LINT | B-UNKNOWN |
-| esquery@1.7.0 | T | dev | BSD-3-Clause | LINT | B-UNKNOWN |
-| source-map-js@1.2.1 | T | dev | BSD-3-Clause | VITE | B-UNKNOWN |
-| caniuse-lite@1.0.30001803 | T | dev | CC-BY-4.0 | HOOKS | B-UNKNOWN |
-| electron-to-chromium@1.5.389 | T | dev | ISC | HOOKS | B-UNKNOWN |
-| flatted@3.4.2 | T | dev | ISC | LINT | B-UNKNOWN |
-| glob-parent@6.0.2 | T | dev | ISC | LINT | B-UNKNOWN |
-| isexe@2.0.0 | T | dev | ISC | LINT | B-UNKNOWN |
-| lru-cache@5.1.1 | T | dev | ISC | HOOKS | B-UNKNOWN |
-| @typescript-eslint/typescript-estree > semver@7.8.5 | T | dev | ISC | TSE | B-UNKNOWN |
-| picocolors@1.1.1 | T | dev | ISC | HOOKS,VITE | B-UNKNOWN |
-| semver@6.3.1 | T | dev | ISC | HOOKS | B-UNKNOWN |
-| which@2.0.2 | T | dev | ISC | LINT | B-UNKNOWN |
-| yallist@3.1.1 | T | dev | ISC | HOOKS | B-UNKNOWN |
-| lightningcss-android-arm64@1.32.0 | T | dev+optional | MPL-2.0 | VITE | B-UNKNOWN |
-| lightningcss-darwin-arm64@1.32.0 | T | dev+optional | MPL-2.0 | VITE | B-UNKNOWN |
-| lightningcss-darwin-x64@1.32.0 | T | dev+optional | MPL-2.0 | VITE | B-UNKNOWN |
-| lightningcss-freebsd-x64@1.32.0 | T | dev+optional | MPL-2.0 | VITE | B-UNKNOWN |
-| lightningcss-linux-arm-gnueabihf@1.32.0 | T | dev+optional | MPL-2.0 | VITE | B-UNKNOWN |
-| lightningcss-linux-arm64-gnu@1.32.0 | T | dev+optional | MPL-2.0 | VITE | B-UNKNOWN |
-| lightningcss-linux-arm64-musl@1.32.0 | T | dev+optional | MPL-2.0 | VITE | B-UNKNOWN |
-| lightningcss-linux-x64-gnu@1.32.0 | T | dev+optional | MPL-2.0 | VITE | B-UNKNOWN |
-| lightningcss-linux-x64-musl@1.32.0 | T | dev+optional | MPL-2.0 | VITE | B-UNKNOWN |
-| lightningcss-win32-arm64-msvc@1.32.0 | T | dev+optional | MPL-2.0 | VITE | B-UNKNOWN |
-| lightningcss-win32-x64-msvc@1.32.0 | T | dev+optional | MPL-2.0 | VITE | B-UNKNOWN |
-| lightningcss@1.32.0 | T | dev | MPL-2.0 | VITE | B-UNKNOWN |
+`com.pgvector:pgvector:0.1.6`, `org.antlr:antlr4-runtime:4.13.1`,
+`org.apiguardian:apiguardian-api:1.1.2`, OSGi annotation/service family와
+Spring AI pgvector store 5개 module이다. local cache에만 있는
+`org.checkerframework:checker-qual`도 같은 이유로 세지 않는다.
 
 ## G-01 확정 배포 경계
 

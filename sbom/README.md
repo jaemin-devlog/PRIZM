@@ -1,88 +1,72 @@
-# PRIZM SBOM and AI model manifest
+# PRIZM machine-readable SBOM records
 
-This directory contains the machine-readable supply-chain records for PRIZM's
-current **source-only** release profile. It does not claim that every listed
-operational component is included in the Git source archive.
+This directory is the single source for PRIZM's full component identities,
+exact versions, license expressions, source URLs, package hashes, and generated
+file checksums. The human-readable source-only conclusion is in
+[`2026-compliance.md`](../docs/contest/2026-compliance.md).
 
-| File | Format | Scope |
+## File roles
+
+| File | Format | Role |
 |---|---|---|
-| [`prizm-backend-runtime.cdx.json`](prizm-backend-runtime.cdx.json) | CycloneDX 1.6 JSON | Resolved Java runtime dependency graph. |
-| [`prizm-frontend.cdx.json`](prizm-frontend.cdx.json) | CycloneDX 1.6 JSON | `frontend/package-lock.json` component inventory, including development and optional entries. |
-| [`prizm-ai-model-manifest.json`](prizm-ai-model-manifest.json) | PRIZM JSON manifest 1.0 | Ollama, `bge-m3`, and development-assistance provenance and distribution boundary. |
-| [`prizm-scope-manifest.json`](prizm-scope-manifest.json) | PRIZM JSON manifest 1.0 | Runtime, test/build, CI, container, model, and asset scope boundary. |
-| [`SHA256SUMS`](SHA256SUMS) | SHA-256 checksums | Integrity record for the four JSON documents above. |
+| [`prizm-backend-runtime.cdx.json`](prizm-backend-runtime.cdx.json) | CycloneDX 1.6 JSON | Resolved Java runtime artifact inventory. |
+| [`prizm-frontend.cdx.json`](prizm-frontend.cdx.json) | CycloneDX 1.6 JSON | All versioned `frontend/package-lock.json` entries, including development and optional scope. |
+| [`prizm-ai-model-manifest.json`](prizm-ai-model-manifest.json) | PRIZM JSON manifest 1.0 | Ollama, `bge-m3`, registry artifact, and authoring-assistance provenance and distribution boundary. |
+| [`prizm-scope-manifest.json`](prizm-scope-manifest.json) | PRIZM JSON manifest 1.0 | Runtime, test/build, CI, container, model, and asset scope decisions. |
+| [`SHA256SUMS`](SHA256SUMS) | SHA-256 | Integrity record for the four JSON files above. |
 
-## Distribution boundary
+These records describe source-only and external operational scopes separately.
+They do not claim that Java JARs, frontend `dist`, container images, Ollama,
+model weights, OpenSQL files, database volumes, or uploaded documents are
+included in the Git source archive.
 
-The tracked source distribution contains PRIZM source, documentation,
-configuration, the Gradle Wrapper, and synthetic fixtures. It does **not**
-redistribute Java JARs, frontend `dist`, container images, PostgreSQL/pgvector
-images or volumes, the Ollama binary, `bge-m3` weights/cache, or uploaded
-documents. The CycloneDX files therefore record external/provided operational
-dependencies, while [`../NOTICE`](../NOTICE) remains limited to the current
-source-only distribution.
+## Generate
 
-`bge-m3` is recorded separately from PRIZM's Apache-2.0 source license. Its
-Ollama registry artifact is pinned by manifest/blob hashes, but the exact BAAI
-upstream-to-registry conversion lineage remains `UNVERIFIED_LINEAGE`. PRIZM
-does not redistribute those model bytes or claim that lineage as verified.
-
-## Reproduce and verify
-
-Run from the repository root with Java 17, Node 22.17.0, and npm 10.9.2:
-
-```powershell
-node scripts/verify-oss-readiness.mjs
-```
-
-This is the same command used by GitHub Actions. It checks required OSS files,
-Markdown links and formatting, tracked-file safety, the source-only license
-Gate, strict Gradle dependency verification, deterministic SBOM regeneration,
-checksums, CycloneDX structure, and regression tests. Repeated `404` or `410`
-responses fail the external-link check. Authentication failures, rate limits,
-server errors, timeouts, and other network failures are reported separately as
-indeterminate so a temporary upstream outage is not misreported as a deleted
-document.
-
-When an intentional dependency or manifest change updates an SBOM, regenerate
-and review the files before refreshing the checksums:
+Run from the repository root with Java 17, Node 22.17.0, and npm 10.9.2.
 
 ```powershell
 .\gradlew.bat generateBackendSbom --no-daemon --dependency-verification=strict
 npm --prefix frontend run sbom
-node scripts/verify-sbom.mjs --write-checksums
+```
+
+The backend generator is the first-party `generateBackendSbom` task in
+[`build.gradle`](../build.gradle). The frontend generator is the first-party
+[`generate-frontend-sbom.mjs`](../scripts/generate-frontend-sbom.mjs). Neither
+generator adds an external SBOM plugin to the source release.
+
+## Verify
+
+Normal verification must not rewrite checksums.
+
+```powershell
+node scripts/verify-sbom.mjs
+node --test scripts/verify-sbom.test.mjs
 node scripts/verify-oss-readiness.mjs
 ```
 
-`--write-checksums` is an intentional maintenance step and is never run by CI.
-Normal verification fails when regenerated files drift from
-[`SHA256SUMS`](SHA256SUMS).
+The verifier checks JSON structure, CycloneDX 1.6 fields, unique `bom-ref`
+values, canonical hash names, deterministic line endings, generated-file
+drift, checksums, and local path or credential-shaped data.
 
-The frontend generator is a first-party, lockfile-only script. It does not
-install packages, call a registry, infer missing licenses, or add a third-party
-SBOM CLI to the source release. It deterministically maps every versioned
-`package-lock.json` entry to a CycloneDX component and retains only lockfile
-license fields, integrity hashes, resolved tarball URLs, and dependency scope.
-The backend generator is a first-party Gradle task that reads the resolved
-`runtimeClasspath`; it uses Gradle plus Groovy/JDK classes already present in
-the build and adds no SBOM plugin. It emits LF on every operating system and
-adds a Maven `classifier` PURL qualifier when one module resolves to multiple
-platform artifacts. The repository structural verifier checks both files'
-format, schema version, primary component, reproducibility fields, globally
-unique `bom-ref` values, canonical CycloneDX hash algorithm names, canonical
-LF line endings with a terminal LF, checksum, and prohibited
-local/secret-shaped data. The Node regression tests prove that non-canonical
-hash names, malformed component fields and hashes, duplicate references, CRLF
-output, a missing terminal LF, Markdown defects, and a blocked source-only
-license Gate are rejected.
+## Check and update checksums
 
-## Generator provenance
+To compare a generated file with the recorded value, use the platform's
+SHA-256 tool and compare the result with [`SHA256SUMS`](SHA256SUMS).
 
-- backend: `generateBackendSbom` in [`build.gradle`](../build.gradle), first-party Apache-2.0 source; it uses Gradle's resolved runtime classpath plus Groovy/JDK classes already present in the build.
-- frontend: [`scripts/generate-frontend-sbom.mjs`](../scripts/generate-frontend-sbom.mjs), first-party Apache-2.0 source; it uses only Node.js standard-library modules.
+```powershell
+Get-FileHash sbom\prizm-backend-runtime.cdx.json -Algorithm SHA256
+Get-FileHash sbom\prizm-frontend.cdx.json -Algorithm SHA256
+Get-FileHash sbom\prizm-ai-model-manifest.json -Algorithm SHA256
+Get-FileHash sbom\prizm-scope-manifest.json -Algorithm SHA256
+```
 
-The runtime artifact identities are protected by
-[`../gradle/verification-metadata.xml`](../gradle/verification-metadata.xml)
-and [`../frontend/package-lock.json`](../frontend/package-lock.json). Both
-generators are tracked PRIZM source and are covered by the repository's
-Apache-2.0 license.
+Only after an intentional, reviewed inventory change should the checksum file
+be refreshed:
+
+```powershell
+node scripts/verify-sbom.mjs --write-checksums
+node scripts/verify-sbom.mjs
+```
+
+CI never runs `--write-checksums`. An unexpected change must fail instead of
+silently becoming the new baseline.

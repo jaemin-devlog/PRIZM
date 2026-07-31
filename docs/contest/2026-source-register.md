@@ -1,5 +1,9 @@
 # 2026 오픈소스 개발자대회 공식 근거 등록부
 
+> 이 문서는 공식 출처의 URL, artifact identity와 재배포 경계의 단일
+> 원본이다. 요구사항 대응은 [추적표](2026-requirements-traceability.md),
+> source-only 배포 결론은 [2026 compliance](2026-compliance.md)를 따른다.
+
 ## 문서 상태
 
 | 항목 | 값 |
@@ -30,6 +34,7 @@
 |---|---|---|---|---|---|---|---|---|
 | `SRC-CONTEST-HOME` | 오픈소스 개발자대회 운영사무국·한국오픈소스협회 | 오픈소스 개발자대회 | [공식 홈페이지](https://osscontest.kr/) | 게시일 미제공; 2026-07-24 KST 수집 | 동적 HTML 관찰값은 artifact hash로 사용하지 않음 | 대회 주체와 공식 도메인 식별 | Footer의 권리 고지를 존중해 링크와 최소 요약만 기록 | `VERIFIED_OFFICIAL_WEB` |
 | `SRC-CONTEST-OVERVIEW` | 오픈소스 개발자대회 운영사무국·한국오픈소스협회 | 대회 개요 | [공식 개요](https://osscontest.kr/overview) | 게시일 미제공; 2026-07-24 KST 수집 | 동적 HTML 관찰값은 artifact hash로 사용하지 않음 | 일정, 제출물, 운영규정·결과보고서 공식 연결 | 링크와 최소 요약만 기록 | `VERIFIED_OFFICIAL_WEB` |
+| `SRC-TMAX-TASK` | 한국오픈소스협회·티맥스티베로 | 2026 오픈소스 개발자대회 티맥스티베로 지정과제 | [지정과제 원문](https://www.kossa.kr/materials/2026/ossp/tasks-tmax.html) | 게시일 미제공; 2026-07-24 KST URL·내용 확인 | 동적 HTML 관찰값은 artifact hash로 사용하지 않음 | OpenSQL 기반 AI 검색·벡터 데이터 플랫폼 미션과 문서 업로드·자동 임베딩·메타데이터·버전 관리·변경 로그 동기화·MCP 검색 개발과제 예시 | 링크와 최소 요약만 기록하고 페이지를 저장소에 복사하지 않음 | `VERIFIED_OFFICIAL_WEB` |
 | `SRC-CONTEST-RULES` | 오픈소스 개발자대회 운영사무국·한국오픈소스협회 | 2026년 오픈소스 개발자대회 운영규정 | [공식 PDF](https://api.osscontest.kr/static/uploads/b3b4491a-3bbe-454e-a1d8-6ed475b01b14.pdf) | 문서 2026.06; 시행 2026-06-15; 2026-07-24 KST 수집 | `application/pdf`; 15쪽; 170,020 bytes; `5C129ED9F389ECC04B6F7BA8B97F719A313EFAF32AEA9178E635500023AE1DA1` | 직접 작성 코드의 OSI 라이선스, 외부 구성요소·모델 출처와 라이선스, AI 모델 조건, 전체 source·공개 저장소 | 출처 표시를 전제로 필요한 최소 인용·활용은 가능하지만 무단 수정·변형·복제·배포 제한이 있어 원문은 커밋하지 않음 | `VERIFIED_OFFICIAL_ARTIFACT` |
 | `SRC-CONTEST-REPORT` | 운영사무국을 통한 공식 배포; artifact 내부 발행자 표기는 없음 | 2026 오픈소스 개발자대회 결과보고서 양식 | [공식 ZIP](https://api.osscontest.kr/static/uploads/46414fba-c473-4dae-b595-7214d635b494.zip) | 게시일 미제공; 2026-07-24 KST 수집 | `application/zip`; 142,434 bytes; `9A5D2968D48FF8A8FD85CE991DC72DC2B0818D7E8C06EBB871CC97CE5CC62D95` | 결과보고서, SBOM, AI 모델 활용·라이선스 명세 필드 | ZIP과 내부 양식에 별도 재배포 허락이 없어 원본·작성본 모두 커밋하지 않음 | `VERIFIED_OFFICIAL_ARTIFACT`, 권리 `UNKNOWN_DO_NOT_COMMIT` |
 | `SRC-CONTEST-OT-NOTICE` | 오픈소스 개발자대회 운영사무국·한국오픈소스협회 | 「2026 오픈소스 개발자대회」 오리엔테이션 안내(7/23(목)) | [공식 공지](https://osscontest.kr/notice/31), [공지 이미지](https://api.osscontest.kr/static/uploads/8d98fbbb-d256-4fa1-9521-1ff689f0c885.png) | 공지 UI 게시일 2026-07-22; 2026-07-24 KST 수집 | 이미지 1,836,176 bytes; `808E6B3C6830A6B05431795DFE1FA4EA325CBEE81AC5FEAF450985B0153A77D7` | OT 개최와 평가기준 안내 세션의 존재 | 공개 이미지는 행사 안내일 뿐 세부 평가 슬라이드 원본이 아님; 링크와 최소 요약만 기록 | `VERIFIED_OFFICIAL_WEB` |

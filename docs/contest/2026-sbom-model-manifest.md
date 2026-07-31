@@ -1,5 +1,10 @@
 # PRIZM 2026 SBOM 및 AI 모델 명세
 
+> 사람이 읽는 최종 배포·라이선스 결론은
+> [2026 compliance](2026-compliance.md), machine file의 역할과 검증 방법은
+> [SBOM README](../../sbom/README.md)를 따른다. 패키지별 전체 목록과 전체
+> checksum은 이 문서에 복제하지 않는다.
+
 | 항목 | 값 |
 |---|---|
 | 관련 spec | [PRZ-002](../../specs/PRZ-002-open-source-readiness/spec.md) |

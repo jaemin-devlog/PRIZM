@@ -1,5 +1,9 @@
 # PRIZM 2026 저장소 자산 provenance 감사
 
+> 현재 source-only 배포의 종합 결론은
+> [2026 compliance](2026-compliance.md)에 있다. 이 문서는 fixture, sample,
+> image, 문서와 binary 후보의 상세 provenance 근거를 보존한다.
+
 ## 문서 상태
 
 | 항목 | 값 |
@@ -7,20 +11,22 @@
 | PRZ 작업 | [`PRZ-002-open-source-readiness`](../../specs/PRZ-002-open-source-readiness/spec.md) |
 | 범위 | Git에 추적되는 fixture·sample·이미지·문서·binary와 로컬 자산 참조 |
 | 기준 commit | `a5f5cd53525d1e759d558ce0c09e2b1cc42544a1` |
-| 감사일 | 2026-07-24 |
+| 최초 감사일 / 현재 상태 기준일 | 2026-07-24 / 2026-07-30 |
 | 상태 | `COMPLETE` — 자산 provenance blocker 없음 |
-| PRIZM outgoing license | `Apache-2.0` 사용자 승인 완료, 파일 적용 전 |
+| PRIZM outgoing license | `Apache-2.0` root `LICENSE`와 source-only `NOTICE` 적용 완료 |
 | 배포 경계 | source·문서·실행 설정만 배포 |
 | 법적 성격 | 기술적 provenance 감사이며 법률 자문이 아님 |
 
-이 감사는 `LICENSE`와 `NOTICE`를 만들기 전에, 저장소가 실제로 함께
-배포하는 비코드 자산의 출처와 재배포 권리를 확인한다. Apache-2.0 선택과
+이 감사는 `LICENSE`와 `NOTICE`를 만들기 전에 저장소가 실제로 함께
+배포하는 비코드 자산의 출처와 재배포 권리를 확인하기 위해 시작했다.
+Apache-2.0 선택과
 검색 평가 fixture·초기 PRIZM 골격·Mermaid diagram의 공개 허락은
 2026-07-24 사용자가 확인했다. 같은 날 외부 Toss reference에서 유래한
 frontend token을 제거하고 독립 PRIZM color·spacing·radius 체계로
-교체했다. 자산 provenance blocker는 해소됐지만 전체 license audit의
-다른 `UNKNOWN`·`CONFLICT`·`BLOCKED`가 남아 있어 표준 `LICENSE`·`NOTICE`
-원문은 아직 적용하지 않는다.
+교체했다. 당시 남아 있던 비자산 license Gate도 이후 해결되어 현재
+source-only 범위에는 root `LICENSE`와 `NOTICE`가 적용돼 있다. 미래 binary·
+image·model 재배포 조건은 현재 source-only 배포를 막지 않으며 해당 산출물을
+실제로 배포하기 전 별도 Gate로 다시 확인한다.
 
 ## 상태 정의
 
@@ -231,6 +237,6 @@ Git에 배포되는 이미지·PDF·문서 sample·font·model은 없고 Gradle 
 외부 provenance와 직접 작성 fixture·Mermaid·초기 source 경계도 확인됐다.
 외부 reference에서 유래한 color·spacing·radius token도 제거하고 독립
 PRIZM token으로 교체했다. 이에 따라 `BLOCKED_EXTERNAL_DESIGN_RIGHTS`는
-해소됐다. 다만 전체 [`2026-license-audit.md`](2026-license-audit.md)의
-비자산 `UNKNOWN`·`CONFLICT`·`BLOCKED`는 별개로 남아 있으므로 지금
-`LICENSE`와 `NOTICE`를 생성하면 안 된다.
+해소됐다. 이후 전체 [`2026-license-audit.md`](2026-license-audit.md)의
+현재 source-only Gate도 통과해 root `LICENSE`와 `NOTICE`가 적용됐다.
+미래 binary·image·model 재배포의 미해결 조건은 별도 release Gate로 남는다.

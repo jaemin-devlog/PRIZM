@@ -1,26 +1,20 @@
 # 2026 오픈소스 개발자대회 티맥스티베로 과제 대응 계획
 
-> 기준일: 2026-07-24
+> 기준일: 2026-07-30
 >
 > 제출 마감: 2026-08-27
 >
 > 원칙: 구현하지 않은 기능과 검증하지 않은 환경을 주장하지 않는다.
 
-## 결론
+## 문서 역할과 현재 위치
 
-PRIZM의 현재 기반은 지정과제와 잘 맞지만 아직 출품 요건을 완성한 상태는
-아니다.
+이 문서는 대회 일정과 P0~P10 실행 단계의 단일 원본이다. 일반 제품 개발
+순서는 [개발 로드맵](../roadmap.md), 현재 구현과 검증 결과는
+[현재 구현 현황](../project-status.md)을 따른다.
 
-- 이미 구현: 문서 업로드, 자동 임베딩, 메타데이터·immutable version,
-  owner-scoped pgvector 검색, 비동기 작업 복구
-- 검증됨: 실제 OpenSQL 단일 SQL 호환성 Gate와 독립 `AUDIT`
-- 미구현: 변경 로그 기반 동기화, MCP 검색 API
-- 미검증: OpenProxy runtime, DB 장애전환·서비스 연속성
-- 별도 제품 계획: CareerFact와 근거 기반 portfolio
-
-따라서 CareerFact·portfolio보다 `OpenSQL → 장애복구 → 동기화 → MCP`를
-먼저 개발한다. PRIZM 고유 기능은 이 핵심 Gate가 통과한 뒤 작은 수직
-슬라이스로 추가한다.
+현재 P0 소스 전용(source-only) 준비는 완료됐다. P1에서는 실제 OpenSQL
+single-node SQL Gate를 통과했고, 안전한 demo `USER`를 이용한 clean-clone 전체
+사용자 흐름은 아직 실행하지 않았다(`NOT_RUN`).
 
 ## 공식 과제 해석
 
@@ -93,9 +87,10 @@ CareerFact, portfolio와 제출 감사는 실제 착수 순서에 따라 각각 
 
 ### P0. 공식 기준·오픈소스 준비 — 7월 24~27일
 
-- 공식 지정과제와 평가기준 내용 추출·초기 매핑 —
-  `CONTENT_EXTRACTED_SOURCE_PENDING`
-- 공식 오리엔테이션 PDF의 URL·버전·hash 확보 후 추적표 source 고정
+- 공식 지정과제와 평가기준 매핑 — 완료. 다만 오리엔테이션 슬라이드의 공개
+  공식 원본은 아직 확보하지 못함
+- 지정과제·일정의 공식 URL과 현재 확인 가능한 출처를 source register에 고정 — 완료
+- 공식 오리엔테이션 PDF를 확보하면 URL·버전·hash를 추적표에 추가
 - dependency, `bge-m3`, 합성 데이터, asset, OpenSQL 구성요소 라이선스를
   `docs/contest/2026-license-audit.md`에 감사 — 완료
 - Apache-2.0 root LICENSE, source-only NOTICE, SBOM·AI 모델 명세 — 완료

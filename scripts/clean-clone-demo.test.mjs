@@ -110,6 +110,7 @@ test('prepares unique isolated env files without overwriting or printing secrets
   const examplePath = join(directory, '.env.example')
   const firstPath = join(directory, '.env.first')
   const secondPath = join(directory, '.env.second')
+  const standardHttpPath = join(directory, '.env.standard-http')
   writeFileSync(examplePath, environmentTemplate())
   const randomBytesFunction = deterministicRandom()
 
@@ -125,8 +126,15 @@ test('prepares unique isolated env files without overwriting or printing secrets
     portOverrides: { db: 15434, backend: 18082, frontend: 15175 },
     randomBytesFunction,
   })
+  prepareDemoEnvironment({
+    examplePath,
+    envPath: standardHttpPath,
+    portOverrides: { db: 15435, backend: 18083, frontend: 80 },
+    randomBytesFunction,
+  })
   const firstValues = parseEnvFile(readFileSync(firstPath, 'utf8'))
   const secondValues = parseEnvFile(readFileSync(secondPath, 'utf8'))
+  const standardHttpValues = parseEnvFile(readFileSync(standardHttpPath, 'utf8'))
 
   assert.match(first.projectName, /^prizm-clean-clone-/)
   assert.notEqual(first.projectName, second.projectName)
@@ -135,6 +143,7 @@ test('prepares unique isolated env files without overwriting or printing secrets
   assert.equal(firstValues.PRIZM_FRONTEND_PORT, '15174')
   assert.equal(firstValues.PRIZM_CORS_ALLOWED_ORIGINS, 'http://localhost:15174')
   assert.equal(secondValues.PRIZM_CORS_ALLOWED_ORIGINS, 'http://localhost:15175')
+  assert.equal(standardHttpValues.PRIZM_CORS_ALLOWED_ORIGINS, 'http://localhost')
   assert.equal(firstValues.PRIZM_BOOTSTRAP_DEMO_USER_ENABLED, 'true')
   assert.equal(firstValues.PRIZM_BOOTSTRAP_DEMO_USER_EMAIL, 'demo@prizm.local')
   assert.ok(firstValues.PRIZM_JWT_SECRET.length >= 32)

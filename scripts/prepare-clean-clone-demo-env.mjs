@@ -96,7 +96,11 @@ export function prepareDemoEnvironment({
   content = replaceRequiredValue(content, PORT_KEYS.db, ports.db)
   content = replaceRequiredValue(content, PORT_KEYS.backend, ports.backend)
   content = replaceRequiredValue(content, PORT_KEYS.frontend, ports.frontend)
-  content = replaceRequiredValue(content, 'PRIZM_CORS_ALLOWED_ORIGINS', `http://localhost:${ports.frontend}`)
+  content = replaceRequiredValue(
+    content,
+    'PRIZM_CORS_ALLOWED_ORIGINS',
+    new URL(`http://localhost:${ports.frontend}`).origin,
+  )
   content = replaceRequiredValue(content, 'PRIZM_JWT_SECRET', generatedSecret(randomBytesFunction, 48))
   content = replaceRequiredValue(content, 'PRIZM_DB_PASSWORD', generatedSecret(randomBytesFunction))
   content = replaceRequiredValue(content, 'PRIZM_FLYWAY_PASSWORD', generatedSecret(randomBytesFunction))

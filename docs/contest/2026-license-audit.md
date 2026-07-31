@@ -434,9 +434,10 @@ Ollama 변환 lineage와 binary·image 고지 범위는 source-only 배포 경�
 | PRIZM 관점 | 작은 source 배포에는 단순 | 재사용 가능한 Engine·extension ecosystem의 patent 명확성에 장점 가능 |
 
 **사용자 결정:** PRIZM 직접 작성 source의 outgoing license는
-`Apache-2.0`으로 승인됐다. 이 결정으로 candidate 선택은 끝났지만, 아직
-표준 원문을 생성하거나 저장소 자산에 적용하지 않았다. 다음 조건을 모두
-충족해 T-03의 **현재 source-only 범위**를 마감하고 T-04 구현으로 이동한다.
+`Apache-2.0`으로 승인됐다. 이 결정 당시에는 아직 표준 원문을 적용하지
+않았으며, 이후 T-04에서 루트 `LICENSE`와 `NOTICE`를 적용했다. 다음 조건을
+모두 충족해 T-03의 **현재 source-only 범위**를 마감하고 T-04 구현으로
+이동했다.
 
 1. 완료: G-01의 배포 후보별 `배포/미배포` 결정
 2. 완료: fixture 작성자·제3자 비파생·Apache-2.0 재배포 권리 확인

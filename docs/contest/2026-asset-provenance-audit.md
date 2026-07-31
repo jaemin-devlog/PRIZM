@@ -10,7 +10,7 @@
 |---|---|
 | PRZ 작업 | [`PRZ-002-open-source-readiness`](../../specs/PRZ-002-open-source-readiness/spec.md) |
 | 범위 | Git에 추적되는 fixture·sample·이미지·문서·binary와 로컬 자산 참조 |
-| 기준 commit | `a5f5cd53525d1e759d558ce0c09e2b1cc42544a1` |
+| 최초 Inventory 기준 commit | `a5f5cd53525d1e759d558ce0c09e2b1cc42544a1` |
 | 최초 감사일 / 현재 상태 기준일 | 2026-07-24 / 2026-07-30 |
 | 상태 | `COMPLETE` — 자산 provenance blocker 없음 |
 | PRIZM outgoing license | `Apache-2.0` root `LICENSE`와 source-only `NOTICE` 적용 완료 |
@@ -43,9 +43,11 @@ design reference의 token 값과 이름을 제거했으며, 새 PRIZM token은
 Career Vault의 차분한 문서 관리 화면을 위해 독립적으로 선택했다.
 따라서 `BLOCKED_EXTERNAL_DESIGN_RIGHTS`는 해소됐다.
 
-## 감사 방법
+## 최초 자산 Inventory
 
-2026-07-24 현재 다음을 읽기 전용으로 대조했다.
+2026-07-24 commit `a5f5cd53525d1e759d558ce0c09e2b1cc42544a1`에서
+추적 파일 274개를 대상으로 다음 항목을 읽기 전용으로 대조했다. 이 수치는
+현재 파일 수가 아니라 최초 감사 당시의 snapshot이다.
 
 1. `git ls-files`의 274개 추적 파일 전체를 확장자, 크기와 NUL byte
    signature로 검사했다.
@@ -72,7 +74,20 @@ Git commit author는 파일을 저장소에 추가한 사람을 보여줄 뿐, �
 표기나 commit author만으로 `VERIFIED_DIRECT`를 부여하지 않았다. 외부
 코드와의 의미 유사성 전수 비교도 이 감사의 증거로 가장하지 않는다.
 
-## 추적 파일 범위
+## 후속 자산 추가 감사
+
+2026-07-29 commit `288cb7af2dccb551586ed71864b41f75ea54ee36`에서 로그인
+배경 SVG를 추가로 감사했다. 아래 `ASSET-LOGIN-EVIDENCE-VISUAL` 행에 파일의
+SHA-256, 제작 경위, 외부 요소 미포함 여부와 재배포 판정을 별도로 기록했다.
+
+2026-07-30에는 후속 자산까지 포함한 현재 source-only 범위를 다시 판정했으며,
+자산 provenance blocker는 0건이다.
+
+## 최초 추적 파일 범위
+
+아래 표의 274개는 2026-07-24 최초 Inventory의 범위다. 2026-07-29에 추가한
+로그인 배경 SVG는 이 수에 포함되지 않으며 후속 감사와 배포 자산 판정에서
+별도로 관리한다.
 
 | 조사 범위 | 추적 파일 수 | 결과 |
 |---|---:|---|
@@ -80,8 +95,8 @@ Git commit author는 파일을 저장소에 추가한 사람을 보여줄 뿐, �
 | test·evaluation resource | 5 | 설정 YAML 3개, 검색 평가 fixture 2개 |
 | 검색 평가 fixture | 2 | 아래 provenance 확인 대상 |
 | NUL byte가 있는 binary | 1 | `gradle-wrapper.jar` |
-| image·PDF·Office·font·media·model | 1 | 직접 제작 SVG 1개, 그 외 파일 없음 |
-| frontend `public`·`assets` | 1 | 로그인 배경 SVG 1개 |
+| image·PDF·Office·font·media·model | 0 | 최초 Inventory 당시 추적 파일 없음 |
+| frontend `public`·`assets` | 0 | 최초 Inventory 당시 추적 파일 없음 |
 | docs의 비-Markdown 첨부 | 0 | 로컬 image·attachment 없음 |
 | Markdown image 참조 | 0 | 저장소 이미지에 대한 참조 없음 |
 | inline Mermaid block | 5 | Markdown source로 직접 렌더링되며 별도 binary 자산은 아님 |

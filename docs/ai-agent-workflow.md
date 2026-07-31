@@ -8,10 +8,10 @@
 
 제품 기능, API 계약과 구현 완료 여부는 이 문서가 아니라 소스 코드(source
 code), Flyway 마이그레이션(migration)과 실행 가능한 테스트(test)로 판단한다.
-대회 평가 기준과 내부 평가 자료는
-[요구사항·평가기준 추적표](contest/2026-requirements-traceability.md)의 단일
-원본을 따른다. 이 workflow는 PRIZM 내부 품질 정책이지 공식 대회 요구사항이
-아니다.
+공식 평가항목과 현재 evidence의 연결은
+[요구사항·평가기준 추적표](contest/2026-requirements-traceability.md)를 따른다.
+내부 예상 점수와 Assessment 이력은 공개 문서에서 관리하지 않는다. 이
+workflow는 PRIZM 내부 품질 정책이지 공식 대회 요구사항이 아니다.
 
 ## 작업 전에 지킬 네 가지 원칙
 

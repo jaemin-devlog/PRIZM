@@ -2,7 +2,7 @@
 
 > 현재 검증 기준일: 2026-07-30
 >
-> 기준 commit: `91949f2cabff8e37c6a6210b3641e4a7c37d2910`
+> 구현 기준 source commit: `91949f2cabff8e37c6a6210b3641e4a7c37d2910`
 >
 > 기존 구현 기준선: `PRZ-000 AS_BUILT_BASELINE`
 >

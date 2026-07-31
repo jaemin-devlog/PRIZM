@@ -511,8 +511,8 @@ test('redacts secrets from diagnostic messages', () => {
 })
 
 test('finds the Windows per-user Ollama fallback without changing PATH', () => {
-  const environment = { PATH: '', LOCALAPPDATA: 'C:\\Users\\person\\AppData\\Local' }
-  const expected = 'C:\\Users\\person\\AppData\\Local\\Programs\\Ollama\\ollama.exe'
+  const environment = { PATH: '', LOCALAPPDATA: 'C:\\sandbox\\local-app-data' }
+  const expected = 'C:\\sandbox\\local-app-data\\Programs\\Ollama\\ollama.exe'
   assert.ok(executableCandidates('ollama', { environment, platform: 'win32' }).includes(expected))
   assert.deepEqual(findExecutable('ollama', {
     environment,
@@ -522,8 +522,8 @@ test('finds the Windows per-user Ollama fallback without changing PATH', () => {
 })
 
 test('includes the Windows per-user Docker Desktop fallback and validates port overrides', () => {
-  const environment = { PATH: '', LOCALAPPDATA: 'C:\\Users\\person\\AppData\\Local' }
-  const expected = 'C:\\Users\\person\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe'
+  const environment = { PATH: '', LOCALAPPDATA: 'C:\\sandbox\\local-app-data' }
+  const expected = 'C:\\sandbox\\local-app-data\\Programs\\DockerDesktop\\resources\\bin\\docker.exe'
   assert.ok(executableCandidates('docker', { environment, platform: 'win32' }).includes(expected))
   assert.deepEqual(parsePrerequisiteArguments([
     '--db-port', '15433',

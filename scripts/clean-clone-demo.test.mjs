@@ -52,6 +52,7 @@ function environmentTemplate() {
   return [
     'SERVER_PORT=8080',
     'PRIZM_FRONTEND_PORT=5173',
+    'PRIZM_CORS_ALLOWED_ORIGINS=http://localhost:5173',
     'PRIZM_JWT_SECRET=',
     'COMPOSE_PROJECT_NAME=prizm',
     'PRIZM_DB_PORT=5432',
@@ -132,6 +133,8 @@ test('prepares unique isolated env files without overwriting or printing secrets
   assert.equal(firstValues.PRIZM_DB_PORT, '15433')
   assert.equal(firstValues.SERVER_PORT, '18081')
   assert.equal(firstValues.PRIZM_FRONTEND_PORT, '15174')
+  assert.equal(firstValues.PRIZM_CORS_ALLOWED_ORIGINS, 'http://localhost:15174')
+  assert.equal(secondValues.PRIZM_CORS_ALLOWED_ORIGINS, 'http://localhost:15175')
   assert.equal(firstValues.PRIZM_BOOTSTRAP_DEMO_USER_ENABLED, 'true')
   assert.equal(firstValues.PRIZM_BOOTSTRAP_DEMO_USER_EMAIL, 'demo@prizm.local')
   assert.ok(firstValues.PRIZM_JWT_SECRET.length >= 32)

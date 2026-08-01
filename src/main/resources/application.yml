@@ -52,6 +52,10 @@ prizm:
     enabled: ${PRIZM_BOOTSTRAP_SYSTEM_ADMIN_ENABLED:false}
     email: ${PRIZM_BOOTSTRAP_SYSTEM_ADMIN_EMAIL:}
     password: ${PRIZM_BOOTSTRAP_SYSTEM_ADMIN_PASSWORD:}
+  bootstrap-demo-user:
+    enabled: ${PRIZM_BOOTSTRAP_DEMO_USER_ENABLED:false}
+    email: ${PRIZM_BOOTSTRAP_DEMO_USER_EMAIL:}
+    password: ${PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD:}
   storage:
     root: ${PRIZM_STORAGE_ROOT:./var/storage}
     temp: ${PRIZM_STORAGE_TEMP:./var/tmp}

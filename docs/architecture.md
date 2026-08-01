@@ -1,8 +1,14 @@
 # PRIZM Architecture
 
-> 구현 검토 기준 source commit: `936e957132fcf54b5cee1f58d83f8d591e5786e2`
+> 공개 GitHub main 문서 commit:
+> `b8a3cc1af9381bb9998f0e489528def600eb13fc`
+>
+> PRZ-004 구현·clean-clone 검증 source commit:
+> `25d09e9eee9837cf4a63d7461699825ff22743e2`
 >
 > 문서 검토 기준일: `2026-08-01`
+>
+> PRZ-004 상태: `IMPLEMENTED_UNVERIFIED` — 독립 최종 `AUDIT`와 GitHub 통합 대기
 >
 > 범위: 현재 Spring Boot 애플리케이션과 React Career Vault Reference App
 
@@ -310,9 +316,12 @@ stateDiagram-v2
 - 파일 저장소의 상대 경로는 소유권의 원본이 아닙니다. 문서 작업의 권한은 DB
   owner 관계에서 결정합니다.
 
-현재 branch에는 명시적으로 한 번만 켜는 `SYSTEM_ADMIN` bootstrap은 있지만 demo
-`USER` bootstrap은 없습니다. 암호화 저장, 감사 로그, 기관용 workspace와 외부
-인증은 현재 구조에 포함하지 않습니다.
+새 설치에는 공개 회원가입 API가 없습니다. 대신 기본적으로 꺼져 있고 명시적으로
+한 번만 켜는 demo `USER` bootstrap을 제공합니다. 역할은 항상 `USER`이며, 기존
+email이 있거나 `SYSTEM_ADMIN` bootstrap과 동시에 활성화하면 계정을 덮어쓰지
+않고 시작을 실패합니다. demo 계정도 일반 로그인, JWT·DB 사용자 재확인과
+owner-scoped 문서·검색 경로를 그대로 사용합니다. 저장 데이터 암호화, 감사 로그,
+기관용 workspace와 외부 인증은 현재 구조에 포함하지 않습니다.
 
 근거:
 
@@ -321,8 +330,14 @@ stateDiagram-v2
 - [현재 사용자 추출](../src/main/java/com/prizm/auth/security/CurrentUserProvider.java)
 - [문서 조회 서비스](../src/main/java/com/prizm/document/service/DocumentQueryService.java)
 - [벡터 검색 SQL](../src/main/java/com/prizm/search/repository/VectorSearchRepository.java)
+- [demo USER bootstrap](../src/main/java/com/prizm/auth/bootstrap/DemoUserBootstrapRunner.java)
+- [bootstrap 충돌 차단](../src/main/java/com/prizm/auth/bootstrap/BootstrapAccountConflictGuard.java)
+- [BCrypt 입력 경계](../src/main/java/com/prizm/auth/bootstrap/BcryptPasswordPolicy.java)
+- [demo 환경 생성](../scripts/prepare-clean-clone-demo-env.mjs)
+- [clean-clone smoke](../scripts/verify-clean-clone-demo.mjs)
 - [인증·격리 통합 테스트](../src/integrationTest/java/com/prizm/infrastructure/AuthenticationIntegrationTest.java)
 - [migration 통합 테스트](../src/integrationTest/java/com/prizm/infrastructure/CareerPlatformMigrationTest.java)
+- [PRZ-004 Evidence](../specs/PRZ-004-clean-clone-demo/evidence.md)
 
 ## 10. Worker 실패와 복구
 
@@ -394,7 +409,7 @@ Windows에서는 `SecureDirectoryStream` 성공 경로를 제공하지 않아 fa
 
 | 환경 | 목적 | 검증한 범위 | 검증하지 않은 범위 |
 |---|---|---|---|
-| PostgreSQL 16+pgvector | 로컬 실행, 자동 통합 테스트와 clean-clone 구성 | 애플리케이션 회귀, migration, 벡터 검색, ownership, Worker·파일 정리, Compose build·기동·health | OpenSQL 호환성, demo `USER` 전체 흐름 |
+| PostgreSQL 16+pgvector | 로컬 실행, 자동 통합 테스트와 clean-clone 구성 | 애플리케이션 회귀, migration, 벡터 검색, ownership, Worker·파일 정리와 두 독립 환경의 demo `USER` 로그인→TXT/PDF 업로드→ACTIVE→검색·브라우저 흐름 | OpenSQL 호환성 |
 | OpenSQL single-node | 별도 SQL 호환성 Gate | Flyway V1~V13, `vector(1024)`, owner·ACTIVE 검색 조건, processing·cleanup job SQL | Ollama 색인, Scheduler·실제 파일 삭제, browser, OpenProxy, OpenHA, DB failover |
 
 OpenSQL single-node SQL Gate는 기존 Evidence 기준 `PASS`입니다. 그 범위를 넘어선
@@ -404,6 +419,10 @@ OpenSQL single-node SQL Gate는 기존 Evidence 기준 `PASS`입니다. 그 범�
 - OpenProxy runtime: `NOT_VERIFIED`
 - OpenHA: `NOT_RUN`
 - DB failover: `NOT_RUN`
+
+PRZ-004 local branch에서는 PostgreSQL·pgvector와 호스트 Ollama를 사용한 두 독립
+clean clone을 검증했습니다. 두 번째 browser의 업로드 전 빈 목록 직접 관찰은
+`NOT_RUN`이며, 독립 최종 `AUDIT`와 GitHub 통합도 아직 완료하지 않았습니다.
 
 PostgreSQL 테스트 통과는 OpenSQL 결과가 아니며, OpenSQL SQL Gate 통과도 전체
 사용자 흐름이나 고가용성 근거가 아닙니다.
@@ -454,7 +473,6 @@ frontend/src/
 - OpenProxy 애플리케이션 연결, OpenHA와 DB failover
 - 기관용 workspace와 멤버십
 - 여러 vector DB·storage adapter
-- 안전한 demo `USER`를 포함한 clean-clone 전체 사용자 흐름
 
 상세 상태와 가장 가까운 제품 작업은 [현재 구현 현황](project-status.md)과
 [개발 로드맵](roadmap.md)을 따릅니다.
@@ -469,3 +487,4 @@ frontend/src/
 - [Spec Registry](../specs/README.md)
 - [PRZ-000 플랫폼 기준선 Evidence](../specs/PRZ-000-platform-baseline/evidence.md)
 - [PRZ-003 OpenSQL single-node Evidence](../specs/PRZ-003-opensql-single-node-gate/evidence.md)
+- [PRZ-004 clean-clone Evidence](../specs/PRZ-004-clean-clone-demo/evidence.md)

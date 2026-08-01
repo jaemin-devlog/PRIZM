@@ -1,6 +1,6 @@
 # 2026 오픈소스 개발자대회 티맥스티베로 과제 대응 계획
 
-> 기준일: 2026-07-30
+> 기준일: 2026-08-01
 >
 > 제출 마감: 2026-08-27
 >
@@ -14,7 +14,8 @@
 
 현재 P0 소스 전용(source-only) 준비는 완료됐다. P1에서는 실제 OpenSQL
 single-node SQL Gate를 통과했고, 안전한 demo `USER`를 이용한 clean-clone 전체
-사용자 흐름은 아직 실행하지 않았다(`NOT_RUN`).
+사용자 흐름도 PRZ-004 local branch의 두 독립 clone에서 검증했다. 독립 최종
+`AUDIT`와 GitHub 통합은 아직 완료하지 않았다.
 
 ## 공식 과제 해석
 
@@ -108,9 +109,14 @@ CareerFact, portfolio와 제출 감사는 실제 착수 순서에 따라 각각 
 - 전용 OpenSQL DB/schema에서 Flyway V1~V13과 `vector(1024)` 검색 — 완료
 - owner·ACTIVE, claim·lease·fencing·`SKIP LOCKED` 결과를 PostgreSQL과
   분리해 검증 — 완료
-- 별도 clean-clone demo spec에서 안전한 demo `USER`와 합성 TXT/PDF 준비
-- 두 번째 깨끗한 환경에서 로그인→업로드→ACTIVE→검색 재현
-- 처리 완료 확인 절차와 browser E2E 또는 고정 수동 UI 시험표 작성
+- PRZ-004에서 안전한 demo `USER`, 고유 Compose project와 합성 TXT/PDF 구현 —
+  local 구현·자동 검증 완료
+- 두 fresh clone에서 로그인→TXT/PDF 업로드→ACTIVE→검색 재현 — local `PASS`
+- 처리 완료 API smoke와 브라우저 로그인·문서·PDF viewer·검색·로그아웃 확인 —
+  local `PASS`; 두 번째 browser의 업로드 전 빈 목록 직접 관찰은 `NOT_RUN`
+- 독립 최종 `AUDIT`와 GitHub push·PR·CI·review·merge — `NOT_RUN`
+- OpenSQL+Ollama 전체 사용자 흐름, OpenProxy·OpenHA·DB failover — `NOT_RUN`
+  또는 `NOT_VERIFIED`
 
 ### P2. DB 장애복구 Gate — 8월 4~7일
 

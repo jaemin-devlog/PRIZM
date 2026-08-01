@@ -17,9 +17,11 @@ agent. The detailed delivery procedure lives in
   generation remain planned until source and executable tests prove otherwise.
 - N2SF is no longer the product direction. Do not add N2SF-only classifications,
   approval flows, terminology, or security features.
-- The current contest phase is P1 clean-clone evidence. P0 source-only readiness
-  and the actual OpenSQL single-node SQL Gate are complete; the demo `USER`
-  clean-clone end-to-end flow remains `NOT_RUN`.
+- The current contest phase is P1. P0 source-only readiness and the actual
+  OpenSQL single-node SQL Gate are complete; two local PostgreSQL·pgvector and
+  host Ollama clean-clone flows passed PRZ-004 verification.
+- PRZ-004 is not integrated into GitHub `main`. The OpenSQL+Ollama user flow,
+  OpenProxy runtime, OpenHA, and DB failover remain unverified or `NOT_RUN`.
 
 ## Career evidence principle
 

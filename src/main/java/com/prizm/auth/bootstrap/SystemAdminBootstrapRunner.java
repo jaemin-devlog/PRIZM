@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,17 +24,17 @@ public class SystemAdminBootstrapRunner implements ApplicationRunner {
 
     private final BootstrapSystemAdminProperties properties;
     private final UserAccountRepository userAccountRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final BcryptPasswordPolicy passwordPolicy;
     private final Validator validator;
 
     public SystemAdminBootstrapRunner(
             BootstrapSystemAdminProperties properties,
             UserAccountRepository userAccountRepository,
-            PasswordEncoder passwordEncoder,
+            BcryptPasswordPolicy passwordPolicy,
             Validator validator) {
         this.properties = properties;
         this.userAccountRepository = userAccountRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.passwordPolicy = passwordPolicy;
         this.validator = validator;
     }
 
@@ -56,11 +55,10 @@ public class SystemAdminBootstrapRunner implements ApplicationRunner {
 
         UserAccount systemAdmin = UserAccount.create(
                 normalizedEmail,
-                passwordEncoder.encode(properties.password()),
+                passwordPolicy.encode(properties.password()),
                 UserRole.SYSTEM_ADMIN);
         userAccountRepository.saveAndFlush(systemAdmin);
-        log.info("One-time bootstrap SYSTEM_ADMIN created for {}. Disable bootstrap before the next start.",
-                normalizedEmail);
+        log.info("One-time bootstrap SYSTEM_ADMIN created. Disable bootstrap before the next start.");
     }
 
     private void validateSettings() {
@@ -71,6 +69,9 @@ public class SystemAdminBootstrapRunner implements ApplicationRunner {
                     .sorted()
                     .collect(Collectors.joining(", "));
             throw new IllegalStateException("Invalid bootstrap SYSTEM_ADMIN settings: " + fields);
+        }
+        if (!passwordPolicy.isWithinLimit(properties.password())) {
+            throw new IllegalStateException("Invalid bootstrap SYSTEM_ADMIN settings: password");
         }
     }
 }

@@ -30,12 +30,14 @@ class SystemAdminBootstrapRunnerTest {
 
     private UserAccountRepository repository;
     private PasswordEncoder passwordEncoder;
+    private BcryptPasswordPolicy passwordPolicy;
     private Validator validator;
 
     @BeforeEach
     void setUp() {
         repository = mock(UserAccountRepository.class);
         passwordEncoder = new BCryptPasswordEncoder(4);
+        passwordPolicy = new BcryptPasswordPolicy(passwordEncoder);
         validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
@@ -105,7 +107,20 @@ class SystemAdminBootstrapRunnerTest {
     void redactsBootstrapPasswordFromToString() {
         BootstrapSystemAdminProperties properties = properties("system-admin@prizm.local", "strong-password");
 
-        assertThat(properties.toString()).doesNotContain("strong-password").contains("[REDACTED]");
+        assertThat(properties.toString())
+                .doesNotContain("system-admin@prizm.local", "strong-password")
+                .contains("email=[REDACTED]", "password=[REDACTED]");
+    }
+
+    @Test
+    void rejectsPasswordOverBcryptUtf8LimitBeforeSaving() {
+        BootstrapSystemAdminProperties properties = properties(
+                "system-admin@prizm.local", "가".repeat(25));
+
+        assertThatThrownBy(() -> runner(properties).run(new DefaultApplicationArguments(new String[0])))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Invalid bootstrap SYSTEM_ADMIN settings: password");
+        verify(repository, never()).saveAndFlush(any());
     }
 
     private BootstrapSystemAdminProperties properties(String email, String password) {
@@ -113,7 +128,7 @@ class SystemAdminBootstrapRunnerTest {
     }
 
     private SystemAdminBootstrapRunner runner(BootstrapSystemAdminProperties properties) {
-        return new SystemAdminBootstrapRunner(properties, repository, passwordEncoder, validator);
+        return new SystemAdminBootstrapRunner(properties, repository, passwordPolicy, validator);
     }
 
     @Configuration(proxyBeanMethods = false)
@@ -129,6 +144,11 @@ class SystemAdminBootstrapRunnerTest {
         @Bean
         PasswordEncoder passwordEncoder() {
             return new BCryptPasswordEncoder(4);
+        }
+
+        @Bean
+        BcryptPasswordPolicy bcryptPasswordPolicy(PasswordEncoder passwordEncoder) {
+            return new BcryptPasswordPolicy(passwordEncoder);
         }
 
         @Bean

@@ -30,6 +30,8 @@ Intelligence Engine**과 Reference App을 제공하는 것입니다. 현재 저�
 
 - JWT 로그인 뒤 사용자를 DB에서 다시 확인하고, 사용자별 문서와 검색 결과를
   분리합니다.
+- 기본적으로 꺼져 있는 one-time demo `USER` bootstrap과 합성 TXT/PDF 검증
+  도구를 제공합니다. 공개 회원가입 API는 제공하지 않습니다.
 - UTF-8 TXT와 텍스트가 포함된 PDF를 업로드하고 관리합니다.
 - 등록한 문서 버전은 직접 고치지 않고 바뀌지 않는 새 버전(immutable version)으로
   보존합니다.
@@ -45,21 +47,25 @@ CareerFact, 근거 기반 portfolio 생성, `/api/v1`, MCP, 독립 Engine 패키
 
 ## 최소 실행
 
-Docker Desktop과 호스트에서 실행 중인 Ollama가 필요합니다. `.env.example`을
-`.env`로 복사한 뒤 JWT 서명 비밀값(secret)과 DB 비밀번호를 로컬 값으로
-바꿉니다.
+Docker Desktop과 호스트에서 실행 중인 Ollama가 필요합니다. 다음 명령은 도구,
+감사된 `bge-m3` identity와 예시 포트를 확인한 뒤, 비밀값을 출력하지 않고 고유한
+Compose project용 `.env`를 만듭니다.
 
 ```powershell
-Copy-Item .env.example .env
-ollama pull bge-m3
-docker compose up -d --build
-Invoke-WebRequest http://localhost:8080/actuator/health | Select-Object -ExpandProperty Content
+node scripts/check-clean-clone-prerequisites.mjs --db-port 15433 --backend-port 18081 --frontend-port 15174
+node scripts/prepare-clean-clone-demo-env.mjs --db-port 15433 --backend-port 18081 --frontend-port 15174
+node scripts/generate-clean-clone-demo-fixtures.mjs
+node scripts/run-clean-clone-compose.mjs config --quiet
+node scripts/run-clean-clone-compose.mjs up -d --build
 ```
 
-Career Vault는 `http://localhost:5173`에서 열 수 있습니다. 다만 회원가입과
-안전한 demo `USER` 생성 경로가 아직 없어, 새 설치자가 로그인부터 업로드·검색까지
-완주하는 전체 흐름은 아직 검증하지 않았습니다(`NOT_RUN`). 실제 변수와 명령,
-상태 확인과 종료 방법은 [로컬 Quickstart](docs/quickstart.md)를 따릅니다.
+최초 기동에서 demo 계정을 만든 뒤에는 bootstrap을 끄고 backend를 다시 만들어야
+합니다. 로그인→합성 TXT/PDF 업로드→`ACTIVE`→원문 출처 검색, 브라우저 확인과
+종료까지의 정확한 절차는 [로컬 Quickstart](docs/quickstart.md)를 따릅니다.
+PRZ-004 local branch에서는 PostgreSQL·pgvector와 호스트 Ollama 기반 전체 흐름을
+두 독립 환경에서 검증했습니다. 독립 최종 `AUDIT`와 공개 GitHub main 통합은 아직
+완료하지 않았습니다. 자세한 경계는
+[PRZ-004 Evidence](specs/PRZ-004-clean-clone-demo/evidence.md)에서 확인합니다.
 
 ## 검증 범위
 

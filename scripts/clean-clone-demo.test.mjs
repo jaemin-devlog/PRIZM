@@ -38,6 +38,7 @@ import {
   readDemoConfiguration,
   readFixtureManifest,
   redactSecrets,
+  validateSearchResults,
   verifyCleanCloneDemo,
   waitForActiveVersion,
 } from './verify-clean-clone-demo.mjs'
@@ -217,7 +218,27 @@ test('builds explicit isolated Compose invocations for two different env files',
 test('uses a Docker executable outside PATH and removes Compose environment overrides', (t) => {
   const directory = temporaryDirectory(t)
   const envPath = join(directory, '.env')
-  writeFileSync(envPath, 'COMPOSE_PROJECT_NAME=prizm-clean-clone-fallback01\n')
+  writeFileSync(envPath, [
+    'COMPOSE_PROJECT_NAME=prizm-clean-clone-fallback01',
+    'SERVER_PORT=18081',
+    'PRIZM_FRONTEND_PORT=15174',
+    'PRIZM_DB_PORT=15433',
+    'PRIZM_DB_USERNAME=prizm_app',
+    'PRIZM_DB_PASSWORD=file-db-password',
+    'PRIZM_FLYWAY_USERNAME=prizm_owner',
+    'PRIZM_FLYWAY_PASSWORD=file-owner-password',
+    'PRIZM_JWT_SECRET=file-jwt-secret',
+    'PRIZM_BOOTSTRAP_DEMO_USER_ENABLED=false',
+    'PRIZM_BOOTSTRAP_DEMO_USER_EMAIL=demo@prizm.local',
+    'PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD=file-demo-password',
+    'PRIZM_BOOTSTRAP_SYSTEM_ADMIN_ENABLED=false',
+    'PRIZM_BOOTSTRAP_SYSTEM_ADMIN_EMAIL=admin@prizm.local',
+    'PRIZM_BOOTSTRAP_SYSTEM_ADMIN_PASSWORD=file-admin-password',
+    'PRIZM_OLLAMA_BASE_URL=http://localhost:11434',
+    'PRIZM_COMPOSE_OLLAMA_BASE_URL=http://host.docker.internal:11434',
+    'PRIZM_EMBEDDING_MODEL=bge-m3',
+    'PRIZM_CORS_ALLOWED_ORIGINS=http://localhost:15174',
+  ].join('\n'))
   let captured
   const result = runCleanCloneCompose({
     composeArguments: ['config', '--quiet'],
@@ -227,6 +248,24 @@ test('uses a Docker executable outside PATH and removes Compose environment over
       COMPOSE_FILE: 'untrusted.yaml',
       compose_project_name: 'untrusted-project',
       COMPOSE_ENV_FILES: 'untrusted.env',
+      SERVER_PORT: '28081',
+      PRIZM_FRONTEND_PORT: '25174',
+      PRIZM_DB_PORT: '25433',
+      PRIZM_DB_USERNAME: 'shell-app-user',
+      PRIZM_DB_PASSWORD: 'shell-db-secret',
+      PRIZM_FLYWAY_USERNAME: 'shell-owner-user',
+      PRIZM_FLYWAY_PASSWORD: 'shell-owner-secret',
+      PRIZM_JWT_SECRET: 'shell-jwt-secret',
+      PRIZM_BOOTSTRAP_DEMO_USER_ENABLED: 'true',
+      PRIZM_BOOTSTRAP_DEMO_USER_EMAIL: 'shell-demo@example.invalid',
+      PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD: 'shell-demo-secret',
+      PRIZM_BOOTSTRAP_SYSTEM_ADMIN_ENABLED: 'true',
+      PRIZM_BOOTSTRAP_SYSTEM_ADMIN_EMAIL: 'shell-admin@example.invalid',
+      PRIZM_BOOTSTRAP_SYSTEM_ADMIN_PASSWORD: 'shell-admin-secret',
+      PRIZM_OLLAMA_BASE_URL: 'https://external-host.example.invalid',
+      PRIZM_COMPOSE_OLLAMA_BASE_URL: 'https://external.example.invalid',
+      PRIZM_EMBEDDING_MODEL: 'external-model',
+      PRIZM_CORS_ALLOWED_ORIGINS: 'https://external.example.invalid',
       SAFE_VALUE: 'kept',
     },
     platform: 'win32',
@@ -244,6 +283,32 @@ test('uses a Docker executable outside PATH and removes Compose environment over
   assert.equal(Object.keys(captured.options.environment).some((key) => key.toUpperCase() === 'COMPOSE_FILE'), false)
   assert.equal(Object.keys(captured.options.environment).some((key) => key.toUpperCase() === 'COMPOSE_PROJECT_NAME'), false)
   assert.equal(Object.keys(captured.options.environment).some((key) => key.toUpperCase() === 'COMPOSE_ENV_FILES'), false)
+  for (const protectedKey of [
+    'SERVER_PORT',
+    'PRIZM_FRONTEND_PORT',
+    'PRIZM_DB_PORT',
+    'PRIZM_DB_USERNAME',
+    'PRIZM_DB_PASSWORD',
+    'PRIZM_FLYWAY_USERNAME',
+    'PRIZM_FLYWAY_PASSWORD',
+    'PRIZM_JWT_SECRET',
+    'PRIZM_BOOTSTRAP_DEMO_USER_ENABLED',
+    'PRIZM_BOOTSTRAP_DEMO_USER_EMAIL',
+    'PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD',
+    'PRIZM_BOOTSTRAP_SYSTEM_ADMIN_ENABLED',
+    'PRIZM_BOOTSTRAP_SYSTEM_ADMIN_EMAIL',
+    'PRIZM_BOOTSTRAP_SYSTEM_ADMIN_PASSWORD',
+    'PRIZM_OLLAMA_BASE_URL',
+    'PRIZM_COMPOSE_OLLAMA_BASE_URL',
+    'PRIZM_EMBEDDING_MODEL',
+    'PRIZM_CORS_ALLOWED_ORIGINS',
+  ]) {
+    assert.equal(Object.hasOwn(captured.options.environment, protectedKey), false)
+  }
+  assert.doesNotMatch(
+    JSON.stringify(captured),
+    /shell-db-secret|shell-owner-secret|shell-jwt-secret|shell-demo-secret|shell-admin-secret|shell-demo@example\.invalid|shell-admin@example\.invalid|external.*example\.invalid/,
+  )
 })
 
 test('rejects secret-rendering config, Compose overrides, and volume deletion', (t) => {
@@ -268,7 +333,7 @@ test('rejects secret-rendering config, Compose overrides, and volume deletion', 
     }),
     /must not override/,
   )
-  const cleaned = sanitizedComposeEnvironment({ COMPOSE_FILE: 'other.yaml', SAFE: 'yes' })
+  const cleaned = sanitizedComposeEnvironment({ COMPOSE_FILE: 'other.yaml', SAFE: 'yes' }, envPath)
   assert.deepEqual(cleaned, { SAFE: 'yes' })
 })
 
@@ -295,6 +360,36 @@ test('parses only unambiguous env data, requires disabled bootstrap, and enforce
     .replace('ENABLED=true', 'ENABLED=false')
     .replace('private-demo-password', '가'.repeat(25)))
   assert.throws(() => readDemoConfiguration(envPath, {}), /72 UTF-8 bytes/)
+})
+
+test('rejects shell overrides instead of masking the clone .env configuration', (t) => {
+  const directory = temporaryDirectory(t)
+  const envPath = join(directory, '.env')
+  writeFileSync(envPath, [
+    'SERVER_PORT=8181',
+    'PRIZM_BOOTSTRAP_DEMO_USER_ENABLED=true',
+    'PRIZM_BOOTSTRAP_DEMO_USER_EMAIL=file-demo@prizm.local',
+    'PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD=file-private-demo-password',
+  ].join('\n'))
+
+  assert.throws(
+    () => readDemoConfiguration(envPath, { PRIZM_BOOTSTRAP_DEMO_USER_ENABLED: 'false' }),
+    (error) => {
+      assert.match(error.message, /PRIZM_BOOTSTRAP_DEMO_USER_ENABLED/)
+      assert.doesNotMatch(error.message, /true|false/)
+      return true
+    },
+  )
+  assert.throws(
+    () => readDemoConfiguration(envPath, {
+      PRIZM_BOOTSTRAP_DEMO_USER_EMAIL: 'shell-demo@example.invalid',
+    }),
+    (error) => {
+      assert.match(error.message, /PRIZM_BOOTSTRAP_DEMO_USER_EMAIL/)
+      assert.doesNotMatch(error.message, /file-demo@prizm\.local|shell-demo@example\.invalid/)
+      return true
+    },
+  )
 })
 
 test('rejects every non-loopback credential destination before calling fetch', async (t) => {
@@ -479,6 +574,44 @@ test('rejects a reused database that already contains demo USER documents', asyn
   )
 })
 
+test('rejects empty, foreign, mismatched-version, and invalid-source search results', () => {
+  const upload = {
+    document: {
+      key: 'txt',
+      marker: 'GLASS ORBIT TEXT EVIDENCE 2026',
+      expectedSourceType: 'TEXT_CHUNK',
+      expectedSourceIndexMinimum: 1,
+    },
+    documentId: 11,
+    versionId: 101,
+  }
+  const validResult = {
+    documentId: 11,
+    documentVersionId: 101,
+    sourceType: 'TEXT_CHUNK',
+    sourceIndex: 1,
+    content: 'SEARCH MARKER: GLASS ORBIT TEXT EVIDENCE 2026',
+  }
+
+  assert.throws(() => validateSearchResults([], upload, [upload]), /did not contain any results/)
+  assert.throws(
+    () => validateSearchResults([
+      validResult,
+      { ...validResult, documentId: 999, documentVersionId: 9991 },
+    ], upload, [upload]),
+    /unexpected document, version, or source/,
+  )
+  assert.throws(
+    () => validateSearchResults([{ ...validResult, documentVersionId: 102 }], upload, [upload]),
+    /unexpected document, version, or source/,
+  )
+  assert.throws(
+    () => validateSearchResults([{ ...validResult, sourceType: 'PAGE', sourceIndex: 0 }], upload, [upload]),
+    /unexpected document, version, or source/,
+  )
+  assert.equal(validateSearchResults([validResult], upload, [upload]), validResult)
+})
+
 test('distinguishes failed processing from polling timeout', async () => {
   const upload = { document: { key: 'txt' }, documentId: 11, versionId: 101 }
   await assert.rejects(
@@ -509,6 +642,53 @@ test('distinguishes failed processing from polling timeout', async () => {
       sleep: async (duration) => { clock += duration },
     }),
     /Timed out/,
+  )
+})
+
+test('stops polling at the attempt cap even when the clock does not advance', async () => {
+  const upload = { document: { key: 'txt' }, documentId: 11, versionId: 101 }
+  let attempts = 0
+  await assert.rejects(
+    waitForActiveVersion({
+      fetchImpl: async () => {
+        attempts += 1
+        return Response.json({
+          activeVersionId: null,
+          versions: [{ versionId: 101, status: 'QUARANTINED', processingStatus: 'PROCESSING' }],
+        })
+      },
+      baseUrl: 'http://127.0.0.1:8080',
+      token: 'temporary-token',
+      upload,
+      timeoutMs: 180_000,
+      pollIntervalMs: 1,
+      maxAttempts: 2,
+      now: () => 0,
+      sleep: async () => {},
+    }),
+    /after 2 attempts/,
+  )
+  assert.equal(attempts, 2)
+})
+
+test('rejects an ACTIVE response that arrives after the overall deadline', async () => {
+  const upload = { document: { key: 'txt' }, documentId: 11, versionId: 101 }
+  const observedTimes = [0, 0, 180_001]
+  await assert.rejects(
+    waitForActiveVersion({
+      fetchImpl: async () => Response.json({
+        activeVersionId: 101,
+        versions: [{ versionId: 101, status: 'ACTIVE', processingStatus: 'COMPLETED' }],
+      }),
+      baseUrl: 'http://127.0.0.1:8080',
+      token: 'temporary-token',
+      upload,
+      timeoutMs: 180_000,
+      maxAttempts: 181,
+      now: () => observedTimes.shift() ?? 180_001,
+      sleep: async () => {},
+    }),
+    /after 1 attempts/,
   )
 })
 

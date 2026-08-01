@@ -57,14 +57,16 @@ export function validateComposeArguments(args) {
   return Object.freeze([...args])
 }
 
-export function sanitizedComposeEnvironment(environment = process.env) {
-  const sanitized = { ...environment }
-  for (const key of Object.keys(sanitized)) {
-    if (['COMPOSE_FILE', 'COMPOSE_PROJECT_NAME', 'COMPOSE_ENV_FILES'].includes(key.toUpperCase())) {
-      delete sanitized[key]
-    }
-  }
-  return sanitized
+export function sanitizedComposeEnvironment(environment = process.env, envPath = defaultEnvPath) {
+  const protectedKeys = new Set([
+    ...Object.keys(parseEnvFile(readFileSync(envPath, 'utf8'))),
+    'COMPOSE_FILE',
+    'COMPOSE_PROJECT_NAME',
+    'COMPOSE_ENV_FILES',
+  ].map((key) => key.toUpperCase()))
+  return Object.fromEntries(
+    Object.entries(environment).filter(([key]) => !protectedKeys.has(key.toUpperCase())),
+  )
 }
 
 export function buildCleanCloneComposeInvocation({
@@ -105,7 +107,7 @@ export function runCleanCloneCompose({
   })
   const result = runner(invocation.executable, invocation.arguments, {
     cwd: repositoryRoot,
-    environment: sanitizedComposeEnvironment(environment),
+    environment: sanitizedComposeEnvironment(environment, envPath),
     stdio: 'inherit',
     timeoutMs: 0,
   })

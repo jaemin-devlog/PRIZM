@@ -5,6 +5,9 @@ import com.prizm.user.entity.UserRole;
 import com.prizm.user.repository.UserAccountRepository;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -41,8 +44,8 @@ public class DemoUserBootstrapRunner implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments arguments) {
-        validateSettings();
-        String normalizedEmail = UserAccount.normalizeEmail(properties.email());
+        String normalizedEmail = normalizeAndValidateEmail();
+        validatePassword();
         if (userAccountRepository.findByEmail(normalizedEmail).isPresent()) {
             throw new IllegalStateException(
                     "Bootstrap demo USER was not created because the configured email already exists");
@@ -56,8 +59,26 @@ public class DemoUserBootstrapRunner implements ApplicationRunner {
         log.info("One-time bootstrap demo USER created. Disable bootstrap before the next start.");
     }
 
-    private void validateSettings() {
-        Set<ConstraintViolation<BootstrapDemoUserProperties>> violations = validator.validate(properties);
+    private String normalizeAndValidateEmail() {
+        String configuredEmail = properties.email();
+        if (configuredEmail == null) {
+            throw new IllegalStateException("Invalid bootstrap demo USER settings: email");
+        }
+        String normalizedEmail = UserAccount.normalizeEmail(configuredEmail);
+        if (normalizedEmail.isBlank()) {
+            throw new IllegalStateException("Invalid bootstrap demo USER settings: email");
+        }
+        Set<ConstraintViolation<NormalizedDemoEmail>> violations =
+                validator.validate(new NormalizedDemoEmail(normalizedEmail));
+        if (!violations.isEmpty()) {
+            throw new IllegalStateException("Invalid bootstrap demo USER settings: email");
+        }
+        return normalizedEmail;
+    }
+
+    private void validatePassword() {
+        Set<ConstraintViolation<BootstrapDemoUserProperties>> violations =
+                validator.validateProperty(properties, "password");
         if (!violations.isEmpty()) {
             String fields = violations.stream()
                     .map(violation -> violation.getPropertyPath().toString())
@@ -68,5 +89,9 @@ public class DemoUserBootstrapRunner implements ApplicationRunner {
         if (!passwordPolicy.isWithinLimit(properties.password())) {
             throw new IllegalStateException("Invalid bootstrap demo USER settings: password");
         }
+    }
+
+    private record NormalizedDemoEmail(
+            @NotBlank @Email @Size(max = 320) String email) {
     }
 }

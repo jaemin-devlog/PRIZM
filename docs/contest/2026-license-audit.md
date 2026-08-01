@@ -18,6 +18,12 @@
 | 정부 지원금·상금·개발비 | 없음 |
 | 법적 성격 | 기술적 inventory이며 법률 자문이 아님 |
 
+> 위 `VERIFIED_FOR_CURRENT_SOURCE_ONLY_SCOPE` 판정은 PRZ-002의 공개 source
+> commit `f54e3d98e3eddc20dc3c89d9b3e2b84e1649bea1`과 GitHub CI 기준
+> `777e184f206d2a2770d055940ddabf139abfed9d`에 대한 역사적 결과다. PRZ-004
+> local candidate는 이 결론을 대체하지 않는다. 최종 공급망 검증 전까지
+> PRZ-004의 상태는 `IMPLEMENTATION_CANDIDATE_UNVERIFIED`다.
+
 G-01 배포 경계는 2026-07-24 사용자 승인으로 source-only로 확정했다.
 같은 날 사용자는 PRIZM 직접 작성 source의 outgoing license로
 `Apache-2.0`을 승인했고, 현재 root `LICENSE`와 source-only `NOTICE`가
@@ -60,7 +66,7 @@ OpenProxy·OpenHA는 계속 `NOT_RUN` 또는 `NOT_VERIFIED`다.
 - `Status / unresolved`
 - `Verified`: 마지막 검증일
 
-## 재생성 기준과 입력 hash
+## PRZ-002 검증 기준과 입력 hash
 
 | 입력 | SHA-256 |
 |---|---|
@@ -69,13 +75,30 @@ OpenProxy·OpenHA는 계속 `NOT_RUN` 또는 `NOT_VERIFIED`다.
 | `gradle/wrapper/gradle-wrapper.properties` | `735B1FFB51D53B1FFAAAD7ECAF66B36014D758AEDAA35EC354CB2B2717B8EE7C` |
 | `gradle/wrapper/gradle-wrapper.jar` | `497C8C2A7E5031F6AA847F88104AA80A93532EC32EE17BDB8D1D2F67A194A9C7` |
 | `gradle/verification-metadata.xml` | `24B43A1FC2319C7C87475192BDEA62A860BCAD20D0B68F0C60A4EA1730380D71` |
-| `frontend/package.json` | `EC0CD5D8BBA2684097E0CF0DBA81C7EF0D95CCEBF5DCE65BDAB43762FD9BE58D` |
-| `frontend/package-lock.json` | `F14F034AA910996BE41FF744DC24213C7478B34D1DEA89DE75FB71543FFD922D` |
+| `frontend/package.json` | `ED40AD99488120CF5A4928050AB4FAC4F69CE4D62CACBD92578EC3F80DDF1725` |
+| `frontend/package-lock.json` | `967063C8B12574A1467D492AD5FEC7C6E080E89A6250F153E49ED1F1714FB66C` |
 | `.nvmrc` | `157C2EB0DE1187AC028E89BCFF580F1FEAB7EEA2A280B110998C9472E19B4D98` |
 | `compose.yaml` | `4B0D8957D993E963888DA2FD539952A5ADBDE5031FBD8152971F3184447673AC` |
 | backend Dockerfile | `D7919AF879015F78114DDD1E03A909D51D29895ACBD694536243557120B90DEC` |
+| frontend Dockerfile | `C2859300EC00F750BB7E7525F78E7556E3BF9D5F075F64070DF5066A8FA4AF98` |
+| `.github/workflows/ci.yml` | `8A686095B7879B7B639CB2E1ADEF4EBC5FCFDCAD6697BF7ED06C4900C4BA444A` |
+
+### PRZ-004 local candidate
+
+- 최초 정적 감사 후보: `0d20454eb9a3c3d9b8c7812d54a20781415b0378`
+- 상태: `IMPLEMENTATION_CANDIDATE_UNVERIFIED`
+- candidate dependency·Docker·CI·SBOM·checksum 파일은 갱신돼 있고 정적
+  일관성만 확인했다.
+- 최종 source에서의 `npm ci`, full·production audit, lint·build, Docker builder
+  identity, SBOM 재생성, checksum·license·OSS readiness 검증은 `NOT_RUN`이다.
+
+| candidate 입력 | 현재 파일 SHA-256 또는 정적 정보 |
+|---|---|
+| `frontend/package.json` | `EC0CD5D8BBA2684097E0CF0DBA81C7EF0D95CCEBF5DCE65BDAB43762FD9BE58D` |
+| `frontend/package-lock.json` | `F14F034AA910996BE41FF744DC24213C7478B34D1DEA89DE75FB71543FFD922D` |
 | frontend Dockerfile | `E84AF0B9D993DE9D550AAC92A45EF69036304ABD6AA2FEA5E11B60F127EEA32B` |
 | `.github/workflows/ci.yml` | `49B38EFA01511F0C761F4A23CF72CA1ED9E48287CA5EE63569E16A91EF4D6CBA` |
+| `sbom/prizm-frontend.cdx.json` | 183 components; 현재 checksum `cd1ed67bffefdaf4618bf9452d193f52c69aa37c646014b1daaf6354609c254a` |
 
 ## GitHub Actions 실행 증거
 
@@ -242,22 +265,12 @@ Apache-2.0 exact component는
 `eslint-visitor-keys@3.4.3`·`5.0.1`, `typescript@6.0.3`이다.
 
 `.nvmrc`와 package engines는 Node `22.17.0`, package manager는 npm
-`10.9.2`다. 2026-08-01 재현에서 기존 Dockerfile의 `node:22-alpine`은
-Node `22.23.2`를 실행해 이 선언과 달랐다. 따라서 frontend builder를
-`node:22.17.0-alpine`으로 고정했고, 확인한 Linux/amd64 image는 Node
-`22.17.0`과 repository digest
-`sha256:fc3e945f920b7e3000cd1af86c4ae406ec70c72f328b667baf0f3a8910d69eed`를
-반환했다. Dockerfile은 exact version tag를 사용하지만 digest 자체를 pin하지
-않으므로 향후 image 재배포 전 registry identity와 base package SBOM은 다시
-감사한다.
-
-같은 날 full npm audit에서 개발 전용 transitive dependency
-`brace-expansion@5.0.7`과 `postcss@8.5.16`의 high finding 2건을 재현했다.
-직접 dependency를 추가하지 않고 npm `overrides`를 각각 `5.0.9`와 `8.5.25`로
-고정했다. lockfile 재해소 과정에서 `postcss`가 요구하는 `nanoid`도
-`3.3.16`으로 갱신됐다. 세 구성요소는 모두 개발 전용 `MIT`이고, 전체 183개
-component와 license cohort 수는 변하지 않았다. clean `npm ci` 뒤 full audit와
-`--omit=dev` audit는 모두 finding 0건이었다.
+`10.9.2`다. PRZ-004 최초 후보는 frontend builder를
+`node:22.17.0-alpine`으로 바꾸고 개발 전용 transitive dependency 세 항목을
+갱신했다. 현재 lockfile과 candidate SBOM은 183개 component로 정적 일관성을
+보인다. 다만 이번 교정 단계에서는 final source의 clean `npm ci`, full·production
+audit, frontend build, Docker builder identity와 SBOM 재생성을 실행하지 않았다.
+따라서 finding 0, builder identity 또는 공급망 최종 `PASS`로 판정하지 않는다.
 
 현재 ignored `frontend/dist`의 JavaScript에는 React·React DOM `19.2.7`
 계열이 포함되지만 license/copyright 고지가 없었다. clean build는 이번
@@ -279,7 +292,7 @@ package SBOM을 만들거나 registry에 publish하지 않았다.
 |---|---|---|---|---|---|---|---|---|
 | `IMG-TEMURIN-JDK` | `eclipse-temurin:17-jdk` | [Temurin image](https://hub.docker.com/_/eclipse-temurin) | Dockerfile Apache-2.0; OpenJDK `GPL-2.0-only WITH Classpath-exception-2.0`; OS composite | backend build | `NOT_DISTRIBUTED`; 사용자가 local build 중 upstream에서 받음 | image를 future 배포하면 package별 필요 | mutable tag, digest·SBOM `UNKNOWN` | 2026-07-24 |
 | `IMG-TEMURIN-JRE` | `eclipse-temurin:17-jre` | [Temurin image](https://hub.docker.com/_/eclipse-temurin) | OpenJDK `GPL-2.0-only WITH Classpath-exception-2.0` + OS composite | backend runtime | `NOT_DISTRIBUTED`; 사용자가 local build 중 upstream에서 받음 | image를 future 배포하면 package별 필요 | mutable tag, digest·SBOM `UNKNOWN` | 2026-07-24 |
-| `IMG-NODE` | `node:22.17.0-alpine`; 2026-08-01 Linux/amd64 확인 digest `sha256:fc3e945f920b7e3000cd1af86c4ae406ec70c72f328b667baf0f3a8910d69eed` | [Node image](https://hub.docker.com/_/node) | Node `MIT`, Alpine packages composite | frontend build | `NOT_DISTRIBUTED`; 사용자가 local build 중 upstream에서 받음 | image를 future 배포하면 package별 필요 | Node `22.17.0` 실행 확인; tag가 digest로 고정된 것은 아니며 Alpine package SBOM은 `UNKNOWN` | 2026-08-01 |
+| `IMG-NODE` | `node:22-alpine` | [Node image](https://hub.docker.com/_/node) | Node `MIT`, Alpine packages composite | frontend build | `NOT_DISTRIBUTED`; 사용자가 local build 중 upstream에서 받음 | image를 future 배포하면 package별 필요 | patch·Alpine·digest·SBOM `UNKNOWN`; PRZ-004 candidate 변경은 위 별도 절에 기록 | 2026-07-24 |
 | `IMG-NGINX` | `nginx:1.27-alpine` | [Nginx image](https://hub.docker.com/_/nginx) | Nginx BSD family, Alpine packages composite | frontend runtime | `NOT_DISTRIBUTED`; 사용자가 local build 중 upstream에서 받음 | image를 future 배포하면 package별 필요 | minor·Alpine·digest·SBOM `UNKNOWN` | 2026-07-24 |
 | `IMG-PGVECTOR` | `pgvector/pgvector:0.8.2-pg16-bookworm` | [pgvector v0.8.2 Dockerfile](https://github.com/pgvector/pgvector/blob/v0.8.2/Dockerfile), [PostgreSQL license](https://www.postgresql.org/about/licence/) | pgvector·PostgreSQL License; Debian packages composite | database runtime | `NOT_DISTRIBUTED`; 사용자의 Docker가 upstream에서 pull | image를 future 배포하면 package별 필요 | PostgreSQL 16 base patch·digest·SBOM `UNKNOWN` | 2026-07-24 |
 

@@ -7,6 +7,16 @@
 - 작업 branch: `PRZ-004-clean-clone-demo` (local only)
 - 공개 main 상태: demo `USER` 전체 흐름 `NOT_RUN`
 
+## 작성·사후 대조 이력
+
+- 초기 구현 후보 일부는 최종 Spec·Plan이 확정되기 전에 만들어졌다.
+- Spec·Plan과 구현이 처음 함께 기록된 commit은 `f7d600f`이며, 이를 사전 승인된
+  계획으로 간주하지 않는다.
+- 이후 범위를 축소하고 후보 commit `0d20454eb9a3c3d9b8c7812d54a20781415b0378`을
+  Spec·Plan과 사후 대조했다.
+- 현재 상태는 `IMPLEMENTATION_CANDIDATE_UNVERIFIED`다. 두 clean clone,
+  브라우저, 전체 회귀와 공급망 최종 검증은 `NOT_RUN`이다.
+
 ## 선택한 접근
 
 1. 기존 `users` table과 인증 흐름을 그대로 사용하고, 명시적으로 켠 한 번의
@@ -24,6 +34,25 @@
 6. Quickstart를 단일 실행 문서로 유지하고 별도 상세 문서를 추가하지 않는다.
 7. 원격 main에서 직접 재현된 npm high 2건만 exact override로 교정한다. frontend
    접근성 변경은 clean-clone 차단 문제가 아니므로 제외한다.
+
+### 정적 감사 뒤 최소 교정
+
+- 정적 감사에서 상위 shell이 `.env`의 Compose 설정을 덮어쓸 수 있음을 확인했다.
+  방식 A를 선택해 child process에서 실제 `.env`가 관리하는 모든 key와 Compose
+  제어 key를 제거한다. 관계없는 `PATH` 같은 환경은 보존하고 값은 출력하지 않는다.
+- verifier는 bootstrap·demo credential·port·project·Ollama 관련 shell override가
+  있으면 key 이름만 표시하고 fail-closed한다. 실제 값은 `.env`만 읽는다.
+- version polling은 180초 deadline, 1초 간격과 최대 181회 요청을 함께 적용한다.
+- 검색 결과는 현재 실행에서 이미 업로드한 document/version allowlist 전체와
+  대조하고, 예상하지 않은 결과를 조용히 무시하지 않는다.
+
+### CORS 교정 이력
+
+- 초기 후보의 custom frontend port와 기본 `5173` origin 불일치는 정적
+  설정·script 대조에서 발견했으며 브라우저에서 재현한 결과가 아니다.
+- commit `207143b`에서 frontend port를 CORS origin에 연결했다.
+- commit `0d20454`에서 URL 기본 port `80` 정규화 회귀를 교정했다.
+- 실제 브라우저 CORS 검증은 현재 `NOT_RUN`이다.
 
 ## 예상 변경
 
@@ -92,8 +121,9 @@
 
 ## Dependency·license 판단
 
-- main full npm audit에서 `brace-expansion 5.0.7`, `postcss 8.5.16` high finding을
-  재현했다. production-only audit은 0건이다.
+- 기준 main의 ORIENT에서 `brace-expansion 5.0.7`, `postcss 8.5.16` high finding과
+  production-only audit 0건을 관찰했다. PRZ-004 final source의 audit은 아직
+  `NOT_RUN`이다.
 - 최소 safe exact version으로 올린 뒤 lockfile 183개 component와 license
   expression을 다시 대조한다.
 - frontend SBOM·checksum·license audit input SHA를 같은 diff에서 갱신한다.

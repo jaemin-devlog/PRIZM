@@ -6,6 +6,22 @@ import { pathToFileURL } from 'node:url'
 const repositoryRoot = resolve(import.meta.dirname, '..')
 const defaultManifestPath = resolve(repositoryRoot, 'local', 'clean-clone-demo', 'manifest.json')
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '::1'])
+const DEFAULT_PROCESSING_TIMEOUT_MS = 180_000
+const DEFAULT_POLL_INTERVAL_MS = 1_000
+const DEFAULT_MAX_POLL_ATTEMPTS = 181
+const VERIFIER_SHELL_OVERRIDE_KEYS = new Set([
+  'COMPOSE_PROJECT_NAME',
+  'SERVER_PORT',
+  'PRIZM_FRONTEND_PORT',
+  'PRIZM_BOOTSTRAP_DEMO_USER_ENABLED',
+  'PRIZM_BOOTSTRAP_DEMO_USER_EMAIL',
+  'PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD',
+  'PRIZM_DEMO_BASE_URL',
+  'PRIZM_OLLAMA_BASE_URL',
+  'PRIZM_COMPOSE_OLLAMA_BASE_URL',
+  'PRIZM_EMBEDDING_MODEL',
+  'PRIZM_EMBEDDING_DIMENSIONS',
+])
 
 export function parseEnvFile(content) {
   const values = {}
@@ -55,7 +71,13 @@ export function readDemoConfiguration(
   environment = process.env,
 ) {
   const fileValues = parseEnvFile(readFileSync(envFile, 'utf8'))
-  const value = (key, fallback = '') => environment[key] ?? fileValues[key] ?? fallback
+  const conflictingKeys = [...new Set(Object.keys(environment)
+    .map((key) => key.toUpperCase())
+    .filter((key) => VERIFIER_SHELL_OVERRIDE_KEYS.has(key)))].sort()
+  if (conflictingKeys.length > 0) {
+    throw new Error(`Demo verification does not accept shell overrides: ${conflictingKeys.join(', ')}`)
+  }
+  const value = (key, fallback = '') => fileValues[key] ?? fallback
   const email = value('PRIZM_BOOTSTRAP_DEMO_USER_EMAIL').trim().toLowerCase()
   const password = value('PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD')
   const enabled = value('PRIZM_BOOTSTRAP_DEMO_USER_ENABLED', 'false').trim().toLowerCase()
@@ -175,38 +197,57 @@ export async function waitForActiveVersion({
   baseUrl,
   token,
   upload,
-  timeoutMs = 180_000,
-  pollIntervalMs = 1_000,
+  timeoutMs = DEFAULT_PROCESSING_TIMEOUT_MS,
+  pollIntervalMs = DEFAULT_POLL_INTERVAL_MS,
+  maxAttempts = DEFAULT_MAX_POLL_ATTEMPTS,
   now = Date.now,
   sleep = (duration) => new Promise((resolveSleep) => setTimeout(resolveSleep, duration)),
 }) {
+  if (!Number.isInteger(maxAttempts) || maxAttempts < 1) {
+    throw new Error('Polling maxAttempts must be a positive integer')
+  }
   const deadline = now() + timeoutMs
-  while (now() <= deadline) {
+  let attempts = 0
+  while (attempts < maxAttempts && now() <= deadline) {
+    attempts += 1
     const detail = await requestJson(fetchImpl, `${baseUrl}/api/documents/${upload.documentId}`, {
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
     }, 200)
+    const observedAt = now()
     const version = detail.versions?.find((candidate) => candidate.versionId === upload.versionId)
     if (!version) throw new Error(`Uploaded ${upload.document.key} version is missing from document detail`)
     if (version.status === 'FAILED' || version.processingStatus === 'FAILED') {
       throw new Error(`Uploaded ${upload.document.key} processing failed with ${version.processingErrorCode ?? 'UNKNOWN'}`)
     }
-    if (detail.activeVersionId === upload.versionId && version.status === 'ACTIVE') return detail
+    if (observedAt <= deadline
+      && detail.activeVersionId === upload.versionId
+      && version.status === 'ACTIVE') return detail
+    if (attempts >= maxAttempts || observedAt > deadline) break
     await sleep(pollIntervalMs)
   }
-  throw new Error(`Timed out waiting for uploaded ${upload.document.key} version to become ACTIVE`)
+  throw new Error(
+    `Timed out waiting for uploaded ${upload.document.key} version to become ACTIVE after ${attempts} attempts`,
+  )
 }
 
-async function verifySearch(fetchImpl, baseUrl, token, upload) {
-  const results = await requestJson(fetchImpl, `${baseUrl}/api/career-evidence/search`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ query: upload.document.query }),
-  }, 200)
-  if (!Array.isArray(results)) throw new Error('Career Evidence response was not an array')
+export function validateSearchResults(results, currentUpload, allowedUploads) {
+  if (!Array.isArray(results) || results.length === 0) {
+    throw new Error('Career Evidence response did not contain any results')
+  }
+  const allowedByDocument = new Map(allowedUploads.map((upload) => [upload.documentId, upload]))
+  for (const result of results) {
+    const allowed = allowedByDocument.get(result.documentId)
+    if (!allowed
+      || result.documentVersionId !== allowed.versionId
+      || result.sourceType !== allowed.document.expectedSourceType
+      || !Number.isInteger(result.sourceIndex)
+      || result.sourceIndex < allowed.document.expectedSourceIndexMinimum
+      || typeof result.content !== 'string') {
+      throw new Error('Career Evidence response contained an unexpected document, version, or source')
+    }
+  }
+  const upload = currentUpload
   const marker = upload.document.marker.toLowerCase()
   const match = results.find((result) => (
     result.documentId === upload.documentId
@@ -221,6 +262,18 @@ async function verifySearch(fetchImpl, baseUrl, token, upload) {
     throw new Error(`Search did not return the uploaded ${upload.document.key} document with the expected source`)
   }
   return match
+}
+
+async function verifySearch(fetchImpl, baseUrl, token, upload, allowedUploads) {
+  const results = await requestJson(fetchImpl, `${baseUrl}/api/career-evidence/search`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ query: upload.document.query }),
+  }, 200)
+  return validateSearchResults(results, upload, allowedUploads)
 }
 
 async function verifyLoggedOutBoundary(fetchImpl, baseUrl) {
@@ -239,6 +292,7 @@ export async function verifyCleanCloneDemo({
   fetchImpl = fetch,
   timeoutMs,
   pollIntervalMs,
+  maxAttempts,
   now,
   sleep,
 }) {
@@ -249,7 +303,8 @@ export async function verifyCleanCloneDemo({
   const manifest = readFixtureManifest(manifestPath)
   const token = await login(fetchImpl, safeBaseUrl, email, password)
   await verifyEmptyOwnerDocumentList(fetchImpl, safeBaseUrl, token)
-  const uploads = []
+  const allowedUploads = []
+  const verifiedUploads = []
   for (const document of manifest.documents) {
     const upload = await uploadDocument(fetchImpl, safeBaseUrl, token, document)
     await waitForActiveVersion({
@@ -259,11 +314,13 @@ export async function verifyCleanCloneDemo({
       upload,
       timeoutMs,
       pollIntervalMs,
+      maxAttempts,
       now,
       sleep,
     })
-    const source = await verifySearch(fetchImpl, safeBaseUrl, token, upload)
-    uploads.push(Object.freeze({
+    allowedUploads.push(upload)
+    const source = await verifySearch(fetchImpl, safeBaseUrl, token, upload, allowedUploads)
+    verifiedUploads.push(Object.freeze({
       key: document.key,
       documentId: upload.documentId,
       versionId: upload.versionId,
@@ -273,9 +330,9 @@ export async function verifyCleanCloneDemo({
   }
   await verifyLoggedOutBoundary(fetchImpl, safeBaseUrl)
   return Object.freeze({
-    documentsVerified: uploads.length,
+    documentsVerified: verifiedUploads.length,
     unauthenticatedAccessRejected: true,
-    uploads: Object.freeze(uploads),
+    uploads: Object.freeze(verifiedUploads),
   })
 }
 

@@ -4,6 +4,10 @@
 
 `IN_PROGRESS`
 
+이 문서는 초기 구현 후보가 만들어진 뒤 범위를 축소해 사후 대조한 conformance
+계약이다. 구현 전에 확정된 사전 계획으로 소급해 표현하지 않으며, 자세한 이력은
+[Plan](plan.md)과 [Evidence](evidence.md)에 기록한다.
+
 ## 목적
 
 처음 PRIZM을 clone한 사용자가 기존 계정이나 Docker volume에 기대지 않고,
@@ -43,6 +47,12 @@ PostgreSQL·pgvector와 호스트 Ollama를 이용해 로그인부터 원문 근
 - 매 실행은 안전한 고유 `COMPOSE_PROJECT_NAME`을 사용한다.
 - Compose 실행은 `.env`의 project·`compose.yaml`을 명시해 상위 shell의
   `COMPOSE_PROJECT_NAME`·`COMPOSE_FILE`로 격리 경계가 바뀌지 않게 한다.
+- `.env`가 관리하는 project·port·DB/Flyway credential·JWT·bootstrap·Ollama·model·
+  CORS 설정은 상위 shell이 덮어쓰지 못하게 한다. 충돌이나 실패 메시지에는
+  비밀값과 demo email을 출력하지 않는다.
+- CORS 허용 origin은 `.env`의 frontend port로 만든 정확한 localhost origin과
+  일치해야 한다. 기본 port가 생략되는 URL 정규화도 처리하며 wildcard, 이전 port,
+  상위 shell origin을 허용하지 않는다.
 - 사용자는 기존 Compose project나 volume을 삭제하지 않고 host port를 명시적으로
   바꿀 수 있다.
 - POSIX에서 새 `.env` mode는 `0600`이어야 한다. Windows에서는 mode bit 대신
@@ -66,7 +76,11 @@ PostgreSQL·pgvector와 호스트 Ollama를 이용해 로그인부터 원문 근
 - 로그인 응답이 enabled `USER`인지 확인한다.
 - TXT/PDF를 각각 업로드하고 실패·timeout을 구분하며 해당 version이 `ACTIVE`가
   될 때까지 polling한다.
-- 검색 결과가 해당 owner의 document/version과 marker를 포함하는지 확인한다.
+- polling은 전체 deadline과 최대 시도 횟수를 함께 적용하고, terminal failure를
+  즉시 실패로 처리한다. 시간이 비정상적으로 움직여도 최대 시도 횟수를 넘지 않는다.
+- 검색 결과 전체가 이번 실행에서 업로드한 document/version 허용 목록에 속해야
+  한다. 예상 밖 document/version이 하나라도 있거나 결과가 비어 있으면 실패한다.
+- 현재 검증 대상의 marker가 검색 결과에 포함돼야 한다.
 - TXT는 `TEXT_CHUNK`, PDF는 `PAGE`와 유효한 page index를 확인한다.
 - token을 제거한 요청이 보호 경로에서 `401`인지 확인한다.
 

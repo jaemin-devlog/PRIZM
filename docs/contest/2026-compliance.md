@@ -6,6 +6,13 @@
 > 전체 identity, exact version과 checksum은 [기계 판독용 SBOM](../../sbom/README.md)을
 > 단일 원본으로 사용한다. 이 문서는 법률 자문이 아니다.
 
+> 아래 source-only `VERIFIED` 결론은 PRZ-002 source commit
+> `f54e3d98e3eddc20dc3c89d9b3e2b84e1649bea1`과 GitHub CI 기준
+> `777e184f206d2a2770d055940ddabf139abfed9d`의 역사적 결과다. PRZ-004 local
+> candidate에 연결된 frontend SBOM과 checksum은 현재
+> `IMPLEMENTATION_CANDIDATE_UNVERIFIED`이며, 재생성·runtime·license 최종 검증은
+> `NOT_RUN`이다. 이 후보는 공개 main 결론을 대체하지 않는다.
+
 ## 한눈에 보는 결론
 
 | 항목 | 현재 결론 |

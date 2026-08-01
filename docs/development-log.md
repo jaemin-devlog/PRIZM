@@ -607,3 +607,24 @@
   `f54e3d98e3eddc20dc3c89d9b3e2b84e1649bea1`, tree는
   `7e5f22fdbfbe1f4c87d8cd2c4fb579cba776e047`이다. 이 값을 PRZ-002
   evidence·registry와 라이선스/SBOM 검증 기준에 고정했다.
+
+## 2026-08-01 — PRZ-004 clean-clone 검증과 GitHub 통합
+
+- 전체 흐름: source `25d09e9eee9837cf4a63d7461699825ff22743e2`에서 자동 검증
+  `339 PASS / 18 SKIP / 0 FAIL`과 서로 다른 project·port·volume의 두 독립
+  clean clone을 통과했다. PostgreSQL·pgvector와 호스트 Ollama `bge-m3`를
+  사용했으며 OpenSQL 결과가 아니다.
+- 감사: 독립 최종 판정은 `AUDIT_PASS_WITH_NON_BLOCKING_FINDINGS`, blocking
+  finding 0건이다. 두 번째 환경의 업로드 전 빈 목록은 API로 확인했지만
+  브라우저에서 직접 관찰하지 않아 해당 항목을 `NOT_RUN`으로 보존한다.
+- 플랫폼 교정: GitHub Linux CI에서 발견한 Node test 경로 호환성을 source
+  `aff3e87a9a912e44fcf217291a45328cf451cfc9`에서 교정했다. Windows 결과는
+  `26 PASS / 1 SKIP / 0 FAIL`, Linux 결과는 `27 PASS / 0 SKIP / 0 FAIL`이며,
+  PR head의 GitHub check 6건이 성공했다. 전체 clean clone은 이 commit에서 다시
+  실행한 것으로 기록하지 않는다.
+- 통합: 실제 [PR #25](https://github.com/jaemin-devlog/PRIZM/pull/25)를 merge
+  commit `1f9a5ad964778a2e72de9949a0fadae042008392`로 `main`에 병합했다. 별도
+  Issue는 소급 생성하지 않았고 GitHub review 0건은
+  `REVIEW_NOT_AVAILABLE_SOLO`로 기록한다.
+- 남은 경계: OpenSQL+Ollama 전체 사용자 흐름은 `NOT_RUN`, OpenProxy는
+  `NOT_VERIFIED`, OpenHA와 DB failover는 `NOT_RUN`이다.

@@ -70,7 +70,7 @@
 | [PRZ-001](PRZ-001-search-evaluation-integrity/spec.md) | 검색 평가 분할 및 지표 정합성 | `VERIFIED` | `36c8610` | 2026-07-24 |
 | [PRZ-002](PRZ-002-open-source-readiness/spec.md) | 오픈소스 준비: 출처·라이선스·기여 기준선 | `VERIFIED` | `f54e3d9` | 2026-07-30 |
 | [PRZ-003](PRZ-003-opensql-single-node-gate/spec.md) | OpenSQL 단일 노드 검증 환경 | `VERIFIED` | `777e184` | 2026-07-30 |
-| [PRZ-004](PRZ-004-clean-clone-demo/spec.md) | 안전한 demo USER와 clean-clone 전체 흐름 | `IMPLEMENTED_UNVERIFIED` | `25d09e9` | 2026-08-01 (`VERIFY` 완료, `AUDIT` 대기) |
+| [PRZ-004](PRZ-004-clean-clone-demo/spec.md) | 안전한 demo USER와 clean-clone 전체 흐름 | `VERIFIED` | `aff3e87` | 2026-08-01 |
 
 다음 신규 Spec의 우선순위는
 [2026 티맥스티베로 지정과제 대응 계획](../docs/contest/2026-tmaxtibero-plan.md)을

@@ -2,10 +2,11 @@
 
 ## 상태
 
-`IMPLEMENTED_UNVERIFIED`
+`VERIFIED`
 
-구현과 필수 `VERIFY`는 완료했지만 독립 최종 `AUDIT`와 GitHub 통합은 아직
-완료하지 않았다.
+구현과 필수 `VERIFY`, 독립 최종 `AUDIT`, GitHub PR #25 CI와 `main` 통합을
+완료했다. 환경별 실행 기준과 남은 `NOT_RUN` 항목은 [Evidence](evidence.md)에
+기록한다.
 
 이 문서는 초기 구현 후보가 만들어진 뒤 범위를 축소해 사후 대조한 conformance
 계약이다. 구현 전에 확정된 사전 계획으로 소급해 표현하지 않으며, 자세한 이력은
@@ -107,8 +108,8 @@ PostgreSQL·pgvector와 호스트 Ollama를 이용해 로그인부터 원문 근
 
 ### PRZ-004-R07 — 상태와 Evidence
 
-- 공개 main 기준선, local source commit, 두 clean clone 결과와 GitHub 미통합
-  상태를 구분한다.
+- 작업 시작 main, 전체 clean-clone source commit, 최종 교정 source commit,
+  두 clean clone 결과와 GitHub 통합 상태를 구분한다.
 - `PASS`, `FAIL`, `SKIPPED`, `NOT_RUN`, `NOT_VERIFIED`를 서로 바꾸어 쓰지 않는다.
 - 실제 Issue·PR·CI·review·merge가 없으면 없다고 기록한다.
 - PostgreSQL 결과를 OpenSQL 결과로 표현하지 않는다.

@@ -7,8 +7,8 @@
 | T3 | demo USER·충돌·BCrypt 보안 계약 구현 | `PASS` | [Evidence](evidence.md) |
 | T4 | 안전한 env·fixture·smoke 도구 구현 | `PASS` | [Evidence](evidence.md) |
 | T5 | npm audit 교정과 SBOM·license 동기화 | `PASS` | vulnerability 0, SBOM·OSS readiness 통과; [Evidence](evidence.md) |
-| T6 | 문서와 상태 경계 갱신 | `VERIFY_PASS_AUDIT_PENDING` | 공개 main·local 검증·GitHub 미통합을 분리하고 문서 검증 통과; [Evidence](evidence.md) |
+| T6 | 문서와 상태 경계 갱신 | `PASS` | source·환경·GitHub 통합 상태를 분리해 기록; [Evidence](evidence.md) |
 | T7 | 최종 source commit 자동 검증 | `PASS` | `339 PASS / 18 SKIP / 0 FAIL`; [Evidence](evidence.md) |
 | T8 | 두 fresh clone API·browser 검증 | `PASS` | 두 번째 빈 목록 UI 관찰은 `NOT_RUN` 비차단 finding; [Evidence](evidence.md) |
-| T9 | 독립 최종 보안·ownership·license 감사 | `PENDING_AUDIT` | 문서 교정 뒤 재실행; [Evidence](evidence.md) |
-| T10 | GitHub 통합 | `NOT_RUN` | 이번 승인 범위에서 제외 |
+| T9 | 독립 최종 보안·ownership·license 감사 | `PASS_WITH_NON_BLOCKING_FINDINGS` | blocking finding 0건; [Evidence](evidence.md) |
+| T10 | GitHub 통합 | `PASS` | [PR #25](https://github.com/jaemin-devlog/PRIZM/pull/25), CI 6건 성공, merge `1f9a5ad`; review는 `REVIEW_NOT_AVAILABLE_SOLO` |

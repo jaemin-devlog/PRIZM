@@ -1,6 +1,6 @@
 # 2026 티맥스티베로 지정과제 요구사항·평가기준 추적표
 
-> 현재 검증 기준일: 2026-07-30
+> 현재 검증 기준일: 2026-08-01
 >
 > 목적: 공식 요구사항과 평가기준을 PRIZM의 현재 대응, source·test,
 > 실제 환경 검증과 다음 Gate에 연결한다.
@@ -43,9 +43,9 @@ version, hash를 추가한다. 공개 대회 페이지는 1차 평가 시작일�
 | ID | 공식 미션·개발과제 예시 | PRIZM의 현재 대응 | source·test·evidence | 실제 환경 검증 | 다음 Gate |
 |---|---|---|---|---|---|
 | `TMAX-01` | OpenSQL 기반 AI 검색·벡터 데이터 플랫폼 | `VERIFIED_SINGLE_NODE_SQL_GATE`; 전체 AI 사용자 흐름이나 HA 판정은 아님 | [OpenSQL integration test](../../src/integrationTest/java/com/prizm/infrastructure/OpenSqlInfrastructureTest.java), [공통 assertions](../../src/integrationTest/java/com/prizm/infrastructure/OpenSqlCompatibilityAssertions.java), [기술 Gate](../opensql-gate.md), [PRZ-003 evidence](../../specs/PRZ-003-opensql-single-node-gate/evidence.md) | 실제 OpenSQL single-node에서 Flyway V1~V13, `vector(1024)`, 검색, ownership, claim·lease·fencing·recovery·`SKIP LOCKED` `PASS` | OpenSQL+Ollama 로그인→업로드→ACTIVE→검색; OpenProxy runtime, OpenHA·DB failover는 별도 `NOT_RUN`·`NOT_VERIFIED` Gate |
-| `TMAX-02` | 문서 업로드 | `IMPLEMENTED` | [controller](../../src/main/java/com/prizm/document/controller/DocumentController.java), [service](../../src/main/java/com/prizm/document/service/DocumentUploadService.java), [service test](../../src/test/java/com/prizm/document/service/DocumentUploadServiceTest.java), [PRZ-004 local evidence](../../specs/PRZ-004-clean-clone-demo/evidence.md) | unit·PostgreSQL 회귀와 두 local clean clone의 로그인→TXT/PDF 업로드→ACTIVE `PASS`; OpenSQL E2E `NOT_RUN` | PRZ-004 GitHub 통합과 OpenSQL+Ollama 실제 업로드 흐름 |
-| `TMAX-03` | 자동 임베딩 | `IMPLEMENTED` | [Ollama service](../../src/main/java/com/prizm/embedding/service/OllamaEmbeddingService.java), [validator](../../src/main/java/com/prizm/embedding/service/EmbeddingValidator.java), [indexing test](../../src/test/java/com/prizm/ingestion/service/DocumentIndexingProcessorTest.java), [PRZ-004 local evidence](../../specs/PRZ-004-clean-clone-demo/evidence.md) | PostgreSQL·pgvector와 host Ollama를 사용한 두 local clean clone `PASS`; OpenSQL+Ollama 전체 흐름 `NOT_RUN` | OpenSQL·Ollama를 함께 사용한 실제 색인·검색 결과 |
-| `TMAX-04` | 메타데이터·버전 관리 | `IMPLEMENTED` | [upload/version service](../../src/main/java/com/prizm/document/service/DocumentUploadService.java), [V3 migration](../../src/main/resources/db/migration/V3__create_documents_and_document_versions.sql), [V8 ownership](../../src/main/resources/db/migration/V8__add_document_ownership.sql), [DB integration test](../../src/integrationTest/java/com/prizm/infrastructure/DocumentManagementDatabaseIntegrationTest.java), [PRZ-004 local evidence](../../specs/PRZ-004-clean-clone-demo/evidence.md) | unit·PostgreSQL 회귀와 두 local clean clone의 새 version·ACTIVE 전환 `PASS`; OpenSQL E2E `NOT_RUN` | OpenSQL에서 이전 ACTIVE 보존·새 version 전환 증거 |
+| `TMAX-02` | 문서 업로드 | `IMPLEMENTED` | [controller](../../src/main/java/com/prizm/document/controller/DocumentController.java), [service](../../src/main/java/com/prizm/document/service/DocumentUploadService.java), [service test](../../src/test/java/com/prizm/document/service/DocumentUploadServiceTest.java), [PRZ-004 evidence](../../specs/PRZ-004-clean-clone-demo/evidence.md) | unit·PostgreSQL 회귀와 두 clean clone의 로그인→TXT/PDF 업로드→ACTIVE `PASS`; PR #25로 통합. OpenSQL E2E `NOT_RUN` | OpenSQL+Ollama 실제 업로드 흐름 |
+| `TMAX-03` | 자동 임베딩 | `IMPLEMENTED` | [Ollama service](../../src/main/java/com/prizm/embedding/service/OllamaEmbeddingService.java), [validator](../../src/main/java/com/prizm/embedding/service/EmbeddingValidator.java), [indexing test](../../src/test/java/com/prizm/ingestion/service/DocumentIndexingProcessorTest.java), [PRZ-004 evidence](../../specs/PRZ-004-clean-clone-demo/evidence.md) | PostgreSQL·pgvector와 host Ollama를 사용한 두 clean clone `PASS`; PR #25로 통합. OpenSQL+Ollama 전체 흐름 `NOT_RUN` | OpenSQL·Ollama를 함께 사용한 실제 색인·검색 결과 |
+| `TMAX-04` | 메타데이터·버전 관리 | `IMPLEMENTED` | [upload/version service](../../src/main/java/com/prizm/document/service/DocumentUploadService.java), [V3 migration](../../src/main/resources/db/migration/V3__create_documents_and_document_versions.sql), [V8 ownership](../../src/main/resources/db/migration/V8__add_document_ownership.sql), [DB integration test](../../src/integrationTest/java/com/prizm/infrastructure/DocumentManagementDatabaseIntegrationTest.java), [PRZ-004 evidence](../../specs/PRZ-004-clean-clone-demo/evidence.md) | unit·PostgreSQL 회귀와 두 clean clone의 새 version·ACTIVE 전환 `PASS`; PR #25로 통합. OpenSQL E2E `NOT_RUN` | OpenSQL에서 이전 ACTIVE 보존·새 version 전환 증거 |
 | `TMAX-05` | 변경 로그 기반 동기화 | `NOT_IMPLEMENTED`; processing job과 document version은 변경 로그 동기화가 아님 | 해당 source·test 없음 | `NOT_RUN` | 별도 spec에서 동기화 경계·멱등성·재시도·누락 방지 acceptance test와 실제 결과 |
 | `TMAX-06` | MCP 기반 검색 API | `NOT_IMPLEMENTED`; 현재 Career Evidence API는 REST이며 MCP가 아님 | [REST controller](../../src/main/java/com/prizm/search/controller/CareerEvidenceSearchController.java), [contract test](../../src/test/java/com/prizm/search/controller/CareerEvidenceSearchControllerTest.java) | `NOT_RUN` | owner-scoped 읽기 전용 MCP 검색, 인증·출처·빈 결과 contract test와 demo |
 | `TMAX-07` | DB 노드 장애에도 중단 없는 자동 복구 | `NOT_IMPLEMENTED`; Worker recovery는 DB failover 증거가 아님 | [Worker recovery](../../src/main/java/com/prizm/ingestion/service/ProcessingJobRecoveryService.java), [test](../../src/test/java/com/prizm/ingestion/service/ProcessingJobRecoveryServiceTest.java) | OpenSQL HA `NOT_RUN` | topology, 장애 시나리오, RTO·RPO, 허용 오류·중복·유실과 반복 횟수를 spec에 고정한 뒤 실제 장애 주입 |
@@ -69,9 +69,9 @@ version, hash를 추가한다. 공개 대회 페이지는 1차 평가 시작일�
 
 | ID | 공식 평가항목 | 배점 | 현재 evidence | 다음 Gate |
 |---|---|---:|---|---|
-| `EVAL-R1-01` | 프로젝트 구조 및 코드 완성도 | 6 | 인증·ownership·version·비동기 복구·검색과 실제 OpenSQL single-node SQL Gate | clean-clone, demo `USER`, 처리 완료 확인, OpenSQL+Ollama 전체 흐름, browser E2E 또는 고정 수동 UI 시험표 |
-| `EVAL-R1-02` | 오픈소스 프로젝트 발전 가능성 | 6 | Engine·Reference App 방향, source-only Apache-2.0·NOTICE·SBOM·AI 모델 명세, 검증 CI·최종 감사 | 안전한 demo `USER`를 포함한 clean-clone Quickstart와 안정된 확장 경계 |
-| `EVAL-R1-03` | 개발 문서의 구체성 | 6 | 현황·roadmap·spec·OpenSQL 실행 evidence와 실제 PR·CI·merge 연결 | 문서만 보고 재현한 clean-clone 설치·운영·troubleshooting |
+| `EVAL-R1-01` | 프로젝트 구조 및 코드 완성도 | 6 | 인증·ownership·version·비동기 복구·검색, 실제 OpenSQL single-node SQL Gate와 두 clean-clone 전체 흐름 | OpenSQL+Ollama 전체 흐름, 오류·복구 시험표 |
+| `EVAL-R1-02` | 오픈소스 프로젝트 발전 가능성 | 6 | Engine·Reference App 방향, source-only Apache-2.0·NOTICE·SBOM·AI 모델 명세, clean-clone Quickstart·검증 CI·최종 감사 | 외부 사용자의 독립 재현과 안정된 확장 경계 |
+| `EVAL-R1-03` | 개발 문서의 구체성 | 6 | 현황·roadmap·spec·OpenSQL·clean-clone evidence와 실제 PR·CI·merge 연결 | 외부 사용자의 설치·운영·troubleshooting feedback |
 | `EVAL-R1-04` | 프로젝트 혁신성 | 6 | 원문 출처 검색, version fencing, 안전한 복구 | 동기화·MCP·DB 가용성 중 실제 수직 slice |
 | `EVAL-R1-05` | 프로젝트 팀워크; 개인은 안정적·체계적 관리체계 | 6 | 실제 spec→branch→PR→CI→merge 흐름과 review 부재의 정직한 기록 | 신규 작업의 실제 Issue·review와 genuine community evidence |
 
@@ -87,7 +87,7 @@ version, hash를 추가한다. 공개 대회 페이지는 1차 평가 시작일�
 
 | 공식 항목 | 배점 | 공식 확인 방식 | 현재 evidence | 다음 Gate |
 |---|---:|---|---|---|
-| 기능테스트 | 10 | 전문기관 온·오프라인 시험, 시스템 소개·구현 환경·소스 확인, 비정상 동작 없이 운영되는지 확인 | backend·frontend test와 실제 OpenSQL single-node Gate | clean-clone, 고정 fixture, 처리 완료 확인, OpenSQL·Ollama 전체 결과, 정상·예외·장애 시험표 |
+| 기능테스트 | 10 | 전문기관 온·오프라인 시험, 시스템 소개·구현 환경·소스 확인, 비정상 동작 없이 운영되는지 확인 | backend·frontend test, 실제 OpenSQL single-node Gate, 고정 합성 fixture를 사용한 두 clean-clone 전체 흐름 | OpenSQL·Ollama 전체 결과와 정상·예외·장애 시험표 |
 | 라이선스 검증 | 5 | 오픈소스SW 역량프라자 온라인 검증, 소스 업로드, 사용 OSS와 복수 라이선스 충돌·해결 확인 | [source-only compliance 결론](2026-compliance.md), Apache-2.0 `LICENSE`·`NOTICE`, SBOM·AI 모델 명세, 검증 CI | 외부 분석 결과와 OpenSQL runtime의 사용·비공개·비재배포 경계 확인 |
 
 검증 도구에는 credentials, `.env`, 업로드 원본, DB volume, model,
@@ -104,7 +104,7 @@ IDE·build 산출물을 올리지 않는다. 검증된 commit/tag의 tracked 파
 |---|---:|---|---|
 | 작품발표(PT) | 10 | `NOT_STARTED` | 평가항목 순서의 PPT, OSS 표기, 10+5분 리허설 |
 | 활용성 | 15 | 대상 사용자와 Reference App 방향 | 반복 가능한 demo와 사용자 검증 근거 |
-| 작품 데모(완성도) | 10 | 현재 Reference App 사용자 흐름 | clean-clone, 처리 완료 확인, 고정 UI 시험표, 오류·근거 없음·복구 시나리오 |
+| 작품 데모(완성도) | 10 | 현재 Reference App과 두 clean-clone 사용자 흐름 | 오류·근거 없음·복구 시나리오와 OpenSQL 전체 흐름 |
 | 커뮤니티 확장 가능성 | 10 | Apache-2.0·NOTICE, SBOM, spec·roadmap·개발 기록 | 실제 외부 기여 접수 또는 지원 release 전에 기여·보안 운영 경로 확정 |
 | 오픈소스SW 적절성 | 10 | 실제 OpenSQL single-node SQL Gate와 source-only OSS inventory | OpenSQL+Ollama 전체 사용자 흐름과 OSS 선택 이유·version·용도·license 표 |
 | 기능테스트 | 10 | repository test와 환경별 evidence | 외부 검증 가능한 정상·예외·장애 test 결과 |

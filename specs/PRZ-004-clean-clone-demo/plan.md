@@ -4,8 +4,8 @@
 
 - 원격: `https://github.com/jaemin-devlog/PRIZM.git`
 - 기준 main: `936e957132fcf54b5cee1f58d83f8d591e5786e2`
-- 작업 branch: `PRZ-004-clean-clone-demo` (local only)
-- 공개 main 상태: PRZ-004 미통합
+- 작업 branch: `PRZ-004-clean-clone-demo` (계획 작성 당시 local only)
+- 공개 main 상태: 계획 작성 당시 PRZ-004 미통합
 
 ## 작성·사후 대조 이력
 
@@ -16,9 +16,8 @@
   Spec·Plan과 사후 대조했다.
 - 이 Plan은 초기 후보를 요구사항과 비교하기 위한 conformance baseline이다.
   실행 결과의 단일 원본은 [Evidence](evidence.md)다.
-- 구현 commit `25d09e9eee9837cf4a63d7461699825ff22743e2`에서 자동 검증과 두
-  clean clone을 완료했다. 독립 최종 `AUDIT`와 GitHub 통합은 아직
-  `NOT_RUN`이다.
+- 이후 실제 실행 결과와 GitHub 통합 기록은 [Evidence](evidence.md)로 이동했다.
+  이 Plan의 당시 기준선과 선택은 과거 계획으로 보존한다.
 
 ## 선택한 접근
 
@@ -180,5 +179,6 @@ bootstrap 비활성화·backend recreate, API smoke, browser UI 시험과 `compo
 
 ## GitHub 경계
 
-이번 작업에서는 local commit까지만 만든다. Issue, push, PR, CI, review, merge,
-main 변경과 branch 삭제는 모두 `NOT_RUN`이다.
+계획 작성 당시 승인 범위는 local commit까지였다. 이후 별도 승인으로 수행한
+push, PR, CI와 merge 결과는 [Evidence](evidence.md)에만 기록한다. 별도 Issue와
+GitHub review는 생성되지 않았다.

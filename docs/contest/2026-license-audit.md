@@ -11,19 +11,18 @@
 | PRZ 작업 | [`PRZ-002-open-source-readiness`](../../specs/PRZ-002-open-source-readiness/spec.md) |
 | 범위 | T-02 inventory와 G-01·outgoing license 결정·자산 감사 자료 |
 | 기준 commit | `846bd06e59aeb1cab88134f02c43ff9731f360fd` (`PR #13` merge) |
-| 최종 source-only 검증 기준 | `f54e3d98e3eddc20dc3c89d9b3e2b84e1649bea1`, 2026-07-30 |
+| 최종 source-only 검증 기준 | `aff3e87a9a912e44fcf217291a45328cf451cfc9`, 2026-08-01 |
 | 상태 | `VERIFIED_FOR_CURRENT_SOURCE_ONLY_SCOPE` |
 | 직접 작성 코드 저작권자 | `Jaemin Jeong` |
 | 공동 개발자·코드 기여자 | 확인된 사람 없음 |
 | 정부 지원금·상금·개발비 | 없음 |
 | 법적 성격 | 기술적 inventory이며 법률 자문이 아님 |
 
-> 위 `VERIFIED_FOR_CURRENT_SOURCE_ONLY_SCOPE` 판정은 PRZ-002의 공개 source
-> commit `f54e3d98e3eddc20dc3c89d9b3e2b84e1649bea1`과 GitHub CI 기준
-> `777e184f206d2a2770d055940ddabf139abfed9d`에 대한 역사적 결과다. PRZ-004
-> local 구현 commit `25d09e9eee9837cf4a63d7461699825ff22743e2`는 공급망
-> 검증을 통과했지만 독립 최종 `AUDIT`와 GitHub 통합 전이므로 상태는
-> `IMPLEMENTED_UNVERIFIED`다. 이 결과는 공개 main 결론을 대체하지 않는다.
+> PRZ-002의 공개 source 결론은 역사적 기준으로 보존한다. 이후 PRZ-004의
+> dependency·frontend SBOM·checksum·npm audit·OSS readiness를 최종 source
+> `aff3e87a9a912e44fcf217291a45328cf451cfc9`에서 다시 검증했다. 독립 감사와
+> GitHub CI를 통과해 PR #25로 `main`에 통합했으며 source-only 상태는
+> `VERIFIED_FOR_CURRENT_SOURCE_ONLY_SCOPE`다.
 
 G-01 배포 경계는 2026-07-24 사용자 승인으로 source-only로 확정했다.
 같은 날 사용자는 PRIZM 직접 작성 source의 outgoing license로
@@ -84,14 +83,17 @@ OpenProxy·OpenHA는 계속 `NOT_RUN` 또는 `NOT_VERIFIED`다.
 | frontend Dockerfile | `C2859300EC00F750BB7E7525F78E7556E3BF9D5F075F64070DF5066A8FA4AF98` |
 | `.github/workflows/ci.yml` | `8A686095B7879B7B639CB2E1ADEF4EBC5FCFDCAD6697BF7ED06C4900C4BA444A` |
 
-### PRZ-004 local 구현 검증
+### PRZ-004 구현·통합 검증
 
 - 최초 정적 감사 후보: `0d20454eb9a3c3d9b8c7812d54a20781415b0378`
 - 검증된 구현 commit: `25d09e9eee9837cf4a63d7461699825ff22743e2`
-- 상태: `IMPLEMENTED_UNVERIFIED` — 공급망 `VERIFY` 완료, 독립 `AUDIT` 대기
+- 최종 경로 교정·CI source: `aff3e87a9a912e44fcf217291a45328cf451cfc9`
+- 상태: `VERIFIED` — 공급망 `VERIFY`, 독립 `AUDIT`, PR #25 CI와 merge 완료
 - `npm ci`, full·production audit, lint·build, SBOM 재생성·구조·checksum과
   OSS readiness를 실행해 통과했다. 두 npm audit의 vulnerability는 0건이다.
-- GitHub CI·review·merge는 아직 `NOT_RUN`이다.
+- GitHub check 6건은 모두 성공했다. GitHub review는 없어
+  `REVIEW_NOT_AVAILABLE_SOLO`이며 review evidence로 계산하지 않는다. merge는
+  `1f9a5ad964778a2e72de9949a0fadae042008392`다.
 
 | PRZ-004 입력 | 현재 파일 SHA-256 또는 검증 정보 |
 |---|---|

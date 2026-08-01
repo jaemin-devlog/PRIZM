@@ -1,14 +1,17 @@
 # PRIZM Architecture
 
-> 공개 GitHub main 문서 commit:
-> `b8a3cc1af9381bb9998f0e489528def600eb13fc`
+> PRZ-004 GitHub 통합 merge commit:
+> `1f9a5ad964778a2e72de9949a0fadae042008392`
 >
-> PRZ-004 구현·clean-clone 검증 source commit:
+> PRZ-004 전체 clean-clone 검증 source commit:
 > `25d09e9eee9837cf4a63d7461699825ff22743e2`
+>
+> 최종 Windows·Linux 경로 교정·CI source commit:
+> `aff3e87a9a912e44fcf217291a45328cf451cfc9`
 >
 > 문서 검토 기준일: `2026-08-01`
 >
-> PRZ-004 상태: `IMPLEMENTED_UNVERIFIED` — 독립 최종 `AUDIT`와 GitHub 통합 대기
+> PRZ-004 상태: `VERIFIED` — 독립 감사, PR #25 CI와 GitHub `main` 통합 완료
 >
 > 범위: 현재 Spring Boot 애플리케이션과 React Career Vault Reference App
 
@@ -420,9 +423,9 @@ OpenSQL single-node SQL Gate는 기존 Evidence 기준 `PASS`입니다. 그 범�
 - OpenHA: `NOT_RUN`
 - DB failover: `NOT_RUN`
 
-PRZ-004 local branch에서는 PostgreSQL·pgvector와 호스트 Ollama를 사용한 두 독립
-clean clone을 검증했습니다. 두 번째 browser의 업로드 전 빈 목록 직접 관찰은
-`NOT_RUN`이며, 독립 최종 `AUDIT`와 GitHub 통합도 아직 완료하지 않았습니다.
+PRZ-004에서는 PostgreSQL·pgvector와 호스트 Ollama를 사용한 두 독립 clean clone을
+검증하고 PR #25로 `main`에 통합했습니다. 두 번째 browser의 업로드 전 빈 목록
+직접 관찰은 여전히 `NOT_RUN`입니다.
 
 PostgreSQL 테스트 통과는 OpenSQL 결과가 아니며, OpenSQL SQL Gate 통과도 전체
 사용자 흐름이나 고가용성 근거가 아닙니다.

@@ -6,17 +6,10 @@
 > 전체 identity, exact version과 checksum은 [기계 판독용 SBOM](../../sbom/README.md)을
 > 단일 원본으로 사용한다. 이 문서는 법률 자문이 아니다.
 
-> 아래 source-only `VERIFIED` 결론은 PRZ-002 source commit
-> `f54e3d98e3eddc20dc3c89d9b3e2b84e1649bea1`과 GitHub CI 기준
-> `777e184f206d2a2770d055940ddabf139abfed9d`의 역사적 결과다. PRZ-004 local
-> 구현 commit `25d09e9eee9837cf4a63d7461699825ff22743e2`의 frontend
-> SBOM·checksum·npm audit·OSS readiness는 검증을 통과했다. 다만 독립 최종
-> `AUDIT`와 GitHub 통합 전이므로 상태는 `IMPLEMENTED_UNVERIFIED`다. 이 결과는
-> 공개 main 결론을 대체하지 않는다.
-
-> 공개 GitHub main에는 PRZ-004가 아직 통합되지 않았다. local 검증 source는
-> `25d09e9eee9837cf4a63d7461699825ff22743e2`이며, GitHub push·PR·CI·review·merge는
-> 모두 `NOT_RUN`이다.
+> PRZ-002의 source-only 결론을 바탕으로 PRZ-004의 dependency·frontend SBOM·
+> checksum·npm audit·OSS readiness를 다시 검증했다. 최종 교정 source
+> `aff3e87a9a912e44fcf217291a45328cf451cfc9`는 독립 감사와 GitHub CI를 통과해
+> PR #25의 merge `1f9a5ad964778a2e72de9949a0fadae042008392`로 `main`에 통합됐다.
 
 ## 한눈에 보는 결론
 
@@ -24,9 +17,9 @@
 |---|---|
 | 공개 범위 | source-only Git repository와 source ZIP |
 | PRIZM 직접 작성 source | `Apache-2.0`; root [`LICENSE`](../../LICENSE)와 [`NOTICE`](../../NOTICE) 적용 |
-| 최종 source-only 검증 | source commit `f54e3d98e3eddc20dc3c89d9b3e2b84e1649bea1`, 2026-07-30 |
+| 최종 source-only 검증 | source commit `aff3e87a9a912e44fcf217291a45328cf451cfc9`, 2026-08-01 |
 | 현재 blocker | source-only 범위에서 `UNKNOWN`·`CONFLICT`·`BLOCKED` 0 |
-| CI | commit `777e184f206d2a2770d055940ddabf139abfed9d`; [OSS Readiness 30477035697](https://github.com/jaemin-devlog/PRIZM/actions/runs/30477035697)·[CI 30477035700](https://github.com/jaemin-devlog/PRIZM/actions/runs/30477035700) `PASS` |
+| CI | PRZ-004 head `aff3e87`; [push OSS](https://github.com/jaemin-devlog/PRIZM/actions/runs/30698202833)·[push CI](https://github.com/jaemin-devlog/PRIZM/actions/runs/30698202866)·[PR OSS](https://github.com/jaemin-devlog/PRIZM/actions/runs/30698204330)·[PR CI](https://github.com/jaemin-devlog/PRIZM/actions/runs/30698204334)의 check 6건 `PASS` |
 | 미래 배포 | JAR, frontend `dist`, container image, Ollama binary와 model bytes를 배포하려면 별도 Gate 필요 |
 
 현재 결론은 PRIZM source에만 적용된다. 외부 구성요소의 라이선스를

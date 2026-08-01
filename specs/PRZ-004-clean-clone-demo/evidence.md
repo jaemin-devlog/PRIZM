@@ -2,19 +2,25 @@
 
 ## 현재 판정
 
-`IMPLEMENTED_UNVERIFIED` — `VERIFY` 완료, 독립 최종 `AUDIT` 대기
+`VERIFIED` — 필수 `VERIFY`, 독립 `AUDIT`, GitHub CI와 `main` 통합 완료
 
-- 공개 기준 main: `936e957132fcf54b5cee1f58d83f8d591e5786e2`
-- 검증된 구현 commit: `25d09e9eee9837cf4a63d7461699825ff22743e2`
-- 작업 branch: `PRZ-004-clean-clone-demo` (local only)
+- 작업 시작 main: `936e957132fcf54b5cee1f58d83f8d591e5786e2`
+- 전체 clean-clone 검증 source commit: `25d09e9eee9837cf4a63d7461699825ff22743e2`
+- 최종 Windows·Linux 경로 교정·CI source commit:
+  `aff3e87a9a912e44fcf217291a45328cf451cfc9`
+- GitHub 통합 merge commit: `1f9a5ad964778a2e72de9949a0fadae042008392`
+- 작업 branch: `PRZ-004-clean-clone-demo` (PR #25로 병합)
 - 자동 검증: `339 PASS / 18 SKIP / 0 FAIL`
 - 첫 번째 독립 clone: `CLEAN_CLONE_01_PASS`
 - 두 번째 독립 clone: `CLEAN_CLONE_02_ISOLATION_PASS_WITH_FINDINGS`
-- GitHub Issue·push·PR·CI·review·merge: 없음 (`NOT_RUN`)
+- 독립 감사: `AUDIT_PASS_WITH_NON_BLOCKING_FINDINGS`, blocking finding 0건
+- GitHub: Issue 없음, [PR #25](https://github.com/jaemin-devlog/PRIZM/pull/25),
+  CI 6건 성공, review `REVIEW_NOT_AVAILABLE_SOLO`, merge 완료
 
-필수 자동 검증과 두 독립 clone의 환경 검증은 끝났다. 다만 독립 최종
-`AUDIT`를 아직 실행하지 않았으므로 이 Spec을 `VERIFIED`로 판정하지 않는다.
-공개 GitHub main에도 PRZ-004가 아직 통합되지 않았다.
+전체 clean-clone 실행 결과는 `25d09e9...`에서 얻었다. 이후 GitHub Linux CI에서
+발견한 플랫폼 경로 차이를 `aff3e87...`에서 교정하고 Windows·Linux Node test와
+GitHub check를 통과했다. 두 전체 clean clone을 `aff3e87...`에서 다시 실행한
+것으로 확대하지 않는다.
 
 ## 요구사항별 상태
 
@@ -25,11 +31,11 @@
 | PRZ-004-R03 합성 fixture | `PASS` | ignored 로컬 경로에 생성한 first-party TXT·PDF와 서로 다른 marker 사용 |
 | PRZ-004-R04 API smoke | `PASS` | 로그인, 업로드, `ACTIVE`, source metadata, 검색 allowlist와 비로그인 `401` 확인 |
 | PRZ-004-R05 기존 계약 보존 | `PASS` | 전체 unit·PostgreSQL integration 실패 0건, 첫 환경 정보의 두 번째 환경 노출 0건 |
-| PRZ-004-R06 재현성과 공급망 기록 | `VERIFY PASS — AUDIT PENDING` | 두 `--no-hardlinks` clone, 모델 identity·1024차원, npm audit·SBOM·OSS readiness 통과 |
-| PRZ-004-R07 상태와 Evidence | `VERIFY PASS — AUDIT PENDING` | 문서 현행화와 읽기 전용 정합성 검증 통과; 독립 최종 `AUDIT`에서 최종 판정 |
+| PRZ-004-R06 재현성과 공급망 기록 | `PASS` | 두 `--no-hardlinks` clone, 모델 identity·1024차원, npm audit·SBOM·OSS readiness와 GitHub CI 통과 |
+| PRZ-004-R07 상태와 Evidence | `PASS` | source·환경별 결과, 독립 감사, PR·CI·review 부재·merge를 구분해 기록 |
 
-위 표는 구현 commit의 `VERIFY` 결과다. 최종 Spec 상태는 독립 `AUDIT`에서
-blocking finding이 0건인지 확인한 뒤 결정한다.
+전체 사용자 흐름에 대한 위 판정은 `25d09e9...`의 실행 결과를 기준으로 한다.
+플랫폼 경로 교정과 GitHub 통합 근거는 아래 별도 절에서 확인한다.
 
 ## 자동 검증
 
@@ -51,6 +57,25 @@ blocking finding이 0건인지 확인한 뒤 결정한다.
 | `git diff --check` | `PASS` |
 
 총 자동 결과는 `339 PASS / 18 SKIP / 0 FAIL`이다.
+
+## 최종 플랫폼 교정과 GitHub CI
+
+GitHub Linux CI에서 Windows 절대 경로 표현에 의존하던 Node test 두 곳을 발견했다.
+최종 source `aff3e87a9a912e44fcf217291a45328cf451cfc9`에서 운영체제와 무관한 경로
+표현으로 교정한 뒤 다음을 확인했다.
+
+| 검증 | 결과 |
+|---|---|
+| Windows `node --test scripts/clean-clone-demo.test.mjs` | `26 PASS / 1 SKIP / 0 FAIL` |
+| Linux Node 22.17 Docker의 같은 명령 | `27 PASS / 0 SKIP / 0 FAIL` |
+| GitHub push CI backend·frontend | 2건 `PASS` |
+| GitHub push OSS Readiness·License·Markdown·SBOM | 1건 `PASS` |
+| GitHub PR CI backend·frontend | 2건 `PASS` |
+| GitHub PR OSS Readiness·License·Markdown·SBOM | 1건 `PASS` |
+
+이 교정은 test fixture 경로의 플랫폼 호환성만 바꿨다. 제품 동작이나 앞서 실행한
+두 clean clone 환경은 바꾸지 않았으며, 두 전체 clean clone은 `aff3e87...`에서
+재실행하지 않았다.
 
 ### SKIP 경계
 
@@ -110,8 +135,8 @@ blocking finding이 0건인지 확인한 뒤 결정한다.
 직접 관찰하지 못했다. 대신 업로드 전 API 문서 0건, 첫 번째 계정 0건, 첫 번째
 marker 0건, 서로 다른 project·volume, 첫 번째 credential 로그인 `401`과 검색
 allowlist로 초기 DB와 환경 격리를 확인했다. API의 업로드 전 0건 확인을 브라우저
-직접 관찰 `PASS`로 바꾸지 않는다. 이 항목은 최종 `AUDIT`에서 비차단 finding으로
-다시 검토한다.
+직접 관찰 `PASS`로 바꾸지 않는다. 독립 `AUDIT`에서도 비차단 finding으로
+판정했다.
 
 ## Ollama·모델 재현성
 
@@ -152,14 +177,16 @@ allowlist로 초기 DB와 환경 격리를 확인했다. API의 업로드 전 0�
 
 | 항목 | 상태 |
 |---|---|
-| 공개 GitHub main 반영 | `NOT_RUN` |
-| push | `NOT_RUN` |
-| Issue·PR | `NOT_RUN` |
-| GitHub CI | `NOT_RUN` |
-| review | `NOT_RUN` |
-| merge | `NOT_RUN` |
+| 공개 GitHub main 반영 | `PASS`; merge `1f9a5ad964778a2e72de9949a0fadae042008392` |
+| push | `PASS`; head `aff3e87a9a912e44fcf217291a45328cf451cfc9` |
+| Issue | 없음; 과거 Issue를 소급 생성하지 않음 |
+| PR | `PASS`; [PR #25](https://github.com/jaemin-devlog/PRIZM/pull/25) |
+| GitHub CI | `PASS`; [push CI](https://github.com/jaemin-devlog/PRIZM/actions/runs/30698202866), [push OSS](https://github.com/jaemin-devlog/PRIZM/actions/runs/30698202833), [PR CI](https://github.com/jaemin-devlog/PRIZM/actions/runs/30698204334), [PR OSS](https://github.com/jaemin-devlog/PRIZM/actions/runs/30698204330) |
+| review | `REVIEW_NOT_AVAILABLE_SOLO`; GitHub review 0건이며 review evidence가 아님 |
+| merge | `PASS`; 2026-08-01 20:46:40 KST |
 
-존재하지 않는 URL이나 GitHub 활동을 증거로 만들지 않는다.
+PR #25의 head에서 push·pull_request event별 backend, frontend, OSS check 6건이
+모두 성공했다. 사용자 병합 승인과 독립 감사는 GitHub review로 계산하지 않는다.
 
 ## 핵심 교정 이력
 
@@ -169,9 +196,13 @@ allowlist로 초기 DB와 환경 격리를 확인했다. API의 업로드 전 0�
   검색 allowlist와 polling 상한을 교정했다.
 - 제공 ZIP과 기존 작업 폴더의 성공 주장은 검증 근거로 복사하지 않았다.
 - 교정 뒤 자동 검증과 두 독립 clone을 최종 구현 commit에서 다시 실행했다.
+- 독립 최종 감사는 `f4c252944148ebf7b4abb0ff5b26d158e2534cf8` 기준
+  `AUDIT_PASS_WITH_NON_BLOCKING_FINDINGS`였고 blocking finding은 0건이었다.
+- GitHub Linux CI의 경로 finding은 `aff3e87...`에서 교정해 Windows·Linux Node
+  test와 GitHub CI로 재검증했다.
 
 ## 남은 단계
 
-다음 단계는 구현·검증 결과를 분리된 관점에서 확인하는 독립 최종 `AUDIT`다.
-blocking finding 0건을 확인하기 전에는 PRZ-004를 `VERIFIED`로 바꾸거나 GitHub
-통합 가능 상태로 선언하지 않는다.
+PRZ-004의 필수 관리 단계는 완료했다. 다음 기능 Gate는 OpenSQL과 Ollama를 함께
+사용하는 전체 사용자 흐름이다. OpenProxy·OpenHA·DB failover는 계속 별도
+`NOT_VERIFIED` 또는 `NOT_RUN` 범위로 남긴다.

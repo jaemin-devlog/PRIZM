@@ -8,6 +8,14 @@
 현재 저장소는 소스와 실행 설정만 배포하는 소스 전용(source-only) 범위입니다.
 컨테이너 이미지, Ollama 실행 파일과 AI 모델은 저장소에 포함하지 않습니다.
 
+이 절차는 local 구현 commit
+`25d09e9eee9837cf4a63d7461699825ff22743e2`의 서로 다른 두 clean clone에서
+검증했습니다. 자동 검증은 `339 PASS / 18 SKIP / 0 FAIL`이었습니다. 두 번째
+환경에서는 빈 문서 목록을 API로 확인했지만 브라우저로 직접 관찰하지 않아 해당
+UI 항목은 `NOT_RUN`입니다. 독립 최종 `AUDIT`와 공개 GitHub main 통합은 아직
+실행하지 않았으므로 자세한 경계는 [PRZ-004 Evidence](../specs/PRZ-004-clean-clone-demo/evidence.md)를
+확인하세요.
+
 ## 이 절차로 확인하는 것
 
 - 고유한 Compose project와 새 PostgreSQL·pgvector volume을 사용합니다.

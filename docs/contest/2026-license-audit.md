@@ -21,8 +21,9 @@
 > 위 `VERIFIED_FOR_CURRENT_SOURCE_ONLY_SCOPE` 판정은 PRZ-002의 공개 source
 > commit `f54e3d98e3eddc20dc3c89d9b3e2b84e1649bea1`과 GitHub CI 기준
 > `777e184f206d2a2770d055940ddabf139abfed9d`에 대한 역사적 결과다. PRZ-004
-> local candidate는 이 결론을 대체하지 않는다. 최종 공급망 검증 전까지
-> PRZ-004의 상태는 `IMPLEMENTATION_CANDIDATE_UNVERIFIED`다.
+> local 구현 commit `25d09e9eee9837cf4a63d7461699825ff22743e2`는 공급망
+> 검증을 통과했지만 독립 최종 `AUDIT`와 GitHub 통합 전이므로 상태는
+> `IMPLEMENTED_UNVERIFIED`다. 이 결과는 공개 main 결론을 대체하지 않는다.
 
 G-01 배포 경계는 2026-07-24 사용자 승인으로 source-only로 확정했다.
 같은 날 사용자는 PRIZM 직접 작성 source의 outgoing license로
@@ -83,16 +84,16 @@ OpenProxy·OpenHA는 계속 `NOT_RUN` 또는 `NOT_VERIFIED`다.
 | frontend Dockerfile | `C2859300EC00F750BB7E7525F78E7556E3BF9D5F075F64070DF5066A8FA4AF98` |
 | `.github/workflows/ci.yml` | `8A686095B7879B7B639CB2E1ADEF4EBC5FCFDCAD6697BF7ED06C4900C4BA444A` |
 
-### PRZ-004 local candidate
+### PRZ-004 local 구현 검증
 
 - 최초 정적 감사 후보: `0d20454eb9a3c3d9b8c7812d54a20781415b0378`
-- 상태: `IMPLEMENTATION_CANDIDATE_UNVERIFIED`
-- candidate dependency·Docker·CI·SBOM·checksum 파일은 갱신돼 있고 정적
-  일관성만 확인했다.
-- 최종 source에서의 `npm ci`, full·production audit, lint·build, Docker builder
-  identity, SBOM 재생성, checksum·license·OSS readiness 검증은 `NOT_RUN`이다.
+- 검증된 구현 commit: `25d09e9eee9837cf4a63d7461699825ff22743e2`
+- 상태: `IMPLEMENTED_UNVERIFIED` — 공급망 `VERIFY` 완료, 독립 `AUDIT` 대기
+- `npm ci`, full·production audit, lint·build, SBOM 재생성·구조·checksum과
+  OSS readiness를 실행해 통과했다. 두 npm audit의 vulnerability는 0건이다.
+- GitHub CI·review·merge는 아직 `NOT_RUN`이다.
 
-| candidate 입력 | 현재 파일 SHA-256 또는 정적 정보 |
+| PRZ-004 입력 | 현재 파일 SHA-256 또는 검증 정보 |
 |---|---|
 | `frontend/package.json` | `EC0CD5D8BBA2684097E0CF0DBA81C7EF0D95CCEBF5DCE65BDAB43762FD9BE58D` |
 | `frontend/package-lock.json` | `F14F034AA910996BE41FF744DC24213C7478B34D1DEA89DE75FB71543FFD922D` |
@@ -265,25 +266,33 @@ Apache-2.0 exact component는
 `eslint-visitor-keys@3.4.3`·`5.0.1`, `typescript@6.0.3`이다.
 
 `.nvmrc`와 package engines는 Node `22.17.0`, package manager는 npm
-`10.9.2`다. PRZ-004 최초 후보는 frontend builder를
-`node:22.17.0-alpine`으로 바꾸고 개발 전용 transitive dependency 세 항목을
-갱신했다. 현재 lockfile과 candidate SBOM은 183개 component로 정적 일관성을
-보인다. 다만 이번 교정 단계에서는 final source의 clean `npm ci`, full·production
-audit, frontend build, Docker builder identity와 SBOM 재생성을 실행하지 않았다.
-따라서 finding 0, builder identity 또는 공급망 최종 `PASS`로 판정하지 않는다.
+`10.9.2`다. PRZ-004는 frontend builder를 `node:22.17.0-alpine`으로 고정하고
+개발 전용 transitive dependency 세 항목을 갱신했다. 구현 commit에서 clean
+`npm ci`, full·production audit, frontend build와 SBOM 재생성을 실행했다.
+두 audit의 vulnerability는 0건이고 lockfile과 SBOM은 183개 component로
+일치한다. 이 검증은 source-only 범위의 결과이며 container image 배포 승인이나
+Alpine package 전체 lineage 증명은 아니다.
 
-현재 ignored `frontend/dist`의 JavaScript에는 React·React DOM `19.2.7`
-계열이 포함되지만 license/copyright 고지가 없었다. clean build는 이번
-범위에서 실행하지 않았다. 따라서:
+PRZ-004에서는 clean `npm ci`, lint와 production build를 실행해 통과했고,
+full·production audit의 취약점은 모두 0건이었다. 현재 ignored
+`frontend/dist`의 JavaScript에는 React·React DOM `19.2.7` 계열이 포함되지만
+license/copyright 고지가 없었다. 최종 bundle 내부의 전체
+dependency·license·NOTICE 포함 범위 분석은 `UNKNOWN / NOT_PERFORMED`다. 따라서:
 
 - G-01 initial source-only 경계에서는 `dist`를 배포하지 않으므로 현재
   배포 충돌은 아니다.
 - 향후 `dist`를 배포하면 runtime MIT 고지 누락이 `CONFLICT`가 된다.
-- dev-only dependency가 빠졌다고 단정할 수 없어 clean bundle 검증은
+- dev-only dependency의 최종 포함 여부와 bundle 고지 범위는 아직
   `UNKNOWN`이다.
 - `dist`의 future release는 clean bundle·NOTICE 검증 전까지 `BLOCKED`한다.
 
-## Container·database inventory
+### 현재 PRZ-004 frontend builder
+
+현재 local candidate는 version tag를 고정한 `node:22.17.0-alpine`을 사용한다.
+manifest digest pin은 아니며 PRIZM의 source-only 배포물에 이 image를 재배포하지
+않는다.
+
+## Container·database inventory — PRZ-002 당시 snapshot
 
 Tag는 repository 설정에서 확인한 값이다. platform manifest digest와 base
 package SBOM을 만들거나 registry에 publish하지 않았다.

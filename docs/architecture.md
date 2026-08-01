@@ -2,7 +2,8 @@
 
 > 공개 기준 main: `936e957132fcf54b5cee1f58d83f8d591e5786e2`
 >
-> PRZ-004 local source commit: 최종 검증 전에 고정 예정
+> PRZ-004 구현 검토 기준 source commit:
+> `25d09e9eee9837cf4a63d7461699825ff22743e2`
 >
 > 범위: 현재 Spring Boot 애플리케이션과 React Career Vault Reference App
 

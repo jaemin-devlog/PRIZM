@@ -54,8 +54,12 @@ image, Ollama binary, 모델 가중치와 OpenSQL 공급 자산의 재배포를 
 | `docker compose config` | `PASS` | T-05 구현 검증 |
 | `git diff --check` | `PASS` | 최종 감사 |
 
-PRZ-002 최종 source 기준의 현재 SBOM checksum은 다음과 같다. 단일 원본은
-[`sbom/SHA256SUMS`](../../sbom/SHA256SUMS)다.
+### PRZ-002 검증 snapshot
+
+다음 값은 기준 source `f54e3d98e3eddc20dc3c89d9b3e2b84e1649bea1`을 검증한
+PRZ-002 당시의 역사적 snapshot이다. 현재 작업 트리의
+[`sbom/SHA256SUMS`](../../sbom/SHA256SUMS)를 이 과거 값의 직접 근거로 사용하지
+않는다.
 
 | 산출물 | SHA-256 |
 |---|---|
@@ -64,8 +68,14 @@ PRZ-002 최종 source 기준의 현재 SBOM checksum은 다음과 같다. 단일
 | AI model manifest | `9b4e4a805fffa38a9ea40567ede25ccaf0669970c0c1994e036148855fc2f728` |
 | Scope manifest | `ce82411416d020102b78de861c10b79bcd39924e0bc1ec9ee8e1a0673a4f3b0e` |
 
-실제 `prizm-scope-manifest.json`의 SHA-256은 위 단일 원본과 일치하며,
-[`verify-sbom.mjs`](../../scripts/verify-sbom.mjs)가 같은 값을 검증한다.
+### 현재 machine-readable 원본
+
+현재 작업 트리 checksum의 단일 원본은
+[`sbom/SHA256SUMS`](../../sbom/SHA256SUMS)다. PRZ-004 구현 commit의 frontend
+SBOM SHA-256은
+`cd1ed67bffefdaf4618bf9452d193f52c69aa37c646014b1daaf6354609c254a`이며,
+[`verify-sbom.mjs`](../../scripts/verify-sbom.mjs)가 현재 파일과 checksum의
+일치를 검증한다. PRZ-002 역사값을 현재 값으로 덮어쓰지 않는다.
 
 ## 주요 검증 이력
 

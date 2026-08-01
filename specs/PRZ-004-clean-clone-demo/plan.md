@@ -5,7 +5,7 @@
 - 원격: `https://github.com/jaemin-devlog/PRIZM.git`
 - 기준 main: `936e957132fcf54b5cee1f58d83f8d591e5786e2`
 - 작업 branch: `PRZ-004-clean-clone-demo` (local only)
-- 공개 main 상태: demo `USER` 전체 흐름 `NOT_RUN`
+- 공개 main 상태: PRZ-004 미통합
 
 ## 작성·사후 대조 이력
 
@@ -14,8 +14,11 @@
   계획으로 간주하지 않는다.
 - 이후 범위를 축소하고 후보 commit `0d20454eb9a3c3d9b8c7812d54a20781415b0378`을
   Spec·Plan과 사후 대조했다.
-- 현재 상태는 `IMPLEMENTATION_CANDIDATE_UNVERIFIED`다. 두 clean clone,
-  브라우저, 전체 회귀와 공급망 최종 검증은 `NOT_RUN`이다.
+- 이 Plan은 초기 후보를 요구사항과 비교하기 위한 conformance baseline이다.
+  실행 결과의 단일 원본은 [Evidence](evidence.md)다.
+- 구현 commit `25d09e9eee9837cf4a63d7461699825ff22743e2`에서 자동 검증과 두
+  clean clone을 완료했다. 독립 최종 `AUDIT`와 GitHub 통합은 아직
+  `NOT_RUN`이다.
 
 ## 선택한 접근
 
@@ -52,7 +55,7 @@
   설정·script 대조에서 발견했으며 브라우저에서 재현한 결과가 아니다.
 - commit `207143b`에서 frontend port를 CORS origin에 연결했다.
 - commit `0d20454`에서 URL 기본 port `80` 정규화 회귀를 교정했다.
-- 실제 브라우저 CORS 검증은 현재 `NOT_RUN`이다.
+- 두 독립 clone의 브라우저 시험에서 실제 frontend port와 CORS 연결을 확인했다.
 
 ## 예상 변경
 
@@ -122,8 +125,8 @@
 ## Dependency·license 판단
 
 - 기준 main의 ORIENT에서 `brace-expansion 5.0.7`, `postcss 8.5.16` high finding과
-  production-only audit 0건을 관찰했다. PRZ-004 final source의 audit은 아직
-  `NOT_RUN`이다.
+  production-only audit 0건을 관찰했다. 구현 commit에서 full·production audit,
+  SBOM과 OSS readiness 검증을 실행해 통과했다.
 - 최소 safe exact version으로 올린 뒤 lockfile 183개 component와 license
   expression을 다시 대조한다.
 - frontend SBOM·checksum·license audit input SHA를 같은 diff에서 갱신한다.

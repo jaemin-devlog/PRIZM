@@ -1,6 +1,6 @@
 # PRIZM 2026 배포·라이선스·SBOM 결론
 
-> 기준일: 2026-07-30
+> 기준일: 2026-08-01
 >
 > 이 문서는 사람이 빠르게 확인할 수 있는 compliance 결론이다. 패키지별
 > 전체 identity, exact version과 checksum은 [기계 판독용 SBOM](../../sbom/README.md)을
@@ -9,9 +9,14 @@
 > 아래 source-only `VERIFIED` 결론은 PRZ-002 source commit
 > `f54e3d98e3eddc20dc3c89d9b3e2b84e1649bea1`과 GitHub CI 기준
 > `777e184f206d2a2770d055940ddabf139abfed9d`의 역사적 결과다. PRZ-004 local
-> candidate에 연결된 frontend SBOM과 checksum은 현재
-> `IMPLEMENTATION_CANDIDATE_UNVERIFIED`이며, 재생성·runtime·license 최종 검증은
-> `NOT_RUN`이다. 이 후보는 공개 main 결론을 대체하지 않는다.
+> 구현 commit `25d09e9eee9837cf4a63d7461699825ff22743e2`의 frontend
+> SBOM·checksum·npm audit·OSS readiness는 검증을 통과했다. 다만 독립 최종
+> `AUDIT`와 GitHub 통합 전이므로 상태는 `IMPLEMENTED_UNVERIFIED`다. 이 결과는
+> 공개 main 결론을 대체하지 않는다.
+
+> 공개 GitHub main에는 PRZ-004가 아직 통합되지 않았다. local 검증 source는
+> `25d09e9eee9837cf4a63d7461699825ff22743e2`이며, GitHub push·PR·CI·review·merge는
+> 모두 `NOT_RUN`이다.
 
 ## 한눈에 보는 결론
 

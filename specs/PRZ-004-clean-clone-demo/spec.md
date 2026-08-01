@@ -2,7 +2,10 @@
 
 ## 상태
 
-`IN_PROGRESS`
+`IMPLEMENTED_UNVERIFIED`
+
+구현과 필수 `VERIFY`는 완료했지만 독립 최종 `AUDIT`와 GitHub 통합은 아직
+완료하지 않았다.
 
 이 문서는 초기 구현 후보가 만들어진 뒤 범위를 축소해 사후 대조한 conformance
 계약이다. 구현 전에 확정된 사전 계획으로 소급해 표현하지 않으며, 자세한 이력은

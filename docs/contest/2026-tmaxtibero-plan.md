@@ -14,8 +14,8 @@
 
 현재 P0 소스 전용(source-only) 준비는 완료됐다. P1에서는 실제 OpenSQL
 single-node SQL Gate를 통과했고, 안전한 demo `USER`를 이용한 clean-clone 전체
-사용자 흐름은 PRZ-004 local branch에서 구현·검증 중이다. 최종 source commit의
-두 fresh clone 결과와 GitHub 통합은 아직 `NOT_RUN`이다.
+사용자 흐름도 PRZ-004 local branch의 두 독립 clone에서 검증했다. 독립 최종
+`AUDIT`와 GitHub 통합은 아직 완료하지 않았다.
 
 ## 공식 과제 해석
 
@@ -110,9 +110,13 @@ CareerFact, portfolio와 제출 감사는 실제 착수 순서에 따라 각각 
 - owner·ACTIVE, claim·lease·fencing·`SKIP LOCKED` 결과를 PostgreSQL과
   분리해 검증 — 완료
 - PRZ-004에서 안전한 demo `USER`, 고유 Compose project와 합성 TXT/PDF 구현 —
-  local 구현 완료, 최종 source commit 검증 전
-- 두 fresh clone에서 로그인→업로드→ACTIVE→검색 재현 — `NOT_RUN`
-- 처리 완료 API smoke와 고정 브라우저 UI 시험표 실행 — `NOT_RUN`
+  local 구현·자동 검증 완료
+- 두 fresh clone에서 로그인→TXT/PDF 업로드→ACTIVE→검색 재현 — local `PASS`
+- 처리 완료 API smoke와 브라우저 로그인·문서·PDF viewer·검색·로그아웃 확인 —
+  local `PASS`; 두 번째 browser의 업로드 전 빈 목록 직접 관찰은 `NOT_RUN`
+- 독립 최종 `AUDIT`와 GitHub push·PR·CI·review·merge — `NOT_RUN`
+- OpenSQL+Ollama 전체 사용자 흐름, OpenProxy·OpenHA·DB failover — `NOT_RUN`
+  또는 `NOT_VERIFIED`
 
 ### P2. DB 장애복구 Gate — 8월 4~7일
 

@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync, statSync } from 'node:fs'
 import { createServer } from 'node:net'
-import { delimiter, dirname, join, resolve } from 'node:path'
+import { dirname, join, posix, resolve, win32 } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 import { validatePort } from './prepare-clean-clone-demo-env.mjs'
@@ -32,44 +32,54 @@ export function executableCandidates(name, {
   platform = process.platform,
 } = {}) {
   const windows = platform === 'win32'
+  const pathImplementation = windows ? win32 : posix
   const extensions = windows
     ? (environment.PATHEXT ?? '.COM;.EXE;.BAT;.CMD').split(';').filter(Boolean)
     : ['']
   const hasExtension = windows && /\.[A-Za-z0-9]+$/.test(name)
   const names = hasExtension ? [name] : extensions.map((extension) => `${name}${extension.toLowerCase()}`)
   const candidates = []
-  for (const directory of pathEnvironment(environment).split(delimiter).filter(Boolean)) {
-    for (const candidateName of names) candidates.push(join(directory, candidateName))
+  for (const directory of pathEnvironment(environment).split(pathImplementation.delimiter).filter(Boolean)) {
+    for (const candidateName of names) candidates.push(pathImplementation.join(directory, candidateName))
   }
 
   if (windows && name.toLowerCase() === 'docker') {
     const local = environment.LOCALAPPDATA
     const programs = environment.ProgramFiles
     if (local) {
-      candidates.push(join(local, 'Docker', 'resources', 'bin', 'docker.exe'))
-      candidates.push(join(local, 'Docker', 'Docker', 'resources', 'bin', 'docker.exe'))
-      candidates.push(join(local, 'Programs', 'DockerDesktop', 'resources', 'bin', 'docker.exe'))
+      candidates.push(pathImplementation.join(local, 'Docker', 'resources', 'bin', 'docker.exe'))
+      candidates.push(pathImplementation.join(local, 'Docker', 'Docker', 'resources', 'bin', 'docker.exe'))
+      candidates.push(pathImplementation.join(local, 'Programs', 'DockerDesktop', 'resources', 'bin', 'docker.exe'))
     }
-    if (programs) candidates.push(join(programs, 'Docker', 'Docker', 'resources', 'bin', 'docker.exe'))
+    if (programs) {
+      candidates.push(pathImplementation.join(programs, 'Docker', 'Docker', 'resources', 'bin', 'docker.exe'))
+    }
   }
   if (windows && name.toLowerCase() === 'ollama' && environment.LOCALAPPDATA) {
-    candidates.push(join(environment.LOCALAPPDATA, 'Programs', 'Ollama', 'ollama.exe'))
+    candidates.push(pathImplementation.join(environment.LOCALAPPDATA, 'Programs', 'Ollama', 'ollama.exe'))
   }
   return [...new Set(candidates)]
 }
 
 export function findExecutable(name, options = {}) {
+  const environment = options.environment ?? process.env
+  const platform = options.platform ?? process.platform
+  const pathImplementation = platform === 'win32' ? win32 : posix
   const exists = options.fileExists ?? ((path) => isFile(path))
-  const candidates = executableCandidates(name, options)
-  const pathDirectories = new Set(pathEnvironment(options.environment ?? process.env)
-    .split(delimiter)
+  const candidates = executableCandidates(name, { ...options, environment, platform })
+  const pathDirectories = new Set(pathEnvironment(environment)
+    .split(pathImplementation.delimiter)
     .filter(Boolean)
-    .map((value) => resolve(value).toLowerCase()))
-  const path = candidates.find((candidate) => exists(candidate))
-  if (!path) return null
+    .map((value) => pathImplementation.resolve(value).toLowerCase()))
+  const executablePath = candidates.find((candidate) => exists(candidate))
+  if (!executablePath) return null
   return Object.freeze({
-    path,
-    source: pathDirectories.has(resolve(path, '..').toLowerCase()) ? 'PATH' : 'known installation location',
+    path: executablePath,
+    source: pathDirectories.has(
+      pathImplementation.dirname(pathImplementation.resolve(executablePath)).toLowerCase(),
+    )
+      ? 'PATH'
+      : 'known installation location',
   })
 }
 

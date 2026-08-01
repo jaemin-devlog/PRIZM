@@ -278,7 +278,7 @@ test('uses a Docker executable outside PATH and removes Compose environment over
 
   assert.equal(result.projectName, 'prizm-clean-clone-fallback01')
   assert.equal(captured.executable, 'X:\\DockerDesktop\\docker.exe')
-  assert.equal(captured.options.cwd.endsWith('PRIZM-clean-clone-rebuild'), true)
+  assert.equal(captured.options.cwd, resolve(import.meta.dirname, '..'))
   assert.equal(captured.options.environment.SAFE_VALUE, 'kept')
   assert.equal(Object.keys(captured.options.environment).some((key) => key.toUpperCase() === 'COMPOSE_FILE'), false)
   assert.equal(Object.keys(captured.options.environment).some((key) => key.toUpperCase() === 'COMPOSE_PROJECT_NAME'), false)

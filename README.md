@@ -62,8 +62,10 @@ node scripts/run-clean-clone-compose.mjs up -d --build
 최초 기동에서 demo 계정을 만든 뒤에는 bootstrap을 끄고 backend를 다시 만들어야
 합니다. 로그인→합성 TXT/PDF 업로드→`ACTIVE`→원문 출처 검색, 브라우저 확인과
 종료까지의 정확한 절차는 [로컬 Quickstart](docs/quickstart.md)를 따릅니다.
-현재 local 작업과 공개 main의 검증 상태는
-[PRZ-004 Evidence](specs/PRZ-004-clean-clone-demo/evidence.md)에서 구분합니다.
+PRZ-004 local branch에서는 PostgreSQL·pgvector와 호스트 Ollama 기반 전체 흐름을
+두 독립 환경에서 검증했습니다. 독립 최종 `AUDIT`와 공개 GitHub main 통합은 아직
+완료하지 않았습니다. 자세한 경계는
+[PRZ-004 Evidence](specs/PRZ-004-clean-clone-demo/evidence.md)에서 확인합니다.
 
 ## 검증 범위
 
@@ -88,6 +90,7 @@ node scripts/run-clean-clone-compose.mjs up -d --build
 ## 문서
 
 - [문서 안내와 독자별 탐색 경로](docs/README.md)
+- [시스템 아키텍처와 핵심 데이터 흐름](docs/architecture.md)
 - [로컬 실행 절차](docs/quickstart.md)
 - [현재 구현 현황](docs/project-status.md)
 - [개발 로드맵](docs/roadmap.md)

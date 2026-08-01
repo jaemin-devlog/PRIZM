@@ -84,6 +84,7 @@ Career Vault는 `http://localhost:5173`에서 열 수 있습니다. 다만 회�
 ## 문서
 
 - [문서 안내와 독자별 탐색 경로](docs/README.md)
+- [시스템 아키텍처와 핵심 데이터 흐름](docs/architecture.md)
 - [로컬 실행 절차](docs/quickstart.md)
 - [현재 구현 현황](docs/project-status.md)
 - [개발 로드맵](docs/roadmap.md)

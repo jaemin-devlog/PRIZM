@@ -13,7 +13,7 @@
 | 자동 OpenSQL 통합 테스트 | `VERIFIED` |
 | 전체 회귀·OSS·SBOM 감사 | `VERIFIED` |
 | OpenProxy SQL 인증·routing | `AUTH_BLOCKED`·`NOT_VERIFIED`, 적용 `DEFERRED` |
-| 다음 후보 단계 | P2 DB 장애복구 Gate |
+| 다음 후보 작업 | DB 장애복구 검증 |
 
 ## 최종 검증 결과
 
@@ -33,7 +33,7 @@
 | OpenProxy SQL routing | `NOT_VERIFIED` | TCP 연결과 달리 실제 SQL 반환은 확인하지 못했다. |
 | OpenProxy 인증 | `AUTH_BLOCKED` | OpenProxy 1.1.3에서 안전한 외부 비밀정보 주입 방식을 확인하지 못했다. |
 | OpenProxy 적용 | `DEFERRED` | 공급사의 안전한 공식 인증 구성 답변 뒤 별도 Gate로 재개한다. |
-| OpenHA·DB failover | `DEFERRED` | PRZ-005는 single-node 범위이며 P2 DB 장애복구 Gate의 후속 후보로 남긴다. |
+| OpenHA·DB failover | `DEFERRED` | PRZ-005는 single-node 범위이며 별도 DB 장애복구 작업으로 남긴다. |
 | 영구 journal | `DEFERRED` | 적용 필요성과 로그 보존 정책을 별도로 결정한다. |
 
 ## 전체 연결 흐름
@@ -75,8 +75,8 @@ OpenSQL single-node SQL Gate 결과는 [PRZ-003 Evidence](../PRZ-003-opensql-sin
 
 ### OpenSQL
 
-OpenSQL은 TmaxTibero가 제공하는 PostgreSQL 기반 DBMS 플랫폼이다. PRIZM은 커리어 문서의
-메타데이터, 처리 상태, 추출 텍스트와 벡터를 실제 지정과제 환경에 저장하기 위해
+OpenSQL은 PostgreSQL 기반 DBMS 플랫폼이다. PRIZM은 커리어 문서의
+메타데이터, 처리 상태, 추출 텍스트와 벡터를 실제 검증 환경에 저장하기 위해
 OpenSQL을 사용한다. 이번 작업에서는 single-node 설치의 실행 구조와 직접 포트 인증을
 확인했다.
 
@@ -430,7 +430,7 @@ VM 응답 중단 뒤 파일시스템·로그·서비스 구조를 순서대로 �
 - **목표:** 검증된 소스가 실제 `main`에 반영됐다는 관리 증거를 남긴다.
 - **조치:** 검증 소스 commit `eab32c870f06237d37048b6b8de1287e5e18ae66`을 [PR #26](https://github.com/jaemin-devlog/PRIZM/pull/26)으로 통합했다.
 - **결과:** `main` merge commit은 `6dc982227bafe94f0879c22bf4381a6e47adf925`, 병합 시각은 2026-08-02 20:40:49 KST다. 백엔드 2건, 프론트엔드 2건, License·Markdown·SBOM 2건 등 GitHub checks 6건이 `SUCCESS`였다. 등록된 review는 없어 `REVIEW_NOT_AVAILABLE_SOLO`다.
-- **후속:** 존재하지 않는 Issue나 review를 증거로 만들지 않았다. 다음 후보는 P2 DB 장애복구 Gate이며, PRZ-005의 비필수 보류 항목과 분리한다.
+- **후속:** 존재하지 않는 Issue나 review를 증거로 만들지 않았다. DB 장애복구는 PRZ-005의 비필수 보류 항목과 분리한 별도 후속 작업이다.
 
 </details>
 
@@ -555,8 +555,8 @@ OpenHA·DB failover도 single-node 범위에서 제외했으므로 완료로 확
 <details>
 <summary>기술 용어 설명 보기</summary>
 
-- **OpenSQL**: PostgreSQL 기반의 TmaxTibero DBMS 플랫폼이다. PRZ-005의 실제 지정과제
-  데이터베이스 환경이다.
+- **OpenSQL**: PostgreSQL 기반 DBMS 플랫폼이다. PRZ-005의 실제 데이터베이스
+  검증 환경이다.
 - **PostgreSQL**: PRIZM의 기존 개발과 clean-clone 검증에 사용한 관계형 데이터베이스다.
   OpenSQL 결과와 PostgreSQL 결과는 별도로 기록한다.
 - **Patroni**: PostgreSQL/OpenSQL 프로세스와 Leader 상태를 관리하는 도구다. 이 VM에서는

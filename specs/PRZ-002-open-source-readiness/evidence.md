@@ -18,8 +18,8 @@ image, Ollama binary, 모델 가중치와 OpenSQL 공급 자산의 재배포를 
 
 | ID | 판정 | 근거 |
 |---|---|---|
-| `OR-001` | `PASS` | [공식 source register](../../docs/contest/2026-source-register.md)에 공식 자료 URL·hash·권리 경계를 기록 |
-| `OR-002` | `PASS_SOURCE_ONLY` | [라이선스 감사](../../docs/contest/2026-license-audit.md)와 [자산 출처 감사](../../docs/contest/2026-asset-provenance-audit.md)의 현재 배포 범위 blocker 0건 |
+| `OR-001` | `PASS` | [SBOM 범위 manifest](../../sbom/prizm-scope-manifest.json)와 [NOTICE](../../NOTICE)가 저장소 포함물과 외부 준비물의 배포 경계를 구분 |
+| `OR-002` | `PASS_SOURCE_ONLY` | machine-readable SBOM, package lock과 source-only Gate의 현재 배포 범위 blocker 0건 |
 | `OR-003` | `PASS` | Apache-2.0 [LICENSE](../../LICENSE), [NOTICE](../../NOTICE)와 감사 판정 일치 |
 | `OR-004` | `PASS` | 직접 작성 코드 저작권자와 Codex 보조도구 경계를 LICENSE·NOTICE·AI 명세에 분리 |
 | `OR-005` | `DEFERRED` | 외부 기여 접수 또는 첫 지원 release·외부 배포 중 먼저 도래하는 시점에 재개 |
@@ -109,19 +109,11 @@ SBOM SHA-256은
 PR #22에 requested reviewer·comment·review가 없었다. 독립 agent 감사와 사용자
 병합 승인은 GitHub review가 아니므로 `REVIEW_NOT_AVAILABLE_SOLO`로 기록한다.
 
-## 평가 evidence
-
-- `EVAL-R1-02`: Apache-2.0, source register, license audit, NOTICE와 재현 가능한
-  SBOM·AI 모델 명세가 현재 source-only 재사용 경계를 증명한다.
-- `EVAL-R1-03`: 공식 근거, 명령, checksum, 환경과 `NOT_RUN` 경계가 문서로 연결된다.
-- `EVAL-R1-05`: 실제 PR·CI·merge와 실패 교정 이력을 사용한다. Solo 예외는
-  제3자 review나 community evidence가 아니다.
-
 ## 남은 제한
 
 - G-02·T-06은 외부 기여 접수 또는 첫 지원 release·외부 배포 전에 재개한다.
 - T-07은 외부 Issue·PR 접수를 공식 지원하기 전에 재개한다.
 - JAR, `dist`, image, Ollama binary와 모델 가중치 배포는 별도 감사가 필요하다.
-- 제출 직전 source·SBOM snapshot과 checksum은 별도 Gate에서 고정해야 한다.
+- release 전에 source·SBOM snapshot과 checksum은 별도 Gate에서 고정해야 한다.
 - OpenSQL·OpenProxy·OpenHA 검증은 이 Spec의 결과가 아니다.
 - `bge-m3` 변환 lineage의 `UNVERIFIED_LINEAGE` 경계는 그대로 유지한다.

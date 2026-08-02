@@ -4,8 +4,8 @@
 |---|---|---|---|
 | `P-00` | 범위·배포 경계·검증 계획 확정 | `COMPLETE` | [계획](plan.md) |
 | `G-03A` | 구현 전 GitHub Issue·branch 권한 확인 | `ISSUE_NOT_CREATED` | [GitHub 기록](evidence.md#github-통합과-review) |
-| `T-01` | 공식 source register 작성 | `PASS` | [OR-001 판정](evidence.md#요구사항별-판정) |
-| `T-02` | 전체 license·provenance 감사 | `PASS_SOURCE_ONLY` | [OR-002 판정](evidence.md#요구사항별-판정) |
+| `T-01` | 외부 구성요소와 배포 경계 기록 | `PASS` | [OR-001 판정](evidence.md#요구사항별-판정) |
+| `T-02` | 전체 license·provenance 검증 | `PASS_SOURCE_ONLY` | [OR-002 판정](evidence.md#요구사항별-판정) |
 | `G-01` | 배포 경계와 outgoing license 결정 | `PASS` | [License 판정](evidence.md#요구사항별-판정) |
 | `T-03` | MIT·Apache-2.0 비교와 사용자 승인 | `PASS` | [OR-003 판정](evidence.md#요구사항별-판정) |
 | `T-04` | `LICENSE`·`NOTICE` 적용 | `PASS_SOURCE_ONLY` | [OR-003·004 판정](evidence.md#요구사항별-판정) |

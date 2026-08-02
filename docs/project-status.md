@@ -32,7 +32,7 @@
 |---|---|
 | 현재 제품 | Spring Boot 애플리케이션과 React 기반 Career Vault Reference App |
 | 구현됨 | 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, 비동기 색인·복구, pgvector 검색, Career Vault 문서 관리 |
-| 현재 단계 | P0 소스 전용(source-only) 준비와 P1 OpenSQL·clean-clone 검증 완료. 다음 계획은 P2 DB 장애복구 Gate이며 아직 시작하지 않음 |
+| 현재 단계 | 소스 전용 공개 준비, clean-clone과 실제 OpenSQL 전체 흐름 검증 완료. 다음 후보인 DB 장애복구는 아직 시작하지 않음 |
 | 미구현·미검증 | CareerFact, 근거 기반 portfolio, `/api/v1`, MCP, 독립 Engine 패키지, OpenProxy SQL routing·안전한 인증, OpenHA와 DB 장애 전환 |
 
 PRIZM의 장기 목표는 재사용 가능한 Career Intelligence Engine과 Reference App을
@@ -143,8 +143,7 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 
 ## 다음 우선순위
 
-제품 개발 순서는 [개발 로드맵](roadmap.md), 대회 일정과 P0~P10 세부 단계는
-[티맥스티베로 과제 대응 계획](contest/2026-tmaxtibero-plan.md)을 따릅니다.
-가장 가까운 대회 Gate는 P2 DB 장애복구입니다. 실제 다중 노드 환경과 공식 절차를
-확보한 뒤 별도 Spec으로 착수하며, OpenProxy의 안전한 인증과 SQL routing도 공급사
-지원 방식을 확인한 경우에만 검증합니다.
+제품 개발 순서는 [개발 로드맵](roadmap.md)을 따릅니다. 다음 후보는 DB
+장애복구입니다. 실제 다중 노드 환경과 공식 절차를 확보한 뒤 별도 Spec으로
+착수하며, OpenProxy의 안전한 인증과 SQL routing도 공급사 지원 방식을 확인한
+경우에만 검증합니다.

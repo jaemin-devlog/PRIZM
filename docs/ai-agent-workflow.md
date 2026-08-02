@@ -8,10 +8,6 @@
 
 제품 기능, API 계약과 구현 완료 여부는 이 문서가 아니라 소스 코드(source
 code), Flyway 마이그레이션(migration)과 실행 가능한 테스트(test)로 판단한다.
-공식 평가항목과 현재 evidence의 연결은
-[요구사항·평가기준 추적표](contest/2026-requirements-traceability.md)를 따른다.
-내부 예상 점수와 Assessment 이력은 공개 문서에서 관리하지 않는다. 이
-workflow는 PRIZM 내부 품질 정책이지 공식 대회 요구사항이 아니다.
 
 ## 작업 전에 지킬 네 가지 원칙
 
@@ -28,8 +24,7 @@ workflow는 PRIZM 내부 품질 정책이지 공식 대회 요구사항이 아�
 PRIZM에 맞게 정리한 것이다. 참고한 공개 자료는
 [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)의
 MIT 표기 `karpathy-guidelines` skill이다. 해당 skill 파일이나 외부 실행 파일은
-PRIZM 배포물에 포함하지 않으며, 이 원칙은 런타임 기능이나 대회 구현 증거가
-아니다.
+PRIZM 배포물에 포함하지 않으며 런타임 기능이나 구현 증거가 아니다.
 
 ## 어떤 절차를 적용하는가
 
@@ -43,7 +38,7 @@ INTEGRATE`를 모두 적용한다.
 - Flyway migration
 - 인증, 권한, 사용자 소유권과 파일 안전성을 포함한 보안 변경
 - Docker, DB, OpenSQL, 배포와 CI를 포함한 인프라 변경
-- 대회 제출 기능
+- release와 배포 범위를 바꾸는 변경
 - 여러 모듈이나 핵심 데이터 흐름을 바꾸는 큰 구조 리팩터링
 - 기존 `AS_BUILT_BASELINE` 또는 `VERIFIED` 계약을 실질적으로 고치는 작업
 
@@ -71,9 +66,9 @@ INTEGRATE`를 모두 적용한다.
 - 제품 테스트를 실행하지 않았다면 그 이유와 `NOT_RUN` 사실
 - 새 Spec·Plan을 생략했다면 제품 동작이 바뀌지 않는다고 판단한 근거
 
-장기적인 설계·workflow 결정이나 의미 있는 구현 결과는
-[개발 기록](development-log.md)에 짧게 남긴다. 단순 오타나 링크 교정까지 기록을
-늘리지는 않는다.
+장기적인 설계·workflow 결정이나 의미 있는 구현 결과는 관련 Spec과 Evidence,
+실제 Git commit과 PR에 남긴다. 단순 오타나 링크 교정을 별도 기록으로 늘리지
+않는다.
 
 ## 공통 진행 규칙
 
@@ -98,9 +93,8 @@ INTEGRATE`를 모두 적용한다.
    [현재 구현 현황](project-status.md), [Architecture](architecture.md),
    [개발 로드맵](roadmap.md), [Spec Registry](../specs/README.md)
 3. 관련 spec·evidence, source, migration, 설정과 test
-4. 대회 작업이면 [대회 계획](contest/2026-tmaxtibero-plan.md),
-   [요구사항·평가기준 추적표](contest/2026-requirements-traceability.md)와 관련
-   라이선스 감사
+4. 배포 범위가 바뀌면 [LICENSE](../LICENSE), [NOTICE](../NOTICE),
+   [SBOM 안내](../sbom/README.md)와 machine-readable manifest
 5. 사용자 변경, 보존할 공개 계약, ownership·보안·migration·라이선스 영향
 6. 수정할 정확한 파일과 실행할 검증 명령
 
@@ -143,7 +137,7 @@ Gate:
 
 ## 3. PLAN
 
-대회 범위 제품 코드에는 구현 전에 `plan.md`와 `tasks.md`를 작성한다.
+새 기능과 관찰 가능한 계약 변경에는 구현 전에 `plan.md`와 `tasks.md`를 작성한다.
 
 `plan.md`에 기록할 내용:
 
@@ -269,8 +263,8 @@ Gate:
 GitHub 쓰기와 병합이 사용자의 범위에 포함될 때만 실행한다.
 
 1. 실제 변경을 담은 PR을 만들고 관련 Issue, spec, tasks와 evidence를 연결한다.
-2. Issue는 작업 시점에 실제로 필요한 경우에만 만들며, 완료된 과거 작업이나
-   점수 상승을 위해 소급 생성하지 않는다.
+2. Issue는 작업 시점에 실제로 필요한 경우에만 만들며, 완료된 과거 작업의
+   이력을 꾸미기 위해 소급 생성하지 않는다.
 3. 필수 CI를 실행하고 실제 review를 요청한다.
 4. 혼자 유지보수해 reviewer가 없으면 독립 감사, 사용자 승인과
    `REVIEW_NOT_AVAILABLE_SOLO`를 evidence에 기록한다. 이것은 review 증거가
@@ -315,7 +309,7 @@ Gate:
   돌아간다.
 - 필수 test 실패, 필수 환경 `NOT_RUN`, 라이선스 충돌, 문서·source 모순이나
   blocking finding이 있으면 `VERIFIED` 또는 `INTEGRATE`로 가지 않는다.
-- reviewer가 없는 대회 범위 제품 변경은 독립 감사와 사용자 승인 없이 병합하지
+- reviewer가 없는 고위험 제품 변경은 독립 감사와 사용자 승인 없이 병합하지
   않는다.
 - branch 안전 확인과 `main` push가 끝나기 전에는 임시 branch를 삭제하지 않는다.
 
@@ -329,28 +323,21 @@ Gate:
 | `docs/project-status.md` | source와 실행 근거가 현재 구현·검증 상태를 바꿀 때 |
 | `docs/architecture.md` | 현재 구성 요소, 데이터 흐름 또는 설계 계약이 바뀔 때 |
 | `docs/roadmap.md` | 제품 우선순위와 순서가 바뀔 때 |
-| `docs/contest/2026-tmaxtibero-plan.md` | 대회 일정, P0~P10 범위·우선순위·중단 조건이 바뀔 때 |
-| `docs/contest/2026-requirements-traceability.md` | 통합된 근거가 공식 매핑, 평가 evidence, 환경·제출 상태를 바꿀 때 |
 | `specs/PRZ-###/spec.md` | 구현 전 의도·범위·acceptance criteria가 바뀔 때 |
 | `specs/PRZ-###/plan.md`, `tasks.md` | 구현 전 계획과 구현 중 작업 상태·deviation이 바뀔 때 |
 | `specs/PRZ-###/evidence.md` | VERIFY·AUDIT 결과와 실제 GitHub 통합 근거가 생길 때 |
 | `specs/README.md` | Spec 상태, source commit 또는 마지막 검증일이 바뀔 때 |
 | `README.md`, `docs/quickstart.md` | 공개 기능, 설치·demo, 지원 환경이나 attribution이 바뀔 때 |
-| `LICENSE`, `NOTICE`, license audit | dependency, 모델, 데이터, asset 또는 재배포 산출물이 바뀔 때 |
-| `docs/development-log.md` | 의미 있는 구현·설계·검증·비채택·통합 결정이 생길 때 |
+| `LICENSE`, `NOTICE`, `sbom/` | dependency, 모델, 데이터, asset 또는 재배포 산출물이 바뀔 때 |
 
-문서 설명만 바꾸어 source 구현 상태나 평가 evidence를 과장하지 않는다. 대회
-평가 ID와 category별 현재 evidence는
-[요구사항·평가기준 추적표](contest/2026-requirements-traceability.md)에서만
-관리하며, 내부 예상 점수와 assessment 변경 이력은 공개 문서에 두지 않는다.
+문서 설명만 바꾸어 source 구현 상태나 검증 evidence를 과장하지 않는다.
 
 ## DEFERRED와 REJECTED 처리
 
 작업을 미루거나 채택하지 않으면 사라지게 두지 않는다.
 
 1. Spec 상태를 `DEFERRED` 또는 `REJECTED`로 바꾼다.
-2. `evidence.md`와 필요한 경우 [개발 기록](development-log.md)에 이유, 재개 조건
-   또는 비채택 근거를 적는다.
+2. `evidence.md`에 이유, 재개 조건 또는 비채택 근거를 적는다.
 3. 실제 Issue·PR이 있으면 현재 상태를 연결한다. 존재하지 않는 기록은 만들지
    않는다.
 4. 임시 branch의 unique commit과 변경 파일을 확인한다.

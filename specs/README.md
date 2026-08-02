@@ -48,13 +48,10 @@
 - Registry 도입 전 기능은 `AS_BUILT_BASELINE`으로만 기록한다. 존재하지 않았던
   Issue·PR·review를 만들거나 과거에 있었던 것처럼 기록하지 않는다.
 - 새 기능과 observable contract 변경은 구현 전에 `spec.md`를 작성한다.
-- 대회 범위 product code에는 구현 전에 `plan.md`와 `tasks.md`가 필요하다.
-  제품 동작을 바꾸지 않는 문서 전용 수정은 생략 이유와 확인 결과를 남길 수 있다.
+- 새 기능과 관찰 가능한 계약 변경에는 구현 전에 `plan.md`와 `tasks.md`가
+  필요하다. 제품 동작을 바꾸지 않는 문서 전용 수정은 생략 이유와 확인 결과를
+  남길 수 있다.
 - 요구사항은 `evidence.md`에서 source·migration·test·실행 환경·결과와 연결한다.
-- 대회 평가 ID는 evidence에서 실제 근거와 남은 제한에만 연결한다. 공식
-  평가항목과 현재 evidence의 연결은
-  [요구사항·평가기준 추적표](../docs/contest/2026-requirements-traceability.md)를
-  따른다. 내부 예상 점수는 공개 문서에서 관리하지 않는다.
 - Issue, PR, CI, merge와 review URL은 실제 존재할 때만 기록한다.
   `REVIEW_NOT_AVAILABLE_SOLO`는 review evidence가 아니다.
 - [AGENTS.md](../AGENTS.md)가 프로젝트 불변식의 원본이다. Spec에 같은 규칙을
@@ -88,6 +85,5 @@ source commit `eab32c870f06237d37048b6b8de1287e5e18ae66`, merge commit
 `6dc982227bafe94f0879c22bf4381a6e47adf925`다. GitHub check 6건은 모두
 성공했고 review는 없어 `REVIEW_NOT_AVAILABLE_SOLO`로 기록한다.
 
-다음 신규 Spec의 우선순위는
-[2026 티맥스티베로 지정과제 대응 계획](../docs/contest/2026-tmaxtibero-plan.md)을
-따른다. 실제로 착수하는 작은 수직 슬라이스만 추가한다.
+다음 신규 Spec의 우선순위는 [개발 로드맵](../docs/roadmap.md)을 따른다. 실제로
+착수하는 작은 수직 슬라이스만 추가한다.

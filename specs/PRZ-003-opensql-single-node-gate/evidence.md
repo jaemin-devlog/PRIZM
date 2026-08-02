@@ -144,14 +144,6 @@ PR #24에 requested reviewer·comment·review thread가 없었다. 독립 agent 
 
 OpenSQL은 PRIZM source-only 저장소에 포함하거나 재배포하지 않는 외부 runtime이다.
 
-## 평가 evidence
-
-- `EVAL-R1-01`: 기본 Windows 회귀와 실제 OpenSQL single-node SQL Gate가
-  실행 가능한 코드·환경 근거를 제공한다.
-- `EVAL-R1-03`: 설치, SQL Gate와 미검증 범위를 분리해 재현 조건을 기록한다.
-- `EVAL-R1-05`: 실제 PR·CI·merge와 실패·보완 이력을 사용한다.
-  `REVIEW_NOT_AVAILABLE_SOLO`는 제3자 review가 아니다.
-
 ## 남은 제한
 
 - 설치 후 전체 service 재부팅 지속성은 `NOT_RUN`이다.

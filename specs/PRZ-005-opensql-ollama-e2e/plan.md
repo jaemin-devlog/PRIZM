@@ -102,7 +102,7 @@ PRZ-004의 first-party 합성 TXT/PDF와 verifier를 재사용한다. 실제 Ope
 | 애플리케이션 | 원칙적으로 소스 변경 없음. 실제 차단 오류가 재현될 때만 PLAN으로 복귀 |
 | migration | 변경 없음 |
 | dependency·SBOM·license | 변경 없음. identity가 달라지면 compliance Gate로 복귀 |
-| 공개 문서 | 검증 완료 후 project status·roadmap·contest traceability만 현행화 |
+| 공개 문서 | 검증 완료 후 project status와 roadmap만 현행화 |
 
 ## 구현 Batch
 
@@ -174,7 +174,7 @@ test·failure·error·skip 수만 공개한다.
 ## Dependency·license
 
 새 dependency, Docker image, model 또는 공급 파일을 저장소에 추가하지 않는다. OpenSQL은
-대회 목적의 외부 비공개 runtime이며 Ollama와 `bge-m3`도 사용자가 별도로 준비한다. 실제
+외부 비공개 runtime이며 Ollama와 `bge-m3`도 사용자가 별도로 준비한다. 실제
 model identity가 기존 provenance 기록과 다르면 조용히 갱신하지 않고 license·SBOM Gate로
 돌아간다.
 

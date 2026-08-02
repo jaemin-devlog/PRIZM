@@ -104,7 +104,7 @@ PostgreSQL·pgvector와 호스트 Ollama를 이용해 로그인부터 원문 근
 - 실제 Ollama version, model name·manifest, 1024 embedding dimension을 기록한다.
   mutable `latest`를 bit-identical 재현으로 표현하지 않는다.
 - dependency나 Docker build identity가 바뀌면 실제 필요성을 기록하고 frontend
-  SBOM, checksum과 license audit을 함께 갱신한다.
+  SBOM, checksum과 license 범위 기록을 함께 갱신한다.
 
 ### PRZ-004-R07 — 상태와 Evidence
 
@@ -141,5 +141,5 @@ PostgreSQL·pgvector와 호스트 Ollama를 이용해 로그인부터 원문 근
 4. 최종 source commit의 두 fresh clone에서 고유 project·volume·port로 전체
    API smoke와 브라우저 시험표를 통과한다.
 5. `.env`, credential, fixture, model, volume과 image가 Git에 포함되지 않는다.
-6. SBOM·checksum·license audit과 OSS readiness가 서로 일치한다.
+6. SBOM·checksum·license 범위와 OSS readiness가 서로 일치한다.
 7. Evidence가 환경별 결과와 `NOT_RUN` 경계를 실제 결과 그대로 기록한다.

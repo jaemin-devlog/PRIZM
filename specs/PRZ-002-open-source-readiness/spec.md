@@ -2,13 +2,12 @@
 
 ## 목적
 
-PRIZM의 공개 source와 제출 산출물을 재사용할 수 있도록 공식 출처, 저작권,
+PRIZM의 공개 source와 배포물을 재사용할 수 있도록 출처, 저작권,
 라이선스, 외부 구성요소와 배포 경계를 검증 가능한 형태로 정리한다. 이 작업은
 새 제품 기능이나 OpenSQL 호환성을 구현하는 작업이 아니다.
 
 ## 범위
 
-- 대회 공식 규정·홈페이지·결과보고서 양식과 OT 보조 근거의 출처 등록
 - Java·Gradle, npm, container·database, CI, Ollama·`bge-m3`, fixture·asset의
   license·provenance 감사
 - 사용자가 승인한 OSI 라이선스, 제3자 고지와 source-only 배포 경계
@@ -20,9 +19,9 @@ PRIZM의 공개 source와 제출 산출물을 재사용할 수 있도록 공식 
 
 | ID | 요구사항 |
 |---|---|
-| `OR-001` | 공식 운영 규정, 공식 홈페이지, 결과보고서 양식과 OT 보조 근거의 출처·발행일 또는 수집일·SHA-256·저작권/재배포 제한·PRIZM 적용 항목을 source register에 기록해야 한다. |
+| `OR-001` | 공개 source에 포함하거나 외부에서 준비하는 구성요소와 자산의 출처·버전·라이선스·재배포 경계를 SBOM과 NOTICE에 기록해야 한다. |
 | `OR-002` | Java/Gradle, frontend npm, Docker/컨테이너, PostgreSQL·pgvector, Ollama와 `bge-m3`, 테스트 fixture·예제·이미지·문서 자산을 대상으로 버전·출처·라이선스·사용 목적·배포 여부·NOTICE 의무를 감사해야 한다. |
-| `OR-003` | 감사 후 사용자가 승인한 OSI 인증 프로젝트 라이선스를 루트 `LICENSE`에 적용하고, 필요한 제3자 고지와 예외를 `NOTICE`와 라이선스 감사 문서에 일관되게 기록해야 한다. |
+| `OR-003` | 검토 후 사용자가 승인한 OSI 인증 프로젝트 라이선스를 루트 `LICENSE`에 적용하고, 필요한 제3자 고지와 예외를 `NOTICE`와 SBOM 범위 manifest에 일관되게 기록해야 한다. |
 | `OR-004` | PRIZM의 직접 작성 코드 저작권자를 `Jaemin Jeong`으로 기록하고 Codex는 개발 보조도구로 분리해야 한다. AI 사용을 특정 제3자 코드·자산을 복사하지 않았다는 보증으로 바꾸지 않아야 한다. |
 | `OR-005` | CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT와 최소 maintainer 정책은 외부 기여 접수 또는 첫 지원 release·외부 배포 중 먼저 도래하는 시점에 재개해야 한다. 실제 운영 가능한 신고 경로만 사용하고 비밀정보를 공개 Issue에 올리지 않도록 안내해야 한다. |
 | `OR-006` | Bug·feature·documentation Issue form과 PR template은 외부 Issue·PR 접수를 공식 지원하기 전에 재개해야 한다. 템플릿 자체를 review 증거로 주장하지 않아야 한다. |
@@ -36,8 +35,8 @@ PRIZM의 공개 source와 제출 산출물을 재사용할 수 있도록 공식 
 - PostgreSQL 결과를 OpenSQL·OpenProxy·OpenHA 호환성 증거로 바꾸지 않는다.
 - 원본 경력 문서, JWT, 비밀번호, 전체 JDBC URL, 저장 경로, 모델 파일과 빌드
   산출물을 공개 source에 추가하지 않는다.
-- 공식 원문과 OT 캡처는 재배포 권한을 가정하지 않고 source register의 링크,
-  식별 정보와 필요한 최소 해석만 공개한다.
+- 외부 자료는 재배포 권한을 가정하지 않고 확인 가능한 출처와 필요한 최소
+  식별 정보만 공개한다.
 
 ## 제외 범위
 
@@ -50,10 +49,10 @@ PRIZM의 공개 source와 제출 산출물을 재사용할 수 있도록 공식 
 
 ## 측정 가능한 완료 조건
 
-1. Source register가 공식 원본과 OT 보조 근거의 권한·추적 한계를 구분한다.
+1. SBOM과 NOTICE가 저장소 포함물과 외부 준비물의 출처·배포 경계를 구분한다.
 2. 현재 source-only 배포 범위의 모든 발견 구성요소가 판정되고 `UNKNOWN`,
    `CONFLICT`, `BLOCKED`가 0건이다.
-3. 루트 `LICENSE`·`NOTICE`와 라이선스 감사 결과가 일치한다.
+3. 루트 `LICENSE`·`NOTICE`와 SBOM 배포 경계가 일치한다.
 4. 미구현 거버넌스 항목은 `DEFERRED`와 재개 조건으로 일관되게 기록한다.
 5. README·Quickstart·문서 색인이 현재 구현·계획·미검증 환경을 구분한다.
 6. SBOM·AI 모델 명세를 clean checkout에서 재생성·검증할 수 있고 checksum과

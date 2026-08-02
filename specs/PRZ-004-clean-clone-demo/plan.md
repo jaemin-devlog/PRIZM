@@ -91,14 +91,13 @@
 - `frontend/package.json`, `frontend/package-lock.json`
 - 필요성이 실제 Docker build에서 확인될 때만 `frontend/Dockerfile`
 - `sbom/prizm-frontend.cdx.json`, `sbom/SHA256SUMS`
-- `docs/contest/2026-license-audit.md`
+- `LICENSE`, `NOTICE`, `sbom/README.md`
 
 ### 문서·Evidence
 
 - `README.md`, `AGENTS.md`
 - `docs/README.md`, `docs/quickstart.md`, `docs/project-status.md`
 - `docs/architecture.md`, `docs/roadmap.md`, `docs/ai-agent-workflow.md`
-- `docs/contest/2026-tmaxtibero-plan.md`, `docs/development-log.md`
 - `specs/README.md`
 - `specs/PRZ-004-clean-clone-demo/{spec,plan,tasks,evidence}.md`
 
@@ -128,7 +127,7 @@
   SBOM과 OSS readiness 검증을 실행해 통과했다.
 - 최소 safe exact version으로 올린 뒤 lockfile 183개 component와 license
   expression을 다시 대조한다.
-- frontend SBOM·checksum·license audit input SHA를 같은 diff에서 갱신한다.
+- frontend SBOM·checksum·license 범위 기록을 같은 diff에서 갱신한다.
 - 현재 Ollama `0.32.3`, `bge-m3:latest` manifest `790764...6bab`은 기존 감사와
   일치하므로 model manifest를 변경하지 않는다.
 - `node:22-alpine`의 실제 builder version이 선언한 `22.17.0`과 다를 때만 exact

@@ -84,11 +84,9 @@ PRZ-004에서는 PostgreSQL·pgvector와 호스트 Ollama 기반 전체 흐름�
 범위입니다. PostgreSQL·pgvector·Ollama·`bge-m3`는 사용자가 각 upstream에서
 직접 준비합니다. 컨테이너 이미지(container image), 모델 가중치, OpenSQL 공급
 자산과 DB 볼륨(volume)은 재배포하지 않습니다. 미래에 binary·image·model을
-배포하려면 별도의 검증 단계(Gate)가 필요합니다. 현재 결론은
-[source-only compliance](docs/contest/2026-compliance.md), 적용 라이선스는
-[LICENSE](LICENSE)와 [NOTICE](NOTICE), 상세 근거는
-[라이선스·출처 감사](docs/contest/2026-license-audit.md)와
-[SBOM·AI 모델 명세](docs/contest/2026-sbom-model-manifest.md)에서 확인할 수 있습니다.
+배포하려면 별도의 검증 단계(Gate)가 필요합니다. 적용 라이선스는
+[LICENSE](LICENSE)와 [NOTICE](NOTICE), 구성요소·모델·배포 경계와 checksum은
+[SBOM 안내](sbom/README.md)에서 확인할 수 있습니다.
 
 ## 문서
 
@@ -97,5 +95,4 @@ PRZ-004에서는 PostgreSQL·pgvector와 호스트 Ollama 기반 전체 흐름�
 - [로컬 실행 절차](docs/quickstart.md)
 - [현재 구현 현황](docs/project-status.md)
 - [개발 로드맵](docs/roadmap.md)
-- [대회 요구사항·평가기준 추적표](docs/contest/2026-requirements-traceability.md)
 - [Spec Registry와 검증 근거](specs/README.md)

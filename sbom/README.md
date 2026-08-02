@@ -1,9 +1,15 @@
 # PRIZM machine-readable SBOM records
 
 This directory is the single source for PRIZM's full component identities,
-exact versions, license expressions, source URLs, package hashes, and generated
-file checksums. The human-readable source-only conclusion is in
-[`2026-compliance.md`](../docs/contest/2026-compliance.md).
+exact versions, license expressions, source URLs, package hashes, generated
+file checksums, and source-only distribution boundary.
+
+PRIZM publishes source and configuration under Apache-2.0. Java artifacts,
+frontend bundles, container images, PostgreSQL·pgvector, Ollama, model weights,
+OpenSQL assets, database volumes, and uploaded documents are not redistributed
+in the source archive. The current source-only license Gate is `PASS` with no
+known blocking `UNKNOWN`, `CONFLICT`, or `BLOCKED` result. Any future binary,
+image, or model distribution requires a new artifact-specific review.
 
 ## File roles
 

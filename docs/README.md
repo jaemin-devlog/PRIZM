@@ -12,8 +12,8 @@
 | 로컬에서 실행하려는 개발자 | [로컬 Quickstart](quickstart.md) | [OpenSQL 기술 Gate](opensql-gate.md) |
 | 프로젝트 구조를 이해하려는 개발자 | [Architecture](architecture.md) | [현재 구현 현황](project-status.md), [대표 문제 해결 사례](showcase/problem-solving-case-studies.md), [검색 품질 평가](evaluation/search-evaluation.md) |
 | 실제 기여자와 AI 에이전트 | [핵심 프로젝트 규칙](../AGENTS.md) | [상세 Contributor Workflow](ai-agent-workflow.md), [Spec Registry](../specs/README.md) |
-| 검증·대회 자료를 확인하는 사람 | [요구사항·평가기준 추적표](contest/2026-requirements-traceability.md) | [source-only compliance 결론](contest/2026-compliance.md), [대회 대응 계획](contest/2026-tmaxtibero-plan.md), [공식 근거 등록부](contest/2026-source-register.md), [라이선스 감사](contest/2026-license-audit.md), [SBOM·AI 모델 명세](contest/2026-sbom-model-manifest.md) |
-| 과거 기록을 찾는 사람 | [개발 기록](development-log.md) | [`archive/`](archive/)의 과거 계획·실험·검증 기록 |
+| 검증 근거를 확인하는 사람 | [Spec Registry](../specs/README.md) | [현재 구현 현황](project-status.md), [SBOM 안내](../sbom/README.md) |
+| 과거 기록을 찾는 사람 | [`archive/`](archive/) | 종료된 기술 실험과 초기 검증 기록 |
 
 ## 공통 상태 코드
 
@@ -32,11 +32,9 @@
 
 ## 보관 문서
 
-`archive/`는 과거 기획, 종료된 실험과 초기 검증 기록입니다. 현재 구현이나
+`archive/`는 종료된 실험과 초기 검증 기록입니다. 현재 구현이나
 현재 개발 순서를 판단하는 기준으로 사용하지 않습니다.
 
-- [과거 PRIZM 종합 기획안](archive/PRIZM_최종_기획안.md)
-- [과거 오픈소스 전환 상세 계획](archive/oss-transition-execution-plan.md)
 - [BGE Reranker 비채택 실험](archive/experiments/2026-07-14-bge-reranker-evaluation.md)
 - [초기 문서 등록 검증](archive/verification/2026-07-13-minimal-document-registration.md)
 - [초기 벡터 검색 검증](archive/verification/2026-07-13-minimal-vector-search.md)

@@ -19,6 +19,9 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 class OpenSqlInfrastructureTest {
 
     private static final String TARGET_CONFIRMATION = "PRIZM_OPENSQL_VERIFICATION_TARGET_CONFIRMED";
+    private static final String EXPECTED_DATABASE = "prizm_integration_test";
+    private static final String EXPECTED_RUNTIME_USER = "prizm_app";
+    private static final String EXPECTED_FLYWAY_USER = "prizm_owner";
 
     @BeforeAll
     static void suppressConnectionDetailsFromLibraryLogs() {
@@ -41,7 +44,9 @@ class OpenSqlInfrastructureTest {
                 required("PRIZM_FLYWAY_USERNAME"),
                 required("PRIZM_FLYWAY_PASSWORD"));
 
-        OpenSqlCompatibilityAssertions.verify(runtimeDataSource, flywayDataSource);
+        verifyConnectionIdentity(runtimeDataSource, EXPECTED_RUNTIME_USER);
+        verifyConnectionIdentity(flywayDataSource, EXPECTED_FLYWAY_USER);
+        OpenSqlCompatibilityAssertions.verifyWithOpenSqlRuntimeGrants(runtimeDataSource, flywayDataSource);
     }
 
     private void requireDedicatedVerificationTarget() {
@@ -63,5 +68,15 @@ class OpenSqlInfrastructureTest {
 
     private DataSource dataSource(String url, String username, String password) {
         return new DriverManagerDataSource(url, username, password);
+    }
+
+    private void verifyConnectionIdentity(DataSource dataSource, String expectedUser) {
+        org.springframework.jdbc.core.JdbcTemplate jdbc =
+                new org.springframework.jdbc.core.JdbcTemplate(dataSource);
+        String database = jdbc.queryForObject("SELECT current_database()", String.class);
+        String user = jdbc.queryForObject("SELECT current_user", String.class);
+        if (!EXPECTED_DATABASE.equals(database) || !expectedUser.equals(user)) {
+            throw new AssertionError("OpenSQL verification target identity did not match the dedicated test target.");
+        }
     }
 }

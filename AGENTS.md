@@ -20,8 +20,13 @@ agent. The detailed delivery procedure lives in
 - The current contest phase is P1. P0 source-only readiness, the actual OpenSQL
   single-node SQL Gate, and two independent PostgreSQL·pgvector plus host Ollama
   clean-clone flows are verified. PRZ-004 is integrated into GitHub `main`.
-- The OpenSQL+Ollama user flow, OpenProxy runtime, OpenHA, and DB failover remain
-  unverified or `NOT_RUN`.
+- PRZ-005 is `VERIFIED` for the OpenSQL+Ollama direct-`5432` synthetic TXT/PDF
+  API and browser flows, including two-user document and search isolation. Its
+  isolated OpenSQL opt-in integration test and final backend, frontend,
+  OSS-readiness, SBOM, and documentation audit are also complete. OpenProxy TCP
+  connectivity is verified, but SQL routing is `NOT_VERIFIED`, authentication is
+  `AUTH_BLOCKED`, and application is `DEFERRED`. OpenHA, DB failover, and the
+  persistent journal remain deferred according to PRZ-005.
 
 ## Career evidence principle
 
@@ -86,9 +91,10 @@ agent. The detailed delivery procedure lives in
 
 - Keep PostgreSQL·pgvector results separate from OpenSQL results. PostgreSQL
   success is not OpenSQL evidence.
-- The verified OpenSQL result is limited to the actual single-node SQL Gate. Do
-  not expand it to the OpenSQL+Ollama user flow, OpenProxy, OpenHA, DB failover,
-  or service continuity.
+- Verified OpenSQL results are limited to the actual single-node SQL Gate and
+  the PRZ-005 direct-`5432` API, browser, and two-user isolation flows. Do not
+  expand them to OpenProxy SQL routing, OpenHA, DB failover, or service
+  continuity.
 - Record unavailable or unexecuted checks as `NOT_RUN` or `NOT_VERIFIED`, never
   `PASS`. Keep historical results separate from checks rerun on the current
   source.

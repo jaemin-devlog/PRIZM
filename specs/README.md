@@ -71,6 +71,17 @@
 | [PRZ-002](PRZ-002-open-source-readiness/spec.md) | 오픈소스 준비: 출처·라이선스·기여 기준선 | `VERIFIED` | `f54e3d9` | 2026-07-30 |
 | [PRZ-003](PRZ-003-opensql-single-node-gate/spec.md) | OpenSQL 단일 노드 검증 환경 | `VERIFIED` | `777e184` | 2026-07-30 |
 | [PRZ-004](PRZ-004-clean-clone-demo/spec.md) | 안전한 demo USER와 clean-clone 전체 흐름 | `VERIFIED` | `aff3e87` | 2026-08-01 |
+| [PRZ-005](PRZ-005-opensql-ollama-e2e/spec.md) | OpenSQL·Ollama 전체 사용자 흐름 | `VERIFIED` | `f359187` | 2026-08-02 |
+
+PRZ-005의 실제 환경 준비 결과와 남은 범위는
+[실제 OpenSQL 통합 작업 보고서](PRZ-005-opensql-ollama-e2e/implementation-report.md)에서
+확인한다.
+
+PRZ-005의 직접 `5432` API·브라우저·두 사용자 격리는 검증됐다. 현재 source의 OpenSQL
+opt-in integration test도 격리된 `prizm_integration_test`에서 통과했다. backend 전체
+회귀, frontend lint·typecheck·build, OSS readiness·SBOM과 최종 감사도 통과해 상태는
+`VERIFIED`다. frontend unit test는 공식 명령이 없어 `NOT_RUN`이다. OpenProxy의 안전한
+인증과 SQL routing, OpenHA와 영구 journal은 별도 후속 범위다.
 
 다음 신규 Spec의 우선순위는
 [2026 티맥스티베로 지정과제 대응 계획](../docs/contest/2026-tmaxtibero-plan.md)을

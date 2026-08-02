@@ -56,11 +56,24 @@ final class OpenSqlCompatibilityAssertions {
     }
 
     static void verify(DataSource runtimeDataSource, DataSource flywayDataSource) {
+        verify(runtimeDataSource, flywayDataSource, () -> { });
+    }
+
+    static void verifyWithOpenSqlRuntimeGrants(DataSource runtimeDataSource, DataSource flywayDataSource) {
+        verify(runtimeDataSource, flywayDataSource, () ->
+                OpenSqlRuntimePrivilegePreparation.prepare(runtimeDataSource, flywayDataSource));
+    }
+
+    private static void verify(
+            DataSource runtimeDataSource,
+            DataSource flywayDataSource,
+            Runnable postMigrationPreparation) {
         JdbcTemplate runtimeJdbc = new JdbcTemplate(runtimeDataSource);
         JdbcTemplate flywayJdbc = new JdbcTemplate(flywayDataSource);
 
         verifyPreMigrationTargets(flywayJdbc, runtimeJdbc);
         verifyMigrations(flywayDataSource, flywayJdbc);
+        verifyPhase("runtime-privileges", "OpenSQL test-only runtime grants", postMigrationPreparation);
         VerificationMarker marker = verifySharedTarget(flywayJdbc, runtimeJdbc);
         String runToken = UUID.randomUUID().toString();
 
@@ -69,11 +82,11 @@ final class OpenSqlCompatibilityAssertions {
                     inTransaction(runtimeDataSource,
                             () -> PgVectorSmokeAssertions.verifyExactCosineSearch(runtimeJdbc)));
             verifyPhase("search", "VectorSearchRepository exact cosine SQL and row mapping", () ->
-                    verifyVectorSearch(runtimeJdbc, runToken));
+                    verifyVectorSearch(runtimeJdbc, flywayJdbc, runToken));
             verifyPhase("indexing-worker", "ProcessingJobClaimRepository claim, lease and SKIP LOCKED SQL", () ->
-                    verifyProcessingJobSql(runtimeDataSource, runtimeJdbc, runToken));
+                    verifyProcessingJobSql(runtimeDataSource, runtimeJdbc, flywayJdbc, runToken));
             verifyPhase("cleanup-worker", "FileCleanupJobRepository registration, claim, recovery and fencing SQL", () ->
-                    verifyCleanupJobSql(runtimeDataSource, runtimeJdbc, runToken));
+                    verifyCleanupJobSql(runtimeDataSource, runtimeJdbc, flywayJdbc, runToken));
         }
         finally {
             verifyPhase("target-cleanup", "run-scoped verification marker cleanup", () -> {
@@ -343,8 +356,9 @@ final class OpenSqlCompatibilityAssertions {
         }
     }
 
-    private static void verifyVectorSearch(JdbcTemplate jdbcTemplate, String runToken) {
-        try (FixtureScope fixtures = new FixtureScope(jdbcTemplate, runToken + "-search")) {
+    private static void verifyVectorSearch(
+            JdbcTemplate jdbcTemplate, JdbcTemplate cleanupJdbc, String runToken) {
+        try (FixtureScope fixtures = new FixtureScope(cleanupJdbc, runToken + "-search")) {
             VectorSearchRepository repository = new VectorSearchRepository(jdbcTemplate);
             long owner = createUser(jdbcTemplate, fixtures);
             long otherOwner = createUser(jdbcTemplate, fixtures);
@@ -429,9 +443,12 @@ final class OpenSqlCompatibilityAssertions {
     }
 
     private static void verifyProcessingJobSql(
-            DataSource dataSource, JdbcTemplate jdbcTemplate, String runToken) {
+            DataSource dataSource,
+            JdbcTemplate jdbcTemplate,
+            JdbcTemplate cleanupJdbc,
+            String runToken) {
         ProcessingJobClaimRepository repository = new ProcessingJobClaimRepository(jdbcTemplate);
-        try (FixtureScope fixtures = new FixtureScope(jdbcTemplate, runToken + "-indexing-claim")) {
+        try (FixtureScope fixtures = new FixtureScope(cleanupJdbc, runToken + "-indexing-claim")) {
             long owner = createUser(jdbcTemplate, fixtures);
             Instant now = databaseNow(jdbcTemplate);
             ProcessingFixture pending = createProcessingJob(
@@ -464,7 +481,7 @@ final class OpenSqlCompatibilityAssertions {
             assertThat(repository.lockNextExpiredId()).contains(retry.jobId());
         }
 
-        try (FixtureScope fixtures = new FixtureScope(jdbcTemplate, runToken + "-indexing-skip-locked")) {
+        try (FixtureScope fixtures = new FixtureScope(cleanupJdbc, runToken + "-indexing-skip-locked")) {
             long owner = createUser(jdbcTemplate, fixtures);
             Instant now = databaseNow(jdbcTemplate);
             ProcessingFixture first = createProcessingJob(
@@ -486,9 +503,12 @@ final class OpenSqlCompatibilityAssertions {
     }
 
     private static void verifyCleanupJobSql(
-            DataSource dataSource, JdbcTemplate jdbcTemplate, String runToken) {
+            DataSource dataSource,
+            JdbcTemplate jdbcTemplate,
+            JdbcTemplate cleanupJdbc,
+            String runToken) {
         FileCleanupJobRepository repository = new FileCleanupJobRepository(jdbcTemplate);
-        try (FixtureScope fixtures = new FixtureScope(jdbcTemplate, runToken + "-cleanup-lifecycle")) {
+        try (FixtureScope fixtures = new FixtureScope(cleanupJdbc, runToken + "-cleanup-lifecycle")) {
             String completedKey = fixtures.storageKey("cleanup-complete.txt");
             registerCleanupJob(repository, jdbcTemplate, fixtures, completedKey);
             repository.registerPending(completedKey);
@@ -548,7 +568,7 @@ final class OpenSqlCompatibilityAssertions {
                     recoveredClaim.fileCleanupJobId(), recoveredClaim.claimVersion())).isTrue();
         }
 
-        try (FixtureScope fixtures = new FixtureScope(jdbcTemplate, runToken + "-cleanup-skip-locked")) {
+        try (FixtureScope fixtures = new FixtureScope(cleanupJdbc, runToken + "-cleanup-skip-locked")) {
             String firstKey = fixtures.storageKey("cleanup-skip-locked-first.txt");
             String secondKey = fixtures.storageKey("cleanup-skip-locked-second.txt");
             long firstId = registerCleanupJob(repository, jdbcTemplate, fixtures, firstKey);
@@ -933,7 +953,7 @@ final class OpenSqlCompatibilityAssertions {
 
     private static final class FixtureScope implements AutoCloseable {
 
-        private final JdbcTemplate jdbcTemplate;
+        private final JdbcTemplate cleanupJdbc;
         private final String runToken;
         private final Set<String> cleanupKeys = new LinkedHashSet<>();
         private final Set<Long> processingJobIds = new LinkedHashSet<>();
@@ -944,8 +964,8 @@ final class OpenSqlCompatibilityAssertions {
         private int emailSequence;
         private boolean closed;
 
-        private FixtureScope(JdbcTemplate jdbcTemplate, String runToken) {
-            this.jdbcTemplate = jdbcTemplate;
+        private FixtureScope(JdbcTemplate cleanupJdbc, String runToken) {
+            this.cleanupJdbc = cleanupJdbc;
             this.runToken = runToken;
         }
 
@@ -996,7 +1016,7 @@ final class OpenSqlCompatibilityAssertions {
             deleteCleanupJobs();
             deleteById("processing_jobs", processingJobIds);
             deleteById("document_chunks", chunkIds);
-            forEachReversed(documentIds, documentId -> assertThat(jdbcTemplate.update(
+            forEachReversed(documentIds, documentId -> assertThat(cleanupJdbc.update(
                     "UPDATE documents SET active_version_id = NULL WHERE id = ?",
                     documentId)).isEqualTo(1));
             deleteById("document_versions", versionIds);
@@ -1007,14 +1027,14 @@ final class OpenSqlCompatibilityAssertions {
         private void deleteCleanupJobs() {
             List<String> keys = new ArrayList<>(cleanupKeys);
             for (int index = keys.size() - 1; index >= 0; index--) {
-                assertThat(jdbcTemplate.update(
+                assertThat(cleanupJdbc.update(
                         "DELETE FROM file_cleanup_jobs WHERE storage_key = ?",
                         keys.get(index))).isEqualTo(1);
             }
         }
 
         private void deleteById(String table, Set<Long> ids) {
-            forEachReversed(ids, id -> assertThat(jdbcTemplate.update(
+            forEachReversed(ids, id -> assertThat(cleanupJdbc.update(
                     "DELETE FROM " + table + " WHERE id = ?",
                     id)).isEqualTo(1));
         }

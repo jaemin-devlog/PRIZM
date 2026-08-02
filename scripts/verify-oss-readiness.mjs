@@ -10,8 +10,7 @@ const root = resolve(import.meta.dirname, '..')
 const requiredFiles = [
   'LICENSE',
   'NOTICE',
-  'docs/contest/2026-license-audit.md',
-  'docs/contest/2026-sbom-model-manifest.md',
+  'sbom/README.md',
   'sbom/SHA256SUMS',
   'sbom/prizm-ai-model-manifest.json',
   'sbom/prizm-backend-runtime.cdx.json',

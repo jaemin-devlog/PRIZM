@@ -4,8 +4,8 @@
 
 1. 공개 Git 저장소와 source ZIP을 현재 배포 경계로 두고 JAR, frontend `dist`,
    container image, Ollama binary와 모델 가중치는 후속 배포 Gate로 분리한다.
-2. 공식 자료는 원문을 복제하지 않고 source register에 URL, hash, 권리 상태와
-   PRIZM 적용 항목을 기록한다.
+2. 외부 자료는 원문을 복제하지 않고 SBOM과 NOTICE에 출처, 버전, 라이선스와
+   배포 경계를 기록한다.
 3. Lockfile·resolved graph·artifact license·bundle·image·model metadata를 함께
    대조하고 자동 도구 결과만으로 license 판정을 끝내지 않는다.
 4. 전체 감사를 마친 뒤 사용자가 MIT와 Apache-2.0을 비교해 outgoing license를
@@ -20,12 +20,12 @@
 
 | 범위 | 예상 산출물 |
 |---|---|
-| 공식 근거 | `docs/contest/2026-source-register.md` |
-| License·provenance | `LICENSE`, `NOTICE`, license·asset 감사 |
+| 공개 경계 | `LICENSE`, `NOTICE`, `sbom/` |
+| License·provenance | `LICENSE`, `NOTICE`, SBOM 범위 manifest |
 | SBOM·AI | `sbom/` manifest·checksum, 생성·검증 script |
-| 공개 진입 문서 | README, Quickstart, docs index와 상태·대회 문서 |
+| 공개 진입 문서 | README, Quickstart, docs index와 상태 문서 |
 | 자동 검증 | 로컬 OSS readiness 명령과 GitHub Actions |
-| 추적성 | Spec, tasks, evidence, Registry와 개발 기록 |
+| 추적성 | Spec, tasks, evidence, Registry와 Git commit·PR 기록 |
 
 제품 source, Flyway migration, production configuration과 frontend 기능은 예상
 변경 범위에 넣지 않는다.
@@ -69,7 +69,7 @@
   배포 여부와 NOTICE 의무를 기록한다.
 - Ollama source, 실행 binary, `bge-m3` 가중치와 PRIZM integration code를 별도
   구성요소로 취급한다.
-- 모델 파일·cache와 공급사 OpenSQL 자산은 Git과 기본 제출물에 넣지 않는다.
+- 모델 파일·cache와 공급사 OpenSQL 자산은 Git과 source 배포물에 넣지 않는다.
 
 ## Branch·PR 계획
 

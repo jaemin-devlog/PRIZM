@@ -35,6 +35,6 @@
 
 ## 다음 후보 작업
 
-PRZ-005의 핵심 범위는 완료됐다. 다음 후보는 P2 DB 장애복구 Gate이며, 여기에서 `T-10`
+PRZ-005의 핵심 범위는 완료됐다. 다음 후보는 DB 장애복구 검증이며, 여기에서 `T-10`
 OpenProxy 안전 인증·SQL routing, `T-11` 영구 journal, `T-15` OpenHA·DB failover의 착수
 여부와 범위를 결정한다.

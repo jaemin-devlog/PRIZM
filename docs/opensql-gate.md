@@ -28,7 +28,7 @@ PostgreSQL 성공을 OpenSQL 성공으로 바꾸어 표현하지 않는다.
 | 항목 | 상태 |
 |---|---|
 | OpenSQL single 설치 | `PASS_INSTALLATION_ONLY` — 공급 자산 세부정보는 비공개 |
-| 대회용 테스트 라이선스 적용 | `PASS_PRIVATE_EVIDENCE` — 자산은 Git 밖에서 관리 |
+| 공급사 테스트 라이선스 적용 | `PASS_PRIVATE_EVIDENCE` — 자산은 Git 밖에서 관리 |
 | 기본 인증 DB 질의 | `PASS_INSTALLATION_ONLY` |
 | `vector` extension·`vector(1024)` 실행 검증 | `PASS` |
 | 일회성 검증 전용 DB | `PASS_PRIVATE_EVIDENCE` — 실행 뒤 제거 확인 |

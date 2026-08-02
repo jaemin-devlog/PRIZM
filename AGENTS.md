@@ -17,9 +17,8 @@ agent. The detailed delivery procedure lives in
   generation remain planned until source and executable tests prove otherwise.
 - N2SF is no longer the product direction. Do not add N2SF-only classifications,
   approval flows, terminology, or security features.
-- P0 source-only readiness and P1 OpenSQL·clean-clone verification are complete.
-  The next planned contest phase is P2 DB failover verification. PRZ-004 and
-  PRZ-005 are integrated into GitHub `main`.
+- Source-only readiness, clean-clone verification, and the PRZ-005 OpenSQL
+  integration are complete and integrated into GitHub `main`.
 - PRZ-005 is `VERIFIED` for the OpenSQL+Ollama direct-`5432` synthetic TXT/PDF
   API and browser flows, including two-user document and search isolation. Its
   isolated OpenSQL opt-in integration test and final backend, frontend,
@@ -99,8 +98,6 @@ agent. The detailed delivery procedure lives in
 - Record unavailable or unexecuted checks as `NOT_RUN` or `NOT_VERIFIED`, never
   `PASS`. Keep historical results separate from checks rerun on the current
   source.
-- PRIZM's internal workflow and contest evidence policy are stricter project
-  rules, not official contest requirements.
 
 ## Document sources of truth
 
@@ -109,14 +106,9 @@ agent. The detailed delivery procedure lives in
 | Current implemented and verified state | [`docs/project-status.md`](docs/project-status.md) |
 | Current architecture and data flow | [`docs/architecture.md`](docs/architecture.md) |
 | Product development order | [`docs/roadmap.md`](docs/roadmap.md) |
-| Contest schedule and P0~P10 plan | [`docs/contest/2026-tmaxtibero-plan.md`](docs/contest/2026-tmaxtibero-plan.md) |
-| Official requirements, evaluation criteria, and implementation evidence mapping | [`docs/contest/2026-requirements-traceability.md`](docs/contest/2026-requirements-traceability.md) |
-| Human-readable current source-only compliance conclusion | [`docs/contest/2026-compliance.md`](docs/contest/2026-compliance.md) |
-| Detailed component and license audit evidence | [`docs/contest/2026-license-audit.md`](docs/contest/2026-license-audit.md) |
-| Machine-readable SBOM and checksums | [`sbom/`](sbom/README.md) |
+| License, redistribution boundary, SBOM and checksums | [`LICENSE`](LICENSE), [`NOTICE`](NOTICE), [`sbom/`](sbom/README.md) |
 | Spec lifecycle and evidence registry | [`specs/README.md`](specs/README.md) |
 | Detailed contribution and agent workflow | [`docs/ai-agent-workflow.md`](docs/ai-agent-workflow.md) |
-| Meaningful implementation and decision history | [`docs/development-log.md`](docs/development-log.md) |
 
 Treat `docs/archive/` as historical context, not current truth.
 
@@ -124,8 +116,8 @@ Treat `docs/archive/` as historical context, not current truth.
 
 - Use the full `ORIENT -> SPEC -> PLAN -> IMPLEMENT -> VERIFY -> AUDIT ->
   INTEGRATE` workflow for features, observable behavior or contract changes,
-  migrations, security changes, infrastructure changes, contest submission
-  features, and large structural refactors.
+  migrations, security changes, infrastructure changes, release changes, and
+  large structural refactors.
 - A reduced documentation procedure is allowed only for typos, broken links,
   date corrections, explanation improvements that do not change implementation,
   and wording corrections of already established facts.

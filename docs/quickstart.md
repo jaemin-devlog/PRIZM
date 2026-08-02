@@ -206,6 +206,5 @@ Windows에서 안전한 파일 삭제 primitive인 `SecureDirectoryStream` 관�
 ## 공개·배포 경계
 
 PRIZM은 현재 Apache-2.0 소스 전용(source-only) 배포입니다. 자세한 범위는
-[NOTICE](../NOTICE), [source-only compliance](contest/2026-compliance.md),
-[license·provenance 감사](contest/2026-license-audit.md)와
-[SBOM 및 AI 모델 명세](contest/2026-sbom-model-manifest.md)를 따릅니다.
+[LICENSE](../LICENSE), [NOTICE](../NOTICE)와 [SBOM 안내](../sbom/README.md)를
+따릅니다.

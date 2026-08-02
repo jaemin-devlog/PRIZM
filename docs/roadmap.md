@@ -3,8 +3,7 @@
 > 기준일: 2026-08-02
 
 이 문서는 제품이 발전하는 순서만 설명합니다. 현재 구현과 검증 결과는
-[현재 구현 현황](project-status.md), 대회 일정과 P0~P10 실행 단계는
-[티맥스티베로 과제 대응 계획](contest/2026-tmaxtibero-plan.md), 기능별 근거는
+[현재 구현 현황](project-status.md), 기능별 근거는
 [Spec Registry](../specs/README.md)를 따릅니다.
 
 ## 현재

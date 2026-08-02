@@ -24,7 +24,7 @@
 | 검증 환경 | VirtualBox guest, Host-only 네트워크, NTP와 single-node OpenSQL |
 | 테스트 | OpenSQL opt-in infrastructure test와 Windows UTF-8 회귀 교정 |
 | 운영 보조 | 일회성 SSH key와 공유 `tmux` 세션 |
-| 문서 | Spec·plan·tasks·evidence, 상태·대회 문서의 검증 경계 |
+| 문서 | Spec·plan·tasks·evidence와 상태 문서의 검증 경계 |
 | 제외 | 제품 API, Flyway migration, dependency, Docker Compose와 frontend 기능 |
 
 ## 위험

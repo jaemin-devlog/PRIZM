@@ -1,6 +1,6 @@
 # 2026 오픈소스 개발자대회 티맥스티베로 과제 대응 계획
 
-> 기준일: 2026-08-01
+> 기준일: 2026-08-02
 >
 > 제출 마감: 2026-08-27
 >
@@ -12,10 +12,11 @@
 순서는 [개발 로드맵](../roadmap.md), 현재 구현과 검증 결과는
 [현재 구현 현황](../project-status.md)을 따른다.
 
-현재 P0 소스 전용(source-only) 준비는 완료됐다. P1에서는 실제 OpenSQL
-single-node SQL Gate를 통과했고, 안전한 demo `USER`를 이용한 clean-clone 전체
-사용자 흐름도 두 독립 clone에서 검증했다. PRZ-004 독립 감사와 PR #25 CI를
-통과해 GitHub `main`에 통합했다.
+현재 P0 소스 전용(source-only) 준비와 P1 OpenSQL·clean-clone 검증은 완료됐다.
+PRZ-004에서 안전한 demo `USER`를 이용한 두 독립 clean clone을 확인했고,
+PRZ-005에서 Spring Boot·Ollama `bge-m3`·실제 OpenSQL 직접 `5432` API와
+브라우저 E2E, 두 사용자 격리를 검증했다. PR #25와 PR #26을 GitHub `main`에
+통합했으며 다음 계획은 P2 DB 장애복구 Gate다.
 
 ## 공식 과제 해석
 
@@ -116,8 +117,17 @@ CareerFact, portfolio와 제출 감사는 실제 착수 순서에 따라 각각 
 - 독립 최종 `AUDIT` — `AUDIT_PASS_WITH_NON_BLOCKING_FINDINGS`, blocking 0건
 - GitHub push·PR·CI·merge — `PASS`; PR #25, check 6건 성공, merge `1f9a5ad`
 - GitHub Issue는 소급 생성하지 않았고 review는 `REVIEW_NOT_AVAILABLE_SOLO`
-- OpenSQL+Ollama 전체 사용자 흐름, OpenProxy·OpenHA·DB failover — `NOT_RUN`
-  또는 `NOT_VERIFIED`
+- PRZ-005 실제 OpenSQL 직접 `5432` 로그인→TXT/PDF 업로드→임베딩→`ACTIVE`→
+  원문 검색 API와 브라우저 E2E — `VERIFIED`
+- PRZ-005 두 사용자 문서·검색 격리와 격리 DB OpenSQL opt-in integration test —
+  `VERIFIED`
+- PRZ-005 전체 backend·frontend·OSS readiness·SBOM 회귀와 최종 감사 — `VERIFIED`;
+  frontend unit test는 공식 명령이 없어 `NOT_RUN`
+- PRZ-005 GitHub 통합 — `PASS`; PR #26, check 6건 성공, source `eab32c8`,
+  merge `6dc9822`, review는 `REVIEW_NOT_AVAILABLE_SOLO`
+- OpenProxy TCP 연결 — `VERIFIED`; SQL routing `NOT_VERIFIED`, 인증
+  `AUTH_BLOCKED`, 애플리케이션 적용 `DEFERRED`
+- OpenHA·DB failover·영구 journal — `DEFERRED`
 
 ### P2. DB 장애복구 Gate — 8월 4~7일
 

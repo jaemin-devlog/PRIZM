@@ -20,10 +20,10 @@
 | 영역 | 결과 | 핵심 증거 |
 |---|---|---|
 | 애플리케이션 | `VERIFIED` | Spring Boot → OpenSQL `5432` 연결, Ollama `bge-m3`, 로그인, TXT/PDF 업로드, 임베딩, `ACTIVE` 전환, 벡터 검색과 원문 위치를 API와 브라우저에서 확인했다. |
-| 데이터베이스 | `VERIFIED` | Flyway V1~V13 13개, 현재 V13, pending·실패 0개이며 6개 테이블과 6개 시퀀스의 소유자는 `prizm_owner`다. vector는 `0.8.1`, 소유자는 `postgres`다. |
+| 데이터베이스 | `VERIFIED` | Flyway `V1`–`V13` 13개, 현재 V13, pending·실패 0개이며 6개 테이블과 6개 시퀀스의 소유자는 `prizm_owner`다. vector는 `0.8.1`, 소유자는 `postgres`다. |
 | 보안·격리 | `VERIFIED` | `prizm_owner`와 `prizm_app`을 분리했고, 두 USER의 목록·상세·검색 격리와 DB owner 불일치 0건을 확인했다. |
 | 자동 테스트 | `VERIFIED` | 격리된 `prizm_integration_test`에서 OpenSQL opt-in integration test 1개가 성공했고 실패·오류·skip은 0건이었다. |
-| 회귀·OSS | `VERIFIED` | backend 단위 262개·통합 69개, frontend lint·typecheck·build, OSS readiness·SBOM·문서·민감정보 감사를 통과했다. frontend unit test는 공식 명령이 없어 `NOT_RUN`이다. |
+| 회귀·OSS | `VERIFIED` | 백엔드 단위 262개·통합 69개, 프론트엔드 lint·typecheck·build, OSS readiness·SBOM·문서·민감정보 감사를 통과했다. 프론트엔드 unit test는 공식 명령이 없어 `NOT_RUN`이다. |
 
 ## 현재 보류 범위
 
@@ -54,6 +54,9 @@ OpenSQL single-node SQL Gate 결과는 [PRZ-003 Evidence](../PRZ-003-opensql-sin
 
 ## 상태 코드
 
+<details>
+<summary>상태 코드 설명 보기</summary>
+
 | 코드 | 의미 |
 |---|---|
 | `VERIFIED` | 실제 실행 결과로 정상 동작을 확인했다. |
@@ -62,6 +65,8 @@ OpenSQL single-node SQL Gate 결과는 [PRZ-003 Evidence](../PRZ-003-opensql-sin
 | `NOT_RUN` | 계획만 있고 실행하지 않았다. |
 | `AUTH_BLOCKED` | 네트워크 연결 뒤 인증 단계에서 보안 요구를 만족하지 못해 중단했다. |
 | `DEFERRED` | 현재 범위에서 제외하고 이후 작업으로 미뤘다. |
+
+</details>
 
 ## 주요 구성요소
 
@@ -96,7 +101,7 @@ single-node이지만 Patroni의 관리 구조에 필요하다. 따라서 OpenSQL
 
 ### OpenProxy
 
-OpenProxy는 OpenSQL 앞에서 클라이언트 연결을 받아 backend 데이터베이스로 전달하는
+OpenProxy는 OpenSQL 앞에서 클라이언트 연결을 받아 백엔드 데이터베이스로 전달하는
 연결 계층이다. PRIZM에서는 향후 연결 경로와 장애 대응 기능을 검증할 후보지만 현재
 핵심 E2E의 필수 조건은 아니다. Windows에서 OpenProxy `6432`까지의 연결은
 `VERIFIED`다. SQL routing은 `NOT_VERIFIED`이고 인증은 `AUTH_BLOCKED`다. 안전한 공식
@@ -112,9 +117,9 @@ Patroni와 OpenProxy unit을 추가해 `etcd → Patroni/OpenSQL → OpenProxy` 
 ### Flyway
 
 Flyway는 버전이 붙은 SQL migration을 순서대로 데이터베이스에 적용한다. PRIZM에서는
-`prizm_owner`가 V1~V13을 적용하고 애플리케이션 역할과 DDL 권한을 분리한다.
-V1~V13과 예상 객체를 조사했고, D2A에서 Spring Context 없이 Flyway만 실행하는 테스트
-전용 경로를 추가했다. D2B에서 실제 OpenSQL에 V1~V13을 적용하고 이력을 검증했다.
+`prizm_owner`가 `V1`–`V13`을 적용하고 애플리케이션 역할과 DDL 권한을 분리한다.
+`V1`–`V13`과 예상 객체를 조사했고, D2A에서 Spring Context 없이 Flyway만 실행하는 테스트
+전용 경로를 추가했다. D2B에서 실제 OpenSQL에 `V1`–`V13`을 적용하고 이력을 검증했다.
 
 ### Ollama bge-m3
 
@@ -128,6 +133,9 @@ Ollama는 로컬에서 AI 모델을 실행하는 도구다. `bge-m3`는 PRIZM �
 
 ## 시작 당시 상태
 
+<details>
+<summary>시작 당시 환경과 준비 상태 보기</summary>
+
 | 항목 | 시작 상태 | 의미 |
 |---|---|---|
 | Rocky Linux VM | Rocky Linux 9.7 설치와 고정 Host-only 주소 구성 | 공급사가 제공한 실제 OpenSQL single-node 검증 환경은 준비돼 있었다. |
@@ -140,7 +148,9 @@ Ollama는 로컬에서 AI 모델을 실행하는 도구다. `bge-m3`는 PRIZM �
 | `prizm` DB | 없음 | PRIZM 전용 저장 공간을 새로 만들어야 했다. |
 | `prizm_owner` | 없음 | Flyway 전용 소유 역할을 새로 만들어야 했다. |
 | `prizm_app` | 없음 | 애플리케이션 최소 권한 역할을 새로 만들어야 했다. |
-| 제품 코드와 migration | 기준 commit의 코드와 V1~V13 유지 | VM 작업을 위해 제품 구현을 바꿀 이유가 없었다. |
+| 제품 코드와 migration | 기준 commit의 코드와 `V1`–`V13` 유지 | VM 작업을 위해 제품 구현을 바꿀 이유가 없었다. |
+
+</details>
 
 ## 계획과 초기 환경 점검
 
@@ -235,20 +245,39 @@ VM 응답 중단 뒤 파일시스템·로그·서비스 구조를 순서대로 �
 관리자 비밀번호를 추측하지 않고 Unix 로컬 소켓 관리자 경로를 사용했다. Flyway는 `prizm_owner`, runtime은 `prizm_app`으로 분리했으며, OpenProxy의 안전한 인증 방식이 확인되지 않자 설정을 원복하고 OpenSQL `5432` 직접 경로로 진행했다.
 
 <details>
-<summary>DB·역할 생성, OpenProxy 인증 판단, Flyway V1~V13과 최소 권한 기록 보기</summary>
+<summary>DB·역할 생성, OpenProxy 인증 판단, Flyway `V1`–`V13`과 최소 권한 기록 보기</summary>
 
 ### 11. Batch C1 — prizm DB와 최소 권한 역할 생성
 
 - **목표:** 관리자 계정을 애플리케이션에서 사용하지 않고 Flyway와 runtime 권한을 분리했다.
-- **조치:** Unix 로컬 소켓의 관리자 경로를 사용해 `prizm_owner`, `prizm_app`과 `prizm` DB를 만들었다. `PUBLIC`의 불필요한 CONNECT와 스키마 CREATE 권한을 제거했다. 관리자 경로로 vector `0.8.1` 확장을 만들었다. postgres 비밀번호를 추측하거나 초기화하지 않았다. Unix 로컬 소켓의 운영체제 관리자 경로를 사용했다. 실패한 각 실행에서는 그 실행이 새로 만든 DB와 역할만 제거했다.
-- **결과:** postgres 네트워크 비밀번호를 알 수 없었다. 검증 절차가 가정한 권한 확인 방식과 실제 OpenSQL 동작 사이에 차이가 있었다. 중간 검증 과정에서 세 번 rollback이 발생했다. 최종 실행은 성공했다. 두 역할은 `5432`에서 직접 인증됐다. `prizm_app`은 DB, 역할과 스키마를 만들 수 없었다. probe 객체는 남지 않았다. `prizm` DB, 두 login 역할과 vector 확장이 남았다. 기존 OpenSQL 데이터와 서비스 설정은 rollback의 영향을 받지 않았다.
+- **핵심 조치**
+  - Unix 로컬 소켓 관리자 경로로 `prizm_owner`, `prizm_app`과 `prizm` DB를 만들었다.
+  - `PUBLIC`의 불필요한 CONNECT·스키마 CREATE 권한을 제거하고 vector `0.8.1`을 만들었다.
+  - postgres 비밀번호를 추측하거나 초기화하지 않았다. 실패한 실행은 새로 만든 DB와 역할만 제거했다.
+- **결과**
+  - postgres 네트워크 비밀번호는 확인할 수 없었다. 권한 검증 가정과 실제 OpenSQL 동작에도 차이가 있었다.
+  - 중간 검증에서 세 번 rollback한 뒤 최종 실행이 성공했다. 기존 데이터와 서비스 설정은 영향을 받지 않았다.
+  - 두 역할의 `5432` 직접 인증을 확인했다. `prizm_app`의 DB·역할·스키마 생성은 거부됐다.
+  - probe 객체는 0건이었다. `prizm` DB, 두 login 역할과 vector 확장이 남았다.
 - **후속:** `prizm_app`을 OpenProxy에만 제한해 SQL routing을 확인하려 했다.
 
 ### 12. Batch C2 — OpenProxy 인증 검증과 설정 복원
 
 - **목표:** 관리자 역할을 노출하지 않고 `prizm_app → prizm` 경로만 OpenProxy에서 검증하려 했다.
-- **조치:** OpenProxy 1.1.3의 공식 도움말과 현재 설정 구조를 확인했다. SCRAM verifier, `server_password`와 인증 유형을 제한적으로 검토하고 정적 검증 뒤 OpenProxy만 재시작했다. 평문 비밀번호 저장을 승인하지 않았다. 공급사 답변 전까지 인증을 `AUTH_BLOCKED`로 판정했다. 변경 전 백업으로 설정을 정확히 복원하고 OpenProxy만 정상 재시작했다.
-- **결과:** 현재 확인된 구성에서는 backend 접속을 위해 평문 비밀번호를 `openproxy.toml`에 넣어야 했다. 안전한 `query_auth`, 환경변수 또는 별도 secret 파일 구성은 확인하지 못했다. SQL 접속은 인증 단계에서 중단됐다. 복원 후 OpenProxy는 `active`, 재시작 횟수 0, `6432` LISTEN 상태였다. Windows TCP 연결도 유지됐다. 설정 파일은 `opensql:opensql 0600`이었다. 백업본과 복원본의 SHA-256은 `ad78d290d745b3f8b69692c87e7390a787b7d5c01602d3fdb5411096c23c0873`으로 일치했다. OpenProxy 인증 변경은 남지 않았다. PRIZM DB와 역할은 그대로 유지했다.
+- **핵심 조치**
+  - OpenProxy 1.1.3의 공식 도움말과 현재 설정 구조를 확인했다.
+  - SCRAM verifier, `server_password`와 인증 유형을 제한적으로 검토했다.
+  - 정적 검증 뒤 OpenProxy만 재시작했다. 평문 비밀번호 저장은 승인하지 않았다.
+  - 변경 전 백업으로 설정을 정확히 복원하고 OpenProxy만 정상 재시작했다.
+- **결과**
+  - 확인된 구성은 백엔드 접속용 평문 비밀번호를 `openproxy.toml`에 요구했다. 안전한
+    `query_auth`, 환경변수나 별도 secret 파일 구성은 확인하지 못했다.
+  - 인증은 `AUTH_BLOCKED`, SQL routing은 `NOT_VERIFIED`로 남았다. Windows TCP 연결은 유지됐다.
+  - 복원 후 OpenProxy는 `active`, 재시작 0, `6432` LISTEN 상태였다. 설정 파일은
+    `opensql:opensql 0600`이었다.
+  - 백업본과 복원본의 SHA-256은
+    `ad78d290d745b3f8b69692c87e7390a787b7d5c01602d3fdb5411096c23c0873`으로 일치했다.
+    OpenProxy 인증 변경은 남지 않았고 PRIZM DB와 역할도 그대로 유지했다.
 - **후속:** OpenProxy를 핵심 E2E의 선행 조건에서 제외하고 `5432` 직접 연결로 진행하기로 했다.
 
 ### 13. OpenSQL 5432 직접 연결 정책 결정
@@ -256,20 +285,43 @@ VM 응답 중단 뒤 파일시스템·로그·서비스 구조를 순서대로 �
 - **목표:** 검증되지 않은 인증 우회를 만들지 않고 다음 애플리케이션 작업의 안전한 경로를 정했다.
 - **조치:** Flyway는 `prizm_owner`, Spring Boot runtime은 `prizm_app`으로 OpenSQL `5432`에 직접 연결하는 정책을 확정했다. OpenProxy 공급사 문의와 핵심 E2E를 분리했다. 관리자 역할은 OpenProxy에 노출하지 않는다.
 - **결과:** OpenProxy SQL routing은 아직 확인할 수 없지만 실제 OpenSQL 직접 인증은 이미 가능했다. 이 단계에서는 직접 연결 정책만 확정했으며 Flyway와 Spring Boot는 `NOT_RUN`이었다. 이 정책 결정으로 제품 코드, migration과 dependency는 변경하지 않았다.
-- **후속:** 다음 Gate는 V1~V13 객체와 권한을 조사한 뒤 Flyway를 실제 실행하는 것이다.
+- **후속:** 다음 Gate는 `V1`–`V13` 객체와 권한을 조사한 뒤 Flyway를 실제 실행하는 것이다.
 
-### 14. Batch D1·D2·D2A — migration 조사와 실행 경로 Gate
+### 14. Batch D1–D2A — migration 조사와 실행 경로 Gate
 
-- **목표:** V1~V13이 만들 객체와 `prizm_app`에 필요한 권한을 먼저 확인한 뒤, 일반 Spring Boot 기능을 시작하지 않고 Flyway만 실행할 수 있는지 판단했다.
-- **조치:** V1~V13의 연속성, 예상 테이블·시퀀스와 객체 소유권을 읽기 전용으로 조사했다. Patroni Leader와 OpenSQL 상태, 빈 migration 대상, vector `0.8.1`, 두 역할의 `5432` 직접 인증도 재확인했다. 별도 Flyway task·CLI, Spring Boot 실행 설정과 기존 OpenSQL 통합 테스트의 범위를 비교했다. 승인 범위를 벗어난 실행 설정, 임시 task나 테스트를 만들지 않았다. Batch D2의 중단 조건에 따라 `MIGRATION_EXECUTION_PATH_BLOCKED`로 판정했다. 이후 승인된 D2A에서 `OpenSqlFlywayMigrationOnlyTest` 하나를 추가했다. 이 테스트는 Spring Context를 시작하지 않고 Flyway Java API를 직접 사용하며, 명시적 승인 환경변수가 없으면 건너뛴다. 첫 D2B 실패 후에는 migrate 전 pending 버전 `1`~`13`, applied 0과 current 없음부터 확인하고, migrate 성공 뒤에만 `validate()`를 실행하도록 순서를 교정했다.
-- **결과:** V1~V13에는 누락이 없고 migration 후 예상되는 도메인 테이블과 BIGSERIAL 시퀀스는 각각 6개다. 그러나 저장소에는 Flyway만 실행하는 별도 task나 CLI가 없다. 일반 `bootRun`은 웹 보안과 JPA 등 애플리케이션 구성을 함께 시작하며, 기존 OpenSQL 통합 테스트는 migration 외의 SQL·DML 검증까지 수행한다. 첫 D2B에서는 빈 DB의 V1~V13이 모두 pending인 상태에서 migrate 전 `validate()`가 `FlywayValidateException`을 반환했다. `migrate()`는 호출되지 않았고, 읽기 전용 확인에서 Flyway 이력·도메인 테이블·BIGSERIAL 시퀀스가 모두 0개임을 확인했다. 별도 public 객체 목록 조회는 OpenSQL의 내부 `char` 타입인 `relkind`를 text와 바로 연결해 실패했다. 이후 조회에서는 `relkind::text`로 명시적으로 변환해야 한다. 첫 D2B 실패 시점에는 `flyway_schema_history`, 6개 도메인 테이블과 6개 BIGSERIAL 시퀀스가 모두 없었다. 교정된 D2A 테스트 소스 컴파일은 통과했고, 승인 환경변수 없는 단독 실행은 1개 테스트가 `SKIPPED`됐다. 교정 후 D2B 재실행은 성공했다. V1~V13이 정확히 13개 적용됐고 현재 버전은 V13, pending과 실패 이력은 0개였다. 두 번째 migrate의 신규 적용도 0개였다. 생성된 6개 도메인 테이블, 6개 BIGSERIAL 시퀀스와 `flyway_schema_history`의 소유자는 모두 `prizm_owner`였다. 모든 도메인 테이블은 0건이었고, vector는 `0.8.1`, 소유자는 `postgres`로 유지됐다.
+- **목표:** `V1`–`V13` 객체와 `prizm_app` 권한을 확인하고, Spring Boot 없이 Flyway만 실행할 경로를 판단했다.
+- **핵심 조치**
+  - migration 연속성, 예상 테이블·시퀀스와 객체 소유권을 읽기 전용으로 조사했다.
+  - Patroni Leader, OpenSQL, 빈 대상 DB, vector `0.8.1`과 두 역할의 `5432` 인증을 확인했다.
+  - 별도 Flyway task·CLI와 기존 실행 경로를 비교한 뒤 `MIGRATION_EXECUTION_PATH_BLOCKED`로 중단했다.
+  - D2A에서 `OpenSqlFlywayMigrationOnlyTest`를 추가했다. 첫 D2B 실패 뒤 pending `1`–`13`,
+    applied 0, current 없음부터 확인하도록 순서를 교정했다.
+- **결과**
+  - `V1`–`V13`에는 누락이 없고 예상 테이블과 시퀀스는 각각 6개였다. Flyway 전용
+    task·CLI는 없었고 `bootRun`과 기존 통합 테스트는 더 넓은 구성을 실행했다.
+  - 첫 D2B의 사전 `validate()`는 `FlywayValidateException`을 반환했다. `migrate()`는 호출되지 않았다.
+    당시 Flyway 이력·도메인 테이블·시퀀스는 0개였고 `relkind` 조회는 타입 연결 오류로 실패했다.
+  - 이후 `relkind::text`를 사용했다. 교정된 테스트는 컴파일·기본 `SKIPPED`를 통과했고,
+    재실행에서 현재 V13, pending·실패 0, 두 번째 migrate 신규 적용 0을 확인했다.
+  - 6개 테이블·6개 시퀀스와 이력 소유자는 `prizm_owner`, 데이터는 0건이었다.
+    vector는 `0.8.1`, 소유자는 `postgres`로 유지됐다.
 - **후속:** D2B가 통과해 migration 객체가 준비됐다. 이어서 D3에서 `prizm_app`의 객체별 최소 runtime 권한을 적용하고 검증했다.
 
 ### 15. Batch D3 — prizm_app 최소 runtime 권한
 
 - **목표:** Flyway 소유 역할과 애플리케이션 실행 역할을 분리하고, `prizm_app`에는 실제 runtime에 필요한 권한만 부여한다.
-- **조치:** `prizm` DB CONNECT와 `public` schema USAGE를 부여했다. `users`에는 SELECT·INSERT, `documents`와 `document_versions`에는 SELECT·INSERT·UPDATE·DELETE, `document_chunks`에는 SELECT·INSERT·DELETE, `processing_jobs`에는 SELECT·INSERT·UPDATE·DELETE, `file_cleanup_jobs`에는 SELECT·INSERT·UPDATE를 부여했다. 6개 BIGSERIAL 시퀀스에는 USAGE만 부여했고 SELECT·UPDATE는 부여하지 않았다. `flyway_schema_history`에는 `prizm_app`과 PUBLIC 권한을 부여하지 않았고 ALTER DEFAULT PRIVILEGES도 사용하지 않았다.
-- **결과:** GRANT와 사후 검증을 한 트랜잭션에서 수행해 조건이 일치한 뒤 COMMIT했다. 합성 데이터로 허용된 SELECT·INSERT·UPDATE·DELETE를 확인했고 CREATE TABLE·SCHEMA·DB·ROLE, 금지된 DML, `flyway_schema_history` 접근과 TRUNCATE는 거부됐다. 검증 트랜잭션은 ROLLBACK했으며 probe 데이터·테이블·스키마·DB·역할은 0건이었다. `prizm_app`과 PUBLIC의 TEMPORARY 권한도 없었다.
+- **핵심 조치**
+  - `prizm` DB CONNECT와 `public` schema USAGE를 부여했다.
+  - `users`에는 SELECT·INSERT를 부여했다. `documents`·`document_versions`·`processing_jobs`에는
+    SELECT·INSERT·UPDATE·DELETE를 부여했다.
+  - `document_chunks`에는 SELECT·INSERT·DELETE, `file_cleanup_jobs`에는 SELECT·INSERT·UPDATE를 부여했다.
+  - 6개 시퀀스에는 USAGE만 부여했다. 이력 권한과 ALTER DEFAULT PRIVILEGES는 사용하지 않았다.
+- **결과**
+  - GRANT와 사후 검증을 한 트랜잭션에서 수행하고 조건이 일치한 뒤 COMMIT했다.
+  - 합성 데이터로 허용된 SELECT·INSERT·UPDATE·DELETE를 확인했다.
+  - CREATE TABLE·SCHEMA·DB·ROLE, 금지된 DML, 이력 접근과 TRUNCATE는 거부됐다.
+  - probe 트랜잭션은 ROLLBACK했고 잔여 객체는 0건이었다. `prizm_app`과 PUBLIC에는
+    TEMPORARY 권한도 없었다.
 - **후속:** D4에서 `prizm_app`으로 Spring Boot를 OpenSQL `5432`에 연결해 JPA schema validation과 health를 확인했다.
 
 </details>
@@ -284,52 +336,100 @@ VM 응답 중단 뒤 파일시스템·로그·서비스 구조를 순서대로 �
 ### 16. Batch D4 — Spring Boot 직접 연결과 JPA validation
 
 - **목표:** 로그인·업로드·Ollama를 실행하기 전에 Spring Boot가 분리된 두 DB 역할로 안전하게 시작되는지 확인한다.
-- **조치:** `opensql` profile에서 Flyway는 `prizm_owner`, runtime datasource는 `prizm_app`으로 OpenSQL `5432`의 `prizm` DB에 연결했다. demo·관리자 bootstrap, indexing Worker와 cleanup Worker를 기존 설정으로 비활성화하고 JPA `ddl-auto=validate`를 유지했다. 첫 실행 도구는 Windows PowerShell에서 지원하지 않는 난수 API 때문에 시작 전에 중단됐고, 비밀 환경변수를 제거한 뒤 호환 API로 실행 도구만 교정했다.
-- **결과:** Spring ApplicationContext, JPA EntityManagerFactory와 Tomcat이 시작됐고 health는 HTTP 200·`UP`이었다. OpenSQL에서 `prizm_app` 세션 1개를 확인했으며 Flyway V13·이력 13개·pending/실패 0, 6개 테이블·6개 시퀀스와 데이터 0건을 유지했다. CREATE·ALTER·DROP은 관찰되지 않았고 종료 뒤 프로세스·포트·DB 세션은 0, Patroni·OpenProxy 재시작도 0이었다.
+- **핵심 조치**
+  - Flyway는 `prizm_owner`, runtime datasource는 `prizm_app`으로 OpenSQL `5432`의 `prizm` DB에 연결했다.
+  - demo·관리자 bootstrap, indexing Worker와 cleanup Worker를 기존 설정으로 비활성화했다.
+  - JPA `ddl-auto=validate`를 유지했다. 첫 실행 도구는 지원되지 않는 난수 API로 시작 전에 중단됐다.
+  - 비밀 환경변수를 제거한 뒤 Windows PowerShell 호환 API로 실행 도구만 교정했다.
+- **결과**
+  - Spring ApplicationContext, JPA EntityManagerFactory와 Tomcat이 시작됐다.
+  - health는 HTTP 200·`UP`이었고 OpenSQL에서 `prizm_app` 세션 1개를 확인했다.
+  - Flyway V13·이력 13개·pending/실패 0, 6개 테이블·6개 시퀀스와 데이터 0건을 유지했다.
+  - CREATE·ALTER·DROP은 없었다. 종료 뒤 프로세스·포트·DB 세션과 서비스 재시작 횟수는 0이었다.
 - **후속:** D4 당시 Ollama `bge-m3`, 로그인, TXT/PDF 업로드, 임베딩과 검색을 연결한 실제 OpenSQL E2E는 `NOT_RUN`이었다. 이후 D5와 D6에서 검증했다.
 
 ### 17. Batch D5 — Ollama와 TXT/PDF 핵심 API 흐름
 
 - **목표:** Spring Boot → OpenSQL `5432` → Ollama `bge-m3` → 업로드·색인·검색의 핵심 API E2E를 검증한다.
-- **조치:** Flyway는 `prizm_owner`, runtime은 `prizm_app`을 사용했다. demo `USER` bootstrap을 한 번만 켠 뒤 끄고, indexing Worker만 활성화했다. 호스트 Ollama `0.32.3`과 `bge-m3:latest`를 사용했으며 digest `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`, 1024차원·유한·0이 아닌 벡터를 확인했다. 모델은 새로 받거나 갱신하지 않았고 mutable `latest`를 bit-identical 재현으로 표현하지 않는다.
-- **결과:** demo 로그인과 JWT 발급, 합성 TXT/PDF 각 1개 업로드, 두 버전의 `ACTIVE` 전환과 두 job의 `COMPLETED`를 확인했다. TXT는 `TEXT_CHUNK` 1, PDF는 `PAGE` 1과 고유 문장을 반환했고 비인증 API는 `401`이었다. DB에는 사용자 1명, 문서·버전·chunk·job 각 2개, 1024차원·0이 아닌 embedding 2개가 남았으며 owner 불일치는 0건이었다. 두 번째 demo 비밀번호 확인 불일치로 사용자 생성 전에 중단돼 당시 두 USER 격리와 브라우저 UI는 `NOT_RUN`이었다.
+- **핵심 조치**
+  - Flyway는 `prizm_owner`, runtime은 `prizm_app`을 사용했다.
+  - demo `USER` bootstrap을 한 번만 켠 뒤 끄고 indexing Worker만 활성화했다.
+  - Ollama `0.32.3`과 `bge-m3:latest`를 사용했다. 모델 digest는
+    `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`였다.
+  - 1024차원·유한·0이 아닌 벡터를 확인했다. 모델을 갱신하거나 bit-identical로 표현하지 않았다.
+- **결과**
+  - demo 로그인과 JWT 발급, 합성 TXT/PDF 각 1개 업로드를 확인했다. 두 버전은
+    `ACTIVE`, 두 job은 `COMPLETED`가 됐다.
+  - TXT는 `TEXT_CHUNK` 1, PDF는 `PAGE` 1과 고유 문장을 반환했다. 비인증 API는 `401`이었다.
+  - DB에는 사용자 1명과 문서·버전·chunk·job 각 2개가 남았다. 1024차원·0이 아닌
+    embedding은 2개, owner 불일치는 0건이었다.
+  - 두 번째 demo 비밀번호 확인 불일치로 생성 전에 중단됐다. 당시 두 USER 격리와 UI는 `NOT_RUN`이었다.
 - **후속:** Spring Boot 종료 뒤 포트·`prizm_app` 세션은 0이었고, Patroni·OpenProxy는 active·재시작 0을 유지했다. 두 USER 격리와 브라우저 흐름은 D6에서 별도로 검증했다.
 
 ### 18. Batch D6 — 두 사용자 격리와 브라우저 UI
 
 - **목표:** 두 사용자의 문서·검색 경계를 API와 DB에서 확인하고, 기존 React UI의 핵심 흐름을 실제 OpenSQL 위에서 검증한다.
-- **조치:** D5 USER를 USER_A로 유지하고 USER_B를 기본 비활성 bootstrap으로 한 번만 생성했다. 각 JWT로 목록·상세·검색을 교차 확인했다. React UI에서는 로그인, 문서 목록·상세, PDF 원문, 경력 근거 검색, 합성 TXT/PDF 추가 업로드와 로그아웃 뒤 보호 경로를 확인했다.
-- **결과:** 상대 문서 목록·상세·검색 결과는 노출되지 않았고 owner 불일치는 0건이었다. UI의 새 TXT/PDF도 처리 완료돼 TXT `TEXT_CHUNK` 1과 PDF `PAGE` 1 근거가 표시됐으며 콘솔 warning·error는 0건이었다. 첫 UI 로그인 때 사용자가 백엔드를 종료해 Vite proxy 연결이 거부됐지만, 코드·설정 변경 없이 같은 승인 설정으로 재시작해 통과했다. 최종 DB에는 사용자 2명, 문서·버전·chunk·job 각 5개, `ACTIVE`·`COMPLETED`·1024차원 0이 아닌 embedding 각 5개가 남았고 owner·관계 객체 소유자 불일치는 0건이었다. 문서 현행화 뒤 OSS readiness는 Markdown 48개와 로컬 링크 476개, tracked-file 안전성, 라이선스와 SBOM 회귀 검사를 통과했으며 SBOM 구조 검사도 별도로 통과했다.
-- **후속:** 백엔드·프런트엔드를 종료해 `18080`·`5173`과 `prizm_app` 세션을 0으로 만들었다. D6 시점에는 전체 backend·frontend 회귀와 독립 감사가 `NOT_RUN`이었고, 이후 T-18에서 완료했다.
+- **핵심 조치**
+  - D5 USER를 USER_A로 유지하고 USER_B를 기본 비활성 bootstrap으로 한 번만 생성했다.
+  - 각 JWT로 문서 목록·상세·검색을 교차 확인했다.
+  - React UI에서 로그인, 목록·상세, PDF 원문과 경력 근거 검색을 확인했다.
+  - 합성 TXT/PDF 추가 업로드와 로그아웃 뒤 보호 경로도 확인했다.
+- **결과**
+  - 상대 문서의 목록·상세·검색 결과는 노출되지 않았고 owner 불일치는 0건이었다.
+  - 새 TXT/PDF는 처리 완료됐다. TXT `TEXT_CHUNK` 1과 PDF `PAGE` 1 근거가 표시됐다.
+    브라우저 콘솔 warning·error는 0건이었다.
+  - 첫 UI 로그인 때 백엔드가 종료돼 Vite proxy 연결이 거부됐다. 같은 승인 설정으로 재시작해 통과했다.
+  - 최종 DB에는 사용자 2명과 문서·버전·chunk·job 각 5개가 남았다.
+    `ACTIVE`·`COMPLETED`·1024차원 0이 아닌 embedding은 각 5개였고 소유자 불일치는 0건이었다.
+  - OSS readiness는 Markdown 48개·로컬 링크 476개와 tracked-file 안전성을 확인했다.
+    라이선스·SBOM 회귀와 별도 SBOM 구조 검사도 통과했다.
+- **후속:** 백엔드·프론트엔드를 종료해 `18080`·`5173`과 `prizm_app` 세션을 0으로 만들었다. D6 시점에는 전체 백엔드·프론트엔드 회귀와 독립 감사가 `NOT_RUN`이었고, 이후 T-18에서 완료했다.
 
 </details>
 
 ## 자동 통합 테스트·전체 회귀·병합 감사
 
-실제 증거가 있는 `prizm` DB를 보호하기 위해 자동 OpenSQL 통합 테스트는 별도 `prizm_integration_test`에서 실행했다. 이후 backend·frontend·OSS·SBOM·문서 감사를 완료하고, PR #26의 검증 커밋과 병합 커밋을 기록했다.
+실제 증거가 있는 `prizm` DB를 보호하기 위해 자동 OpenSQL 통합 테스트는 별도 `prizm_integration_test`에서 실행했다. 이후 백엔드·프론트엔드·OSS·SBOM·문서 감사를 완료하고, PR #26의 검증 커밋과 병합 커밋을 기록했다.
 
 <details>
 <summary>격리 통합 테스트, 전체 회귀와 GitHub 병합 증거 보기</summary>
 
 ### T-17 — 격리 OpenSQL 통합 테스트
 
-- **목표:** 현재 source의 `OpenSqlInfrastructureTest`를 실제 `prizm` 증거 DB와 분리해 실행한다.
-- **조치:** 테스트는 `RUN_OPENSQL_TESTS=true`, `PRIZM_OPENSQL_VERIFICATION_TARGET_CONFIRMED=true`와 정확한 대상 DB `prizm_integration_test`를 요구한다. migration·GRANT는 `prizm_owner`, 실제 DML·vector 검색·Worker SQL은 `prizm_app`으로 실행했다. V1~V13과 객체·소유자·vector가 예상과 일치할 때만 객체별 테스트 전용 최소 권한을 부여했다.
-- **결과:** 테스트 1개 성공, 실패·오류·skip 0건이었다. `flyway_schema_history`의 `prizm_app`·PUBLIC 권한과 테스트 데이터는 0건이며, 격리 DB에는 V1~V13 객체와 명시적 최소 권한만 남았다. 실제 `prizm` DB는 사용자 2명, 문서·버전·chunk·job 각 5개, `ACTIVE` 문서와 1024차원 embedding 각 5개, Flyway V13·이력 13개, 사용자별 문서 `1:4,2:1`, 소유자 불일치 0건으로 실행 전후가 같았다.
+- **목표:** 현재 소스의 `OpenSqlInfrastructureTest`를 실제 `prizm` 증거 DB와 분리해 실행한다.
+- **핵심 조치**
+  - 테스트는 `RUN_OPENSQL_TESTS=true`와
+    `PRIZM_OPENSQL_VERIFICATION_TARGET_CONFIRMED=true`를 요구한다.
+  - 정확한 대상 DB는 `prizm_integration_test`다.
+  - migration·GRANT는 `prizm_owner`, DML·vector 검색·Worker SQL은 `prizm_app`으로 실행했다.
+  - `V1`–`V13`, 객체·소유자와 vector가 일치할 때만 테스트 전용 최소 권한을 부여했다.
+- **결과**
+  - 테스트 1개가 성공했고 실패·오류·skip은 0건이었다.
+  - `flyway_schema_history`의 `prizm_app`·PUBLIC 권한과 테스트 데이터는 0건이었다.
+    격리 DB에는 `V1`–`V13` 객체와 명시적 최소 권한만 남았다.
+  - 실제 `prizm` DB의 사용자 2명과 문서·버전·chunk·job 각 5개는 유지됐다.
+  - `ACTIVE`·1024차원 embedding 각 5개, Flyway V13·이력 13개도 유지됐다. 사용자별 문서는
+    `1:4,2:1`, 소유자 불일치는 0건으로 실행 전후가 같았다.
 - **후속:** `clean`, `repair`, `baseline`, DB·schema DROP과 실제 `prizm` DB 변경은 수행하지 않았다. 다음 Gate에서 전체 회귀와 독립 감사를 진행했다.
 
 ### T-18 — 전체 회귀와 최종 감사
 
 - **목표:** PRZ-005 변경과 검증 증거가 전체 저장소 회귀와 문서 상태를 깨뜨리지 않았는지 독립적으로 확인한다.
-- **조치:** backend, frontend, OSS readiness, SBOM, Markdown 링크, 민감정보와 변경 범위를 감사했다. T-18A에서는 구현 보고서의 오래된 현재형 표현을 교정하고 상태 문서를 다시 대조했다.
-- **결과:** backend 단위 테스트 262개와 통합 테스트 69개가 실패·오류 없이 통과했다. 기본 회귀의 실제 OpenSQL opt-in 테스트는 승인 환경변수가 없어 정상적으로 `SKIPPED`됐다. frontend lint·typecheck·production build, OSS readiness·SBOM·문서·민감정보 감사도 통과했다. frontend unit test는 공식 명령이 없어 `NOT_RUN`이다.
+- **핵심 조치**
+  - 백엔드·프론트엔드, OSS readiness, SBOM과 Markdown 링크를 감사했다.
+  - 민감정보와 변경 범위를 확인하고 T-18A에서 오래된 현재형 표현을 교정했다.
+- **결과**
+  - 백엔드 단위 테스트 262개와 통합 테스트 69개가 실패·오류 없이 통과했다.
+  - 기본 회귀의 OpenSQL opt-in 테스트는 승인 환경변수가 없어 정상적으로 `SKIPPED`됐다.
+  - 프론트엔드 lint·typecheck·production build와 OSS·SBOM·문서·민감정보 감사가 통과했다.
+  - 프론트엔드 unit test는 공식 명령이 없어 `NOT_RUN`이다.
 - **후속:** T-18은 `DONE`, PRZ-005 핵심 범위는 `VERIFIED`로 판정했다. OpenProxy·OpenHA·영구 journal은 별도 후속 범위로 유지했다.
 
 ### GitHub 통합 기록
 
-- **목표:** 검증된 source가 실제 `main`에 반영됐다는 관리 증거를 남긴다.
-- **조치:** 검증 source commit `eab32c870f06237d37048b6b8de1287e5e18ae66`을 [PR #26](https://github.com/jaemin-devlog/PRIZM/pull/26)으로 통합했다.
-- **결과:** `main` merge commit은 `6dc982227bafe94f0879c22bf4381a6e47adf925`, 병합 시각은 2026-08-02 20:40:49 KST다. backend 2건, frontend 2건, License·Markdown·SBOM 2건 등 GitHub checks 6건이 `SUCCESS`였다. 등록된 review는 없어 `REVIEW_NOT_AVAILABLE_SOLO`다.
+- **목표:** 검증된 소스가 실제 `main`에 반영됐다는 관리 증거를 남긴다.
+- **조치:** 검증 소스 commit `eab32c870f06237d37048b6b8de1287e5e18ae66`을 [PR #26](https://github.com/jaemin-devlog/PRIZM/pull/26)으로 통합했다.
+- **결과:** `main` merge commit은 `6dc982227bafe94f0879c22bf4381a6e47adf925`, 병합 시각은 2026-08-02 20:40:49 KST다. 백엔드 2건, 프론트엔드 2건, License·Markdown·SBOM 2건 등 GitHub checks 6건이 `SUCCESS`였다. 등록된 review는 없어 `REVIEW_NOT_AVAILABLE_SOLO`다.
 - **후속:** 존재하지 않는 Issue나 review를 증거로 만들지 않았다. 다음 후보는 P2 DB 장애복구 Gate이며, PRZ-005의 비필수 보류 항목과 분리한다.
 
 </details>
@@ -344,7 +444,7 @@ VM 응답 중단 뒤 파일시스템·로그·서비스 구조를 순서대로 �
 | Patroni·OpenProxy unit 부재 | 재부팅 뒤 표준 서비스 관리 지점이 없었다. | 공급 설치 결과에 두 systemd unit이 없었다. | 최소 unit을 작성·정적 검증·등록했다. | unit 등록 `VERIFIED` | 자동 시작은 의도적으로 `disabled` |
 | Windows `6432` 차단 | OpenProxy가 LISTEN 중이지만 Windows TCP 연결이 실패했다. | Host-only 방화벽에 `6432` 허용 규칙이 없었다. | Windows Host-only 주소 한 개에만 runtime·permanent 규칙을 추가했다. | TCP 연결 `VERIFIED` | SQL routing과 인증 증거는 아니다. |
 | 관리자 인증과 C1 rollback | postgres 네트워크 인증이 실패했고 역할 생성 뒤 권한·결과 검증도 세 번 실패했다. | 관리자 비밀번호를 확인할 수 없었고 일부 검증 가정이 OpenSQL 동작과 달랐다. | 비밀번호를 추측·초기화하지 않고 Unix 소켓 관리자 경로를 사용했으며, 각 실패 실행의 새 객체만 rollback했다. | DB·역할·vector 구성이 최종 성공했다. | 기존 데이터와 서비스 설정에는 영향이 없었다. |
-| OpenProxy 인증·SQL routing | TCP는 성공했지만 `prizm_app` SQL이 backend로 전달되지 않았다. | OpenProxy 1.1.3에서 안전한 외부 secret 주입을 확인하지 못했고 현재 구성은 평문 backend 비밀번호를 요구했다. | 평문 저장을 거부하고 백업본으로 설정을 복원해 공급사 문의로 전환했다. | 인증 `AUTH_BLOCKED`, routing `NOT_VERIFIED`; 복원 SHA-256 일치 | 안전한 공식 방식 확인 전 적용 `DEFERRED` |
+| OpenProxy 인증·SQL routing | TCP는 성공했지만 `prizm_app` SQL이 백엔드로 전달되지 않았다. | OpenProxy 1.1.3에서 안전한 외부 secret 주입을 확인하지 못했고 현재 구성은 평문 백엔드 비밀번호를 요구했다. | 평문 저장을 거부하고 백업본으로 설정을 복원해 공급사 문의로 전환했다. | 인증 `AUTH_BLOCKED`, routing `NOT_VERIFIED`; 복원 SHA-256 일치 | 안전한 공식 방식 확인 전 적용 `DEFERRED` |
 
 ## 주요 기술 결정
 
@@ -359,14 +459,14 @@ VM 응답 중단 뒤 파일시스템·로그·서비스 구조를 순서대로 �
 
 - postgres 관리자는 애플리케이션에서 사용하지 않는다 — 사용자 요청 경로에 관리자 권한을 노출하지 않는다.
 - Flyway는 `prizm_owner`, runtime은 `prizm_app`으로 실행한다 — DDL과 일상 DML 권한을 분리한다.
-- `prizm_owner`가 DB·V1~V13 객체·`flyway_schema_history`를 소유한다 — migration 이력과 객체 소유권을 한 역할로 고정한다.
+- `prizm_owner`가 DB·`V1`–`V13` 객체·`flyway_schema_history`를 소유한다 — migration 이력과 객체 소유권을 한 역할로 고정한다.
 - `prizm_app`에는 승인한 객체별 DML과 시퀀스 USAGE만 부여한다 — DB·역할·스키마 생성과 Flyway 이력 접근을 차단한다.
 - PUBLIC의 불필요한 CONNECT·CREATE를 제거하고 vector는 관리자 경로로 생성한다 — 명시된 역할만 접근하게 하고 `prizm_owner`를 superuser로 올리지 않는다.
 
 ### OpenProxy 보안 판단
 
 - OpenProxy에는 postgres와 `prizm_owner`를 노출하지 않는다 — 인증 검증 대상을 `prizm_app`으로 제한한다.
-- backend 평문 비밀번호 저장은 승인하지 않는다 — 연결 편의보다 비밀정보 경계를 우선한다.
+- 백엔드 평문 비밀번호 저장은 승인하지 않는다 — 연결 편의보다 비밀정보 경계를 우선한다.
 - 핵심 E2E는 OpenSQL `5432` 직접 경로를 사용한다 — 두 전용 역할의 실제 인증이 확인됐다.
 - OpenProxy SQL routing은 공급사의 안전한 인증 구성 답변 뒤 검증한다 — TCP 성공을 SQL 성공으로 확대하지 않는다.
 
@@ -393,7 +493,7 @@ VM 응답 중단 뒤 파일시스템·로그·서비스 구조를 순서대로 �
 | `prizm_owner` | Flyway·객체 소유용 제한된 login 역할로 생성 |
 | `prizm_app` | 애플리케이션용 제한된 login 역할로 생성 |
 | vector 확장 | `prizm` DB에 `0.8.1` 생성, 확장 소유자는 `postgres` |
-| Flyway 객체 | V1~V13, 6개 도메인 테이블, 6개 BIGSERIAL 시퀀스와 이력 테이블 생성; 소유자 `prizm_owner` |
+| Flyway 객체 | `V1`–`V13`, 6개 도메인 테이블, 6개 BIGSERIAL 시퀀스와 이력 테이블 생성; 소유자 `prizm_owner` |
 | `prizm_app` 권한 | DB CONNECT, schema USAGE와 승인된 객체별 DML·시퀀스 USAGE 부여 |
 | Patroni·OpenProxy 실행 상태 | 마지막 검증 시점에 `active`, 재부팅 자동 시작은 `disabled` |
 
@@ -410,7 +510,7 @@ C2에서 확인한 일치 SHA-256은 설정 내용 자체를 공개하지 않고
 - `prizm_owner`를 사용한다.
 - OpenSQL `5432`에 직접 연결한다.
 - `prizm` DB를 대상으로 한다.
-- V1~V13 적용과 이력 검증 상태는 `VERIFIED`다.
+- `V1`–`V13` 적용과 이력 검증 상태는 `VERIFIED`다.
 
 ### Spring Boot
 
@@ -452,6 +552,9 @@ OpenHA·DB failover도 single-node 범위에서 제외했으므로 완료로 확
 
 ## 용어 정리
 
+<details>
+<summary>기술 용어 설명 보기</summary>
+
 - **OpenSQL**: PostgreSQL 기반의 TmaxTibero DBMS 플랫폼이다. PRZ-005의 실제 지정과제
   데이터베이스 환경이다.
 - **PostgreSQL**: PRIZM의 기존 개발과 clean-clone 검증에 사용한 관계형 데이터베이스다.
@@ -460,7 +563,7 @@ OpenHA·DB failover도 single-node 범위에서 제외했으므로 완료로 확
   OpenSQL 프로세스의 시작과 실행 상태를 관리한다. 종료할 때는 Patroni 상태와 공식 종료
   절차를 확인해야 한다.
 - **etcd**: Patroni가 멤버와 Leader 상태를 공유하는 분산 키-값 저장소다.
-- **OpenProxy**: 클라이언트 연결을 OpenSQL backend로 전달하는 연결 계층이다. 현재 TCP만
+- **OpenProxy**: 클라이언트 연결을 OpenSQL 백엔드로 전달하는 연결 계층이다. 현재 TCP만
   검증했고 SQL routing은 검증하지 못했다.
 - **systemd unit**: Linux 서비스의 실행 사용자, 명령과 의존 순서를 정의하는 파일이다.
 - **Flyway**: 버전이 붙은 SQL을 순서대로 적용하고 이력을 기록하는 migration 도구다.
@@ -489,3 +592,5 @@ OpenHA·DB failover도 single-node 범위에서 제외했으므로 완료로 확
 - **active**: systemd 서비스가 현재 실행 중인 상태다.
 - **disabled**: systemd 서비스가 재부팅 때 자동 시작되지 않는 상태다. 현재 active인지와는
   별개의 설정이다.
+
+</details>

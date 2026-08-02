@@ -17,7 +17,7 @@
 | `T-07` | vector `0.8.1` 확장 생성 | `DONE` | `prizm` DB에 vector `0.8.1`을 생성하고 소유자 `postgres`를 확인했다. | [DB·권한 구성](implementation-report.md#db역할flyway최소-권한-구성) |
 | `T-08` | OpenProxy 설정을 변경 전 상태로 복원 | `DONE` | 백업본과 SHA-256이 일치하는 원래 설정으로 복원했다. | [DB·권한 구성](implementation-report.md#db역할flyway최소-권한-구성) |
 | `T-12A` | Spring Context 없는 Flyway migration 전용 테스트 경로 | `DONE` | 사전 `validate()` 순서를 교정하고 컴파일·기본 `SKIPPED`를 확인했다. | [DB·권한 구성](implementation-report.md#db역할flyway최소-권한-구성) |
-| `T-12` | Flyway V1~V13 실행 | `DONE` | 13개를 적용해 현재 V13, pending·실패 0, 두 번째 migrate 신규 적용 0을 확인했다. | [DB·권한 구성](implementation-report.md#db역할flyway최소-권한-구성) |
+| `T-12` | Flyway `V1`–`V13` 실행 | `DONE` | 13개를 적용해 현재 V13, pending·실패 0, 두 번째 migrate 신규 적용 0을 확인했다. | [DB·권한 구성](implementation-report.md#db역할flyway최소-권한-구성) |
 | `T-13` | Spring Boot와 Ollama `bge-m3` 연결 | `DONE` | OpenSQL `5432` 연결과 Ollama `0.32.3`·1024차원 embedding을 확인했다. | [애플리케이션 E2E](implementation-report.md#spring-bootollamaapi브라우저-e2e) |
 | `T-14` | 업로드·임베딩·검색 OpenSQL E2E | `DONE` | demo 로그인부터 TXT/PDF `ACTIVE`, embedding과 원문 검색까지 통과했다. | [애플리케이션 E2E](implementation-report.md#spring-bootollamaapi브라우저-e2e) |
 | `T-16` | 두 USER API 격리와 브라우저 UI | `DONE` | 목록·상세·검색 격리와 UI 업로드·검색·로그아웃 차단을 확인했다. | [애플리케이션 E2E](implementation-report.md#spring-bootollamaapi브라우저-e2e) |

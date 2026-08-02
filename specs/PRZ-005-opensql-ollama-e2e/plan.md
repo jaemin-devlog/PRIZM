@@ -1,5 +1,15 @@
 # PRZ-005 계획
 
+> **문서 성격:** 이 문서는 구현 전에 작성한 계획이다. 실제 구현 과정에서 일부 방법이
+> 변경됐다. 최종 적용 결과는 [작업 보고서](implementation-report.md)에서 확인한다.
+
+## 계획 대비 변경 사항
+
+- default privileges는 사용하지 않고 객체별 명시적 `GRANT`를 적용했다.
+- 6개 시퀀스에는 `USAGE`만 부여했다.
+- OpenProxy 인증과 SQL routing은 안전한 공식 구성을 확인하지 못해 보류했다.
+- 핵심 E2E는 OpenSQL 직접 포트 `5432`로 완료했다.
+
 ## 기준선
 
 - 기준 `main`: `f3591875f5b2df458db342bb1f46c80504acae64`
@@ -63,7 +73,7 @@ V1의 `CREATE EXTENSION vector`가 관리자 권한을 요구하면 migration �
 
 ### 4. Windows 호스트에서 애플리케이션을 실행한다
 
-첫 전체 흐름에서는 Docker backend를 사용하지 않는다. Windows Spring Boot를 직접 실행해
+첫 전체 흐름에서는 Docker 백엔드를 사용하지 않는다. Windows Spring Boot를 직접 실행해
 네트워크 변수를 줄이고 다음 값을 process 환경변수로만 전달한다.
 
 - `SPRING_PROFILES_ACTIVE=opensql`
@@ -80,7 +90,7 @@ V1의 `CREATE EXTENSION vector`가 관리자 권한을 요구하면 migration �
 ### 5. API와 브라우저 흐름을 검증한다
 
 PRZ-004의 first-party 합성 TXT/PDF와 verifier를 재사용한다. 실제 OpenSQL 환경이라는 점만
-달라지므로 source나 migration을 바꾸지 않는다. 로그인, 업로드, `ACTIVE`, TXT/PDF 출처
+달라지므로 소스나 migration을 바꾸지 않는다. 로그인, 업로드, `ACTIVE`, TXT/PDF 출처
 검색, ownership와 로그아웃 뒤 `401`을 확인한다. 브라우저 시험은 별도 체크표로 기록한다.
 
 ## 예상 변경
@@ -89,7 +99,7 @@ PRZ-004의 first-party 합성 TXT/PDF와 verifier를 재사용한다. 실제 Ope
 |---|---|
 | Spec | PRZ-005 spec·plan·tasks·최종 evidence |
 | VM | 시간 동기화 교정, 전용 DB와 두 login role 구성, host-only 접근 제한 확인 |
-| 애플리케이션 | 원칙적으로 source 변경 없음. 실제 차단 오류가 재현될 때만 PLAN으로 복귀 |
+| 애플리케이션 | 원칙적으로 소스 변경 없음. 실제 차단 오류가 재현될 때만 PLAN으로 복귀 |
 | migration | 변경 없음 |
 | dependency·SBOM·license | 변경 없음. identity가 달라지면 compliance Gate로 복귀 |
 | 공개 문서 | 검증 완료 후 project status·roadmap·contest traceability만 현행화 |
@@ -115,7 +125,7 @@ PRZ-004의 first-party 합성 TXT/PDF와 verifier를 재사용한다. 실제 Ope
 
 ### Batch 3 — SQL과 전체 사용자 흐름
 
-1. OpenSQL opt-in integration test로 Flyway V1~V13과 SQL 계약을 재검증한다.
+1. OpenSQL opt-in integration test로 Flyway `V1`–`V13`과 SQL 계약을 재검증한다.
 2. Ollama version, `bge-m3` identity와 1024차원을 확인한다.
 3. Windows Spring Boot를 `opensql` profile로 실행한다.
 4. demo `USER`를 일회성 생성하고 bootstrap을 비활성화해 재시작한다.
@@ -124,7 +134,7 @@ PRZ-004의 first-party 합성 TXT/PDF와 verifier를 재사용한다. 실제 Ope
 
 ### Batch 4 — 검증·감사·통합 준비
 
-1. 전체 backend·frontend·OSS readiness·SBOM 검증을 실행한다.
+1. 전체 백엔드·프론트엔드·OSS readiness·SBOM 검증을 실행한다.
 2. credential·로컬 절대 경로·공급 자산이 tracked file에 없는지 검사한다.
 3. OpenSQL과 PostgreSQL 결과, 미실행 OpenProxy·OpenHA 항목을 분리해 Evidence를 쓴다.
 4. 독립 AUDIT 뒤 실제 GitHub 권한과 사용자 승인 범위에서만 통합한다.
@@ -134,7 +144,7 @@ PRZ-004의 first-party 합성 TXT/PDF와 verifier를 재사용한다. 실제 Ope
 - Rocky Linux 9.7 VM: chrony, OpenSQL process·port, 역할과 권한 확인
 - Windows host: Java 17, Spring Boot, Ollama와 API/browser 흐름
 - 실제 OpenSQL: `OpenSqlInfrastructureTest`
-- 공개 회귀: unit·integration test, frontend lint·build·audit, OSS readiness와 SBOM
+- 공개 회귀: unit·integration test, 프론트엔드 lint·build·audit, OSS readiness와 SBOM
 
 credential이 포함된 명령 전문은 Evidence에 복사하지 않는다. 각 검증은 종료 코드와
 test·failure·error·skip 수만 공개한다.

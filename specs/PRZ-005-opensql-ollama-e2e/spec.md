@@ -4,6 +4,8 @@
 
 `VERIFIED`
 
+[최종 구현·검증 결과](implementation-report.md)
+
 ## 목적
 
 Windows에서 실행한 PRIZM Spring Boot 서버를 Rocky Linux 9.7 VM의 실제 OpenSQL
@@ -18,7 +20,7 @@ single-node 데이터베이스와 호스트 Ollama `bge-m3`에 연결한다. 안
 
 - Rocky Linux 9.7 VM의 OpenSQL single-node 직접 포트 연결
 - PRIZM 전용 데이터베이스와 Flyway/runtime 역할 분리
-- Flyway V1~V13 적용과 Hibernate schema validation
+- Flyway `V1`–`V13` 적용과 Hibernate schema validation
 - Windows Spring Boot와 호스트 Ollama `bge-m3` 연동
 - 기본 비활성화된 demo `USER`의 일회성 생성과 재비활성화
 - 합성 TXT/PDF 업로드, 비동기 색인, `ACTIVE` 전환과 원문 출처 검색
@@ -97,12 +99,12 @@ single-node 데이터베이스와 호스트 Ollama `bge-m3`에 연결한다. 안
 
 1. VM 시간 동기화와 호스트 상태의 차단 문제가 해소된다.
 2. Windows에서 실제 OpenSQL `5432` 연결과 전용 DB의 분리된 역할 권한을 확인한다.
-3. Flyway V1~V13과 OpenSQL opt-in integration test가 실패·오류·skip 0건으로 통과한다.
+3. Flyway `V1`–`V13`과 OpenSQL opt-in integration test가 실패·오류·skip 0건으로 통과한다.
 4. Windows Spring Boot가 OpenSQL과 호스트 Ollama를 사용해 demo `USER` 전체 API 흐름을 통과한다.
 5. 브라우저에서 로그인, 문서 상세, PDF 원문, 검색과 로그아웃 후 차단을 확인한다.
 6. credential과 공급 자산이 Git·공개 로그에 포함되지 않았음을 확인한다.
 7. PostgreSQL 결과와 OpenSQL 결과, 실행 항목과 미실행 항목을 Evidence에서 분리한다.
 
 완료 조건 3의 OpenSQL opt-in integration test는 D5·D6 증거가 있는 `prizm` DB를 변경하지
-않고, 빈 전용 `prizm_integration_test` DB에 V1~V13과 테스트 전용 최소 권한을 적용해
+않고, 빈 전용 `prizm_integration_test` DB에 `V1`–`V13`과 테스트 전용 최소 권한을 적용해
 실패·오류·skip 0건으로 통과했다.

@@ -1,6 +1,6 @@
 # PRIZM 개발 로드맵
 
-> 기준일: 2026-08-01
+> 기준일: 2026-08-02
 
 이 문서는 제품이 발전하는 순서만 설명합니다. 현재 구현과 검증 결과는
 [현재 구현 현황](project-status.md), 대회 일정과 P0~P10 실행 단계는
@@ -17,26 +17,27 @@ PRIZM은 Spring Boot 애플리케이션과 React Career Vault Reference App으�
 완료했습니다. 안전한 demo `USER`, 자동 검증과 두 독립 clean clone도 확인하고
 PRZ-004 독립 감사와 GitHub 통합을 마쳤습니다.
 
+PRZ-005에서는 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 직접
+연결해 API·브라우저 E2E와 두 사용자 격리를 검증했습니다. 격리된 OpenSQL
+integration test와 전체 회귀를 통과하고 PR #26으로 `main`에 통합했습니다.
+
 ## 다음
 
-1. **OpenSQL 전체 사용자 흐름**
-   - Spring Boot와 Ollama를 실제 OpenSQL에 연결합니다.
-   - 업로드→임베딩→검색을 한 환경에서 검증하고 단일 SQL Gate와 구분해 기록합니다.
-2. **DB 장애 전환**
+1. **DB 장애 전환**
    - 실제 다중 노드 구성을 확보한 뒤 장애 주입, 애플리케이션 재연결과 검색 복구를
      측정합니다.
    - OpenProxy·OpenHA는 실제 사용하고 검증한 경우에만 결과에 적습니다.
-3. **변경 로그 동기화**
+2. **변경 로그 동기화**
    - 문서와 버전 변경을 누락이나 중복 없이 검색 데이터에 반영하는 최소 흐름을
      구현합니다.
-4. **MCP 검색**
+3. **MCP 검색**
    - 현재 Career Evidence 검색을 재사용하는 읽기 전용 MCP 도구를 만듭니다.
    - 사용자 격리, 원문 출처와 근거 없음 응답을 기존 REST 계약과 함께 검증합니다.
 
 ## 향후
 
-CareerFact는 clean-clone, OpenSQL 전체 흐름, DB 장애 전환, 변경 로그 동기화와
-MCP 검색의 필수 Gate를 통과한 뒤 시작합니다. 첫 범위는 원문 조각과 연결된 최소
+CareerFact는 완료된 clean-clone·OpenSQL 전체 흐름에 이어 DB 장애 전환, 변경 로그
+동기화와 MCP 검색의 필수 Gate를 통과한 뒤 시작합니다. 첫 범위는 원문 조각과 연결된 최소
 후보·확인·거절 흐름입니다.
 
 Portfolio 생성은 검증된 CareerFact 이후에 진행합니다. 확인되지 않은 경력이나

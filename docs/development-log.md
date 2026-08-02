@@ -628,3 +628,21 @@
   `REVIEW_NOT_AVAILABLE_SOLO`로 기록한다.
 - 남은 경계: OpenSQL+Ollama 전체 사용자 흐름은 `NOT_RUN`, OpenProxy는
   `NOT_VERIFIED`, OpenHA와 DB failover는 `NOT_RUN`이다.
+
+## 2026-08-02 — PRZ-005 실제 OpenSQL 전체 흐름 검증과 GitHub 통합
+
+- 검증: source `eab32c870f06237d37048b6b8de1287e5e18ae66`에서 Spring Boot와
+  Ollama `bge-m3`를 실제 OpenSQL 직접 `5432`에 연결해 합성 TXT/PDF API·브라우저
+  E2E와 두 사용자 문서·검색 격리를 확인했다. 격리 DB의 OpenSQL opt-in
+  integration test와 T-18 전체 회귀·최종 감사도 통과했다.
+- 통합: 실제 [PR #26](https://github.com/jaemin-devlog/PRIZM/pull/26)을 merge
+  commit `6dc982227bafe94f0879c22bf4381a6e47adf925`로 `main`에 병합했다.
+  backend 2건, frontend 2건, License·Markdown·SBOM 2건 등 GitHub check 6건이
+  모두 성공했다.
+- review: 등록된 GitHub review가 없어 `REVIEW_NOT_AVAILABLE_SOLO`로 기록한다.
+  존재하지 않는 Issue나 review를 통합 증거로 만들지 않는다.
+- 남은 경계: OpenProxy TCP 연결은 `VERIFIED`지만 SQL routing은 `NOT_VERIFIED`,
+  인증은 `AUTH_BLOCKED`, 애플리케이션 적용은 `DEFERRED`다. OpenHA·DB failover와
+  영구 journal도 별도 후속 범위로 `DEFERRED`다.
+- 범위: 병합 뒤 상태 현행화는 문서 전용이다. 제품 source·Flyway migration·
+  dependency·DB·VM과 서비스는 변경하지 않았다.

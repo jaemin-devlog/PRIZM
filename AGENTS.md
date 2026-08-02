@@ -17,15 +17,16 @@ agent. The detailed delivery procedure lives in
   generation remain planned until source and executable tests prove otherwise.
 - N2SF is no longer the product direction. Do not add N2SF-only classifications,
   approval flows, terminology, or security features.
-- The current contest phase is P1. P0 source-only readiness, the actual OpenSQL
-  single-node SQL Gate, and two independent PostgreSQL·pgvector plus host Ollama
-  clean-clone flows are verified. PRZ-004 is integrated into GitHub `main`.
+- P0 source-only readiness and P1 OpenSQL·clean-clone verification are complete.
+  The next planned contest phase is P2 DB failover verification. PRZ-004 and
+  PRZ-005 are integrated into GitHub `main`.
 - PRZ-005 is `VERIFIED` for the OpenSQL+Ollama direct-`5432` synthetic TXT/PDF
   API and browser flows, including two-user document and search isolation. Its
   isolated OpenSQL opt-in integration test and final backend, frontend,
-  OSS-readiness, SBOM, and documentation audit are also complete. OpenProxy TCP
-  connectivity is verified, but SQL routing is `NOT_VERIFIED`, authentication is
-  `AUTH_BLOCKED`, and application is `DEFERRED`. OpenHA, DB failover, and the
+  OSS-readiness, SBOM, and documentation audit are also complete. PR #26 merged
+  source `eab32c8` into `main` as merge commit `6dc9822`. OpenProxy TCP
+  connectivity is verified, but SQL routing is `NOT_VERIFIED`, authentication
+  is `AUTH_BLOCKED`, and application is `DEFERRED`. OpenHA, DB failover, and the
   persistent journal remain deferred according to PRZ-005.
 
 ## Career evidence principle

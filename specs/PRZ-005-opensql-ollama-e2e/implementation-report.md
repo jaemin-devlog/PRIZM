@@ -961,6 +961,19 @@ typecheck와 production build도 통과했다. frontend unit test는 공식 명�
 `NOT_RUN`이다. OSS readiness, SBOM, Markdown 링크, 민감정보와 변경 범위 감사도 통과했다.
 T-18A에서 오래된 현재형 표현을 교정하고 상태 문서를 다시 대조했다.
 
+### GitHub 통합 기록
+
+- 검증 source commit: `eab32c870f06237d37048b6b8de1287e5e18ae66`
+- Pull request: [#26](https://github.com/jaemin-devlog/PRIZM/pull/26)
+- `main` merge commit: `6dc982227bafe94f0879c22bf4381a6e47adf925`
+- 병합 시각: 2026-08-02 20:40:49 KST
+- GitHub checks: backend 2건, frontend 2건, License·Markdown·SBOM 2건 등
+  총 6건 `SUCCESS`
+- GitHub review: 등록된 review가 없어 `REVIEW_NOT_AVAILABLE_SOLO`
+
+존재하지 않는 Issue나 review를 통합 증거로 만들지 않았다. 이 기록은 PRZ-005의
+검증 source가 PR #26을 통해 `main`에 반영됐다는 사실만 증명한다.
+
 남은 비필수 후속 범위는 다음과 같다.
 
 1. OpenProxy의 안전한 인증 방식과 SQL routing을 공급사 답변 뒤 검증

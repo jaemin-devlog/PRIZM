@@ -413,19 +413,27 @@ Windows에서는 `SecureDirectoryStream` 성공 경로를 제공하지 않아 fa
 | 환경 | 목적 | 검증한 범위 | 검증하지 않은 범위 |
 |---|---|---|---|
 | PostgreSQL 16+pgvector | 로컬 실행, 자동 통합 테스트와 clean-clone 구성 | 애플리케이션 회귀, migration, 벡터 검색, ownership, Worker·파일 정리와 두 독립 환경의 demo `USER` 로그인→TXT/PDF 업로드→ACTIVE→검색·브라우저 흐름 | OpenSQL 호환성 |
-| OpenSQL single-node | 별도 SQL 호환성 Gate | Flyway V1~V13, `vector(1024)`, owner·ACTIVE 검색 조건, processing·cleanup job SQL | Ollama 색인, Scheduler·실제 파일 삭제, browser, OpenProxy, OpenHA, DB failover |
+| OpenSQL single-node | SQL 호환성 Gate와 실제 애플리케이션 환경 검증 | Flyway V1~V13, `vector(1024)`, owner·ACTIVE 검색 조건, processing·cleanup job SQL, Spring Boot·Ollama 직접 `5432` API·브라우저 E2E와 두 사용자 격리 | OpenProxy SQL routing·안전한 인증, OpenHA, DB failover, 영구 journal |
 
-OpenSQL single-node SQL Gate는 기존 Evidence 기준 `PASS`입니다. 그 범위를 넘어선
-상태는 다음과 같습니다.
+OpenSQL single-node SQL Gate는 PRZ-003 Evidence 기준 `PASS`입니다. PRZ-005에서는
+직접 `5432` 경로의 OpenSQL·Ollama 전체 사용자 흐름을 별도로 검증했습니다.
+현재 상태는 다음과 같습니다.
 
-- OpenSQL+Ollama 전체 사용자 흐름: `NOT_RUN`
-- OpenProxy runtime: `NOT_VERIFIED`
-- OpenHA: `NOT_RUN`
-- DB failover: `NOT_RUN`
+- OpenSQL+Ollama 직접 `5432` API·브라우저·두 사용자 격리: `VERIFIED`
+- OpenProxy TCP 연결: `VERIFIED`
+- OpenProxy SQL routing: `NOT_VERIFIED`
+- OpenProxy 인증: `AUTH_BLOCKED`
+- OpenProxy 애플리케이션 적용: `DEFERRED`
+- OpenHA·DB failover·영구 journal: `DEFERRED`
 
 PRZ-004에서는 PostgreSQL·pgvector와 호스트 Ollama를 사용한 두 독립 clean clone을
 검증하고 PR #25로 `main`에 통합했습니다. 두 번째 browser의 업로드 전 빈 목록
 직접 관찰은 여전히 `NOT_RUN`입니다.
+
+PRZ-005에서는 실제 OpenSQL single-node에 Spring Boot와 Ollama `bge-m3`를 연결해
+로그인, 합성 TXT/PDF 업로드, 임베딩 저장, `ACTIVE` 전환, 원문 검색과 브라우저
+흐름을 확인했습니다. 두 사용자 문서·검색 격리와 전용 DB의 OpenSQL opt-in
+integration test도 통과했으며 PR #26으로 `main`에 통합했습니다.
 
 PostgreSQL 테스트 통과는 OpenSQL 결과가 아니며, OpenSQL SQL Gate 통과도 전체
 사용자 흐름이나 고가용성 근거가 아닙니다.
@@ -436,6 +444,7 @@ PostgreSQL 테스트 통과는 OpenSQL 결과가 아니며, OpenSQL SQL Gate 통
 - [OpenSQL 기술 Gate](opensql-gate.md)
 - [OpenSQL opt-in 테스트](../src/integrationTest/java/com/prizm/infrastructure/OpenSqlInfrastructureTest.java)
 - [PRZ-003 Evidence](../specs/PRZ-003-opensql-single-node-gate/evidence.md)
+- [PRZ-005 실제 OpenSQL 통합 작업 보고서](../specs/PRZ-005-opensql-ollama-e2e/implementation-report.md)
 
 ## 13. 패키지·코드 지도
 

@@ -2,8 +2,8 @@
 
 ## 현재 단계와 범위
 
-- 현재 단계: `AUDIT`
-- 기준 source commit: `b370cd91f93bd617abebd7afce56fc495eb7b161`
+- 현재 단계: `INTEGRATE`
+- 검증 source commit: `bfd86005862aa15927c707250330c70ebf81c133`
 - GitHub Issue: `NOT_CREATED`
 - 이번 구현은 기존 Docker 실행과 로그인 UI 안에 작은 local-session 진입점을 더하는
   수직 슬라이스다.

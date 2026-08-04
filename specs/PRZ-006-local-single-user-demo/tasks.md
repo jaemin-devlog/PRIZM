@@ -2,9 +2,9 @@
 
 ## 상태
 
-- 현재 단계: `AUDIT`
-- 구현 상태: `IMPLEMENTED_UNVERIFIED`
-- 기준 source commit: `b370cd91f93bd617abebd7afce56fc495eb7b161`
+- 현재 단계: `INTEGRATE`
+- 구현 상태: `VERIFIED`
+- 검증 source commit: `bfd86005862aa15927c707250330c70ebf81c133`
 - GitHub Issue: `NOT_CREATED`
 
 아래 항목은 구현·검증 순서를 위한 작업 목록이다. 체크되지 않은 항목은 구현 또는 검증
@@ -39,8 +39,9 @@
 ## AUDIT / INTEGRATE
 
 - [x] T-13 독립 읽기 전용 AUDIT으로 인증·소유권·Compose·문서·diff를 검토한다.
-  - 초기 availability 조회 실패가 일반 로그인 화면에 고정되는 문제와 문서 모순을 확인해 수정했고 재감사를 기다린다.
-- [ ] T-14 CRITICAL/HIGH/MEDIUM finding을 모두 해소하고 재감사한다.
+  - 초기 availability 조회 실패가 일반 로그인 화면에 고정되는 문제와 문서 모순을 확인해 수정했다.
+- [x] T-14 CRITICAL/HIGH/MEDIUM finding을 모두 해소하고 재감사한다.
+  - 재감사 결과 두 MEDIUM finding은 모두 `RESOLVED`였고 최종 판정은 `PASS`였다.
 - [ ] T-15 사용자가 GitHub write를 승인한 경우에만 실제 PR, CI, solo review 예외와 merge evidence를 기록한다.
 - [ ] T-16 병합 뒤 `main`과 registry/evidence의 실제 source commit·last verified를 갱신하고 branch 정리 조건을 확인한다.
 

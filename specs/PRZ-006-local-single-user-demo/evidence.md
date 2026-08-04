@@ -3,24 +3,25 @@
 ## 판정
 
 - 검증일: `2026-08-04`
-- 판정: `VERIFY_PASS_AUDIT_PENDING`
-- registry 권고 상태: `IN_PROGRESS` 유지
+- 판정: `AUDIT_PASS_INTEGRATION_PENDING`
+- registry 상태: `VERIFIED`
 - GitHub Issue: `NOT_CREATED`
 - GitHub PR·CI·review·merge: `NOT_RUN`
 
 현재 범위의 backend unit, PostgreSQL·pgvector integration, frontend lint/build와
 Docker 브라우저 흐름이 통과했다. local-session JWT의 DB 재검증과 owner isolation도
-전체 통합 테스트에 포함됐다. 독립 AUDIT 전까지 PRZ-006은 `VERIFIED`가 아니다.
+전체 통합 테스트에 포함됐다. 독립 재감사에서 두 MEDIUM finding이 모두 해소됐고
+CRITICAL/HIGH/MEDIUM finding 없이 `PASS` 판정을 받았다.
 
 ## 검증한 source
 
 - branch: `PRZ-006-local-single-user-demo`
-- 기준 HEAD: `b370cd91f93bd617abebd7afce56fc495eb7b161`
-- 상태: 기준 HEAD 위의 미커밋 PRZ-006 working tree
+- 검증 source commit: `bfd86005862aa15927c707250330c70ebf81c133`
+- 상태: 검증·감사 결과를 기능 commit에 고정함
 - staged 파일: 없음
 
-이 결과는 미커밋 working tree를 대상으로 하므로 최종 PR이나 merge commit에 고정된
-증거가 아니다. AUDIT 통과와 커밋 뒤 최종 source commit을 기록해야 한다.
+GitHub PR·CI·review·merge 결과는 아직 기록되지 않았으며 INTEGRATE 단계에서 별도로
+확인해야 한다.
 
 ## 실행 환경
 
@@ -88,9 +89,9 @@ PostgreSQL 성공은 OpenSQL·OpenProxy·OpenHA 성공을 의미하지 않는다
 
 ## 남은 Gate
 
-독립 읽기 전용 AUDIT과 source commit 고정이 남아 있다.
+실제 GitHub PR·CI와 solo review 예외, merge 결과 기록이 남아 있다.
 
 ## 다음 단계
 
-1. 독립 읽기 전용 `AUDIT`을 진행한다.
-2. AUDIT 통과 뒤 commit에 검증 결과를 고정한다.
+1. 검증 source commit을 원격 임시 브랜치에 push한다.
+2. 실제 PR·CI를 확인하고 사용자 승인 뒤 merge evidence를 기록한다.

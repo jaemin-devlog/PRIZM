@@ -11,6 +11,7 @@
 | 처음 방문한 사용자 | [프로젝트 소개](../README.md) | [현재 구현 현황](project-status.md), [개발 로드맵](roadmap.md) |
 | 로컬에서 실행하려는 개발자 | [로컬 Quickstart](quickstart.md) | [OpenSQL 기술 Gate](opensql-gate.md) |
 | 프로젝트 구조를 이해하려는 개발자 | [Architecture](architecture.md) | [현재 구현 현황](project-status.md), [대표 문제 해결 사례](showcase/problem-solving-case-studies.md), [검색 품질 평가](evaluation/search-evaluation.md) |
+| 주요 변경과 설계 판단의 흐름을 보려는 사람 | [개발 기록](development-log.md) | [Spec Registry](../specs/README.md), [현재 구현 현황](project-status.md) |
 | 실제 기여자와 AI 에이전트 | [핵심 프로젝트 규칙](../AGENTS.md) | [상세 Contributor Workflow](ai-agent-workflow.md), [Spec Registry](../specs/README.md) |
 | 검증 근거를 확인하는 사람 | [Spec Registry](../specs/README.md) | [현재 구현 현황](project-status.md), [SBOM 안내](../sbom/README.md) |
 | 과거 기록을 찾는 사람 | [`archive/`](archive/) | 종료된 기술 실험과 초기 검증 기록 |

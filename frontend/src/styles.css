@@ -457,6 +457,14 @@ select:disabled {
   margin-top: var(--prizm-space-md);
 }
 
+.local-demo-start {
+  margin-top: var(--prizm-space-xxl);
+}
+
+.local-demo-start .primary-button {
+  width: 100%;
+}
+
 .login-footnote {
   margin: var(--prizm-space-xl) 0 0;
   color: var(--prizm-color-body);
@@ -667,6 +675,26 @@ select:disabled {
 .document-section > .document-state,
 .document-section > .feedback-message {
   margin-top: var(--prizm-space-xl);
+}
+
+.document-section > .document-empty-state {
+  min-height: clamp(240px, calc(100vh - 420px), 480px);
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: var(--prizm-space-xl);
+  color: var(--prizm-color-muted);
+  text-align: center;
+}
+
+.search-result > .search-empty-state {
+  min-height: clamp(220px, calc(100vh - 520px), 400px);
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: var(--prizm-space-xl);
+  color: var(--prizm-color-muted);
+  text-align: center;
 }
 
 /* Document cards */

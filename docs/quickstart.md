@@ -8,6 +8,25 @@
 현재 저장소는 소스와 실행 설정만 배포하는 소스 전용(source-only) 범위입니다.
 컨테이너 이미지, Ollama 실행 파일과 AI 모델은 저장소에 포함하지 않습니다.
 
+## 실행 방식 선택
+
+PRIZM은 인증과 소유권 검사를 없애지 않고, 첫 진입 방식만 두 가지로 제공합니다.
+
+| 방식 | 활성 조건 | 첫 화면 | 계정 준비 |
+|---|---|---|---|
+| 로컬 보관함 빠른 시작 | 기본 `compose.yaml`의 `PRIZM_LOCAL_DEMO_ENABLED=true` | `내 보관함`과 `PRIZM 시작하기` | 버튼을 처음 누를 때 `local@prizm.local` `USER`를 만들고, 다음부터 재사용 |
+| 일반 로그인 | `PRIZM_LOCAL_DEMO_ENABLED=false`인 일반 Spring Boot 실행 | 이메일·비밀번호 로그인 | DB에 기존 활성 사용자가 있어야 함 |
+
+로컬 보관함에서 `PRIZM 시작하기`를 눌러도 기존 JWT가 발급됩니다. 이후 API는
+일반 로그인과 똑같이 사용자의 활성 상태·이메일·역할을 DB에서 다시 확인하고,
+해당 사용자가 소유한 문서와 검색 결과만 반환합니다. Spring Security를 끄거나
+서비스 코드에 사용자 ID를 고정하지 않습니다.
+
+현재 `compose.yaml`은 로컬 체험을 위해 빠른 시작을 기본으로 켭니다. 애플리케이션
+설정의 기본값은 `false`이므로 Compose 밖의 일반 Spring Boot 실행에서는 기존
+로그인 화면이 유지됩니다. 이 저장소는 별도의 운영용 multi-user Compose 구성을
+아직 제공하지 않습니다.
+
 이 절차는 전체 흐름 검증 commit
 `25d09e9eee9837cf4a63d7461699825ff22743e2`의 서로 다른 두 clean clone에서
 검증했습니다. 전체 흐름을 실행한 commit의 자동 검증은
@@ -20,6 +39,8 @@ API로 확인했지만 브라우저로 직접 관찰하지 않아 해당 UI 항�
 ## 이 절차로 확인하는 것
 
 - 고유한 Compose project와 새 PostgreSQL·pgvector volume을 사용합니다.
+- 브라우저의 `PRIZM 시작하기`가 로컬 `USER`용 정상 JWT를 발급하는지 확인할 수
+  있습니다.
 - 한 번만 활성화하는 demo `USER`를 만든 뒤 bootstrap을 다시 끕니다.
 - 실제 사람이 아닌 PRIZM 자체 합성 TXT와 text-layer PDF를 업로드합니다.
 - 호스트 Ollama의 `bge-m3`로 임베딩한 뒤 두 문서가 검색 대상 버전
@@ -29,6 +50,8 @@ API로 확인했지만 브라우저로 직접 관찰하지 않아 해당 UI 항�
 
 ## 이 절차가 확인하지 않는 것
 
+- 공개 회원가입, 이메일 인증, 비밀번호 재설정, refresh token과 OIDC
+- 외부 네트워크에 공개하는 로컬 보관함 또는 별도 운영용 multi-user Compose
 - OpenSQL과 Ollama를 함께 사용하는 전체 사용자 흐름
 - OpenProxy 애플리케이션 연결과 OpenHA·DB 장애 전환(failover)
 - MCP, CareerFact, portfolio 생성
@@ -159,18 +182,40 @@ redirect를 따라가지 않습니다. 로그인 직후 문서 목록이 비어 
 
 ## 7. 브라우저 UI 확인
 
-브라우저에서 `http://localhost:15174`를 엽니다. ignored `.env`는 로컬 편집기로만
-열고 demo email과 password를 로그인 화면에 입력합니다. 비밀번호를 명령 출력,
-스크린샷이나 Evidence에 복사하지 마세요.
+브라우저에서 `http://localhost:15174`를 엽니다. 기본 Compose에서는 로그인
+입력창 대신 `내 보관함`과 `PRIZM 시작하기`가 보입니다. 버튼을 누르면
+`local@prizm.local` 계정을 만들거나 기존 계정을 재사용하고, 정상 JWT를 발급한
+뒤 문서 보관함으로 이동합니다. 내부 비밀번호는 무작위로 만들며 화면·응답·로그에
+노출하지 않습니다.
+
+6단계의 API 자동 검증은 별도의 `demo@prizm.local` bootstrap 계정을 사용합니다.
+ignored `.env`의 demo email과 password를 일반 로그인 검증에 사용할 때에도
+비밀번호를 명령 출력, 스크린샷이나 Evidence에 복사하지 마세요. 일반 로그인
+화면은 local demo가 꺼진 실행에서만 표시됩니다.
 
 다음 시험표를 순서대로 확인합니다.
 
-- `USER`로 로그인되는가
+- `PRIZM 시작하기` 뒤 `local@prizm.local` `USER`로 들어가는가
 - 합성 TXT와 PDF 두 문서가 목록에 보이는가
 - 두 문서의 상세와 `ACTIVE` version을 확인할 수 있는가
 - PDF 원문을 열 수 있는가
 - 두 합성 marker를 Career Evidence에서 검색할 수 있는가
 - 로그아웃 뒤 보호 화면이 다시 로그인으로 돌아가는가
+
+## 현재 제한사항
+
+- 로컬 보관함은 `127.0.0.1`에만 바인딩된 개인용 환경을 전제로 합니다. 외부
+  네트워크에 공개하는 인증 방식으로 사용하지 않습니다.
+- `local@prizm.local` 사용자가 비활성화됐거나 `USER`가 아닌 역할로 바뀌면 빠른
+  시작은 안전하게 실패합니다.
+- 계정과 문서는 브라우저 저장소가 아니라 PostgreSQL과 Docker volume에
+  저장됩니다. 같은 volume을 다시 사용하면 이전 데이터도 유지됩니다.
+- 공개 회원가입과 비밀번호 재설정은 없습니다. 일반 로그인에는 사전에 생성한
+  활성 사용자 계정이 필요합니다.
+- Compose가 Ollama나 `bge-m3`를 설치하지 않습니다. 호스트에서 별도로 준비해야
+  하며, 모델 가중치와 cache는 PRIZM 배포물에 포함되지 않습니다.
+- 로컬 빠른 시작과 일반 로그인은 API와 데이터 모델이 다른 별도 제품 모드가
+  아닙니다. 첫 인증 절차만 다르고 이후 보안·소유권 계약은 같습니다.
 
 ## 8. 안전한 종료
 

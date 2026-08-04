@@ -6,11 +6,15 @@ export type CurrentUser = {
   role: UserRole
 }
 
-type LoginResponse = {
+export type LoginResponse = {
   accessToken: string
   tokenType: 'Bearer'
   expiresIn: number
   user: CurrentUser
+}
+
+type LocalDemoAvailabilityResponse = {
+  available: boolean
 }
 
 export class AuthApiError extends Error {
@@ -39,6 +43,16 @@ export function login(email: string, password: string): Promise<LoginResponse> {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ email, password }),
+  })
+}
+
+export function getLocalDemoAvailability(): Promise<LocalDemoAvailabilityResponse> {
+  return requestJson<LocalDemoAvailabilityResponse>('/api/auth/local-demo', {})
+}
+
+export function startLocalSession(): Promise<LoginResponse> {
+  return requestJson<LoginResponse>('/api/auth/local-session', {
+    method: 'POST',
   })
 }
 

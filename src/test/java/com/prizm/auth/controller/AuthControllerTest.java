@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.prizm.auth.config.LocalDemoProperties;
 import com.prizm.auth.service.AuthService;
 import com.prizm.auth.dto.request.LoginRequest;
 import com.prizm.auth.dto.response.AuthenticatedUserResponse;
@@ -23,7 +24,9 @@ class AuthControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new AuthController(mock(AuthService.class)))
+        mockMvc = MockMvcBuilders.standaloneSetup(new AuthController(
+                        mock(AuthService.class),
+                        new LocalDemoProperties(true)))
                 .setControllerAdvice(new AuthExceptionHandler())
                 .build();
     }
@@ -38,6 +41,13 @@ class AuthControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("INVALID_LOGIN_REQUEST"))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty());
+    }
+
+    @Test
+    void exposesOnlyWhetherLocalDemoStartIsAvailableBeforeLogin() throws Exception {
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/api/auth/local-demo"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.available").value(true));
     }
 
     @Test

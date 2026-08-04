@@ -10,8 +10,11 @@ import {
 import {
   AuthApiError,
   getCurrentUser,
+  getLocalDemoAvailability,
   login,
+  startLocalSession,
   type CurrentUser,
+  type LoginResponse,
 } from './api/authApi'
 import {
   DocumentApiError,
@@ -138,6 +141,7 @@ function App() {
       ? getStoredCurrentUser()
       : null
   })
+  const [localDemoAvailable, setLocalDemoAvailable] = useState(false)
 
   useEffect(() => {
     const syncPath = () => {
@@ -152,6 +156,35 @@ function App() {
     return () => window.removeEventListener('popstate', syncPath)
   }, [])
 
+  useEffect(() => {
+    let isCurrent = true
+    let retryTimer: number | undefined
+
+    const loadLocalDemoAvailability = () => {
+      getLocalDemoAvailability()
+        .then((response) => {
+          if (isCurrent) {
+            setLocalDemoAvailable(response.available)
+          }
+        })
+        .catch((error) => {
+          const isTransientFailure = !(error instanceof AuthApiError) || error.status >= 500
+          if (isCurrent && isTransientFailure) {
+            retryTimer = window.setTimeout(loadLocalDemoAvailability, 1_000)
+          }
+        })
+    }
+
+    loadLocalDemoAvailability()
+
+    return () => {
+      isCurrent = false
+      if (retryTimer !== undefined) {
+        window.clearTimeout(retryTimer)
+      }
+    }
+  }, [])
+
   const navigate = useCallback((nextPath: AppPath) => {
     if (window.location.pathname !== nextPath) {
       window.history.pushState(null, '', nextPath)
@@ -159,12 +192,12 @@ function App() {
     setPath(nextPath)
   }, [])
 
-  const handleLogin = async (email: string, password: string): Promise<string | null> => {
+  const establishSession = async (requestSession: () => Promise<LoginResponse>): Promise<string | null> => {
     clearSession()
 
     let accessToken: string
     try {
-      const response = await login(email, password)
+      const response = await requestSession()
       accessToken = response.accessToken
     } catch (error) {
       clearSession()
@@ -184,6 +217,11 @@ function App() {
     }
   }
 
+  const handleLogin = (email: string, password: string): Promise<string | null> =>
+    establishSession(() => login(email, password))
+
+  const handleLocalStart = (): Promise<string | null> => establishSession(startLocalSession)
+
   const handleLogout = useCallback(() => {
     clearSession()
     setCurrentUser(null)
@@ -202,13 +240,23 @@ function App() {
     )
   }
 
-  return <LoginPage onLogin={handleLogin} />
+  return (
+    <LoginPage
+      localDemoAvailable={localDemoAvailable}
+      onLogin={handleLogin}
+      onLocalStart={handleLocalStart}
+    />
+  )
 }
 
 function LoginPage({
+  localDemoAvailable,
   onLogin,
+  onLocalStart,
 }: {
+  localDemoAvailable: boolean
   onLogin: (email: string, password: string) => Promise<string | null>
+  onLocalStart: () => Promise<string | null>
 }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -233,6 +281,17 @@ function LoginPage({
     }
   }
 
+  const handleLocalStart = async () => {
+    setErrorMessage(null)
+    setIsSubmitting(true)
+    const error = await onLocalStart()
+    setIsSubmitting(false)
+
+    if (error !== null) {
+      setErrorMessage(error)
+    }
+  }
+
   return (
     <main className="login-page">
       <section className="login-intro" aria-labelledby="login-intro-title">
@@ -245,20 +304,20 @@ function LoginPage({
           <p className="eyebrow">CAREER VAULT · REFERENCE APP</p>
           <h2 id="login-intro-title">
             흩어진 커리어 기록을
-            <span>하나의 근거로</span>
+            <span>한곳에</span>
           </h2>
           <p className="description">
-            문서에 담긴 관련 내용을 찾고,
+            등록한 문서에서 필요한 내용을 찾고,
             <br />
-            필요할 때 원문과 함께 확인하세요.
+            필요할 때 바로 열어보세요.
           </p>
         </div>
 
         <div className="evidence-principle">
           <span className="principle-dot" aria-hidden="true" />
           <div>
-            <strong>문서에 있는 내용만</strong>
-            <p>등록한 문서에서 근거를 찾지 못하면 찾지 못했다고 분명하게 안내합니다.</p>
+            <strong>등록한 문서를 바탕으로</strong>
+            <p>관련 내용을 찾지 못하면 찾지 못했다고 분명하게 안내합니다.</p>
           </div>
         </div>
       </section>
@@ -266,59 +325,82 @@ function LoginPage({
       <section className="login-panel" aria-labelledby="login-title">
         <div className="login-heading">
           <p className="eyebrow">CAREER VAULT</p>
-          <h1 id="login-title">로그인</h1>
-          <p>내 커리어 문서와 원문 근거를 확인하세요.</p>
+          <h1 id="login-title">{localDemoAvailable ? '내 보관함' : '로그인'}</h1>
+          <p>
+            {localDemoAvailable
+              ? '이 컴퓨터에서 나만의 커리어 문서를 모아 관리하세요.'
+              : '내 커리어 문서를 모아 관리하세요.'}
+          </p>
         </div>
 
-        <form className="login-form" onSubmit={handleSubmit} noValidate aria-busy={isSubmitting}>
-          <div className="form-field">
-            <label htmlFor="email">이메일</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              placeholder="name@example.com"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
+        {localDemoAvailable ? (
+          <div className="local-demo-start">
+            {errorMessage !== null && (
+              <p className="form-error feedback-message" role="alert">
+                {errorMessage}
+              </p>
+            )}
+            <button
+              type="button"
+              className="primary-button button-xlarge"
               disabled={isSubmitting}
-              aria-invalid={errorMessage !== null}
-              aria-describedby={errorMessage !== null ? 'login-form-error' : undefined}
-            />
+              aria-busy={isSubmitting}
+              onClick={handleLocalStart}
+            >
+              {isSubmitting ? 'PRIZM을 준비하는 중' : 'PRIZM 시작하기'}
+            </button>
           </div>
+        ) : (
+          <form className="login-form" onSubmit={handleSubmit} noValidate aria-busy={isSubmitting}>
+            <div className="form-field">
+              <label htmlFor="email">이메일</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder="name@example.com"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                disabled={isSubmitting}
+                aria-invalid={errorMessage !== null}
+                aria-describedby={errorMessage !== null ? 'login-form-error' : undefined}
+              />
+            </div>
 
-          <div className="form-field">
-            <label htmlFor="password">비밀번호</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              placeholder="비밀번호를 입력하세요"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
+            <div className="form-field">
+              <label htmlFor="password">비밀번호</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                placeholder="비밀번호를 입력하세요"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                disabled={isSubmitting}
+                aria-invalid={errorMessage !== null}
+                aria-describedby={errorMessage !== null ? 'login-form-error' : undefined}
+              />
+            </div>
+
+            {errorMessage !== null && (
+              <p id="login-form-error" className="form-error feedback-message" role="alert">
+                {errorMessage}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              className="primary-button button-xlarge"
               disabled={isSubmitting}
-              aria-invalid={errorMessage !== null}
-              aria-describedby={errorMessage !== null ? 'login-form-error' : undefined}
-            />
-          </div>
-
-          {errorMessage !== null && (
-            <p id="login-form-error" className="form-error feedback-message" role="alert">
-              {errorMessage}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            className="primary-button button-xlarge"
-            disabled={isSubmitting}
-            aria-busy={isSubmitting}
-          >
-            {isSubmitting && <span className="button-spinner" aria-hidden="true" />}
-            {isSubmitting ? '로그인 중' : '로그인'}
-          </button>
-        </form>
+              aria-busy={isSubmitting}
+            >
+              {isSubmitting && <span className="button-spinner" aria-hidden="true" />}
+              {isSubmitting ? '로그인 중' : '로그인'}
+            </button>
+          </form>
+        )}
 
         <p className="login-footnote">PRIZM은 등록된 문서에 없는 경험을 만들지 않습니다.</p>
       </section>
@@ -904,7 +986,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
           </p>
         )}
         {!isLoading && errorMessage === null && documents.length === 0 && (
-          <p className="state-message document-state">
+          <p className="state-message document-empty-state">
             {selectedDocumentType === undefined
               ? '아직 등록한 문서가 없습니다. 문서 업로드 메뉴에서 첫 문서를 등록해 보세요.'
               : '선택한 조건의 문서가 없습니다.'}
@@ -1473,7 +1555,7 @@ function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
 
       <div className="search-result" aria-live="polite" aria-busy={searchState === 'loading'}>
         {searchState === 'idle' && (
-          <p className="state-message search-state">
+          <p className="state-message search-empty-state">
             등록한 문서에서 확인하고 싶은 경험이나 기술을 입력해 보세요.
           </p>
         )}
@@ -1484,7 +1566,7 @@ function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
           </p>
         )}
         {searchState === 'empty' && (
-          <p className="state-message search-state">
+          <p className="state-message search-empty-state">
             현재 PRIZM에 등록된 문서에서 관련 근거를 찾지 못했습니다.
           </p>
         )}

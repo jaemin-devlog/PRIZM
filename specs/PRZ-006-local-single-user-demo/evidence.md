@@ -1,12 +1,16 @@
 # PRZ-006 로컬 보관함 빠른 시작 — Evidence
 
-## 판정
+## 최종 판정
+
+`VERIFIED` — 필수 VERIFY, 독립 AUDIT, GitHub CI와 `main` 통합 완료
 
 - 검증일: `2026-08-04`
-- 판정: `AUDIT_PASS_INTEGRATION_PENDING`
 - registry 상태: `VERIFIED`
+- 기능 검증 source commit: `bfd86005862aa15927c707250330c70ebf81c133`
+- GitHub 통합 merge commit: `f1c9b109092b7ffa525999e0b19c5fb64390dc22`
 - GitHub Issue: `NOT_CREATED`
-- GitHub PR·CI·review·merge: `NOT_RUN`
+- GitHub: [PR #30](https://github.com/jaemin-devlog/PRIZM/pull/30), head 기준 check 6건 성공,
+  review `REVIEW_NOT_AVAILABLE_SOLO`, merge 완료
 
 현재 범위의 backend unit, PostgreSQL·pgvector integration, frontend lint/build와
 Docker 브라우저 흐름이 통과했다. local-session JWT의 DB 재검증과 owner isolation도
@@ -20,8 +24,10 @@ CRITICAL/HIGH/MEDIUM finding 없이 `PASS` 판정을 받았다.
 - 상태: 검증·감사 결과를 기능 commit에 고정함
 - staged 파일: 없음
 
-GitHub PR·CI·review·merge 결과는 아직 기록되지 않았으며 INTEGRATE 단계에서 별도로
-확인해야 한다.
+PR #30은 `2026-08-04T06:06:10Z`에 병합됐다. GitHub의 backend, frontend,
+License/Markdown/SBOM check는 push·pull request 실행을 합쳐 head commit에서 6건 모두
+성공했다. GitHub review 제출은 0건이므로 `REVIEW_NOT_AVAILABLE_SOLO`는 실제 review
+evidence가 아니다.
 
 ## 실행 환경
 
@@ -87,11 +93,15 @@ JWT 형태 문자열이 노출되지 않는 것도 확인했다.
 
 PostgreSQL 성공은 OpenSQL·OpenProxy·OpenHA 성공을 의미하지 않는다.
 
-## 남은 Gate
+## GitHub 통합
 
-실제 GitHub PR·CI와 solo review 예외, merge 결과 기록이 남아 있다.
+| 항목 | 결과 |
+|---|---|
+| PR | [#30](https://github.com/jaemin-devlog/PRIZM/pull/30) — `PRZ-006-local-single-user-demo` → `main` |
+| head commit | `4a14e5a76adeab450c444b604c57a197d9cded25` |
+| merge commit | `f1c9b109092b7ffa525999e0b19c5fb64390dc22` |
+| GitHub CI | backend, frontend, License/Markdown/SBOM check 총 6건 `success` |
+| review | `REVIEW_NOT_AVAILABLE_SOLO` — GitHub review 0건 |
 
-## 다음 단계
-
-1. 검증 source commit을 원격 임시 브랜치에 push한다.
-2. 실제 PR·CI를 확인하고 사용자 승인 뒤 merge evidence를 기록한다.
+PRZ-006은 `main`에 통합됐다. 다음 제품 기능은 이 Evidence가 아니라
+[개발 로드맵](../../docs/roadmap.md)의 순서를 따른다.

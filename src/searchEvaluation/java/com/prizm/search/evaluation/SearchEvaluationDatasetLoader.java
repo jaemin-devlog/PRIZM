@@ -7,8 +7,10 @@ import com.prizm.search.evaluation.SearchEvaluationData.EvidenceAnchor;
 import com.prizm.search.evaluation.SearchEvaluationData.ExpectedEvidence;
 import com.prizm.search.evaluation.SearchEvaluationData.FixtureDocument;
 import com.prizm.search.evaluation.SearchEvaluationData.FixturePage;
+import com.prizm.search.evaluation.SearchEvaluationData.OwnerScenario;
 import com.prizm.search.evaluation.SearchEvaluationData.Question;
 import com.prizm.search.evaluation.SearchEvaluationData.Split;
+import com.prizm.search.evaluation.SearchEvaluationData.VersionScenario;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -16,10 +18,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.Locale;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
@@ -42,8 +44,8 @@ public class SearchEvaluationDatasetLoader {
 
         Corpus corpus = readCorpus(datasetDirectory.resolve(CORPUS_FILE));
         List<Question> questions = readQuestions(datasetDirectory.resolve(QUESTIONS_FILE));
-        Set<String> evidenceIds = validateCorpus(corpus);
-        validateQuestions(questions, evidenceIds);
+        CorpusIndex corpusIndex = validateCorpus(corpus);
+        validateQuestions(corpus, questions, corpusIndex);
         return new Dataset(corpus, List.copyOf(questions));
     }
 
@@ -86,14 +88,21 @@ public class SearchEvaluationDatasetLoader {
         return questions;
     }
 
-    private Set<String> validateCorpus(Corpus corpus) {
+    private CorpusIndex validateCorpus(Corpus corpus) {
         if (corpus == null || isBlank(corpus.datasetId()) || corpus.documents() == null
                 || corpus.documents().isEmpty()) {
             throw new SearchEvaluationDataException("Evaluation corpus requires datasetId and documents.");
         }
+        if (corpus.schemaVersion() != null
+                && (corpus.schemaVersion() < 1 || corpus.schemaVersion() > 2)) {
+            throw new SearchEvaluationDataException("Unsupported search evaluation dataset schemaVersion.");
+        }
 
         Set<String> documentIds = new HashSet<>();
         Set<String> evidenceIds = new HashSet<>();
+        Map<String, FixtureDocument> documentsById = new HashMap<>();
+        Map<String, FixtureDocument> documentsByEvidenceId = new HashMap<>();
+        Map<String, Split> sourceFactSplits = new HashMap<>();
         for (FixtureDocument document : corpus.documents()) {
             if (document == null || isBlank(document.fixtureId()) || isBlank(document.title())
                     || document.documentType() == null || document.fileType() == null) {
@@ -101,6 +110,10 @@ public class SearchEvaluationDatasetLoader {
             }
             if (!documentIds.add(document.fixtureId())) {
                 throw new SearchEvaluationDataException("Duplicate fixture document ID is not allowed.");
+            }
+            documentsById.put(document.fixtureId(), document);
+            if (isVersionTwo(corpus) && document.split() == null) {
+                throw new SearchEvaluationDataException("Dataset v2 fixture documents require a split.");
             }
             if (document.pages() == null || document.pages().isEmpty()) {
                 throw new SearchEvaluationDataException("Every fixture document requires at least one page.");
@@ -132,15 +145,33 @@ public class SearchEvaluationDatasetLoader {
                 if (fullText.indexOf(anchor.anchorText()) < 0) {
                     throw new SearchEvaluationDataException("Evidence anchor text was not found in its fixture document.");
                 }
+                documentsByEvidenceId.put(anchor.fixtureEvidenceId(), document);
+                if (isVersionTwo(corpus)) {
+                    if (isBlank(anchor.sourceFactId())) {
+                        throw new SearchEvaluationDataException(
+                                "Dataset v2 evidence anchors require a sourceFactId.");
+                    }
+                    Split existingSplit = sourceFactSplits.putIfAbsent(
+                            anchor.sourceFactId(), document.split());
+                    if (existingSplit != null && existingSplit != document.split()) {
+                        throw new SearchEvaluationDataException(
+                                "The same source fact cannot be duplicated across TUNING and TEST fixtures.");
+                    }
+                }
             }
         }
-        return Set.copyOf(evidenceIds);
+        return new CorpusIndex(
+                Map.copyOf(documentsById),
+                Map.copyOf(documentsByEvidenceId),
+                Set.copyOf(evidenceIds));
     }
 
-    private void validateQuestions(List<Question> questions, Set<String> corpusEvidenceIds) {
+    private void validateQuestions(Corpus corpus, List<Question> questions, CorpusIndex corpusIndex) {
         Set<String> questionIds = new HashSet<>();
         Set<String> normalizedQueries = new HashSet<>();
         Map<String, Split> positiveEvidenceSplits = new HashMap<>();
+        Map<String, Split> evidenceGroupSplits = new HashMap<>();
+        Map<String, Split> questionGroupSplits = new HashMap<>();
         for (Question question : questions) {
             if (question == null || isBlank(question.questionId()) || isBlank(question.query())
                     || question.query().length() > 500 || question.split() == null
@@ -157,8 +188,13 @@ public class SearchEvaluationDatasetLoader {
             if (question.expectedEvidence() == null) {
                 throw new SearchEvaluationDataException("expectedEvidence must be an array.");
             }
+            if (isVersionTwo(corpus)) {
+                validateVersionTwoQuestionMetadata(
+                        question, corpusIndex.documentsById(), questionGroupSplits);
+            }
 
             boolean hasPositiveEvidence = false;
+            boolean hasPositivePdfEvidence = false;
             Set<String> expectedIds = new HashSet<>();
             for (ExpectedEvidence evidence : question.expectedEvidence()) {
                 if (evidence == null || isBlank(evidence.fixtureEvidenceId())
@@ -169,8 +205,22 @@ public class SearchEvaluationDatasetLoader {
                 if (!expectedIds.add(evidence.fixtureEvidenceId())) {
                     throw new SearchEvaluationDataException("Duplicate expected evidence is not allowed per question.");
                 }
-                if (!corpusEvidenceIds.contains(evidence.fixtureEvidenceId())) {
+                if (!corpusIndex.evidenceIds().contains(evidence.fixtureEvidenceId())) {
                     throw new SearchEvaluationDataException("Question references an unknown fixture evidence ID.");
+                }
+                FixtureDocument evidenceDocument = corpusIndex.documentsByEvidenceId()
+                        .get(evidence.fixtureEvidenceId());
+                if (isVersionTwo(corpus)) {
+                    if (!question.fixtureIds().contains(evidenceDocument.fixtureId())) {
+                        throw new SearchEvaluationDataException(
+                                "Dataset v2 expected evidence must belong to a declared fixtureId.");
+                    }
+                    Split existingGroupSplit = evidenceGroupSplits.putIfAbsent(
+                            evidence.evidenceGroupId(), question.split());
+                    if (existingGroupSplit != null && existingGroupSplit != question.split()) {
+                        throw new SearchEvaluationDataException(
+                                "The same evidenceGroup cannot be reused across TUNING and TEST.");
+                    }
                 }
                 if (evidence.relevance() > 0) {
                     Split existingSplit = positiveEvidenceSplits.putIfAbsent(
@@ -179,6 +229,7 @@ public class SearchEvaluationDatasetLoader {
                         throw new SearchEvaluationDataException(
                                 "Positive fixture evidence cannot be reused across TUNING and TEST.");
                     }
+                    hasPositivePdfEvidence |= evidenceDocument.fileType() == DocumentFileType.PDF;
                 }
                 hasPositiveEvidence |= evidence.relevance() > 0;
             }
@@ -188,7 +239,94 @@ public class SearchEvaluationDatasetLoader {
             if (!question.noEvidence() && !hasPositiveEvidence) {
                 throw new SearchEvaluationDataException("Evidence-bearing questions require relevance 1 or 2.");
             }
+            if (isVersionTwo(corpus)) {
+                validateVersionTwoQuestionSemantics(question, hasPositivePdfEvidence, corpusIndex);
+            }
         }
+    }
+
+    private void validateVersionTwoQuestionMetadata(
+            Question question,
+            Map<String, FixtureDocument> documentsById,
+            Map<String, Split> questionGroupSplits) {
+        if (question.fixtureIds() == null || question.fixtureIds().isEmpty()
+                || isBlank(question.questionGroupId())
+                || question.ownerScenario() == null || question.versionScenario() == null) {
+            throw new SearchEvaluationDataException(
+                    "Dataset v2 questions require fixtureIds, questionGroupId, ownerScenario, and versionScenario.");
+        }
+        if (question.expectedEvidence().isEmpty()) {
+            throw new SearchEvaluationDataException(
+                    "Dataset v2 questions require at least one evidenceGroup label.");
+        }
+
+        Set<String> uniqueFixtureIds = new HashSet<>();
+        for (String fixtureId : question.fixtureIds()) {
+            if (isBlank(fixtureId) || !uniqueFixtureIds.add(fixtureId)) {
+                throw new SearchEvaluationDataException(
+                        "Dataset v2 question fixtureIds must be unique and non-blank.");
+            }
+            FixtureDocument document = documentsById.get(fixtureId);
+            if (document == null) {
+                throw new SearchEvaluationDataException("Question references an unknown fixture document ID.");
+            }
+            if (document.split() != question.split()) {
+                throw new SearchEvaluationDataException(
+                        "The same fixture document cannot be used across TUNING and TEST.");
+            }
+        }
+
+        Split existingQuestionGroupSplit = questionGroupSplits.putIfAbsent(
+                question.questionGroupId(), question.split());
+        if (existingQuestionGroupSplit != null && existingQuestionGroupSplit != question.split()) {
+            throw new SearchEvaluationDataException(
+                    "Paraphrase question groups cannot be split across TUNING and TEST.");
+        }
+    }
+
+    private void validateVersionTwoQuestionSemantics(
+            Question question,
+            boolean hasPositivePdfEvidence,
+            CorpusIndex corpusIndex) {
+        if ((question.ownerScenario() == OwnerScenario.OTHER_OWNER_ONLY
+                || question.ownerScenario() == OwnerScenario.NO_SEARCHABLE_DOCUMENTS
+                || question.versionScenario() == VersionScenario.PAST_VERSION_ONLY
+                || question.versionScenario() == VersionScenario.NO_ACTIVE_VERSION)
+                && !question.noEvidence()) {
+            throw new SearchEvaluationDataException(
+                    "Owner and version boundary scenarios must be labelled noEvidence.");
+        }
+        if (question.ownerScenario() == OwnerScenario.NO_SEARCHABLE_DOCUMENTS
+                && question.versionScenario() != VersionScenario.NO_ACTIVE_VERSION) {
+            throw new SearchEvaluationDataException(
+                    "NO_SEARCHABLE_DOCUMENTS requires the NO_ACTIVE_VERSION scenario.");
+        }
+        if (hasPositivePdfEvidence) {
+            if (question.goldPage() == null || question.goldPage() < 1) {
+                throw new SearchEvaluationDataException(
+                        "Dataset v2 PDF evidence questions require a positive goldPage.");
+            }
+            boolean goldPageMatches = question.expectedEvidence().stream()
+                    .filter(evidence -> evidence.relevance() > 0)
+                    .map(evidence -> corpusIndex.documentsByEvidenceId().get(evidence.fixtureEvidenceId()))
+                    .filter(document -> document.fileType() == DocumentFileType.PDF)
+                    .anyMatch(document -> document.pages().stream()
+                            .anyMatch(page -> page.pageNumber() == question.goldPage()
+                                    && document.evidenceAnchors().stream()
+                                            .filter(anchor -> question.expectedEvidence().stream()
+                                                    .filter(evidence -> evidence.relevance() > 0)
+                                                    .map(ExpectedEvidence::fixtureEvidenceId)
+                                                    .anyMatch(anchor.fixtureEvidenceId()::equals))
+                                            .anyMatch(anchor -> page.text().contains(anchor.anchorText()))));
+            if (!goldPageMatches) {
+                throw new SearchEvaluationDataException(
+                        "Dataset v2 PDF goldPage must contain expected positive evidence.");
+            }
+        }
+    }
+
+    private boolean isVersionTwo(Corpus corpus) {
+        return Integer.valueOf(2).equals(corpus.schemaVersion());
     }
 
     private String normalizeQuery(String query) {
@@ -197,5 +335,11 @@ public class SearchEvaluationDatasetLoader {
 
     private boolean isBlank(String value) {
         return value == null || value.isBlank();
+    }
+
+    private record CorpusIndex(
+            Map<String, FixtureDocument> documentsById,
+            Map<String, FixtureDocument> documentsByEvidenceId,
+            Set<String> evidenceIds) {
     }
 }

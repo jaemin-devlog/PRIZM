@@ -16,7 +16,17 @@ public final class SearchEvaluationData {
         PROBLEM_SOLVING,
         COLLABORATION,
         EXACT_VALUE,
-        NO_EVIDENCE
+        NO_EVIDENCE,
+        NEAR_TOPIC_NO_EVIDENCE,
+        ABSENT_ENTITY,
+        ALTERED_FACT,
+        OWNER_BOUNDARY,
+        VERSION_BOUNDARY,
+        NO_SEARCHABLE_DOCUMENTS,
+        DIRECT_EVIDENCE,
+        PARAPHRASE,
+        PDF_EVIDENCE,
+        OVERLAP_DUPLICATE
     }
 
     public enum Split {
@@ -24,7 +34,19 @@ public final class SearchEvaluationData {
         TEST
     }
 
-    public record Corpus(String datasetId, List<FixtureDocument> documents) {
+    public enum OwnerScenario {
+        PRIMARY_OWNER,
+        OTHER_OWNER_ONLY,
+        NO_SEARCHABLE_DOCUMENTS
+    }
+
+    public enum VersionScenario {
+        ACTIVE,
+        PAST_VERSION_ONLY,
+        NO_ACTIVE_VERSION
+    }
+
+    public record Corpus(String datasetId, Integer schemaVersion, List<FixtureDocument> documents) {
     }
 
     public record FixtureDocument(
@@ -33,7 +55,8 @@ public final class SearchEvaluationData {
             DocumentType documentType,
             DocumentFileType fileType,
             List<FixturePage> pages,
-            List<EvidenceAnchor> evidenceAnchors) {
+            List<EvidenceAnchor> evidenceAnchors,
+            Split split) {
     }
 
     public record FixturePage(int pageNumber, String text) {
@@ -43,7 +66,7 @@ public final class SearchEvaluationData {
      * DB의 순번 기반 chunk ID 대신 원문의 짧고 고유한 문자열에 붙이는 안정적인 합성 식별자다.
      * 같은 anchor가 overlap 청크 두 개에 포함되면 두 청크 모두 같은 근거로 평가된다.
      */
-    public record EvidenceAnchor(String fixtureEvidenceId, String anchorText) {
+    public record EvidenceAnchor(String fixtureEvidenceId, String anchorText, String sourceFactId) {
     }
 
     public record Question(
@@ -52,7 +75,12 @@ public final class SearchEvaluationData {
             List<ExpectedEvidence> expectedEvidence,
             boolean noEvidence,
             Split split,
-            Category category) {
+            Category category,
+            List<String> fixtureIds,
+            String questionGroupId,
+            OwnerScenario ownerScenario,
+            VersionScenario versionScenario,
+            Integer goldPage) {
     }
 
     public record ExpectedEvidence(String fixtureEvidenceId, int relevance, String evidenceGroupId) {

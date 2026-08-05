@@ -46,4 +46,21 @@ class SearchEvaluationSampleDatasetTest {
                     .contains(true, false);
         }
     }
+
+    @Test
+    void preservesLegacyExactFiftyPercentLabelAndDatasetIdentity() {
+        Dataset dataset = new SearchEvaluationDatasetLoader(new ObjectMapper()).load(SAMPLE_DATASET);
+
+        SearchEvaluationData.Question legacyQuestion = dataset.questions().stream()
+                .filter(question -> question.questionId().equals("exact-fifty-percent"))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(dataset.corpus().datasetId()).isEqualTo("prizm-synthetic-dense-pilot-v2");
+        assertThat(dataset.corpus().schemaVersion()).isNull();
+        assertThat(legacyQuestion.split()).isEqualTo(Split.TEST);
+        assertThat(legacyQuestion.noEvidence()).isFalse();
+        assertThat(legacyQuestion.expectedEvidence()).singleElement()
+                .satisfies(evidence -> assertThat(evidence.relevance()).isEqualTo(1));
+    }
 }

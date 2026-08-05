@@ -13,10 +13,6 @@ export type LoginResponse = {
   user: CurrentUser
 }
 
-type LocalDemoAvailabilityResponse = {
-  available: boolean
-}
-
 export class AuthApiError extends Error {
   readonly status: number
 
@@ -46,14 +42,18 @@ export function login(email: string, password: string): Promise<LoginResponse> {
   })
 }
 
-export function getLocalDemoAvailability(): Promise<LocalDemoAvailabilityResponse> {
-  return requestJson<LocalDemoAvailabilityResponse>('/api/auth/local-demo', {})
-}
-
-export function startLocalSession(): Promise<LoginResponse> {
-  return requestJson<LoginResponse>('/api/auth/local-session', {
+export async function signup(email: string, password: string): Promise<void> {
+  const response = await fetch('/api/auth/signup', {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
   })
+
+  if (!response.ok) {
+    throw new AuthApiError(response.status)
+  }
 }
 
 export function getCurrentUser(accessToken: string): Promise<CurrentUser> {

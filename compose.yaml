@@ -37,7 +37,6 @@ services:
       PRIZM_STORAGE_ROOT: /app/var/storage
       PRIZM_STORAGE_TEMP: /app/var/tmp
       PRIZM_OLLAMA_BASE_URL: ${PRIZM_COMPOSE_OLLAMA_BASE_URL:-http://host.docker.internal:11434}
-      PRIZM_LOCAL_DEMO_ENABLED: "true"
     depends_on:
       db:
         condition: service_healthy

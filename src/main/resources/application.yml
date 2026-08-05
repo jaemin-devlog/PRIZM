@@ -42,8 +42,6 @@ management:
         enabled: true
 
 prizm:
-  local-demo:
-    enabled: ${PRIZM_LOCAL_DEMO_ENABLED:false}
   jwt:
     secret: ${PRIZM_JWT_SECRET:}
     expiration-seconds: ${PRIZM_JWT_EXPIRATION_SECONDS:3600}

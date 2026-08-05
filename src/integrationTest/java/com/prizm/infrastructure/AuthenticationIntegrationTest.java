@@ -96,7 +96,6 @@ class AuthenticationIntegrationTest {
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
         registry.add("prizm.storage.root", STORAGE_ROOT::toString);
-        registry.add("prizm.local-demo.enabled", () -> true);
     }
 
     @Autowired
@@ -229,42 +228,63 @@ class AuthenticationIntegrationTest {
     }
 
     @Test
-    void localSessionJwtRevalidatesDatabaseUserAndIsolatesDocumentsByOwner() throws Exception {
-        String responseBody = mockMvc.perform(post("/api/auth/local-session"))
+    void signedUpUserLogsInAndJwtRevalidationIsolatesDocumentsByOwner() throws Exception {
+        mockMvc.perform(post("/api/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"new-user@prizm.local","password":"signup-password","role":"SYSTEM_ADMIN"}
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(content().string(""));
+
+        UserAccount signedUpUser = userAccountRepository.findByEmail("new-user@prizm.local").orElseThrow();
+        assertThat(signedUpUser.getRole()).isEqualTo(UserRole.USER);
+        assertThat(signedUpUser.isEnabled()).isTrue();
+        assertThat(signedUpUser.getPasswordHash()).isNotEqualTo("signup-password");
+        assertThat(passwordEncoder.matches("signup-password", signedUpUser.getPasswordHash())).isTrue();
+
+        String responseBody = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"new-user@prizm.local","password":"signup-password"}
+                                """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
-                .andExpect(jsonPath("$.user.email").value("local@prizm.local"))
+                .andExpect(jsonPath("$.user.email").value("new-user@prizm.local"))
                 .andExpect(jsonPath("$.user.role").value("USER"))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        String localToken = JsonPath.read(responseBody, "$.accessToken");
-        UserAccount localUser = userAccountRepository.findByEmail("local@prizm.local").orElseThrow();
-        UserAccount otherUser = createUser("other-local-demo-user@prizm.local", UserRole.USER, true);
-        ActiveDocument localDocument = createActiveDocument(
-                localUser.getId(), "로컬 사용자 문서", "로컬 사용자에게만 보이는 기록");
+        String accessToken = JsonPath.read(responseBody, "$.accessToken");
+        UserAccount otherUser = createUser("other-user@prizm.local", UserRole.USER, true);
+        ActiveDocument signedUpUserDocument = createActiveDocument(
+                signedUpUser.getId(), "신규 사용자 문서", "신규 사용자에게만 보이는 기록");
         ActiveDocument otherDocument = createActiveDocument(
                 otherUser.getId(), "다른 사용자 문서", "다른 사용자에게만 보이는 기록");
 
         mockMvc.perform(get("/api/users/me")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(localToken)))
+                        .header(HttpHeaders.AUTHORIZATION, bearer(accessToken)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("local@prizm.local"))
+                .andExpect(jsonPath("$.email").value("new-user@prizm.local"))
                 .andExpect(jsonPath("$.role").value("USER"));
         mockMvc.perform(get("/api/documents")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(localToken)))
+                        .header(HttpHeaders.AUTHORIZATION, bearer(accessToken)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].documentId").value(localDocument.documentId()))
+                .andExpect(jsonPath("$[0].documentId").value(signedUpUserDocument.documentId()))
                 .andExpect(jsonPath("$[1]").doesNotExist());
         mockMvc.perform(get("/api/documents/{documentId}", otherDocument.documentId())
-                        .header(HttpHeaders.AUTHORIZATION, bearer(localToken)))
+                        .header(HttpHeaders.AUTHORIZATION, bearer(accessToken)))
                 .andExpect(status().isNotFound());
 
-        localUser.disable();
-        userAccountRepository.saveAndFlush(localUser);
+        signedUpUser.disable();
+        userAccountRepository.saveAndFlush(signedUpUser);
 
         mockMvc.perform(get("/api/users/me")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(localToken)))
+                        .header(HttpHeaders.AUTHORIZATION, bearer(accessToken)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+
+        mockMvc.perform(post("/api/auth/local-session"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
     }

@@ -28,13 +28,11 @@ Intelligence Engine**과 Reference App을 제공하는 것입니다. 현재 저�
 
 현재 구현은 다음과 같습니다.
 
-- Docker Compose의 로컬 보관함에서는 `PRIZM 시작하기`를 눌러 로컬 전용
-  `USER`로 바로 들어갈 수 있습니다. 일반 실행에서는 기존 이메일·비밀번호
-  로그인 화면을 사용합니다.
-- 두 진입 방식 모두 기존 JWT를 발급하고 사용자를 DB에서 다시 확인하며,
-  사용자별 문서와 검색 결과를 분리합니다.
+- 첫 화면에서 일반 `USER` 계정을 만든 뒤 기존 이메일·비밀번호 로그인으로
+  Career Vault에 들어갑니다. 회원가입 직후 자동 로그인하거나 JWT를 발급하지 않습니다.
+- 로그인 뒤에는 사용자를 DB에서 다시 확인하며 사용자별 문서와 검색 결과를 분리합니다.
 - 기본적으로 꺼져 있는 one-time demo `USER` bootstrap과 합성 TXT/PDF 검증
-  도구를 제공합니다. 공개 회원가입 API는 제공하지 않습니다.
+  도구도 계속 제공합니다.
 - UTF-8 TXT와 텍스트가 포함된 PDF를 업로드하고 관리합니다.
 - 등록한 문서 버전은 직접 고치지 않고 바뀌지 않는 새 버전(immutable version)으로
   보존합니다.
@@ -48,21 +46,17 @@ CareerFact, 근거 기반 portfolio 생성, `/api/v1`, MCP, 독립 Engine 패키
 기관용 workspace는 아직 구현되지 않았습니다. 구체적인 기능과 제한은
 [현재 구현 현황](docs/project-status.md)을 기준으로 확인합니다.
 
-## 인증 진입 방식
+## 인증 진입 흐름
 
-| 방식 | 사용 환경 | 화면과 동작 |
-|---|---|---|
-| 로컬 보관함 빠른 시작 | 기본 `compose.yaml`로 실행하는 개인용 로컬 환경 | 로그인 입력창 대신 `PRIZM 시작하기`를 표시합니다. 처음 누르면 `local@prizm.local` 계정을 만들고, 이후에는 같은 계정을 재사용합니다. |
-| 일반 로그인 | `PRIZM_LOCAL_DEMO_ENABLED=false`인 일반 Spring Boot 실행 | 기존 이메일·비밀번호 로그인 화면을 표시합니다. DB에 등록된 활성 사용자만 로그인할 수 있습니다. |
+| 단계 | 화면과 동작 |
+|---|---|
+| 회원가입 | 이메일과 비밀번호로 활성 `USER` 계정을 만듭니다. JWT나 세션은 생성하지 않습니다. |
+| 로그인 | 가입한 이메일·비밀번호로 기존 JWT 로그인을 수행한 뒤 Career Vault로 이동합니다. |
 
-로컬 보관함도 인증을 끄거나 사용자 ID를 고정하는 방식이 아닙니다. 시작 버튼이
-기존 JWT 발급 절차를 자동화할 뿐이며, 이후 요청에는 동일한 DB 사용자 재검증과
-소유자 범위 제한이 적용됩니다.
-
-현재 공개 회원가입, 이메일 인증, 비밀번호 재설정, refresh token과 OIDC는
-제공하지 않습니다. 기본 Compose는 포트를 `127.0.0.1`에만 열며, 로컬 보관함을
-외부 네트워크에 공개하는 운영 구성으로 사용하지 않습니다. 문서와 계정은
-브라우저가 아니라 PostgreSQL과 Docker volume에 저장됩니다.
+이 회원가입은 자체 호스팅용 최소 기능입니다. 이메일 인증, 비밀번호 재설정,
+refresh token, OIDC와 공개 SaaS 운영 보호 기능은 제공하지 않습니다. 기본 Compose는
+포트를 `127.0.0.1`에만 엽니다. 문서와 계정은 브라우저가 아니라 PostgreSQL과
+Docker volume에 저장됩니다.
 
 ## 최소 실행
 
@@ -78,10 +72,9 @@ node scripts/run-clean-clone-compose.mjs config --quiet
 node scripts/run-clean-clone-compose.mjs up -d --build
 ```
 
-기본 Compose 화면에서는 이메일과 비밀번호를 입력하지 않고 `PRIZM 시작하기`를
-누릅니다. 위 스크립트가 만드는 별도의 `demo@prizm.local` 계정은 자동 검증용이며,
-최초 기동 뒤 bootstrap을 끄고 backend를 다시 만들어야 합니다. 로컬 빠른 시작과
-계정 로그인, 합성 TXT/PDF 업로드→`ACTIVE`→원문 출처 검색, 브라우저 확인과
+기본 Compose 화면에서는 새 계정을 가입한 뒤 로그인합니다. 위 스크립트가 만드는
+별도의 `demo@prizm.local` 계정은 자동 검증용이며, 최초 기동 뒤 bootstrap을 끄고
+backend를 다시 만들어야 합니다. 계정 로그인, 합성 TXT/PDF 업로드→`ACTIVE`→원문 출처 검색, 브라우저 확인과
 종료까지의 정확한 절차는 [로컬 Quickstart](docs/quickstart.md)를 따릅니다.
 PRZ-004에서는 PostgreSQL·pgvector와 호스트 Ollama 기반 전체 흐름을 두 독립
 환경에서 검증했습니다. 독립 감사와 GitHub PR #25의 CI를 통과해 `main`에

@@ -1,6 +1,9 @@
 # PRIZM 현재 구현 현황
 
-> 현재 검증 기준일: 2026-08-02
+> 현재 검증 기준일: 2026-08-05
+>
+> PRZ-007 자체 호스팅 회원가입: `VERIFIED` — `main` `37bd737` 위 worktree에서
+> PostgreSQL·Compose·브라우저와 전체 회귀 검증 통과
 >
 > PRZ-005 검증 source commit: `eab32c870f06237d37048b6b8de1287e5e18ae66`
 >
@@ -31,7 +34,7 @@
 | 구분 | 현재 상태 |
 |---|---|
 | 현재 제품 | Spring Boot 애플리케이션과 React 기반 Career Vault Reference App |
-| 구현됨 | 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, 비동기 색인·복구, pgvector 검색, Career Vault 문서 관리 |
+| 구현됨 | 자체 호스팅 회원가입, 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, 비동기 색인·복구, pgvector 검색, Career Vault 문서 관리 |
 | 현재 단계 | 소스 전용 공개 준비, clean-clone과 실제 OpenSQL 전체 흐름 검증 완료. 다음 후보인 DB 장애복구는 아직 시작하지 않음 |
 | 미구현·미검증 | CareerFact, 근거 기반 portfolio, `/api/v1`, MCP, 독립 Engine 패키지, OpenProxy SQL routing·안전한 인증, OpenHA와 DB 장애 전환 |
 
@@ -42,7 +45,7 @@ Spring Boot 애플리케이션에 주요 기능이 모여 있습니다.
 ## 현재 사용자 흐름
 
 ```text
-로그인
+회원가입 → 로그인
 → 내 문서 목록 확인
 → UTF-8 TXT 또는 텍스트가 포함된 PDF 업로드
 → 원본과 새 문서 버전 저장
@@ -52,8 +55,9 @@ Spring Boot 애플리케이션에 주요 기능이 모여 있습니다.
 ```
 
 새 버전 처리가 실패하면 이전 검색 대상 버전을 유지합니다. 다른 사용자의 문서와
-검색 결과는 이 흐름에 포함하지 않습니다. PRZ-004는 공개 회원가입을
-추가하지 않고, 한 번만 켜는 demo `USER`와 합성 TXT/PDF로 이 흐름을 재현합니다.
+검색 결과는 이 흐름에 포함하지 않습니다. 현재 자체 호스팅 사용자는 일반 `USER`
+계정을 직접 만들 수 있습니다. PRZ-004는 한 번만 켜는 demo `USER`와 합성 TXT/PDF로
+이 흐름을 재현합니다.
 검증 source commit의 두 fresh clone에서 이 흐름을 확인하고 독립 감사와
 GitHub 통합을 완료했습니다.
 
@@ -65,6 +69,8 @@ PRZ-005에서는 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 직�
 
 ### 로그인과 사용자 격리
 
+- 이메일·비밀번호로 활성 일반 `USER`를 만드는 자체 호스팅 회원가입. 성공 응답은
+  JWT를 포함하지 않으며 사용자는 기존 로그인 화면으로 이동
 - 이메일·비밀번호 로그인과 JWT 인증
 - 요청마다 DB에서 사용자 활성 상태·이메일·역할 재확인
 - 사용자별 문서·버전·처리 작업·검색 결과 격리
@@ -99,9 +105,10 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 
 | 대상 | 상태 | 최근 기록 |
 |---|---|---|
-| Backend `test` task | `PASS` | 2026-08-02 source `eab32c8`: 전체 262개, 환경 조건 15개 skip, 실패·오류 0건 |
-| Frontend lint·typecheck·build | `PASS` | 2026-08-02 source `eab32c8`: lint·typecheck·production build 통과. 공식 unit test 명령은 없어 `NOT_RUN` |
-| 기본 integration 회귀 | `PASS` | 2026-08-02 source `eab32c8`: 전체 69개, 환경 조건 3개 skip, 실패·오류 0건. 기본 실행에서 OpenSQL opt-in test skip은 정상 |
+| Backend `test` task | `PASS` | 2026-08-05 PRZ-007 worktree: 전체 268개 중 253 pass, 15 skip, 실패·오류 0건 |
+| Frontend lint·typecheck·build | `PASS` | 2026-08-05 PRZ-007 worktree: lint·typecheck·production build 통과. 공식 unit test 명령은 없어 `NOT_RUN` |
+| 기본 integration 회귀 | `PASS` | 2026-08-05 PRZ-007 worktree: 전체 70개 중 67 pass, 3 skip, 실패·오류 0건. 기본 실행에서 OpenSQL opt-in test skip은 정상 |
+| PRZ-007 자체 호스팅 회원가입 | `VERIFIED` | PostgreSQL signup·BCrypt·활성 `USER`, 기존 login·JWT 보호 API, 두 사용자 격리, local-demo 제거, bootstrap 유지와 `http://localhost:5173` 브라우저 흐름 통과 |
 | Dense 검색 평가 | `HISTORICAL_PASS_NOT_RERUN` | 2026-07-14 합성 기준선 보존 |
 | Docker Compose | `PASS` — PRZ-004 | 2026-08-01 서로 다른 project·port·volume의 두 독립 clone에서 구성·빌드·기동과 demo `USER` 전체 흐름 확인 |
 | Ollama `bge-m3` | `VERIFIED` — PostgreSQL·OpenSQL 범위 구분 | 2026-08-02 Ollama 0.32.3, `bge-m3:latest` digest와 1024차원·0이 아닌 임베딩을 확인. 실제 OpenSQL 직접 `5432` E2E에도 사용 |

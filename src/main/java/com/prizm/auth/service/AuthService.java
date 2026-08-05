@@ -6,7 +6,9 @@ import com.prizm.auth.dto.response.AuthenticatedUserResponse;
 import com.prizm.auth.dto.response.LoginResponse;
 import com.prizm.auth.exception.InvalidCredentialsException;
 import com.prizm.user.entity.UserAccount;
+import com.prizm.user.entity.UserRole;
 import com.prizm.user.repository.UserAccountRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,5 +49,24 @@ public class AuthService {
                 "Bearer",
                 token.expiresInSeconds(),
                 AuthenticatedUserResponse.from(user));
+    }
+
+    @Transactional
+    public void signup(LoginRequest request) {
+        String normalizedEmail = UserAccount.normalizeEmail(request.email());
+        if (userAccountRepository.findByEmail(normalizedEmail).isPresent()) {
+            throw new DataIntegrityViolationException("Email is already registered");
+        }
+
+        String passwordHash = passwordPolicy.encode(request.password());
+        try {
+            userAccountRepository.saveAndFlush(UserAccount.create(
+                    normalizedEmail,
+                    passwordHash,
+                    UserRole.USER));
+        }
+        catch (DataIntegrityViolationException exception) {
+            throw new DataIntegrityViolationException("Email is already registered", exception);
+        }
     }
 }

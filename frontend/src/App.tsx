@@ -10,9 +10,8 @@ import {
 import {
   AuthApiError,
   getCurrentUser,
-  getLocalDemoAvailability,
   login,
-  startLocalSession,
+  signup,
   type CurrentUser,
   type LoginResponse,
 } from './api/authApi'
@@ -141,7 +140,6 @@ function App() {
       ? getStoredCurrentUser()
       : null
   })
-  const [localDemoAvailable, setLocalDemoAvailable] = useState(false)
 
   useEffect(() => {
     const syncPath = () => {
@@ -154,35 +152,6 @@ function App() {
     syncPath()
     window.addEventListener('popstate', syncPath)
     return () => window.removeEventListener('popstate', syncPath)
-  }, [])
-
-  useEffect(() => {
-    let isCurrent = true
-    let retryTimer: number | undefined
-
-    const loadLocalDemoAvailability = () => {
-      getLocalDemoAvailability()
-        .then((response) => {
-          if (isCurrent) {
-            setLocalDemoAvailable(response.available)
-          }
-        })
-        .catch((error) => {
-          const isTransientFailure = !(error instanceof AuthApiError) || error.status >= 500
-          if (isCurrent && isTransientFailure) {
-            retryTimer = window.setTimeout(loadLocalDemoAvailability, 1_000)
-          }
-        })
-    }
-
-    loadLocalDemoAvailability()
-
-    return () => {
-      isCurrent = false
-      if (retryTimer !== undefined) {
-        window.clearTimeout(retryTimer)
-      }
-    }
   }, [])
 
   const navigate = useCallback((nextPath: AppPath) => {
@@ -220,7 +189,14 @@ function App() {
   const handleLogin = (email: string, password: string): Promise<string | null> =>
     establishSession(() => login(email, password))
 
-  const handleLocalStart = (): Promise<string | null> => establishSession(startLocalSession)
+  const handleSignup = async (email: string, password: string): Promise<string | null> => {
+    try {
+      await signup(email, password)
+      return null
+    } catch (error) {
+      return signupErrorMessage(error)
+    }
+  }
 
   const handleLogout = useCallback(() => {
     clearSession()
@@ -241,55 +217,63 @@ function App() {
   }
 
   return (
-    <LoginPage
-      localDemoAvailable={localDemoAvailable}
-      onLogin={handleLogin}
-      onLocalStart={handleLocalStart}
-    />
+    <LoginPage onLogin={handleLogin} onSignup={handleSignup} />
   )
 }
 
 function LoginPage({
-  localDemoAvailable,
   onLogin,
-  onLocalStart,
+  onSignup,
 }: {
-  localDemoAvailable: boolean
   onLogin: (email: string, password: string) => Promise<string | null>
-  onLocalStart: () => Promise<string | null>
+  onSignup: (email: string, password: string) => Promise<string | null>
 }) {
+  const [mode, setMode] = useState<'signup' | 'login'>('signup')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [passwordConfirmation, setPasswordConfirmation] = useState('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (email.trim() === '' || password === '') {
-      setErrorMessage('이메일과 비밀번호를 입력해 주세요.')
+    if (email.trim() === '' || password === '' || (mode === 'signup' && passwordConfirmation === '')) {
+      setErrorMessage(mode === 'signup'
+        ? '이메일, 비밀번호, 비밀번호 확인을 입력해 주세요.'
+        : '이메일과 비밀번호를 입력해 주세요.')
+      return
+    }
+
+    if (mode === 'signup' && password !== passwordConfirmation) {
+      setErrorMessage('비밀번호가 일치하지 않습니다.')
       return
     }
 
     setErrorMessage(null)
     setIsSubmitting(true)
-    const error = await onLogin(email.trim(), password)
+    const error = mode === 'signup'
+      ? await onSignup(email.trim(), password)
+      : await onLogin(email.trim(), password)
     setIsSubmitting(false)
 
     if (error !== null) {
       setErrorMessage(error)
+      return
+    }
+
+    if (mode === 'signup') {
+      setMode('login')
+      setPassword('')
+      setPasswordConfirmation('')
     }
   }
 
-  const handleLocalStart = async () => {
+  const switchMode = () => {
     setErrorMessage(null)
-    setIsSubmitting(true)
-    const error = await onLocalStart()
-    setIsSubmitting(false)
-
-    if (error !== null) {
-      setErrorMessage(error)
-    }
+    setPassword('')
+    setPasswordConfirmation('')
+    setMode((currentMode) => currentMode === 'signup' ? 'login' : 'signup')
   }
 
   return (
@@ -325,33 +309,11 @@ function LoginPage({
       <section className="login-panel" aria-labelledby="login-title">
         <div className="login-heading">
           <p className="eyebrow">CAREER VAULT</p>
-          <h1 id="login-title">{localDemoAvailable ? '내 보관함' : '로그인'}</h1>
-          <p>
-            {localDemoAvailable
-              ? '이 컴퓨터에서 나만의 커리어 문서를 모아 관리하세요.'
-              : '내 커리어 문서를 모아 관리하세요.'}
-          </p>
+          <h1 id="login-title">{mode === 'signup' ? '회원가입' : '로그인'}</h1>
+          <p>{mode === 'signup' ? '일반 계정을 만든 후 로그인하세요.' : '내 커리어 문서를 모아 관리하세요.'}</p>
         </div>
 
-        {localDemoAvailable ? (
-          <div className="local-demo-start">
-            {errorMessage !== null && (
-              <p className="form-error feedback-message" role="alert">
-                {errorMessage}
-              </p>
-            )}
-            <button
-              type="button"
-              className="primary-button button-xlarge"
-              disabled={isSubmitting}
-              aria-busy={isSubmitting}
-              onClick={handleLocalStart}
-            >
-              {isSubmitting ? 'PRIZM을 준비하는 중' : 'PRIZM 시작하기'}
-            </button>
-          </div>
-        ) : (
-          <form className="login-form" onSubmit={handleSubmit} noValidate aria-busy={isSubmitting}>
+        <form className="login-form" onSubmit={handleSubmit} noValidate aria-busy={isSubmitting}>
             <div className="form-field">
               <label htmlFor="email">이메일</label>
               <input
@@ -374,7 +336,7 @@ function LoginPage({
                 id="password"
                 name="password"
                 type="password"
-                autoComplete="current-password"
+                autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
                 placeholder="비밀번호를 입력하세요"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
@@ -383,6 +345,24 @@ function LoginPage({
                 aria-describedby={errorMessage !== null ? 'login-form-error' : undefined}
               />
             </div>
+
+            {mode === 'signup' && (
+              <div className="form-field">
+                <label htmlFor="password-confirmation">비밀번호 확인</label>
+                <input
+                  id="password-confirmation"
+                  name="password-confirmation"
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder="비밀번호를 다시 입력하세요"
+                  value={passwordConfirmation}
+                  onChange={(event) => setPasswordConfirmation(event.target.value)}
+                  disabled={isSubmitting}
+                  aria-invalid={errorMessage !== null}
+                  aria-describedby={errorMessage !== null ? 'login-form-error' : undefined}
+                />
+              </div>
+            )}
 
             {errorMessage !== null && (
               <p id="login-form-error" className="form-error feedback-message" role="alert">
@@ -397,10 +377,20 @@ function LoginPage({
               aria-busy={isSubmitting}
             >
               {isSubmitting && <span className="button-spinner" aria-hidden="true" />}
-              {isSubmitting ? '로그인 중' : '로그인'}
+              {isSubmitting
+                ? (mode === 'signup' ? '가입 중' : '로그인 중')
+                : (mode === 'signup' ? '회원가입' : '로그인')}
+            </button>
+
+            <button
+              type="button"
+              className="secondary-button button-xlarge"
+              disabled={isSubmitting}
+              onClick={switchMode}
+            >
+              {mode === 'signup' ? '이미 계정이 있나요? 로그인' : '계정이 없나요? 회원가입'}
             </button>
           </form>
-        )}
 
         <p className="login-footnote">PRIZM은 등록된 문서에 없는 경험을 만들지 않습니다.</p>
       </section>
@@ -1876,6 +1866,18 @@ function loginErrorMessage(error: unknown): string {
     }
   }
   return '로그인 처리 중 문제가 발생했습니다.'
+}
+
+function signupErrorMessage(error: unknown): string {
+  if (error instanceof AuthApiError) {
+    if (error.status === 409) {
+      return '이미 가입된 이메일입니다.'
+    }
+    if (error.status === 400) {
+      return '이메일과 비밀번호를 확인해 주세요.'
+    }
+  }
+  return '회원가입 처리 중 문제가 발생했습니다.'
 }
 
 function uploadFailureMessage(error: unknown): string {

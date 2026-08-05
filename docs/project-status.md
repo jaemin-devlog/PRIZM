@@ -2,8 +2,10 @@
 
 > 현재 검증 기준일: 2026-08-05
 >
-> PRZ-007 자체 호스팅 회원가입: `VERIFIED` — `main` `37bd737` 위 worktree에서
-> PostgreSQL·Compose·브라우저와 전체 회귀 검증 통과
+> PRZ-007 검증 source commit: `2b8b60069c37eea91e485bffe2c54e62cd2117ab`
+>
+> PRZ-007 GitHub 통합: [PR #33](https://github.com/jaemin-devlog/PRIZM/pull/33),
+> merge commit `f1fb34145a7cb4a8d5025365764c11dac4516527`
 >
 > PRZ-005 검증 source commit: `eab32c870f06237d37048b6b8de1287e5e18ae66`
 >
@@ -105,9 +107,9 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 
 | 대상 | 상태 | 최근 기록 |
 |---|---|---|
-| Backend `test` task | `PASS` | 2026-08-05 PRZ-007 worktree: 전체 268개 중 253 pass, 15 skip, 실패·오류 0건 |
-| Frontend lint·typecheck·build | `PASS` | 2026-08-05 PRZ-007 worktree: lint·typecheck·production build 통과. 공식 unit test 명령은 없어 `NOT_RUN` |
-| 기본 integration 회귀 | `PASS` | 2026-08-05 PRZ-007 worktree: 전체 70개 중 67 pass, 3 skip, 실패·오류 0건. 기본 실행에서 OpenSQL opt-in test skip은 정상 |
+| Backend `test` task | `PASS` | 2026-08-05 source `2b8b600`: 전체 268개 중 253 pass, 15 skip, 실패·오류 0건 |
+| Frontend lint·typecheck·build | `PASS` | 2026-08-05 source `2b8b600`: lint·typecheck·production build 통과. 공식 unit test 명령은 없어 `NOT_RUN` |
+| 기본 integration 회귀 | `PASS` | 2026-08-05 source `2b8b600`: 전체 70개 중 67 pass, 3 skip, 실패·오류 0건. 기본 실행에서 OpenSQL opt-in test skip은 정상 |
 | PRZ-007 자체 호스팅 회원가입 | `VERIFIED` | PostgreSQL signup·BCrypt·활성 `USER`, 기존 login·JWT 보호 API, 두 사용자 격리, local-demo 제거, bootstrap 유지와 `http://localhost:5173` 브라우저 흐름 통과 |
 | Dense 검색 평가 | `HISTORICAL_PASS_NOT_RERUN` | 2026-07-14 합성 기준선 보존 |
 | Docker Compose | `PASS` — PRZ-004 | 2026-08-01 서로 다른 project·port·volume의 두 독립 clone에서 구성·빌드·기동과 demo `USER` 전체 흐름 확인 |

@@ -5,9 +5,10 @@
 `VERIFIED`
 
 - 실행일: `2026-08-05`
-- 기준: `main` `37bd73756d677963ba26685a27041ef190beb3f7` 위 uncommitted worktree
+- 로컬 검증 기준: `main` `37bd73756d677963ba26685a27041ef190beb3f7` 위 uncommitted worktree
+- 통합 source: `2b8b60069c37eea91e485bffe2c54e62cd2117ab`
 - GitHub Issue: `NOT_CREATED` — 이 작업을 위해 별도 Issue를 만들지 않음
-- GitHub 통합: commit `909d5ce`, PR [#33](https://github.com/jaemin-devlog/PRIZM/pull/33) `OPEN`, review 없음, merge `NOT_RUN`
+- GitHub 통합: PR [#33](https://github.com/jaemin-devlog/PRIZM/pull/33) `MERGED`, merge commit `f1fb34145a7cb4a8d5025365764c11dac4516527`, review 없음
 - Flyway migration·dependency 변경: 없음
 
 Docker Compose의 PostgreSQL 16.14에서 Flyway V1~V13, 회원가입·로그인·보호 API와
@@ -36,7 +37,7 @@ Docker Compose의 PostgreSQL 16.14에서 Flyway V1~V13, 회원가입·로그인�
 | 브라우저 | 인앱 브라우저에서 `http://localhost:5173` 접속 후 회원가입→로그인→보관함→새로고침 | `PASS` — 가입 후 로그인 화면, 자동 로그인 없음, 로그인과 인증 유지 성공, console error/warn 0 |
 | 브라우저 HTTP | frontend Nginx access log 조회 | `PASS` — 공식 흐름의 실패 응답 0건, local-demo 요청 0건. 브라우저 network panel 직접 조회는 도구 제약으로 `NOT_RUN` |
 | local-demo 제거 | 유효한 일반 `USER` JWT로 두 경로 요청 후 Security·controller source 대조 | `PASS` — 두 요청 모두 deny-all `403`; `AuthController` 매핑은 login·signup만 존재해 제거 확인 |
-| GitHub PR | `gh pr view --json number,title,url,state,isDraft,mergeable,mergeStateStatus,headRefName,baseRefName,headRefOid,statusCheckRollup,reviews,reviewDecision` | `PASS` — PR #33, head `909d5ce`, `OPEN`·`MERGEABLE`·`CLEAN`, check 6건 성공, review 없음, merge `NOT_RUN` |
+| GitHub PR | `gh pr view 33 --json number,title,url,state,mergedAt,mergeCommit,headRefName,headRefOid,baseRefName,statusCheckRollup,reviews,reviewDecision` | `PASS` — PR #33, head `2b8b600`, merge `f1fb341`, check 6건 성공, review 없음 |
 | 최종 whitespace | `git diff --check` | `PASS` |
 | OpenSQL·OpenProxy·OpenHA | 실행하지 않음 | `NOT_RUN` |
 
@@ -65,4 +66,4 @@ Docker Compose의 PostgreSQL 16.14에서 Flyway V1~V13, 회원가입·로그인�
 - OpenSQL·OpenProxy·OpenHA는 PRZ-007 범위가 아니므로 `NOT_RUN`이다.
 - 검증용 고유 사용자와 TXT 문서는 기존 영구 PostgreSQL volume에 남겼다. 안전한
   production 삭제 API가 없어 DB를 직접 수정하지 않았고 volume도 삭제하지 않았다.
-- PR #33은 merge 전이며 review는 없어 `REVIEW_NOT_AVAILABLE_SOLO`다. 이는 GitHub review 근거가 아니다.
+- PR #33은 merge됐으며 review는 없어 `REVIEW_NOT_AVAILABLE_SOLO`다. 이는 GitHub review 근거가 아니다.

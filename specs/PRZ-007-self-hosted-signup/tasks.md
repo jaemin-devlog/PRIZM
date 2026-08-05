@@ -1,6 +1,6 @@
 # PRZ-007 자체 호스팅 회원가입 — Tasks
 
-최종 상태: `VERIFIED` — `main` `37bd737` 위 worktree, 2026-08-05
+최종 상태: `VERIFIED` — source `2b8b600`, merge `f1fb341`, 2026-08-05
 
 ## 구현
 
@@ -18,4 +18,4 @@
 - [x] Docker Compose runtime과 `http://localhost:5173` 브라우저 흐름을 실행한다.
 - [x] 제거 문자열, 파일 상한, 보호 경로와 최종 diff를 감사한다.
 - [x] bootstrap 도구 회귀와 OSS·Markdown·SBOM 검증을 실행한다.
-- [x] commit·push·PR을 수행한다. — commit `909d5ce`, PR #33 `OPEN`, GitHub check 6건 `PASS`; merge 대기
+- [x] commit·push·PR·merge를 수행한다. — source `2b8b600`, PR #33, check 6건 `PASS`, merge `f1fb341`

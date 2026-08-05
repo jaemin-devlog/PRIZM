@@ -5,6 +5,7 @@
 ## 데이터 위치와 형식
 
 - 추적 가능한 합성 예제: `src/test/resources/search-evaluation/sample/`
+- PRZ-008 Dataset v2: `src/test/resources/search-evaluation/v2/`
 - 실제 개인 평가 데이터: `local/search-evaluation/<dataset>/`
 - 실행 결과 기본 위치: `local/search-evaluation/results/`
 
@@ -25,6 +26,17 @@
 
 `noEvidence=true` 질문에는 relevance 1 또는 2를 넣을 수 없습니다. 같은 근거가 overlap 청크 여러 개에 포함되면 같은 `evidenceGroupId`로 중복률을 측정합니다.
 
+Dataset v2는 `schemaVersion: 2`를 명시하고 다음 메타데이터를 추가합니다.
+
+- 문서: `split`, anchor별 `sourceFactId`
+- 질문: `fixtureIds`, `questionGroupId`, `ownerScenario`, `versionScenario`
+- PDF 직접 근거 질문: `goldPage`
+
+v2 loader는 문서·`evidenceGroupId`·`questionGroupId`·`sourceFactId`가 TUNING과
+TEST에 걸쳐 재사용되는 경우와 정규화한 동일 질문을 거부합니다. 또한 owner·과거
+version 경계 질문은 `noEvidence=true`여야 하며, PDF 직접 근거의 gold page가 실제
+anchor 위치와 일치해야 합니다.
+
 추적되는 파일럿 데이터는 가상 문서 11개와 질문 30개로 구성됩니다. 질문 구성은 기술·도구 8개, 문제 해결 6개, 협업·역할 4개, 수치·고유 표현 6개, 실제 근거 없음 6개입니다. 기술명만 같은 문서와 수치가 다른 문서를 포함한 hard negative 질문은 11개입니다.
 
 `split`은 다음 용도로만 사용합니다.
@@ -34,6 +46,18 @@
 
 동일한 정규화 질문은 두 split에 들어갈 수 없습니다. 의미가 같은 패러프레이즈와 같은 원문 근거를 묻는 질문이 split 사이에 반복되지 않는지도 파일럿 작성 시 수동 검토했습니다. `TEST` 결과를 보고 임계값이나 라벨을 다시 맞추지 않습니다.
 양성 expected evidence(`relevance` 1 또는 2)는 split 사이에 반복될 수 없으며 로더가 이를 실행 전에 차단합니다. `relevance` 0 hard negative의 반복은 허용합니다.
+
+## PRZ-008 Dataset v2
+
+`prizm-search-evidence-synthetic-v2`는 기존 파일럿을 재라벨링하지 않고 별도로 추가한
+합성 Dataset입니다. TUNING 10문항과 TEST 10문항이며, 각 split은 서로 다른 문서와
+원문 사실을 사용합니다. 일반·유사 주제 무근거, 없는 회사·자격증·기술, 바뀐 역할·수치,
+다른 사용자 문서, 과거 version, 검색 가능한 문서가 없는 사용자, 직접 근거,
+paraphrase, 날짜·숫자·고유명사, PDF gold page와 overlap 중복 사례를 포함합니다.
+
+기존 `sample` Dataset 30문항과 아래 과거 기준선은 변경하지 않았습니다. Dataset v2의
+실제 `searchEvaluation` 실행, Ollama·PostgreSQL 측정과 threshold 분석은 Batch 1A
+범위가 아니므로 `NOT_RUN`입니다.
 
 ## 실행
 

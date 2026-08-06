@@ -2,7 +2,8 @@
 
 ## 상태
 
-`PLANNED` — 0단계 Spec 검토 대기. 제품 구현은 시작하지 않았다.
+`IN_PROGRESS` — Batch 2A 제품 적용 계약을 확정했다. 제품 구현과 TEST는
+`NOT_RUN`이다.
 
 이 문서에서 `CONFIRMED`는 source·test·migration으로 확인한 사실,
 `OPEN_DECISION`은 후속 단계에서 측정 후 확정할 사항을 뜻한다.
@@ -86,9 +87,37 @@ version과 TEST 정책을 다시 고정한다. 조용히 재라벨링한 뒤 같
 세 상태는 정상적인 검색 결과이므로 `200`이 적합하다. 잘못된 질의는 `400`,
 인증·권한 문제는 `401`·`403`, 임베딩·DB 장애는 기존 `5xx` 계약을 유지한다.
 
-후속 API는 상태와 결과 배열을 함께 반환하는 방향으로 설계한다. 구체 필드명,
-기존 단일 검색 404와 Career Evidence 배열 응답의 이행 방식, `distance`·`score`
-공개 여부와 검색 profile version 노출 여부는 2단계 `OPEN_DECISION`이다.
+### 제품 API 호환 계약
+
+기존 client를 깨지 않도록 현재 API를 제거하거나 응답 형태를 바꾸지 않는다.
+
+| API | 제품 적용 후 계약 |
+|---|---|
+| `POST /api/search` | 단일 결과와 검색 가능한 청크가 없을 때의 `404 SEARCH_NO_RESULT`를 그대로 유지한다. PRZ-008 profile 적용 대상이 아니다. |
+| `POST /api/career-evidence/search` | 최대 5개의 기존 JSON 배열을 유지한다. 새 profile을 사용하더라도 세 상태의 `results`만 반환해 기존 client와 호환한다. |
+| `POST /api/v2/career-evidence/search` | 상태를 구분해야 하는 새 client용 API다. `state`와 `results`를 반환한다. |
+
+v2의 정상 응답은 다음 두 필드만 필수 계약으로 고정한다.
+
+```json
+{
+  "state": "NO_EVIDENCE",
+  "results": []
+}
+```
+
+- `state`는 `EVIDENCE_FOUND`, `NO_EVIDENCE`, `NO_SEARCHABLE_DOCUMENTS` 중 하나다.
+- `EVIDENCE_FOUND`의 `results`는 기존 `CareerEvidenceSearchResponse` 필드를
+  유지하며 1~5개다. 나머지 두 상태의 `results`는 빈 배열이다.
+- `distance`와 `score`는 기존 결과 호환을 위해 유지하지만 확률·정확도·신뢰도로
+  설명하지 않는다.
+- profile 이름, threshold와 내부 판정 신호는 응답에 노출하지 않는다.
+- 정상 세 상태는 `200`, 잘못된 질의는 `400`, 인증·권한은 `401`·`403`,
+  임베딩·DB 장애는 기존 `5xx`를 유지한다.
+
+Career Evidence v1과 v2는 같은 선택 profile을 사용한다. v1은 결과 배열만 소비하고,
+v2는 상태까지 소비한다. 프론트엔드는 제품 적용 Batch에서 v2로 이행하되 v1 제거
+시점은 PRZ-008 범위에서 정하지 않는다.
 
 ### 평가 정책과 지표
 
@@ -116,6 +145,71 @@ version과 TEST 정책을 다시 고정한다. 조용히 재라벨링한 뒤 같
 기존 하네스에는 Direct MRR@5, 거부·오거부, top-1 직접 정확도, page 정확도,
 결과 수와 분리 지연이 없다. 1단계에서 순위를 바꾸기 전에 이 측정을 교정한다.
 
+#### Dataset v2.2 TUNING Gate
+
+score 단독 threshold는 근거 질문과 무근거 질문의 분포가 겹쳐 채택하지 않는다.
+제품 변경 전 평가 전용 profile에서 다음 순서를 검증한다.
+
+1. exact cosine 상위 20개 후보를 유지한다.
+2. 같은 PDF 페이지와 고정 overlap으로 본문이 반복된 인접 TXT 청크를 한 근거로
+   축약한다.
+3. 고유 식별자·수치·핵심어 일치와 긍정 주장에 대한 명시적 부정 표현을 score와
+   별도 신호로 사용한다.
+4. 각 후보가 신호를 통과해야 하며, 강한 식별자 또는 수치와 핵심어가 함께 반복되는
+   요약 근거는 출처 문서가 달라도 한 결과로 축약한다.
+5. 남은 근거만 최대 5개를 `EVIDENCE_FOUND`로 반환한다.
+
+`source-dedup-evidence-signals-v1`은 TUNING 전용 profile이며 제품 threshold나 제품
+동작이 아니다. 기존 TEST 10문항은 제품 적용 계약을 별도로 승인할 때까지
+실행·재라벨링하지 않는다.
+
+TUNING 15문항 Gate는 직접 근거 top-1 `8/8`, 오타 질문 top-1 `2/2`, 중복 결과
+비율 `0`, 무근거 질문 거부율 `1.0`, 근거 질문 오거부율 `0`이다. 이 수치는 작은
+합성 TUNING 집합의 통과 조건일 뿐 일반 검색 품질이나 최종 TEST 성능을 뜻하지
+않는다.
+
+### 제품 profile 설정 계약
+
+- Spring property는 `prizm.search.profile`, 환경변수는
+  `PRIZM_SEARCH_PROFILE`로 고정한다.
+- 허용값은 `legacy-dense-v1`과 `source-dedup-evidence-signals-v1`이다. 알 수 없는
+  값은 애플리케이션 시작 시 실패시킨다.
+- 최종 TEST와 실제 OpenSQL direct `5432` Gate 전 기본값은
+  `legacy-dense-v1`이다. 새 profile은 명시적으로 선택한 환경에서만 동작한다.
+- 후보 수 20, 최종 결과 수 5와 판정 신호는 versioned profile 내부의 고정값으로
+  둔다. 개별 threshold나 신호를 환경변수로 분해하지 않는다.
+- rollback은 profile 값을 `legacy-dense-v1`로 되돌리는 것이다. migration,
+  재색인, 데이터·권한 변경은 필요하지 않아야 한다.
+
+### 제품 적용 검증 계약
+
+제품 구현은 다음 Gate를 모두 통과해야 한다.
+
+| 범위 | 필수 검증 |
+|---|---|
+| unit·service | profile 신호와 중복 축약, 세 상태, 최대 5건, owner·`ACTIVE` 경계, 기존 `/api/search` 무변경 |
+| controller·API | v1 배열 호환, v2 세 상태와 빈 배열, 기존 `400`·`401`·`403`·`5xx`, 내부 판정 신호 미노출 |
+| frontend | 세 상태별 안내, 인증·server 오류 분리, score 비확률 표현, lint·typecheck·build |
+| PostgreSQL·pgvector | 후보 20건 exact cosine, owner·version 격리, 근거·무근거·검색 문서 없음과 중복 축약 |
+| OpenSQL | direct `5432` 합성 TXT/PDF API·UI에서 동일 상태와 owner 격리를 별도 검증 |
+| 회귀 | backend 전체 test, frontend 공식 검사, OSS·SBOM·문서·민감정보 검사 |
+
+설정과 구현을 고정한 뒤 TEST는 기존 profile과 새 profile을 한 번의 최종 비교에서만
+실행한다. 실패 결과를 보고 TEST에 맞춰 profile을 다시 조정하지 않는다.
+
+| TEST Gate | 통과 조건 |
+|---|---|
+| Direct Recall@20 | `1.0` |
+| top-1 직접 근거 정확도 | `1.0` |
+| 무관 질문 거부율·근거 질문 오거부율 | 각각 `1.0`·`0` |
+| 중복 결과 비율·PDF page 인용 정확도 | 각각 `0`·`1.0` |
+| Direct MRR@5·@20 | 같은 실행의 `legacy-dense-v1` 이상 |
+| nDCG@5 | 같은 실행의 legacy 결과보다 `0.02`를 넘게 낮아지지 않음 |
+| total p95 | 같은 실행의 legacy 결과 대비 20% 초과 증가하지 않음 |
+
+필수 Gate가 실패하거나 OpenSQL 검증이 `NOT_RUN`이면 새 profile은 기본값으로
+승격하지 않는다. 이 계약 확정 단계에서는 제품 source와 TEST를 변경·실행하지 않는다.
+
 ## 요구사항
 
 | ID | 요구사항 |
@@ -141,8 +235,10 @@ version과 TEST 정책을 다시 고정한다. 조용히 재라벨링한 뒤 같
 ## 제외 범위
 
 HNSW, IVFFlat, FTS, RRF, hybrid search, OCR, 다단 PDF layout 복원, page 경계를
-넘는 청크, `document_chunk_spans`, reranker, MMR, Worker 부분 저장·checkpoint·
-병렬화, 별도 vector DB와 LLM 답변 생성은 필수 계획에 포함하지 않는다.
+넘는 청크, `document_chunk_spans`, 별도 모델을 호출하는 reranker, MMR, Worker
+부분 저장·checkpoint·병렬화, 별도 vector DB와 LLM 답변 생성은 필수 계획에
+포함하지 않는다. 1단계의 후보 축약과 결정 신호는 저장된 결과의 출처·본문과
+질문만 사용하는 평가 전용 후처리로 제한한다.
 
 0단계에서는 제품·test source, API DTO, UI, threshold, 청킹, Ollama·PDF 처리,
 migration, dependency, 기존 문서 재색인을 변경하지 않는다.

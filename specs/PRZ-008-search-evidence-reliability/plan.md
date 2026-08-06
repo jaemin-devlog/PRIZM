@@ -2,7 +2,8 @@
 
 ## 상태와 접근
 
-`PLANNED` — 현재는 0단계 문서 검토 범위다.
+`IN_PROGRESS` — Batch 2A 제품 적용 계약을 확정했으며, 다음 단계는 opt-in 제품
+구현과 계약 검증이다.
 
 측정 계약, 근거 판정, UI, 청킹 실험과 색인 최적화를 순서대로 분리한다. 각
 단계는 최신 `main`에서 시작하는 별도 branch·PR이며, 이전 Gate를 통과하지
@@ -29,29 +30,49 @@ PRZ-001의 dense 평가 harness를 출발점으로 사용하되, 제품 순위�
 | 구분 | 계획 |
 |---|---|
 | 입력 | 승인된 0단계, 현재 dense 순위와 고정 dataset |
-| 산출물 | 실패 fixture, 필수 지표·누출 검증, PostgreSQL 기준선 Evidence |
+| 산출물 | 실패 fixture, 필수 지표·누출 검증, PostgreSQL 기준선과 TUNING 후보 profile Evidence |
 | 변경 가능 | `src/searchEvaluation`, 관련 test·fixture와 평가 문서 |
 | 변경 금지 | 제품 검색·API·UI·청킹·migration·dependency·threshold |
-| Gate | split·evidence group 누출 0건, 지표 test와 현재 기준선 재현 |
+| Gate | split·evidence group 누출 0건, 지표 test와 현재 기준선 재현, TUNING 15문항의 top-1·오타·중복·거부 Gate 통과 |
 | 중단 | 원문과 라벨을 연결할 수 없거나 측정에 제품 변경이 필요함 |
 
 Threshold 후보와 수치 Gate는 TUNING으로만 정한다. TEST는 설정 고정 뒤 최종
 비교에만 사용한다. OpenSQL은 실제 direct `5432` 환경에서 실행한 경우만 별도
 결과로 기록한다.
 
-### 2. 근거 없음 판정
+score 단독 threshold가 분리되지 않았으므로, 같은 출처 위치·본문 overlap과 강한
+식별자·수치로 연결된 반복 요약 근거를 먼저 축약한다. 각 후보에는 고유 식별자·수치·
+핵심어·부정 표현을 별도 결정 신호로 사용하는 평가 profile을 TUNING에서만 검증한다.
+이 profile의 제품 적용 계약은 2A에서 고정했다. 제품 구현과 TEST는 아직 실행하지 않는다.
+
+### 2A. 제품 적용 계약 확정
 
 | 구분 | 계획 |
 |---|---|
-| 입력 | 1단계 기준선·TUNING 분포·수치 Gate, API 호환 전략 |
-| 산출물 | 세 상태 판정, API 계약·test, 검색 profile Evidence |
+| 입력 | `source-dedup-evidence-signals-v1` TUNING Gate, 현재 API·frontend·설정·test 계약 |
+| 산출물 | 호환 API, 세 상태 응답, versioned profile 설정, rollback과 TEST Gate |
+| 변경 가능 | PRZ-008 Spec·Plan·Tasks |
+| 변경 금지 | 제품·test source, Dataset·TEST, migration·dependency·DB·runtime |
+| Gate | v1 호환, v2 응답, 기본 legacy profile, 검증·승격 조건의 모순 없음 |
+| 중단 | 기존 client를 깨지 않고 세 상태를 표현할 방법이 없거나 TEST 전 수치 조정이 필요함 |
+
+기존 `/api/search`와 Career Evidence 배열은 유지하고, 세 상태가 필요한 client에는
+`/api/v2/career-evidence/search`를 추가한다. profile은 하나의 versioned 설정으로
+선택하며, TEST와 OpenSQL Gate 전에는 legacy 기본값을 유지한다.
+
+### 2B. 근거 없음 판정 제품 적용
+
+| 구분 | 계획 |
+|---|---|
+| 입력 | 2A에서 고정한 API·설정·검증 계약과 1단계 TUNING profile |
+| 산출물 | 세 상태 판정, v2 API·v1 adapter, profile 설정과 제품 test Evidence |
 | 변경 가능 | 검색 service·repository·DTO·controller와 관련 test·문서 |
 | 변경 금지 | 청킹·색인·PDF·migration·frontend design, owner·ACTIVE 경계 |
 | Gate | 거부·오거부 Gate, owner·past-version test, 기존 장애 5xx 유지 |
 | 중단 | 허용 오거부율을 지키는 판정 구간이 없거나 환경별 재현 실패 |
 
-정상 질의 결과는 `200`과 상태·결과 배열로 표현하는 방향을 우선한다. 기존
-404와 raw 배열의 이행 방식은 구현 전에 확정한다.
+정상 질의 결과는 v2에서 `200`과 `state`·`results`로 표현한다. 기존 단일 검색의
+404와 Career Evidence raw 배열은 호환 경로로 유지한다.
 
 ### 3. 검색 UI 신뢰성 개선
 
@@ -162,8 +183,8 @@ Threshold 후보와 수치 Gate는 TUNING으로만 정한다. TEST는 설정 고
 
 ## 다음 단계 전 열린 결정
 
-- 1단계: owner·version·PDF fixture, 새 dataset version과 latency 측정 지점
-- 2단계: threshold, 후보 수, profile version, API 이행과 score 공개 정책
 - 4B 이후: 기존 문서 재색인의 필요성·비용·rollback
 
-수치 Gate는 1단계 TUNING 결과 전에는 확정하지 않는다.
+2A에서 API 이행, profile 설정과 TEST Gate를 고정했다. 제품 구현 중 이 계약을
+바꿔야 한다면 TEST 실행 전에 별도 Spec 검토로 돌아가며, TEST 결과로 수치를
+재조정하지 않는다.

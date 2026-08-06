@@ -1,6 +1,6 @@
 # PRZ-008 작업 목록
 
-> 현재 상태: 검색 개선 Batch 1A `BATCH_1A_READY_FOR_REVIEW`
+> 현재 상태: 검색 개선 Batch 1B `BATCH_1B_READY_FOR_REVIEW`
 
 | ID | 작업 | 최종 상태 | 결과 문서 |
 |---|---|---|---|
@@ -14,5 +14,10 @@
 | `S1A-02` | TUNING·TEST 문서·근거·질문 그룹 누출 validation 추가 | `DONE` | [평가 문서](../../docs/evaluation/search-evaluation.md) |
 | `S1A-03` | owner·version·PDF gold page 라벨 불변식 추가 | `DONE` | [평가 문서](../../docs/evaluation/search-evaluation.md) |
 | `S1A-04` | Dataset v2 loader와 의도적 실패 fixture 검증 | `DONE` | [평가 문서](../../docs/evaluation/search-evaluation.md) |
+| `S1B-01` | Precision@5·Direct MRR@5·@20·group 중복 nDCG 계산 계약 교정 | `DONE` | [평가 문서](../../docs/evaluation/search-evaluation.md) |
+| `S1B-02` | 거부·오거부·no-searchable-documents·top-1·PDF page 지표 추가 | `DONE` | [평가 문서](../../docs/evaluation/search-evaluation.md) |
+| `S1B-03` | 사용자 반환 수·후보 수와 total·embedding·DB 지연 분리 | `DONE` | [평가 문서](../../docs/evaluation/search-evaluation.md) |
+| `S1B-04` | 현재 제품·평가용 threshold profile을 분리한 보고서 계약과 경계 테스트 추가 | `DONE` | [평가 문서](../../docs/evaluation/search-evaluation.md) |
 
-Batch 1A 검증과 감사 통과 전에는 지표 계산·threshold 분석·실제 평가를 시작하지 않는다.
+Dataset v2 실제 평가와 threshold 분석은 `NOT_RUN`이다. Batch 1B 검토 전에는 다음
+Batch를 시작하지 않는다.

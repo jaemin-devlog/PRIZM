@@ -2,6 +2,7 @@ package com.prizm.search.evaluation;
 
 import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.entity.DocumentType;
+import com.prizm.ingestion.entity.ChunkSourceType;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +45,17 @@ public final class SearchEvaluationData {
         ACTIVE,
         PAST_VERSION_ONLY,
         NO_ACTIVE_VERSION
+    }
+
+    public enum SearchState {
+        EVIDENCE_FOUND,
+        NO_EVIDENCE,
+        NO_SEARCHABLE_DOCUMENTS
+    }
+
+    public enum EvaluationProfileKind {
+        CURRENT_PRODUCT,
+        EVALUATION_THRESHOLD
     }
 
     public record Corpus(String datasetId, Integer schemaVersion, List<FixtureDocument> documents) {
@@ -100,6 +112,8 @@ public final class SearchEvaluationData {
             long chunkId,
             String fixtureChunkId,
             List<String> fixtureEvidenceIds,
+            ChunkSourceType sourceType,
+            int sourceIndex,
             int relevance,
             String evidenceGroupId,
             double score,
@@ -119,7 +133,38 @@ public final class SearchEvaluationData {
             Double top1Distance,
             boolean duplicateEvidence,
             long searchTimeMillis,
+            long embeddingTimeMillis,
+            long dbSearchTimeMillis,
+            SearchState searchState,
+            Integer goldPage,
             List<CandidateResult> candidates) {
+    }
+
+    public record CountDistribution(
+            int questionCount,
+            int minimum,
+            double average,
+            int maximum) {
+    }
+
+    public record LatencyDistribution(
+            int sampleCount,
+            double averageMillis,
+            long p50Millis,
+            long p95Millis) {
+    }
+
+    public record DecisionMetrics(
+            int noEvidenceQuestionCount,
+            double noEvidenceRejectionRate,
+            int evidenceQuestionCount,
+            double falseRejectionRate,
+            int noSearchableDocumentsQuestionCount,
+            double noSearchableDocumentsAccuracy,
+            int directEvidenceQuestionCount,
+            double top1DirectEvidenceAccuracy,
+            int pdfEvidenceQuestionCount,
+            double pdfPageCitationAccuracy) {
     }
 
     public record ScoreDistribution(
@@ -139,12 +184,19 @@ public final class SearchEvaluationData {
             double precisionAt5,
             double directPrecisionAt5,
             double directMrrAt20,
+            double directMrrAt5,
             double ndcgAt5,
             double duplicateResultRatio,
             double averageSearchTimeMillis,
             long p95SearchTimeMillis,
             ScoreDistribution evidenceScoreDistribution,
-            ScoreDistribution noEvidenceScoreDistribution) {
+            ScoreDistribution noEvidenceScoreDistribution,
+            DecisionMetrics decisionMetrics,
+            CountDistribution userResultCountDistribution,
+            CountDistribution candidateCountDistribution,
+            LatencyDistribution totalLatency,
+            LatencyDistribution embeddingLatency,
+            LatencyDistribution dbSearchLatency) {
     }
 
     public record Breakdown(
@@ -153,9 +205,13 @@ public final class SearchEvaluationData {
             Map<Category, Summary> categories) {
     }
 
+    public record EvaluationProfile(String profileId, EvaluationProfileKind kind) {
+    }
+
     public record Report(
             String generatedAt,
             String datasetId,
+            EvaluationProfile profile,
             Breakdown metrics,
             List<QuestionResult> questions) {
     }

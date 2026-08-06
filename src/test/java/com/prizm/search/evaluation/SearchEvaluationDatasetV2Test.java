@@ -13,7 +13,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.EnumSet;
+import java.util.HexFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -38,12 +41,12 @@ class SearchEvaluationDatasetV2Test {
     void loadsVersionTwoWithRequiredScenariosAndDisjointSplits() {
         Dataset dataset = loader.load(DATASET_V2);
 
-        assertThat(dataset.corpus().datasetId()).isEqualTo("prizm-search-evidence-synthetic-v2");
+        assertThat(dataset.corpus().datasetId()).isEqualTo("prizm-search-evidence-synthetic-v2.2");
         assertThat(dataset.corpus().schemaVersion()).isEqualTo(2);
-        assertThat(dataset.questions()).hasSize(20);
+        assertThat(dataset.questions()).hasSize(25);
         assertThat(dataset.questions().stream().collect(Collectors.groupingBy(
                 Question::split, Collectors.counting())))
-                .containsEntry(Split.TUNING, 10L)
+                .containsEntry(Split.TUNING, 15L)
                 .containsEntry(Split.TEST, 10L);
         for (Split split : Split.values()) {
             assertThat(dataset.questions().stream()
@@ -93,6 +96,70 @@ class SearchEvaluationDatasetV2Test {
                 .split(overlapDocument.pages().get(0).text()))
                 .filteredOn(chunk -> chunk.content().contains(anchor))
                 .hasSize(2);
+    }
+
+    @Test
+    void reproducesPortfolioResumeTypoDuplicatePageAndNoEvidenceCasesInTuningOnly() {
+        Dataset dataset = loader.load(DATASET_V2);
+        Set<String> reproductionQuestionIds = Set.of(
+                "v2-1-t-match-direct",
+                "v2-1-t-match-typo",
+                "v2-1-t-match-duplicate-page",
+                "v2-1-t-notification-typo",
+                "v2-1-t-no-evidence-kafka");
+
+        assertThat(dataset.questions())
+                .filteredOn(question -> reproductionQuestionIds.contains(question.questionId()))
+                .hasSize(5)
+                .allMatch(question -> question.split() == Split.TUNING);
+        assertThat(dataset.questions())
+                .filteredOn(question -> question.questionId().equals("v2-1-t-no-evidence-kafka"))
+                .allMatch(Question::noEvidence);
+        assertThat(dataset.questions())
+                .filteredOn(question -> question.questionId().equals("v2-1-t-match-typo")
+                        || question.questionId().equals("v2-1-t-notification-typo"))
+                .extracting(Question::category)
+                .containsOnly(Category.PARAPHRASE);
+
+        SearchEvaluationData.FixtureDocument portfolio = dataset.corpus().documents().stream()
+                .filter(document -> document.fixtureId().equals("tuning-synthetic-backend-portfolio"))
+                .findFirst()
+                .orElseThrow();
+        String matchAnchor = portfolio.evidenceAnchors().stream()
+                .filter(anchor -> anchor.fixtureEvidenceId().equals("t-fr-portfolio-match-unique"))
+                .findFirst()
+                .orElseThrow()
+                .anchorText();
+        assertThat(new TextChunker(new IngestionProperties())
+                .split(portfolio.pages().get(1).text()))
+                .filteredOn(chunk -> chunk.content().contains(matchAnchor))
+                .as("same PDF page evidence repeated by the current 800/120 overlap")
+                .hasSize(2);
+
+        String truncatedLockAnchor = portfolio.evidenceAnchors().stream()
+                .filter(anchor -> anchor.fixtureEvidenceId().equals("t-fr-portfolio-match-lock-overlap"))
+                .findFirst()
+                .orElseThrow()
+                .anchorText();
+        assertThat(new TextChunker(new IngestionProperties())
+                .split(portfolio.pages().get(1).text()))
+                .filteredOn(chunk -> chunk.content().contains(truncatedLockAnchor))
+                .as("the overlap fragment remains direct DB-lock evidence in both chunks")
+                .hasSize(2);
+    }
+
+    @Test
+    void preservesTheFrozenTestQuestionsByteForByte() throws IOException, NoSuchAlgorithmException {
+        String testQuestions = Files.readAllLines(
+                        DATASET_V2.resolve(SearchEvaluationDatasetLoader.QUESTIONS_FILE),
+                        StandardCharsets.UTF_8).stream()
+                .filter(line -> line.contains("\"split\":\"TEST\""))
+                .collect(Collectors.joining("\n", "", "\n"));
+
+        byte[] digest = MessageDigest.getInstance("SHA-256")
+                .digest(testQuestions.getBytes(StandardCharsets.UTF_8));
+        assertThat(HexFormat.of().formatHex(digest))
+                .isEqualTo("6eeeffed3a93b53edbc474e8a57f2eba6b627c6f4358cbafdc7b2f0b2b29fce9");
     }
 
     @Test

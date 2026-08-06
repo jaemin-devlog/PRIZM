@@ -55,7 +55,8 @@ public final class SearchEvaluationData {
 
     public enum EvaluationProfileKind {
         CURRENT_PRODUCT,
-        EVALUATION_THRESHOLD
+        EVALUATION_THRESHOLD,
+        EVALUATION_COMPOSITE
     }
 
     public record Corpus(String datasetId, Integer schemaVersion, List<FixtureDocument> documents) {

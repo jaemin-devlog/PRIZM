@@ -186,6 +186,41 @@ class SearchEvaluationMetricsTest {
     }
 
     @Test
+    void calculatesReturnedRankingMetricsFromActualReturnedChunkIds() {
+        List<CandidateResult> candidates = List.of(
+                candidate(1, 0, "irrelevant"),
+                candidate(2, 2, "direct"),
+                candidate(3, 2, "direct"));
+        QuestionResult reranked = new QuestionResult(
+                "q-reranked",
+                "합성 재정렬 질문",
+                false,
+                Split.TUNING,
+                Category.DIRECT_EVIDENCE,
+                List.of(expected("direct", 2, "direct")),
+                List.of(2L),
+                List.of(2),
+                candidates.get(1).score(),
+                candidates.get(1).distance(),
+                false,
+                10L,
+                3L,
+                5L,
+                SearchState.EVIDENCE_FOUND,
+                null,
+                candidates);
+
+        Summary summary = metrics.calculate(List.of(reranked));
+
+        assertThat(summary.directMrrAt5()).isEqualTo(1.0d);
+        assertThat(summary.directMrrAt20()).isEqualTo(0.5d);
+        assertThat(summary.decisionMetrics().top1DirectEvidenceAccuracy()).isEqualTo(1.0d);
+        assertThat(summary.precisionAt5()).isEqualTo(0.2d);
+        assertThat(summary.duplicateResultRatio()).isZero();
+        assertThat(summary.candidateCountDistribution().maximum()).isEqualTo(3);
+    }
+
+    @Test
     void returnsZeroDuplicateRatioForEmptyResults() {
         QuestionResult result = result(List.of(expected("direct", 2, "direct-group")), List.of());
 
@@ -433,7 +468,7 @@ class SearchEvaluationMetricsTest {
                 Split.TEST,
                 Category.NO_EVIDENCE,
                 List.of(),
-                List.of(2L),
+                List.of(1L),
                 List.of(0),
                 0.4d,
                 0.6d,

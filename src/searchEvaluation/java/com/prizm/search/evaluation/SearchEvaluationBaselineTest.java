@@ -22,13 +22,16 @@ import com.prizm.search.evaluation.SearchEvaluationData.EvaluationProfile;
 import com.prizm.search.evaluation.SearchEvaluationData.EvaluationProfileKind;
 import com.prizm.search.evaluation.SearchEvaluationData.FixtureDocument;
 import com.prizm.search.evaluation.SearchEvaluationData.FixturePage;
+import com.prizm.search.evaluation.SearchEvaluationData.OwnerScenario;
 import com.prizm.search.evaluation.SearchEvaluationData.Question;
 import com.prizm.search.evaluation.SearchEvaluationData.QuestionResult;
 import com.prizm.search.evaluation.SearchEvaluationData.Report;
 import com.prizm.search.evaluation.SearchEvaluationData.ReportFiles;
 import com.prizm.search.evaluation.SearchEvaluationData.ScoreDistribution;
 import com.prizm.search.evaluation.SearchEvaluationData.SearchState;
+import com.prizm.search.evaluation.SearchEvaluationData.Split;
 import com.prizm.search.evaluation.SearchEvaluationData.Summary;
+import com.prizm.search.evaluation.SearchEvaluationData.VersionScenario;
 import com.prizm.search.repository.VectorSearchResult;
 import com.prizm.search.service.SearchService;
 import java.io.IOException;
@@ -71,6 +74,7 @@ import tools.jackson.databind.ObjectMapper;
 class SearchEvaluationBaselineTest {
 
     private static final int CANDIDATE_LIMIT = 20;
+    private static final List<Integer> CANDIDATE_LIMITS = List.of(5, 10, CANDIDATE_LIMIT);
     private static final DockerImageName PGVECTOR_IMAGE = DockerImageName
             .parse("pgvector/pgvector:0.8.2-pg16-bookworm")
             .asCompatibleSubstituteFor("postgres");
@@ -111,6 +115,8 @@ class SearchEvaluationBaselineTest {
     @Autowired
     PlatformTransactionManager transactionManager;
 
+    private final Map<Integer, List<Long>> candidateDbTimes = new LinkedHashMap<>();
+
     @Test
     void measuresCurrentDenseSearchBaseline() {
         Path datasetPath = Path.of(System.getProperty("prizm.search-evaluation.dataset-dir"))
@@ -121,44 +127,83 @@ class SearchEvaluationBaselineTest {
                 .normalize();
 
         ObjectMapper objectMapper = new ObjectMapper();
-        Dataset dataset = new SearchEvaluationDatasetLoader(objectMapper).load(datasetPath);
+        Dataset loadedDataset = new SearchEvaluationDatasetLoader(objectMapper).load(datasetPath);
+        Dataset dataset = selectDatasetForRun(loadedDataset);
+        RunProfile runProfile = runProfile();
         SeededCorpus seededCorpus = seedCorpus(dataset);
         validateExpectedEvidence(dataset, seededCorpus.fixtureEvidenceIds());
 
-        List<QuestionResult> questionResults = evaluate(dataset, seededCorpus);
+        List<QuestionResult> questionResults = evaluate(dataset, seededCorpus, runProfile);
         Breakdown breakdown = new SearchEvaluationMetrics().calculateBreakdown(questionResults);
         Report report = new Report(
                 Instant.now().toString(),
                 dataset.corpus().datasetId(),
-                new EvaluationProfile("current-product", EvaluationProfileKind.CURRENT_PRODUCT),
+                runProfile.profile(),
                 breakdown,
                 questionResults);
         ReportFiles files = new SearchEvaluationReportWriter(objectMapper).write(outputPath, report);
 
         printReport(breakdown, questionResults, files);
+        if (runProfile.currentProduct()) {
+            printCandidateLimitAnalysis(questionResults);
+        }
         assertThat(questionResults).hasSize(dataset.questions().size());
     }
 
-    private SeededCorpus seedCorpus(Dataset dataset) {
-        Long ownerUserId = jdbcTemplate.queryForObject(
-                """
-                        INSERT INTO users(email, password_hash, role, enabled)
-                        VALUES (?, ?, 'USER', TRUE)
-                        RETURNING id
-                        """,
-                Long.class,
-                "search-evaluation@prizm.invalid",
-                "{noop}search-evaluation-only");
-        if (ownerUserId == null) {
-            throw new IllegalStateException("Failed to create the synthetic evaluation user.");
+    private RunProfile runProfile() {
+        String value = System.getenv("PRIZM_SEARCH_EVALUATION_PROFILE");
+        if (value == null || value.isBlank() || value.equals("current-product")) {
+            return new RunProfile(
+                    new EvaluationProfile("current-product", EvaluationProfileKind.CURRENT_PRODUCT),
+                    true);
+        }
+        if (value.equals(SearchEvaluationCompositeProfile.PROFILE_ID)) {
+            return new RunProfile(
+                    new EvaluationProfile(value, EvaluationProfileKind.EVALUATION_COMPOSITE),
+                    false);
+        }
+        throw new SearchEvaluationDataException("Unknown search evaluation profile.");
+    }
+
+    private Dataset selectDatasetForRun(Dataset loadedDataset) {
+        String splitValue = System.getenv("PRIZM_SEARCH_EVALUATION_SPLIT");
+        boolean versionTwo = loadedDataset.corpus().schemaVersion() != null
+                && loadedDataset.corpus().schemaVersion() >= 2;
+        if (!versionTwo && (splitValue == null || splitValue.isBlank())) {
+            return loadedDataset;
         }
 
+        SearchEvaluationDatasetSelector selector = new SearchEvaluationDatasetSelector();
+        Split selectedSplit = selector.parseRequiredSplit(splitValue);
+        if (versionTwo && selectedSplit != Split.TUNING) {
+            throw new SearchEvaluationDataException("This Batch permits Dataset v2 TUNING execution only.");
+        }
+        return selector.select(loadedDataset, selectedSplit);
+    }
+
+    private SeededCorpus seedCorpus(Dataset dataset) {
+        Long primaryOwnerUserId = createEvaluationUser("primary");
+        Long otherOwnerUserId = createEvaluationUser("other-owner");
+        Long noSearchableDocumentsUserId = createEvaluationUser("no-searchable-documents");
+
+        Map<String, FixtureScenario> scenarioByFixture = fixtureScenarios(
+                dataset,
+                primaryOwnerUserId,
+                otherOwnerUserId);
         Map<Long, ChunkDescriptor> descriptors = new HashMap<>();
         Set<String> fixtureEvidenceIds = new HashSet<>();
         for (FixtureDocument document : dataset.corpus().documents()) {
+            FixtureScenario scenario = scenarioByFixture.get(document.fixtureId());
+            if (scenario == null) {
+                throw new SearchEvaluationDataException("Selected fixture is not referenced by a question.");
+            }
             PreparedDocument prepared = prepareDocument(document);
             SeededDocument seeded = new TransactionTemplate(transactionManager).execute(status ->
-                    storeDocument(ownerUserId, document, prepared.chunks()));
+                    storeDocument(
+                            scenario.ownerUserId(),
+                            document,
+                            prepared.chunks(),
+                            scenario.versionScenario() == VersionScenario.ACTIVE));
             if (seeded == null) {
                 throw new IllegalStateException("Failed to store a synthetic evaluation document.");
             }
@@ -177,7 +222,7 @@ class SearchEvaluationBaselineTest {
                         }
                         return result;
                     },
-                    ownerUserId,
+                    scenario.ownerUserId(),
                     seeded.versionId());
 
             for (Map.Entry<Integer, Long> entry : chunkIds.entrySet()) {
@@ -193,7 +238,57 @@ class SearchEvaluationBaselineTest {
                                 matchedEvidence));
             }
         }
-        return new SeededCorpus(ownerUserId, Map.copyOf(descriptors), Set.copyOf(fixtureEvidenceIds));
+        return new SeededCorpus(
+                primaryOwnerUserId,
+                noSearchableDocumentsUserId,
+                Map.copyOf(descriptors),
+                Set.copyOf(fixtureEvidenceIds));
+    }
+
+    private Long createEvaluationUser(String localPart) {
+        Long ownerUserId = jdbcTemplate.queryForObject(
+                """
+                        INSERT INTO users(email, password_hash, role, enabled)
+                        VALUES (?, ?, 'USER', TRUE)
+                        RETURNING id
+                """,
+                Long.class,
+                "search-evaluation-" + localPart + "@prizm.invalid",
+                "{noop}search-evaluation-only");
+        if (ownerUserId == null) {
+            throw new IllegalStateException("Failed to create the synthetic evaluation user.");
+        }
+        return ownerUserId;
+    }
+
+    private Map<String, FixtureScenario> fixtureScenarios(
+            Dataset dataset,
+            Long primaryOwnerUserId,
+            Long otherOwnerUserId) {
+        Map<String, FixtureScenario> scenarios = new HashMap<>();
+        for (FixtureDocument document : dataset.corpus().documents()) {
+            List<Question> questions = dataset.questions().stream()
+                    .filter(question -> question.fixtureIds().contains(document.fixtureId()))
+                    .toList();
+            Set<OwnerScenario> ownerScenarios = questions.stream()
+                    .map(Question::ownerScenario)
+                    .collect(java.util.stream.Collectors.toSet());
+            Set<VersionScenario> versionScenarios = questions.stream()
+                    .map(Question::versionScenario)
+                    .collect(java.util.stream.Collectors.toSet());
+            if (ownerScenarios.size() != 1 || versionScenarios.size() != 1) {
+                throw new SearchEvaluationDataException(
+                        "A fixture must have one owner and version scenario within the selected split.");
+            }
+            OwnerScenario ownerScenario = ownerScenarios.iterator().next();
+            Long ownerUserId = ownerScenario == OwnerScenario.PRIMARY_OWNER
+                    ? primaryOwnerUserId
+                    : otherOwnerUserId;
+            scenarios.put(
+                    document.fixtureId(),
+                    new FixtureScenario(ownerUserId, versionScenarios.iterator().next()));
+        }
+        return Map.copyOf(scenarios);
     }
 
     private PreparedDocument prepareDocument(FixtureDocument document) {
@@ -242,7 +337,8 @@ class SearchEvaluationBaselineTest {
     private SeededDocument storeDocument(
             Long ownerUserId,
             FixtureDocument document,
-            List<IndexedChunk> chunks) {
+            List<IndexedChunk> chunks,
+            boolean activate) {
         Long documentId = jdbcTemplate.queryForObject(
                 """
                         INSERT INTO documents(title, owner_user_id, document_type)
@@ -279,25 +375,33 @@ class SearchEvaluationBaselineTest {
         }
 
         documentChunkRepository.replaceAll(ownerUserId, versionId, chunks);
-        int activated = jdbcTemplate.update(
-                "UPDATE documents SET active_version_id = ?, updated_at = now() WHERE id = ? AND owner_user_id = ?",
-                versionId,
-                documentId,
-                ownerUserId);
-        if (activated != 1) {
-            throw new IllegalStateException("Failed to activate a synthetic evaluation version.");
+        if (activate) {
+            int activated = jdbcTemplate.update(
+                    "UPDATE documents SET active_version_id = ?, updated_at = now() WHERE id = ? AND owner_user_id = ?",
+                    versionId,
+                    documentId,
+                    ownerUserId);
+            if (activated != 1) {
+                throw new IllegalStateException("Failed to activate a synthetic evaluation version.");
+            }
         }
         return new SeededDocument(versionId);
     }
 
-    private List<QuestionResult> evaluate(Dataset dataset, SeededCorpus seededCorpus) {
+    private List<QuestionResult> evaluate(
+            Dataset dataset,
+            SeededCorpus seededCorpus,
+            RunProfile runProfile) {
         SearchEvaluationCandidateRepository candidateRepository =
                 new SearchEvaluationCandidateRepository(jdbcTemplate);
         List<QuestionResult> results = new ArrayList<>();
 
         for (Question question : dataset.questions()) {
+            Long queryOwnerUserId = question.ownerScenario() == OwnerScenario.NO_SEARCHABLE_DOCUMENTS
+                    ? seededCorpus.noSearchableDocumentsUserId()
+                    : seededCorpus.primaryOwnerUserId();
             List<CareerEvidenceSearchResponse> productionTop5 =
-                    searchService.searchCareerEvidence(seededCorpus.ownerUserId(), question.query());
+                    searchService.searchCareerEvidence(queryOwnerUserId, question.query());
 
             long totalStartedAt = System.nanoTime();
             long embeddingStartedAt = totalStartedAt;
@@ -306,11 +410,35 @@ class SearchEvaluationBaselineTest {
             long embeddingElapsedMillis = elapsedMillisSince(embeddingStartedAt);
             long dbStartedAt = System.nanoTime();
             List<VectorSearchResult> top20 = candidateRepository.findCandidates(
-                    seededCorpus.ownerUserId(),
+                    queryOwnerUserId,
                     queryEmbedding,
                     CANDIDATE_LIMIT);
             long dbElapsedMillis = elapsedMillisSince(dbStartedAt);
             long totalElapsedMillis = elapsedMillisSince(totalStartedAt);
+            candidateDbTimes.computeIfAbsent(CANDIDATE_LIMIT, ignored -> new ArrayList<>())
+                    .add(dbElapsedMillis);
+
+            for (int candidateLimit : CANDIDATE_LIMITS) {
+                if (candidateLimit == CANDIDATE_LIMIT) {
+                    continue;
+                }
+                long experimentStartedAt = System.nanoTime();
+                List<VectorSearchResult> experiment = candidateRepository.findCandidates(
+                        queryOwnerUserId,
+                        queryEmbedding,
+                        candidateLimit);
+                long experimentElapsedMillis = elapsedMillisSince(experimentStartedAt);
+                candidateDbTimes.computeIfAbsent(candidateLimit, ignored -> new ArrayList<>())
+                        .add(experimentElapsedMillis);
+                List<Long> expectedPrefix = top20.stream()
+                        .limit(candidateLimit)
+                        .map(VectorSearchResult::chunkId)
+                        .toList();
+                List<Long> actualIds = experiment.stream().map(VectorSearchResult::chunkId).toList();
+                if (!actualIds.equals(expectedPrefix)) {
+                    throw new IllegalStateException("Candidate-limit experiment changed exact cosine order.");
+                }
+            }
 
             List<Long> productionIds = productionTop5.stream()
                     .map(CareerEvidenceSearchResponse::chunkId)
@@ -323,13 +451,38 @@ class SearchEvaluationBaselineTest {
                 throw new IllegalStateException("Evaluation candidate SQL diverged from the production top-five order.");
             }
 
+            List<VectorSearchResult> evaluatedCandidates = top20;
+            List<VectorSearchResult> returnedResults = top20.stream()
+                    .limit(productionIds.size())
+                    .toList();
+            if (!runProfile.currentProduct()) {
+                SearchEvaluationCompositeProfile.Decision decision =
+                        new SearchEvaluationCompositeProfile().apply(question.query(), top20);
+                evaluatedCandidates = decision.candidates();
+                returnedResults = decision.results();
+                if (decision.rejected()) {
+                    System.out.printf(
+                            Locale.ROOT,
+                            "- profile rejection %s: %s%n",
+                            question.questionId(),
+                            decision.rejectionReasons());
+                }
+            }
+
             List<CandidateResult> candidates = labelCandidates(
                     question,
-                    top20,
+                    evaluatedCandidates,
                     seededCorpus.chunkDescriptors());
-            List<CandidateResult> top5 = candidates.stream().limit(5).toList();
-            Double top1Score = productionTop5.isEmpty() ? null : productionTop5.get(0).score();
-            Double top1Distance = productionTop5.isEmpty() ? null : productionTop5.get(0).distance();
+            List<Long> returnedIds = returnedResults.stream()
+                    .map(VectorSearchResult::chunkId)
+                    .toList();
+            Map<Long, CandidateResult> candidatesById = candidates.stream()
+                    .collect(java.util.stream.Collectors.toMap(CandidateResult::chunkId, candidate -> candidate));
+            List<CandidateResult> returnedCandidates = returnedIds.stream()
+                    .map(candidatesById::get)
+                    .toList();
+            Double top1Score = returnedResults.isEmpty() ? null : returnedResults.get(0).score();
+            Double top1Distance = returnedResults.isEmpty() ? null : returnedResults.get(0).distance();
             results.add(new QuestionResult(
                     question.questionId(),
                     question.query(),
@@ -337,15 +490,15 @@ class SearchEvaluationBaselineTest {
                     question.split(),
                     question.category(),
                     question.expectedEvidence(),
-                    productionIds,
-                    top5.stream().map(CandidateResult::relevance).toList(),
+                    returnedIds,
+                    returnedCandidates.stream().map(CandidateResult::relevance).toList(),
                     top1Score,
                     top1Distance,
-                    hasDuplicateEvidence(top5),
+                    hasDuplicateEvidence(returnedCandidates),
                     totalElapsedMillis,
                     embeddingElapsedMillis,
                     dbElapsedMillis,
-                    searchState(question, productionTop5),
+                    searchState(question, returnedResults),
                     question.goldPage(),
                     candidates));
         }
@@ -400,8 +553,8 @@ class SearchEvaluationBaselineTest {
 
     private SearchState searchState(
             Question question,
-            List<CareerEvidenceSearchResponse> productionResults) {
-        if (!productionResults.isEmpty()) {
+            List<?> returnedResults) {
+        if (!returnedResults.isEmpty()) {
             return SearchState.EVIDENCE_FOUND;
         }
         return question.category() == Category.NO_SEARCHABLE_DOCUMENTS
@@ -461,6 +614,54 @@ class SearchEvaluationBaselineTest {
         }
         System.out.println("결과 JSON 파일: " + files.report().getFileName());
         System.out.println("후보 CSV 파일: " + files.rawCandidates().getFileName());
+    }
+
+    private void printCandidateLimitAnalysis(List<QuestionResult> questions) {
+        SearchEvaluationMetrics metrics = new SearchEvaluationMetrics();
+        for (int candidateLimit : CANDIDATE_LIMITS) {
+            List<Long> dbTimes = candidateDbTimes.getOrDefault(candidateLimit, List.of());
+            List<QuestionResult> projected = new ArrayList<>();
+            for (int index = 0; index < questions.size(); index++) {
+                QuestionResult question = questions.get(index);
+                List<CandidateResult> candidates = question.candidates().stream()
+                        .limit(candidateLimit)
+                        .toList();
+                List<CandidateResult> returned = candidates.stream().limit(5).toList();
+                long dbMillis = index < dbTimes.size() ? dbTimes.get(index) : 0L;
+                projected.add(new QuestionResult(
+                        question.questionId(),
+                        question.query(),
+                        question.noEvidence(),
+                        question.split(),
+                        question.category(),
+                        question.expectedEvidence(),
+                        returned.stream().map(CandidateResult::chunkId).toList(),
+                        returned.stream().map(CandidateResult::relevance).toList(),
+                        returned.isEmpty() ? null : returned.get(0).score(),
+                        returned.isEmpty() ? null : returned.get(0).distance(),
+                        hasDuplicateEvidence(returned),
+                        question.searchTimeMillis(),
+                        question.embeddingTimeMillis(),
+                        dbMillis,
+                        returned.isEmpty()
+                                ? question.category() == Category.NO_SEARCHABLE_DOCUMENTS
+                                        ? SearchState.NO_SEARCHABLE_DOCUMENTS
+                                        : SearchState.NO_EVIDENCE
+                                : SearchState.EVIDENCE_FOUND,
+                        question.goldPage(),
+                        candidates));
+            }
+            Summary summary = metrics.calculate(projected);
+            System.out.printf(Locale.ROOT,
+                    "후보 수 %d | Recall@20=%.4f | Direct MRR@20=%.4f | nDCG@5=%.4f | duplicate=%.4f | DB p50/p95=%dms/%dms%n",
+                    candidateLimit,
+                    summary.recallAt20(),
+                    summary.directMrrAt20(),
+                    summary.ndcgAt5(),
+                    summary.duplicateResultRatio(),
+                    summary.dbSearchLatency().p50Millis(),
+                    summary.dbSearchLatency().p95Millis());
+        }
     }
 
     private void printSummary(String label, Summary summary) {
@@ -523,8 +724,15 @@ class SearchEvaluationBaselineTest {
     }
 
     private record SeededCorpus(
-            Long ownerUserId,
+            Long primaryOwnerUserId,
+            Long noSearchableDocumentsUserId,
             Map<Long, ChunkDescriptor> chunkDescriptors,
             Set<String> fixtureEvidenceIds) {
+    }
+
+    private record RunProfile(EvaluationProfile profile, boolean currentProduct) {
+    }
+
+    private record FixtureScenario(Long ownerUserId, VersionScenario versionScenario) {
     }
 }

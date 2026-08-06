@@ -52,7 +52,7 @@ public class SearchEvaluationReportWriter {
 
     private String rawCandidates(Report report) {
         StringBuilder csv = new StringBuilder(
-                "question_id,split,category,no_evidence,rank,chunk_id,fixture_chunk_id,fixture_evidence_ids,score,distance,relevance,evidence_group_id\n");
+                "question_id,split,category,no_evidence,rank,chunk_id,fixture_chunk_id,fixture_evidence_ids,score,distance,relevance,evidence_group_id,source_type,source_index,search_state,user_result_count,candidate_count,total_search_ms,embedding_ms,db_search_ms,profile_kind,profile_id\n");
         for (QuestionResult question : report.questions()) {
             for (CandidateResult candidate : question.candidates()) {
                 csv.append(escape(question.questionId())).append(',')
@@ -66,7 +66,17 @@ public class SearchEvaluationReportWriter {
                         .append(candidate.score()).append(',')
                         .append(candidate.distance()).append(',')
                         .append(candidate.relevance()).append(',')
-                        .append(escape(candidate.evidenceGroupId())).append('\n');
+                        .append(escape(candidate.evidenceGroupId())).append(',')
+                        .append(candidate.sourceType()).append(',')
+                        .append(candidate.sourceIndex()).append(',')
+                        .append(question.searchState()).append(',')
+                        .append(question.returnedChunkIds().size()).append(',')
+                        .append(question.candidates().size()).append(',')
+                        .append(question.searchTimeMillis()).append(',')
+                        .append(question.embeddingTimeMillis()).append(',')
+                        .append(question.dbSearchTimeMillis()).append(',')
+                        .append(report.profile().kind()).append(',')
+                        .append(escape(report.profile().profileId())).append('\n');
             }
         }
         return csv.toString();

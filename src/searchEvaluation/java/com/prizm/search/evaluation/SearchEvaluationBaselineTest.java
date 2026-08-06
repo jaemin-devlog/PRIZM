@@ -12,11 +12,14 @@ import com.prizm.ingestion.service.TextChunk;
 import com.prizm.ingestion.service.TextChunker;
 import com.prizm.search.dto.response.CareerEvidenceSearchResponse;
 import com.prizm.search.evaluation.SearchEvaluationData.CandidateResult;
+import com.prizm.search.evaluation.SearchEvaluationData.Category;
 import com.prizm.search.evaluation.SearchEvaluationData.Breakdown;
 import com.prizm.search.evaluation.SearchEvaluationData.ChunkDescriptor;
 import com.prizm.search.evaluation.SearchEvaluationData.Dataset;
 import com.prizm.search.evaluation.SearchEvaluationData.EvidenceAnchor;
 import com.prizm.search.evaluation.SearchEvaluationData.ExpectedEvidence;
+import com.prizm.search.evaluation.SearchEvaluationData.EvaluationProfile;
+import com.prizm.search.evaluation.SearchEvaluationData.EvaluationProfileKind;
 import com.prizm.search.evaluation.SearchEvaluationData.FixtureDocument;
 import com.prizm.search.evaluation.SearchEvaluationData.FixturePage;
 import com.prizm.search.evaluation.SearchEvaluationData.Question;
@@ -24,6 +27,7 @@ import com.prizm.search.evaluation.SearchEvaluationData.QuestionResult;
 import com.prizm.search.evaluation.SearchEvaluationData.Report;
 import com.prizm.search.evaluation.SearchEvaluationData.ReportFiles;
 import com.prizm.search.evaluation.SearchEvaluationData.ScoreDistribution;
+import com.prizm.search.evaluation.SearchEvaluationData.SearchState;
 import com.prizm.search.evaluation.SearchEvaluationData.Summary;
 import com.prizm.search.repository.VectorSearchResult;
 import com.prizm.search.service.SearchService;
@@ -126,6 +130,7 @@ class SearchEvaluationBaselineTest {
         Report report = new Report(
                 Instant.now().toString(),
                 dataset.corpus().datasetId(),
+                new EvaluationProfile("current-product", EvaluationProfileKind.CURRENT_PRODUCT),
                 breakdown,
                 questionResults);
         ReportFiles files = new SearchEvaluationReportWriter(objectMapper).write(outputPath, report);
@@ -291,17 +296,21 @@ class SearchEvaluationBaselineTest {
         List<QuestionResult> results = new ArrayList<>();
 
         for (Question question : dataset.questions()) {
-            long startedAt = System.nanoTime();
             List<CareerEvidenceSearchResponse> productionTop5 =
                     searchService.searchCareerEvidence(seededCorpus.ownerUserId(), question.query());
-            long elapsedMillis = Math.round((System.nanoTime() - startedAt) / 1_000_000.0d);
 
+            long totalStartedAt = System.nanoTime();
+            long embeddingStartedAt = totalStartedAt;
             float[] queryEmbedding = embeddingService.embed(question.query());
             embeddingValidator.validate(queryEmbedding);
+            long embeddingElapsedMillis = elapsedMillisSince(embeddingStartedAt);
+            long dbStartedAt = System.nanoTime();
             List<VectorSearchResult> top20 = candidateRepository.findCandidates(
                     seededCorpus.ownerUserId(),
                     queryEmbedding,
                     CANDIDATE_LIMIT);
+            long dbElapsedMillis = elapsedMillisSince(dbStartedAt);
+            long totalElapsedMillis = elapsedMillisSince(totalStartedAt);
 
             List<Long> productionIds = productionTop5.stream()
                     .map(CareerEvidenceSearchResponse::chunkId)
@@ -333,7 +342,11 @@ class SearchEvaluationBaselineTest {
                     top1Score,
                     top1Distance,
                     hasDuplicateEvidence(top5),
-                    elapsedMillis,
+                    totalElapsedMillis,
+                    embeddingElapsedMillis,
+                    dbElapsedMillis,
+                    searchState(question, productionTop5),
+                    question.goldPage(),
                     candidates));
         }
         return List.copyOf(results);
@@ -370,6 +383,8 @@ class SearchEvaluationBaselineTest {
                     result.chunkId(),
                     descriptor.fixtureChunkId(),
                     descriptor.fixtureEvidenceIds(),
+                    result.sourceType(),
+                    result.sourceIndex(),
                     relevance,
                     group,
                     result.score(),
@@ -381,6 +396,17 @@ class SearchEvaluationBaselineTest {
     private boolean hasDuplicateEvidence(List<CandidateResult> candidates) {
         Set<String> groups = new HashSet<>();
         return candidates.stream().anyMatch(candidate -> !groups.add(candidate.evidenceGroupId()));
+    }
+
+    private SearchState searchState(
+            Question question,
+            List<CareerEvidenceSearchResponse> productionResults) {
+        if (!productionResults.isEmpty()) {
+            return SearchState.EVIDENCE_FOUND;
+        }
+        return question.category() == Category.NO_SEARCHABLE_DOCUMENTS
+                ? SearchState.NO_SEARCHABLE_DOCUMENTS
+                : SearchState.NO_EVIDENCE;
     }
 
     private void validateExpectedEvidence(Dataset dataset, Set<String> fixtureEvidenceIds) {
@@ -420,7 +446,7 @@ class SearchEvaluationBaselineTest {
         breakdown.categories().forEach((category, summary) -> printSummary("category=" + category, summary));
         for (QuestionResult question : questions) {
             System.out.printf(Locale.ROOT,
-                    "- %s | %s/%s | chunks=%s | relevance=%s | top1Score=%s | top1Distance=%s | duplicate=%s | %dms%n",
+                    "- %s | %s/%s | chunks=%s | relevance=%s | top1Score=%s | top1Distance=%s | duplicate=%s | total=%dms | embedding=%dms | db=%dms%n",
                     question.questionId(),
                     question.split(),
                     question.category(),
@@ -429,7 +455,9 @@ class SearchEvaluationBaselineTest {
                     question.top1Score(),
                     question.top1Distance(),
                     question.duplicateEvidence(),
-                    question.searchTimeMillis());
+                    question.searchTimeMillis(),
+                    question.embeddingTimeMillis(),
+                    question.dbSearchTimeMillis());
         }
         System.out.println("결과 JSON 파일: " + files.report().getFileName());
         System.out.println("후보 CSV 파일: " + files.rawCandidates().getFileName());
@@ -442,11 +470,19 @@ class SearchEvaluationBaselineTest {
                 summary.recallAt20(), summary.directRecallAt20());
         System.out.printf(Locale.ROOT, "Precision@5: %.4f (direct %.4f)%n",
                 summary.precisionAt5(), summary.directPrecisionAt5());
-        System.out.printf(Locale.ROOT, "Direct MRR@20: %.4f%n", summary.directMrrAt20());
+        System.out.printf(Locale.ROOT, "Direct MRR@5/@20: %.4f/%.4f%n",
+                summary.directMrrAt5(), summary.directMrrAt20());
         System.out.printf(Locale.ROOT, "nDCG@5: %.4f%n", summary.ndcgAt5());
         System.out.printf(Locale.ROOT, "중복 결과 비율: %.4f%n", summary.duplicateResultRatio());
-        System.out.printf(Locale.ROOT, "검색 지연 평균/p95: %.2fms/%dms%n",
-                summary.averageSearchTimeMillis(), summary.p95SearchTimeMillis());
+        System.out.printf(Locale.ROOT, "검색 지연 total p50/p95: %dms/%dms%n",
+                summary.totalLatency().p50Millis(), summary.totalLatency().p95Millis());
+        System.out.printf(Locale.ROOT, "검색 지연 embedding p50/p95: %dms/%dms%n",
+                summary.embeddingLatency().p50Millis(), summary.embeddingLatency().p95Millis());
+        System.out.printf(Locale.ROOT, "검색 지연 DB p50/p95: %dms/%dms%n",
+                summary.dbSearchLatency().p50Millis(), summary.dbSearchLatency().p95Millis());
+        System.out.printf(Locale.ROOT, "무근거 거부/근거 오거부: %.4f/%.4f%n",
+                summary.decisionMetrics().noEvidenceRejectionRate(),
+                summary.decisionMetrics().falseRejectionRate());
         System.out.printf(Locale.ROOT, "근거/무근거 질문 수: %d/%d%n",
                 summary.evidenceScoreDistribution().questionCount(),
                 summary.noEvidenceScoreDistribution().questionCount());
@@ -463,6 +499,10 @@ class SearchEvaluationBaselineTest {
                 distribution.minimumTop1Score(),
                 distribution.averageTop1Score(),
                 distribution.maximumTop1Score());
+    }
+
+    private long elapsedMillisSince(long startedAt) {
+        return Math.round((System.nanoTime() - startedAt) / 1_000_000.0d);
     }
 
     private static Path createTemporaryStorageRoot() {

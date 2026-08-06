@@ -56,7 +56,7 @@ anchor 위치와 일치해야 합니다.
 paraphrase, 날짜·숫자·고유명사, PDF gold page와 overlap 중복 사례를 포함합니다.
 
 기존 `sample` Dataset 30문항과 아래 과거 기준선은 변경하지 않았습니다. Dataset v2의
-실제 `searchEvaluation` 실행, Ollama·PostgreSQL 측정과 threshold 분석은 Batch 1A
+실제 `searchEvaluation` 실행, Ollama·PostgreSQL 측정과 threshold 분석은 Batch 1A·1B
 범위가 아니므로 `NOT_RUN`입니다.
 
 ## 실행
@@ -83,9 +83,46 @@ Docker Desktop, PostgreSQL·pgvector Testcontainer와 로컬 Ollama `bge-m3`가 
 - 요약과 질문별 결과: `dense-baseline-<UTC timestamp>-<run token>.json`
 - 임계값 분석용 원시 후보: `dense-baseline-candidates-<UTC timestamp>-<run token>.csv`
 
-전체 원문은 결과에 복사하지 않습니다. JSON에는 질문, 예상 근거, 반환 chunk ID, relevance 순서, top1 score·distance, 중복 여부와 지연이 기록됩니다. CSV에는 split·category와 후보 rank, score, distance, relevance, evidence group이 기록됩니다.
+전체 원문은 결과에 복사하지 않습니다. JSON에는 질문, 예상 근거, 반환 chunk ID,
+relevance 순서, 검색 상태, top1 score·distance, 사용자 반환 수, 후보 수와 분리 지연이
+기록됩니다. CSV에는 이 값과 후보 rank, source type·index, relevance,
+`evidenceGroupId`, 평가 profile을 기록합니다.
 
-지표는 전체, TUNING, TEST, category별로 구분합니다. 각 구분에서 Recall@20, direct Recall@20, Precision@5, direct Precision@5, Direct MRR@20, evidence-group 기준 nDCG@5, 중복 결과 비율, 평균·p95 검색 지연을 기록합니다. JSON의 machine-readable 필드는 `directMrrAt20`이며, PRZ-001 교정 이전 결과의 `mrr` 필드와 직접 비교하지 않습니다. 근거 있음/없음 질문의 top1 score·distance 분포도 별도로 기록합니다.
+한 보고서의 모든 결과에는 다음 profile 중 하나를 명시합니다.
+
+- `CURRENT_PRODUCT`: 현재 제품 동작을 그대로 측정
+- `EVALUATION_THRESHOLD`: TUNING에서 검토할 평가용 판정 profile
+
+평가용 profile 결과를 제품 threshold나 현재 제품 동작으로 표현하지 않습니다. Batch
+1B에서는 profile 계약만 추가했으며 threshold 값은 선택하지 않았습니다.
+
+지표는 전체, TUNING, TEST, category별로 구분합니다.
+
+| 지표 | 계산 계약 |
+|---|---|
+| Recall@20 | relevance 1 이상 근거가 있는 질문에서 top-20 hit 비율 |
+| Direct Recall@20 | relevance 2가 있는 질문에서 top-20 직접 근거 hit 비율 |
+| Precision@5 | top-5 relevance 1 이상 결과 수를 항상 5로 나눈 질문별 평균 |
+| Direct Precision@5 | top-5 relevance 2 결과 수를 항상 5로 나눈 질문별 평균 |
+| Direct MRR@5·@20 | relevance 2가 있는 질문만 분모로 하며 cutoff 안 첫 직접 근거의 역순위. 평가용 거부 시 0 |
+| nDCG@5 | `2^relevance - 1` gain을 사용하고 같은 `evidenceGroupId`의 두 번째 결과부터 gain 0 |
+| 중복 결과 비율 | 사용자에게 반환된 top-5 안에서 이미 나온 evidence group이 다시 나온 비율 |
+| 무관 질문 거부율 | 검색 가능한 문서가 있는 no-evidence 질문 중 `NO_EVIDENCE` 비율 |
+| 근거 질문 오거부율 | relevance 1 이상 근거 질문 중 `NO_EVIDENCE` 비율 |
+| top-1 직접 근거 정확도 | relevance 2가 있는 질문 중 첫 반환 결과가 relevance 2인 비율 |
+| PDF page 인용 정확도 | PDF 직접 근거 질문 중 첫 직접 근거의 `PAGE` index가 gold page와 일치한 비율 |
+| 결과 개수 | 질문별 사용자 반환 수와 평가용 후보 수의 min·평균·max |
+
+Precision@5는 결과가 5개보다 적어도 분모를 5로 유지합니다. 직접 정답 하나만
+label한 질문의 최대 Precision@5는 0.2이며, 이는 오류가 아니라 고정 분모 계약입니다.
+`NO_SEARCHABLE_DOCUMENTS`는 무관 질문 거부율에서 제외하고 별도 질문 수와 상태 정확도로
+집계합니다. 근거 있음/없음 질문의 top1 score·distance 분포도 계속 별도로 기록합니다.
+
+지연은 nearest-rank 방식의 p50·p95와 평균을 함께 기록합니다. `embedding`은 Ollama
+요청 시작부터 벡터 검증 종료, `DB`는 JDBC 호출 직전부터 row mapping 종료,
+`total`은 embedding 시작부터 DB mapping 종료까지입니다. 기존
+`averageSearchTimeMillis`와 `p95SearchTimeMillis`도 total 지연의 호환 필드로 유지합니다.
+JSON의 `directMrrAt20`은 PRZ-001 교정 이전 결과의 `mrr` 필드와 직접 비교하지 않습니다.
 
 합성 파일럿 기준선은 실제 개인 문서나 서비스 전체 검색 성능을 보장하지 않습니다. 이 수치는 이후 Reranker, Hybrid Search, 청킹 실험의 비교 기준입니다. 현재 score에 운영 임계값을 적용하거나 정답 확률로 해석하지 않습니다.
 

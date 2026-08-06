@@ -3,11 +3,16 @@ package com.prizm.search.evaluation;
 import com.prizm.search.evaluation.SearchEvaluationData.CandidateResult;
 import com.prizm.search.evaluation.SearchEvaluationData.Breakdown;
 import com.prizm.search.evaluation.SearchEvaluationData.Category;
+import com.prizm.search.evaluation.SearchEvaluationData.CountDistribution;
+import com.prizm.search.evaluation.SearchEvaluationData.DecisionMetrics;
 import com.prizm.search.evaluation.SearchEvaluationData.ExpectedEvidence;
+import com.prizm.search.evaluation.SearchEvaluationData.LatencyDistribution;
 import com.prizm.search.evaluation.SearchEvaluationData.QuestionResult;
 import com.prizm.search.evaluation.SearchEvaluationData.ScoreDistribution;
+import com.prizm.search.evaluation.SearchEvaluationData.SearchState;
 import com.prizm.search.evaluation.SearchEvaluationData.Split;
 import com.prizm.search.evaluation.SearchEvaluationData.Summary;
+import com.prizm.ingestion.entity.ChunkSourceType;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -57,18 +62,35 @@ public class SearchEvaluationMetrics {
         int directRecallHits = 0;
         double precisionSum = 0.0d;
         double directPrecisionSum = 0.0d;
-        double reciprocalRankSum = 0.0d;
+        double reciprocalRankAt5Sum = 0.0d;
+        double reciprocalRankAt20Sum = 0.0d;
         double ndcgSum = 0.0d;
         int ndcgQuestionCount = 0;
         int duplicateCount = 0;
         int returnedTop5Count = 0;
-        List<Long> latencies = new ArrayList<>();
+        int noEvidenceQuestionCount = 0;
+        int noEvidenceRejectionCount = 0;
+        int evidenceDecisionQuestionCount = 0;
+        int falseRejectionCount = 0;
+        int noSearchableDocumentsQuestionCount = 0;
+        int noSearchableDocumentsCorrectCount = 0;
+        int top1DirectHitCount = 0;
+        int pdfEvidenceQuestionCount = 0;
+        int pdfPageHitCount = 0;
+        List<Integer> userResultCounts = new ArrayList<>();
+        List<Integer> candidateCounts = new ArrayList<>();
+        List<Long> totalLatencies = new ArrayList<>();
+        List<Long> embeddingLatencies = new ArrayList<>();
+        List<Long> dbLatencies = new ArrayList<>();
 
         for (QuestionResult result : results) {
             List<CandidateResult> top20 = result.candidates().stream()
                     .limit(CANDIDATE_LIMIT)
                     .toList();
-            List<CandidateResult> top5 = top20.stream().limit(FINAL_RESULT_LIMIT).toList();
+            int userResultCount = Math.min(result.returnedChunkIds().size(), top20.size());
+            List<CandidateResult> top5 = top20.stream()
+                    .limit(Math.min(userResultCount, FINAL_RESULT_LIMIT))
+                    .toList();
 
             boolean hasExpectedEvidence = result.expectedEvidence().stream()
                     .anyMatch(evidence -> evidence.relevance() >= 1);
@@ -87,7 +109,48 @@ public class SearchEvaluationMetrics {
                 if (top20.stream().anyMatch(candidate -> candidate.relevance() == 2)) {
                     directRecallHits++;
                 }
-                reciprocalRankSum += reciprocalRank(top20);
+                if (result.searchState() == SearchState.EVIDENCE_FOUND) {
+                    reciprocalRankAt5Sum += reciprocalRank(top20, FINAL_RESULT_LIMIT);
+                    reciprocalRankAt20Sum += reciprocalRank(top20, CANDIDATE_LIMIT);
+                }
+                if (result.searchState() == SearchState.EVIDENCE_FOUND
+                        && !top5.isEmpty()
+                        && top5.get(0).relevance() == 2) {
+                    top1DirectHitCount++;
+                }
+            }
+
+            if (result.noEvidence() && result.category() != Category.NO_SEARCHABLE_DOCUMENTS) {
+                noEvidenceQuestionCount++;
+                if (result.searchState() == SearchState.NO_EVIDENCE) {
+                    noEvidenceRejectionCount++;
+                }
+            }
+            if (hasExpectedEvidence) {
+                evidenceDecisionQuestionCount++;
+                if (result.searchState() == SearchState.NO_EVIDENCE) {
+                    falseRejectionCount++;
+                }
+            }
+            if (result.category() == Category.NO_SEARCHABLE_DOCUMENTS) {
+                noSearchableDocumentsQuestionCount++;
+                if (result.searchState() == SearchState.NO_SEARCHABLE_DOCUMENTS) {
+                    noSearchableDocumentsCorrectCount++;
+                }
+            }
+            if (result.category() == Category.PDF_EVIDENCE && hasExpectedDirectEvidence) {
+                pdfEvidenceQuestionCount++;
+                CandidateResult firstDirect = top5.stream()
+                        .filter(candidate -> candidate.relevance() == 2)
+                        .findFirst()
+                        .orElse(null);
+                if (result.searchState() == SearchState.EVIDENCE_FOUND
+                        && firstDirect != null
+                        && firstDirect.sourceType() == ChunkSourceType.PAGE
+                        && result.goldPage() != null
+                        && firstDirect.sourceIndex() == result.goldPage()) {
+                    pdfPageHitCount++;
+                }
             }
 
             long relevantTop5 = top5.stream().filter(candidate -> candidate.relevance() >= 1).count();
@@ -101,8 +164,27 @@ public class SearchEvaluationMetrics {
                     duplicateCount++;
                 }
             }
-            latencies.add(result.searchTimeMillis());
+            userResultCounts.add(userResultCount);
+            candidateCounts.add(result.candidates().size());
+            totalLatencies.add(result.searchTimeMillis());
+            embeddingLatencies.add(result.embeddingTimeMillis());
+            dbLatencies.add(result.dbSearchTimeMillis());
         }
+
+        LatencyDistribution totalLatency = latencyDistribution(totalLatencies);
+        LatencyDistribution embeddingLatency = latencyDistribution(embeddingLatencies);
+        LatencyDistribution dbLatency = latencyDistribution(dbLatencies);
+        DecisionMetrics decisionMetrics = new DecisionMetrics(
+                noEvidenceQuestionCount,
+                divide(noEvidenceRejectionCount, noEvidenceQuestionCount),
+                evidenceDecisionQuestionCount,
+                divide(falseRejectionCount, evidenceDecisionQuestionCount),
+                noSearchableDocumentsQuestionCount,
+                divide(noSearchableDocumentsCorrectCount, noSearchableDocumentsQuestionCount),
+                directEvidenceQuestionCount,
+                divide(top1DirectHitCount, directEvidenceQuestionCount),
+                pdfEvidenceQuestionCount,
+                divide(pdfPageHitCount, pdfEvidenceQuestionCount));
 
         return new Summary(
                 results.size(),
@@ -110,17 +192,24 @@ public class SearchEvaluationMetrics {
                 divide(directRecallHits, directEvidenceQuestionCount),
                 precisionSum / results.size(),
                 directPrecisionSum / results.size(),
-                divide(reciprocalRankSum, directEvidenceQuestionCount),
+                divide(reciprocalRankAt20Sum, directEvidenceQuestionCount),
+                divide(reciprocalRankAt5Sum, directEvidenceQuestionCount),
                 divide(ndcgSum, ndcgQuestionCount),
                 divide(duplicateCount, returnedTop5Count),
-                latencies.stream().mapToLong(Long::longValue).average().orElse(0.0d),
-                percentile95(latencies),
+                totalLatency.averageMillis(),
+                totalLatency.p95Millis(),
                 scoreDistribution(results.stream().filter(result -> !result.noEvidence()).toList()),
-                scoreDistribution(results.stream().filter(QuestionResult::noEvidence).toList()));
+                scoreDistribution(results.stream().filter(QuestionResult::noEvidence).toList()),
+                decisionMetrics,
+                countDistribution(userResultCounts),
+                countDistribution(candidateCounts),
+                totalLatency,
+                embeddingLatency,
+                dbLatency);
     }
 
-    private double reciprocalRank(List<CandidateResult> candidates) {
-        for (CandidateResult candidate : candidates) {
+    private double reciprocalRank(List<CandidateResult> candidates, int cutoff) {
+        for (CandidateResult candidate : candidates.stream().limit(cutoff).toList()) {
             if (candidate.relevance() == 2) {
                 return 1.0d / candidate.rank();
             }
@@ -170,12 +259,29 @@ public class SearchEvaluationMetrics {
                 withResult.stream().mapToDouble(QuestionResult::top1Distance).max().orElseThrow());
     }
 
-    private long percentile95(List<Long> values) {
+    private CountDistribution countDistribution(List<Integer> values) {
+        return new CountDistribution(
+                values.size(),
+                values.stream().mapToInt(Integer::intValue).min().orElse(0),
+                values.stream().mapToInt(Integer::intValue).average().orElse(0.0d),
+                values.stream().mapToInt(Integer::intValue).max().orElse(0));
+    }
+
+    private LatencyDistribution latencyDistribution(List<Long> values) {
+        return new LatencyDistribution(
+                values.size(),
+                values.stream().mapToLong(Long::longValue).average().orElse(0.0d),
+                percentile(values, 0.50d),
+                percentile(values, 0.95d));
+    }
+
+    /** 기존 p95와 동일한 nearest-rank 방식으로 p50·p95를 계산한다. */
+    private long percentile(List<Long> values, double percentile) {
         if (values.isEmpty()) {
             return 0L;
         }
         List<Long> sorted = values.stream().sorted().toList();
-        int index = Math.max(0, (int) Math.ceil(sorted.size() * 0.95d) - 1);
+        int index = Math.max(0, (int) Math.ceil(sorted.size() * percentile) - 1);
         return sorted.get(index);
     }
 

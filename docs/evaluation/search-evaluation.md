@@ -5,7 +5,7 @@
 ## 데이터 위치와 형식
 
 - 추적 가능한 합성 예제: `src/test/resources/search-evaluation/sample/`
-- PRZ-008 Dataset v2: `src/test/resources/search-evaluation/v2/`
+- PRZ-008 Dataset v2.1: `src/test/resources/search-evaluation/v2/`
 - 실제 개인 평가 데이터: `local/search-evaluation/<dataset>/`
 - 실행 결과 기본 위치: `local/search-evaluation/results/`
 
@@ -47,17 +47,24 @@ anchor 위치와 일치해야 합니다.
 동일한 정규화 질문은 두 split에 들어갈 수 없습니다. 의미가 같은 패러프레이즈와 같은 원문 근거를 묻는 질문이 split 사이에 반복되지 않는지도 파일럿 작성 시 수동 검토했습니다. `TEST` 결과를 보고 임계값이나 라벨을 다시 맞추지 않습니다.
 양성 expected evidence(`relevance` 1 또는 2)는 split 사이에 반복될 수 없으며 로더가 이를 실행 전에 차단합니다. `relevance` 0 hard negative의 반복은 허용합니다.
 
-## PRZ-008 Dataset v2
+## PRZ-008 Dataset v2.2
 
-`prizm-search-evidence-synthetic-v2`는 기존 파일럿을 재라벨링하지 않고 별도로 추가한
-합성 Dataset입니다. TUNING 10문항과 TEST 10문항이며, 각 split은 서로 다른 문서와
+`prizm-search-evidence-synthetic-v2.2`는 기존 파일럿을 재라벨링하지 않고 별도로 추가한
+합성 Dataset입니다. TUNING 15문항과 TEST 10문항이며, 각 split은 서로 다른 문서와
 원문 사실을 사용합니다. 일반·유사 주제 무근거, 없는 회사·자격증·기술, 바뀐 역할·수치,
 다른 사용자 문서, 과거 version, 검색 가능한 문서가 없는 사용자, 직접 근거,
 paraphrase, 날짜·숫자·고유명사, PDF gold page와 overlap 중복 사례를 포함합니다.
 
-기존 `sample` Dataset 30문항과 아래 과거 기준선은 변경하지 않았습니다. Dataset v2의
-실제 `searchEvaluation` 실행, Ollama·PostgreSQL 측정과 threshold 분석은 Batch 1A·1B
-범위가 아니므로 `NOT_RUN`입니다.
+v2.1은 실제 문서에서 관찰한 실패 구조만 합성한 백엔드 이력서·포트폴리오 2개와 TUNING
+5문항을 추가합니다. 정답 질문, 오타 질문, 동일 PDF 페이지의 overlap 중복과 유사 주제
+무근거 질문을 포함합니다. 실제 프로젝트명·개인정보·원문·성과 수치는 포함하지 않았습니다.
+v2.2는 overlap 경계에 걸린 직접 근거 anchor를 보완하되 질문·split은 바꾸지 않습니다.
+기존 TEST 10문항은 줄 단위 SHA-256
+`6eeeffed3a93b53edbc474e8a57f2eba6b627c6f4358cbafdc7b2f0b2b29fce9`로 고정했습니다.
+
+기존 `sample` Dataset 30문항과 아래 v2·v2.1 과거 기준선은 변경하지 않았습니다.
+Dataset v2의 TUNING 10문항, v2.1의 실패 재현 15문항과 v2.2의 평가 profile 15문항을
+Batch 1C에서 각각 측정했습니다. TEST는 계속 `NOT_RUN`입니다.
 
 ## 실행
 
@@ -76,6 +83,24 @@ Docker Desktop, PostgreSQL·pgvector Testcontainer와 로컬 Ollama `bge-m3`가 
 
 결과 위치를 바꾸려면 `-PsearchEvaluationOutput=<local-path>`를 추가합니다.
 
+Dataset v2는 split을 명시하지 않으면 실행을 거부합니다. 기존 sample Dataset의 기본
+실행 계약은 유지합니다. Batch 1C의 TUNING-only 실행은
+현재 PowerShell 프로세스에 다음 환경변수를 설정해 수행했습니다.
+
+```powershell
+$env:PRIZM_SEARCH_EVALUATION_SPLIT = 'TUNING'
+$env:PRIZM_SEARCH_EVALUATION_PROFILE = 'source-dedup-evidence-signals-v1'
+.\gradlew.bat searchEvaluation --no-daemon `
+  -PsearchEvaluationDataset=src/test/resources/search-evaluation/v2 `
+  -PsearchEvaluationOutput=local/search-evaluation/prz008-tuning-baseline
+Remove-Item Env:PRIZM_SEARCH_EVALUATION_SPLIT
+Remove-Item Env:PRIZM_SEARCH_EVALUATION_PROFILE
+```
+
+선택기는 질문과 corpus 문서를 같은 split으로 함께 제한합니다. 다른 사용자 전용 fixture는
+별도 합성 owner로 저장하고, 과거 version fixture는 `active_version_id`에 연결하지 않아
+제품과 동일한 owner·ACTIVE 검색 조건 밖에 둡니다.
+
 평가기는 합성 corpus를 현재 `TextChunker`와 실제 임베딩으로 색인하고, 프로덕션 `SearchService`의 top 5와 동일 owner·ACTIVE 조건의 평가 전용 top 20 순서가 일치하는지 확인합니다.
 
 ## 결과
@@ -92,6 +117,7 @@ relevance 순서, 검색 상태, top1 score·distance, 사용자 반환 수, 후
 
 - `CURRENT_PRODUCT`: 현재 제품 동작을 그대로 측정
 - `EVALUATION_THRESHOLD`: TUNING에서 검토할 평가용 판정 profile
+- `EVALUATION_COMPOSITE`: 출처 중복 축약과 비점수 근거 신호를 결합한 TUNING profile
 
 평가용 profile 결과를 제품 threshold나 현재 제품 동작으로 표현하지 않습니다. Batch
 1B에서는 profile 계약만 추가했으며 threshold 값은 선택하지 않았습니다.
@@ -125,6 +151,133 @@ label한 질문의 최대 Precision@5는 0.2이며, 이는 오류가 아니라 �
 JSON의 `directMrrAt20`은 PRZ-001 교정 이전 결과의 `mrr` 필드와 직접 비교하지 않습니다.
 
 합성 파일럿 기준선은 실제 개인 문서나 서비스 전체 검색 성능을 보장하지 않습니다. 이 수치는 이후 Reranker, Hybrid Search, 청킹 실험의 비교 기준입니다. 현재 score에 운영 임계값을 적용하거나 정답 확률로 해석하지 않습니다.
+
+## 2026-08-06 PRZ-008 Dataset v2 TUNING 기준선
+
+기준 source는 `b980e593ead1013704cd6eb6ce0664904e244879`이며 평가 전용 변경이 남은
+작업 트리에서 실행했습니다. Dataset ID는 `prizm-search-evidence-synthetic-v2`입니다.
+`corpus.json` bytes 뒤에 `questions.jsonl` bytes를 이어 계산한 SHA-256은
+`aecf3cca052e30e4937919920f7d53bfc117512bae8f2d9004a8f5f23e57c3c5`입니다.
+Docker Desktop 29.6.2, PostgreSQL 16.14를 포함한
+`pgvector/pgvector:0.8.2-pg16-bookworm` 이미지와 Ollama 0.32.5를 사용했습니다. 모델은
+`bge-m3:latest`, digest는
+`7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`, embedding은
+1024차원입니다. 후보 수는 20, 사용자 반환 수는 5, 순위는 exact cosine이며 제품
+threshold는 없습니다.
+
+| 지표 | 현재 제품 기준선 |
+|---|---:|
+| 질문 | TUNING 10개 |
+| Recall@20 / Direct Recall@20 | 1.0000 / 1.0000 |
+| Precision@5 / Direct Precision@5 | 0.1000 / 0.1000 |
+| Direct MRR@5 / @20 | 1.0000 / 1.0000 |
+| nDCG@5 | 0.9566 |
+| 중복 결과 비율 | 0.0200 |
+| top-1 직접 근거 / PDF page 정확도 | 1.0000 / 1.0000 |
+| 무관 질문 거부율 / 근거 질문 오거부율 | 0.0000 / 0.0000 |
+| 사용자 반환 수 min / avg / max | 5 / 5.0 / 5 |
+| 후보 수 min / avg / max | 6 / 6.0 / 6 |
+| total p50 / p95 | 117ms / 127ms |
+| embedding p50 / p95 | 115ms / 124ms |
+| DB p50 / p95 | 2ms / 4ms |
+
+후보 수 5·10·20의 prefix 품질은 이 작은 corpus에서 모두 Recall 1.0000, Direct MRR@20
+1.0000, nDCG@5 0.9566이었습니다. DB p50은 모두 2ms였고 p95는 각각 2ms, 2ms,
+4ms였습니다. 실제 후보가 질문마다 6개뿐이므로 10과 20의 차이는 운영 규모 후보 수
+효과를 증명하지 않습니다.
+
+근거 질문 top-1 score 범위는 `0.5582~0.7281`, 무근거 질문은 `0.3740~0.5849`로
+겹쳤습니다. `0.50`에서는 무근거 거부율 0.6667, 오거부율 0.0000과 기존 MRR·nDCG를
+유지했지만, `0.585`에서는 무근거 질문을 모두 거부하는 대신 오거부율이 0.2500,
+Direct MRR@5·@20이 0.7500, nDCG@5가 0.7066으로 떨어졌습니다. 하나의 threshold가
+두 집단을 안정적으로 분리하지 못하므로 결과는 `THRESHOLD_NOT_SEPARABLE`입니다.
+평가 profile과 제품 threshold는 고정하지 않았고 TEST도 실행하지 않았습니다. raw JSON과
+후보 CSV는 Git에서 제외된 `local/search-evaluation/prz008-tuning-baseline/`에 있습니다.
+이 결과는 v2.1 TUNING 실패 재현 사례를 추가하기 전의 과거 기준선이며, 새 5문항의 실제
+검색 결과로 확대 해석하지 않습니다.
+
+## 2026-08-06 PRZ-008 Dataset v2.1 TUNING 실패 재현
+
+기준 source commit은 `b980e593ead1013704cd6eb6ce0664904e244879`이며 평가 전용 변경이
+남은 작업 트리에서 실행했습니다. Dataset ID는
+`prizm-search-evidence-synthetic-v2.1`, 결합 SHA-256은
+`5e91468f3de7263f558116b83b8bbb32803c242cf0d5a0f1ba1a814cad1bf61c`입니다.
+Docker Desktop 29.6.2, PostgreSQL 16.14·pgvector 0.8.2 Testcontainer, Ollama 0.32.5와
+`bge-m3:latest`를 사용했습니다. 모델 digest는
+`7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`이고 embedding은
+1024차원입니다. 후보 20개를 평가하고 사용자 결과 5개를 반환하는 현재 제품 profile이며
+threshold는 없습니다.
+
+| 지표 | TUNING 15문항 |
+|---|---:|
+| Recall@20 / Direct Recall@20 | 1.0000 / 1.0000 |
+| Precision@5 / Direct Precision@5 | 0.1867 / 0.1467 |
+| Direct MRR@5 / @20 | 0.9375 / 0.9375 |
+| nDCG@5 | 0.9321 |
+| top-1 직접 근거 정확도 | 0.8750 |
+| 중복 결과 비율 | 0.0933 |
+| 무관 질문 거부율 / 근거 질문 오거부율 | 0.0000 / 0.0000 |
+| 사용자 반환 수 / 실제 후보 수 | 질문별 5 / 11 |
+| total p50 / p95 | 120ms / 130ms |
+| embedding p50 / p95 | 117ms / 127ms |
+| DB p50 / p95 | 3ms / 4ms |
+
+추가한 실패 재현 5문항에서 정답 질문은 relevance 순서 `2,2,0,1,0`, 매칭 오타 질문은
+`2,0,2,1,0`, 외부 푸시 오타 질문은 `2,0,0,0,0`으로 직접 근거가 1위였습니다. 오타
+질문 2개는 모두 top-1 직접 근거를 유지했습니다. 동일 페이지 중복 질문은
+`0,2,1,0,0`으로 무관 청크가 1위이고 직접 근거가 2위였습니다. 새 5문항의 top-5 중
+같은 evidence group 반복은 6건으로 중복률은 24%였습니다. 유사 주제 무근거 질문은
+관련 근거가 없는데도 `EVIDENCE_FOUND`와 5개 결과를 반환했고 top-1 score는 0.5781이었습니다.
+
+전체 근거 질문 top-1 score 범위 `0.5582~0.7281`과 무근거 질문 범위
+`0.3740~0.5849`는 계속 겹칩니다. 따라서 score 단독 threshold는 여전히
+`THRESHOLD_NOT_SEPARABLE`이며 제품 profile을 고정하지 않았습니다. 실행 결과의 split은
+`TUNING` 하나뿐이고 TEST는 실행하지 않았습니다. raw JSON과 후보 CSV는 Git에서 제외된
+`local/search-evaluation/prz008-tuning-v21-failure-reproduction-20260806/`에 있습니다.
+
+## 2026-08-07 PRZ-008 Dataset v2.2 TUNING profile
+
+기준 source commit은 `b980e593ead1013704cd6eb6ce0664904e244879`이며 평가 전용 변경이
+남은 작업 트리에서 실행했습니다. Dataset ID는 `prizm-search-evidence-synthetic-v2.2`,
+결합 SHA-256은
+`f946fed8c145112c1082d7c08c25b357bd459b4c7cc53deb7b7e23731a2b7c2c`입니다.
+TUNING은 질문 15개, fixture 8개, evidence group 13개입니다. Docker Desktop 29.6.2,
+PostgreSQL 16.14·pgvector 0.8.2 Testcontainer, Ollama 0.32.5와 `bge-m3:latest`를
+사용했습니다. 모델 digest는
+`7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`이고 embedding은
+1024차원입니다.
+
+평가 전용 `source-dedup-evidence-signals-v1` profile은 exact cosine 후보 최대 20개를
+그대로 측정한 뒤 같은 PDF page·TXT overlap을 축약합니다. 각 반환 후보에 고유 식별자,
+수치, 핵심어와 명시적 부정 신호를 검사하고, 강한 식별자 또는 수치와 핵심어가 함께
+반복되는 요약 근거는 문서가 달라도 한 결과로 묶습니다. 이는 제품 검색 동작이 아닙니다.
+Recall@20과 후보 수는 원래 후보를 사용하고 Precision·MRR@5·nDCG·top-1·중복률은 실제
+반환 chunk ID와 반환 순서를 사용합니다.
+
+| 지표 | TUNING 15문항 |
+|---|---:|
+| Recall@20 / Direct Recall@20 | 1.0000 / 1.0000 |
+| Precision@5 / Direct Precision@5 | 0.1067 / 0.1067 |
+| Direct MRR@5 / @20 | 1.0000 / 1.0000 |
+| nDCG@5 | 0.9783 |
+| top-1 직접 근거 / PDF page 정확도 | 1.0000 / 1.0000 |
+| 중복 결과 비율 | 0.0000 |
+| 무관 질문 거부율 / 근거 질문 오거부율 | 1.0000 / 0.0000 |
+| 사용자 반환 수 min / avg / max | 0 / 0.5333 / 1 |
+| 후보 수 min / avg / max | 11 / 11.0 / 11 |
+| total p50 / p95 | 122ms / 132ms |
+| embedding p50 / p95 | 119ms / 129ms |
+| DB p50 / p95 | 3ms / 4ms |
+
+직접 근거 질문 8개와 오타 질문 2개는 모두 relevance 2를 1위로 반환했습니다. 무관 질문
+7개는 모두 `NO_EVIDENCE`와 결과 0건이었고, 근거 질문의 오거부는 없었습니다. 모든 근거
+질문은 직접 근거 한 건만 반환해 같은 page·overlap·이력서 요약의 중복과 약한 후속 결과가
+남지 않았습니다. 따라서 사전 고정한 작은 TUNING Gate는 통과했습니다.
+
+이 결과는 평가 profile 동작을 고정할 근거일 뿐 제품 품질 완료나 일반화를 뜻하지
+않습니다. 제품 source와 threshold는 변경하지 않았고 TEST·Batch 1D도 실행하지
+않았습니다. raw JSON과 후보 CSV는 Git에서 제외된
+`local/search-evaluation/prz008-tuning-v22-composite-final-20260807/`에 있습니다.
 
 ## 2026-07-14 합성 기준선
 

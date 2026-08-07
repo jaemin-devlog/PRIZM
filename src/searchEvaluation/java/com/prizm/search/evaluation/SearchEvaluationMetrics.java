@@ -87,10 +87,8 @@ public class SearchEvaluationMetrics {
             List<CandidateResult> top20 = result.candidates().stream()
                     .limit(CANDIDATE_LIMIT)
                     .toList();
-            int userResultCount = Math.min(result.returnedChunkIds().size(), top20.size());
-            List<CandidateResult> top5 = top20.stream()
-                    .limit(Math.min(userResultCount, FINAL_RESULT_LIMIT))
-                    .toList();
+            List<CandidateResult> top5 = returnedCandidates(result, top20);
+            int userResultCount = top5.size();
 
             boolean hasExpectedEvidence = result.expectedEvidence().stream()
                     .anyMatch(evidence -> evidence.relevance() >= 1);
@@ -110,7 +108,7 @@ public class SearchEvaluationMetrics {
                     directRecallHits++;
                 }
                 if (result.searchState() == SearchState.EVIDENCE_FOUND) {
-                    reciprocalRankAt5Sum += reciprocalRank(top20, FINAL_RESULT_LIMIT);
+                    reciprocalRankAt5Sum += reciprocalRank(top5, FINAL_RESULT_LIMIT);
                     reciprocalRankAt20Sum += reciprocalRank(top20, CANDIDATE_LIMIT);
                 }
                 if (result.searchState() == SearchState.EVIDENCE_FOUND
@@ -208,10 +206,29 @@ public class SearchEvaluationMetrics {
                 dbLatency);
     }
 
+    private List<CandidateResult> returnedCandidates(
+            QuestionResult result,
+            List<CandidateResult> candidates) {
+        Map<Long, CandidateResult> candidatesById = candidates.stream()
+                .collect(java.util.stream.Collectors.toMap(CandidateResult::chunkId, candidate -> candidate));
+        return result.returnedChunkIds().stream()
+                .limit(FINAL_RESULT_LIMIT)
+                .map(chunkId -> {
+                    CandidateResult candidate = candidatesById.get(chunkId);
+                    if (candidate == null) {
+                        throw new IllegalStateException(
+                                "Returned result is missing from the evaluated candidate set.");
+                    }
+                    return candidate;
+                })
+                .toList();
+    }
+
     private double reciprocalRank(List<CandidateResult> candidates, int cutoff) {
-        for (CandidateResult candidate : candidates.stream().limit(cutoff).toList()) {
-            if (candidate.relevance() == 2) {
-                return 1.0d / candidate.rank();
+        int limit = Math.min(cutoff, candidates.size());
+        for (int index = 0; index < limit; index++) {
+            if (candidates.get(index).relevance() == 2) {
+                return 1.0d / (index + 1.0d);
             }
         }
         return 0.0d;

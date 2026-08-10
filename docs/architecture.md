@@ -9,9 +9,12 @@
 > 최종 Windows·Linux 경로 교정·CI source commit:
 > `aff3e87a9a912e44fcf217291a45328cf451cfc9`
 >
-> 문서 검토 기준일: `2026-08-01`
+> 문서 검토 기준일: `2026-08-10`
 >
 > PRZ-004 상태: `VERIFIED` — 독립 감사, PR #25 CI와 GitHub `main` 통합 완료
+>
+> PRZ-009 상태: `IMPLEMENTED_UNVERIFIED` — 현재 작업 트리의 전체 PostgreSQL integration,
+> browser와 최종 감사는 통과했으나 OpenSQL opt-in 검증은 `NOT_RUN`
 >
 > 범위: 현재 Spring Boot 애플리케이션과 React Career Vault Reference App
 
@@ -128,9 +131,9 @@ API 경로에서, 문서 색인은 Indexing Worker 경로에서 Ollama를 호출
 
 | 구성요소 | 책임 | 직접 접근 대상 |
 |---|---|---|
-| React Career Vault | 로그인, 문서 목록·상세·업로드·관리와 검색 결과 표시 | 같은 origin의 Nginx `/api` |
+| React Career Vault | 로그인, 문서 목록·상세·업로드·관리, 검색 결과와 경력 키워드 맵 표시 | 같은 origin의 Nginx `/api` |
 | Nginx | React SPA 정적 파일 제공, `/api`·`/actuator` reverse proxy | Spring Boot backend |
-| Spring Boot API | JWT·DB 사용자 재검증, 문서 관리, 검색 요청 처리 | PostgreSQL, 파일 저장소, Ollama |
+| Spring Boot API | JWT·DB 사용자 재검증, 문서 관리, 검색과 경력 키워드 요청 처리 | PostgreSQL, 파일 저장소, Ollama |
 | Indexing Scheduler / Worker | 작업 선점, 추출·청킹·임베딩, ACTIVE 전환과 실패 복구 | PostgreSQL, 파일 저장소, Ollama |
 | Cleanup Scheduler / Worker | 보상 삭제와 문서 삭제에서 생긴 파일 정리 작업의 재시도·복구 | PostgreSQL, 파일 저장소 |
 | PostgreSQL+pgvector | 사용자·문서·버전·작업 상태 저장과 owner-scoped exact cosine 검색 | Spring Boot 프로세스 |
@@ -217,6 +220,38 @@ ANN 인덱스나 score 임계값은 사용하지 않습니다.
 - [벡터 검색 SQL](../src/main/java/com/prizm/search/repository/VectorSearchRepository.java)
 - [검색 서비스 테스트](../src/test/java/com/prizm/search/service/SearchServiceTest.java)
 - [Career Evidence API 테스트](../src/test/java/com/prizm/search/controller/CareerEvidenceSearchControllerTest.java)
+
+### 경력 키워드 맵의 생성과 해석
+
+PRZ-009 작업 트리는 별도 keyword table이나 생성형 모델 없이 기존 active chunk를
+요청 시 읽는다. SQL은 현재 사용자의 document·version·chunk owner를 모두 제한하고,
+`active_version_id`가 가리키는 `ACTIVE` 이력서와 포트폴리오만 선택한다. TXT chunk는
+overlap을 한 번만 남겨 전체 원문으로 조립하고 PDF chunk는 페이지별로 유지한다.
+
+조립한 원문에 실제 등장한 token과 명시적으로 지원하는 복합 기술어만 정규화해
+빈도와 문서 수를 계산한다. 등록된 한영 별칭과 Java 버전 표기는 canonical keyword에
+합치되 source의 실제 표기는 variants와 matched terms로 보존한다. 각 keyword에는
+언어·프레임워크·DB·인프라 등 고정 category가 붙고 React 화면은 언급 수·문서 수·
+`log1p(frequency) * (1 + log1p(documentCount))` 균형 점수로 같은 목록을 재정렬한다.
+
+이 값은 원문 탐색용 인덱스이며 CareerFact, 숙련도나 경력 진위 판정이 아니다. 화면에서
+키워드를 선택하면 같은 active source의 발췌문을 document/version별로 묶어 대표 근거를
+먼저 보여준다. owner-scoped original endpoint로 UTF-8 TXT의 첫 일치 표기를 강조하거나
+PDF built-in viewer를 page/search fragment 위치로 연다.
+
+현재 소스 구현과 단위·controller test, frontend lint·build, 전체 PostgreSQL integration,
+synthetic browser 흐름과 최종 diff 감사는 완료됐다. OpenSQL opt-in integration은 전용
+검증 target을 활성화하지 않아 `NOT_RUN`이므로 이 절은 계속 `IMPLEMENTED_UNVERIFIED`
+구조를 설명하며 OpenSQL 검증 근거로 사용하지 않는다.
+
+근거:
+
+- [키워드 source SQL](../src/main/java/com/prizm/careerkeyword/repository/CareerKeywordRepository.java)
+- [원문 overlap 조립](../src/main/java/com/prizm/careerkeyword/service/KeywordSourceAssembler.java)
+- [키워드 추출](../src/main/java/com/prizm/careerkeyword/service/CareerKeywordExtractor.java)
+- [키워드 API service](../src/main/java/com/prizm/careerkeyword/service/CareerKeywordService.java)
+- [React 키워드 화면](../frontend/src/App.tsx)
+- [PRZ-009 검증 기록](../specs/PRZ-009-career-keyword-map/evidence.md)
 
 ## 7. 핵심 데이터 관계
 

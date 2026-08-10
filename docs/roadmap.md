@@ -28,10 +28,12 @@ integration test와 전체 회귀를 통과하고 PR #26으로 `main`에 통합�
    - UI와 청킹·색인 최적화는 같은 변경에 섞지 않고, 평가 Gate를 통과한 단계만
      별도 PR로 진행합니다.
 2. **경력 키워드 맵**
-   - 현재 사용자의 `ACTIVE` 이력서·포트폴리오 원문에서 실제로 확인한 키워드를
-     빈도 기반으로 표시하고, 선택한 키워드를 원문 위치와 TXT/PDF 원본에 연결합니다.
-   - [PRZ-009](../specs/PRZ-009-career-keyword-map/spec.md)는 `PLANNED`이며 구현은
-     시작하지 않았습니다. 결과는 CareerFact나 검증된 숙련도 판정으로 사용하지 않습니다.
+   - 현재 사용자의 `ACTIVE` 이력서·포트폴리오 원문에서 실제로 확인한 기술을 정규화하고,
+     category와 세 순위 기준으로 표시하며 문서별 근거와 TXT/PDF 원본 위치에 연결합니다.
+   - [PRZ-009](../specs/PRZ-009-career-keyword-map/spec.md)는 소스 구현, 단위·정적 검증,
+     전체 PostgreSQL integration, synthetic browser와 최종 감사를 마쳤습니다. OpenSQL
+     opt-in target이 `NOT_RUN`이므로 상태는 `IMPLEMENTED_UNVERIFIED`이며, 결과를
+     CareerFact나 검증된 숙련도 판정으로 사용하지 않습니다.
 3. **DB 장애 전환**
    - 실제 다중 노드 구성을 확보한 뒤 장애 주입, 애플리케이션 재연결과 검색 복구를
      측정합니다.

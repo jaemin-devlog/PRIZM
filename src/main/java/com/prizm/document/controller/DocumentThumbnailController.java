@@ -3,6 +3,7 @@ package com.prizm.document.controller;
 import com.prizm.auth.security.CurrentUserProvider;
 import com.prizm.document.dto.response.DocumentOriginalResponse;
 import com.prizm.document.dto.response.DocumentThumbnailResponse;
+import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.service.DocumentThumbnailService;
 import java.nio.charset.StandardCharsets;
 import org.springframework.http.ContentDisposition;
@@ -45,8 +46,8 @@ public class DocumentThumbnailController {
                 .body(thumbnail.pngBytes());
     }
 
-    /** Streams an owner-scoped PDF inline without exposing its storage key or local path. */
-    @GetMapping(value = "/{documentId}/versions/{versionId}/original", produces = MediaType.APPLICATION_PDF_VALUE)
+    /** Streams an owner-scoped TXT/PDF original inline without exposing its storage key or local path. */
+    @GetMapping("/{documentId}/versions/{versionId}/original")
     public ResponseEntity<byte[]> getOriginal(
             @PathVariable Long documentId,
             @PathVariable Long versionId) {
@@ -55,14 +56,17 @@ public class DocumentThumbnailController {
         ContentDisposition disposition = ContentDisposition.inline()
                 .filename(sanitizeHeaderFileName(original.originalFileName()), StandardCharsets.UTF_8)
                 .build();
+        MediaType contentType = original.fileType() == DocumentFileType.PDF
+                ? MediaType.APPLICATION_PDF
+                : new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CACHE_CONTROL, "private, no-store, no-cache, must-revalidate")
                 .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
                 .header("X-Content-Type-Options", "nosniff")
                 .header("Content-Security-Policy", "sandbox")
-                .contentType(MediaType.APPLICATION_PDF)
-                .contentLength(original.pdfBytes().length)
-                .body(original.pdfBytes());
+                .contentType(contentType)
+                .contentLength(original.bytes().length)
+                .body(original.bytes());
     }
 
     private String sanitizeHeaderFileName(String originalFileName) {

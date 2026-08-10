@@ -72,7 +72,7 @@
 | [PRZ-006](PRZ-006-local-single-user-demo/spec.md) | 로컬 보관함 빠른 시작 | `VERIFIED` | `bfd8600` | 2026-08-04 |
 | [PRZ-007](PRZ-007-self-hosted-signup/spec.md) | 자체 호스팅 회원가입 | `VERIFIED` | `2b8b600` | 2026-08-05 |
 | [PRZ-008](PRZ-008-search-evidence-reliability/spec.md) | 검색 근거 신뢰성 | `PLANNED` | — | — |
-| [PRZ-009](PRZ-009-career-keyword-map/spec.md) | 경력 키워드 맵 | `PLANNED` | — | — |
+| [PRZ-009](PRZ-009-career-keyword-map/spec.md) | 경력 키워드 맵 | `IMPLEMENTED_UNVERIFIED` | 작업 트리 | 2026-08-10 |
 
 PRZ-005의 실제 환경 준비 결과와 남은 범위는
 [실제 OpenSQL 통합 작업 보고서](PRZ-005-opensql-ollama-e2e/implementation-report.md)에서

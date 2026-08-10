@@ -180,8 +180,9 @@ class DocumentManagementDatabaseIntegrationTest {
         var original = documentThumbnailService.getOriginal(
                 owner.getId(), upload.documentId(), upload.versionId());
 
-        assertThat(original.pdfBytes()).isEqualTo(pdfBytes);
+        assertThat(original.bytes()).isEqualTo(pdfBytes);
         assertThat(original.originalFileName()).isEqualTo("career-evidence.pdf");
+        assertThat(original.fileType()).isEqualTo(DocumentFileType.PDF);
         assertThatThrownBy(() -> documentThumbnailService.getOriginal(
                         otherUser.getId(), upload.documentId(), upload.versionId()))
                 .isInstanceOf(DocumentNotFoundException.class);

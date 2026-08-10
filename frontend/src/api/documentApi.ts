@@ -237,6 +237,34 @@ export async function getDocumentPdf(
   return response.blob()
 }
 
+export type DocumentOriginal = {
+  blob: Blob
+  fileType: DocumentFileType
+}
+
+export async function getDocumentOriginal(
+  documentId: number,
+  versionId: number,
+  signal?: AbortSignal,
+): Promise<DocumentOriginal> {
+  const response = await documentRequest(
+    `/api/documents/${documentId}/versions/${versionId}/original`,
+    {
+      headers: { Accept: 'application/pdf, text/plain, application/json' },
+      signal,
+    },
+  )
+
+  const contentType = (response.headers.get('Content-Type') ?? '').toLowerCase()
+  if (contentType.startsWith('application/pdf')) {
+    return { blob: await response.blob(), fileType: 'PDF' }
+  }
+  if (contentType.startsWith('text/plain')) {
+    return { blob: await response.blob(), fileType: 'TXT' }
+  }
+  throw new DocumentApiError(502, 'INVALID_ORIGINAL_RESPONSE')
+}
+
 async function responseErrorCode(response: Response): Promise<string | null> {
   try {
     const body: unknown = await response.json()

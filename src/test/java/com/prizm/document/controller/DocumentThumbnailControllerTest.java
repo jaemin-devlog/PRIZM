@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.prizm.document.dto.response.DocumentOriginalResponse;
 import com.prizm.document.dto.response.DocumentThumbnailResponse;
+import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.exception.DocumentThumbnailErrorCode;
 import com.prizm.document.exception.DocumentThumbnailException;
 import com.prizm.document.service.DocumentThumbnailService;
@@ -66,7 +67,8 @@ class DocumentThumbnailControllerTest {
     void returnsUtf8NamedPdfInlineWithPrivateNoStoreSecurityHeaders() throws Exception {
         byte[] pdfBytes = "%PDF-1.7".getBytes();
         when(documentThumbnailService.getOriginal(7L, 11L, 22L))
-                .thenReturn(new DocumentOriginalResponse(pdfBytes, "경력 증명서.pdf"));
+                .thenReturn(new DocumentOriginalResponse(
+                        pdfBytes, "경력 증명서.pdf", DocumentFileType.PDF));
 
         mockMvc.perform(get(ORIGINAL_ENDPOINT).with(userJwt(7L)))
                 .andExpect(status().isOk())
@@ -86,9 +88,28 @@ class DocumentThumbnailControllerTest {
     }
 
     @Test
+    void returnsUtf8TxtInlineWithPrivateNoStoreSecurityHeaders() throws Exception {
+        byte[] txtBytes = "Spring Boot 경력".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        when(documentThumbnailService.getOriginal(7L, 11L, 22L))
+                .thenReturn(new DocumentOriginalResponse(
+                        txtBytes, "이력서.txt", DocumentFileType.TXT));
+
+        mockMvc.perform(get(ORIGINAL_ENDPOINT).with(userJwt(7L)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                .andExpect(content().bytes(txtBytes))
+                .andExpect(header().string(
+                        HttpHeaders.CACHE_CONTROL,
+                        "private, no-store, no-cache, must-revalidate"))
+                .andExpect(header().string("X-Content-Type-Options", "nosniff"))
+                .andExpect(header().string("Content-Security-Policy", "sandbox"));
+    }
+
+    @Test
     void sanitizesControlCharactersInTheOriginalResponseFileName() throws Exception {
         when(documentThumbnailService.getOriginal(7L, 11L, 22L))
-                .thenReturn(new DocumentOriginalResponse("%PDF".getBytes(), "report\r\nInjected.pdf"));
+                .thenReturn(new DocumentOriginalResponse(
+                        "%PDF".getBytes(), "report\r\nInjected.pdf", DocumentFileType.PDF));
 
         mockMvc.perform(get(ORIGINAL_ENDPOINT).with(userJwt(7L)))
                 .andExpect(status().isOk())
@@ -125,7 +146,7 @@ class DocumentThumbnailControllerTest {
     }
 
     @Test
-    void returnsUnsupportedMediaTypeForTxtAndUnreadablePdfVersions() throws Exception {
+    void returnsUnsupportedMediaTypeForTxtThumbnailVersions() throws Exception {
         when(documentThumbnailService.get(7L, 11L, 22L)).thenThrow(new DocumentThumbnailException(
                 DocumentThumbnailErrorCode.UNSUPPORTED_FILE_TYPE,
                 "Thumbnail previews are only available for PDF documents."));
@@ -148,11 +169,8 @@ class DocumentThumbnailControllerTest {
     }
 
     @Test
-    void returnsSafeOriginalErrorsForTxtMissingAndTransientStorageFailures() throws Exception {
+    void returnsSafeOriginalErrorsForMissingAndTransientStorageFailures() throws Exception {
         when(documentThumbnailService.getOriginal(7L, 11L, 22L))
-                .thenThrow(new DocumentThumbnailException(
-                        DocumentThumbnailErrorCode.UNSUPPORTED_FILE_TYPE,
-                        "Original viewing is only available for PDF documents."))
                 .thenThrow(new DocumentThumbnailException(
                         DocumentThumbnailErrorCode.ORIGINAL_FILE_NOT_FOUND,
                         "The original file is not available."))
@@ -160,9 +178,6 @@ class DocumentThumbnailControllerTest {
                         DocumentThumbnailErrorCode.ORIGINAL_FILE_READ_FAILED,
                         "The original file is temporarily unavailable."));
 
-        mockMvc.perform(get(ORIGINAL_ENDPOINT).with(userJwt(7L)))
-                .andExpect(status().isUnsupportedMediaType())
-                .andExpect(jsonPath("$.code").value("UNSUPPORTED_FILE_TYPE"));
         mockMvc.perform(get(ORIGINAL_ENDPOINT).with(userJwt(7L)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("ORIGINAL_FILE_NOT_FOUND"));

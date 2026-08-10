@@ -57,7 +57,9 @@ public class SecurityConfiguration {
                                 "/api/documents/**",
                                 "/api/search",
                                 "/api/search/**",
-                                "/api/career-evidence/search")
+                                "/api/career-evidence/search",
+                                "/api/career-keywords",
+                                "/api/career-keywords/**")
                         .hasRole("USER")
                         .requestMatchers("/api/users/me").authenticated()
                         .anyRequest().denyAll())

@@ -17,7 +17,7 @@ import com.prizm.infrastructure.storage.TransientFileStorageException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Resolves an owner-scoped PDF for either a bounded thumbnail or a secured inline original view. */
+/** Resolves an owner-scoped version for a bounded PDF thumbnail or secured inline original view. */
 @Service
 @Transactional(readOnly = true)
 public class DocumentThumbnailService {
@@ -45,25 +45,31 @@ public class DocumentThumbnailService {
         return new DocumentThumbnailResponse(renderer.render(originalBytes), version.getContentHash());
     }
 
-    /** Returns the immutable original PDF without exposing its storage key or local path. */
+    /** Returns the immutable TXT/PDF original without exposing its storage key or local path. */
     public DocumentOriginalResponse getOriginal(Long ownerUserId, Long documentId, Long versionId) {
-        DocumentVersion version = resolveOwnedPdfVersion(ownerUserId, documentId, versionId);
-        return new DocumentOriginalResponse(readOriginal(version), version.getOriginalFileName());
+        DocumentVersion version = resolveOwnedVersion(ownerUserId, documentId, versionId);
+        return new DocumentOriginalResponse(
+                readOriginal(version),
+                version.getOriginalFileName(),
+                version.getFileType());
     }
 
     private DocumentVersion resolveOwnedPdfVersion(Long ownerUserId, Long documentId, Long versionId) {
+        DocumentVersion version = resolveOwnedVersion(ownerUserId, documentId, versionId);
+        if (version.getFileType() != DocumentFileType.PDF) {
+            throw new DocumentThumbnailException(
+                    DocumentThumbnailErrorCode.UNSUPPORTED_FILE_TYPE,
+                    "Thumbnail previews are only available for PDF documents.");
+        }
+        return version;
+    }
+
+    private DocumentVersion resolveOwnedVersion(Long ownerUserId, Long documentId, Long versionId) {
         documentRepository.findByIdAndOwnerUserId(documentId, ownerUserId)
                 .orElseThrow(() -> new DocumentNotFoundException(documentId));
         DocumentVersion version = documentVersionRepository
                 .findByIdAndOwnerUserIdAndDocumentId(versionId, ownerUserId, documentId)
                 .orElseThrow(() -> new DocumentVersionNotFoundException(versionId));
-
-        if (version.getFileType() != DocumentFileType.PDF) {
-            throw new DocumentThumbnailException(
-                    DocumentThumbnailErrorCode.UNSUPPORTED_FILE_TYPE,
-                    "Original viewing is only available for PDF documents.");
-        }
-
         return version;
     }
 

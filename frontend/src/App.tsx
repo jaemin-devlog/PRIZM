@@ -16,9 +16,18 @@ import {
   type LoginResponse,
 } from './api/authApi'
 import {
+  CareerKeywordApiError,
+  getCareerKeywordEvidence,
+  getCareerKeywordMap,
+  type CareerKeywordCategory,
+  type CareerKeywordEvidenceItem,
+  type CareerKeywordSummary,
+} from './api/careerKeywordApi'
+import {
   DocumentApiError,
   deleteDocument,
   getDocument,
+  getDocumentOriginal,
   getDocumentPdf,
   getDocuments,
   getDocumentThumbnail,
@@ -46,9 +55,26 @@ import {
 const LOGIN_PATH = '/login'
 const CAREER_VAULT_PATH = '/career-vault'
 const DOCUMENTS_PATH = '/career-vault/documents'
+const KEYWORDS_PATH = '/career-vault/keywords'
 const EVIDENCE_PATH = '/career-vault/evidence'
 const UPLOAD_PATH = '/career-vault/upload'
 const MAX_UPLOAD_FILE_SIZE_BYTES = 10 * 1024 * 1024
+const TOP_KEYWORD_LIMIT = 15
+
+const KEYWORD_CATEGORY_LABELS: Record<CareerKeywordCategory, string> = {
+  LANGUAGE: '언어',
+  FRAMEWORK: '프레임워크',
+  DATABASE: '데이터베이스',
+  INFRASTRUCTURE: '인프라',
+  MESSAGING: '메시징',
+  SECURITY: '보안',
+  TESTING: '테스트',
+  WEB: '웹·애플리케이션',
+  TOOLING: '개발 도구',
+  ENGINEERING_CONCEPT: '공학 개념',
+}
+
+const KEYWORD_CATEGORY_ORDER = Object.keys(KEYWORD_CATEGORY_LABELS) as CareerKeywordCategory[]
 
 const DOCUMENT_TYPE_OPTIONS: ReadonlyArray<{ value: DocumentType | undefined; label: string }> = [
   { value: undefined, label: '전체' },
@@ -104,11 +130,16 @@ const NAVIGATION_ITEMS: ReadonlyArray<{
   marker: string
 }> = [
   { path: DOCUMENTS_PATH, label: '문서 보관함', marker: '문' },
+  { path: KEYWORDS_PATH, label: '경력 키워드', marker: '키' },
   { path: EVIDENCE_PATH, label: '경력 근거 검색', marker: '근' },
   { path: UPLOAD_PATH, label: '문서 업로드', marker: '+' },
 ]
 
-type VaultPath = typeof DOCUMENTS_PATH | typeof EVIDENCE_PATH | typeof UPLOAD_PATH
+type VaultPath =
+  | typeof DOCUMENTS_PATH
+  | typeof KEYWORDS_PATH
+  | typeof EVIDENCE_PATH
+  | typeof UPLOAD_PATH
 type AppPath = typeof LOGIN_PATH | VaultPath
 type SearchState = 'idle' | 'loading' | 'result' | 'empty' | 'error'
 type UploadErrorTarget = 'file' | 'title' | 'form' | null
@@ -120,8 +151,40 @@ type PdfViewerTarget = {
   originalFileName: string
 }
 
+type KeywordRankingMode = 'frequency' | 'documents' | 'balanced'
+type KeywordCategoryFilter = CareerKeywordCategory | 'ALL'
+
+type OriginalViewerTarget = Pick<
+  CareerKeywordEvidenceItem,
+  | 'documentId'
+  | 'documentVersionId'
+  | 'versionNo'
+  | 'originalFileName'
+  | 'fileType'
+  | 'sourceType'
+  | 'sourceIndex'
+  | 'sourceLabel'
+  | 'matchedTerms'
+> & { keyword: string }
+
+type CareerKeywordEvidenceGroup = {
+  key: string
+  documentId: number
+  documentVersionId: number
+  documentTitle: string
+  documentType: DocumentType
+  versionNo: number
+  originalFileName: string
+  fileType: CareerKeywordEvidenceItem['fileType']
+  occurrenceCount: number
+  sources: CareerKeywordEvidenceItem[]
+}
+
 function isVaultPath(pathname: string): pathname is VaultPath {
-  return pathname === DOCUMENTS_PATH || pathname === EVIDENCE_PATH || pathname === UPLOAD_PATH
+  return pathname === DOCUMENTS_PATH
+    || pathname === KEYWORDS_PATH
+    || pathname === EVIDENCE_PATH
+    || pathname === UPLOAD_PATH
 }
 
 function toAppPath(pathname: string): AppPath {
@@ -520,6 +583,7 @@ function CareerVaultShell({
       <main className="vault-content">
         <div className="vault-page-container">
           {path === DOCUMENTS_PATH && <DocumentsPage onSessionExpired={onSessionExpired} />}
+          {path === KEYWORDS_PATH && <CareerKeywordsPage onSessionExpired={onSessionExpired} />}
           {path === EVIDENCE_PATH && <EvidencePage onSessionExpired={onSessionExpired} />}
           {path === UPLOAD_PATH && (
             <UploadPage
@@ -1459,6 +1523,658 @@ function DocumentThumbnail({
       )}
     </div>
   )
+}
+
+function CareerKeywordsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
+  const [keywords, setKeywords] = useState<CareerKeywordSummary[]>([])
+  const [documentCount, setDocumentCount] = useState(0)
+  const [keywordState, setKeywordState] = useState<SearchState>('loading')
+  const [keywordReloadKey, setKeywordReloadKey] = useState(0)
+  const [categoryFilter, setCategoryFilter] = useState<KeywordCategoryFilter>('ALL')
+  const [rankingMode, setRankingMode] = useState<KeywordRankingMode>('frequency')
+  const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null)
+  const [evidence, setEvidence] = useState<CareerKeywordEvidenceItem[]>([])
+  const [evidenceFrequency, setEvidenceFrequency] = useState(0)
+  const [evidenceState, setEvidenceState] = useState<SearchState>('idle')
+  const [originalViewerTarget, setOriginalViewerTarget] = useState<OriginalViewerTarget | null>(null)
+  const [originalViewerUrl, setOriginalViewerUrl] = useState<string | null>(null)
+  const [originalViewerText, setOriginalViewerText] = useState<string | null>(null)
+  const [originalViewerErrorMessage, setOriginalViewerErrorMessage] = useState<string | null>(null)
+  const [isOriginalViewerLoading, setIsOriginalViewerLoading] = useState(false)
+  const [expandedEvidenceGroups, setExpandedEvidenceGroups] = useState<Set<string>>(() => new Set())
+  const evidenceRequestId = useRef(0)
+  const originalRequestId = useRef(0)
+  const originalAbortController = useRef<AbortController | null>(null)
+  const originalObjectUrl = useRef<string | null>(null)
+  const originalMatchRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    void getCareerKeywordMap(controller.signal)
+      .then((response) => {
+        setDocumentCount(response.documentCount)
+        setKeywords(response.keywords)
+        setKeywordState(response.keywords.length === 0 ? 'empty' : 'result')
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) {
+          return
+        }
+        if (error instanceof CareerKeywordApiError && (error.status === 401 || error.status === 403)) {
+          onSessionExpired()
+          return
+        }
+        setKeywordState('error')
+      })
+
+    return () => controller.abort()
+  }, [keywordReloadKey, onSessionExpired])
+
+  const handleKeywordReload = () => {
+    evidenceRequestId.current += 1
+    setKeywords([])
+    setKeywordState('loading')
+    setSelectedKeyword(null)
+    setEvidence([])
+    setEvidenceState('idle')
+    setExpandedEvidenceGroups(new Set())
+    setKeywordReloadKey((value) => value + 1)
+  }
+
+  const closeOriginalViewer = useCallback(() => {
+    originalRequestId.current += 1
+    originalAbortController.current?.abort()
+    originalAbortController.current = null
+    if (originalObjectUrl.current !== null) {
+      URL.revokeObjectURL(originalObjectUrl.current)
+      originalObjectUrl.current = null
+    }
+    setOriginalViewerTarget(null)
+    setOriginalViewerUrl(null)
+    setOriginalViewerText(null)
+    setOriginalViewerErrorMessage(null)
+    setIsOriginalViewerLoading(false)
+    originalMatchRef.current = null
+  }, [])
+
+  useEffect(() => () => {
+    originalAbortController.current?.abort()
+    if (originalObjectUrl.current !== null) {
+      URL.revokeObjectURL(originalObjectUrl.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (originalViewerTarget === null) {
+      return
+    }
+
+    const previousOverflow = document.body.style.overflow
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeOriginalViewer()
+      }
+    }
+    document.body.style.overflow = 'hidden'
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [closeOriginalViewer, originalViewerTarget])
+
+  useEffect(() => {
+    if (originalViewerText === null || isOriginalViewerLoading) {
+      return
+    }
+    const animationFrame = window.requestAnimationFrame(() => {
+      originalMatchRef.current?.scrollIntoView({ block: 'center' })
+    })
+    return () => window.cancelAnimationFrame(animationFrame)
+  }, [isOriginalViewerLoading, originalViewerText])
+
+  const handleKeywordSelect = async (keyword: string) => {
+    const requestId = evidenceRequestId.current + 1
+    evidenceRequestId.current = requestId
+    setSelectedKeyword(keyword)
+    setEvidence([])
+    setEvidenceFrequency(0)
+    setEvidenceState('loading')
+    setExpandedEvidenceGroups(new Set())
+
+    try {
+      const response = await getCareerKeywordEvidence(keyword)
+      if (evidenceRequestId.current !== requestId) {
+        return
+      }
+      setEvidence(response.evidence)
+      setEvidenceFrequency(response.totalFrequency)
+      setEvidenceState(response.evidence.length === 0 ? 'empty' : 'result')
+    } catch (error) {
+      if (evidenceRequestId.current !== requestId) {
+        return
+      }
+      if (error instanceof CareerKeywordApiError && (error.status === 401 || error.status === 403)) {
+        onSessionExpired()
+        return
+      }
+      setEvidenceState('error')
+    }
+  }
+
+  const handleOpenOriginal = async (target: OriginalViewerTarget) => {
+    closeOriginalViewer()
+    const requestId = originalRequestId.current + 1
+    originalRequestId.current = requestId
+    const controller = new AbortController()
+    originalAbortController.current = controller
+    setOriginalViewerTarget(target)
+    setOriginalViewerErrorMessage(null)
+    setIsOriginalViewerLoading(true)
+
+    try {
+      const original = await getDocumentOriginal(
+        target.documentId,
+        target.documentVersionId,
+        controller.signal,
+      )
+      if (originalRequestId.current !== requestId) {
+        return
+      }
+      if (original.fileType === 'PDF') {
+        const objectUrl = URL.createObjectURL(original.blob)
+        if (originalRequestId.current !== requestId) {
+          URL.revokeObjectURL(objectUrl)
+          return
+        }
+        originalObjectUrl.current = objectUrl
+        setOriginalViewerUrl(originalViewerLocationUrl(objectUrl, target))
+      } else {
+        const originalText = await original.blob.text()
+        if (originalRequestId.current !== requestId) {
+          return
+        }
+        setOriginalViewerText(originalText)
+      }
+    } catch (error) {
+      if (originalRequestId.current !== requestId) {
+        return
+      }
+      if (error instanceof DocumentApiError && (error.status === 401 || error.status === 403)) {
+        closeOriginalViewer()
+        onSessionExpired()
+        return
+      }
+      setOriginalViewerErrorMessage('원본 파일을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.')
+    } finally {
+      if (originalRequestId.current === requestId) {
+        originalAbortController.current = null
+        setIsOriginalViewerLoading(false)
+      }
+    }
+  }
+
+  const availableCategories = KEYWORD_CATEGORY_ORDER.filter((category) =>
+    keywords.some((keyword) => keyword.category === category))
+  const rankedKeywords = keywords
+    .filter((keyword) => categoryFilter === 'ALL' || keyword.category === categoryFilter)
+    .sort((left, right) => compareRankedKeywords(left, right, rankingMode))
+  const topKeywords = rankedKeywords.slice(0, TOP_KEYWORD_LIMIT)
+  const otherKeywords = rankedKeywords.slice(TOP_KEYWORD_LIMIT)
+  const maxRankValue = topKeywords[0] === undefined ? 1 : keywordRankValue(topKeywords[0], rankingMode)
+  const selectedSummary = keywords.find((keyword) => keyword.keyword === selectedKeyword)
+  const evidenceGroups = groupKeywordEvidence(evidence)
+
+  const handleCategorySelect = (category: KeywordCategoryFilter) => {
+    setCategoryFilter(category)
+    if (category !== 'ALL' && selectedSummary?.category !== category) {
+      evidenceRequestId.current += 1
+      setSelectedKeyword(null)
+      setEvidence([])
+      setEvidenceState('idle')
+      setExpandedEvidenceGroups(new Set())
+    }
+  }
+
+  const toggleEvidenceGroup = (groupKey: string) => {
+    setExpandedEvidenceGroups((current) => {
+      const next = new Set(current)
+      if (next.has(groupKey)) {
+        next.delete(groupKey)
+      } else {
+        next.add(groupKey)
+      }
+      return next
+    })
+  }
+
+  return (
+    <section className="vault-page keyword-page" aria-labelledby="keyword-title">
+      <header className="page-heading keyword-page-heading">
+        <p className="eyebrow">CAREER KEYWORD MAP</p>
+        <h1 id="keyword-title">경력 키워드</h1>
+        <p>활성 이력서와 포트폴리오에서 반복해서 확인된 핵심 키워드를 모았습니다.</p>
+      </header>
+
+      {keywordState === 'result' && (
+        <div className="keyword-controls" aria-label="키워드 표시 기준">
+          <fieldset className="keyword-ranking-control">
+            <legend>순위 기준</legend>
+            <div>
+              {([
+                ['frequency', '언급 수'],
+                ['documents', '등장 문서 수'],
+                ['balanced', '균형 점수'],
+              ] as const).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={rankingMode === value}
+                  title={value === 'balanced' ? '반복 언급은 낮추고 여러 문서에서 확인된 기술을 높입니다.' : undefined}
+                  onClick={() => setRankingMode(value)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset className="keyword-category-control">
+            <legend>기술 분류</legend>
+            <div>
+              <button
+                type="button"
+                aria-pressed={categoryFilter === 'ALL'}
+                onClick={() => handleCategorySelect('ALL')}
+              >
+                전체 <small>{keywords.length}</small>
+              </button>
+              {availableCategories.map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  aria-pressed={categoryFilter === category}
+                  onClick={() => handleCategorySelect(category)}
+                >
+                  {KEYWORD_CATEGORY_LABELS[category]}
+                  <small>{keywords.filter((keyword) => keyword.category === category).length}</small>
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        </div>
+      )}
+
+      <div className="keyword-workspace">
+        <section className="keyword-cloud-panel" aria-labelledby="keyword-cloud-title">
+          <header className="keyword-panel-heading">
+            <div>
+              <p className="section-kicker">KEYWORD CLOUD</p>
+              <h2 id="keyword-cloud-title">내 문서의 핵심 키워드</h2>
+            </div>
+            <span>상위 {topKeywords.length}개 · {documentCount}개 문서 · {keywordRankingLabel(rankingMode)}</span>
+          </header>
+
+          <div className="keyword-cloud" aria-live="polite" aria-busy={keywordState === 'loading'}>
+            {keywordState === 'loading' && (
+              <p className="keyword-state"><span className="state-spinner" aria-hidden="true" />키워드를 모으는 중입니다.</p>
+            )}
+            {keywordState === 'empty' && (
+              <p className="keyword-state">검색 가능한 이력서 또는 포트폴리오에서 키워드를 찾지 못했습니다.</p>
+            )}
+            {keywordState === 'error' && (
+              <div className="keyword-state" role="alert">
+                <p>키워드를 불러오지 못했습니다.</p>
+                <button type="button" className="secondary-button" onClick={handleKeywordReload}>
+                  다시 시도
+                </button>
+              </div>
+            )}
+            {keywordState === 'result' && topKeywords.map((keyword) => (
+              <button
+                key={keyword.keyword}
+                type="button"
+                className="keyword-cloud-item"
+                style={{
+                  fontSize: keywordFontSize(keywordRankValue(keyword, rankingMode), maxRankValue),
+                }}
+                aria-pressed={selectedKeyword === keyword.keyword}
+                aria-label={`${keyword.keyword}, ${keyword.frequency}회, ${keyword.documentCount}개 문서, ${KEYWORD_CATEGORY_LABELS[keyword.category]}`}
+                title={keywordSummaryTitle(keyword)}
+                onClick={() => void handleKeywordSelect(keyword.keyword)}
+              >
+                <span>{keyword.keyword}</span>
+              </button>
+            ))}
+          </div>
+
+          {keywordState === 'result' && otherKeywords.length > 0 && (
+            <section className="keyword-other-section" aria-labelledby="keyword-other-title">
+              <header>
+                <div>
+                  <p className="section-kicker">MORE TECHNOLOGIES</p>
+                  <h3 id="keyword-other-title">그 외 기술 키워드</h3>
+                </div>
+                <span>{otherKeywords.length}개</span>
+              </header>
+              <div className="keyword-other-list">
+                {otherKeywords.map((keyword) => (
+                  <button
+                    key={keyword.keyword}
+                    type="button"
+                    className="keyword-other-item"
+                    aria-pressed={selectedKeyword === keyword.keyword}
+                    aria-label={`${keyword.keyword}, ${keyword.frequency}회, ${keyword.documentCount}개 문서`}
+                    onClick={() => void handleKeywordSelect(keyword.keyword)}
+                  >
+                    <span>{keyword.keyword}</span>
+                    <small>{keywordRankDisplay(keyword, rankingMode)}</small>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+        </section>
+
+        <aside className="keyword-evidence-panel" aria-labelledby="keyword-evidence-title">
+          <header className="keyword-panel-heading">
+            <div>
+              <p className="section-kicker">SOURCE EVIDENCE</p>
+              <h2 id="keyword-evidence-title">{selectedKeyword ?? '키워드 근거'}</h2>
+            </div>
+            {evidenceState === 'result' && <span>{evidenceFrequency}회</span>}
+          </header>
+
+          <div className="keyword-evidence-content" aria-live="polite" aria-busy={evidenceState === 'loading'}>
+            {evidenceState === 'idle' && <p className="keyword-state">가운데 키워드를 선택하면 관련 문서 내용이 표시됩니다.</p>}
+            {evidenceState === 'loading' && <p className="keyword-state"><span className="state-spinner" aria-hidden="true" />근거를 찾는 중입니다.</p>}
+            {evidenceState === 'empty' && <p className="keyword-state">현재 활성 문서에서 해당 근거를 찾지 못했습니다.</p>}
+            {evidenceState === 'error' && <p className="keyword-state" role="alert">키워드 근거를 불러오지 못했습니다.</p>}
+            {evidenceState === 'result' && (
+              <div className="keyword-evidence-results">
+                {selectedSummary !== undefined && (
+                  <p className="keyword-normalization-note">
+                    <strong>{KEYWORD_CATEGORY_LABELS[selectedSummary.category]}</strong>
+                    <span>
+                      확인 표기 {selectedSummary.variants.join(' · ')}
+                    </span>
+                  </p>
+                )}
+                <ol className="keyword-evidence-list">
+                  {evidenceGroups.map((group) => {
+                    const expanded = expandedEvidenceGroups.has(group.key)
+                    const visibleSources = expanded ? group.sources : group.sources.slice(0, 1)
+                    return (
+                      <li key={group.key}>
+                        <article className="keyword-evidence-card">
+                          <header>
+                            <div>
+                              <span>{DOCUMENT_TYPE_LABELS[group.documentType]}</span>
+                              <h3>{group.documentTitle}</h3>
+                              <small>버전 {group.versionNo} · 근거 {group.sources.length}개</small>
+                            </div>
+                            <strong>{group.occurrenceCount}회</strong>
+                          </header>
+
+                          <div className="keyword-evidence-sources">
+                            {visibleSources.map((item) => {
+                              const viewerTarget: OriginalViewerTarget = {
+                                ...item,
+                                keyword: selectedKeyword ?? '',
+                              }
+                              return (
+                                <section
+                                  key={`${item.sourceType}-${item.sourceIndex}`}
+                                  className="keyword-evidence-source"
+                                >
+                                  <button
+                                    type="button"
+                                    className="keyword-source-location"
+                                    onClick={() => void handleOpenOriginal(viewerTarget)}
+                                  >
+                                    <strong>{sourceLocationLabel(item)}</strong>
+                                    <span>이 위치 열기 →</span>
+                                  </button>
+                                  <p className="keyword-context-label">
+                                    <strong>{selectedKeyword}</strong> 주변 문맥
+                                  </p>
+                                  <blockquote>
+                                    <HighlightedKeywordExcerpt
+                                      excerpt={item.excerpt}
+                                      terms={[selectedKeyword ?? '', ...item.matchedTerms]}
+                                    />
+                                  </blockquote>
+                                  <button
+                                    type="button"
+                                    className="keyword-original-button"
+                                    onClick={() => void handleOpenOriginal(viewerTarget)}
+                                  >
+                                    원본에서 {item.sourceLabel} 열기
+                                  </button>
+                                </section>
+                              )
+                            })}
+                          </div>
+
+                          {group.sources.length > 1 && (
+                            <button
+                              type="button"
+                              className="keyword-evidence-toggle"
+                              aria-expanded={expanded}
+                              onClick={() => toggleEvidenceGroup(group.key)}
+                            >
+                              {expanded ? '추가 근거 접기' : `근거 ${group.sources.length - 1}개 더 보기`}
+                            </button>
+                          )}
+                        </article>
+                      </li>
+                    )
+                  })}
+                </ol>
+              </div>
+            )}
+          </div>
+        </aside>
+      </div>
+
+      {originalViewerTarget !== null && (
+        <div className="pdf-viewer-layer">
+          <button type="button" className="pdf-viewer-backdrop" aria-label="원본 뷰어 닫기" onClick={closeOriginalViewer} />
+          <section
+            className="pdf-viewer-panel keyword-original-viewer"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="keyword-original-title"
+            aria-busy={isOriginalViewerLoading}
+          >
+            <header className="pdf-viewer-heading">
+              <div>
+                <p className="section-kicker">
+                  ORIGINAL {originalViewerTarget.fileType} · VERSION {originalViewerTarget.versionNo}
+                </p>
+                <h2 id="keyword-original-title">{originalViewerTarget.originalFileName}</h2>
+                <p className="keyword-original-location">
+                  {sourceLocationLabel(originalViewerTarget)} · <strong>{originalViewerTarget.keyword}</strong> 위치
+                </p>
+              </div>
+              <button type="button" className="pdf-viewer-close-button" aria-label="원본 뷰어 닫기" onClick={closeOriginalViewer}>×</button>
+            </header>
+            <div className="pdf-viewer-content">
+              {isOriginalViewerLoading && <p className="pdf-viewer-state"><span className="state-spinner" aria-hidden="true" />원본을 불러오는 중입니다.</p>}
+              {originalViewerErrorMessage !== null && !isOriginalViewerLoading && (
+                <div className="pdf-viewer-error" role="alert">
+                  <strong>원본을 열 수 없습니다.</strong>
+                  <p>{originalViewerErrorMessage}</p>
+                  <button type="button" className="secondary-button" onClick={() => void handleOpenOriginal(originalViewerTarget)}>다시 시도</button>
+                </div>
+              )}
+              {originalViewerUrl !== null && !isOriginalViewerLoading && (
+                <iframe className="pdf-viewer-frame" src={originalViewerUrl} title={`${originalViewerTarget.originalFileName} 미리보기`} />
+              )}
+              {originalViewerText !== null && !isOriginalViewerLoading && (
+                <pre className="keyword-original-text">
+                  <HighlightedOriginalText
+                    text={originalViewerText}
+                    terms={[originalViewerTarget.keyword, ...originalViewerTarget.matchedTerms]}
+                    onFirstMatch={(element) => {
+                      originalMatchRef.current = element
+                    }}
+                  />
+                </pre>
+              )}
+            </div>
+          </section>
+        </div>
+      )}
+    </section>
+  )
+}
+
+function keywordFontSize(value: number, maxValue: number): string {
+  const ratio = maxValue <= 1 ? 0 : Math.log1p(value) / Math.log1p(maxValue)
+  return `${0.92 + ratio * 0.72}rem`
+}
+
+function keywordRankValue(keyword: CareerKeywordSummary, mode: KeywordRankingMode): number {
+  if (mode === 'documents') {
+    return keyword.documentCount
+  }
+  if (mode === 'balanced') {
+    return Math.log1p(keyword.frequency) * (1 + Math.log1p(keyword.documentCount))
+  }
+  return keyword.frequency
+}
+
+function keywordRankDisplay(keyword: CareerKeywordSummary, mode: KeywordRankingMode): string {
+  if (mode === 'documents') {
+    return `${keyword.documentCount}문서`
+  }
+  if (mode === 'balanced') {
+    return `${keywordRankValue(keyword, mode).toFixed(1)}점`
+  }
+  return `${keyword.frequency}회`
+}
+
+function keywordRankingLabel(mode: KeywordRankingMode): string {
+  if (mode === 'documents') {
+    return '등장 문서 수'
+  }
+  if (mode === 'balanced') {
+    return '균형 점수'
+  }
+  return '언급 수'
+}
+
+function compareRankedKeywords(
+  left: CareerKeywordSummary,
+  right: CareerKeywordSummary,
+  mode: KeywordRankingMode,
+): number {
+  return keywordRankValue(right, mode) - keywordRankValue(left, mode)
+    || right.documentCount - left.documentCount
+    || right.frequency - left.frequency
+    || left.keyword.localeCompare(right.keyword)
+}
+
+function keywordSummaryTitle(keyword: CareerKeywordSummary): string {
+  const variants = keyword.variants.length > 1 ? ` · 통합 표기 ${keyword.variants.join(', ')}` : ''
+  return `${KEYWORD_CATEGORY_LABELS[keyword.category]} · ${keyword.frequency}회 · ${keyword.documentCount}개 문서${variants}`
+}
+
+function sourceLocationLabel(
+  item: Pick<CareerKeywordEvidenceItem, 'fileType' | 'sourceLabel'>,
+): string {
+  return `${item.fileType} · ${item.sourceLabel}`
+}
+
+function groupKeywordEvidence(evidence: CareerKeywordEvidenceItem[]): CareerKeywordEvidenceGroup[] {
+  const groups = new Map<string, CareerKeywordEvidenceGroup>()
+  evidence.forEach((item) => {
+    const key = `${item.documentId}-${item.documentVersionId}`
+    const group = groups.get(key)
+    if (group === undefined) {
+      groups.set(key, {
+        key,
+        documentId: item.documentId,
+        documentVersionId: item.documentVersionId,
+        documentTitle: item.documentTitle,
+        documentType: item.documentType,
+        versionNo: item.versionNo,
+        originalFileName: item.originalFileName,
+        fileType: item.fileType,
+        occurrenceCount: item.occurrenceCount,
+        sources: [item],
+      })
+      return
+    }
+    group.occurrenceCount += item.occurrenceCount
+    group.sources.push(item)
+  })
+  return [...groups.values()]
+    .map((group) => ({
+      ...group,
+      sources: group.sources.sort((left, right) =>
+        right.occurrenceCount - left.occurrenceCount || left.sourceIndex - right.sourceIndex),
+    }))
+    .sort((left, right) =>
+      right.occurrenceCount - left.occurrenceCount || left.documentTitle.localeCompare(right.documentTitle))
+}
+
+function originalViewerLocationUrl(objectUrl: string, target: OriginalViewerTarget): string {
+  if (target.fileType !== 'PDF' || target.sourceType !== 'PAGE') {
+    return objectUrl
+  }
+  const searchTerm = target.matchedTerms[0] ?? target.keyword
+  return `${objectUrl}#page=${Math.max(1, target.sourceIndex)}&zoom=page-width&search=${encodeURIComponent(searchTerm)}`
+}
+
+function highlightExpression(terms: string[]): RegExp | null {
+  const uniqueTerms = [...new Set(terms.map((term) => term.trim()).filter(Boolean))]
+    .sort((left, right) => right.length - left.length)
+  if (uniqueTerms.length === 0) {
+    return null
+  }
+  const expression = uniqueTerms
+    .map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('|')
+  return new RegExp(`(${expression})`, 'gi')
+}
+
+function HighlightedKeywordExcerpt({ excerpt, terms }: { excerpt: string; terms: string[] }) {
+  const expression = highlightExpression(terms)
+  if (expression === null) {
+    return excerpt
+  }
+  const parts = excerpt.split(expression)
+  return parts.map((part, index) => index % 2 === 1
+    ? <mark key={`${part}-${index}`}>{part}</mark>
+    : part)
+}
+
+function HighlightedOriginalText({
+  text,
+  terms,
+  onFirstMatch,
+}: {
+  text: string
+  terms: string[]
+  onFirstMatch: (element: HTMLElement | null) => void
+}) {
+  const expression = highlightExpression(terms)
+  if (expression === null) {
+    return text
+  }
+  const parts = text.split(expression)
+  let matched = false
+  return parts.map((part, index) => {
+    if (index % 2 !== 1) {
+      return part
+    }
+    const isFirst = !matched
+    matched = true
+    return <mark key={`${part}-${index}`} ref={isFirst ? onFirstMatch : undefined}>{part}</mark>
+  })
 }
 
 function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {

@@ -1,5 +1,12 @@
 # PRZ-010 — 변경 로그 동기화 Plan
 
+## 최종 실행 상태
+
+`VERIFIED`
+
+아래 상태·기준선 및 P1~P10 계획은 구현 당시의 frozen plan이다. P1~P10 실제 결과는
+[`tasks.md`](tasks.md)와 [`evidence.md`](evidence.md)를 따른다.
+
 ## 상태와 기준선
 
 `IN_PROGRESS` — SPEC Gate `PASSED` 뒤 P1~P7을 완료했다. P8 이후에는 source,

@@ -33,6 +33,23 @@ Indexing Worker가 색인하도록 분리한다. 모든 P1~P10 Gate가 통과했
 | P10-A 회귀 | `PASS` | backend, integration, frontend, Compose, diff 감사 통과 |
 | P10-B Evidence/상태 문서 | `PASS` | 이 Evidence, Tasks, Registry, Project Status와 `git diff --check` 일치 |
 
+## 요구사항 Traceability
+
+| Requirement | 판정 | 구현/검증 근거 |
+|---|---|---|
+| `PRZ-010-R1` | `PASS` | `DocumentUploadService`의 version·ChangeLog 동일 transaction과 `DocumentUploadChangeLogDatabaseIntegrationTest` |
+| `PRZ-010-R2` | `PASS` | 업로드의 직접 ProcessingJob 생성 제거와 `ChangeLogDispatchTransaction` |
+| `PRZ-010-R3` | `PASS` | V14 unique 제약, `ChangeLogDispatchDatabaseIntegrationTest`의 replay·동시 dispatch idempotency |
+| `PRZ-010-R4` | `PASS` | `DocumentChangeLogRepository`의 `FOR UPDATE SKIP LOCKED`와 `ChangeLogDispatchTransaction` Transaction A |
+| `PRZ-010-R5` | `PASS` | `DocumentUploadService`·`DocumentManagementService` version/job guard와 upload/delete database test |
+| `PRZ-010-R6` | `PASS` | `ChangeLogDispatchFailureRecorder`, retry policy와 `ChangeLogDispatchFailureDatabaseIntegrationTest` |
+| `PRZ-010-R7` | `PASS` | immutable version·원본 hash·rollback compensation·owner/lease/fencing·atomic activation 보존과 V1 보존 E2E |
+| `PRZ-010-R8` | `PASS` | forward-only V14, no backfill migration test와 실제 OpenSQL direct `5432` assertion |
+| `PRZ-010-R9` | `PASS` | `OpenSqlChangeLogE2eTest`의 실제 V1→V2→검색 전환 및 실패 시 V1 보존 |
+| `PRZ-010-R10` | `PASS` | P10-A diff 감사: PRZ-008/search/parser/chunker/embedding 변경 0건 |
+| `PRZ-010-R11` | `PASS` | Transaction A/B 분리와 `ChangeLogDispatchFailureRecorderTest`·failure database integration |
+| `PRZ-010-R12` | `PASS` — documented deployment constraint | spec/plan의 구 writer 중지 또는 신규 업로드 quiesce 절차. 애플리케이션이 자동 강제하는 기능이라고 주장하지 않음 |
+
 ## PostgreSQL 검증
 
 - ChangeLog 전용 PostgreSQL database integration에서 schema, dispatch, replay,

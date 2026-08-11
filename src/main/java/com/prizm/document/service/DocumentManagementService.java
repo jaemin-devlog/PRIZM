@@ -1,9 +1,11 @@
 package com.prizm.document.service;
 
 import com.prizm.cleanup.service.FileCleanupJobService;
+import com.prizm.changelog.repository.DocumentChangeLogRepository;
 import com.prizm.document.entity.Document;
 import com.prizm.document.entity.DocumentType;
 import com.prizm.document.entity.DocumentVersion;
+import com.prizm.document.entity.DocumentVersionStatus;
 import com.prizm.document.exception.DocumentManagementErrorCode;
 import com.prizm.document.exception.DocumentManagementException;
 import com.prizm.document.repository.DocumentRepository;
@@ -23,6 +25,7 @@ public class DocumentManagementService {
 
     private final DocumentRepository documentRepository;
     private final DocumentVersionRepository documentVersionRepository;
+    private final DocumentChangeLogRepository documentChangeLogRepository;
     private final ProcessingJobRepository processingJobRepository;
     private final DocumentChunkRepository documentChunkRepository;
     private final FileCleanupJobService fileCleanupJobService;
@@ -30,11 +33,13 @@ public class DocumentManagementService {
     public DocumentManagementService(
             DocumentRepository documentRepository,
             DocumentVersionRepository documentVersionRepository,
+            DocumentChangeLogRepository documentChangeLogRepository,
             ProcessingJobRepository processingJobRepository,
             DocumentChunkRepository documentChunkRepository,
             FileCleanupJobService fileCleanupJobService) {
         this.documentRepository = documentRepository;
         this.documentVersionRepository = documentVersionRepository;
+        this.documentChangeLogRepository = documentChangeLogRepository;
         this.processingJobRepository = processingJobRepository;
         this.documentChunkRepository = documentChunkRepository;
         this.fileCleanupJobService = fileCleanupJobService;
@@ -65,6 +70,11 @@ public class DocumentManagementService {
         Document document = foundDocument.orElseThrow();
         List<DocumentVersion> versions = documentVersionRepository
                 .findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(ownerUserId, documentId);
+        if (!versions.isEmpty() && isInFlight(versions.get(0).getStatus())) {
+            throw new DocumentManagementException(
+                    DocumentManagementErrorCode.DOCUMENT_PROCESSING,
+                    "Document processing must finish before deletion.");
+        }
         List<Long> versionIds = versions.stream().map(DocumentVersion::getId).toList();
         List<ProcessingJob> jobs = versionIds.isEmpty()
                 ? List.of()
@@ -79,6 +89,10 @@ public class DocumentManagementService {
             fileCleanupJobService.registerPendingCleanupInCurrentTransaction(version.getStoredFilePath());
         }
 
+        if (!versionIds.isEmpty()) {
+            documentChangeLogRepository.deleteByOwnerUserIdAndDocumentVersionIdIn(ownerUserId, versionIds);
+            documentChangeLogRepository.flush();
+        }
         processingJobRepository.deleteAll(jobs);
         processingJobRepository.flush();
         for (DocumentVersion version : versions) {
@@ -97,6 +111,11 @@ public class DocumentManagementService {
         return status == ProcessingJobStatus.PENDING
                 || status == ProcessingJobStatus.RETRY_WAIT
                 || status == ProcessingJobStatus.PROCESSING;
+    }
+
+    private boolean isInFlight(DocumentVersionStatus status) {
+        return status == DocumentVersionStatus.QUARANTINED
+                || status == DocumentVersionStatus.PROCESSING;
     }
 
     private String normalizeTitle(String title) {

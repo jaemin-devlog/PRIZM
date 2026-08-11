@@ -2,7 +2,7 @@
 
 > 현재 상태 기준일: 2026-08-12
 >
-> PRZ-010 검증 source: 현재 작업 트리(아직 commit하지 않음)
+> PRZ-010 검증 source commit: `26c546b16eb9ea42d98460dd6e5aa0bf0752212a`
 >
 > PRZ-007 검증 source commit: `2b8b60069c37eea91e485bffe2c54e62cd2117ab`
 >
@@ -139,7 +139,7 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 | OpenHA·DB failover·영구 journal | `DEFERRED` | PRZ-005 핵심 완료 범위와 분리한 후속 작업 |
 | PRZ-004 demo `USER` clean-clone | `VERIFIED` | `25d09e9`에서 자동 검증 `339 PASS / 18 SKIP / 0 FAIL`과 두 독립 clone 통과. `aff3e87` 경로 교정 뒤 Windows·Linux Node test와 GitHub CI 6건 통과, PR #25 merge `1f9a5ad`. 두 번째 빈 목록 UI 직접 관찰은 `NOT_RUN` |
 | PRZ-009 경력 키워드 맵 | `IMPLEMENTED_UNVERIFIED` | 2026-08-10 작업 트리: backend unit 323개 중 308 pass·15 skip·실패 0, 전체 integration 71개 중 68 pass·조건부 3 skip·실패 0, frontend lint·build, Docker build/runtime, synthetic browser와 diff 감사 pass. OpenSQL opt-in은 `NOT_RUN` |
-| PRZ-010 변경 로그 동기화 | `VERIFIED` | 2026-08-12 현재 작업 트리: PostgreSQL ChangeLog integration, 실제 OpenSQL direct `5432` V14 SQL Gate, 실제 OpenSQL+Ollama `bge-m3` V1→V2 E2E와 실패 시 V1 보존, 전체 integration `104 completed / 7 skipped / 0 failures`, backend test, frontend lint/build, Compose와 diff 감사 통과 |
+| PRZ-010 변경 로그 동기화 | `VERIFIED` | 2026-08-12 source `26c546b`: PostgreSQL ChangeLog integration, 실제 OpenSQL direct `5432` V14 SQL Gate, 실제 OpenSQL+Ollama `bge-m3` V1→V2 E2E와 실패 시 V1 보존, 전체 integration `104 completed / 7 skipped / 0 failures`, backend test, frontend lint/build, Compose와 diff 감사 통과 |
 
 세부 실행 환경과 명령은 [PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md),
 [PRZ-002 Evidence](../specs/PRZ-002-open-source-readiness/evidence.md),

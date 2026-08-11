@@ -5,7 +5,7 @@
 `VERIFIED`
 
 - branch: `PRZ-010-change-log-sync`
-- 검증 source: 현재 작업 트리(아직 commit하지 않음)
+- 검증 source commit: `26c546b16eb9ea42d98460dd6e5aa0bf0752212a`
 - 검증일: `2026-08-12`
 - 환경: Windows PowerShell, Java 17, Gradle 9.5.1, Docker Desktop Engine
   29.6.2, PostgreSQL+pgvector Testcontainers, 실제 OpenSQL VM direct TCP/JDBC
@@ -93,4 +93,5 @@ embedding model/dimension, Flyway V1~V13, dependency, license와 SBOM 변경은 
   failover와 영구 journal은 검증하지 않았으며 여전히 별도 후속 범위다.
 - P10은 회귀와 Evidence 단계만 수행했다. 새 검색 알고리즘, parser/chunker, embedding
   model, frontend 기능, MCP 또는 PRZ-008 변경은 수행하지 않았다.
-- 이 Evidence의 검증 source는 아직 commit/PR/merge되지 않은 현재 작업 트리다.
+- 검증 source commit은 `26c546b16eb9ea42d98460dd6e5aa0bf0752212a`다. 이 Evidence를
+  anchoring한 후속 문서 commit은 제품/test 동작을 변경하지 않는다.

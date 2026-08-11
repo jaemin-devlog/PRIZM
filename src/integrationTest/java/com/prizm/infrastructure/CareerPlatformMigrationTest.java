@@ -45,7 +45,7 @@ class CareerPlatformMigrationTest {
         assertChunkSourceSchema(database.jdbcTemplate());
         assertPdfFileTypeSchema(database.jdbcTemplate());
         assertFileCleanupJobSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(13L);
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(14L);
         for (String table : DOCUMENT_TABLES) {
             assertThat(rowCount(database.jdbcTemplate(), table)).isZero();
         }
@@ -90,7 +90,7 @@ class CareerPlatformMigrationTest {
         assertChunkSourceSchema(database.jdbcTemplate());
         assertPdfFileTypeSchema(database.jdbcTemplate());
         assertFileCleanupJobSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(13L);
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(14L);
     }
 
     @Test
@@ -161,7 +161,7 @@ class CareerPlatformMigrationTest {
         assertChunkSourceSchema(database.jdbcTemplate());
         assertPdfFileTypeSchema(database.jdbcTemplate());
         assertFileCleanupJobSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(13L);
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(14L);
     }
 
     @Test

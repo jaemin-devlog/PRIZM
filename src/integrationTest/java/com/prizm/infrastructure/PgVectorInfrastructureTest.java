@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
+import com.prizm.changelog.service.ChangeLogDispatchTransaction;
 import com.prizm.document.dto.response.DocumentDetailResponse;
 import com.prizm.document.dto.response.DocumentUploadResponse;
 import com.prizm.document.entity.DocumentFileType;
@@ -182,6 +183,9 @@ class PgVectorInfrastructureTest {
     ProcessingJobRepository processingJobRepository;
 
     @Autowired
+    ChangeLogDispatchTransaction changeLogDispatchTransaction;
+
+    @Autowired
     ProcessingJobClaimService processingJobClaimService;
 
     @Autowired
@@ -230,7 +234,7 @@ class PgVectorInfrastructureTest {
                 PgVectorSmokeAssertions.verifyExactCosineSearch(jdbcTemplate);
 
         assertThat(serverVersion).isBetween(160000, 169999);
-        assertThat(successfulMigrations).isEqualTo(13L);
+        assertThat(successfulMigrations).isEqualTo(14L);
         assertThat(result.extensionVersion()).isEqualTo("0.8.2");
         assertThat(documentCount).isZero();
         assertThat(versionCount).isZero();
@@ -400,6 +404,8 @@ class PgVectorInfrastructureTest {
             assertThatThrownBy(() -> searchService.search(ownerUserId, "휴가는 어디에서 신청하나요?"))
                     .isInstanceOf(SearchResultNotFoundException.class);
 
+            assertThat(processingJobRepository.count()).isZero();
+            assertThat(changeLogDispatchTransaction.dispatchNext()).isTrue();
             assertThat(processingJobRepository.count()).isEqualTo(1);
             assertThat(processingJobRepository.findAll().get(0).getStatus())
                     .isEqualTo(ProcessingJobStatus.PENDING);
@@ -507,6 +513,8 @@ class PgVectorInfrastructureTest {
             assertThat(uploaded.status()).isEqualTo(DocumentVersionStatus.QUARANTINED);
             assertThat(documentVersionRepository.findById(uploaded.versionId()).orElseThrow().getFileType())
                     .isEqualTo(DocumentFileType.PDF);
+
+            assertThat(changeLogDispatchTransaction.dispatchNext()).isTrue();
 
             ClaimedProcessingJob claimed = processingJobClaimService.claimNext().orElseThrow();
             documentIndexingProcessor.process(claimed);
@@ -1251,6 +1259,7 @@ class PgVectorInfrastructureTest {
     }
 
     private void deleteCommittedDocumentData() {
+        jdbcTemplate.update("DELETE FROM document_change_logs");
         jdbcTemplate.update("DELETE FROM file_cleanup_jobs");
         jdbcTemplate.update("DELETE FROM processing_jobs");
         jdbcTemplate.update("DELETE FROM document_chunks");

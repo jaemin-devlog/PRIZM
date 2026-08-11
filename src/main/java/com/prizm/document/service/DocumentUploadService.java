@@ -1,10 +1,13 @@
 package com.prizm.document.service;
 
+import com.prizm.changelog.entity.DocumentChangeLog;
+import com.prizm.changelog.repository.DocumentChangeLogRepository;
 import com.prizm.document.dto.response.DocumentUploadResponse;
 import com.prizm.document.entity.Document;
 import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.entity.DocumentType;
 import com.prizm.document.entity.DocumentVersion;
+import com.prizm.document.entity.DocumentVersionStatus;
 import com.prizm.document.exception.DocumentManagementErrorCode;
 import com.prizm.document.exception.DocumentManagementException;
 import com.prizm.document.exception.DocumentNotFoundException;
@@ -43,6 +46,7 @@ public class DocumentUploadService {
 
     private final DocumentRepository documentRepository;
     private final DocumentVersionRepository documentVersionRepository;
+    private final DocumentChangeLogRepository documentChangeLogRepository;
     private final ProcessingJobRepository processingJobRepository;
     private final FileStorage fileStorage;
     private final FileCleanupJobService fileCleanupJobService;
@@ -52,6 +56,7 @@ public class DocumentUploadService {
     public DocumentUploadService(
             DocumentRepository documentRepository,
             DocumentVersionRepository documentVersionRepository,
+            DocumentChangeLogRepository documentChangeLogRepository,
             ProcessingJobRepository processingJobRepository,
             FileStorage fileStorage,
             FileCleanupJobService fileCleanupJobService,
@@ -59,6 +64,7 @@ public class DocumentUploadService {
             @Value("${prizm.upload.max-file-size-bytes}") long maxFileSizeBytes) {
         this.documentRepository = documentRepository;
         this.documentVersionRepository = documentVersionRepository;
+        this.documentChangeLogRepository = documentChangeLogRepository;
         this.processingJobRepository = processingJobRepository;
         this.fileStorage = fileStorage;
         this.fileCleanupJobService = fileCleanupJobService;
@@ -137,8 +143,8 @@ public class DocumentUploadService {
         version.updateStoredFilePath(storedFilePath);
         // 파일 저장 후 DB 커밋이 실패할 수 있으므로 트랜잭션 종료 시 보상 삭제한다.
         registerRollbackCompensation(storedFilePath);
-        // 검증과 원본 저장이 끝난 버전은 관리자 개입 없이 Worker가 처리하도록 예약한다.
-        processingJobRepository.save(ProcessingJob.pendingIndexing(ownerUserId, version.getId()));
+        documentChangeLogRepository.save(
+                DocumentChangeLog.pendingDocumentVersionCreated(ownerUserId, version.getId()));
 
         return new DocumentUploadResponse(
                 document.getId(),
@@ -151,6 +157,11 @@ public class DocumentUploadService {
     }
 
     private void requireNoInFlightVersion(Long ownerUserId, List<DocumentVersion> versions) {
+        if (!versions.isEmpty() && isInFlight(versions.get(0).getStatus())) {
+            throw new DocumentManagementException(
+                    DocumentManagementErrorCode.DOCUMENT_PROCESSING,
+                    "A new version can be added after current document processing finishes.");
+        }
         List<Long> versionIds = versions.stream().map(DocumentVersion::getId).toList();
         if (versionIds.isEmpty()) {
             return;
@@ -171,6 +182,11 @@ public class DocumentUploadService {
         return status == ProcessingJobStatus.PENDING
                 || status == ProcessingJobStatus.RETRY_WAIT
                 || status == ProcessingJobStatus.PROCESSING;
+    }
+
+    private boolean isInFlight(DocumentVersionStatus status) {
+        return status == DocumentVersionStatus.QUARANTINED
+                || status == DocumentVersionStatus.PROCESSING;
     }
 
     private String validateTitle(String title) {

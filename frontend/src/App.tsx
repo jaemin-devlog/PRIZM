@@ -949,11 +949,15 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
     }
   }
 
-  const hasInFlightVersion = selectedDocument?.versions.some((version) =>
-    version.processingStatus === 'PENDING' ||
-    version.processingStatus === 'PROCESSING' ||
-    version.processingStatus === 'RETRY_WAIT'
-  ) ?? false
+  const latestVersion = selectedDocument?.versions[0] ?? null
+  const hasInFlightVersion =
+    latestVersion?.status === 'QUARANTINED' ||
+    latestVersion?.status === 'PROCESSING' ||
+    (selectedDocument?.versions.some((version) =>
+      version.processingStatus === 'PENDING' ||
+      version.processingStatus === 'PROCESSING' ||
+      version.processingStatus === 'RETRY_WAIT'
+    ) ?? false)
   const activeVersion = selectedDocument?.versions.find(
     (version) => version.versionId === selectedDocument.activeVersionId,
   ) ?? null
@@ -1318,14 +1322,19 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
                     type="button"
                     className="danger-button"
                     onClick={() => setIsDeleteConfirming(true)}
-                    disabled={isSaving || isDeleting || isVersionUploading}
+                    disabled={hasInFlightVersion || isSaving || isDeleting || isVersionUploading}
                   >
                     문서 삭제
                   </button>
                 ) : (
                   <div className="delete-confirmation" role="alert">
                     <p>이 문서의 모든 버전과 검색용 데이터가 삭제됩니다. 계속할까요?</p>
-                    <button type="button" className="danger-button" onClick={() => void handleDelete()} disabled={isDeleting}>
+                    <button
+                      type="button"
+                      className="danger-button"
+                      onClick={() => void handleDelete()}
+                      disabled={hasInFlightVersion || isDeleting}
+                    >
                       {isDeleting ? '삭제 중' : '삭제 확인'}
                     </button>
                     <button

@@ -3,11 +3,13 @@ package com.prizm.document.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.prizm.cleanup.service.FileCleanupJobService;
+import com.prizm.changelog.repository.DocumentChangeLogRepository;
 import com.prizm.document.entity.Document;
 import com.prizm.document.entity.DocumentType;
 import com.prizm.document.entity.DocumentVersion;
@@ -25,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.InOrder;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,6 +35,7 @@ class DocumentManagementServiceTest {
 
     @Mock DocumentRepository documentRepository;
     @Mock DocumentVersionRepository documentVersionRepository;
+    @Mock DocumentChangeLogRepository documentChangeLogRepository;
     @Mock ProcessingJobRepository processingJobRepository;
     @Mock DocumentChunkRepository documentChunkRepository;
     @Mock FileCleanupJobService fileCleanupJobService;
@@ -46,6 +50,7 @@ class DocumentManagementServiceTest {
         service = new DocumentManagementService(
                 documentRepository,
                 documentVersionRepository,
+                documentChangeLogRepository,
                 processingJobRepository,
                 documentChunkRepository,
                 fileCleanupJobService);
@@ -76,6 +81,7 @@ class DocumentManagementServiceTest {
         when(documentVersionRepository.findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(7L, 11L))
                 .thenReturn(List.of(version));
         when(version.getId()).thenReturn(21L);
+        when(version.getStatus()).thenReturn(com.prizm.document.entity.DocumentVersionStatus.ACTIVE);
         when(version.getStoredFilePath()).thenReturn("documents/7/21/guide.txt");
         when(processingJobRepository.findByOwnerUserIdAndDocumentVersionIdIn(7L, List.of(21L)))
                 .thenReturn(List.of(processingJob));
@@ -84,11 +90,18 @@ class DocumentManagementServiceTest {
         assertThat(service.delete(7L, 11L)).isTrue();
 
         verify(fileCleanupJobService).registerPendingCleanupInCurrentTransaction("documents/7/21/guide.txt");
-        verify(processingJobRepository).deleteAll(List.of(processingJob));
+        InOrder deletionOrder = inOrder(
+                documentChangeLogRepository, processingJobRepository, documentVersionRepository);
+        deletionOrder.verify(documentChangeLogRepository)
+                .deleteByOwnerUserIdAndDocumentVersionIdIn(7L, List.of(21L));
+        deletionOrder.verify(documentChangeLogRepository).flush();
+        deletionOrder.verify(processingJobRepository).deleteAll(List.of(processingJob));
+        deletionOrder.verify(processingJobRepository).flush();
         verify(documentChunkRepository).deleteByOwnerUserIdAndDocumentVersionId(7L, 21L);
         verify(document).clearActiveVersion();
         verify(documentRepository).saveAndFlush(document);
-        verify(documentVersionRepository).deleteAll(List.of(version));
+        deletionOrder.verify(documentVersionRepository).deleteAll(List.of(version));
+        deletionOrder.verify(documentVersionRepository).flush();
         verify(documentRepository).delete(document);
     }
 
@@ -98,6 +111,7 @@ class DocumentManagementServiceTest {
         when(documentVersionRepository.findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(7L, 11L))
                 .thenReturn(List.of(version));
         when(version.getId()).thenReturn(21L);
+        when(version.getStatus()).thenReturn(com.prizm.document.entity.DocumentVersionStatus.ACTIVE);
         when(processingJobRepository.findByOwnerUserIdAndDocumentVersionIdIn(7L, List.of(21L)))
                 .thenReturn(List.of(processingJob));
         when(processingJob.getStatus()).thenReturn(ProcessingJobStatus.PROCESSING);
@@ -109,6 +123,42 @@ class DocumentManagementServiceTest {
 
         verify(fileCleanupJobService, never()).registerPendingCleanupInCurrentTransaction(org.mockito.ArgumentMatchers.anyString());
         verify(documentRepository, never()).delete(document);
+    }
+
+    @Test
+    void doesNotDeleteWhenNewestVersionIsQuarantinedBeforeCleanupIsQueued() {
+        when(documentRepository.findByIdAndOwnerUserIdForUpdate(11L, 7L)).thenReturn(Optional.of(document));
+        when(documentVersionRepository.findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(7L, 11L))
+                .thenReturn(List.of(version));
+        when(version.getStatus()).thenReturn(com.prizm.document.entity.DocumentVersionStatus.QUARANTINED);
+
+        assertThatThrownBy(() -> service.delete(7L, 11L))
+                .isInstanceOf(DocumentManagementException.class)
+                .extracting(exception -> ((DocumentManagementException) exception).code())
+                .isEqualTo(DocumentManagementErrorCode.DOCUMENT_PROCESSING);
+
+        verify(processingJobRepository, never())
+                .findByOwnerUserIdAndDocumentVersionIdIn(org.mockito.ArgumentMatchers.anyLong(), org.mockito.ArgumentMatchers.anyList());
+        verify(fileCleanupJobService, never()).registerPendingCleanupInCurrentTransaction(org.mockito.ArgumentMatchers.anyString());
+        verify(documentChangeLogRepository, never())
+                .deleteByOwnerUserIdAndDocumentVersionIdIn(org.mockito.ArgumentMatchers.anyLong(), org.mockito.ArgumentMatchers.anyList());
+    }
+
+    @Test
+    void doesNotDeleteWhenNewestVersionIsProcessingBeforeCleanupIsQueued() {
+        when(documentRepository.findByIdAndOwnerUserIdForUpdate(11L, 7L)).thenReturn(Optional.of(document));
+        when(documentVersionRepository.findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(7L, 11L))
+                .thenReturn(List.of(version));
+        when(version.getStatus()).thenReturn(com.prizm.document.entity.DocumentVersionStatus.PROCESSING);
+
+        assertThatThrownBy(() -> service.delete(7L, 11L))
+                .isInstanceOf(DocumentManagementException.class)
+                .extracting(exception -> ((DocumentManagementException) exception).code())
+                .isEqualTo(DocumentManagementErrorCode.DOCUMENT_PROCESSING);
+
+        verify(fileCleanupJobService, never()).registerPendingCleanupInCurrentTransaction(org.mockito.ArgumentMatchers.anyString());
+        verify(documentChangeLogRepository, never())
+                .deleteByOwnerUserIdAndDocumentVersionIdIn(org.mockito.ArgumentMatchers.anyLong(), org.mockito.ArgumentMatchers.anyList());
     }
 
     @Test

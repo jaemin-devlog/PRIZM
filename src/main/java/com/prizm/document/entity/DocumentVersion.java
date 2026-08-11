@@ -121,6 +121,11 @@ public class DocumentVersion {
         transition(DocumentVersionStatus.PROCESSING, DocumentVersionStatus.FAILED);
     }
 
+    /** ChangeLog dispatch가 최종 실패한 격리 버전은 색인 전에 종료한다. */
+    public void failDispatch() {
+        transition(DocumentVersionStatus.QUARANTINED, DocumentVersionStatus.FAILED);
+    }
+
     private void transition(DocumentVersionStatus expected, DocumentVersionStatus next) {
         if (status != expected) {
             throw new InvalidDocumentVersionStateException(id, status, next);

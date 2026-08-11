@@ -10,6 +10,10 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.lenient;
 
+import com.prizm.changelog.entity.ChangeLogDispatchStatus;
+import com.prizm.changelog.entity.ChangeLogEventType;
+import com.prizm.changelog.entity.DocumentChangeLog;
+import com.prizm.changelog.repository.DocumentChangeLogRepository;
 import com.prizm.document.dto.response.DocumentUploadResponse;
 import com.prizm.cleanup.service.FileCleanupJobService;
 import com.prizm.document.entity.Document;
@@ -64,6 +68,9 @@ class DocumentUploadServiceTest {
     DocumentVersionRepository documentVersionRepository;
 
     @Mock
+    DocumentChangeLogRepository documentChangeLogRepository;
+
+    @Mock
     ProcessingJobRepository processingJobRepository;
 
     @Mock
@@ -80,6 +87,7 @@ class DocumentUploadServiceTest {
         documentUploadService = new DocumentUploadService(
                 documentRepository,
                 documentVersionRepository,
+                documentChangeLogRepository,
                 processingJobRepository,
                 fileStorage,
                 fileCleanupJobService,
@@ -126,11 +134,16 @@ class DocumentUploadServiceTest {
         var versionCaptor = org.mockito.ArgumentCaptor.forClass(DocumentVersion.class);
         verify(documentVersionRepository).save(versionCaptor.capture());
         assertThat(versionCaptor.getValue().getOwnerUserId()).isEqualTo(7L);
-        var jobCaptor = org.mockito.ArgumentCaptor.forClass(ProcessingJob.class);
-        verify(processingJobRepository).save(jobCaptor.capture());
-        assertThat(jobCaptor.getValue().getOwnerUserId()).isEqualTo(7L);
-        assertThat(jobCaptor.getValue().getDocumentVersionId()).isEqualTo(22L);
-        assertThat(jobCaptor.getValue().getStatus()).isEqualTo(ProcessingJobStatus.PENDING);
+        var changeLogCaptor = org.mockito.ArgumentCaptor.forClass(DocumentChangeLog.class);
+        verify(documentChangeLogRepository).save(changeLogCaptor.capture());
+        assertThat(changeLogCaptor.getValue().getOwnerUserId()).isEqualTo(7L);
+        assertThat(changeLogCaptor.getValue().getDocumentVersionId()).isEqualTo(22L);
+        assertThat(changeLogCaptor.getValue().getEventType())
+                .isEqualTo(ChangeLogEventType.DOCUMENT_VERSION_CREATED);
+        assertThat(changeLogCaptor.getValue().getEventKey())
+                .isEqualTo("DOCUMENT_VERSION_CREATED:22");
+        assertThat(changeLogCaptor.getValue().getDispatchStatus()).isEqualTo(ChangeLogDispatchStatus.PENDING);
+        verify(processingJobRepository, never()).save(any(ProcessingJob.class));
     }
 
     @Test
@@ -179,10 +192,12 @@ class DocumentUploadServiceTest {
         verify(documentVersionRepository).save(versionCaptor.capture());
         assertThat(versionCaptor.getValue().getVersionNo()).isEqualTo(2);
         assertThat(versionCaptor.getValue().getStatus()).isEqualTo(DocumentVersionStatus.QUARANTINED);
-        var jobCaptor = org.mockito.ArgumentCaptor.forClass(ProcessingJob.class);
-        verify(processingJobRepository).save(jobCaptor.capture());
-        assertThat(jobCaptor.getValue().getDocumentVersionId()).isEqualTo(22L);
-        assertThat(jobCaptor.getValue().getStatus()).isEqualTo(ProcessingJobStatus.PENDING);
+        var changeLogCaptor = org.mockito.ArgumentCaptor.forClass(DocumentChangeLog.class);
+        verify(documentChangeLogRepository).save(changeLogCaptor.capture());
+        assertThat(changeLogCaptor.getValue().getDocumentVersionId()).isEqualTo(22L);
+        assertThat(changeLogCaptor.getValue().getEventKey())
+                .isEqualTo("DOCUMENT_VERSION_CREATED:22");
+        verify(processingJobRepository, never()).save(any(ProcessingJob.class));
     }
 
     @Test
@@ -193,6 +208,7 @@ class DocumentUploadServiceTest {
         DocumentVersion currentVersion = DocumentVersion.quarantined(
                 7L, 11L, "guide-v1.txt", DocumentFileType.TXT, "a".repeat(64));
         ReflectionTestUtils.setField(currentVersion, "id", 21L);
+        ReflectionTestUtils.setField(currentVersion, "status", DocumentVersionStatus.ACTIVE);
         ProcessingJob pendingJob = ProcessingJob.pendingIndexing(7L, 21L);
         when(documentRepository.findByIdAndOwnerUserIdForUpdate(11L, 7L)).thenReturn(Optional.of(document));
         when(documentVersionRepository.findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(7L, 11L))
@@ -210,6 +226,76 @@ class DocumentUploadServiceTest {
     }
 
     @Test
+    void rejectsANewVersionWhenTheNewestVersionIsQuarantinedBeforeLookingForAJob() {
+        MockMultipartFile file = new MockMultipartFile("file", "guide-v3.txt", "text/plain", "revised".getBytes());
+        Document document = Document.create(7L, "Guide", DocumentType.PROJECT_REPORT);
+        ReflectionTestUtils.setField(document, "id", 11L);
+        DocumentVersion quarantinedVersion = DocumentVersion.quarantined(
+                7L, 11L, 2, "guide-v2.txt", DocumentFileType.TXT, "a".repeat(64));
+        ReflectionTestUtils.setField(quarantinedVersion, "id", 22L);
+        when(documentRepository.findByIdAndOwnerUserIdForUpdate(11L, 7L)).thenReturn(Optional.of(document));
+        when(documentVersionRepository.findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(7L, 11L))
+                .thenReturn(List.of(quarantinedVersion));
+
+        assertThatThrownBy(() -> documentUploadService.uploadVersion(7L, 11L, file))
+                .isInstanceOf(DocumentManagementException.class)
+                .extracting(exception -> ((DocumentManagementException) exception).code())
+                .isEqualTo(DocumentManagementErrorCode.DOCUMENT_PROCESSING);
+
+        verify(processingJobRepository, never())
+                .findByOwnerUserIdAndDocumentVersionIdIn(7L, List.of(22L));
+        verify(documentVersionRepository, never()).save(any(DocumentVersion.class));
+        verifyNoInteractions(fileStorage);
+    }
+
+    @Test
+    void rejectsANewVersionWhenTheNewestVersionIsProcessingBeforeLookingForAJob() {
+        MockMultipartFile file = new MockMultipartFile("file", "guide-v3.txt", "text/plain", "revised".getBytes());
+        Document document = Document.create(7L, "Guide", DocumentType.PROJECT_REPORT);
+        ReflectionTestUtils.setField(document, "id", 11L);
+        DocumentVersion processingVersion = DocumentVersion.quarantined(
+                7L, 11L, 2, "guide-v2.txt", DocumentFileType.TXT, "a".repeat(64));
+        ReflectionTestUtils.setField(processingVersion, "id", 22L);
+        ReflectionTestUtils.setField(processingVersion, "status", DocumentVersionStatus.PROCESSING);
+        when(documentRepository.findByIdAndOwnerUserIdForUpdate(11L, 7L)).thenReturn(Optional.of(document));
+        when(documentVersionRepository.findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(7L, 11L))
+                .thenReturn(List.of(processingVersion));
+
+        assertThatThrownBy(() -> documentUploadService.uploadVersion(7L, 11L, file))
+                .isInstanceOf(DocumentManagementException.class)
+                .extracting(exception -> ((DocumentManagementException) exception).code())
+                .isEqualTo(DocumentManagementErrorCode.DOCUMENT_PROCESSING);
+
+        verify(processingJobRepository, never())
+                .findByOwnerUserIdAndDocumentVersionIdIn(7L, List.of(22L));
+        verifyNoInteractions(fileStorage);
+    }
+
+    @Test
+    void allowsANewVersionWhenTheNewestVersionFailed() {
+        byte[] content = "revised".getBytes(StandardCharsets.UTF_8);
+        MockMultipartFile file = new MockMultipartFile("file", "guide-v3.txt", "text/plain", content);
+        Document document = Document.create(7L, "Guide", DocumentType.PROJECT_REPORT);
+        ReflectionTestUtils.setField(document, "id", 11L);
+        DocumentVersion failedVersion = DocumentVersion.quarantined(
+                7L, 11L, 2, "guide-v2.txt", DocumentFileType.TXT, "a".repeat(64));
+        ReflectionTestUtils.setField(failedVersion, "id", 22L);
+        ReflectionTestUtils.setField(failedVersion, "status", DocumentVersionStatus.FAILED);
+        when(documentRepository.findByIdAndOwnerUserIdForUpdate(11L, 7L)).thenReturn(Optional.of(document));
+        when(documentVersionRepository.findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(7L, 11L))
+                .thenReturn(List.of(failedVersion));
+        when(processingJobRepository.findByOwnerUserIdAndDocumentVersionIdIn(7L, List.of(22L)))
+                .thenReturn(List.of());
+        when(fileStorage.store(11L, 22L, "guide-v3.txt", content))
+                .thenReturn("documents/11/22/guide-v3.txt");
+
+        DocumentUploadResponse response = documentUploadService.uploadVersion(7L, 11L, file);
+
+        assertThat(response.versionId()).isEqualTo(22L);
+        verify(documentVersionRepository).save(any(DocumentVersion.class));
+    }
+
+    @Test
     void hidesAnotherOwnersDocumentWhenAddingAVersion() {
         MockMultipartFile file = new MockMultipartFile("file", "guide-v2.txt", "text/plain", "revised".getBytes());
         when(documentRepository.findByIdAndOwnerUserIdForUpdate(11L, 7L)).thenReturn(Optional.empty());
@@ -217,7 +303,7 @@ class DocumentUploadServiceTest {
         assertThatThrownBy(() -> documentUploadService.uploadVersion(7L, 11L, file))
                 .isInstanceOf(DocumentNotFoundException.class);
 
-        verifyNoInteractions(documentVersionRepository, processingJobRepository, fileStorage);
+        verifyNoInteractions(documentVersionRepository, documentChangeLogRepository, processingJobRepository, fileStorage);
     }
 
     @Test
@@ -300,12 +386,12 @@ class DocumentUploadServiceTest {
     }
 
     @Test
-    void deletesStoredFileWhenAutomaticJobPersistenceFails() {
+    void deletesStoredFileWhenChangeLogPersistenceFails() {
         byte[] content = "hello".getBytes(StandardCharsets.UTF_8);
         MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", content);
         when(fileStorage.store(11L, 22L, "guide.txt", content))
                 .thenReturn("documents/11/22/guide.txt");
-        when(processingJobRepository.save(any(ProcessingJob.class)))
+        when(documentChangeLogRepository.save(any(DocumentChangeLog.class)))
                 .thenThrow(new IllegalStateException("database unavailable"));
 
         assertThatThrownBy(() -> documentUploadService.upload(7L, "Guide", file))
@@ -323,7 +409,7 @@ class DocumentUploadServiceTest {
         MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", content);
         when(fileStorage.store(11L, 22L, "guide.txt", content))
                 .thenReturn("documents/11/22/guide.txt");
-        when(processingJobRepository.save(any(ProcessingJob.class)))
+        when(documentChangeLogRepository.save(any(DocumentChangeLog.class)))
                 .thenThrow(new IllegalStateException("database unavailable"));
         org.mockito.Mockito.doThrow(new FileStorageException("delete unavailable"))
                 .when(fileStorage)
@@ -344,7 +430,7 @@ class DocumentUploadServiceTest {
         MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", content);
         when(fileStorage.store(11L, 22L, "guide.txt", content))
                 .thenReturn("documents/11/22/guide.txt");
-        when(processingJobRepository.save(any(ProcessingJob.class)))
+        when(documentChangeLogRepository.save(any(DocumentChangeLog.class)))
                 .thenThrow(new IllegalStateException("database unavailable"));
         org.mockito.Mockito.doThrow(new FileStorageException("delete unavailable"))
                 .when(fileStorage)
@@ -370,7 +456,12 @@ class DocumentUploadServiceTest {
                 .isInstanceOf(DocumentUploadException.class)
                 .extracting(exception -> ((DocumentUploadException) exception).code())
                 .isEqualTo(DocumentUploadErrorCode.EMPTY_FILE);
-        verifyNoInteractions(documentRepository, documentVersionRepository, processingJobRepository, fileStorage);
+        verifyNoInteractions(
+                documentRepository,
+                documentVersionRepository,
+                documentChangeLogRepository,
+                processingJobRepository,
+                fileStorage);
     }
 
     @Test
@@ -397,7 +488,12 @@ class DocumentUploadServiceTest {
                 .isInstanceOf(DocumentUploadException.class)
                 .extracting(exception -> ((DocumentUploadException) exception).code())
                 .isEqualTo(DocumentUploadErrorCode.INVALID_DOCUMENT_CONTENT);
-        verifyNoInteractions(documentRepository, documentVersionRepository, processingJobRepository, fileStorage);
+        verifyNoInteractions(
+                documentRepository,
+                documentVersionRepository,
+                documentChangeLogRepository,
+                processingJobRepository,
+                fileStorage);
     }
 
     @Test
@@ -408,7 +504,12 @@ class DocumentUploadServiceTest {
                 .isInstanceOf(DocumentUploadException.class)
                 .extracting(exception -> ((DocumentUploadException) exception).code())
                 .isEqualTo(DocumentUploadErrorCode.INVALID_DOCUMENT_CONTENT);
-        verifyNoInteractions(documentRepository, documentVersionRepository, processingJobRepository, fileStorage);
+        verifyNoInteractions(
+                documentRepository,
+                documentVersionRepository,
+                documentChangeLogRepository,
+                processingJobRepository,
+                fileStorage);
     }
 
     @Test
@@ -416,6 +517,7 @@ class DocumentUploadServiceTest {
         DocumentUploadService limitedUploadService = new DocumentUploadService(
                 documentRepository,
                 documentVersionRepository,
+                documentChangeLogRepository,
                 processingJobRepository,
                 fileStorage,
                 fileCleanupJobService,
@@ -428,7 +530,12 @@ class DocumentUploadServiceTest {
                 .isInstanceOf(DocumentUploadException.class)
                 .extracting(exception -> ((DocumentUploadException) exception).code())
                 .isEqualTo(DocumentUploadErrorCode.INVALID_DOCUMENT_CONTENT);
-        verifyNoInteractions(documentRepository, documentVersionRepository, processingJobRepository, fileStorage);
+        verifyNoInteractions(
+                documentRepository,
+                documentVersionRepository,
+                documentChangeLogRepository,
+                processingJobRepository,
+                fileStorage);
     }
 
     @Test

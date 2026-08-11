@@ -19,9 +19,9 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 class OpenSqlInfrastructureTest {
 
     private static final String TARGET_CONFIRMATION = "PRIZM_OPENSQL_VERIFICATION_TARGET_CONFIRMED";
-    private static final String EXPECTED_DATABASE = "prizm_integration_test";
-    private static final String EXPECTED_RUNTIME_USER = "prizm_app";
-    private static final String EXPECTED_FLYWAY_USER = "prizm_owner";
+    private static final String EXPECTED_DATABASE = configured("PRIZM_OPENSQL_EXPECTED_DATABASE", "prizm_integration_test");
+    private static final String EXPECTED_RUNTIME_USER = configured("PRIZM_OPENSQL_EXPECTED_RUNTIME_USER", "prizm_app");
+    private static final String EXPECTED_FLYWAY_USER = configured("PRIZM_OPENSQL_EXPECTED_FLYWAY_USER", "prizm_owner");
 
     @BeforeAll
     static void suppressConnectionDetailsFromLibraryLogs() {
@@ -68,6 +68,11 @@ class OpenSqlInfrastructureTest {
 
     private DataSource dataSource(String url, String username, String password) {
         return new DriverManagerDataSource(url, username, password);
+    }
+
+    private static String configured(String name, String defaultValue) {
+        String value = System.getenv(name);
+        return value == null || value.isBlank() ? defaultValue : value;
     }
 
     private void verifyConnectionIdentity(DataSource dataSource, String expectedUser) {

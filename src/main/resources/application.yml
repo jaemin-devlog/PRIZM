@@ -67,6 +67,10 @@ prizm:
       max-extracted-characters: ${PRIZM_DOCUMENT_PDF_MAX_EXTRACTED_CHARACTERS:2000000}
   embedding:
     dimensions: ${PRIZM_EMBEDDING_DIMENSIONS:1024}
+  change-log:
+    scheduler:
+      enabled: ${PRIZM_CHANGE_LOG_SCHEDULER_ENABLED:true}
+      poll-delay-ms: ${PRIZM_CHANGE_LOG_SCHEDULER_POLL_DELAY_MS:1000}
   ingestion:
     max-chunk-length: ${PRIZM_MAX_CHUNK_LENGTH:800}
     overlap: ${PRIZM_CHUNK_OVERLAP:120}

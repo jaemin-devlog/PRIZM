@@ -1,7 +1,8 @@
 # PRZ-010 — 변경 로그 동기화 Tasks
 
-현재 상태: `IN_PROGRESS`. P1~P7 구현과 전용 DB test는 완료했고, P8 이후 구현·테스트는
-시작하지 않았다. 각 P 단계의 Gate를 통과하기 전에는 다음 P 단계로 진행하지 않는다.
+현재 상태: `VERIFIED`. P1~P10 Gate를 순서대로 통과했다. PostgreSQL 검증, 실제 OpenSQL
+direct `5432` SQL Gate, 실제 OpenSQL+Ollama `bge-m3` V1→V2 E2E와 P10-A 회귀 결과는
+[`evidence.md`](evidence.md)에 기록한다.
 
 ## P1. Migration + ChangeLog Domain
 
@@ -53,19 +54,25 @@
 
 ## P8. 실제 OpenSQL 검증
 
-- [ ] compatibility assertion과 기존 OpenSQL test만 필요한 범위로 갱신한다.
-- [ ] 실제 direct `5432` 결과를 PostgreSQL 결과와 분리해 기록한다.
+- [x] compatibility assertion과 기존 OpenSQL test를 필요한 범위로만 갱신했다.
+- [x] 실제 OpenSQL direct `5432`에서 V1~V14, V14 schema/제약, SKIP LOCKED,
+  ON CONFLICT idempotency, owner isolation과 기존 data 보존을 PostgreSQL과 분리해 통과했다.
 
 ## P9. V1 → V2 전체 E2E
 
-- [ ] Ollama bge-m3로 V1 ACTIVE → V2 PENDING ChangeLog → DISPATCHED Job → V2 ACTIVE를 검증한다.
-- [ ] V2 고유 질의가 V2만 반환하고 dispatch/indexing 실패에는 V1을 유지함을 검증한다.
+- [x] 실제 OpenSQL direct `5432`와 Ollama `bge-m3`로 V1 ACTIVE → V2 QUARANTINED
+  ChangeLog → DISPATCHED Job → V2 ACTIVE를 검증했다.
+- [x] V2 고유 질의가 V2만 반환하고 dispatch/indexing 최종 실패에는 V1 ACTIVE·검색을
+  유지함을 검증했다.
 
 ## P10. Regression / Evidence
 
-- [ ] backend test, integrationTest, frontend lint/build, Compose config, `git diff --check`를 실행한다.
-- [ ] PRZ-008 검색/평가/dataset 및 parser/chunker/embedding 구현 변경이 0건인지 감사한다.
-- [ ] 실제 결과와 NOT_RUN 환경을 evidence·registry에 정직하게 기록한다.
+- [x] P10-A에서 backend test, integrationTest, frontend lint/build, Compose config와
+  `git diff --check`를 실행했다. integrationTest는 `104 completed, 7 skipped, 0 failures`다.
+- [x] 기존 통합 테스트의 V14 ChangeLog → Dispatcher → ProcessingJob 계약, FK cleanup
+  순서와 Flyway V14 기대값만 정정했고 제품 코드는 변경하지 않았다.
+- [x] PRZ-008 검색/평가/dataset 및 parser/chunker/embedding 구현 변경이 0건임을 감사했다.
+- [x] P10-B에서 실제 결과와 남은 제한을 Evidence·registry·project status에 기록했다.
 
 ## 공통 중단 규칙
 

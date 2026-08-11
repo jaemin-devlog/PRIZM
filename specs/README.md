@@ -73,11 +73,15 @@
 | [PRZ-007](PRZ-007-self-hosted-signup/spec.md) | 자체 호스팅 회원가입 | `VERIFIED` | `2b8b600` | 2026-08-05 |
 | [PRZ-008](PRZ-008-search-evidence-reliability/spec.md) | 검색 근거 신뢰성 | `PLANNED` | — | — |
 | [PRZ-009](PRZ-009-career-keyword-map/spec.md) | 경력 키워드 맵 | `IMPLEMENTED_UNVERIFIED` | 작업 트리 | 2026-08-10 |
-| [PRZ-010](PRZ-010-change-log-sync/spec.md) | 변경 로그 동기화 | `IN_PROGRESS` | — | — |
+| [PRZ-010](PRZ-010-change-log-sync/spec.md) | 변경 로그 동기화 | `VERIFIED` | 작업 트리 | 2026-08-12 |
 
 PRZ-005의 실제 환경 준비 결과와 남은 범위는
 [실제 OpenSQL 통합 작업 보고서](PRZ-005-opensql-ollama-e2e/implementation-report.md)에서
 확인한다.
+
+PRZ-010은 실제 OpenSQL direct `5432` SQL Gate와 실제 OpenSQL+Ollama `bge-m3`
+V1→V2 E2E, 전체 회귀를 통과했다. PostgreSQL과 OpenSQL 결과, 임시 credential bootstrap
+환경 이력과 남은 범위는 [PRZ-010 Evidence](PRZ-010-change-log-sync/evidence.md)에 기록한다.
 
 PRZ-005의 직접 `5432` API·브라우저·두 사용자 격리는 검증됐다. 현재 source의 OpenSQL
 opt-in integration test도 격리된 `prizm_integration_test`에서 통과했다. backend 전체

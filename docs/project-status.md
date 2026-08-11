@@ -1,6 +1,8 @@
 # PRIZM 현재 구현 현황
 
-> 현재 상태 기준일: 2026-08-10
+> 현재 상태 기준일: 2026-08-12
+>
+> PRZ-010 검증 source: 현재 작업 트리(아직 commit하지 않음)
 >
 > PRZ-007 검증 source commit: `2b8b60069c37eea91e485bffe2c54e62cd2117ab`
 >
@@ -36,8 +38,8 @@
 | 구분 | 현재 상태 |
 |---|---|
 | 현재 제품 | Spring Boot 애플리케이션과 React 기반 Career Vault Reference App |
-| 구현됨 | 자체 호스팅 회원가입, 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, 비동기 색인·복구, pgvector 검색, Career Vault 문서 관리 |
-| 현재 단계 | 소스 전용 공개 준비, clean-clone과 실제 OpenSQL 전체 흐름 검증 완료. PRZ-008은 계획 상태이며 PRZ-009 경력 키워드 맵은 `IMPLEMENTED_UNVERIFIED` |
+| 구현됨 | 자체 호스팅 회원가입, 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, ChangeLog 기반 비동기 색인·복구, pgvector 검색, Career Vault 문서 관리 |
+| 현재 단계 | 소스 전용 공개 준비, clean-clone과 실제 OpenSQL 전체 흐름 검증 완료. PRZ-010 변경 로그 동기화는 `VERIFIED`; PRZ-008은 계획 상태이며 PRZ-009 경력 키워드 맵은 `IMPLEMENTED_UNVERIFIED` |
 | 미구현·미검증 | CareerFact, 근거 기반 portfolio, `/api/v1`, MCP, 독립 Engine 패키지, OpenProxy SQL routing·안전한 인증, OpenHA와 DB 장애 전환 |
 
 PRIZM의 장기 목표는 재사용 가능한 Career Intelligence Engine과 Reference App을
@@ -50,7 +52,8 @@ Spring Boot 애플리케이션에 주요 기능이 모여 있습니다.
 회원가입 → 로그인
 → 내 문서 목록 확인
 → UTF-8 TXT 또는 텍스트가 포함된 PDF 업로드
-→ 원본과 새 문서 버전 저장
+→ 원본·새 문서 버전·ChangeLog를 함께 저장
+→ Dispatcher가 기존 색인 ProcessingJob을 생성 또는 재사용
 → Worker가 텍스트 추출·분할·임베딩 수행
 → 처리가 끝난 버전을 검색 대상으로 전환
 → 내 문서에서 원문 위치와 함께 검색 결과 확인
@@ -136,19 +139,21 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 | OpenHA·DB failover·영구 journal | `DEFERRED` | PRZ-005 핵심 완료 범위와 분리한 후속 작업 |
 | PRZ-004 demo `USER` clean-clone | `VERIFIED` | `25d09e9`에서 자동 검증 `339 PASS / 18 SKIP / 0 FAIL`과 두 독립 clone 통과. `aff3e87` 경로 교정 뒤 Windows·Linux Node test와 GitHub CI 6건 통과, PR #25 merge `1f9a5ad`. 두 번째 빈 목록 UI 직접 관찰은 `NOT_RUN` |
 | PRZ-009 경력 키워드 맵 | `IMPLEMENTED_UNVERIFIED` | 2026-08-10 작업 트리: backend unit 323개 중 308 pass·15 skip·실패 0, 전체 integration 71개 중 68 pass·조건부 3 skip·실패 0, frontend lint·build, Docker build/runtime, synthetic browser와 diff 감사 pass. OpenSQL opt-in은 `NOT_RUN` |
+| PRZ-010 변경 로그 동기화 | `VERIFIED` | 2026-08-12 현재 작업 트리: PostgreSQL ChangeLog integration, 실제 OpenSQL direct `5432` V14 SQL Gate, 실제 OpenSQL+Ollama `bge-m3` V1→V2 E2E와 실패 시 V1 보존, 전체 integration `104 completed / 7 skipped / 0 failures`, backend test, frontend lint/build, Compose와 diff 감사 통과 |
 
 세부 실행 환경과 명령은 [PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md),
 [PRZ-002 Evidence](../specs/PRZ-002-open-source-readiness/evidence.md),
 [PRZ-003 Evidence](../specs/PRZ-003-opensql-single-node-gate/evidence.md),
 [PRZ-004 Evidence](../specs/PRZ-004-clean-clone-demo/evidence.md),
-[PRZ-005 실제 OpenSQL 통합 작업 보고서](../specs/PRZ-005-opensql-ollama-e2e/implementation-report.md)에서
+[PRZ-005 실제 OpenSQL 통합 작업 보고서](../specs/PRZ-005-opensql-ollama-e2e/implementation-report.md),
+[PRZ-010 Evidence](../specs/PRZ-010-change-log-sync/evidence.md)에서
 확인합니다. PostgreSQL·pgvector 결과를 OpenSQL 결과로 바꾸어 표현하지 않습니다.
 
 ## 미구현 기능
 
 - OpenProxy의 안전한 인증과 SQL routing, 애플리케이션 적용
 - OpenHA와 DB 장애 전환, 영구 journal
-- 변경 로그 기반 동기화와 MCP 검색 API
+- MCP 검색 API
 - CareerFact 후보·확인·거절과 `INSUFFICIENT_EVIDENCE`
 - 검증된 CareerFact를 이용한 JSON·Markdown portfolio와 source manifest
 - `/api/v1`, OpenAPI, webhook/outbox

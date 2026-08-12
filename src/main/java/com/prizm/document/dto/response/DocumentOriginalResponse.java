@@ -1,5 +1,10 @@
 package com.prizm.document.dto.response;
 
-/** Owner-scoped PDF bytes and the safe display name needed for an inline response. */
-public record DocumentOriginalResponse(byte[] pdfBytes, String originalFileName) {
+import com.prizm.document.entity.DocumentFileType;
+
+/** Owner-scoped original bytes and safe metadata needed for an inline response. */
+public record DocumentOriginalResponse(
+        byte[] bytes,
+        String originalFileName,
+        DocumentFileType fileType) {
 }

@@ -21,6 +21,7 @@ import com.prizm.auth.bootstrap.DemoUserBootstrapRunner;
 import com.prizm.auth.bootstrap.SystemAdminBootstrapRunner;
 import com.prizm.auth.dto.request.LoginRequest;
 import com.prizm.auth.service.AuthService;
+import com.prizm.changelog.service.ChangeLogDispatchTransaction;
 import com.prizm.cleanup.service.FileCleanupCoordinator;
 import com.prizm.document.dto.response.DocumentUploadResponse;
 import com.prizm.document.entity.DocumentType;
@@ -126,6 +127,9 @@ class AuthenticationIntegrationTest {
     ProcessingJobRepository processingJobRepository;
 
     @Autowired
+    ChangeLogDispatchTransaction changeLogDispatchTransaction;
+
+    @Autowired
     EmbeddingService embeddingService;
 
     @Autowired
@@ -151,6 +155,7 @@ class AuthenticationIntegrationTest {
 
     @AfterEach
     void cleanUp() {
+        jdbcTemplate.update("DELETE FROM document_change_logs");
         jdbcTemplate.update("DELETE FROM file_cleanup_jobs");
         jdbcTemplate.update("DELETE FROM processing_jobs");
         jdbcTemplate.update("DELETE FROM document_chunks");
@@ -370,6 +375,8 @@ class AuthenticationIntegrationTest {
                 .andExpect(jsonPath("$.documentType").value("PORTFOLIO"))
                 .andExpect(jsonPath("$.status").value("QUARANTINED"));
 
+        assertThat(processingJobRepository.count()).isZero();
+        assertThat(changeLogDispatchTransaction.dispatchNext()).isTrue();
         assertThat(processingJobRepository.count()).isEqualTo(1L);
         var job = processingJobRepository.findAll().get(0);
         assertThat(job.getStatus()).isEqualTo(ProcessingJobStatus.PENDING);
@@ -638,6 +645,8 @@ class AuthenticationIntegrationTest {
                 DocumentType.OTHER,
                 new MockMultipartFile(
                         "file", "other-document.txt", "text/plain", "other document body".getBytes(StandardCharsets.UTF_8)));
+        assertThat(changeLogDispatchTransaction.dispatchNext()).isTrue();
+        assertThat(changeLogDispatchTransaction.dispatchNext()).isTrue();
         String storageKey = jdbcTemplate.queryForObject(
                 "SELECT stored_file_path FROM document_versions WHERE id = ?", String.class, ownerUpload.versionId());
 

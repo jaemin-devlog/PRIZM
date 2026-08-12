@@ -3,6 +3,7 @@ package com.prizm.infrastructure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.prizm.changelog.repository.DocumentChangeLogRepository;
 import com.prizm.document.entity.Document;
 import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.entity.DocumentType;
@@ -75,12 +76,14 @@ class DocumentManagementDatabaseIntegrationTest {
     @Autowired DocumentThumbnailService documentThumbnailService;
     @Autowired DocumentRepository documentRepository;
     @Autowired DocumentVersionRepository documentVersionRepository;
+    @Autowired DocumentChangeLogRepository documentChangeLogRepository;
     @Autowired ProcessingJobRepository processingJobRepository;
     @Autowired UserAccountRepository userAccountRepository;
     @Autowired JdbcTemplate jdbcTemplate;
 
     @AfterEach
     void cleanUp() {
+        jdbcTemplate.update("DELETE FROM document_change_logs");
         jdbcTemplate.update("DELETE FROM file_cleanup_jobs");
         jdbcTemplate.update("DELETE FROM processing_jobs");
         jdbcTemplate.update("DELETE FROM document_chunks");
@@ -95,6 +98,7 @@ class DocumentManagementDatabaseIntegrationTest {
     void hardDeletesTerminalOwnerMetadataWithActiveVersionFkAndRegistersCleanup() {
         UserAccount owner = createUser("terminal-owner@prizm.local");
         DocumentFixture fixture = createDocument(owner.getId(), "terminal.txt");
+        jdbcTemplate.update("UPDATE document_versions SET status = 'FAILED' WHERE id = ?", fixture.versionId());
         jdbcTemplate.update(
                 "UPDATE processing_jobs SET status = 'FAILED', completed_at = now() WHERE id = ?",
                 fixture.processingJobId());
@@ -145,6 +149,7 @@ class DocumentManagementDatabaseIntegrationTest {
     void addsASecondVersionWhileKeepingThePreviousActiveVersionUntilIndexingCompletes() {
         UserAccount owner = createUser("version-owner@prizm.local");
         DocumentFixture fixture = createDocument(owner.getId(), "guide-v1.txt");
+        jdbcTemplate.update("UPDATE document_versions SET status = 'ACTIVE' WHERE id = ?", fixture.versionId());
         jdbcTemplate.update(
                 "UPDATE processing_jobs SET status = 'COMPLETED', completed_at = now() WHERE id = ?",
                 fixture.processingJobId());
@@ -161,9 +166,9 @@ class DocumentManagementDatabaseIntegrationTest {
                 .containsExactly(2, 1);
         assertThat(processingJobRepository
                 .findByOwnerUserIdAndDocumentVersionId(owner.getId(), response.versionId()))
-                .get()
-                .extracting(ProcessingJob::getStatus)
-                .isEqualTo(com.prizm.ingestion.entity.ProcessingJobStatus.PENDING);
+                .isEmpty();
+        assertThat(documentChangeLogRepository.findAll())
+                .anySatisfy(changeLog -> assertThat(changeLog.getDocumentVersionId()).isEqualTo(response.versionId()));
         assertThat(Files.exists(STORAGE_ROOT.resolve("storage").resolve(
                 "documents/%d/%d/guide-v2.txt".formatted(fixture.documentId(), response.versionId())))).isTrue();
     }
@@ -180,8 +185,9 @@ class DocumentManagementDatabaseIntegrationTest {
         var original = documentThumbnailService.getOriginal(
                 owner.getId(), upload.documentId(), upload.versionId());
 
-        assertThat(original.pdfBytes()).isEqualTo(pdfBytes);
+        assertThat(original.bytes()).isEqualTo(pdfBytes);
         assertThat(original.originalFileName()).isEqualTo("career-evidence.pdf");
+        assertThat(original.fileType()).isEqualTo(DocumentFileType.PDF);
         assertThatThrownBy(() -> documentThumbnailService.getOriginal(
                         otherUser.getId(), upload.documentId(), upload.versionId()))
                 .isInstanceOf(DocumentNotFoundException.class);

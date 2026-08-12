@@ -87,8 +87,9 @@ class DocumentThumbnailServiceTest {
 
         DocumentOriginalResponse response = service.getOriginal(OWNER_ID, DOCUMENT_ID, VERSION_ID);
 
-        assertThat(response.pdfBytes()).isEqualTo(pdfBytes);
+        assertThat(response.bytes()).isEqualTo(pdfBytes);
         assertThat(response.originalFileName()).isEqualTo("경력 증명서.pdf");
+        assertThat(response.fileType()).isEqualTo(DocumentFileType.PDF);
         verify(fileStorage).read(STORED_FILE_PATH);
         verifyNoInteractions(renderer);
     }
@@ -130,15 +131,17 @@ class DocumentThumbnailServiceTest {
     }
 
     @Test
-    void rejectsOriginalViewingForTxtWithoutReadingStorage() {
+    void returnsOriginalTxtForAnOwnerScopedVersionWithoutRenderingIt() {
+        byte[] textBytes = "Spring Boot 경력".getBytes(java.nio.charset.StandardCharsets.UTF_8);
         stubOwnedDocumentAndVersion(version(DocumentFileType.TXT, "evidence.txt"));
+        when(fileStorage.read(STORED_FILE_PATH)).thenReturn(textBytes);
 
-        assertThatThrownBy(() -> service.getOriginal(OWNER_ID, DOCUMENT_ID, VERSION_ID))
-                .isInstanceOf(DocumentThumbnailException.class)
-                .extracting(exception -> ((DocumentThumbnailException) exception).code())
-                .isEqualTo(DocumentThumbnailErrorCode.UNSUPPORTED_FILE_TYPE);
+        DocumentOriginalResponse response = service.getOriginal(OWNER_ID, DOCUMENT_ID, VERSION_ID);
 
-        verifyNoInteractions(fileStorage, renderer);
+        assertThat(response.bytes()).isEqualTo(textBytes);
+        assertThat(response.originalFileName()).isEqualTo("evidence.txt");
+        assertThat(response.fileType()).isEqualTo(DocumentFileType.TXT);
+        verifyNoInteractions(renderer);
     }
 
     @Test

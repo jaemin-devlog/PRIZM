@@ -1,6 +1,7 @@
 package com.prizm.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.prizm.cleanup.repository.FileCleanupJobRepository;
 import com.prizm.cleanup.service.ClaimedFileCleanupJob;
@@ -44,13 +45,13 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 final class OpenSqlCompatibilityAssertions {
 
-    private static final int EXPECTED_MIGRATION_COUNT = 13;
+    private static final int EXPECTED_MIGRATION_COUNT = 14;
     private static final Duration LEASE_DURATION = Duration.ofSeconds(30);
     private static final List<String> DOMAIN_TABLES = List.of(
             "users", "documents", "document_versions", "document_chunks",
-            "processing_jobs", "file_cleanup_jobs");
-    private static final Pattern MIGRATION_FILE_PATTERN = Pattern.compile("(?i)\\bV(1[0-3]|[1-9])(?:__|\\b)");
-    private static final Pattern MIGRATION_VERSION_PATTERN = Pattern.compile("(?i)\\bversion\\s+['\"]?(1[0-3]|[1-9])\\b");
+            "processing_jobs", "file_cleanup_jobs", "document_change_logs");
+    private static final Pattern MIGRATION_FILE_PATTERN = Pattern.compile("(?i)\\bV(1[0-4]|[1-9])(?:__|\\b)");
+    private static final Pattern MIGRATION_VERSION_PATTERN = Pattern.compile("(?i)\\bversion\\s+['\"]?(1[0-4]|[1-9])\\b");
 
     private OpenSqlCompatibilityAssertions() {
     }
@@ -85,6 +86,8 @@ final class OpenSqlCompatibilityAssertions {
                     verifyVectorSearch(runtimeJdbc, flywayJdbc, runToken));
             verifyPhase("indexing-worker", "ProcessingJobClaimRepository claim, lease and SKIP LOCKED SQL", () ->
                     verifyProcessingJobSql(runtimeDataSource, runtimeJdbc, flywayJdbc, runToken));
+            verifyPhase("change-log", "V14 constraints, owner isolation, SKIP LOCKED and ProcessingJob ON CONFLICT", () ->
+                    verifyChangeLogSql(runtimeDataSource, runtimeJdbc, flywayJdbc, runToken));
             verifyPhase("cleanup-worker", "FileCleanupJobRepository registration, claim, recovery and fencing SQL", () ->
                     verifyCleanupJobSql(runtimeDataSource, runtimeJdbc, flywayJdbc, runToken));
         }
@@ -120,35 +123,40 @@ final class OpenSqlCompatibilityAssertions {
     }
 
     private static void verifyMigrations(DataSource flywayDataSource, JdbcTemplate flywayJdbc) {
+        PreV14ProcessingFixture preV14Fixture = null;
         try {
-            Flyway flyway = Flyway.configure()
+            Flyway v13Flyway = Flyway.configure()
+                    .dataSource(flywayDataSource)
+                    .locations("classpath:db/migration")
+                    .baselineOnMigrate(false)
+                    .cleanDisabled(true)
+                    .target("13")
+                    .load();
+
+            MigrateResult v13Migration = v13Flyway.migrate();
+            assertThat(v13Migration.migrationsExecuted).isEqualTo(EXPECTED_MIGRATION_COUNT - 1);
+            assertSuccessfulMigrationVersions(flywayJdbc, EXPECTED_MIGRATION_COUNT - 1);
+            assertThat(v13Flyway.info().current()).isNotNull();
+            assertThat(v13Flyway.info().current().getVersion().getVersion()).isEqualTo("13");
+
+            preV14Fixture = createPreV14ProcessingFixture(flywayJdbc);
+
+            Flyway latestFlyway = Flyway.configure()
                     .dataSource(flywayDataSource)
                     .locations("classpath:db/migration")
                     .baselineOnMigrate(false)
                     .cleanDisabled(true)
                     .load();
+            MigrateResult v14Migration = latestFlyway.migrate();
+            assertThat(v14Migration.migrationsExecuted).isEqualTo(1);
+            assertSuccessfulMigrationVersions(flywayJdbc, EXPECTED_MIGRATION_COUNT);
+            assertThat(latestFlyway.info().current()).isNotNull();
+            assertThat(latestFlyway.info().current().getVersion().getVersion()).isEqualTo("14");
+            assertPreV14ProcessingFixturePreserved(flywayJdbc, preV14Fixture);
 
-            MigrateResult firstMigration = flyway.migrate();
-            assertThat(firstMigration.migrationsExecuted).isEqualTo(EXPECTED_MIGRATION_COUNT);
-
-            List<String> successfulVersions = flywayJdbc.queryForList(
-                    """
-                    SELECT version
-                    FROM flyway_schema_history
-                    WHERE success AND version IS NOT NULL
-                    ORDER BY installed_rank
-                    """,
-                    String.class);
-            assertThat(successfulVersions)
-                    .containsExactlyElementsOf(IntStream.rangeClosed(1, EXPECTED_MIGRATION_COUNT)
-                            .mapToObj(Integer::toString)
-                            .toList());
-            assertThat(flyway.info().current()).isNotNull();
-            assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("13");
-
-            MigrateResult secondMigration = flyway.migrate();
+            MigrateResult secondMigration = latestFlyway.migrate();
             assertThat(secondMigration.migrationsExecuted).isZero();
-            assertThat(flyway.info().pending()).isEmpty();
+            assertThat(latestFlyway.info().pending()).isEmpty();
             assertSchema(flywayJdbc);
         }
         catch (AssertionError failure) {
@@ -157,6 +165,93 @@ final class OpenSqlCompatibilityAssertions {
         catch (RuntimeException failure) {
             throw migrationFailure(failure, flywayJdbc);
         }
+        finally {
+            if (preV14Fixture != null) {
+                deletePreV14ProcessingFixture(flywayJdbc, preV14Fixture);
+            }
+        }
+    }
+
+    private static void assertSuccessfulMigrationVersions(JdbcTemplate flywayJdbc, int expectedMigrationCount) {
+        List<String> successfulVersions = flywayJdbc.queryForList(
+                """
+                SELECT version
+                FROM flyway_schema_history
+                WHERE success AND version IS NOT NULL
+                ORDER BY installed_rank
+                """,
+                String.class);
+        assertThat(successfulVersions)
+                .containsExactlyElementsOf(IntStream.rangeClosed(1, expectedMigrationCount)
+                        .mapToObj(Integer::toString)
+                        .toList());
+    }
+
+    private static PreV14ProcessingFixture createPreV14ProcessingFixture(JdbcTemplate jdbcTemplate) {
+        String token = UUID.randomUUID().toString();
+        Long ownerUserId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO users(email, password_hash, role, enabled)
+                VALUES (?, repeat('v', 60), 'USER', TRUE)
+                RETURNING id
+                """,
+                Long.class,
+                "pre-v14-" + token + "@compatibility.invalid");
+        Long documentId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO documents(owner_user_id, title, document_type)
+                VALUES (?, ?, 'OTHER')
+                RETURNING id
+                """,
+                Long.class,
+                ownerUserId,
+                "Pre-V14 ProcessingJob " + token);
+        Long versionId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO document_versions(
+                    owner_user_id, document_id, version_no, original_file_name, stored_file_path,
+                    file_type, content_hash, status
+                )
+                VALUES (?, ?, 1, 'pre-v14.txt', ?, 'TXT', repeat('v', 64), 'QUARANTINED')
+                RETURNING id
+                """,
+                Long.class,
+                ownerUserId,
+                documentId,
+                "compatibility/pre-v14/" + token + ".txt");
+        Long processingJobId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO processing_jobs(owner_user_id, document_version_id, job_type, status)
+                VALUES (?, ?, 'INDEXING', 'PENDING')
+                RETURNING id
+                """,
+                Long.class,
+                ownerUserId,
+                versionId);
+        return new PreV14ProcessingFixture(ownerUserId, documentId, versionId, processingJobId);
+    }
+
+    private static void assertPreV14ProcessingFixturePreserved(
+            JdbcTemplate jdbcTemplate, PreV14ProcessingFixture fixture) {
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM processing_jobs WHERE id = ? AND owner_user_id = ? AND document_version_id = ? "
+                        + "AND job_type = 'INDEXING' AND status = 'PENDING'",
+                Long.class,
+                fixture.processingJobId(),
+                fixture.ownerUserId(),
+                fixture.documentVersionId())).isEqualTo(1L);
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM document_change_logs WHERE owner_user_id = ? AND document_version_id = ?",
+                Long.class,
+                fixture.ownerUserId(),
+                fixture.documentVersionId())).isZero();
+    }
+
+    private static void deletePreV14ProcessingFixture(JdbcTemplate jdbcTemplate, PreV14ProcessingFixture fixture) {
+        jdbcTemplate.update("DELETE FROM processing_jobs WHERE id = ?", fixture.processingJobId());
+        jdbcTemplate.update("DELETE FROM document_versions WHERE id = ?", fixture.documentVersionId());
+        jdbcTemplate.update("DELETE FROM documents WHERE id = ?", fixture.documentId());
+        jdbcTemplate.update("DELETE FROM users WHERE id = ?", fixture.ownerUserId());
     }
 
     private static VerificationMarker verifySharedTarget(
@@ -258,7 +353,7 @@ final class OpenSqlCompatibilityAssertions {
     private static void assertSchema(JdbcTemplate jdbcTemplate) {
         for (String table : List.of(
                 "users", "documents", "document_versions", "document_chunks",
-                "processing_jobs", "file_cleanup_jobs")) {
+                "processing_jobs", "file_cleanup_jobs", "document_change_logs")) {
             assertThat(jdbcTemplate.queryForObject(
                     """
                     SELECT COUNT(*)
@@ -301,7 +396,14 @@ final class OpenSqlCompatibilityAssertions {
                 "fk_document_versions_document_owner",
                 "fk_document_chunks_version_owner",
                 "fk_processing_jobs_version_owner",
-                "fk_documents_active_version_owner"));
+                "fk_documents_active_version_owner",
+                "fk_document_change_logs_version_owner",
+                "fk_document_change_logs_processing_job_owner_version"));
+        assertConstraints(jdbcTemplate, "u", List.of(
+                "uq_processing_jobs_id_owner_version",
+                "uq_document_change_logs_event_key",
+                "uq_document_change_logs_version_event",
+                "uq_document_change_logs_processing_job"));
         assertConstraints(jdbcTemplate, "c", List.of(
                 "ck_document_versions_status",
                 "ck_processing_jobs_status",
@@ -310,14 +412,19 @@ final class OpenSqlCompatibilityAssertions {
                 "ck_document_chunks_source_type",
                 "ck_document_chunks_source_index",
                 "ck_file_cleanup_jobs_status",
-                "ck_file_cleanup_jobs_attempts"));
+                "ck_file_cleanup_jobs_attempts",
+                "ck_document_change_logs_event_type",
+                "ck_document_change_logs_dispatch_status",
+                "ck_document_change_logs_retry_count"));
 
         for (String index : List.of(
                 "ix_processing_jobs_claim",
                 "ix_processing_jobs_status_retry_lease",
                 "idx_processing_jobs_owner_status_available",
                 "ix_file_cleanup_jobs_pending_available",
-                "ix_file_cleanup_jobs_processing_lease")) {
+                "ix_file_cleanup_jobs_processing_lease",
+                "ix_document_change_logs_dispatch_claim",
+                "ix_document_change_logs_owner_version")) {
             assertThat(jdbcTemplate.queryForObject(
                     """
                     SELECT COUNT(*)
@@ -328,15 +435,23 @@ final class OpenSqlCompatibilityAssertions {
                     index)).isEqualTo(1L);
         }
 
+        assertThat(constraintDefinition(jdbcTemplate, "ck_file_cleanup_jobs_status"))
+                .contains("PENDING", "PROCESSING", "RETRY_WAIT", "COMPLETED", "FAILED");
+        assertThat(constraintDefinition(jdbcTemplate, "ck_document_change_logs_event_type"))
+                .contains("DOCUMENT_VERSION_CREATED");
+        assertThat(constraintDefinition(jdbcTemplate, "ck_document_change_logs_dispatch_status"))
+                .contains("PENDING", "RETRY_WAIT", "DISPATCHED", "FAILED");
+        assertThat(constraintDefinition(jdbcTemplate, "ck_document_change_logs_retry_count"))
+                .contains("0", "3");
         assertThat(jdbcTemplate.queryForObject(
                 """
-                SELECT pg_get_constraintdef(constraint_definition.oid)
-                FROM pg_constraint constraint_definition
-                JOIN pg_namespace namespace ON namespace.oid = constraint_definition.connamespace
-                WHERE namespace.nspname = current_schema()
-                  AND constraint_definition.conname = 'ck_file_cleanup_jobs_status'
+                SELECT is_nullable
+                FROM information_schema.columns
+                WHERE table_schema = current_schema()
+                  AND table_name = 'document_change_logs'
+                  AND column_name = 'processing_job_id'
                 """,
-                String.class)).contains("PENDING", "PROCESSING", "RETRY_WAIT", "COMPLETED", "FAILED");
+                String.class)).isEqualTo("YES");
     }
 
     private static void assertConstraints(JdbcTemplate jdbcTemplate, String type, List<String> names) {
@@ -354,6 +469,19 @@ final class OpenSqlCompatibilityAssertions {
                     name,
                     type)).isEqualTo(1L);
         }
+    }
+
+    private static String constraintDefinition(JdbcTemplate jdbcTemplate, String constraintName) {
+        return jdbcTemplate.queryForObject(
+                """
+                SELECT pg_get_constraintdef(constraint_definition.oid)
+                FROM pg_constraint constraint_definition
+                JOIN pg_namespace namespace ON namespace.oid = constraint_definition.connamespace
+                WHERE namespace.nspname = current_schema()
+                  AND constraint_definition.conname = ?
+                """,
+                String.class,
+                constraintName);
     }
 
     private static void verifyVectorSearch(
@@ -502,6 +630,109 @@ final class OpenSqlCompatibilityAssertions {
         }
     }
 
+    private static void verifyChangeLogSql(
+            DataSource dataSource,
+            JdbcTemplate jdbcTemplate,
+            JdbcTemplate cleanupJdbc,
+            String runToken) {
+        try (FixtureScope fixtures = new FixtureScope(cleanupJdbc, runToken + "-change-log")) {
+            long ownerOne = createUser(jdbcTemplate, fixtures);
+            long ownerTwo = createUser(jdbcTemplate, fixtures);
+            DocumentFixture ownerOneFirst = createDocumentVersion(
+                    jdbcTemplate, fixtures, ownerOne, "ChangeLog first", "QUARANTINED", 1);
+            DocumentFixture ownerOneSecond = createDocumentVersion(
+                    jdbcTemplate, fixtures, ownerOne, "ChangeLog second", "QUARANTINED", 1);
+            DocumentFixture ownerOneThird = createDocumentVersion(
+                    jdbcTemplate, fixtures, ownerOne, "ChangeLog third", "QUARANTINED", 1);
+            DocumentFixture ownerTwoFirst = createDocumentVersion(
+                    jdbcTemplate, fixtures, ownerTwo, "ChangeLog foreign", "QUARANTINED", 1);
+
+            long firstChangeLogId = insertPendingChangeLog(
+                    jdbcTemplate, fixtures, ownerOne, ownerOneFirst.versionId(), "first");
+            long secondChangeLogId = insertPendingChangeLog(
+                    jdbcTemplate, fixtures, ownerOne, ownerOneSecond.versionId(), "second");
+            long foreignChangeLogId = insertPendingChangeLog(
+                    jdbcTemplate, fixtures, ownerTwo, ownerTwoFirst.versionId(), "foreign");
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM document_change_logs WHERE processing_job_id IS NULL", Long.class))
+                    .isEqualTo(3L);
+
+            assertThatThrownBy(() -> jdbcTemplate.update(
+                    """
+                    INSERT INTO document_change_logs(
+                        owner_user_id, document_version_id, event_type, event_key, dispatch_status)
+                    VALUES (?, ?, 'DOCUMENT_VERSION_CREATED', ?, 'PENDING')
+                    """,
+                    ownerOne,
+                    ownerOneSecond.versionId(),
+                    fixtures.tag("first")))
+                    .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
+            assertThatThrownBy(() -> jdbcTemplate.update(
+                    """
+                    INSERT INTO document_change_logs(
+                        owner_user_id, document_version_id, event_type, event_key, dispatch_status)
+                    VALUES (?, ?, 'DOCUMENT_VERSION_CREATED', ?, 'PENDING')
+                    """,
+                    ownerOne,
+                    ownerOneFirst.versionId(),
+                    fixtures.tag("duplicate-version-event")))
+                    .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
+
+            assertThat(insertIndexingIfAbsent(jdbcTemplate, ownerOne, ownerOneFirst.versionId())).isEqualTo(1);
+            assertThat(insertIndexingIfAbsent(jdbcTemplate, ownerOne, ownerOneFirst.versionId())).isZero();
+            long firstJobId = processingJobId(jdbcTemplate, ownerOne, ownerOneFirst.versionId());
+            fixtures.trackProcessingJob(firstJobId);
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM processing_jobs WHERE owner_user_id = ? AND document_version_id = ? "
+                            + "AND job_type = 'INDEXING'",
+                    Long.class,
+                    ownerOne,
+                    ownerOneFirst.versionId())).isEqualTo(1L);
+
+            long sameOwnerWrongVersionJobId = createIndexingJob(
+                    jdbcTemplate, fixtures, ownerOne, ownerOneThird.versionId());
+            long foreignOwnerJobId = createIndexingJob(
+                    jdbcTemplate, fixtures, ownerTwo, ownerTwoFirst.versionId());
+
+            assertThat(jdbcTemplate.update(
+                    "UPDATE document_change_logs SET processing_job_id = ? WHERE id = ?",
+                    firstJobId,
+                    firstChangeLogId)).isEqualTo(1);
+            assertThatThrownBy(() -> jdbcTemplate.update(
+                    "UPDATE document_change_logs SET processing_job_id = ? WHERE id = ?",
+                    firstJobId,
+                    secondChangeLogId))
+                    .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
+            assertThatThrownBy(() -> jdbcTemplate.update(
+                    "UPDATE document_change_logs SET processing_job_id = ? WHERE id = ?",
+                    sameOwnerWrongVersionJobId,
+                    secondChangeLogId))
+                    .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
+            assertThatThrownBy(() -> jdbcTemplate.update(
+                    "UPDATE document_change_logs SET processing_job_id = ? WHERE id = ?",
+                    foreignOwnerJobId,
+                    secondChangeLogId))
+                    .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
+
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM document_change_logs WHERE id = ? AND owner_user_id = ?",
+                    Long.class,
+                    firstChangeLogId,
+                    ownerOne)).isEqualTo(1L);
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM document_change_logs WHERE id = ? AND owner_user_id = ?",
+                    Long.class,
+                    firstChangeLogId,
+                    ownerTwo)).isZero();
+
+            assertThat(jdbcTemplate.update(
+                    "UPDATE document_change_logs SET dispatch_status = 'DISPATCHED' WHERE id = ?",
+                    firstChangeLogId)).isEqualTo(1);
+            long skipLockedClaimId = claimChangeLogWhileLocked(dataSource, secondChangeLogId);
+            assertThat(skipLockedClaimId).isEqualTo(foreignChangeLogId);
+        }
+    }
+
     private static void verifyCleanupJobSql(
             DataSource dataSource,
             JdbcTemplate jdbcTemplate,
@@ -633,10 +864,46 @@ final class OpenSqlCompatibilityAssertions {
         }
     }
 
+    private static long claimChangeLogWhileLocked(DataSource dataSource, long lockedChangeLogId) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<Long> future = null;
+        try (Connection connection = dataSource.getConnection()) {
+            connection.setAutoCommit(false);
+            lockRow(connection, "document_change_logs", lockedChangeLogId);
+            future = executor.submit(() -> new JdbcTemplate(dataSource).query(
+                    """
+                    SELECT id
+                    FROM document_change_logs
+                    WHERE dispatch_status = 'PENDING'
+                       OR (dispatch_status = 'RETRY_WAIT' AND next_retry_at <= now())
+                    ORDER BY created_at, id
+                    FOR UPDATE SKIP LOCKED
+                    LIMIT 1
+                    """,
+                    resultSet -> resultSet.next() ? resultSet.getLong("id") : null));
+            Long claimId = future.get(5, TimeUnit.SECONDS);
+            connection.rollback();
+            if (claimId == null) {
+                throw new IllegalStateException("ChangeLog SKIP LOCKED verification did not find a claimable row.");
+            }
+            return claimId;
+        }
+        catch (Exception failure) {
+            if (future != null) {
+                future.cancel(true);
+            }
+            throw new IllegalStateException("ChangeLog SKIP LOCKED verification failed.", failure);
+        }
+        finally {
+            executor.shutdownNow();
+        }
+    }
+
     private static void lockRow(Connection connection, String table, long id) throws SQLException {
         String sql = switch (table) {
             case "processing_jobs" -> "SELECT id FROM processing_jobs WHERE id = ? FOR UPDATE";
             case "file_cleanup_jobs" -> "SELECT id FROM file_cleanup_jobs WHERE id = ? FOR UPDATE";
+            case "document_change_logs" -> "SELECT id FROM document_change_logs WHERE id = ? FOR UPDATE";
             default -> throw new IllegalArgumentException("Unsupported compatibility-test table.");
         };
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -682,6 +949,67 @@ final class OpenSqlCompatibilityAssertions {
                 Timestamp.from(createdAt));
         fixtures.trackProcessingJob(jobId);
         return new ProcessingFixture(document.documentId(), document.versionId(), jobId);
+    }
+
+    private static long insertPendingChangeLog(
+            JdbcTemplate jdbcTemplate,
+            FixtureScope fixtures,
+            long ownerUserId,
+            long documentVersionId,
+            String eventKeySuffix) {
+        Long changeLogId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO document_change_logs(
+                    owner_user_id, document_version_id, event_type, event_key, dispatch_status)
+                VALUES (?, ?, 'DOCUMENT_VERSION_CREATED', ?, 'PENDING')
+                RETURNING id
+                """,
+                Long.class,
+                ownerUserId,
+                documentVersionId,
+                fixtures.tag(eventKeySuffix));
+        fixtures.trackChangeLog(changeLogId);
+        return changeLogId;
+    }
+
+    private static int insertIndexingIfAbsent(
+            JdbcTemplate jdbcTemplate, long ownerUserId, long documentVersionId) {
+        return jdbcTemplate.update(
+                """
+                INSERT INTO processing_jobs(owner_user_id, document_version_id, job_type, status)
+                VALUES (?, ?, 'INDEXING', 'PENDING')
+                ON CONFLICT (document_version_id, job_type) DO NOTHING
+                """,
+                ownerUserId,
+                documentVersionId);
+    }
+
+    private static long processingJobId(JdbcTemplate jdbcTemplate, long ownerUserId, long documentVersionId) {
+        Long processingJobId = jdbcTemplate.queryForObject(
+                """
+                SELECT id
+                FROM processing_jobs
+                WHERE owner_user_id = ? AND document_version_id = ? AND job_type = 'INDEXING'
+                """,
+                Long.class,
+                ownerUserId,
+                documentVersionId);
+        return processingJobId;
+    }
+
+    private static long createIndexingJob(
+            JdbcTemplate jdbcTemplate, FixtureScope fixtures, long ownerUserId, long documentVersionId) {
+        Long processingJobId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO processing_jobs(owner_user_id, document_version_id, job_type, status)
+                VALUES (?, ?, 'INDEXING', 'PENDING')
+                RETURNING id
+                """,
+                Long.class,
+                ownerUserId,
+                documentVersionId);
+        fixtures.trackProcessingJob(processingJobId);
+        return processingJobId;
     }
 
     private static DocumentFixture createDocumentVersion(
@@ -947,7 +1275,8 @@ final class OpenSqlCompatibilityAssertions {
             case "11" -> "TXT/PDF and source CHECK replacement";
             case "12" -> "cleanup table, unique constraint and index";
             case "13" -> "cleanup lease/fencing columns and recovery index";
-            default -> "V1-V13 Flyway SQL";
+            case "14" -> "ChangeLog table, CHECK/unique/composite foreign keys and claim indexes";
+            default -> "V1-V14 Flyway SQL";
         };
     }
 
@@ -956,6 +1285,7 @@ final class OpenSqlCompatibilityAssertions {
         private final JdbcTemplate cleanupJdbc;
         private final String runToken;
         private final Set<String> cleanupKeys = new LinkedHashSet<>();
+        private final Set<Long> changeLogIds = new LinkedHashSet<>();
         private final Set<Long> processingJobIds = new LinkedHashSet<>();
         private final Set<Long> chunkIds = new LinkedHashSet<>();
         private final Set<Long> versionIds = new LinkedHashSet<>();
@@ -986,6 +1316,10 @@ final class OpenSqlCompatibilityAssertions {
             cleanupKeys.add(storageKey);
         }
 
+        private void trackChangeLog(long changeLogId) {
+            changeLogIds.add(changeLogId);
+        }
+
         private void trackProcessingJob(long processingJobId) {
             processingJobIds.add(processingJobId);
         }
@@ -1014,6 +1348,7 @@ final class OpenSqlCompatibilityAssertions {
             closed = true;
 
             deleteCleanupJobs();
+            deleteById("document_change_logs", changeLogIds);
             deleteById("processing_jobs", processingJobIds);
             deleteById("document_chunks", chunkIds);
             forEachReversed(documentIds, documentId -> assertThat(cleanupJdbc.update(
@@ -1054,6 +1389,13 @@ final class OpenSqlCompatibilityAssertions {
     }
 
     private record ProcessingFixture(long documentId, long versionId, long jobId) {
+    }
+
+    private record PreV14ProcessingFixture(
+            long ownerUserId,
+            long documentId,
+            long documentVersionId,
+            long processingJobId) {
     }
 
     private record ProcessingState(

@@ -1,6 +1,8 @@
 # PRIZM 현재 구현 현황
 
-> 현재 검증 기준일: 2026-08-05
+> 현재 상태 기준일: 2026-08-12
+>
+> PRZ-010 검증 source commit: `26c546b16eb9ea42d98460dd6e5aa0bf0752212a`
 >
 > PRZ-007 검증 source commit: `2b8b60069c37eea91e485bffe2c54e62cd2117ab`
 >
@@ -36,8 +38,8 @@
 | 구분 | 현재 상태 |
 |---|---|
 | 현재 제품 | Spring Boot 애플리케이션과 React 기반 Career Vault Reference App |
-| 구현됨 | 자체 호스팅 회원가입, 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, 비동기 색인·복구, pgvector 검색, Career Vault 문서 관리 |
-| 현재 단계 | 소스 전용 공개 준비, clean-clone과 실제 OpenSQL 전체 흐름 검증 완료. PRZ-008은 새 검색 profile의 고정 TEST와 실제 OpenSQL direct `5432` API·UI Gate를 통과해 개선 profile을 기본값으로 승격했고, 현재 source의 전체 backend·frontend·OSS 회귀를 통과함 |
+| 구현됨 | 자체 호스팅 회원가입, 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, ChangeLog 기반 비동기 색인·복구, pgvector 검색, Career Vault 문서 관리 |
+| 현재 단계 | 소스 전용 공개 준비, clean-clone과 실제 OpenSQL 전체 흐름 검증 완료. PRZ-010 변경 로그 동기화는 `VERIFIED`; PRZ-008 검색 개선은 현재 PR source의 전체 backend·frontend·OSS 회귀와 실제 OpenSQL direct `5432` API·UI Gate를 통과해 `IN_PROGRESS`; PRZ-009 경력 키워드 맵은 `IMPLEMENTED_UNVERIFIED` |
 | 미구현·미검증 | CareerFact, 근거 기반 portfolio, `/api/v1`, MCP, 독립 Engine 패키지, OpenProxy SQL routing·안전한 인증, OpenHA와 DB 장애 전환 |
 
 PRIZM의 장기 목표는 재사용 가능한 Career Intelligence Engine과 Reference App을
@@ -50,10 +52,12 @@ Spring Boot 애플리케이션에 주요 기능이 모여 있습니다.
 회원가입 → 로그인
 → 내 문서 목록 확인
 → UTF-8 TXT 또는 텍스트가 포함된 PDF 업로드
-→ 원본과 새 문서 버전 저장
+→ 원본·새 문서 버전·ChangeLog를 함께 저장
+→ Dispatcher가 기존 색인 ProcessingJob을 생성 또는 재사용
 → Worker가 텍스트 추출·분할·임베딩 수행
 → 처리가 끝난 버전을 검색 대상으로 전환
 → 내 문서에서 원문 위치와 함께 검색 결과 확인
+→ 활성 이력서·포트폴리오의 빈도 기반 키워드와 연결 원본 확인(PRZ-009 검증 대기)
 ```
 
 새 버전 처리가 실패하면 이전 검색 대상 버전을 유지합니다. 다른 사용자의 문서와
@@ -98,6 +102,20 @@ PRZ-005에서는 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 직�
 - 검색 가능한 청크가 없어 빈 Career Evidence 결과가 반환되면 등록 문서에서
   찾지 못했다고 안내
 
+### 구현됐으나 통합 검증이 남은 기능
+
+- 현재 사용자의 active 이력서·포트폴리오 원문에서 계산하는 경력 키워드 맵
+- 한영 별칭·Java 버전 표기 통합과 언어·프레임워크·DB·인프라 등 기술 category 필터
+- 언급 수·등장 문서 수·균형 점수 기준의 상위 15개 구름과 순위 밖 기술 목록
+- document/version별로 묶은 페이지·텍스트 발췌 근거와 추가 근거 접기·펼치기
+- owner-scoped UTF-8 TXT 첫 일치 강조와 PDF page/search 위치 원본 열람
+
+PRZ-009의 전체 backend unit test와 전체 PostgreSQL integration, frontend lint·build,
+Docker build/runtime, synthetic browser 흐름과 최종 diff 감사는 통과했다. OpenSQL
+opt-in integration은 전용 target을 활성화하지 않아 `NOT_RUN`이므로 현재 상태는 계속
+`IMPLEMENTED_UNVERIFIED`다. 상세 범위는
+[PRZ-009 Evidence](../specs/PRZ-009-career-keyword-map/evidence.md)를 따른다.
+
 ### 비동기 처리와 파일 정리
 
 Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. 오래된 Worker가 최신
@@ -124,19 +142,22 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 | OpenProxy | TCP `VERIFIED`; SQL routing `NOT_VERIFIED`; 인증 `AUTH_BLOCKED`; 적용 `DEFERRED` | Windows Host-only `6432` 연결은 확인했지만 안전한 backend 인증 방식을 확인하지 못함 |
 | OpenHA·DB failover·영구 journal | `DEFERRED` | PRZ-005 핵심 완료 범위와 분리한 후속 작업 |
 | PRZ-004 demo `USER` clean-clone | `VERIFIED` | `25d09e9`에서 자동 검증 `339 PASS / 18 SKIP / 0 FAIL`과 두 독립 clone 통과. `aff3e87` 경로 교정 뒤 Windows·Linux Node test와 GitHub CI 6건 통과, PR #25 merge `1f9a5ad`. 두 번째 빈 목록 UI 직접 관찰은 `NOT_RUN` |
+| PRZ-009 경력 키워드 맵 | `IMPLEMENTED_UNVERIFIED` | 2026-08-10 작업 트리: backend unit 323개 중 308 pass·15 skip·실패 0, 전체 integration 71개 중 68 pass·조건부 3 skip·실패 0, frontend lint·build, Docker build/runtime, synthetic browser와 diff 감사 pass. OpenSQL opt-in은 `NOT_RUN` |
+| PRZ-010 변경 로그 동기화 | `VERIFIED` | 2026-08-12 source `26c546b`: PostgreSQL ChangeLog integration, 실제 OpenSQL direct `5432` V14 SQL Gate, 실제 OpenSQL+Ollama `bge-m3` V1→V2 E2E와 실패 시 V1 보존, 전체 integration `104 completed / 7 skipped / 0 failures`, backend test, frontend lint/build, Compose와 diff 감사 통과 |
 
 세부 실행 환경과 명령은 [PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md),
 [PRZ-002 Evidence](../specs/PRZ-002-open-source-readiness/evidence.md),
 [PRZ-003 Evidence](../specs/PRZ-003-opensql-single-node-gate/evidence.md),
 [PRZ-004 Evidence](../specs/PRZ-004-clean-clone-demo/evidence.md),
-[PRZ-005 실제 OpenSQL 통합 작업 보고서](../specs/PRZ-005-opensql-ollama-e2e/implementation-report.md)에서
+[PRZ-005 실제 OpenSQL 통합 작업 보고서](../specs/PRZ-005-opensql-ollama-e2e/implementation-report.md),
+[PRZ-010 Evidence](../specs/PRZ-010-change-log-sync/evidence.md)에서
 확인합니다. PostgreSQL·pgvector 결과를 OpenSQL 결과로 바꾸어 표현하지 않습니다.
 
 ## 미구현 기능
 
 - OpenProxy의 안전한 인증과 SQL routing, 애플리케이션 적용
 - OpenHA와 DB 장애 전환, 영구 journal
-- 변경 로그 기반 동기화와 MCP 검색 API
+- MCP 검색 API
 - CareerFact 후보·확인·거절과 `INSUFFICIENT_EVIDENCE`
 - 검증된 CareerFact를 이용한 JSON·Markdown portfolio와 source manifest
 - `/api/v1`, OpenAPI, webhook/outbox
@@ -150,6 +171,10 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 - 기본값 `source-dedup-evidence-signals-v1`은 의미상 근거 없음과 검색 문서 없음을
   구분하고 동일 출처 위치·본문 중복을 축약합니다. `legacy-dense-v1`은 명시적
   `PRIZM_SEARCH_PROFILE` rollback override로 유지합니다.
+- 이력서·포트폴리오의 정규화·category·세 순위 기준 키워드 맵과 문서별 근거·원본 위치
+  연결은 [PRZ-009](../specs/PRZ-009-career-keyword-map/spec.md) 작업 트리에 구현됐고
+  전체 PostgreSQL integration·browser·최종 diff 감사를 통과했습니다. 다만 OpenSQL
+  opt-in target 검증이 `NOT_RUN`이어서 OpenSQL 범위까지 검증 완료한 기능은 아닙니다.
 - 프런트엔드 자동 UI 테스트가 없습니다.
 - V13의 일부 제약과 기존 데이터 보정 전용 회귀 테스트가 없습니다.
 - 일부 JavaDoc이 TXT/PDF 공통 동작을 TXT 전용으로 설명합니다.
@@ -160,8 +185,10 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 
 ## 다음 우선순위
 
-제품 개발 순서는 [개발 로드맵](roadmap.md)을 따릅니다. 현재 다음 작업은
+제품 개발 순서는 [개발 로드맵](roadmap.md)을 따릅니다. 현재
 [PRZ-008 검색 근거 신뢰성](../specs/PRZ-008-search-evidence-reliability/spec.md)의
-기본 profile 승격 이후의 다음 우선순위는 DB 장애복구입니다. 실제 다중 노드 환경과
-공식 절차를 확보한 뒤 별도 Spec으로 착수하며, OpenProxy의 안전한 인증과 SQL
+PR 통합과 [PRZ-009 경력 키워드 맵](../specs/PRZ-009-career-keyword-map/spec.md)의
+남은 OpenSQL Gate를 분리해 관리합니다. PRZ-009는 `IMPLEMENTED_UNVERIFIED`이며
+검증된 기능이 아닙니다. DB 장애복구는 실제 다중 노드
+환경과 공식 절차를 확보한 뒤 별도 Spec으로 착수하며, OpenProxy의 안전한 인증과 SQL
 routing도 공급사 지원 방식을 확인한 경우에만 검증합니다.

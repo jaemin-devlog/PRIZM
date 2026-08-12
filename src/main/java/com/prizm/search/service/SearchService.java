@@ -2,12 +2,24 @@ package com.prizm.search.service;
 
 import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.embedding.service.EmbeddingValidator;
+import com.prizm.search.config.SearchProfile;
+import com.prizm.search.config.SearchProperties;
 import com.prizm.search.dto.response.CareerEvidenceSearchResponse;
+import com.prizm.search.dto.response.CareerEvidenceSearchState;
+import com.prizm.search.dto.response.CareerEvidenceSearchV2Response;
 import com.prizm.search.dto.response.SearchResponse;
 import com.prizm.search.exception.InvalidSearchQueryException;
 import com.prizm.search.exception.SearchResultNotFoundException;
+import com.prizm.search.profile.CompositeSearchProfile;
+import com.prizm.search.profile.ShortGeneralExactTokenRescueProfile;
 import com.prizm.search.repository.VectorSearchRepository;
+import com.prizm.search.repository.VectorSearchResult;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,18 +32,31 @@ import org.springframework.stereotype.Service;
 public class SearchService {
 
     public static final int MAX_QUERY_LENGTH = 500;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchService.class);
 
     private final EmbeddingService embeddingService;
     private final EmbeddingValidator embeddingValidator;
     private final VectorSearchRepository vectorSearchRepository;
+    private final SearchProperties searchProperties;
+    private final CompositeSearchProfile compositeSearchProfile;
+    private final ShortGeneralExactTokenRescueProfile shortGeneralExactTokenRescueProfile;
+    private final SearchSnippetGenerator searchSnippetGenerator;
 
     public SearchService(
             EmbeddingService embeddingService,
             EmbeddingValidator embeddingValidator,
-            VectorSearchRepository vectorSearchRepository) {
+            VectorSearchRepository vectorSearchRepository,
+            SearchProperties searchProperties,
+            CompositeSearchProfile compositeSearchProfile,
+            SearchSnippetGenerator searchSnippetGenerator) {
         this.embeddingService = embeddingService;
         this.embeddingValidator = embeddingValidator;
         this.vectorSearchRepository = vectorSearchRepository;
+        this.searchProperties = searchProperties;
+        this.compositeSearchProfile = compositeSearchProfile;
+        this.shortGeneralExactTokenRescueProfile =
+                new ShortGeneralExactTokenRescueProfile(compositeSearchProfile);
+        this.searchSnippetGenerator = searchSnippetGenerator;
     }
 
     /**
@@ -66,23 +91,91 @@ public class SearchService {
      * An empty result is a valid evidence-search response.
      */
     public List<CareerEvidenceSearchResponse> searchCareerEvidence(Long ownerUserId, String query) {
+        return searchCareerEvidenceV2(ownerUserId, query).results();
+    }
+
+    /**
+     * Searches the authenticated user's active evidence and reports a normal product state.
+     */
+    public CareerEvidenceSearchV2Response searchCareerEvidenceV2(Long ownerUserId, String query) {
         validateQuery(query);
         float[] queryEmbedding = embeddingService.embed(query);
         embeddingValidator.validate(queryEmbedding);
-        return vectorSearchRepository.findCareerEvidence(ownerUserId, queryEmbedding).stream()
-                .map(result -> new CareerEvidenceSearchResponse(
-                        result.chunkId(),
-                        result.documentId(),
-                        result.documentVersionId(),
-                        result.documentTitle(),
-                        result.versionNo(),
-                        result.content(),
-                        result.sourceType(),
-                        result.sourceIndex(),
-                        result.sourceLabel(),
-                        result.distance(),
-                        result.score()))
+
+        SearchProfile selectedProfile = searchProperties.selectedProfile();
+        List<VectorSearchResult> candidates = selectedProfile == SearchProfile.LEGACY_DENSE_V1
+                ? vectorSearchRepository.findCareerEvidence(ownerUserId, queryEmbedding)
+                : vectorSearchRepository.findCareerEvidenceCandidates(ownerUserId, queryEmbedding);
+        if (candidates.isEmpty()) {
+            return emptyOutcome(CareerEvidenceSearchState.NO_SEARCHABLE_DOCUMENTS);
+        }
+
+        List<VectorSearchResult> selected = selectedProfile == SearchProfile.LEGACY_DENSE_V1
+                ? candidates
+                : shortGeneralExactTokenRescueProfile.apply(query, candidates).results();
+        selected = deduplicateExactPresentationContent(selected);
+        if (selected.isEmpty()) {
+            return emptyOutcome(switch (compositeSearchProfile.resolveIntent(query)) {
+                case GENERAL -> CareerEvidenceSearchState.NO_RELEVANT_RESULTS;
+                case COMPLETED_RELEASE_EVIDENCE -> CareerEvidenceSearchState.NO_EVIDENCE;
+            });
+        }
+        return new CareerEvidenceSearchV2Response(
+                CareerEvidenceSearchState.EVIDENCE_FOUND,
+                selected.stream()
+                        .map(result -> toCareerEvidenceResponse(query, result))
+                        .toList());
+    }
+
+    private static CareerEvidenceSearchV2Response emptyOutcome(CareerEvidenceSearchState state) {
+        return new CareerEvidenceSearchV2Response(state, List.of());
+    }
+
+    private static List<VectorSearchResult> deduplicateExactPresentationContent(
+            List<VectorSearchResult> selected) {
+        Set<String> seenContent = new LinkedHashSet<>();
+        return selected.stream()
+                .filter(result -> seenContent.add(presentationContentKey(result.content())))
                 .toList();
+    }
+
+    private static String presentationContentKey(String content) {
+        return Objects.requireNonNullElse(content, "")
+                .replace("\r\n", "\n")
+                .replace('\r', '\n')
+                .strip();
+    }
+
+    private CareerEvidenceSearchResponse toCareerEvidenceResponse(
+            String query,
+            VectorSearchResult result) {
+        return new CareerEvidenceSearchResponse(
+                result.chunkId(),
+                result.documentId(),
+                result.documentVersionId(),
+                result.documentTitle(),
+                result.versionNo(),
+                result.content(),
+                createSnippet(query, result),
+                result.sourceType(),
+                result.sourceIndex(),
+                result.sourceLabel(),
+                result.distance(),
+                result.score());
+    }
+
+    private String createSnippet(String query, VectorSearchResult result) {
+        String fallback = Objects.requireNonNullElse(result.content(), "");
+        try {
+            String snippet = searchSnippetGenerator.generate(query, result.content());
+            return snippet == null || snippet.isBlank() ? fallback : snippet;
+        } catch (RuntimeException exception) {
+            LOGGER.warn(
+                    "Search snippet generation failed for chunk {}; using full content.",
+                    result.chunkId(),
+                    exception);
+            return fallback;
+        }
     }
 
     private void validateQuery(String query) {

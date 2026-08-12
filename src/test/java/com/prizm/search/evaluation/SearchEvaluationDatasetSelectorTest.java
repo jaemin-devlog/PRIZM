@@ -14,6 +14,8 @@ class SearchEvaluationDatasetSelectorTest {
     private final SearchEvaluationDatasetSelector selector = new SearchEvaluationDatasetSelector();
     private final Dataset dataset = new SearchEvaluationDatasetLoader(new ObjectMapper())
             .load(Path.of("src/test/resources/search-evaluation/v2"));
+    private final Dataset frozenTestDataset = new SearchEvaluationDatasetLoader(new ObjectMapper())
+            .load(Path.of("src/test/resources/search-evaluation/v2-3"));
 
     @Test
     void selectsOnlyTuningQuestionsAndDocuments() {
@@ -25,6 +27,21 @@ class SearchEvaluationDatasetSelectorTest {
     }
 
     @Test
+    void excludesASelectedSplitFixtureThatNoSelectedQuestionReferences() {
+        Dataset selected = selector.select(frozenTestDataset, Split.TEST);
+
+        assertThat(selected.questions()).hasSize(10).allMatch(question -> question.split() == Split.TEST);
+        assertThat(selected.corpus().documents())
+                .extracting(document -> document.fixtureId())
+                .containsExactlyInAnyOrder(
+                        "test-orchid-api",
+                        "test-cedar-release",
+                        "test-study-note",
+                        "test-other-owner-only")
+                .doesNotContain("test-past-version-only");
+    }
+
+    @Test
     void requiresAnExplicitKnownSplit() {
         assertThatThrownBy(() -> selector.parseRequiredSplit(null))
                 .isInstanceOf(SearchEvaluationDataException.class)
@@ -32,5 +49,21 @@ class SearchEvaluationDatasetSelectorTest {
         assertThatThrownBy(() -> selector.parseRequiredSplit("all"))
                 .isInstanceOf(SearchEvaluationDataException.class)
                 .hasMessageContaining("TUNING or TEST");
+    }
+
+    @Test
+    void permitsOnlyAnExplicitFrozenV23TestRun() {
+        assertThat(SearchEvaluationBaselineTest.allowsFrozenTestRun(
+                        dataset, Split.TEST, "true"))
+                .isFalse();
+        assertThat(SearchEvaluationBaselineTest.allowsFrozenTestRun(
+                        frozenTestDataset, Split.TEST, null))
+                .isFalse();
+        assertThat(SearchEvaluationBaselineTest.allowsFrozenTestRun(
+                        frozenTestDataset, Split.TUNING, "true"))
+                .isFalse();
+        assertThat(SearchEvaluationBaselineTest.allowsFrozenTestRun(
+                        frozenTestDataset, Split.TEST, "true"))
+                .isTrue();
     }
 }

@@ -39,7 +39,7 @@
 |---|---|
 | 현재 제품 | Spring Boot 애플리케이션과 React 기반 Career Vault Reference App |
 | 구현됨 | 자체 호스팅 회원가입, 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, ChangeLog 기반 비동기 색인·복구, pgvector 검색, Career Vault 문서 관리 |
-| 현재 단계 | 소스 전용 공개 준비, clean-clone과 실제 OpenSQL 전체 흐름 검증 완료. PRZ-010 변경 로그 동기화는 `VERIFIED`; PRZ-008은 계획 상태이며 PRZ-009 경력 키워드 맵은 `IMPLEMENTED_UNVERIFIED` |
+| 현재 단계 | 소스 전용 공개 준비, clean-clone과 실제 OpenSQL 전체 흐름 검증 완료. PRZ-010 변경 로그 동기화는 `VERIFIED`; PRZ-008 검색 개선은 현재 PR source의 전체 backend·frontend·OSS 회귀와 실제 OpenSQL direct `5432` API·UI Gate를 통과해 `IN_PROGRESS`; PRZ-009 경력 키워드 맵은 `IMPLEMENTED_UNVERIFIED` |
 | 미구현·미검증 | CareerFact, 근거 기반 portfolio, `/api/v1`, MCP, 독립 Engine 패키지, OpenProxy SQL routing·안전한 인증, OpenHA와 DB 장애 전환 |
 
 PRIZM의 장기 목표는 재사용 가능한 Career Intelligence Engine과 Reference App을
@@ -94,7 +94,11 @@ PRZ-005에서는 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 직�
 - Ollama `bge-m3`를 이용한 1024차원 임베딩
 - PostgreSQL pgvector 기반 원문 근거 검색
 - TXT 텍스트 구간과 PDF 페이지 위치 반환
-- 단일 검색 결과와 최대 5개의 Career Evidence 결과 제공
+- 단일 검색 결과와 최대 5개의 Career Evidence 결과 제공. Career Evidence는 전체
+  원문을 보존하면서 질문 관련 snippet을 기본 표시하고 전체 원문 펼치기를 제공
+- GENERAL Career Evidence는 기본 dense `0.50`을 유지하고, 결과가 비어 있는 단일
+  2~4자 exact-token 질의에만 `0.49` 이상 후보 한 건을 제한적으로 복구. 완료
+  배포·출시 검색과 Claim Gate에는 적용하지 않음
 - 검색 가능한 청크가 없어 빈 Career Evidence 결과가 반환되면 등록 문서에서
   찾지 못했다고 안내
 
@@ -164,9 +168,9 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 - PRZ-004 두 번째 환경의 빈 문서 목록은 API로 확인했으며 브라우저에서 직접
   관찰하지는 않았습니다.
 - 전체 처리 시간과 버전당 최대 chunk 수를 제한하지 않습니다.
-- 검색 가능한 청크가 있으면 질문과 무관해도 가장 가까운 결과를 반환합니다.
-  의미상 근거 없음 판정은 [PRZ-008](../specs/PRZ-008-search-evidence-reliability/spec.md)의
-  계획이며 아직 구현되지 않았습니다.
+- 기본값 `source-dedup-evidence-signals-v1`은 의미상 근거 없음과 검색 문서 없음을
+  구분하고 동일 출처 위치·본문 중복을 축약합니다. `legacy-dense-v1`은 명시적
+  `PRIZM_SEARCH_PROFILE` rollback override로 유지합니다.
 - 이력서·포트폴리오의 정규화·category·세 순위 기준 키워드 맵과 문서별 근거·원본 위치
   연결은 [PRZ-009](../specs/PRZ-009-career-keyword-map/spec.md) 작업 트리에 구현됐고
   전체 PostgreSQL integration·browser·최종 diff 감사를 통과했습니다. 다만 OpenSQL
@@ -181,10 +185,10 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 
 ## 다음 우선순위
 
-제품 개발 순서는 [개발 로드맵](roadmap.md)을 따릅니다. 현재 다음 작업은
+제품 개발 순서는 [개발 로드맵](roadmap.md)을 따릅니다. 현재
 [PRZ-008 검색 근거 신뢰성](../specs/PRZ-008-search-evidence-reliability/spec.md)의
-단계별 적용과 [PRZ-009 경력 키워드 맵](../specs/PRZ-009-career-keyword-map/spec.md)의
-남은 PostgreSQL·browser Gate를 분리해 관리합니다. PRZ-009는
-`IMPLEMENTED_UNVERIFIED`이며 검증된 기능이 아닙니다. DB 장애복구는 실제 다중 노드
+PR 통합과 [PRZ-009 경력 키워드 맵](../specs/PRZ-009-career-keyword-map/spec.md)의
+남은 OpenSQL Gate를 분리해 관리합니다. PRZ-009는 `IMPLEMENTED_UNVERIFIED`이며
+검증된 기능이 아닙니다. DB 장애복구는 실제 다중 노드
 환경과 공식 절차를 확보한 뒤 별도 Spec으로 착수하며, OpenProxy의 안전한 인증과 SQL
 routing도 공급사 지원 방식을 확인한 경우에만 검증합니다.

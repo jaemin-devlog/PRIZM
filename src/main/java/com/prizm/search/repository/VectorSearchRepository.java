@@ -44,6 +44,7 @@ public class VectorSearchRepository {
 
     private static final String NEAREST_CHUNK_SQL = SEARCHABLE_CHUNKS_SQL + "LIMIT 1";
     private static final String CAREER_EVIDENCE_SQL = SEARCHABLE_CHUNKS_SQL + "LIMIT 5";
+    private static final String CAREER_EVIDENCE_CANDIDATES_SQL = SEARCHABLE_CHUNKS_SQL + "LIMIT 20";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -66,6 +67,13 @@ public class VectorSearchRepository {
      */
     public List<VectorSearchResult> findCareerEvidence(Long ownerUserId, float[] embedding) {
         return find(ownerUserId, embedding, CAREER_EVIDENCE_SQL);
+    }
+
+    /**
+     * Returns the fixed top-20 dense candidate set used only by the opt-in composite profile.
+     */
+    public List<VectorSearchResult> findCareerEvidenceCandidates(Long ownerUserId, float[] embedding) {
+        return find(ownerUserId, embedding, CAREER_EVIDENCE_CANDIDATES_SQL);
     }
 
     private List<VectorSearchResult> find(Long ownerUserId, float[] embedding, String sql) {

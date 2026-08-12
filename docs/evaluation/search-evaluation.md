@@ -5,7 +5,8 @@
 ## 데이터 위치와 형식
 
 - 추적 가능한 합성 예제: `src/test/resources/search-evaluation/sample/`
-- PRZ-008 Dataset v2.1: `src/test/resources/search-evaluation/v2/`
+- PRZ-008 Dataset v2.2(보존): `src/test/resources/search-evaluation/v2/`
+- PRZ-008 Dataset v2.3(현재 TUNING): `src/test/resources/search-evaluation/v2-3/`
 - 실제 개인 평가 데이터: `local/search-evaluation/<dataset>/`
 - 실행 결과 기본 위치: `local/search-evaluation/results/`
 
@@ -47,7 +48,7 @@ anchor 위치와 일치해야 합니다.
 동일한 정규화 질문은 두 split에 들어갈 수 없습니다. 의미가 같은 패러프레이즈와 같은 원문 근거를 묻는 질문이 split 사이에 반복되지 않는지도 파일럿 작성 시 수동 검토했습니다. `TEST` 결과를 보고 임계값이나 라벨을 다시 맞추지 않습니다.
 양성 expected evidence(`relevance` 1 또는 2)는 split 사이에 반복될 수 없으며 로더가 이를 실행 전에 차단합니다. `relevance` 0 hard negative의 반복은 허용합니다.
 
-## PRZ-008 Dataset v2.2
+## PRZ-008 Dataset v2.2와 v2.3
 
 `prizm-search-evidence-synthetic-v2.2`는 기존 파일럿을 재라벨링하지 않고 별도로 추가한
 합성 Dataset입니다. TUNING 15문항과 TEST 10문항이며, 각 split은 서로 다른 문서와
@@ -62,9 +63,24 @@ v2.2는 overlap 경계에 걸린 직접 근거 anchor를 보완하되 질문·sp
 기존 TEST 10문항은 줄 단위 SHA-256
 `6eeeffed3a93b53edbc474e8a57f2eba6b627c6f4358cbafdc7b2f0b2b29fce9`로 고정했습니다.
 
-기존 `sample` Dataset 30문항과 아래 v2·v2.1 과거 기준선은 변경하지 않았습니다.
-Dataset v2의 TUNING 10문항, v2.1의 실패 재현 15문항과 v2.2의 평가 profile 15문항을
-Batch 1C에서 각각 측정했습니다. TEST는 계속 `NOT_RUN`입니다.
+`prizm-search-evidence-synthetic-v2.3`은 v2.2를 덮어쓰지 않고 별도 경로에 추가한
+교정 Dataset입니다. 질문 25개와 TUNING·TEST split, relevance, evidence group,
+gold page는 v2.2와 byte 단위로 같습니다. 변경된 원문은 합성 Atlas PDF의 gold page
+한 곳뿐이며, 해당 페이지 본문에 `합성 Atlas 장애 기록`이라는 정확한 문서명을 포함해 제목을
+보지 않아도 질문의 대상과 완료 사실을 함께 확인할 수 있게 했습니다. 결합 SHA-256은
+`f1bf3cffd1cc51d7c5f972e55fe99a8afe9dce45e403ef742a7e3d0b25bb7f9f`입니다.
+
+기존 `sample` Dataset 30문항과 아래 v2·v2.1·v2.2 과거 기준선은 변경하지 않았습니다.
+Dataset v2의 TUNING 10문항, v2.1의 실패 재현 15문항, v2.2의 평가 profile 15문항과
+v2.3의 본문 근거 profile 15문항을 각각 측정했습니다. 고정 v2.3 TEST 최종 비교는
+별도 명시 allow 조건으로만 완료했으며, 결과로 기본 profile을 변경하지 않았습니다.
+
+2026-08-08 S2C-02에서 Dataset v2.3은 변경하지 않은 채 opt-in을 TUNING 15문항과 고정
+TEST 10문항으로 재검증했습니다. TUNING은 Direct MRR@5/@20 `1.0000`, 근거 오거부 `0`으로
+통과했고, TEST에서 opt-in은 Direct MRR@5/@20 `1.0000`, nDCG@5 `0.9710`, 무근거 거부
+`1.0`, 근거 오거부 `0`, 중복 `0`, PDF page 정확도 `1.0`, total p95 `160ms`(legacy `138ms`,
++`15.9%`)를 기록했습니다. 이후 실제 OpenSQL direct `5432` API·UI Gate도 통과했고,
+사용자 승인으로 기본 profile은 `source-dedup-evidence-signals-v1`으로 승격했습니다.
 
 ## 실행
 
@@ -247,10 +263,11 @@ PostgreSQL 16.14·pgvector 0.8.2 Testcontainer, Ollama 0.32.5와 `bge-m3:latest`
 `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`이고 embedding은
 1024차원입니다.
 
-평가 전용 `source-dedup-evidence-signals-v1` profile은 exact cosine 후보 최대 20개를
+이 측정 당시 평가 전용이었던 `source-dedup-evidence-signals-v1` profile은 exact cosine 후보 최대 20개를
 그대로 측정한 뒤 같은 PDF page·TXT overlap을 축약합니다. 각 반환 후보에 고유 식별자,
 수치, 핵심어와 명시적 부정 신호를 검사하고, 강한 식별자 또는 수치와 핵심어가 함께
-반복되는 요약 근거는 문서가 달라도 한 결과로 묶습니다. 이는 제품 검색 동작이 아닙니다.
+반복되는 요약 근거는 문서가 달라도 한 결과로 묶었습니다. 이 측정 시점에는 제품 검색
+동작이 아니었으며, 이후 Batch 2B에서 opt-in 제품 profile로 옮겼습니다.
 Recall@20과 후보 수는 원래 후보를 사용하고 Precision·MRR@5·nDCG·top-1·중복률은 실제
 반환 chunk ID와 반환 순서를 사용합니다.
 
@@ -275,9 +292,149 @@ Recall@20과 후보 수는 원래 후보를 사용하고 Precision·MRR@5·nDCG�
 남지 않았습니다. 따라서 사전 고정한 작은 TUNING Gate는 통과했습니다.
 
 이 결과는 평가 profile 동작을 고정할 근거일 뿐 제품 품질 완료나 일반화를 뜻하지
-않습니다. 제품 source와 threshold는 변경하지 않았고 TEST·Batch 1D도 실행하지
-않았습니다. raw JSON과 후보 CSV는 Git에서 제외된
+않습니다. 이 측정 당시에는 제품 source와 threshold를 변경하지 않았고 TEST·Batch 1D도
+실행하지 않았습니다. raw JSON과 후보 CSV는 Git에서 제외된
 `local/search-evaluation/prz008-tuning-v22-composite-final-20260807/`에 있습니다.
+
+## 2026-08-07 Batch 2B 현재 제품 source TUNING 재측정
+
+Batch 2B opt-in 제품 source를 기준으로 Unicode 전체 토큰의 정확 일치와 단일 고유명사
+정답 허용을 교정한 뒤 Dataset v2.2의 TUNING 15문항만 다시 실행했습니다. 기준 commit은
+`83631f13c21eab54ac0f32ebb0f893b6c5acea0f`이며, 아래 두 실행은 그 위의 미커밋
+worktree를 사용했습니다. Dataset ID와 결합 SHA-256은 각각
+`prizm-search-evidence-synthetic-v2.2`와
+`f946fed8c145112c1082d7c08c25b357bd459b4c7cc53deb7b7e23731a2b7c2c`입니다.
+
+공통 환경은 Docker Desktop 29.6.2, PostgreSQL 16.14·pgvector 0.8.2
+Testcontainer, Ollama 0.32.6, `bge-m3:latest`입니다. 모델 digest는
+`7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`이고 embedding은
+1024차원입니다. 모든 결과의 split은 `TUNING`이며 고정 TEST는 실행하지 않았습니다.
+
+### Run A — exact-token 1차 교정 실패
+
+Unicode 부분 문자열을 전체 토큰 일치로 바꾸고 단일 고유명사를 허용한 첫 실행에서는
+직접 근거 8문항 중 7문항만 1위로 반환했습니다. `v2-t-paraphrase-lumen`의 직접 근거는
+dense 후보 1위였지만 질문의 `출시한`과 근거의 `배포했다`를 같은 완료 행위로 판단하지
+못해 `INSUFFICIENT_CORE_TERM_COVERAGE`로 오거절했습니다.
+
+- top-1 직접 근거: `7/8`
+- 오타 질문 top-1: `2/2`
+- 무관 질문 거부율 / 근거 질문 오거부율: `1.0000 / 0.1250`
+- Direct MRR@5 / @20: `0.8750 / 0.8750`
+- nDCG@5: `0.8533`
+- 중복 결과 비율: `0.0000`
+- raw 결과: `local/search-evaluation/prz008-tuning-v22-unicode-exact-20260807/`
+
+### Run B — 제한된 완료 행위 정규화 후 통과
+
+`출시한`·`출시했다`와 `배포한`·`배포했다` 계열의 명시적 완료 활용형만 같은 평가
+토큰으로 정규화했습니다. 계획·자동화·부정문과 `출시일`·`배포판`·`재배포` 같은 더 긴
+파생어는 완료 근거로 인정하지 않는 회귀 테스트를 함께 고정했습니다. 최종 profile
+SHA-256은
+`100fb6b2f751b9b39334dfe4d654b7a0487fa1089634812036fb750ea4ef06c5`입니다.
+
+| 지표 | TUNING 15문항 |
+|---|---:|
+| Recall@20 / Direct Recall@20 | 1.0000 / 1.0000 |
+| Precision@5 / Direct Precision@5 | 0.1067 / 0.1067 |
+| Direct MRR@5 / @20 | 1.0000 / 1.0000 |
+| nDCG@5 | 0.9783 |
+| top-1 직접 근거 / PDF page 정확도 | 1.0000 / 1.0000 |
+| 오타 질문 top-1 | 2 / 2 |
+| 중복 결과 비율 | 0.0000 |
+| 무관 질문 거부율 / 근거 질문 오거부율 | 1.0000 / 0.0000 |
+| 사용자 반환 수 min / avg / max | 0 / 0.5333 / 1 |
+| 후보 수 min / avg / max | 11 / 11.0 / 11 |
+| total p50 / p95 | 121ms / 129ms |
+| embedding p50 / p95 | 118ms / 125ms |
+| DB p50 / p95 | 3ms / 4ms |
+
+직접 근거 8문항과 오타 2문항은 모두 relevance 2를 1위로 반환했고, 역할 변경·부정·없는
+기술을 포함한 무근거 7문항은 모두 `NO_EVIDENCE`와 결과 0건을 반환했습니다. raw JSON과
+후보 CSV는 Git에서 제외된
+`local/search-evaluation/prz008-tuning-v22-unicode-exact-final-20260807/`에 있습니다.
+이 결과는 PostgreSQL TUNING 증거이며 OpenSQL 결과나 고정 TEST 결과로 확대하지 않습니다.
+
+### Run C — 제목과 본문 근거 분리 및 Dataset v2.3 통과
+
+근거 존재 여부는 인용되는 `content`만으로 판정하고 문서 제목은 순위 보조에만
+사용하도록 교정했습니다. 이에 맞춰 Atlas PDF gold page가 문서 식별자와 완료 사실을
+본문만으로 함께 제공하도록 Dataset v2.3을 추가하고, TUNING 15문항만 재실행했습니다.
+v2.2 질문 파일은 byte 단위로 보존했으며 고정 TEST는 실행하지 않았습니다. 제품 profile
+SHA-256은 `e10d2d923a046855a0df1a8a81ca60b23a28c5cf20b70140ba75153a25892a83`입니다.
+
+| 지표 | TUNING 15문항 |
+|---|---:|
+| Direct MRR@5 / @20 | 1.0000 / 1.0000 |
+| nDCG@5 | 0.9783 |
+| top-1 직접 근거 / PDF page 정확도 | 1.0000 / 1.0000 |
+| 중복 결과 비율 | 0.0000 |
+| 무관 질문 거부율 / 근거 질문 오거부율 | 1.0000 / 0.0000 |
+| total p50 / p95 | 125ms / 156ms |
+| embedding p50 / p95 | 123ms / 152ms |
+| DB p50 / p95 | 3ms / 4ms |
+
+직접 근거 8문항은 모두 relevance 2를 1위로 반환했고 무근거 7문항은 모두
+`NO_EVIDENCE`를 반환했습니다. `v2-t-pdf-date`는 Atlas 문서 제목 없이 gold page 2의
+본문만으로 `EVIDENCE_FOUND`가 됐습니다. raw 결과는 Git에서 제외된
+`local/search-evaluation/prz008-tuning-v23-exact-document-title-final-20260807/`에 있습니다.
+이 결과는 PostgreSQL TUNING 증거이며 OpenSQL 또는 고정 TEST 결과가 아닙니다.
+
+### Run D — 질문형 완료 표현과 Unicode 복합어 경계 교정
+
+`배포했습니다?`·`출시했습니다?`처럼 물음표로 끝나는 질문형 문장을 완료 사실로
+판정하지 않고, `Kafka랩`처럼 ASCII 식별자가 더 긴 Unicode 복합어 안에 포함된 경우를
+정확 일치로 보지 않도록 교정했습니다. 단위·PostgreSQL 회귀를 통과한 뒤 Dataset
+v2.3 TUNING 15문항만 재실행했으며 고정 TEST는 실행하지 않았습니다. 제품 profile
+SHA-256은 `e72a63fe5eec96640828d402b41fb642c9fbd862049fa65b8d020a32576c79c3`입니다.
+
+| 지표 | TUNING 15문항 |
+|---|---:|
+| Direct MRR@5 / @20 | 1.0000 / 1.0000 |
+| nDCG@5 | 0.9783 |
+| top-1 직접 근거 / PDF page 정확도 | 1.0000 / 1.0000 |
+| 중복 결과 비율 | 0.0000 |
+| 무관 질문 거부율 / 근거 질문 오거부율 | 1.0000 / 0.0000 |
+| total p50 / p95 | 121ms / 139ms |
+| embedding p50 / p95 | 119ms / 136ms |
+| DB p50 / p95 | 3ms / 3ms |
+
+직접 근거 8문항과 오타 2문항은 모두 relevance 2를 1위로 반환했고 무근거
+7문항은 모두 `NO_EVIDENCE`를 반환했습니다. raw 결과는 Git에서 제외된
+`local/search-evaluation/prz008-tuning-v23-p1-fix-20260807/`에 있습니다. 이 결과는
+PostgreSQL TUNING 증거이며 OpenSQL 또는 고정 TEST 결과가 아닙니다.
+
+### Run E — S2B-11 문장 양태 fail-closed 재검증
+
+질문·인용·전언·같은 문장 또는 바로 다음 문장의 부정·철회를 `NO_EVIDENCE`로
+판정하는 S2B-11 현재 source에서 Dataset v2.3 TUNING 15문항만 재실행했습니다.
+기준 commit은 `83631f13c21eab54ac0f32ebb0f893b6c5acea0f`이고 그 위 미커밋
+worktree의 제품 profile SHA-256은
+`01eb199af0ff74c427b5178cce5c312d51b85a0ec1745f87ea89804b981194c6`입니다.
+Dataset 결합 SHA-256은
+`f1bf3cffd1cc51d7c5f972e55fe99a8afe9dce45e403ef742a7e3d0b25bb7f9f`로 유지됐습니다.
+
+| 지표 | TUNING 15문항 |
+|---|---:|
+| Recall@20 / Direct Recall@20 | 1.0000 / 1.0000 |
+| Direct MRR@5 / @20 | 1.0000 / 1.0000 |
+| nDCG@5 | 0.9783 |
+| top-1 직접 근거 / PDF page 정확도 | 1.0000 / 1.0000 |
+| 중복 결과 비율 | 0.0000 |
+| 무관 질문 거부율 / 근거 질문 오거부율 | 1.0000 / 0.0000 |
+| 사용자 반환 수 min / avg / max | 0 / 0.5333 / 1 |
+| 후보 수 min / avg / max | 11 / 11 / 11 |
+| total p50 / p95 | 117ms / 130ms |
+| embedding p50 / p95 | 114ms / 127ms |
+| DB p50 / p95 | 3ms / 3ms |
+
+직접 근거 8문항과 오타 2문항은 모두 relevance 2를 1위로 반환했고 무근거 7문항은
+모두 `NO_EVIDENCE`였습니다. Docker Desktop 29.6.2, PostgreSQL 16.14·pgvector
+0.8.2, Ollama 0.32.6, `bge-m3:latest` digest
+`7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`에서 실행했습니다.
+raw JSON·CSV는 Git에서 제외된
+`local/search-evaluation/prz008-tuning-v23-s2b11-20260807/`에 보존했습니다. 고정
+TEST와 OpenSQL Gate는 실행하지 않았습니다.
 
 ## 2026-07-14 합성 기준선
 

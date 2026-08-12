@@ -26,6 +26,7 @@ import com.prizm.cleanup.service.FileCleanupJobClaimService;
 import com.prizm.cleanup.service.FileCleanupJobRecoveryService;
 import com.prizm.cleanup.service.FileCleanupJobService;
 import com.prizm.embedding.service.EmbeddingService;
+import com.prizm.embedding.service.EmbeddingValidator;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
 import com.prizm.ingestion.entity.ChunkSourceType;
@@ -43,8 +44,13 @@ import com.prizm.ingestion.service.ProcessingJobClaimService;
 import com.prizm.ingestion.service.ProcessingJobLeaseService;
 import com.prizm.search.dto.response.SearchResponse;
 import com.prizm.search.dto.response.CareerEvidenceSearchResponse;
+import com.prizm.search.config.SearchProperties;
+import com.prizm.search.dto.response.CareerEvidenceSearchState;
 import com.prizm.search.exception.SearchResultNotFoundException;
+import com.prizm.search.profile.CompositeSearchProfile;
+import com.prizm.search.repository.VectorSearchRepository;
 import com.prizm.search.service.SearchService;
+import com.prizm.search.service.SearchSnippetGenerator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -139,6 +145,12 @@ class PgVectorInfrastructureTest {
 
     @Autowired
     EmbeddingService embeddingService;
+
+    @Autowired
+    EmbeddingValidator embeddingValidator;
+
+    @Autowired
+    VectorSearchRepository vectorSearchRepository;
 
     @Autowired
     SearchService searchService;
@@ -287,7 +299,7 @@ class PgVectorInfrastructureTest {
 
     @Test
     @Transactional
-    void returnsAtMostFiveOrderedCareerEvidenceChunksOnlyForTheCurrentActiveOwnerVersion() {
+    void returnsAtMostFiveProfileRankedCareerEvidenceChunksOnlyForTheCurrentActiveOwnerVersion() {
         Long ownerA = createUser();
         Long ownerB = createUser();
         String query = "Spring Boot and Redis experience";
@@ -337,18 +349,527 @@ class PgVectorInfrastructureTest {
                 failedEvidence.versionId());
         insertVectorChunk(ownerA, failedEvidence.versionId(), query, 1);
 
-        List<CareerEvidenceSearchResponse> results = searchService.searchCareerEvidence(ownerA, query);
+        ActiveVectorDocument quarantinedEvidence = createActiveVectorDocument(ownerA, "Quarantined evidence");
+        jdbcTemplate.update(
+                "UPDATE document_versions SET status = 'QUARANTINED' WHERE id = ?",
+                quarantinedEvidence.versionId());
+        insertVectorChunk(ownerA, quarantinedEvidence.versionId(), query, 1);
 
-        assertThat(results).hasSize(5);
+        List<CareerEvidenceSearchResponse> results = searchService.searchCareerEvidence(ownerA, query);
+        List<com.prizm.search.repository.VectorSearchResult> rawCandidates =
+                vectorSearchRepository.findCareerEvidenceCandidates(
+                        ownerA,
+                        embeddingService.embed(query));
+        List<com.prizm.search.repository.VectorSearchResult> profileRanked =
+                new CompositeSearchProfile().apply(query, rawCandidates).results();
+
+        assertThat(results).hasSizeBetween(1, 5);
         assertThat(results).extracting(CareerEvidenceSearchResponse::documentId)
                 .containsOnly(ownerEvidence.documentId());
-        assertThat(results).extracting(CareerEvidenceSearchResponse::distance).isSorted();
+        assertThat(rawCandidates)
+                .extracting(com.prizm.search.repository.VectorSearchResult::distance)
+                .isSorted();
+        assertThat(results)
+                .extracting(
+                        CareerEvidenceSearchResponse::chunkId,
+                        CareerEvidenceSearchResponse::score,
+                        CareerEvidenceSearchResponse::distance)
+                .containsExactlyElementsOf(profileRanked.stream()
+                        .map(candidate -> org.assertj.core.groups.Tuple.tuple(
+                                candidate.chunkId(),
+                                candidate.score(),
+                                candidate.distance()))
+                        .toList());
+        assertThat(results).allSatisfy(result -> {
+            assertThat(result.distance()).isBetween(0.0d, 2.0d);
+            assertThat(result.score()).isEqualTo(1.0d - result.distance());
+        });
         assertThat(results.get(0).content()).isEqualTo(query);
         assertThat(results.get(0).chunkId()).isPositive();
         assertThat(results.get(0).documentVersionId()).isEqualTo(ownerEvidence.versionId());
         assertThat(results.get(0).sourceType()).isEqualTo(ChunkSourceType.TEXT_CHUNK);
         assertThat(results.get(0).sourceIndex()).isPositive();
         assertThat(results.get(0).sourceLabel()).isEqualTo("텍스트 구간 " + results.get(0).sourceIndex());
+
+        var optInResult = optInSearchService().searchCareerEvidenceV2(ownerA, query);
+        assertThat(optInResult.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+        assertThat(optInResult.results()).hasSizeBetween(1, 5);
+        assertThat(optInResult.results())
+                .extracting(CareerEvidenceSearchResponse::documentId)
+                .containsOnly(ownerEvidence.documentId());
+        assertThat(optInResult.results())
+                .extracting(CareerEvidenceSearchResponse::documentVersionId)
+                .containsOnly(ownerEvidence.versionId());
+    }
+
+    @Test
+    @Transactional
+    void generalProfileReturnsDenseCandidateWithMissingIdentifierInPostgreSql() {
+        Long ownerWithoutDocuments = createUser();
+        var noDocuments = optInSearchService().searchCareerEvidenceV2(
+                ownerWithoutDocuments, "Kafka 내부 알림 데이터 보존 근거");
+
+        assertThat(noDocuments.state()).isEqualTo(CareerEvidenceSearchState.NO_SEARCHABLE_DOCUMENTS);
+        assertThat(noDocuments.results()).isEmpty();
+
+        Long ownerWithUnrelatedEvidence = createUser();
+        String query = "Kafka 내부 알림 데이터 보존 근거";
+        float[] queryEmbedding = embeddingService.embed(query);
+        ActiveVectorDocument document = createActiveVectorDocument(
+                ownerWithUnrelatedEvidence, "RabbitMQ notification evidence");
+        insertVectorChunk(
+                ownerWithUnrelatedEvidence,
+                document.versionId(),
+                "RabbitMQ는 외부 장애와 분리해 내부 알림 데이터를 보존했다.",
+                1,
+                queryEmbedding,
+                ChunkSourceType.TEXT_CHUNK,
+                1);
+
+        assertThat(vectorSearchRepository.findCareerEvidenceCandidates(
+                        ownerWithUnrelatedEvidence, queryEmbedding))
+                .hasSize(1);
+        var generalResult = optInSearchService().searchCareerEvidenceV2(ownerWithUnrelatedEvidence, query);
+
+        assertThat(generalResult.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+        assertThat(generalResult.results()).hasSize(1);
+    }
+
+    @Test
+    @Transactional
+    void generalProfileDoesNotUseUnicodeCoreTermCoverageAsAHardFilterInPostgreSql() {
+        String query = "루미나 근거";
+        float[] queryEmbedding = embeddingService.embed(query);
+
+        Long longerTokenOwner = createUser();
+        ActiveVectorDocument longerTokenDocument = createActiveVectorDocument(
+                longerTokenOwner, "Longer proper noun evidence");
+        insertVectorChunk(
+                longerTokenOwner,
+                longerTokenDocument.versionId(),
+                "루미나랩 합성 프로젝트 기록",
+                1,
+                queryEmbedding,
+                ChunkSourceType.TEXT_CHUNK,
+                1);
+
+        var longerTokenResult = optInSearchService().searchCareerEvidenceV2(longerTokenOwner, query);
+
+        assertThat(longerTokenResult.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+        assertThat(longerTokenResult.results()).hasSize(1);
+
+        Long exactTokenOwner = createUser();
+        ActiveVectorDocument exactTokenDocument = createActiveVectorDocument(
+                exactTokenOwner, "Exact proper noun evidence");
+        insertVectorChunk(
+                exactTokenOwner,
+                exactTokenDocument.versionId(),
+                "루미나에서 수행한 합성 프로젝트 기록",
+                1,
+                queryEmbedding,
+                ChunkSourceType.TEXT_CHUNK,
+                1);
+
+        var exactTokenResult = optInSearchService().searchCareerEvidenceV2(exactTokenOwner, query);
+
+        assertThat(exactTokenResult.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+        assertThat(exactTokenResult.results()).hasSize(1);
+        assertThat(exactTokenResult.results().get(0).content())
+                .isEqualTo("루미나에서 수행한 합성 프로젝트 기록");
+    }
+
+    @Test
+    @Transactional
+    void generalProfileDoesNotUseExactAsciiIdentifiersAsAHardFilterInPostgreSql() {
+        String query = "Kafka 근거";
+        float[] queryEmbedding = embeddingService.embed(query);
+
+        Long longerTokenOwner = createUser();
+        ActiveVectorDocument longerTokenDocument = createActiveVectorDocument(
+                longerTokenOwner, "Longer mixed token evidence");
+        insertVectorChunk(
+                longerTokenOwner,
+                longerTokenDocument.versionId(),
+                "Kafka랩 관련 합성 문서",
+                1,
+                queryEmbedding,
+                ChunkSourceType.TEXT_CHUNK,
+                1);
+
+        var longerTokenResult = optInSearchService().searchCareerEvidenceV2(longerTokenOwner, query);
+
+        assertThat(longerTokenResult.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+        assertThat(longerTokenResult.results()).hasSize(1);
+
+        Long exactTokenOwner = createUser();
+        ActiveVectorDocument exactTokenDocument = createActiveVectorDocument(
+                exactTokenOwner, "Exact mixed token evidence");
+        insertVectorChunk(
+                exactTokenOwner,
+                exactTokenDocument.versionId(),
+                "Kafka를 운영 환경에서 사용한 경험",
+                1,
+                queryEmbedding,
+                ChunkSourceType.TEXT_CHUNK,
+                1);
+
+        var exactTokenResult = optInSearchService().searchCareerEvidenceV2(exactTokenOwner, query);
+
+        assertThat(exactTokenResult.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+        assertThat(exactTokenResult.results()).hasSize(1);
+    }
+
+    @Test
+    @Transactional
+    void optInProfileRequiresAnAssertedCompletedReleaseClaimInPostgreSql() {
+        String query = "주문 API를 출시했나요?";
+        float[] queryEmbedding = embeddingService.embed(query);
+
+        Long assertedOwner = createUser();
+        ActiveVectorDocument assertedDocument = createActiveVectorDocument(
+                assertedOwner, "Completed release evidence");
+        insertVectorChunk(
+                assertedOwner,
+                assertedDocument.versionId(),
+                "2025년 3월 14일에 주문 API를 배포했습니다.",
+                1,
+                queryEmbedding,
+                ChunkSourceType.TEXT_CHUNK,
+                1);
+
+        var assertedResult = optInSearchService().searchCareerEvidenceV2(assertedOwner, query);
+
+        assertThat(assertedResult.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+        assertThat(assertedResult.results()).hasSize(1);
+
+        List<String> nonAssertedCandidates = List.of(
+                "주문 API를 배포했나요?",
+                "주문 API를 배포했습니다?",
+                "주문 API를 출시했습니다?",
+                "주문 API를 배포했습니다, 맞나요?",
+                "“주문 API를 배포했습니다”라고 했나요?",
+                "주문 API 배포 여부를 확인했다.",
+                "배포했습니다, 그러나 실제로는 하지 않았습니다.",
+                "배포했습니다. 그러나 실제로는 하지 않았습니다.",
+                "담당자가 \"주문 API를 배포했습니다\"라고 전했다.",
+                "담당자가 \"주문 API를 배포했습니다\"라고 물었다.",
+                "주문 API를 배포했습니다. 맞나요?",
+                "주문 API를 배포했습니다. 아니, 아직 배포하지 않았습니다.",
+                "주문 API를 배포했다는 계획만 세웠다.",
+                "주문 API를 배포했다는 자동화 예제를 검토했다.",
+                "주문 completed-release-action 근거를 작성했다.");
+        for (int index = 0; index < nonAssertedCandidates.size(); index++) {
+            Long ownerUserId = createUser();
+            ActiveVectorDocument document = createActiveVectorDocument(
+                    ownerUserId, "Non-asserted release candidate " + index);
+            insertVectorChunk(
+                    ownerUserId,
+                    document.versionId(),
+                    nonAssertedCandidates.get(index),
+                    1,
+                    queryEmbedding,
+                    ChunkSourceType.TEXT_CHUNK,
+                    1);
+
+            var result = optInSearchService().searchCareerEvidenceV2(ownerUserId, query);
+
+            assertThat(result.state())
+                    .as(nonAssertedCandidates.get(index))
+                    .isEqualTo(CareerEvidenceSearchState.NO_EVIDENCE);
+            assertThat(result.results()).isEmpty();
+        }
+
+        String multiTermQuery = "주문 결제 API를 출시한 이력이 있나요?";
+        float[] multiTermQueryEmbedding = embeddingService.embed(multiTermQuery);
+        List<String> modalityGateCandidates = List.of(
+                "주문 결제 API를 배포했습니다?",
+                "주문 결제 API 배포 여부를 확인했다.",
+                "담당자에 따르면 주문 결제 API를 배포했습니다.",
+                "주문 결제 API를 배포했습니다. 그러나 v1.2 배포 주장은 철회합니다.");
+        for (int index = 0; index < modalityGateCandidates.size(); index++) {
+            Long ownerUserId = createUser();
+            ActiveVectorDocument document = createActiveVectorDocument(
+                    ownerUserId, "Required modality gate candidate " + index);
+            insertVectorChunk(
+                    ownerUserId,
+                    document.versionId(),
+                    modalityGateCandidates.get(index),
+                    1,
+                    multiTermQueryEmbedding,
+                    ChunkSourceType.TEXT_CHUNK,
+                    1);
+
+            var result = optInSearchService().searchCareerEvidenceV2(ownerUserId, multiTermQuery);
+
+            assertThat(result.state())
+                    .as(modalityGateCandidates.get(index))
+                    .isEqualTo(CareerEvidenceSearchState.NO_EVIDENCE);
+            assertThat(result.results()).isEmpty();
+        }
+
+        List<SearchScenario> claimUnitScenarios = List.of(
+                new SearchScenario(
+                        "주문 API를 출시한 이력이 있나요?",
+                        "문제없이 주문 API를 배포했습니다.",
+                        CareerEvidenceSearchState.EVIDENCE_FOUND),
+                new SearchScenario(
+                        "문제없이 주문 API를 출시한 이력이 있나요?",
+                        "실제로 문제없이 주문 API를 배포했습니다.",
+                        CareerEvidenceSearchState.EVIDENCE_FOUND),
+                new SearchScenario(
+                        "주문 취소 API를 출시한 이력이 있나요?",
+                        "주문 취소 API를 배포했습니다.",
+                        CareerEvidenceSearchState.EVIDENCE_FOUND),
+                new SearchScenario(
+                        "주문 API를 출시한 이력이 있나요?",
+                        "주문 API “오로라”를 배포했습니다.운영팀에 인계했습니다.",
+                        CareerEvidenceSearchState.EVIDENCE_FOUND),
+                new SearchScenario(
+                        "주문 API를 출시한 이력이 있나요?",
+                        "주문 API “오로라-v1”을 배포했습니다.",
+                        CareerEvidenceSearchState.EVIDENCE_FOUND),
+                new SearchScenario(
+                        "주문 API를 출시한 이력이 있나요?",
+                        "주문 API “오:로라”를 배포했습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문 결제 API를 출시한 이력이 있나요?",
+                        "주문 결제 API를 배포했습니다? 정산 API를 배포했습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문 결제 API 출시 이력이 있나요?",
+                        "주문 결제 API를 배포했습니다?",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문 API를 출시한 이력이 있나요?",
+                        "주문 API를 배포했습니다.\n그러나 실제로는 하지 않았습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문 API를 출시한 이력이 있나요?",
+                        "담당자가 말하길 주문 API를 배포했습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "Kafka를 출시한 이력이 있나요?",
+                        "Kafka를 배포하지 않고 RabbitMQ를 배포했습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문 API를 출시한 이력이 있나요?",
+                        "확인 질문: 주문 API를 배포했습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문 API를 출시한 이력이 있나요?",
+                        "주문 API를 배포했습니다. 정말 맞나요?",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문 API를 출시했습니까?",
+                        "주문 API를 출시했습니까?",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문 API를 출시 했습니까?",
+                        "주문 API를 배포했습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문 API 출시. 이력 있나요?",
+                        "주문 API를 배포했습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문 API 출시 이력 있나요? 경험",
+                        "주문 API를 배포했습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문 API를 출시한 이력이 있나요?",
+                        "주문 API를 배포했습니다",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문 API를 출시한 이력이 있나요?",
+                        "주문 API v1.2 “오로라”를 배포했습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문하는 API를 출시한 이력이 있나요?",
+                        "주문 API를 배포했습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문하는 API를 출시한 이력이 있나요?",
+                        "주문하는 API를 배포했습니다.",
+                        CareerEvidenceSearchState.EVIDENCE_FOUND),
+                new SearchScenario(
+                        "경험 API를 출시한 이력이 있나요?",
+                        "경험 API를 배포했습니다.",
+                        CareerEvidenceSearchState.EVIDENCE_FOUND),
+                new SearchScenario(
+                        "배포 경험 API를 출시한 이력이 있나요?",
+                        "배포 경험 API를 배포했습니다.",
+                        CareerEvidenceSearchState.EVIDENCE_FOUND),
+                new SearchScenario(
+                        "실험했고 API를 출시한 이력이 있나요?",
+                        "실험했고 API를 배포했습니다.",
+                        CareerEvidenceSearchState.EVIDENCE_FOUND),
+                new SearchScenario(
+                        "주문 결제 API를 출시한 이력이 있나요?",
+                        "주문 결제 API 배포 여부를 확인했고 정산 API를 배포했습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "PRIZM API를 출시한 이력이 있나요?",
+                        "PRIZM- API를 배포했습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "PRIZM- API를 출시한 이력이 있나요?",
+                        "PRIZM API를 배포했습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "PRIZM-v1 API를 출시한 이력이 있나요?",
+                        "PRIZM-v1 API를 배포했습니다.",
+                        CareerEvidenceSearchState.EVIDENCE_FOUND),
+                new SearchScenario(
+                        "C#.NET API를 출시한 이력이 있나요?",
+                        "C#.NET API를 배포했습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문 API를 출시하는 건가요?",
+                        "주문 API를 배포했습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문 API 출시하는 이력 있나요?",
+                        "주문 API를 배포했습니다.",
+                        CareerEvidenceSearchState.NO_EVIDENCE),
+                new SearchScenario(
+                        "주문 API 출시 계획과 운영 경험을 보여줘.",
+                        "주문 API 출시 계획과 운영 경험을 기록했다.",
+                        CareerEvidenceSearchState.EVIDENCE_FOUND));
+        for (int index = 0; index < claimUnitScenarios.size(); index++) {
+            SearchScenario scenario = claimUnitScenarios.get(index);
+            float[] scenarioEmbedding = embeddingService.embed(scenario.query());
+            Long ownerUserId = createUser();
+            ActiveVectorDocument document = createActiveVectorDocument(
+                    ownerUserId, "Claim unit candidate " + index);
+            insertVectorChunk(
+                    ownerUserId,
+                    document.versionId(),
+                    scenario.content(),
+                    1,
+                    scenarioEmbedding,
+                    ChunkSourceType.TEXT_CHUNK,
+                    1);
+
+            var result = optInSearchService().searchCareerEvidenceV2(ownerUserId, scenario.query());
+
+            assertThat(result.state()).as(scenario.toString()).isEqualTo(scenario.expectedState());
+            assertThat(result.results()).hasSize(
+                    scenario.expectedState() == CareerEvidenceSearchState.EVIDENCE_FOUND ? 1 : 0);
+        }
+    }
+
+    @Test
+    @Transactional
+    void optInProfileRejectsACompletedReleaseClaimFoundOnlyInTheDocumentTitle() {
+        Long ownerUserId = createUser();
+        String query = "주문 API를 출시했나요?";
+        float[] queryEmbedding = embeddingService.embed(query);
+        ActiveVectorDocument document = createActiveVectorDocument(
+                ownerUserId, "주문 API를 배포했습니다");
+        insertVectorChunk(
+                ownerUserId,
+                document.versionId(),
+                "향후 계획만 검토한다.",
+                1,
+                queryEmbedding,
+                ChunkSourceType.TEXT_CHUNK,
+                1);
+
+        assertThat(vectorSearchRepository.findCareerEvidenceCandidates(ownerUserId, queryEmbedding))
+                .hasSize(1);
+
+        var result = optInSearchService().searchCareerEvidenceV2(ownerUserId, query);
+
+        assertThat(result.state()).isEqualTo(CareerEvidenceSearchState.NO_EVIDENCE);
+        assertThat(result.results()).isEmpty();
+    }
+
+    @Test
+    @Transactional
+    void limitsThePostgreSqlOptInCandidateSetToTwenty() {
+        Long ownerUserId = createUser();
+        String query = "Candidate evidence";
+        float[] queryEmbedding = embeddingService.embed(query);
+        ActiveVectorDocument document = createActiveVectorDocument(ownerUserId, "Candidate limit evidence");
+        for (int index = 1; index <= 25; index++) {
+            insertVectorChunk(
+                    ownerUserId,
+                    document.versionId(),
+                    "Candidate evidence row " + index,
+                    index,
+                    queryEmbedding,
+                    ChunkSourceType.TEXT_CHUNK,
+                    index);
+        }
+
+        assertThat(vectorSearchRepository.findCareerEvidenceCandidates(ownerUserId, queryEmbedding))
+                .hasSize(20);
+    }
+
+    @Test
+    @Transactional
+    void collapsesDuplicatePdfPageCandidatesReturnedByPostgreSql() {
+        Long ownerUserId = createUser();
+        String query = "MatchLedger DB 잠금 중복 방지 근거";
+        float[] queryEmbedding = embeddingService.embed(query);
+        ActiveVectorDocument document = createActiveVectorDocument(
+                ownerUserId, "MatchLedger PDF evidence", DocumentFileType.PDF);
+        insertVectorChunk(
+                ownerUserId,
+                document.versionId(),
+                "MatchLedger는 DB 행 잠금과 상태 재확인으로 중복 확정을 방지했다.",
+                1,
+                queryEmbedding,
+                ChunkSourceType.PAGE,
+                2);
+        insertVectorChunk(
+                ownerUserId,
+                document.versionId(),
+                "MatchLedger의 DB 잠금 기반 중복 방지 요약 근거다.",
+                2,
+                queryEmbedding,
+                ChunkSourceType.PAGE,
+                2);
+
+        var result = optInSearchService().searchCareerEvidenceV2(ownerUserId, query);
+
+        assertThat(result.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+        assertThat(result.results()).hasSize(1);
+        assertThat(result.results().get(0).sourceType()).isEqualTo(ChunkSourceType.PAGE);
+        assertThat(result.results().get(0).sourceIndex()).isEqualTo(2);
+    }
+
+    @Test
+    @Transactional
+    void collapsesAdjacentTxtOverlapCandidatesReturnedByPostgreSql() {
+        Long ownerUserId = createUser();
+        String query = "AlertVault 알림 데이터 보존 장애 분리 근거";
+        float[] queryEmbedding = embeddingService.embed(query);
+        ActiveVectorDocument document = createActiveVectorDocument(ownerUserId, "AlertVault TXT evidence");
+        String overlap = "AlertVault는 외부 장애와 분리해 내부 알림 데이터를 먼저 보존했다. ".repeat(4);
+        insertVectorChunk(
+                ownerUserId,
+                document.versionId(),
+                "직접 근거 " + overlap,
+                1,
+                queryEmbedding,
+                ChunkSourceType.TEXT_CHUNK,
+                1);
+        insertVectorChunk(
+                ownerUserId,
+                document.versionId(),
+                overlap + "추가 설명",
+                2,
+                queryEmbedding,
+                ChunkSourceType.TEXT_CHUNK,
+                2);
+
+        var result = optInSearchService().searchCareerEvidenceV2(ownerUserId, query);
+
+        assertThat(result.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+        assertThat(result.results()).hasSize(1);
+        assertThat(result.results().get(0).sourceType()).isEqualTo(ChunkSourceType.TEXT_CHUNK);
     }
 
     @Test
@@ -1252,6 +1773,11 @@ class PgVectorInfrastructureTest {
             SearchResponse result = searchService.search(ownerUserId, activeContent);
             assertThat(result.documentVersionId()).isEqualTo(activeVersionId);
             assertThat(result.content()).isEqualTo(activeContent);
+            var optInResult = optInSearchService().searchCareerEvidenceV2(ownerUserId, activeContent);
+            assertThat(optInResult.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+            assertThat(optInResult.results())
+                    .extracting(CareerEvidenceSearchResponse::documentVersionId)
+                    .containsExactly(activeVersionId);
         }
         finally {
             deleteCommittedDocumentData();
@@ -1267,6 +1793,16 @@ class PgVectorInfrastructureTest {
         jdbcTemplate.update("DELETE FROM document_versions");
         jdbcTemplate.update("DELETE FROM documents");
         jdbcTemplate.update("DELETE FROM users");
+    }
+
+    private SearchService optInSearchService() {
+        return new SearchService(
+                embeddingService,
+                embeddingValidator,
+                vectorSearchRepository,
+                new SearchProperties(CompositeSearchProfile.PROFILE_ID),
+                new CompositeSearchProfile(),
+                new SearchSnippetGenerator());
     }
 
     private void deleteTestStoredFile(String storedFilePath) {
@@ -1332,6 +1868,14 @@ class PgVectorInfrastructureTest {
     }
 
     private ActiveVectorDocument createActiveVectorDocument(Long ownerUserId, String title) {
+        return createActiveVectorDocument(ownerUserId, title, DocumentFileType.TXT);
+    }
+
+    private ActiveVectorDocument createActiveVectorDocument(
+            Long ownerUserId,
+            String title,
+            DocumentFileType fileType) {
+        String extension = fileType.name().toLowerCase(java.util.Locale.ROOT);
         Long documentId = jdbcTemplate.queryForObject(
                 "INSERT INTO documents(owner_user_id, title) VALUES (?, ?) RETURNING id",
                 Long.class,
@@ -1343,32 +1887,55 @@ class PgVectorInfrastructureTest {
                     owner_user_id, document_id, version_no, original_file_name, stored_file_path, file_type,
                     content_hash, status
                 )
-                VALUES (?, ?, 1, 'vector-search.txt', 'test/vector-search.txt', 'TXT', repeat('a', 64), 'ACTIVE')
+                VALUES (?, ?, 1, ?, ?, ?, repeat('a', 64), 'ACTIVE')
                 RETURNING id
                 """,
                 Long.class,
                 ownerUserId,
-                documentId);
+                documentId,
+                "vector-search." + extension,
+                "test/vector-search." + extension,
+                fileType.name());
         jdbcTemplate.update("UPDATE documents SET active_version_id = ? WHERE id = ?", versionId, documentId);
         return new ActiveVectorDocument(documentId, versionId);
     }
 
     private void insertVectorChunk(Long ownerUserId, Long documentVersionId, String content, int chunkNo) {
+        insertVectorChunk(
+                ownerUserId,
+                documentVersionId,
+                content,
+                chunkNo,
+                embeddingService.embed(content),
+                ChunkSourceType.TEXT_CHUNK,
+                chunkNo);
+    }
+
+    private void insertVectorChunk(
+            Long ownerUserId,
+            Long documentVersionId,
+            String content,
+            int chunkNo,
+            float[] embedding,
+            ChunkSourceType sourceType,
+            int sourceIndex) {
         jdbcTemplate.update(
                 """
                 INSERT INTO document_chunks(
                     owner_user_id, content, embedding, document_version_id, chunk_no, page_no,
                     source_type, source_index, source_label
                 )
-                VALUES (?, ?, CAST(? AS vector), ?, ?, NULL, 'TEXT_CHUNK', ?, ?)
+                VALUES (?, ?, CAST(? AS vector), ?, ?, ?, ?, ?, ?)
                 """,
                 ownerUserId,
                 content,
-                toVectorLiteral(embeddingService.embed(content)),
+                toVectorLiteral(embedding),
                 documentVersionId,
                 chunkNo,
-                chunkNo,
-                "텍스트 구간 " + chunkNo);
+                sourceType == ChunkSourceType.PAGE ? sourceIndex : null,
+                sourceType.name(),
+                sourceIndex,
+                sourceType == ChunkSourceType.PAGE ? sourceIndex + "페이지" : "텍스트 구간 " + sourceIndex);
     }
 
     private Long createActivePdfPageDocument(Long ownerUserId, String content) {
@@ -1547,6 +2114,12 @@ class PgVectorInfrastructureTest {
     }
 
     private record ActiveVectorDocument(Long documentId, Long versionId) {
+    }
+
+    private record SearchScenario(
+            String query,
+            String content,
+            CareerEvidenceSearchState expectedState) {
     }
 
     private record StoredChunkSource(int chunkNo, String sourceType, int sourceIndex, String sourceLabel) {

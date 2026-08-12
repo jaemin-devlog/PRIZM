@@ -2,8 +2,11 @@
 
 ## 상태와 접근
 
-`IN_PROGRESS` — Batch 2A 제품 적용 계약을 확정했으며, 다음 단계는 opt-in 제품
-구현과 계약 검증이다.
+`IN_PROGRESS` — Batch 2B의 opt-in 제품 구현과 계약 검증, 고정 TEST와 실제 OpenSQL
+direct `5432` API·UI Gate를 마쳤다. S2C-03에서 검증된 개선 profile을 기본값으로
+승격했고 legacy rollback 계약을 유지한다. S2C-04에서 전체 회귀 fixture를 직접 근거와
+최대 5건·중복 축약 계약에 정렬하고 backend·frontend·OSS 회귀를 통과했다. PRZ-008의
+이후 단계와 최종 통합은 별도 작업이다.
 
 측정 계약, 근거 판정, UI, 청킹 실험과 색인 최적화를 순서대로 분리한다. 각
 단계는 최신 `main`에서 시작하는 별도 branch·PR이며, 이전 Gate를 통과하지
@@ -43,7 +46,10 @@ Threshold 후보와 수치 Gate는 TUNING으로만 정한다. TEST는 설정 고
 score 단독 threshold가 분리되지 않았으므로, 같은 출처 위치·본문 overlap과 강한
 식별자·수치로 연결된 반복 요약 근거를 먼저 축약한다. 각 후보에는 고유 식별자·수치·
 핵심어·부정 표현을 별도 결정 신호로 사용하는 평가 profile을 TUNING에서만 검증한다.
-이 profile의 제품 적용 계약은 2A에서 고정했다. 제품 구현과 TEST는 아직 실행하지 않는다.
+이 profile의 제품 적용 계약은 2A에서 고정했고 2B에서 opt-in으로 구현했다. 고정 TEST는
+기본적으로 계속 잠겨 있으며, 정확한 v2.3 Dataset·`TEST` split·명시 allow flag를 모두
+제공한 최종 비교 run에서만 실행한다. 이 경로로 두 profile 비교를 완료했으며, TEST 결과는
+기본 profile 변경이나 재튜닝 근거로 사용하지 않는다.
 
 ### 2A. 제품 적용 계약 확정
 
@@ -73,6 +79,54 @@ score 단독 threshold가 분리되지 않았으므로, 같은 출처 위치·�
 
 정상 질의 결과는 v2에서 `200`과 `state`·`results`로 표현한다. 기존 단일 검색의
 404와 Career Evidence raw 배열은 호환 경로로 유지한다.
+
+완료 표현의 질문 양태 교정은 명확한 완료 서술과 직접 질문·꼬리질문·인용·전언·
+완료 여부·같은 문장 또는 바로 다음 문장의 부정·철회 사례를 한 단위 테스트 집합으로
+먼저 고정하고 실패를 재현한 뒤, 완료 주장 판정기만 최소 수정한다. 애매한 문장은
+fail-closed로 거절한다. 검증은 해당 단위 테스트와 동일 사례를 통과시키는 PostgreSQL
+통합 테스트로 제한하며 TUNING·고정 TEST·전체 회귀는 실행하지 않는다.
+
+재감사에서 확인한 양태 우회는 완료 신호를 핵심어 점수와 분리된 필수 Gate로 고정한다.
+동일한 명확한 완료문을 질문·꼬리질문·전언·인용·부정·철회로 변환하고 핵심어 수를
+달리해도 모두 거절되는지 단위 테스트로 검증한다. 문장 경계는 버전·소수점 내부의
+마침표에서 끊지 않아 바로 다음 문장의 철회 판정을 보존한다.
+
+후속 재감사에서 확인한 청크 전역 신호 합성은 claim unit 구조로 대체한다. 완료 질의는
+하나의 unit 안에서 대상 anchor와 직접 완료 predicate를 함께 만족해야 하며, 줄바꿈·
+CRLF·연속 종결부호·무공백 문장 경계는 unit 변환 불변식으로 고정한다. 인접 unit은
+교정 양태와 앞 주장 참조 또는 같은 대상의 출시·배포 참조가 함께 있을 때만 연결한다.
+일반 검색 profile 경로와 API·owner·Dataset 계약은 변경하지 않는다.
+
+S2B-13 재감사 뒤에는 임의 한국어 문장 전체를 P1 0의 대상으로 삼지 않는다. 질의는
+`SUPPORTED`·`UNSUPPORTED`·`NONE`으로 파싱하고, 비등록 출시·배포 활용형은 일반
+검색으로 fallback하지 않는다. 직접 주장은 등록된 prefix·질의 대상구·선택 annotation·
+완료 predicate·종결부호의 full match로만 승인한다. 대상구는 질의 token 순서와 완전히
+일치시켜 같은 unit 안의 부정 대상과 다른 완료 대상을 합성하지 않는다. 지원 문법 밖의
+오거절은 공개된 fail-closed 한계로 두고, 문법 밖 입력의 승인과 지원 문법 오판만 P1로
+판정한다. 검증과 독립 감사도 이 유한 문법과 생성형 변환 집합만을 기준으로 한다.
+
+### 2C. 직접 근거·정확 사실 문법 보정
+
+| 구분 | 계획 |
+|---|---|
+| 입력 | 고정 TEST 비교에서 확인된 opt-in 오거부 유형과 기존 S2B-14 폐쇄 문법 |
+| 변경 가능 | `CompositeSearchProfile`, 변환 기반 대상 단위·PostgreSQL test, PRZ-008 Spec·Plan·Tasks·Evidence |
+| 변경 금지 | Dataset v2.2/v2.3·TEST 질문/라벨·제목 근거·API·세 상태·owner·`ACTIVE`·migration·dependency·설정 |
+| 보존 | 완료 이력 질의의 동일 claim unit Gate, 질문·인용·전언·부정·철회 fail-closed, `Kafka랩` exact token 경계 |
+| 지원 | 본문 프로젝트 이름·직접 참여 선언 뒤의 직접 완료 평서와 일반 직접 근거·정확 수치/날짜 질의를 제한적으로 연결 |
+| TUNING Gate | 직접 근거 8/8, 오타 2/2, 중복 0, 무근거 거부 1.0, 근거 오거부 0 |
+| 최종 Gate | TUNING 통과 후에만 고정 v2.3 TEST에서 legacy와 opt-in을 재비교; TEST 결과로 재튜닝하지 않음 |
+
+구현은 변환 기반 RED로 시작한다. 계사 `이다` 경계와 직접 근거·정확 수치/날짜 문법의
+양성 변환, `Kafka랩`, 제목 전용, 다른 이름 선언, 질문·인용·전언·부정·철회, 완료 이력의
+절간 합성 음성 변환을 함께 추가한다. API나 평가 Dataset은 변경하지 않는다.
+
+2026-08-08 S2C-02는 위 범위로 완료했다. 변환 RED를 재현한 뒤 대상 단위 33/33,
+PostgreSQL 1/1, v2.3 TUNING 15문항과 고정 TEST의 legacy·opt-in 각 1/1을 통과했다.
+opt-in TEST는 모든 품질 Gate를 충족했으며, TEST 결과 뒤 구현·설정·threshold를 다시
+조정하지 않았다. 2026-08-11 실제 OpenSQL direct `5432` API·UI Gate도 통과했고,
+사용자 승인으로 S2C-03 기본 profile 승격을 진행한다. rollback은 명시적
+`PRIZM_SEARCH_PROFILE=legacy-dense-v1` override 또는 기본값 복원이다.
 
 ### 3. 검색 UI 신뢰성 개선
 

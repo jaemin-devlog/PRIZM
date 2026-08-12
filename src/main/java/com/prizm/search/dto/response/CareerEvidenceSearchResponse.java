@@ -10,6 +10,7 @@ public record CareerEvidenceSearchResponse(
         String documentTitle,
         int versionNo,
         String content,
+        String snippet,
         ChunkSourceType sourceType,
         int sourceIndex,
         String sourceLabel,

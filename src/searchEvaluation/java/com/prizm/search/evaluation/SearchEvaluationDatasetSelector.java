@@ -10,7 +10,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/** Dataset v2에서 승인된 split의 질문과 문서만 평가 실행에 전달한다. */
+/** Dataset v2에서 승인된 split의 질문과 그 질문이 참조한 문서만 평가 실행에 전달한다. */
 public class SearchEvaluationDatasetSelector {
 
     public Split parseRequiredSplit(String value) {
@@ -31,8 +31,12 @@ public class SearchEvaluationDatasetSelector {
         List<Question> questions = dataset.questions().stream()
                 .filter(question -> question.split() == split)
                 .toList();
+        Set<String> referencedFixtureIds = questions.stream()
+                .flatMap(question -> question.fixtureIds().stream())
+                .collect(Collectors.toSet());
         List<FixtureDocument> documents = dataset.corpus().documents().stream()
-                .filter(document -> document.split() == split)
+                .filter(document -> document.split() == split
+                        && referencedFixtureIds.contains(document.fixtureId()))
                 .toList();
         if (questions.isEmpty() || documents.isEmpty()) {
             throw new SearchEvaluationDataException("Selected evaluation split must contain questions and documents.");
@@ -41,10 +45,7 @@ public class SearchEvaluationDatasetSelector {
         Set<String> selectedFixtureIds = documents.stream()
                 .map(FixtureDocument::fixtureId)
                 .collect(Collectors.toSet());
-        Set<String> referencedFixtureIds = questions.stream()
-                .flatMap(question -> question.fixtureIds().stream())
-                .collect(Collectors.toSet());
-        if (!selectedFixtureIds.containsAll(referencedFixtureIds)) {
+        if (!selectedFixtureIds.equals(referencedFixtureIds)) {
             throw new SearchEvaluationDataException(
                     "Selected evaluation split references a document outside the split.");
         }

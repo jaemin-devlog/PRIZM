@@ -203,13 +203,28 @@ sequenceDiagram
 
 검색 질문과 문서 chunk를 같은 `bge-m3` 모델로 1024차원 embedding으로 바꿉니다.
 저장과 검색 전에는 차원 수, 모든 값의 유한성, 0이 아닌 norm을 검사합니다.
-PostgreSQL pgvector의 exact cosine distance 연산자 `<=>`로 후보를 정렬하며 현재
-ANN 인덱스나 score 임계값은 사용하지 않습니다.
+PostgreSQL pgvector의 exact cosine distance 연산자 `<=>`로 후보를 정렬하며 ANN
+인덱스는 사용하지 않습니다. 기본 `source-dedup-evidence-signals-v1` profile은 상위
+20개 후보에서 같은 PDF page와 TXT overlap을 축약하고, dense score를 주 신호로
+최대 5건을 반환합니다. GENERAL 검색은 기본 `0.50` floor를 유지하되 기존 결과가
+비어 있고 정규화된 질의가 단일 2~4자 token이며 본문 exact token이 일치할 때만
+`0.49 <= score < 0.50` 후보 한 건을 제한적으로 복구합니다. 부분 문자열은 인정하지
+않고 원래 score와 distance를 반환합니다. 완료 배포·출시 검색은 이 복구 경로를
+사용하지 않으며 기존 Claim Gate와 `0.50` floor를 유지합니다. 명시적
+`legacy-dense-v1` override는 rollback 경로로 남아 있습니다.
 
 `score = 1 - distance`는 정렬 결과를 보여 주는 유사도 값이지 정확도나 확률이
-아닙니다. 단일 검색 API는 가장 가까운 한 건을, Career Evidence API는 최대 다섯
-건을 반환합니다. TXT chunk는 `TEXT_CHUNK`와 텍스트 구간 번호를, PDF chunk는
-`PAGE`와 페이지 번호를 원문 위치로 반환합니다.
+아닙니다. 단일 검색 API는 가장 가까운 한 건을 반환합니다. 기존 Career Evidence
+API는 배열 형식을 유지하고, v2 API는 `EVIDENCE_FOUND`, `NO_RELEVANT_RESULTS`,
+`NO_EVIDENCE`, `NO_SEARCHABLE_DOCUMENTS`와 결과 배열을 반환합니다. GENERAL 질의의
+관련 결과 부재는 `NO_RELEVANT_RESULTS`, 완료 배포·출시 근거 검증 실패는
+`NO_EVIDENCE`로 구분합니다. 최종 결과가 선택된 뒤 질문 토큰과 가장 많이 겹치는
+문장을 중심으로 앞뒤 문장을 포함한 `snippet`을 만들며, ranking과 score는 다시
+계산하지 않습니다. 응답은 전체 `content`도 유지하고 frontend는 snippet을 기본으로
+표시하면서 전체 원문을 펼치거나 접을 수 있습니다. TXT chunk는 `TEXT_CHUNK`와
+텍스트 구간 번호를, PDF chunk는 `PAGE`와 페이지 번호를 원문 위치로 반환합니다.
+PostgreSQL FTS·BGE-M3 Sparse·BGE reranker 실험은 평가 전용이며 Production 경로에
+포함되지 않습니다.
 
 추가 근거:
 
@@ -220,6 +235,8 @@ ANN 인덱스나 score 임계값은 사용하지 않습니다.
 - [벡터 검색 SQL](../src/main/java/com/prizm/search/repository/VectorSearchRepository.java)
 - [검색 서비스 테스트](../src/test/java/com/prizm/search/service/SearchServiceTest.java)
 - [Career Evidence API 테스트](../src/test/java/com/prizm/search/controller/CareerEvidenceSearchControllerTest.java)
+- [opt-in 검색 profile](../src/main/java/com/prizm/search/profile/CompositeSearchProfile.java)
+- [Career Evidence v2 API](../src/main/java/com/prizm/search/controller/CareerEvidenceSearchV2Controller.java)
 
 ### 경력 키워드 맵의 생성과 해석
 

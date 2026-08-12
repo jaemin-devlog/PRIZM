@@ -30,6 +30,8 @@ class SearchEvaluationDatasetV2Test {
 
     private static final Path DATASET_V2 =
             Path.of("src/test/resources/search-evaluation/v2");
+    private static final Path DATASET_V23 =
+            Path.of("src/test/resources/search-evaluation/v2-3");
 
     @TempDir
     Path temporaryDirectory;
@@ -81,6 +83,42 @@ class SearchEvaluationDatasetV2Test {
                 .filter(question -> question.category() == Category.PDF_EVIDENCE)
                 .map(Question::goldPage))
                 .containsOnly(2);
+    }
+
+    @Test
+    void versionTwoPointThreePreservesV22AndMakesTheAtlasGoldPageSelfContained() throws IOException {
+        Dataset previous = loader.load(DATASET_V2);
+        Dataset current = loader.load(DATASET_V23);
+
+        assertThat(previous.corpus().datasetId()).isEqualTo("prizm-search-evidence-synthetic-v2.2");
+        assertThat(current.corpus().datasetId()).isEqualTo("prizm-search-evidence-synthetic-v2.3");
+        assertThat(current.questions()).isEqualTo(previous.questions());
+        assertThat(Files.mismatch(
+                        DATASET_V2.resolve(SearchEvaluationDatasetLoader.QUESTIONS_FILE),
+                        DATASET_V23.resolve(SearchEvaluationDatasetLoader.QUESTIONS_FILE)))
+                .isEqualTo(-1L);
+
+        SearchEvaluationData.FixtureDocument previousAtlas = atlasDocument(previous);
+        SearchEvaluationData.FixtureDocument currentAtlas = atlasDocument(current);
+        String previousGoldPage = previousAtlas.pages().get(1).text();
+        String currentGoldPage = currentAtlas.pages().get(1).text();
+
+        assertThat(previousGoldPage).doesNotContain("Atlas");
+        assertThat(currentGoldPage).contains(currentAtlas.title());
+        assertThat(currentAtlas.evidenceAnchors())
+                .allMatch(anchor -> currentGoldPage.contains(anchor.anchorText()));
+
+        String expectedCorpus = Files.readString(
+                        DATASET_V2.resolve(SearchEvaluationDatasetLoader.CORPUS_FILE),
+                        StandardCharsets.UTF_8)
+                .replace("prizm-search-evidence-synthetic-v2.2", "prizm-search-evidence-synthetic-v2.3")
+                .replace(
+                        "2025년 5월 2일 장애 훈련에서 타임아웃을 적용했고 정상화 확인까지 19분이 걸렸다.",
+                        "합성 Atlas 장애 기록에는 2025년 5월 2일 장애 훈련에서 타임아웃을 적용했고 정상화 확인까지 19분이 걸렸다고 적혀 있다.");
+        assertThat(Files.readString(
+                        DATASET_V23.resolve(SearchEvaluationDatasetLoader.CORPUS_FILE),
+                        StandardCharsets.UTF_8))
+                .isEqualTo(expectedCorpus);
     }
 
     @Test
@@ -246,6 +284,13 @@ class SearchEvaluationDatasetV2Test {
                 assertThat(previous == null || previous == question.split()).isTrue();
             }
         }
+    }
+
+    private SearchEvaluationData.FixtureDocument atlasDocument(Dataset dataset) {
+        return dataset.corpus().documents().stream()
+                .filter(document -> document.fixtureId().equals("tuning-atlas-incident"))
+                .findFirst()
+                .orElseThrow();
     }
 
     private void copyAndMutateQuestions(UnaryOperator<String> questionMutation) throws IOException {

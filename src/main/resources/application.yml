@@ -42,6 +42,8 @@ management:
         enabled: true
 
 prizm:
+  search:
+    profile: ${PRIZM_SEARCH_PROFILE:source-dedup-evidence-signals-v1}
   jwt:
     secret: ${PRIZM_JWT_SECRET:}
     expiration-seconds: ${PRIZM_JWT_EXPIRATION_SECONDS:3600}

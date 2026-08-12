@@ -11,6 +11,21 @@ import com.prizm.ingestion.service.IndexedChunk;
 import com.prizm.ingestion.service.TextChunk;
 import com.prizm.ingestion.service.TextChunker;
 import com.prizm.search.dto.response.CareerEvidenceSearchResponse;
+import com.prizm.search.profile.CompositeSearchProfile;
+import com.prizm.search.evaluation.SearchEvaluationBgeM3SparseArtifacts.PreparedInput;
+import com.prizm.search.evaluation.SearchEvaluationBgeM3SparseArtifacts.RawChunk;
+import com.prizm.search.evaluation.SearchEvaluationBgeM3SparseArtifacts.RawQuestion;
+import com.prizm.search.evaluation.SearchEvaluationBgeM3SparseArtifacts.SparseQuestion;
+import com.prizm.search.evaluation.SearchEvaluationBgeM3SparseArtifacts.SparseRank;
+import com.prizm.search.evaluation.SearchEvaluationBgeM3SparseArtifacts.SparseRun;
+import com.prizm.search.evaluation.SearchEvaluationBgeRerankerArtifacts.RerankerQuestion;
+import com.prizm.search.evaluation.SearchEvaluationBgeRerankerArtifacts.RerankerRank;
+import com.prizm.search.evaluation.SearchEvaluationBgeRerankerArtifacts.RerankerRun;
+import com.prizm.search.evaluation.SearchEvaluationDenseSparseRerankerProfile.RerankerCandidate;
+import com.prizm.search.evaluation.SearchEvaluationDenseSparseRerankerProfile.RerankerOutcome;
+import com.prizm.search.evaluation.SearchEvaluationDenseSparseRrfProfile.SparseCandidate;
+import com.prizm.search.evaluation.SearchEvaluationHybridRrfProfile.Outcome;
+import com.prizm.search.evaluation.SearchEvaluationLexicalCandidateRepository.LexicalCandidate;
 import com.prizm.search.evaluation.SearchEvaluationData.CandidateResult;
 import com.prizm.search.evaluation.SearchEvaluationData.Category;
 import com.prizm.search.evaluation.SearchEvaluationData.Breakdown;
@@ -47,6 +62,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.HexFormat;
+import java.util.IntSummaryStatistics;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -73,11 +89,18 @@ import tools.jackson.databind.ObjectMapper;
 @Testcontainers
 class SearchEvaluationBaselineTest {
 
-    private static final int CANDIDATE_LIMIT = 20;
-    private static final List<Integer> CANDIDATE_LIMITS = List.of(5, 10, CANDIDATE_LIMIT);
+    private static final int PRODUCTION_CANDIDATE_LIMIT = 20;
+    private static final int CANDIDATE_LIMIT = 30;
+    private static final List<Integer> CANDIDATE_LIMITS = List.of(5, 10, PRODUCTION_CANDIDATE_LIMIT, CANDIDATE_LIMIT);
     private static final DockerImageName PGVECTOR_IMAGE = DockerImageName
             .parse("pgvector/pgvector:0.8.2-pg16-bookworm")
             .asCompatibleSubstituteFor("postgres");
+    private static final String FROZEN_TEST_DATASET_ID = "prizm-search-evidence-synthetic-v2.3";
+    private static final String FROZEN_TEST_ALLOW_ENVIRONMENT_VARIABLE =
+            "PRIZM_SEARCH_EVALUATION_ALLOW_FROZEN_TEST";
+    private static final String CHUNKING_ENVIRONMENT_VARIABLE =
+            "PRIZM_SEARCH_EVALUATION_CHUNKING";
+    private static final String PRODUCTION_CHUNKING_PROFILE = "production";
     private static final Path STORAGE_ROOT = createTemporaryStorageRoot();
 
     @Container
@@ -116,6 +139,20 @@ class SearchEvaluationBaselineTest {
     PlatformTransactionManager transactionManager;
 
     private final Map<Integer, List<Long>> candidateDbTimes = new LinkedHashMap<>();
+    private final List<Long> lexicalDbNanos = new ArrayList<>();
+    private final List<Long> fusionNanos = new ArrayList<>();
+    private final List<Long> sparseQueryNanos = new ArrayList<>();
+    private final List<Long> sparseFusionNanos = new ArrayList<>();
+    private final List<Long> rerankerInferenceNanos = new ArrayList<>();
+    private final List<Long> rerankerFusionNanos = new ArrayList<>();
+    private final List<Integer> preparedChunkLengths = new ArrayList<>();
+    private SparseRun sparseRun;
+    private PreparedInput sparsePreparedInput;
+    private RerankerRun rerankerRun;
+    private final SearchEvaluationSectionChunker sectionChunker =
+            new SearchEvaluationSectionChunker();
+    private final SearchEvaluationSectionParagraphV2Chunker sectionParagraphV2Chunker =
+            new SearchEvaluationSectionParagraphV2Chunker();
 
     @Test
     void measuresCurrentDenseSearchBaseline() {
@@ -130,10 +167,37 @@ class SearchEvaluationBaselineTest {
         Dataset loadedDataset = new SearchEvaluationDatasetLoader(objectMapper).load(datasetPath);
         Dataset dataset = selectDatasetForRun(loadedDataset);
         RunProfile runProfile = runProfile();
+        candidateDbTimes.clear();
+        lexicalDbNanos.clear();
+        fusionNanos.clear();
+        sparseQueryNanos.clear();
+        sparseFusionNanos.clear();
+        rerankerInferenceNanos.clear();
+        rerankerFusionNanos.clear();
+        preparedChunkLengths.clear();
+        sparseRun = null;
+        sparsePreparedInput = null;
+        rerankerRun = null;
         SeededCorpus seededCorpus = seedCorpus(dataset);
+        printChunkingStatistics();
         validateExpectedEvidence(dataset, seededCorpus.fixtureEvidenceIds());
+        if (usesDenseSparseCandidates(runProfile)) {
+            sparseRun = prepareSparseRun(
+                    objectMapper,
+                    outputPath,
+                    dataset,
+                    seededCorpus);
+        }
+        if (isBgeReranker(runProfile)) {
+            rerankerRun = prepareRerankerRun(objectMapper, sparsePreparedInput);
+        }
 
-        List<QuestionResult> questionResults = evaluate(dataset, seededCorpus, runProfile);
+        List<QuestionResult> questionResults = evaluate(
+                dataset,
+                seededCorpus,
+                runProfile,
+                sparseRun,
+                rerankerRun);
         Breakdown breakdown = new SearchEvaluationMetrics().calculateBreakdown(questionResults);
         Report report = new Report(
                 Instant.now().toString(),
@@ -144,6 +208,9 @@ class SearchEvaluationBaselineTest {
         ReportFiles files = new SearchEvaluationReportWriter(objectMapper).write(outputPath, report);
 
         printReport(breakdown, questionResults, files);
+        printHybridCost();
+        printSparseCost();
+        printRerankerCost();
         if (runProfile.currentProduct()) {
             printCandidateLimitAnalysis(questionResults);
         }
@@ -162,6 +229,31 @@ class SearchEvaluationBaselineTest {
                     new EvaluationProfile(value, EvaluationProfileKind.EVALUATION_COMPOSITE),
                     false);
         }
+        if (value.equals(SearchEvaluationDeferredPageDedupProfile.PROFILE_ID)) {
+            return new RunProfile(
+                    new EvaluationProfile(value, EvaluationProfileKind.EVALUATION_COMPOSITE),
+                    false);
+        }
+        if (value.equals(SearchEvaluationShortQueryRescueProfile.PROFILE_ID)) {
+            return new RunProfile(
+                    new EvaluationProfile(value, EvaluationProfileKind.EVALUATION_COMPOSITE),
+                    false);
+        }
+        if (value.equals(SearchEvaluationHybridRrfProfile.PROFILE_ID)) {
+            return new RunProfile(
+                    new EvaluationProfile(value, EvaluationProfileKind.EVALUATION_COMPOSITE),
+                    false);
+        }
+        if (value.equals(SearchEvaluationDenseSparseRrfProfile.PROFILE_ID)) {
+            return new RunProfile(
+                    new EvaluationProfile(value, EvaluationProfileKind.EVALUATION_COMPOSITE),
+                    false);
+        }
+        if (value.equals(SearchEvaluationDenseSparseRerankerProfile.PROFILE_ID)) {
+            return new RunProfile(
+                    new EvaluationProfile(value, EvaluationProfileKind.EVALUATION_COMPOSITE),
+                    false);
+        }
         throw new SearchEvaluationDataException("Unknown search evaluation profile.");
     }
 
@@ -175,10 +267,22 @@ class SearchEvaluationBaselineTest {
 
         SearchEvaluationDatasetSelector selector = new SearchEvaluationDatasetSelector();
         Split selectedSplit = selector.parseRequiredSplit(splitValue);
-        if (versionTwo && selectedSplit != Split.TUNING) {
-            throw new SearchEvaluationDataException("This Batch permits Dataset v2 TUNING execution only.");
+        if (versionTwo
+                && selectedSplit != Split.TUNING
+                && !allowsFrozenTestRun(
+                        loadedDataset,
+                        selectedSplit,
+                        System.getenv(FROZEN_TEST_ALLOW_ENVIRONMENT_VARIABLE))) {
+            throw new SearchEvaluationDataException(
+                    "Dataset v2 TEST execution requires the explicit frozen v2.3 allow flag.");
         }
         return selector.select(loadedDataset, selectedSplit);
+    }
+
+    static boolean allowsFrozenTestRun(Dataset dataset, Split split, String allowFlag) {
+        return split == Split.TEST
+                && FROZEN_TEST_DATASET_ID.equals(dataset.corpus().datasetId())
+                && "true".equals(allowFlag);
     }
 
     private SeededCorpus seedCorpus(Dataset dataset) {
@@ -300,7 +404,7 @@ class SearchEvaluationBaselineTest {
                 .sorted(Comparator.comparingInt(FixturePage::pageNumber))
                 .toList();
         for (FixturePage page : pages) {
-            List<TextChunk> pageChunks = textChunker.split(page.text());
+            List<TextChunk> pageChunks = splitEvaluationPage(page.text());
             for (TextChunk pageChunk : pageChunks) {
                 int chunkNo = nextChunkNo++;
                 ChunkSourceType sourceType = document.fileType() == DocumentFileType.PDF
@@ -319,6 +423,7 @@ class SearchEvaluationBaselineTest {
                         sourceLabel,
                         pageChunk.content(),
                         embedding));
+                preparedChunkLengths.add(pageChunk.content().length());
 
                 List<String> matchedEvidence = document.evidenceAnchors().stream()
                         .filter(anchor -> pageChunk.content().contains(anchor.anchorText()))
@@ -332,6 +437,119 @@ class SearchEvaluationBaselineTest {
             throw new SearchEvaluationDataException("Synthetic evaluation document produced no chunks.");
         }
         return new PreparedDocument(List.copyOf(chunks), Map.copyOf(evidenceByChunkNo));
+    }
+
+    private List<TextChunk> splitEvaluationPage(String text) {
+        return switch (chunkingProfile()) {
+            case PRODUCTION_CHUNKING_PROFILE -> textChunker.split(text);
+            case SearchEvaluationSectionChunker.PROFILE_ID -> sectionChunker.split(text);
+            case SearchEvaluationSectionParagraphV2Chunker.PROFILE_ID ->
+                    sectionParagraphV2Chunker.split(text);
+            default -> throw new SearchEvaluationDataException(
+                    "Unknown search evaluation chunking profile.");
+        };
+    }
+
+    private String chunkingProfile() {
+        String value = System.getenv(CHUNKING_ENVIRONMENT_VARIABLE);
+        return value == null || value.isBlank() ? PRODUCTION_CHUNKING_PROFILE : value.strip();
+    }
+
+    private void printChunkingStatistics() {
+        IntSummaryStatistics statistics = preparedChunkLengths.stream()
+                .mapToInt(Integer::intValue)
+                .summaryStatistics();
+        System.out.printf(
+                Locale.ROOT,
+                "Evaluation chunking | profile=%s | chunks=%d | min=%d | avg=%.2f | max=%d%n",
+                chunkingProfile(),
+                statistics.getCount(),
+                statistics.getMin(),
+                statistics.getAverage(),
+                statistics.getMax());
+    }
+
+    private SparseRun prepareSparseRun(
+            ObjectMapper objectMapper,
+            Path outputPath,
+            Dataset dataset,
+            SeededCorpus seededCorpus) {
+        List<RawChunk> chunks = jdbcTemplate.query(
+                """
+                        SELECT chunk.id, chunk.content
+                        FROM document_chunks chunk
+                        JOIN document_versions version
+                          ON chunk.document_version_id = version.id
+                        JOIN documents document
+                          ON document.id = version.document_id
+                         AND document.active_version_id = version.id
+                        WHERE version.status = 'ACTIVE'
+                          AND document.owner_user_id = ?
+                          AND version.owner_user_id = ?
+                          AND chunk.owner_user_id = ?
+                        ORDER BY document.id, chunk.chunk_no
+                        """,
+                (resultSet, rowNum) -> {
+                    long chunkId = resultSet.getLong("id");
+                    ChunkDescriptor descriptor = seededCorpus.chunkDescriptors().get(chunkId);
+                    if (descriptor == null) {
+                        throw new SearchEvaluationDataException(
+                                "P14 sparse input found a searchable chunk without a fixture descriptor.");
+                    }
+                    return new RawChunk(
+                            descriptor.fixtureChunkId(),
+                            resultSet.getString("content"));
+                },
+                seededCorpus.primaryOwnerUserId(),
+                seededCorpus.primaryOwnerUserId(),
+                seededCorpus.primaryOwnerUserId());
+        List<RawQuestion> questions = dataset.questions().stream()
+                .map(question -> new RawQuestion(question.questionId(), question.query()))
+                .toList();
+
+        SearchEvaluationBgeM3SparseArtifacts artifacts =
+                new SearchEvaluationBgeM3SparseArtifacts(objectMapper);
+        PreparedInput prepared = artifacts.writeInput(
+                outputPath,
+                dataset.corpus().datasetId(),
+                chunkingProfile(),
+                chunks,
+                questions);
+        sparsePreparedInput = prepared;
+
+        String sparseOutputValue = System.getenv(
+                SearchEvaluationBgeM3SparseArtifacts.OUTPUT_ENVIRONMENT_VARIABLE);
+        if (sparseOutputValue == null || sparseOutputValue.isBlank()) {
+            throw new SearchEvaluationDataException(
+                    "P14 sparse input was written to "
+                            + outputPath.resolve(SearchEvaluationBgeM3SparseArtifacts.INPUT_FILE)
+                            + "; generate the official FlagEmbedding output and set "
+                            + SearchEvaluationBgeM3SparseArtifacts.OUTPUT_ENVIRONMENT_VARIABLE
+                            + ".");
+        }
+        return artifacts.loadOutput(
+                Path.of(sparseOutputValue).toAbsolutePath().normalize(),
+                prepared);
+    }
+
+    private RerankerRun prepareRerankerRun(
+            ObjectMapper objectMapper,
+            PreparedInput preparedInput) {
+        if (preparedInput == null) {
+            throw new SearchEvaluationDataException(
+                    "P15 reranker requires the exact prepared P14 input.");
+        }
+        String rerankerOutputValue = System.getenv(
+                SearchEvaluationBgeRerankerArtifacts.OUTPUT_ENVIRONMENT_VARIABLE);
+        if (rerankerOutputValue == null || rerankerOutputValue.isBlank()) {
+            throw new SearchEvaluationDataException(
+                    "P15 requires an official bge-reranker-v2-m3 output; set "
+                            + SearchEvaluationBgeRerankerArtifacts.OUTPUT_ENVIRONMENT_VARIABLE
+                            + ".");
+        }
+        return new SearchEvaluationBgeRerankerArtifacts(objectMapper).loadOutput(
+                Path.of(rerankerOutputValue).toAbsolutePath().normalize(),
+                preparedInput);
     }
 
     private SeededDocument storeDocument(
@@ -391,9 +609,19 @@ class SearchEvaluationBaselineTest {
     private List<QuestionResult> evaluate(
             Dataset dataset,
             SeededCorpus seededCorpus,
-            RunProfile runProfile) {
+            RunProfile runProfile,
+            SparseRun sparseRun,
+            RerankerRun rerankerRun) {
         SearchEvaluationCandidateRepository candidateRepository =
                 new SearchEvaluationCandidateRepository(jdbcTemplate);
+        SearchEvaluationLexicalCandidateRepository lexicalCandidateRepository =
+                new SearchEvaluationLexicalCandidateRepository(jdbcTemplate);
+        SearchEvaluationHybridRrfProfile hybridRrfProfile =
+                new SearchEvaluationHybridRrfProfile();
+        SearchEvaluationDenseSparseRrfProfile denseSparseRrfProfile =
+                new SearchEvaluationDenseSparseRrfProfile();
+        SearchEvaluationDenseSparseRerankerProfile denseSparseRerankerProfile =
+                new SearchEvaluationDenseSparseRerankerProfile();
         List<QuestionResult> results = new ArrayList<>();
 
         for (Question question : dataset.questions()) {
@@ -407,16 +635,59 @@ class SearchEvaluationBaselineTest {
             long embeddingStartedAt = totalStartedAt;
             float[] queryEmbedding = embeddingService.embed(question.query());
             embeddingValidator.validate(queryEmbedding);
-            long embeddingElapsedMillis = elapsedMillisSince(embeddingStartedAt);
+            long embeddingElapsedNanos = System.nanoTime() - embeddingStartedAt;
+            long embeddingElapsedMillis = elapsedMillis(embeddingElapsedNanos);
             long dbStartedAt = System.nanoTime();
             List<VectorSearchResult> top20 = candidateRepository.findCandidates(
                     queryOwnerUserId,
                     queryEmbedding,
                     CANDIDATE_LIMIT);
-            long dbElapsedMillis = elapsedMillisSince(dbStartedAt);
-            long totalElapsedMillis = elapsedMillisSince(totalStartedAt);
+            long denseDbElapsedNanos = System.nanoTime() - dbStartedAt;
+            long baseTotalElapsedNanos = System.nanoTime() - totalStartedAt;
+            long lexicalDbElapsedNanos = 0L;
+            List<LexicalCandidate> lexicalCandidates = List.of();
+            if (isHybridRrf(runProfile)) {
+                long lexicalStartedAt = System.nanoTime();
+                lexicalCandidates = lexicalCandidateRepository.findCandidates(
+                        queryOwnerUserId,
+                        question.query(),
+                        queryEmbedding,
+                        SearchEvaluationHybridRrfProfile.BRANCH_CANDIDATE_LIMIT);
+                lexicalDbElapsedNanos = System.nanoTime() - lexicalStartedAt;
+                lexicalDbNanos.add(lexicalDbElapsedNanos);
+            }
+            SparseQuestion sparseQuestion = null;
+            long sparseQueryElapsedNanos = 0L;
+            if (usesDenseSparseCandidates(runProfile)) {
+                if (sparseRun == null) {
+                    throw new SearchEvaluationDataException(
+                            "P14 sparse profile requires a validated sparse run.");
+                }
+                sparseQuestion = sparseRun.question(question.questionId());
+                sparseQueryElapsedNanos = Math.round(sparseQuestion.totalMillis() * 1_000_000.0d);
+                sparseQueryNanos.add(sparseQueryElapsedNanos);
+            }
+            RerankerQuestion rerankerQuestion = null;
+            long rerankerElapsedNanos = 0L;
+            if (isBgeReranker(runProfile)) {
+                if (rerankerRun == null) {
+                    throw new SearchEvaluationDataException(
+                            "P15 reranker profile requires a validated reranker run.");
+                }
+                rerankerQuestion = rerankerRun.question(question.questionId());
+                if (denseSparseRerankerProfile.reranks(question.query())) {
+                    rerankerElapsedNanos = Math.round(
+                            rerankerQuestion.inferenceMillis() * 1_000_000.0d);
+                    rerankerInferenceNanos.add(rerankerElapsedNanos);
+                }
+            }
+            long totalElapsedNanos = baseTotalElapsedNanos
+                    + lexicalDbElapsedNanos
+                    + sparseQueryElapsedNanos
+                    + rerankerElapsedNanos;
+            long dbElapsedNanos = denseDbElapsedNanos + lexicalDbElapsedNanos;
             candidateDbTimes.computeIfAbsent(CANDIDATE_LIMIT, ignored -> new ArrayList<>())
-                    .add(dbElapsedMillis);
+                    .add(elapsedMillis(denseDbElapsedNanos));
 
             for (int candidateLimit : CANDIDATE_LIMITS) {
                 if (candidateLimit == CANDIDATE_LIMIT) {
@@ -443,22 +714,90 @@ class SearchEvaluationBaselineTest {
             List<Long> productionIds = productionTop5.stream()
                     .map(CareerEvidenceSearchResponse::chunkId)
                     .toList();
-            List<Long> candidatePrefix = top20.stream()
-                    .limit(productionIds.size())
+            Set<Long> productCandidateIds = top20.stream()
+                    .limit(PRODUCTION_CANDIDATE_LIMIT)
                     .map(VectorSearchResult::chunkId)
-                    .toList();
-            if (!productionIds.equals(candidatePrefix)) {
-                throw new IllegalStateException("Evaluation candidate SQL diverged from the production top-five order.");
+                    .collect(java.util.stream.Collectors.toSet());
+            if (!productCandidateIds.containsAll(productionIds)) {
+                throw new IllegalStateException("Production result is missing from the evaluated top-20 candidate set.");
             }
 
             List<VectorSearchResult> evaluatedCandidates = top20;
-            List<VectorSearchResult> returnedResults = top20.stream()
-                    .limit(productionIds.size())
+            Map<Long, VectorSearchResult> evaluatedCandidatesById = top20.stream()
+                    .collect(java.util.stream.Collectors.toMap(
+                            VectorSearchResult::chunkId,
+                            candidate -> candidate));
+            List<VectorSearchResult> returnedResults = productionIds.stream()
+                    .map(evaluatedCandidatesById::get)
                     .toList();
             if (!runProfile.currentProduct()) {
-                SearchEvaluationCompositeProfile.Decision decision =
-                        new SearchEvaluationCompositeProfile().apply(question.query(), top20);
-                evaluatedCandidates = decision.candidates();
+                List<VectorSearchResult> productCandidates = top20.stream()
+                        .limit(PRODUCTION_CANDIDATE_LIMIT)
+                        .toList();
+                long fusionStartedAt = System.nanoTime();
+                CompositeSearchProfile.Decision decision;
+                if (isHybridRrf(runProfile)) {
+                    Outcome outcome = hybridRrfProfile.apply(
+                            question.query(),
+                            productCandidates,
+                            lexicalCandidates);
+                    decision = outcome.decision();
+                    evaluatedCandidates = outcome.fusedCandidates().stream()
+                            .map(candidate -> candidate.candidate())
+                            .toList();
+                    long fusionElapsedNanos = System.nanoTime() - fusionStartedAt;
+                    fusionNanos.add(fusionElapsedNanos);
+                    totalElapsedNanos += fusionElapsedNanos;
+                    printHybridTrace(question, lexicalCandidates, outcome);
+                }
+                else if (usesDenseSparseCandidates(runProfile)) {
+                    List<SparseCandidate> sparseCandidates = mapSparseCandidates(
+                            sparseQuestion,
+                            top20,
+                            seededCorpus.chunkDescriptors());
+                    if (isBgeReranker(runProfile)) {
+                        List<RerankerCandidate> rerankerCandidates = mapRerankerCandidates(
+                                rerankerQuestion,
+                                top20,
+                                seededCorpus.chunkDescriptors());
+                        RerankerOutcome outcome = denseSparseRerankerProfile.apply(
+                                question.query(),
+                                productCandidates,
+                                sparseCandidates,
+                                rerankerCandidates);
+                        decision = outcome.decision();
+                        evaluatedCandidates = outcome.rerankedCandidates().isEmpty()
+                                ? outcome.p14Candidates().stream()
+                                        .map(candidate -> candidate.candidate())
+                                        .toList()
+                                : outcome.rerankedCandidates().stream()
+                                        .map(candidate -> candidate.candidate())
+                                        .toList();
+                        long rerankerFusionElapsedNanos = System.nanoTime() - fusionStartedAt;
+                        rerankerFusionNanos.add(rerankerFusionElapsedNanos);
+                        totalElapsedNanos += rerankerFusionElapsedNanos;
+                        printRerankerTrace(question, outcome);
+                    }
+                    else {
+                        SearchEvaluationDenseSparseRrfProfile.Outcome outcome =
+                                denseSparseRrfProfile.apply(
+                                        question.query(),
+                                        productCandidates,
+                                        sparseCandidates);
+                        decision = outcome.decision();
+                        evaluatedCandidates = outcome.fusedCandidates().stream()
+                                .map(candidate -> candidate.candidate())
+                                .toList();
+                        long sparseFusionElapsedNanos = System.nanoTime() - fusionStartedAt;
+                        sparseFusionNanos.add(sparseFusionElapsedNanos);
+                        totalElapsedNanos += sparseFusionElapsedNanos;
+                        printSparseTrace(question, sparseCandidates, outcome);
+                    }
+                }
+                else {
+                    decision = applyEvaluationProfile(
+                            runProfile, question.query(), productCandidates);
+                }
                 returnedResults = decision.results();
                 if (decision.rejected()) {
                     System.out.printf(
@@ -483,6 +822,8 @@ class SearchEvaluationBaselineTest {
                     .toList();
             Double top1Score = returnedResults.isEmpty() ? null : returnedResults.get(0).score();
             Double top1Distance = returnedResults.isEmpty() ? null : returnedResults.get(0).distance();
+            long totalElapsedMillis = elapsedMillis(totalElapsedNanos);
+            long dbElapsedMillis = elapsedMillis(dbElapsedNanos);
             results.add(new QuestionResult(
                     question.questionId(),
                     question.query(),
@@ -503,6 +844,184 @@ class SearchEvaluationBaselineTest {
                     candidates));
         }
         return List.copyOf(results);
+    }
+
+    private CompositeSearchProfile.Decision applyEvaluationProfile(
+            RunProfile runProfile,
+            String query,
+            List<VectorSearchResult> productCandidates) {
+        if (runProfile.profile().profileId().equals(SearchEvaluationCompositeProfile.PROFILE_ID)) {
+            return new SearchEvaluationCompositeProfile().apply(query, productCandidates);
+        }
+        if (runProfile.profile().profileId().equals(SearchEvaluationDeferredPageDedupProfile.PROFILE_ID)) {
+            return new SearchEvaluationDeferredPageDedupProfile().apply(query, productCandidates);
+        }
+        if (runProfile.profile().profileId().equals(SearchEvaluationShortQueryRescueProfile.PROFILE_ID)) {
+            return new SearchEvaluationShortQueryRescueProfile().apply(query, productCandidates);
+        }
+        throw new SearchEvaluationDataException("Unsupported evaluation profile.");
+    }
+
+    private static boolean isHybridRrf(RunProfile runProfile) {
+        return runProfile.profile().profileId().equals(SearchEvaluationHybridRrfProfile.PROFILE_ID);
+    }
+
+    private static boolean isDenseSparseRrf(RunProfile runProfile) {
+        return runProfile.profile().profileId().equals(SearchEvaluationDenseSparseRrfProfile.PROFILE_ID);
+    }
+
+    private static boolean isBgeReranker(RunProfile runProfile) {
+        return runProfile.profile().profileId().equals(
+                SearchEvaluationDenseSparseRerankerProfile.PROFILE_ID);
+    }
+
+    private static boolean usesDenseSparseCandidates(RunProfile runProfile) {
+        return isDenseSparseRrf(runProfile) || isBgeReranker(runProfile);
+    }
+
+    private List<SparseCandidate> mapSparseCandidates(
+            SparseQuestion sparseQuestion,
+            List<VectorSearchResult> allDenseCandidates,
+            Map<Long, ChunkDescriptor> descriptors) {
+        if (sparseQuestion == null) {
+            throw new SearchEvaluationDataException("P14 sparse question is missing.");
+        }
+        Map<String, VectorSearchResult> candidatesByFixtureId = new HashMap<>();
+        for (VectorSearchResult candidate : allDenseCandidates) {
+            ChunkDescriptor descriptor = descriptors.get(candidate.chunkId());
+            if (descriptor == null) {
+                throw new SearchEvaluationDataException(
+                        "P14 dense candidate is missing its fixture descriptor.");
+            }
+            candidatesByFixtureId.put(descriptor.fixtureChunkId(), candidate);
+        }
+
+        List<SparseCandidate> candidates = new ArrayList<>();
+        for (SparseRank sparseRank : sparseQuestion.candidates()) {
+            VectorSearchResult candidate = candidatesByFixtureId.get(sparseRank.fixtureChunkId());
+            if (candidate == null) {
+                throw new SearchEvaluationDataException(
+                        "P14 sparse candidate is outside the evaluated dense raw corpus: "
+                                + sparseRank.fixtureChunkId());
+            }
+            candidates.add(new SparseCandidate(candidate, sparseRank.sparseScore()));
+        }
+        return List.copyOf(candidates);
+    }
+
+    private List<RerankerCandidate> mapRerankerCandidates(
+            RerankerQuestion rerankerQuestion,
+            List<VectorSearchResult> allDenseCandidates,
+            Map<Long, ChunkDescriptor> descriptors) {
+        if (rerankerQuestion == null) {
+            throw new SearchEvaluationDataException("P15 reranker question is missing.");
+        }
+        Map<String, VectorSearchResult> candidatesByFixtureId = new HashMap<>();
+        for (VectorSearchResult candidate : allDenseCandidates) {
+            ChunkDescriptor descriptor = descriptors.get(candidate.chunkId());
+            if (descriptor == null) {
+                throw new SearchEvaluationDataException(
+                        "P15 dense candidate is missing its fixture descriptor.");
+            }
+            candidatesByFixtureId.put(descriptor.fixtureChunkId(), candidate);
+        }
+
+        List<RerankerCandidate> candidates = new ArrayList<>();
+        for (RerankerRank rerankerRank : rerankerQuestion.candidates()) {
+            VectorSearchResult candidate = candidatesByFixtureId.get(rerankerRank.fixtureChunkId());
+            if (candidate == null) {
+                throw new SearchEvaluationDataException(
+                        "P15 reranker candidate is outside the evaluated P14 raw corpus: "
+                                + rerankerRank.fixtureChunkId());
+            }
+            candidates.add(new RerankerCandidate(
+                    candidate,
+                    rerankerRank.p14Rank(),
+                    rerankerRank.rerankerRank(),
+                    rerankerRank.rerankerScore()));
+        }
+        return List.copyOf(candidates);
+    }
+
+    private void printHybridTrace(
+            Question question,
+            List<LexicalCandidate> lexicalCandidates,
+            Outcome outcome) {
+        List<String> lexicalTrace = new ArrayList<>();
+        for (int index = 0; index < lexicalCandidates.size(); index++) {
+            LexicalCandidate candidate = lexicalCandidates.get(index);
+            lexicalTrace.add(String.format(
+                    Locale.ROOT,
+                    "%d:%d:%.6f",
+                    index + 1,
+                    candidate.candidate().chunkId(),
+                    candidate.lexicalScore()));
+        }
+        List<String> fusionTrace = outcome.fusedCandidates().stream()
+                .map(candidate -> String.format(
+                        Locale.ROOT,
+                        "%d:d%s:l%s:%.8f",
+                        candidate.candidate().chunkId(),
+                        candidate.denseRank(),
+                        candidate.lexicalRank(),
+                        candidate.rrfScore()))
+                .toList();
+        System.out.printf(
+                Locale.ROOT,
+                "- hybrid trace %s | lexical=%s | fused=%s%n",
+                question.questionId(),
+                lexicalTrace,
+                fusionTrace);
+    }
+
+    private void printSparseTrace(
+            Question question,
+            List<SparseCandidate> sparseCandidates,
+            SearchEvaluationDenseSparseRrfProfile.Outcome outcome) {
+        List<String> sparseTrace = new ArrayList<>();
+        for (int index = 0; index < sparseCandidates.size(); index++) {
+            SparseCandidate candidate = sparseCandidates.get(index);
+            sparseTrace.add(String.format(
+                    Locale.ROOT,
+                    "%d:%d:%.6f",
+                    index + 1,
+                    candidate.candidate().chunkId(),
+                    candidate.sparseScore()));
+        }
+        List<String> fusionTrace = outcome.fusedCandidates().stream()
+                .map(candidate -> String.format(
+                        Locale.ROOT,
+                        "%d:d%s:s%s:%.8f",
+                        candidate.candidate().chunkId(),
+                        candidate.denseRank(),
+                        candidate.sparseRank(),
+                        candidate.rrfScore()))
+                .toList();
+        System.out.printf(
+                Locale.ROOT,
+                "- sparse hybrid trace %s | sparse=%s | fused=%s%n",
+                question.questionId(),
+                sparseTrace,
+                fusionTrace);
+    }
+
+    private void printRerankerTrace(
+            Question question,
+            RerankerOutcome outcome) {
+        List<String> trace = outcome.rerankedCandidates().stream()
+                .map(candidate -> String.format(
+                        Locale.ROOT,
+                        "%d:p14=%d:rerank=%d:%.6f",
+                        candidate.candidate().chunkId(),
+                        candidate.p14Rank(),
+                        candidate.rerankerRank(),
+                        candidate.rerankerScore()))
+                .toList();
+        System.out.printf(
+                Locale.ROOT,
+                "- BGE reranker trace %s | candidates=%s%n",
+                question.questionId(),
+                trace);
     }
 
     private List<CandidateResult> labelCandidates(
@@ -616,6 +1135,104 @@ class SearchEvaluationBaselineTest {
         System.out.println("후보 CSV 파일: " + files.rawCandidates().getFileName());
     }
 
+    private void printHybridCost() {
+        if (lexicalDbNanos.isEmpty()) {
+            return;
+        }
+        System.out.printf(
+                Locale.ROOT,
+                "Hybrid additional cost | lexical DB avg/p50/p95=%.3f/%.3f/%.3fms"
+                        + " | fusion avg/p50/p95=%.3f/%.3f/%.3fms | extra DB lookups=%d%n",
+                averageMillis(lexicalDbNanos),
+                percentileMillis(lexicalDbNanos, 0.50d),
+                percentileMillis(lexicalDbNanos, 0.95d),
+                averageMillis(fusionNanos),
+                percentileMillis(fusionNanos, 0.50d),
+                percentileMillis(fusionNanos, 0.95d),
+                lexicalDbNanos.size());
+    }
+
+    private void printSparseCost() {
+        if (sparseRun == null || sparseQueryNanos.isEmpty()) {
+            return;
+        }
+        if (sparseFusionNanos.isEmpty()) {
+            System.out.printf(
+                    Locale.ROOT,
+                    "BGE-M3 sparse cost | model=%s@%s | FlagEmbedding=%s | device=%s"
+                            + " | load=%.3fms | corpus=%.3fms | warmup=%.3fms"
+                            + " | query+score avg/p50/p95=%.3f/%.3f/%.3fms"
+                            + " | peakGPU=%d bytes%n",
+                    sparseRun.model(),
+                    sparseRun.modelRevision(),
+                    sparseRun.flagEmbeddingVersion(),
+                    sparseRun.device(),
+                    sparseRun.modelLoadMillis(),
+                    sparseRun.corpusEncodingMillis(),
+                    sparseRun.warmupMillis(),
+                    averageMillis(sparseQueryNanos),
+                    percentileMillis(sparseQueryNanos, 0.50d),
+                    percentileMillis(sparseQueryNanos, 0.95d),
+                    sparseRun.gpuPeakMemoryBytes());
+            return;
+        }
+        System.out.printf(
+                Locale.ROOT,
+                "BGE-M3 sparse cost | model=%s@%s | FlagEmbedding=%s | device=%s"
+                        + " | load=%.3fms | corpus=%.3fms | warmup=%.3fms"
+                        + " | query+score avg/p50/p95=%.3f/%.3f/%.3fms"
+                        + " | fusion avg/p50/p95=%.3f/%.3f/%.3fms | peakGPU=%d bytes%n",
+                sparseRun.model(),
+                sparseRun.modelRevision(),
+                sparseRun.flagEmbeddingVersion(),
+                sparseRun.device(),
+                sparseRun.modelLoadMillis(),
+                sparseRun.corpusEncodingMillis(),
+                sparseRun.warmupMillis(),
+                averageMillis(sparseQueryNanos),
+                percentileMillis(sparseQueryNanos, 0.50d),
+                percentileMillis(sparseQueryNanos, 0.95d),
+                averageMillis(sparseFusionNanos),
+                percentileMillis(sparseFusionNanos, 0.50d),
+                percentileMillis(sparseFusionNanos, 0.95d),
+                sparseRun.gpuPeakMemoryBytes());
+    }
+
+    private void printRerankerCost() {
+        if (rerankerRun == null || rerankerInferenceNanos.isEmpty()) {
+            return;
+        }
+        System.out.printf(
+                Locale.ROOT,
+                "BGE reranker cost | model=%s@%s | runtime=%s@%s | device=%s"
+                        + " | load=%.3fms | warmup=%.3fms | maxPairTokens=%d"
+                        + " | inference avg/p50/p95=%.3f/%.3f/%.3fms"
+                        + " | P15 profile avg/p50/p95=%.3f/%.3f/%.3fms"
+                        + " | gpuModel=%d/%d bytes | gpuPeak=%d/%d bytes"
+                        + " | rss before/after/peak=%d/%d/%d bytes%n",
+                rerankerRun.model(),
+                rerankerRun.modelRevision(),
+                rerankerRun.inferenceLibrary(),
+                rerankerRun.inferenceLibraryVersion(),
+                rerankerRun.device(),
+                rerankerRun.modelLoadMillis(),
+                rerankerRun.warmupMillis(),
+                rerankerRun.maximumPairTokens(),
+                averageMillis(rerankerInferenceNanos),
+                percentileMillis(rerankerInferenceNanos, 0.50d),
+                percentileMillis(rerankerInferenceNanos, 0.95d),
+                averageMillis(rerankerFusionNanos),
+                percentileMillis(rerankerFusionNanos, 0.50d),
+                percentileMillis(rerankerFusionNanos, 0.95d),
+                rerankerRun.gpuModelAllocatedBytes(),
+                rerankerRun.gpuModelReservedBytes(),
+                rerankerRun.gpuPeakAllocatedBytes(),
+                rerankerRun.gpuPeakReservedBytes(),
+                rerankerRun.processRssBeforeLoadBytes(),
+                rerankerRun.processRssAfterLoadBytes(),
+                rerankerRun.processRssPeakBytes());
+    }
+
     private void printCandidateLimitAnalysis(List<QuestionResult> questions) {
         SearchEvaluationMetrics metrics = new SearchEvaluationMetrics();
         for (int candidateLimit : CANDIDATE_LIMITS) {
@@ -703,7 +1320,31 @@ class SearchEvaluationBaselineTest {
     }
 
     private long elapsedMillisSince(long startedAt) {
-        return Math.round((System.nanoTime() - startedAt) / 1_000_000.0d);
+        return elapsedMillis(System.nanoTime() - startedAt);
+    }
+
+    private static long elapsedMillis(long elapsedNanos) {
+        return Math.round(elapsedNanos / 1_000_000.0d);
+    }
+
+    private static double averageMillis(List<Long> elapsedNanos) {
+        return elapsedNanos.stream()
+                .mapToLong(Long::longValue)
+                .average()
+                .orElse(0.0d) / 1_000_000.0d;
+    }
+
+    private static double percentileMillis(List<Long> elapsedNanos, double percentile) {
+        if (elapsedNanos.isEmpty()) {
+            return 0.0d;
+        }
+        List<Long> sorted = elapsedNanos.stream().sorted().toList();
+        int index = Math.max(
+                0,
+                Math.min(
+                        sorted.size() - 1,
+                        (int) Math.ceil(percentile * sorted.size()) - 1));
+        return sorted.get(index) / 1_000_000.0d;
     }
 
     private static Path createTemporaryStorageRoot() {

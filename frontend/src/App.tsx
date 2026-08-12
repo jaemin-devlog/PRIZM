@@ -1587,7 +1587,14 @@ function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
                       <span>버전 {result.versionNo}</span>
                       <span>{result.sourceLabel}</span>
                     </p>
-                    <blockquote>{result.content}</blockquote>
+                    <blockquote className="search-result-snippet">{result.snippet}</blockquote>
+                    <details className="search-result-full-content">
+                      <summary>
+                        <span className="full-content-open-label">전체 원문 보기</span>
+                        <span className="full-content-close-label">접기</span>
+                      </summary>
+                      <blockquote>{result.content}</blockquote>
+                    </details>
                   </article>
                 </li>
               ))}

@@ -23,8 +23,8 @@ integration test와 전체 회귀를 통과하고 PR #26으로 `main`에 통합�
 ## 다음
 
 1. **검색 근거 신뢰성**
-   - 현재 dense 검색 기준선을 교정한 뒤 `EVIDENCE_FOUND`, `NO_EVIDENCE`,
-     `NO_SEARCHABLE_DOCUMENTS`를 구분합니다.
+   - dense 검색 평가와 세 상태를 구분하는 개선 제품 profile을 기본값으로 승격했습니다.
+     고정 TEST와 실제 OpenSQL direct \`5432\` API·UI Gate를 통과한 결과입니다.
    - UI와 청킹·색인 최적화는 같은 변경에 섞지 않고, 평가 Gate를 통과한 단계만
      별도 PR로 진행합니다.
 2. **DB 장애 전환**

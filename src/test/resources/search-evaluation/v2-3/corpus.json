@@ -1,0 +1,212 @@
+{
+  "datasetId": "prizm-search-evidence-synthetic-v2.3",
+  "schemaVersion": 2,
+  "documents": [
+    {
+      "fixtureId": "tuning-lumen-release",
+      "title": "합성 Lumen 배포 기록",
+      "documentType": "PROJECT_REPORT",
+      "fileType": "TXT",
+      "split": "TUNING",
+      "pages": [
+        {
+          "pageNumber": 1,
+          "text": "합성 Lumen 프로젝트에서 백엔드 개발자로 참여했다. 2025년 3월 14일에 주문 API를 배포했다. 합성 부하 시험은 1,200건의 요청으로 수행했으며 p95 응답 시간이 23% 감소했다. 긴 설명이 이어지는 구간에서도 같은 성능 개선 사실은 하나의 근거로 취급한다."
+        }
+      ],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "t-lumen-role", "anchorText": "백엔드 개발자로 참여했다", "sourceFactId": "t-fact-lumen-role"},
+        {"fixtureEvidenceId": "t-lumen-date", "anchorText": "2025년 3월 14일에 주문 API를 배포했다", "sourceFactId": "t-fact-lumen-date"},
+        {"fixtureEvidenceId": "t-lumen-load", "anchorText": "1,200건의 요청으로 수행했으며", "sourceFactId": "t-fact-lumen-load"},
+        {"fixtureEvidenceId": "t-lumen-improvement", "anchorText": "p95 응답 시간이 23% 감소했다", "sourceFactId": "t-fact-lumen-improvement"}
+      ]
+    },
+    {
+      "fixtureId": "tuning-atlas-incident",
+      "title": "합성 Atlas 장애 기록",
+      "documentType": "PROJECT_REPORT",
+      "fileType": "PDF",
+      "split": "TUNING",
+      "pages": [
+        {"pageNumber": 1, "text": "합성 Atlas 서비스의 장애 대응 절차와 담당 연락 경로를 정리했다."},
+        {"pageNumber": 2, "text": "합성 Atlas 장애 기록에는 2025년 5월 2일 장애 훈련에서 타임아웃을 적용했고 정상화 확인까지 19분이 걸렸다고 적혀 있다."}
+      ],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "t-atlas-date", "anchorText": "2025년 5월 2일 장애 훈련", "sourceFactId": "t-fact-atlas-date"},
+        {"fixtureEvidenceId": "t-atlas-recovery", "anchorText": "정상화 확인까지 19분이 걸렸다", "sourceFactId": "t-fact-atlas-recovery"}
+      ]
+    },
+    {
+      "fixtureId": "tuning-overlap-boundary",
+      "title": "합성 overlap 경계 기록",
+      "documentType": "PROJECT_REPORT",
+      "fileType": "TXT",
+      "split": "TUNING",
+      "pages": [
+        {
+          "pageNumber": 1,
+          "text": "합성 검색 평가에서 긴 문서를 준비했다. 앞부분에는 배포 준비 절차를 기록했다. 요구사항을 확인하고 입력 형식을 점검했다. 테스트 환경과 운영 환경을 구분했다. 로그에는 비밀값을 남기지 않았다. 실패한 작업은 자동으로 성공 처리하지 않았다. 문서 소유자와 현재 버전을 확인했다. 검색 후보는 활성 버전에서만 선택했다. 결과의 출처 유형과 위치를 보존했다. TXT 근거는 텍스트 구간으로 표시했다. PDF 근거는 페이지 번호로 표시했다. 합성 자료에는 실제 개인정보를 넣지 않았다. 질문과 정답 라벨은 별도 식별자로 연결했다. 같은 원문 사실은 하나의 source fact로 관리했다. TUNING과 TEST는 서로 다른 문서로 나눴다. TEST 결과를 보고 임계값을 고치지 않았다. 검색 결과의 순위와 근거 유무를 분리했다. 직접 근거와 부분 근거를 다른 relevance로 표시했다. 무관한 문장은 hard negative로 표시했다. 문서가 길어 청크 경계가 생겨도 근거 식별자는 유지돼야 한다. 이 문장은 경계 앞의 길이를 확보하기 위한 합성 설명이다. 이어지는 문장도 동일한 목적의 합성 설명이며 실제 경력이나 성과를 뜻하지 않는다. 평가 fixture의 앞부분은 오직 청크 길이와 overlap 동작을 재현하기 위한 합성 문장으로 구성하며 특정 사람이나 실제 조직의 경험을 표현하지 않는다. 경계 부근의 고유 근거는 배포 검증에서 합성 요청 2,400건을 처리했다는 기록이다. 이후 문장은 다음 청크에도 내용이 이어지도록 충분한 길이를 제공한다. 중복 결과는 같은 evidence group으로 묶어 한 번만 유효한 근거로 계산한다."
+        }
+      ],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "t-overlap-load", "anchorText": "합성 요청 2,400건을 처리했다", "sourceFactId": "t-fact-overlap-load"}
+      ]
+    },
+    {
+      "fixtureId": "tuning-study-note",
+      "title": "합성 기술 학습 노트",
+      "documentType": "COURSE_COMPLETION",
+      "fileType": "TXT",
+      "split": "TUNING",
+      "pages": [
+        {"pageNumber": 1, "text": "Kafka의 기본 개념과 AWS 자격 과정 소개를 읽었다. Kafka를 프로젝트에 적용하지 않았고 AWS 자격증을 취득하지도 않았다."}
+      ],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "t-kafka-theory-only", "anchorText": "Kafka를 프로젝트에 적용하지 않았고", "sourceFactId": "t-fact-kafka-theory"},
+        {"fixtureEvidenceId": "t-aws-cert-not-earned", "anchorText": "AWS 자격증을 취득하지도 않았다", "sourceFactId": "t-fact-aws-cert"}
+      ]
+    },
+    {
+      "fixtureId": "tuning-other-owner-only",
+      "title": "다른 합성 사용자의 Acme 기록",
+      "documentType": "PROJECT_REPORT",
+      "fileType": "TXT",
+      "split": "TUNING",
+      "pages": [
+        {"pageNumber": 1, "text": "다른 합성 사용자의 문서에는 Acme 프로젝트에서 Terraform 배포 모듈을 작성했다는 내용이 있다."}
+      ],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "t-other-owner-terraform", "anchorText": "Acme 프로젝트에서 Terraform 배포 모듈을 작성했다", "sourceFactId": "t-fact-other-owner-terraform"}
+      ]
+    },
+    {
+      "fixtureId": "tuning-past-version-only",
+      "title": "합성 과거 버전 기록",
+      "documentType": "PROJECT_REPORT",
+      "fileType": "TXT",
+      "split": "TUNING",
+      "pages": [
+        {"pageNumber": 1, "text": "비활성 과거 버전에는 GraphQL gateway를 시험했다는 문장이 있었지만 현재 ACTIVE 버전에는 해당 근거가 없다."}
+      ],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "t-past-graphql", "anchorText": "GraphQL gateway를 시험했다", "sourceFactId": "t-fact-past-graphql"}
+      ]
+    },
+    {
+      "fixtureId": "tuning-synthetic-backend-portfolio",
+      "title": "합성 백엔드 포트폴리오",
+      "documentType": "PORTFOLIO",
+      "fileType": "PDF",
+      "split": "TUNING",
+      "pages": [
+        {
+          "pageNumber": 1,
+          "text": "이 문서는 검색 실패 구조를 재현하기 위한 합성 백엔드 포트폴리오다. 실제 인물, 회사, 학교, 연락처, 경력과 성과를 포함하지 않는다. MatchLedger는 동시 매칭 확정 흐름을 설명하는 가상 프로젝트이고 NoticeRelay는 내부 알림 저장과 외부 전송 흐름을 설명하는 가상 프로젝트다. 각 페이지는 문제, 처리 흐름, 검증 결과를 구분해 기록한다."
+        },
+        {
+          "pageNumber": 2,
+          "text": "MatchLedger 동시 매칭 확정 사례. 이 페이지는 긴 포트폴리오 페이지가 고정 길이 청크 여러 개로 나뉘는 구조를 합성한다. 사용자는 대기열에서 후보를 탐색하고 매칭 확정을 요청한다. 후보 탐색 결과는 빠른 응답을 위한 참고 정보이며 데이터 정합성의 최종 기준은 아니다. 여러 요청이 동시에 같은 후보 조합을 선택할 수 있으므로 탐색 결과만으로 확정하면 중복 매칭이 생길 수 있다. 애플리케이션은 요청 순서나 메모리 상태를 최종 기준으로 사용하지 않는다. 확정 단계는 데이터베이스 트랜잭션 안에서 수행한다. 검증용 설명은 실제 조직이나 서비스의 구현을 나타내지 않는다. 동일한 원문 페이지에서 문제 원인과 해결 방법이 가까이 배치되면 의미상 관련된 여러 청크가 검색 결과에 함께 나타날 수 있다. 또한 overlap 구간에 핵심 문장이 놓이면 같은 페이지와 같은 근거가 두 청크에 반복될 수 있다. 이 재현 데이터는 그 현상을 확인하기 위한 길이를 의도적으로 가진다. 검색 화면에서는 문서 제목과 페이지 번호가 같아도 청크별 결과가 각각 표시될 수 있다. 평가에서는 이 반복을 별개의 정답으로 세지 않고 동일한 근거 그룹으로 묶는다. 이 문장은 핵심 근거를 overlap 경계로 이동시키기 위한 합성 설명이다. 처리 단계는 후보 조회, 잠금 획득, 상태 재확인, 확정 저장 순서로 구성된다. 최종 확정 직전에 DB 행 잠금으로 대기 행을 선택하고 상태를 다시 확인한 뒤 매칭을 확정했다. 같은 팀 조합의 중복 확정은 데이터베이스 고유 제약으로 한 번 더 차단했다. 실패한 요청은 기존 확정 결과를 변경하지 않으며 다음 조회에서 저장된 상태를 다시 확인한다. 동시 요청 검증에서는 동일 후보를 여러 요청이 선택하는 상황을 만들고 하나의 확정만 남는지 확인한다. 페이지 뒤쪽에는 검증 절차와 결과 해석을 설명하지만 새로운 경력 사실이나 실제 성과 수치를 추가하지 않는다."
+        },
+        {
+          "pageNumber": 3,
+          "text": "NoticeRelay 외부 전송 장애 격리 사례. 이 페이지는 내부 알림 기록과 외부 푸시 요청을 분리하는 합성 구조를 설명한다. 사용자가 확인해야 하는 내부 알림과 외부 서비스 호출 결과를 하나의 성공 조건으로 묶으면 외부 장애가 내부 기록까지 실패하게 만들 수 있다. 따라서 내부 기록은 애플리케이션 데이터베이스의 트랜잭션 경계 안에서 먼저 확정되어야 한다. 외부 전송은 느리거나 실패할 수 있으며 재시도 가능해야 한다. 검증용 문장은 실제 운영 장애나 사용자 데이터를 나타내지 않는다. 긴 페이지의 핵심 문장이 overlap 구간에 위치하도록 일반 설명을 충분히 둔다. 검색 결과에서 같은 페이지의 앞뒤 청크가 반복되는 현상을 재현하되 두 청크는 하나의 evidence group으로 평가한다. 처리 상태는 대기, 처리 중, 전송 완료, 최종 실패처럼 분리할 수 있다. 내부 알림은 먼저 DB 트랜잭션에 저장하고 외부 전송 요청은 Outbox에 기록한 뒤 Worker가 비동기로 처리했다. 외부 푸시 호출이 실패해도 이미 커밋된 내부 알림과 Outbox 요청은 유지된다. Worker는 저장된 요청을 다시 읽어 재시도하며 성공 또는 최종 실패 상태를 별도로 남긴다. 이 합성 사례는 저장과 외부 호출의 경계를 검색 질문으로 확인하기 위한 것이며 실제 서비스의 수치나 장애 이력을 주장하지 않는다."
+        }
+      ],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "t-fr-portfolio-match-lock", "anchorText": "최종 확정 직전에 DB 행 잠금으로 대기 행을 선택하고 상태를 다시 확인한 뒤 매칭을 확정했다", "sourceFactId": "t-fr-fact-match-finalization"},
+        {"fixtureEvidenceId": "t-fr-portfolio-match-lock-overlap", "anchorText": "DB 행 잠금으로 대기 행을 선택하고 상태를 다시 확인한 뒤 매칭을 확정했다", "sourceFactId": "t-fr-fact-match-finalization"},
+        {"fixtureEvidenceId": "t-fr-portfolio-match-unique", "anchorText": "같은 팀 조합의 중복 확정은 데이터베이스 고유 제약으로 한 번 더 차단했다", "sourceFactId": "t-fr-fact-match-unique-constraint"},
+        {"fixtureEvidenceId": "t-fr-portfolio-notification-outbox", "anchorText": "내부 알림은 먼저 DB 트랜잭션에 저장하고 외부 전송 요청은 Outbox에 기록한 뒤 Worker가 비동기로 처리했다", "sourceFactId": "t-fr-fact-notification-outbox"},
+        {"fixtureEvidenceId": "t-fr-portfolio-notification-retained", "anchorText": "외부 푸시 호출이 실패해도 이미 커밋된 내부 알림과 Outbox 요청은 유지된다", "sourceFactId": "t-fr-fact-notification-retained"}
+      ]
+    },
+    {
+      "fixtureId": "tuning-synthetic-backend-resume",
+      "title": "합성 신입 백엔드 이력서",
+      "documentType": "RESUME",
+      "fileType": "PDF",
+      "split": "TUNING",
+      "pages": [
+        {
+          "pageNumber": 1,
+          "text": "합성 신입 백엔드 이력서. 이 문서는 실제 개인정보를 사용하지 않고 이력서 한 페이지에 기술 요약, 프로젝트 요약, 문제 해결 문장이 밀집된 구조만 재현한다. 기술 요약은 Java, Spring Boot, PostgreSQL, Redis와 메시지 처리 개념을 학습한 것으로 구성한다. MatchLedger 요약: 후보 조회 뒤 데이터베이스 행 잠금과 상태 재확인으로 동시 매칭 확정을 제어하고 고유 제약으로 같은 조합의 중복 저장을 차단했다. NoticeRelay 요약: 내부 알림과 Outbox 요청을 먼저 저장하고 외부 전송은 Worker가 비동기로 처리해 외부 푸시 실패가 내부 기록을 되돌리지 않도록 했다. 나머지 문장은 페이지 전체가 하나의 긴 요약 청크가 되는 상황을 재현하기 위한 합성 설명이다. 특정 회사, 학교, 이메일, 전화번호, 주소, 실제 배포 수치나 개인 성과는 포함하지 않는다. 프로젝트 설명은 검색 질문과 직접 관련된 문장 외에도 기술 목록과 일반적인 역할 설명을 함께 포함한다. 이 때문에 질문과 약하게 관련된 넓은 이력서 청크가 직접 근거 페이지보다 높은 순위에 나타날 가능성을 관찰할 수 있다. 합성 데이터의 목적은 검색 알고리즘을 정답에 맞춰 조정하는 것이 아니라 현재 dense 검색의 순위와 중복 실패를 반복 가능하게 측정하는 데 있다."
+        }
+      ],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "t-fr-resume-match-summary", "anchorText": "데이터베이스 행 잠금과 상태 재확인으로 동시 매칭 확정을 제어하고 고유 제약으로 같은 조합의 중복 저장을 차단했다", "sourceFactId": "t-fr-fact-match-finalization"},
+        {"fixtureEvidenceId": "t-fr-resume-notification-summary", "anchorText": "내부 알림과 Outbox 요청을 먼저 저장하고 외부 전송은 Worker가 비동기로 처리해 외부 푸시 실패가 내부 기록을 되돌리지 않도록 했다", "sourceFactId": "t-fr-fact-notification-outbox"},
+        {"fixtureEvidenceId": "t-fr-resume-kafka-context", "anchorText": "메시지 처리 개념을 학습한 것으로 구성한다", "sourceFactId": "t-fr-fact-message-study-only"}
+      ]
+    },
+    {
+      "fixtureId": "test-orchid-api",
+      "title": "합성 Orchid API 기록",
+      "documentType": "PROJECT_REPORT",
+      "fileType": "TXT",
+      "split": "TEST",
+      "pages": [
+        {"pageNumber": 1, "text": "합성 프로젝트 이름은 Orchid이다. 2024년 11월 8일에 8개의 REST API를 배포했다. 참여 역할은 코드 검토자였으며 기술 리드는 아니었다."}
+      ],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "x-orchid-name", "anchorText": "프로젝트 이름은 Orchid이다", "sourceFactId": "x-fact-orchid-name"},
+        {"fixtureEvidenceId": "x-orchid-date", "anchorText": "2024년 11월 8일에", "sourceFactId": "x-fact-orchid-date"},
+        {"fixtureEvidenceId": "x-orchid-api-count", "anchorText": "8개의 REST API를 배포했다", "sourceFactId": "x-fact-orchid-api-count"},
+        {"fixtureEvidenceId": "x-orchid-role", "anchorText": "참여 역할은 코드 검토자였으며 기술 리드는 아니었다", "sourceFactId": "x-fact-orchid-role"}
+      ]
+    },
+    {
+      "fixtureId": "test-cedar-release",
+      "title": "합성 Cedar 출시 보고서",
+      "documentType": "PROJECT_REPORT",
+      "fileType": "PDF",
+      "split": "TEST",
+      "pages": [
+        {"pageNumber": 1, "text": "합성 Cedar 서비스의 출시 범위와 점검 목록을 기록했다."},
+        {"pageNumber": 2, "text": "Cedar 검색 API는 PostgreSQL 실행 계획을 확인한 뒤 복합 인덱스를 적용했다."}
+      ],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "x-cedar-index", "anchorText": "PostgreSQL 실행 계획을 확인한 뒤 복합 인덱스를 적용했다", "sourceFactId": "x-fact-cedar-index"}
+      ]
+    },
+    {
+      "fixtureId": "test-study-note",
+      "title": "합성 컨테이너 학습 노트",
+      "documentType": "COURSE_COMPLETION",
+      "fileType": "TXT",
+      "split": "TEST",
+      "pages": [
+        {"pageNumber": 1, "text": "Kubernetes와 Kafka의 개념을 학습했지만 실제 서비스를 운영하지 않았다. 자격증 과정도 살펴봤지만 CKA 자격증을 취득하지 않았다."}
+      ],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "x-kubernetes-theory-only", "anchorText": "Kubernetes와 Kafka의 개념을 학습했지만 실제 서비스를 운영하지 않았다", "sourceFactId": "x-fact-kubernetes-theory"},
+        {"fixtureEvidenceId": "x-cka-not-earned", "anchorText": "CKA 자격증을 취득하지 않았다", "sourceFactId": "x-fact-cka-cert"}
+      ]
+    },
+    {
+      "fixtureId": "test-other-owner-only",
+      "title": "다른 합성 사용자의 Zephyr 기록",
+      "documentType": "PORTFOLIO",
+      "fileType": "TXT",
+      "split": "TEST",
+      "pages": [
+        {"pageNumber": 1, "text": "다른 합성 사용자의 문서에는 Zephyr라는 회사에서 메시지 처리 시스템을 운영했다는 내용이 있다."}
+      ],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "x-other-owner-zephyr", "anchorText": "Zephyr라는 회사에서 메시지 처리 시스템을 운영했다", "sourceFactId": "x-fact-other-owner-zephyr"}
+      ]
+    },
+    {
+      "fixtureId": "test-past-version-only",
+      "title": "합성 비활성 버전 기록",
+      "documentType": "PROJECT_REPORT",
+      "fileType": "TXT",
+      "split": "TEST",
+      "pages": [
+        {"pageNumber": 1, "text": "비활성 과거 버전에는 RabbitMQ 소비자 재시도 설정을 실험했다는 내용이 있으나 현재 ACTIVE 버전에서는 제거됐다."}
+      ],
+      "evidenceAnchors": [
+        {"fixtureEvidenceId": "x-past-rabbitmq", "anchorText": "RabbitMQ 소비자 재시도 설정을 실험했다", "sourceFactId": "x-fact-past-rabbitmq"}
+      ]
+    }
+  ]
+}

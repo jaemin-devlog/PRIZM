@@ -5,6 +5,7 @@ import com.prizm.embedding.exception.EmbeddingErrorCode;
 import com.prizm.embedding.exception.EmbeddingException;
 import com.prizm.search.exception.InvalidSearchQueryException;
 import com.prizm.search.exception.SearchResultNotFoundException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,7 +13,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /** 검색 입력·임베딩·결과 없음 오류를 HTTP 응답으로 변환한다. */
-@RestControllerAdvice
+@RestControllerAdvice(assignableTypes = {
+        SearchController.class,
+        CareerEvidenceSearchController.class,
+        CareerEvidenceSearchV2Controller.class
+})
 public class SearchExceptionHandler {
 
     @ExceptionHandler(EmbeddingException.class)
@@ -33,6 +38,12 @@ public class SearchExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNoResult(SearchResultNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse("SEARCH_NO_RESULT", exception.getMessage()));
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<ErrorResponse> handleDatabaseFailure(DataAccessException exception) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("SEARCH_DATABASE_ERROR", "Search database request failed."));
     }
 
     private HttpStatus statusFor(EmbeddingErrorCode code) {

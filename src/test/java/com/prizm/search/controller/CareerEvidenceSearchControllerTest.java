@@ -56,6 +56,7 @@ class CareerEvidenceSearchControllerTest {
                         "Career record",
                         2,
                         "Spring Boot and Redis experience",
+                        "Spring Boot and Redis experience",
                         ChunkSourceType.TEXT_CHUNK,
                         1,
                         "텍스트 구간 1",
@@ -73,6 +74,7 @@ class CareerEvidenceSearchControllerTest {
                 .andExpect(jsonPath("$[0].documentTitle").value("Career record"))
                 .andExpect(jsonPath("$[0].versionNo").value(2))
                 .andExpect(jsonPath("$[0].content").value("Spring Boot and Redis experience"))
+                .andExpect(jsonPath("$[0].snippet").value("Spring Boot and Redis experience"))
                 .andExpect(jsonPath("$[0].sourceType").value("TEXT_CHUNK"))
                 .andExpect(jsonPath("$[0].sourceIndex").value(1))
                 .andExpect(jsonPath("$[0].sourceLabel").value("텍스트 구간 1"))

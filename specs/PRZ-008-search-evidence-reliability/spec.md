@@ -2,8 +2,9 @@
 
 ## 상태
 
-`IN_PROGRESS` — Batch 2A 제품 적용 계약을 확정했다. 제품 구현과 TEST는
-`NOT_RUN`이다.
+`IN_PROGRESS` — P0~P18과 snippet·완전중복 표시 보정의 구현·평가·전체 회귀가
+완료됐다. 개선 profile의 기본값 승격, 제한적 GENERAL exact-token rescue, v2 세 상태,
+완료 Claim Gate, 전체 backend·frontend 검증을 통과했으며 현재 branch 통합을 기다린다.
 
 이 문서에서 `CONFIRMED`는 source·test·migration으로 확인한 사실,
 `OPEN_DECISION`은 후속 단계에서 측정 후 확정할 사항을 뜻한다.
@@ -59,12 +60,12 @@ Direct MRR 계산을 교정한 완료 Spec이다. PRZ-008은 그 평가 기반�
 
 | 질문 유형 | 목표 결과 | 현재 예상 동작 | 단계 | 평가 |
 |---|---|---|---|---|
-| 문서에 답이 없는 일반 질문 | `NO_EVIDENCE` | 가까운 결과 반환 | 1·2 | 포함 |
-| 주제는 비슷하지만 근거가 없는 질문 | `NO_EVIDENCE` | 용어가 가까운 결과 반환 가능 | 1·2 | 포함 |
-| 없는 회사·자격증·기술 질문 | `NO_EVIDENCE` | 가까운 결과 반환 | 1·2 | 포함 |
-| 실제 역할·수치를 바꾼 질문 | `NO_EVIDENCE` | 원래 프로젝트를 반환할 수 있음 | 1·2 | 포함 |
-| 다른 사용자의 문서에만 있는 근거 | 현재 사용자에게 청크가 있으면 `NO_EVIDENCE`, 없으면 `NO_SEARCHABLE_DOCUMENTS` | owner 경계 안의 결과만 반환 | 1·2 | 포함 |
-| 과거 버전에만 있는 근거 | active 청크가 있으면 `NO_EVIDENCE`, 없으면 `NO_SEARCHABLE_DOCUMENTS` | 과거 버전 제외 | 1·2 | 포함 |
+| 문서에 답이 없는 일반 질문 | `NO_RELEVANT_RESULTS` | 가까운 결과 반환 | 1·2 | 포함 |
+| 주제는 비슷하지만 근거가 없는 일반 질문 | `NO_RELEVANT_RESULTS` | 용어가 가까운 결과 반환 가능 | 1·2 | 포함 |
+| 없는 회사·자격증·기술 일반 질문 | `NO_RELEVANT_RESULTS` | 가까운 결과 반환 | 1·2 | 포함 |
+| 실제 역할·수치를 바꾼 일반 질문 | `NO_RELEVANT_RESULTS` | 원래 프로젝트를 반환할 수 있음 | 1·2 | 포함 |
+| 다른 사용자의 문서에만 있는 일반 근거 | 현재 사용자에게 청크가 있으면 `NO_RELEVANT_RESULTS`, 없으면 `NO_SEARCHABLE_DOCUMENTS` | owner 경계 안의 결과만 반환 | 1·2 | 포함 |
+| 과거 버전에만 있는 일반 근거 | active 청크가 있으면 `NO_RELEVANT_RESULTS`, 없으면 `NO_SEARCHABLE_DOCUMENTS` | 과거 버전 제외 | 1·2 | 포함 |
 | 검색 가능한 문서가 없는 사용자 | `NO_SEARCHABLE_DOCUMENTS` | 단일 404, Career Evidence 빈 배열 | 1·2 | 포함 |
 | overlap 구간 반복 | 중복 없는 `EVIDENCE_FOUND` | 같은 사실이 반복될 수 있음 | 1·4A·4B | 포함 |
 | 직접 근거 | `EVIDENCE_FOUND` | 가까운 결과 반환 | 1·2 | 포함 |
@@ -81,10 +82,11 @@ version과 TEST 정책을 다시 고정한다. 조용히 재라벨링한 뒤 같
 | 상태 | 의미 | 결과 배열 |
 |---|---|---|
 | `EVIDENCE_FOUND` | owner 범위의 검색 가능한 `ACTIVE` 청크가 있고 판정 기준을 통과한 근거가 있다. | 1개 이상 |
-| `NO_EVIDENCE` | 검색 가능한 청크는 있지만 판정 기준을 통과한 근거가 없다. | 비어 있음 |
+| `NO_RELEVANT_RESULTS` | 검색 가능한 `ACTIVE` 청크는 있지만 `GENERAL` 질의에 관련된 결과가 없다. | 비어 있음 |
+| `NO_EVIDENCE` | 검색 가능한 `ACTIVE` 청크는 있지만 `COMPLETED_RELEASE_EVIDENCE` 질의를 검증할 완료 근거가 없다. | 비어 있음 |
 | `NO_SEARCHABLE_DOCUMENTS` | 현재 사용자에게 검색 가능한 `ACTIVE` 청크가 없다. | 비어 있음 |
 
-세 상태는 정상적인 검색 결과이므로 `200`이 적합하다. 잘못된 질의는 `400`,
+네 상태는 정상적인 검색 결과이므로 `200`이 적합하다. 잘못된 질의는 `400`,
 인증·권한 문제는 `401`·`403`, 임베딩·DB 장애는 기존 `5xx` 계약을 유지한다.
 
 ### 제품 API 호환 계약
@@ -94,7 +96,7 @@ version과 TEST 정책을 다시 고정한다. 조용히 재라벨링한 뒤 같
 | API | 제품 적용 후 계약 |
 |---|---|
 | `POST /api/search` | 단일 결과와 검색 가능한 청크가 없을 때의 `404 SEARCH_NO_RESULT`를 그대로 유지한다. PRZ-008 profile 적용 대상이 아니다. |
-| `POST /api/career-evidence/search` | 최대 5개의 기존 JSON 배열을 유지한다. 새 profile을 사용하더라도 세 상태의 `results`만 반환해 기존 client와 호환한다. |
+| `POST /api/career-evidence/search` | 최대 5개의 기존 JSON 배열을 유지한다. 새 profile을 사용하더라도 v2 상태의 `results`만 반환해 기존 client와 호환한다. |
 | `POST /api/v2/career-evidence/search` | 상태를 구분해야 하는 새 client용 API다. `state`와 `results`를 반환한다. |
 
 v2의 정상 응답은 다음 두 필드만 필수 계약으로 고정한다.
@@ -106,13 +108,22 @@ v2의 정상 응답은 다음 두 필드만 필수 계약으로 고정한다.
 }
 ```
 
-- `state`는 `EVIDENCE_FOUND`, `NO_EVIDENCE`, `NO_SEARCHABLE_DOCUMENTS` 중 하나다.
-- `EVIDENCE_FOUND`의 `results`는 기존 `CareerEvidenceSearchResponse` 필드를
-  유지하며 1~5개다. 나머지 두 상태의 `results`는 빈 배열이다.
+- `state`는 `EVIDENCE_FOUND`, `NO_RELEVANT_RESULTS`, `NO_EVIDENCE`,
+  `NO_SEARCHABLE_DOCUMENTS` 중 하나다.
+- `EVIDENCE_FOUND`의 `results`는 기존 전체 `content`를 유지하고, 선택이 끝난 결과
+  안에서 질문 관련 문장과 인접 문장을 뽑은 `snippet`을 함께 제공하며 1~5개다.
+  snippet 생성은 후보 선택·ranking·score에 관여하지 않고, 생성 실패 시 전체
+  `content`를 fallback으로 사용한다. 나머지 세 상태의 `results`는 빈 배열이다.
 - `distance`와 `score`는 기존 결과 호환을 위해 유지하지만 확률·정확도·신뢰도로
   설명하지 않는다.
+- GENERAL 결과가 비어 있고 정규화된 질의가 단일 2~4자 token이며 본문에 동일한
+  exact token이 있을 때만 원래 dense score가 `0.49` 이상 `0.50` 미만인 후보를
+  최대 한 건 복구한다. 부분 문자열은 인정하지 않고 반환 score·distance는 원래
+  값을 유지한다. `COMPLETED_RELEASE_EVIDENCE`에는 적용하지 않는다.
 - profile 이름, threshold와 내부 판정 신호는 응답에 노출하지 않는다.
-- 정상 세 상태는 `200`, 잘못된 질의는 `400`, 인증·권한은 `401`·`403`,
+- frontend 검색 카드는 `snippet`을 기본 표시하고, 사용자가 기존 전체 `content`를
+  펼치거나 접을 수 있게 한다. 문서 제목과 source 위치 표시는 유지한다.
+- 정상 네 상태는 `200`, 잘못된 질의는 `400`, 인증·권한은 `401`·`403`,
   임베딩·DB 장애는 기존 `5xx`를 유지한다.
 
 Career Evidence v1과 v2는 같은 선택 profile을 사용한다. v1은 결과 배열만 소비하고,
@@ -145,7 +156,7 @@ v2는 상태까지 소비한다. 프론트엔드는 제품 적용 Batch에서 v2
 기존 하네스에는 Direct MRR@5, 거부·오거부, top-1 직접 정확도, page 정확도,
 결과 수와 분리 지연이 없다. 1단계에서 순위를 바꾸기 전에 이 측정을 교정한다.
 
-#### Dataset v2.2 TUNING Gate
+#### Dataset v2.2·v2.3 TUNING Gate
 
 score 단독 threshold는 근거 질문과 무근거 질문의 분포가 겹쳐 채택하지 않는다.
 제품 변경 전 평가 전용 profile에서 다음 순서를 검증한다.
@@ -159,14 +170,166 @@ score 단독 threshold는 근거 질문과 무근거 질문의 분포가 겹쳐 
    요약 근거는 출처 문서가 달라도 한 결과로 축약한다.
 5. 남은 근거만 최대 5개를 `EVIDENCE_FOUND`로 반환한다.
 
-`source-dedup-evidence-signals-v1`은 TUNING 전용 profile이며 제품 threshold나 제품
-동작이 아니다. 기존 TEST 10문항은 제품 적용 계약을 별도로 승인할 때까지
-실행·재라벨링하지 않는다.
+식별자·수치·Unicode 핵심어는 NFKC 정규화와 제한된 조사 제거 후 완전한 토큰으로
+비교하며, 더 긴 토큰 안의 부분 문자열은 일치로 보지 않는다. 유효한 식별자나 Unicode
+핵심어가 하나뿐인 질문은 그 단일 토큰의 정확 일치로 coverage를 충족할 수 있다. 출시
+완료 표현은 `출시한`·`출시했다`와 `배포한`·`배포했다` 계열의 명시적 완료 활용형만
+같은 판정 토큰으로 정규화한다. `배포 계획`, `배포 자동화`, 부정문과 `출시일`·`배포판`·
+`재배포` 같은 더 긴 단어에는 이 동등성을 적용하지 않는다.
+ASCII 식별자 뒤의 한국어 조사는 명시된 조사만 제거하며, `Kafka랩`처럼 식별자가
+다른 Unicode 복합어 안에 포함된 경우에는 일치로 보지 않는다. 완료 표현 뒤에 `?` 또는
+`？`가 붙은 질문형 문장은 완료 사실로 판정하지 않는다. 완료 표현의 문장 양태는 다음
+합성 사례로 고정한다.
+
+| 양태 | 합성 사례 | 완료 사실 판정 |
+|---|---|---|
+| 명확한 완료 서술 | `주문 API를 배포했습니다.` | 맞음 |
+| 직접 질문 | `주문 API를 배포했습니다?` | 아님 |
+| 꼬리질문 | `주문 API를 배포했습니다, 맞나요?` | 아님 |
+| 인용·전언 | `“주문 API를 배포했습니다”라고 했나요?` | 아님 |
+| 완료 여부 | `주문 API 배포 여부를 확인했다.` | 아님 |
+| 바로 다음 문장의 부정·철회 | `배포했습니다. 그러나 실제로는 하지 않았습니다.` | 아님 |
+
+임의의 한국어 의미를 판정하는 것은 제품 계약이 아니다. 완료 이력 판정은 다음의
+폐쇄형 지원 문법만 다루며, 문법 밖 표현을 새 동의어로 추정하지 않는다.
+
+| 구분 | 지원 문법 | 문법 밖 처리 |
+|---|---|---|
+| 관형형 질의 | `<대상구> <등록 관형 완료형> <이력·경험·여부> [등록 존재형] <질의 종결부호>*` | marker 누락, 중간 구두점, 비등록 후행 token은 `UNSUPPORTED_COMPLETED_RELEASE_QUERY` |
+| 유한형 질의 | `<대상구> <등록 유한 완료형> <질의 종결부호>*` | 완료형 뒤의 marker·다른 token은 `UNSUPPORTED_COMPLETED_RELEASE_QUERY` |
+| 명사형 질의 | `<대상구> <출시·배포> <바로 인접한 이력·경험·여부> [등록 존재형] <질의 종결부호>*` | 떨어진 다른 절의 marker와 합성하지 않음 |
+| 직접 완료 주장 | `[등록된 날짜·문제없이·실제로] <질의 대상구> [후행 v버전 또는 균형 잡힌 제품 별칭] <등록 완료 평서형> <평서 종결부호>+` | claim unit 전체가 맞지 않으면 `MISSING_ASSERTED_COMPLETED_RELEASE_CLAIM` |
+| 인접 unit | 질문부호·등록된 질문 종결형 또는 등록된 부정·철회 marker가 있으면 앞 주장을 승인하지 않음 | marker 없는 별도 unit은 이 제한 문법에서 독립 unit으로 취급 |
+
+질의 파서는 `SUPPORTED`·`UNSUPPORTED`·`NONE`의 세 상태를 반환한다. 등록 관형형은
+`출시한`·`출시했다는`·`배포한`·`배포했다는`, 등록 유한형은 동작별
+`했다`·`했습니다`·`했나요`·`하였다`·`하였습니다`·`하였나요`·`하였는지`·
+`했는지`·`했어요` 결합만 지원한다. 등록 존재형은 `있`·`있나요`·`있나`·`있어`·
+`있습니까`·`있었나`·`있었나요`·`있었어`·`있는지`다. 출시·배포를 활용한 비등록
+질의형은 `UNSUPPORTED`이며 일반 핵심어 검색으로 되돌아가지 않는다. bare `출시`·
+`배포`는 바로 다음 token이 `이력`·`경험`·`여부`일 때만 완료 이력 의도다. 따라서
+`출시 계획과 운영 경험`의 서로 다른 명사절을 합성하지 않는다.
+
+명사형 동작과 marker에는 exact base 또는 base에 정확히 하나 붙은 등록 조사
+`이`·`가`·`을`·`를`·`은`·`는`·`의`·`에`·`도`·`만`만 허용한다. 존재형은 위
+등록 token과 exact match해야 한다. 범용 어간화는 query 문법에 사용하지 않으며,
+bare 동작 바로 뒤 token이 marker 문자열을 포함하지만 이 규칙으로 복원되지 않으면
+malformed nominal intent로 `UNSUPPORTED` 처리한다.
+
+질의 문법 token 사이에는 공백만 허용하고 `. ! ！ 。 ? ？`는 마지막 token 뒤에만
+허용한다. 마지막 구두점은 선택이며, 중간 구두점이나 문법 생산식 뒤의 추가 token은
+전체 질의를 `UNSUPPORTED`로 닫는다. 대상구는 완료 동작 앞의 token에서 정확한
+`실제로` modifier를 제거한 나머지 불투명 token 순서다. 이 순서는 재배열하거나 다른
+절의 token과 합산하지 않는다. 대상 token은 NFKC·소문자와 ASCII 식별자에 붙은 등록
+한국어 조사만 정규화한다. 내부 `+`·`#`·`_`·`-`는 기술 token의 일부로 보존한다.
+내부 `.`은 양쪽이 ASCII 영숫자인 `Node.js`·`v1.2`·`1.25` 형식만 지원한다. token
+끝의 `.`·`_`·`-` 뒤에 다른 grammar token이 오면 공백-only separator 위반으로
+문법 밖이다. `하는`·`한`·`된` 같은 의미 어간 suffix와 Unicode 대상의 조사는
+제거하지 않는다.
+
+ASCII 식별자에 허용하는 조사 목록은 `으로부터`·`에게서`·`에서는`·`에서도`·
+`이라고`·`이라도`·`이라면`·`에는`·`에도`·`에서`·`에게`·`까지`·`부터`·`처럼`·
+`보다`·`으로`·`라고`·`라는`·`로`·`을`·`를`·`은`·`는`·`이`·`가`·`와`·`과`·
+`의`·`에`·`도`·`만`이다. 조사 제거 뒤 전체 token이 ASCII 식별자 문법과 맞을 때만
+제거한다.
+
+완료 질의 탐지 경계도 폐쇄한다. parser는 등록 완료형과 조사 정규화 뒤의 bare
+`출시`·`배포`+인접 marker 후보 각각에 대해 대상구·separator·tail 전체 생산식을
+검증하고, 유일하게 성공한 parse만 `SUPPORTED`로 채택한다. 대상구 안의 등록 완료
+token이나 marker도 불투명 token이므로, tail이 맞지 않는 앞선 후보만으로 전체 질의를
+거절하지 않는다. 성공 parse가 없을 때 bare 동작 바로 다음의 `하`·`했`·`한`·`되`·
+`됐` 시작 보조 token, 또는 raw 한 token 안에 `출시`·`배포`가 포함된 비등록형을
+`UNSUPPORTED`로 탐지한다. 이 탐지 집합에 없는 임의의 우회 문장을 의미적으로
+추론하는 것은 계약이 아니다.
+
+후보는 문장·줄바꿈을 정규화한 `claim unit`별로 판정한다. 등록 완료 평서형은 동작별
+`했다`·`했습니다`·`하였다`·`하였습니다`·`했어요` 결합만 지원하고, 평서 종결부호는
+`. ! ！ 。` 중 하나 이상이 반드시 있어야 한다. 지원 직접 주장 parser는 predicate
+앞의 대상구를 질의에서 얻은 정규화 token 순서와 완전히 비교하며, 식별자·수치가 부정
+절에 있고 다른 대상의 완료 predicate가 뒤따르는 token bag을 승인하지 않는다.
+질문·전언·인용 같은 비등록 prefix와 predicate 뒤의 비등록 suffix, 종결부호 없는
+문장도 전체 문법 불일치로 닫는다. 문서 제목은 이 parser 입력에 포함하지 않는다.
+token이 `했고`·`하고` 등으로 끝난다는 이유만으로 claim unit을 나누지 않는다.
+접속형처럼 보이는 token도 대상구에서는 불투명하게 유지하며, 실제 절간 신호 합성은
+unit 전체의 exact target+predicate full match 실패로 차단한다.
+후행 annotation은 없거나 정확히 하나다. version은 `v<숫자>(.<숫자>)+`, 제품 별칭은
+`""`·`“”`·`‘’`·`「」`·`『』` 중 한 쌍으로 균형을 이루고 body는 Unicode 문자·숫자·
+ASCII space·tab·`+`·`#`·`_`·`-` 하나 이상으로 제한한다. 둘 모두 등록 조사 `을`·`를`·`은`·
+`는`만 선택적으로 붙일 수 있다. version과 별칭을 함께 쓰거나 별칭 body에 그 밖의
+구두점이 있으면 문법 밖이다.
+
+claim 선두의 등록 prefix는 날짜 `YYYY년 M월 D일에`, `문제없이`, `실제로`이며 0개
+이상을 공백으로 연결한다. parser는 prefix를 0개 소비한 해석부터 한 요소씩 소비한
+해석까지 유한하게 비교해 질의 대상 token과 exact match하는 해석을 사용한다. 따라서
+등록 prefix와 같은 token으로 시작하는 대상 자체도 오거절하지 않는다.
+
+바로 다음 claim unit의 등록 비단언 양태는 (1) `?`·`？` 포함, (2) `나요`·`습니까`·
+`인가요`·`일까요`·`죠` 종결, (3) `하지 않/못`, `사실이 아니/아닙`, `거짓입/이/으`,
+`부인합/했/하`, `철회합/했/하`, `취소합/했/하`, `정정합/했/하`, `번복합/했/하`,
+`거둡`, `거두`, `되돌`, `미배포`, `사실무근`, `여부` 포함으로 한정한다. 이 marker가
+바로 다음 unit에 있으면 보수적으로 앞 주장을 무효화하며, 그 밖의 임의 담화 관계는
+추론하지 않는다.
+
+이 Gate의 P1은 (1) 위 질의 생산식이나 완료 민감 탐지 집합의 오분류, (2) 직접 주장
+full match를 하지 않은 claim unit 자체의 근거 승인, (3) 서로 다른 unit·제목에서
+대상과 완료 predicate를 합성한 승인, (4) 등록 변환 범위 안의 직접 완료 평서문
+오거절로 한정한다. 등록 직접 주장과 함께 있는 별도 비등록 unit은 등록 질문·교정
+관계에 해당하지 않으면 독립 unit으로 취급하며, 그 임의 문장의 숨은 의미 관계를
+추론하지 않는 것은 P1이 아니다. `배포했고`, 선두 제품 별칭, predicate 뒤 괄호 주석
+등 명시하지 않은 자연어 형식을 `NO_EVIDENCE`로 거절하는 것도 의도된 fail-closed
+제품 한계이며 P1이 아니다. 새 표현 지원은 개별 finding 패치가 아니라 이 문법과
+변환 기반 테스트를 함께 확장하는 별도 계약 변경으로만 수행한다.
+
+이 TUNING 측정 당시 `source-dedup-evidence-signals-v1`은 평가 전용 profile이었고
+제품 동작이 아니었다. 이후 Batch 2B에서 같은 판정 계약을 opt-in 제품 profile로
+옮겼다. 기존 TEST 10문항은 최종 비교 Gate까지 실행·재라벨링하지 않는다.
+
+#### S2C-02 직접 근거·정확 사실 지원 문법
+
+완료 **이력** 질의는 계속 하나의 동일 claim unit 안에 질의 대상·완료 동작·직접 긍정
+양태가 함께 있어야 한다. 이 규칙은 질문·전언·인용·부정·철회와 서로 다른 unit의 신호
+합성을 막는 필수 Gate이며, 아래 문법으로 완화하지 않는다.
+
+별도 직접 근거·정확 수치·날짜 질의에서는 본문에 명시된 프로젝트 이름 선언
+`프로젝트 이름은 <ASCII 식별자>이다` 또는 직접 참여 선언
+`<ASCII 식별자> 프로젝트에서 … 참여했다` 바로 뒤의 직접 완료 평서 claim을 제한적으로
+사용할 수 있다. 이때 질의 식별자는 선언과 정확히 일치하고, 수치·날짜 질의의 모든 수치는
+완료 claim unit 안에 있으며, 제목은 사용하지 않는다. 구현·API endpoint 직접 근거의
+등록 동의어는 직접 완료 평서 claim에만 연결한다. 선언 자체, 인용·질문·전언·부정·철회
+claim, 다른 이름 선언 뒤의 claim은 근거가 아니다.
+
+ASCII 식별자의 종결 계사 `이다`만 정확 식별자 경계로 해석한다. `Kafka랩`처럼 더 긴
+Unicode 복합어 내부의 ASCII 부분 문자열은 계속 식별자가 아니다. 이 지원 문법 밖의
+질의와 문서는 `NO_EVIDENCE`로 fail-closed 처리한다.
+
+근거 존재 여부는 사용자에게 인용되는 본문 `content`만으로 판정한다. 문서 제목은
+순위 보조에는 사용할 수 있지만 본문에 없는 대상·사실을 근거로 보충할 수 없다.
+Dataset v2.3은 v2.2를 보존한 새 버전이며, Atlas PDF gold page가 문서 식별자와 완료
+사실을 본문 안에서 함께 제공하도록 원문 한 곳만 교정했다. 질문·split·label·gold
+page는 v2.2와 동일하다. Dataset v2 평가는 기본적으로 `TUNING`만 허용한다. 고정
+최종 비교는 Dataset ID가 정확히 `prizm-search-evidence-synthetic-v2.3`이고 split이
+`TEST`이며 `PRIZM_SEARCH_EVALUATION_ALLOW_FROZEN_TEST=true`를 명시한 경우에만 허용한다.
+flag가 없거나 v2.2·다른 Dataset·다른 split이면 계속 거절하며, 이 예외는 평가 runner
+밖의 제품 profile·검색 설정·Dataset을 바꾸지 않는다. runner는 선택된 split의 질문이
+참조한 fixture만 seed한다. 따라서 선택 split에 있으나 어떤 질문도 참조하지 않는 fixture는
+owner·version scenario를 추론해 seed하지 않으며, 원본 Dataset 파일도 변경하지 않는다.
 
 TUNING 15문항 Gate는 직접 근거 top-1 `8/8`, 오타 질문 top-1 `2/2`, 중복 결과
 비율 `0`, 무근거 질문 거부율 `1.0`, 근거 질문 오거부율 `0`이다. 이 수치는 작은
 합성 TUNING 집합의 통과 조건일 뿐 일반 검색 품질이나 최종 TEST 성능을 뜻하지
 않는다.
+
+S2C-02는 Dataset v2.2/v2.3과 고정 TEST를 변경하지 않는다. 변환 기반 단위 테스트로
+지원 문법·오거절·`Kafka랩` 경계·제목 배제를 먼저 고정하고, 대상 PostgreSQL 회귀와
+기존 v2.3 TUNING 15문항을 통과한 뒤에만 고정 TEST를 한 번 재비교한다.
+
+2026-08-08 최종 TUNING 15문항은 Direct MRR@5/@20 `1.0000`, nDCG@5 `0.9783`,
+중복 `0`, 무근거 거부 `1.0`, 근거 오거부 `0`으로 통과했다. 이어 고정 v2.3 TEST에서
+legacy와 opt-in을 각각 한 번 실행했다. opt-in은 Direct MRR@5/@20 `1.0000`,
+nDCG@5 `0.9710`, top-1 직접 근거 `1.0`, 무근거 거부 `1.0`, 근거 오거부 `0`, 중복 `0`,
+PDF page 정확도 `1.0`, total p95 `160ms`(legacy `138ms`, +`15.9%`)로 모든 TEST Gate를
+통과했다. TEST 뒤 구현·설정 재조정은 하지 않았으며, 이후 실제 OpenSQL direct
+`5432` API·UI Gate도 통과했다.
 
 ### 제품 profile 설정 계약
 
@@ -174,8 +337,9 @@ TUNING 15문항 Gate는 직접 근거 top-1 `8/8`, 오타 질문 top-1 `2/2`, �
   `PRIZM_SEARCH_PROFILE`로 고정한다.
 - 허용값은 `legacy-dense-v1`과 `source-dedup-evidence-signals-v1`이다. 알 수 없는
   값은 애플리케이션 시작 시 실패시킨다.
-- 최종 TEST와 실제 OpenSQL direct `5432` Gate 전 기본값은
-  `legacy-dense-v1`이다. 새 profile은 명시적으로 선택한 환경에서만 동작한다.
+- 최종 TEST와 실제 OpenSQL direct `5432` Gate를 통과한 뒤 기본값은
+  `source-dedup-evidence-signals-v1`이다. `legacy-dense-v1`은 명시적 rollback
+  override로만 선택한다.
 - 후보 수 20, 최종 결과 수 5와 판정 신호는 versioned profile 내부의 고정값으로
   둔다. 개별 threshold나 신호를 환경변수로 분해하지 않는다.
 - rollback은 profile 값을 `legacy-dense-v1`로 되돌리는 것이다. migration,
@@ -208,7 +372,8 @@ TUNING 15문항 Gate는 직접 근거 top-1 `8/8`, 오타 질문 top-1 `2/2`, �
 | total p95 | 같은 실행의 legacy 결과 대비 20% 초과 증가하지 않음 |
 
 필수 Gate가 실패하거나 OpenSQL 검증이 `NOT_RUN`이면 새 profile은 기본값으로
-승격하지 않는다. 이 계약 확정 단계에서는 제품 source와 TEST를 변경·실행하지 않는다.
+승격하지 않는다. Batch 2A 계약 확정 당시에는 제품 source와 TEST를 변경·실행하지
+않았으며, Batch 2B에서 opt-in 제품 source와 계약 테스트만 구현했다.
 
 ## 요구사항
 

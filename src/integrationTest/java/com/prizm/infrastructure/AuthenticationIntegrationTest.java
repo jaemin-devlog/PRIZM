@@ -294,6 +294,12 @@ class AuthenticationIntegrationTest {
         mockMvc.perform(get("/api/documents"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+
+        mockMvc.perform(post("/api/v2/career-evidence/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"query\":\"career evidence\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
     }
 
     @Test
@@ -330,6 +336,14 @@ class AuthenticationIntegrationTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
         mockMvc.perform(post("/api/career-evidence/search")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"query":"career evidence"}
+                                """))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+        mockMvc.perform(post("/api/v2/career-evidence/search")
                         .header(HttpHeaders.AUTHORIZATION, bearer(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -392,6 +406,7 @@ class AuthenticationIntegrationTest {
         UserAccount owner = createUser(UserRole.USER, true);
         String token = login(owner.getEmail());
         String content = "연차 신청은 인사 시스템에서 진행합니다.";
+        String evidenceQuery = content;
         ActiveDocument activeDocument = createActiveDocument(owner.getId(), "인사 안내", content);
 
         mockMvc.perform(post("/api/search")
@@ -411,8 +426,8 @@ class AuthenticationIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, bearer(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"query":"휴가 안내에서 요청하는 내용"}
-                                """))
+                                {"query":"%s"}
+                                """.formatted(evidenceQuery)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].chunkId").isNumber())
@@ -420,7 +435,22 @@ class AuthenticationIntegrationTest {
                 .andExpect(jsonPath("$[0].documentVersionId").value(activeDocument.versionId()))
                 .andExpect(jsonPath("$[0].sourceType").value("TEXT_CHUNK"))
                 .andExpect(jsonPath("$[0].sourceLabel").value("텍스트 구간 1"))
-                .andExpect(jsonPath("$[0].content").value(content));
+                .andExpect(jsonPath("$[0].content").value(content))
+                .andExpect(jsonPath("$[0].snippet").value(content));
+
+        mockMvc.perform(post("/api/v2/career-evidence/search")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"query":"%s"}
+                                """.formatted(evidenceQuery)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.state").value("EVIDENCE_FOUND"))
+                .andExpect(jsonPath("$.results.length()").value(1))
+                .andExpect(jsonPath("$.results[0].documentId").value(activeDocument.documentId()))
+                .andExpect(jsonPath("$.results[0].documentVersionId").value(activeDocument.versionId()))
+                .andExpect(jsonPath("$.results[0].content").value(content))
+                .andExpect(jsonPath("$.results[0].snippet").value(content));
     }
 
     @Test
@@ -434,6 +464,13 @@ class AuthenticationIntegrationTest {
                         .content("{\"query\":\"no registered evidence\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
+        mockMvc.perform(post("/api/v2/career-evidence/search")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"query\":\"no registered evidence\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.state").value("NO_SEARCHABLE_DOCUMENTS"))
+                .andExpect(jsonPath("$.results").isEmpty());
         mockMvc.perform(post("/api/career-evidence/search")
                         .header(HttpHeaders.AUTHORIZATION, bearer(token))
                         .contentType(MediaType.APPLICATION_JSON)

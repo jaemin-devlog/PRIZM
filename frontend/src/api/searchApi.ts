@@ -22,6 +22,7 @@ export type CareerEvidenceSearchResult = {
   documentTitle: string
   versionNo: number
   content: string
+  snippet: string
   sourceType: 'TEXT_CHUNK' | 'PAGE'
   sourceIndex: number
   sourceLabel: string

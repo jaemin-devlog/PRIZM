@@ -8,6 +8,7 @@ import com.prizm.document.exception.DocumentVersionNotFoundException;
 import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.ingestion.entity.ProcessingJob;
+import com.prizm.ingestion.entity.ProcessingFailureCode;
 import com.prizm.ingestion.repository.DocumentChunkRepository;
 import com.prizm.ingestion.repository.ProcessingJobClaimRepository;
 import com.prizm.ingestion.repository.ProcessingJobRepository;
@@ -68,10 +69,14 @@ public class ProcessingJobRecoveryService {
         if (retryPolicy.canRetry(job.getRetryCount())) {
             job.recoverForRetry(
                     retryPolicy.nextRetryAt(job.getRetryCount(), databaseNow),
-                    LEASE_EXPIRED_MESSAGE);
+                    LEASE_EXPIRED_MESSAGE,
+                    ProcessingFailureCode.DOCUMENT_PROCESSING_FAILED);
         }
         else {
-            job.recoverAsFailed(databaseNow, LEASE_EXPIRED_MESSAGE);
+            job.recoverAsFailed(
+                    databaseNow,
+                    LEASE_EXPIRED_MESSAGE,
+                    ProcessingFailureCode.DOCUMENT_PROCESSING_FAILED);
             version.failProcessing();
         }
         return true;

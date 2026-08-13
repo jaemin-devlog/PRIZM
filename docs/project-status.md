@@ -1,6 +1,6 @@
 # PRIZM 현재 구현 현황
 
-> 현재 상태 기준일: 2026-08-12
+> 현재 상태 기준일: 2026-08-13
 >
 > PRZ-010 검증 source commit: `26c546b16eb9ea42d98460dd6e5aa0bf0752212a`
 >
@@ -39,7 +39,7 @@
 |---|---|
 | 현재 제품 | Spring Boot 애플리케이션과 React 기반 Career Vault Reference App |
 | 구현됨 | 자체 호스팅 회원가입, 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, ChangeLog 기반 비동기 색인·복구, pgvector 검색, Career Vault 문서 관리 |
-| 현재 단계 | 소스 전용 공개 준비, clean-clone과 실제 OpenSQL 전체 흐름 검증 완료. PRZ-010 변경 로그 동기화는 `VERIFIED`; PRZ-008 검색 개선은 현재 PR source의 전체 backend·frontend·OSS 회귀와 실제 OpenSQL direct `5432` API·UI Gate를 통과해 `IN_PROGRESS`; PRZ-009 경력 키워드 맵은 `IMPLEMENTED_UNVERIFIED` |
+| 현재 단계 | 소스 전용 공개 준비, clean-clone과 실제 OpenSQL 전체 흐름 검증 완료. PRZ-010 변경 로그 동기화와 PRZ-011 문서 처리 상태 UX는 `VERIFIED`; PRZ-008 검색 개선은 `IN_PROGRESS`; PRZ-009 경력 키워드 맵은 `IMPLEMENTED_UNVERIFIED` |
 | 미구현·미검증 | CareerFact, 근거 기반 portfolio, `/api/v1`, MCP, 독립 Engine 패키지, OpenProxy SQL routing·안전한 인증, OpenHA와 DB 장애 전환 |
 
 PRIZM의 장기 목표는 재사용 가능한 Career Intelligence Engine과 Reference App을
@@ -122,6 +122,13 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 결과를 덮어쓰지 못하도록 보호하며, DB 처리와 원본 파일 정리가 어긋난 경우에는
 별도 정리 작업으로 복구를 시도합니다.
 
+PRZ-011 작업 트리에서는 문서 처리의 파일 읽기·텍스트 추출·청크 생성·실제
+임베딩 n/N·저장 단계를 ProcessingJob에 기록한다. 전체 청크 수를 모를 때는
+퍼센트를 만들지 않고, 확정 뒤 실제 완료/전체 수로만 계산한다. 문서 목록과 상세는
+비종료 상태에서 약 2초 간격으로 갱신하며 종료 상태에서 멈춘다. 기존 retry 횟수와
+`next_retry_at`을 그대로 보여 주고, 내부 예외 대신 제한된 Ollama/model/GPU·일반
+처리 실패 메시지를 표시한다.
+
 구성 요소와 내부 보호 방식은 [Architecture](architecture.md), 설계 선택의 배경과
 트레이드오프는 [대표 문제 해결 사례](showcase/problem-solving-case-studies.md)에서
 확인할 수 있습니다.
@@ -144,6 +151,7 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 | PRZ-004 demo `USER` clean-clone | `VERIFIED` | `25d09e9`에서 자동 검증 `339 PASS / 18 SKIP / 0 FAIL`과 두 독립 clone 통과. `aff3e87` 경로 교정 뒤 Windows·Linux Node test와 GitHub CI 6건 통과, PR #25 merge `1f9a5ad`. 두 번째 빈 목록 UI 직접 관찰은 `NOT_RUN` |
 | PRZ-009 경력 키워드 맵 | `IMPLEMENTED_UNVERIFIED` | 2026-08-10 작업 트리: backend unit 323개 중 308 pass·15 skip·실패 0, 전체 integration 71개 중 68 pass·조건부 3 skip·실패 0, frontend lint·build, Docker build/runtime, synthetic browser와 diff 감사 pass. OpenSQL opt-in은 `NOT_RUN` |
 | PRZ-010 변경 로그 동기화 | `VERIFIED` | 2026-08-12 source `26c546b`: PostgreSQL ChangeLog integration, 실제 OpenSQL direct `5432` V14 SQL Gate, 실제 OpenSQL+Ollama `bge-m3` V1→V2 E2E와 실패 시 V1 보존, 전체 integration `104 completed / 7 skipped / 0 failures`, backend test, frontend lint/build, Compose와 diff 감사 통과 |
+| PRZ-011 문서 처리 상태 UX | `VERIFIED` | 2026-08-13 작업 트리: backend unit 464개 중 449 pass·15 skip, integration 112개 중 105 pass·7 skip, frontend unit 5개·lint·build, Compose V15 적용, PostgreSQL+pgvector·Ollama `bge-m3` 문서 처리/검색과 browser polling·retry 표시 통과. AUDIT blocking 2건 수정 뒤 재-AUDIT PASS. INTEGRATE는 `NOT_RUN` |
 
 세부 실행 환경과 명령은 [PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md),
 [PRZ-002 Evidence](../specs/PRZ-002-open-source-readiness/evidence.md),
@@ -152,6 +160,9 @@ Worker가 중단돼도 만료된 작업을 다시 처리할 수 있습니다. �
 [PRZ-005 실제 OpenSQL 통합 작업 보고서](../specs/PRZ-005-opensql-ollama-e2e/implementation-report.md),
 [PRZ-010 Evidence](../specs/PRZ-010-change-log-sync/evidence.md)에서
 확인합니다. PostgreSQL·pgvector 결과를 OpenSQL 결과로 바꾸어 표현하지 않습니다.
+PRZ-011의 현재 작업 트리 결과는
+[PRZ-011 Evidence](../specs/PRZ-011-document-processing-status-ux/evidence.md)에
+기록합니다.
 
 ## 미구현 기능
 

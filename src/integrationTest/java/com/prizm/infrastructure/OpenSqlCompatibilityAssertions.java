@@ -45,13 +45,13 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 final class OpenSqlCompatibilityAssertions {
 
-    private static final int EXPECTED_MIGRATION_COUNT = 14;
+    private static final int EXPECTED_MIGRATION_COUNT = 15;
     private static final Duration LEASE_DURATION = Duration.ofSeconds(30);
     private static final List<String> DOMAIN_TABLES = List.of(
             "users", "documents", "document_versions", "document_chunks",
             "processing_jobs", "file_cleanup_jobs", "document_change_logs");
-    private static final Pattern MIGRATION_FILE_PATTERN = Pattern.compile("(?i)\\bV(1[0-4]|[1-9])(?:__|\\b)");
-    private static final Pattern MIGRATION_VERSION_PATTERN = Pattern.compile("(?i)\\bversion\\s+['\"]?(1[0-4]|[1-9])\\b");
+    private static final Pattern MIGRATION_FILE_PATTERN = Pattern.compile("(?i)\\bV(1[0-5]|[1-9])(?:__|\\b)");
+    private static final Pattern MIGRATION_VERSION_PATTERN = Pattern.compile("(?i)\\bversion\\s+['\"]?(1[0-5]|[1-9])\\b");
 
     private OpenSqlCompatibilityAssertions() {
     }
@@ -134,8 +134,8 @@ final class OpenSqlCompatibilityAssertions {
                     .load();
 
             MigrateResult v13Migration = v13Flyway.migrate();
-            assertThat(v13Migration.migrationsExecuted).isEqualTo(EXPECTED_MIGRATION_COUNT - 1);
-            assertSuccessfulMigrationVersions(flywayJdbc, EXPECTED_MIGRATION_COUNT - 1);
+            assertThat(v13Migration.migrationsExecuted).isEqualTo(EXPECTED_MIGRATION_COUNT - 2);
+            assertSuccessfulMigrationVersions(flywayJdbc, EXPECTED_MIGRATION_COUNT - 2);
             assertThat(v13Flyway.info().current()).isNotNull();
             assertThat(v13Flyway.info().current().getVersion().getVersion()).isEqualTo("13");
 
@@ -147,11 +147,11 @@ final class OpenSqlCompatibilityAssertions {
                     .baselineOnMigrate(false)
                     .cleanDisabled(true)
                     .load();
-            MigrateResult v14Migration = latestFlyway.migrate();
-            assertThat(v14Migration.migrationsExecuted).isEqualTo(1);
+            MigrateResult latestMigration = latestFlyway.migrate();
+            assertThat(latestMigration.migrationsExecuted).isEqualTo(2);
             assertSuccessfulMigrationVersions(flywayJdbc, EXPECTED_MIGRATION_COUNT);
             assertThat(latestFlyway.info().current()).isNotNull();
-            assertThat(latestFlyway.info().current().getVersion().getVersion()).isEqualTo("14");
+            assertThat(latestFlyway.info().current().getVersion().getVersion()).isEqualTo("15");
             assertPreV14ProcessingFixturePreserved(flywayJdbc, preV14Fixture);
 
             MigrateResult secondMigration = latestFlyway.migrate();
@@ -378,6 +378,20 @@ final class OpenSqlCompatibilityAssertions {
                     column)).isEqualTo(1L);
         }
 
+        for (String column : List.of(
+                "progress_stage", "completed_chunks", "total_chunks", "failure_code")) {
+            assertThat(jdbcTemplate.queryForObject(
+                    """
+                    SELECT COUNT(*)
+                    FROM information_schema.columns
+                    WHERE table_schema = current_schema()
+                      AND table_name = 'processing_jobs'
+                      AND column_name = ?
+                    """,
+                    Long.class,
+                    column)).isEqualTo(1L);
+        }
+
         assertThat(jdbcTemplate.queryForObject(
                 """
                 SELECT format_type(attribute.atttypid, attribute.atttypmod)
@@ -408,6 +422,9 @@ final class OpenSqlCompatibilityAssertions {
                 "ck_document_versions_status",
                 "ck_processing_jobs_status",
                 "ck_processing_jobs_claim_version",
+                "ck_processing_jobs_progress_stage",
+                "ck_processing_jobs_chunk_progress",
+                "ck_processing_jobs_failure_code",
                 "ck_documents_document_type",
                 "ck_document_chunks_source_type",
                 "ck_document_chunks_source_index",
@@ -1276,7 +1293,8 @@ final class OpenSqlCompatibilityAssertions {
             case "12" -> "cleanup table, unique constraint and index";
             case "13" -> "cleanup lease/fencing columns and recovery index";
             case "14" -> "ChangeLog table, CHECK/unique/composite foreign keys and claim indexes";
-            default -> "V1-V14 Flyway SQL";
+            case "15" -> "processing progress columns and CHECK constraints";
+            default -> "V1-V15 Flyway SQL";
         };
     }
 

@@ -12,6 +12,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "test:unit": "node --experimental-strip-types --test test/document-processing-presentation.test.ts",
     "typecheck": "tsc -b --pretty false",
     "preview": "vite preview",
     "sbom": "node ../scripts/generate-frontend-sbom.mjs"

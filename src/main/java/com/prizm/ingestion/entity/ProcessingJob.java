@@ -60,6 +60,20 @@ public class ProcessingJob {
     @Column(name = "error_message")
     private String errorMessage;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "progress_stage", length = 30)
+    private ProcessingProgressStage progressStage;
+
+    @Column(name = "completed_chunks")
+    private Integer completedChunks;
+
+    @Column(name = "total_chunks")
+    private Integer totalChunks;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "failure_code", length = 50)
+    private ProcessingFailureCode failureCode;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -80,7 +94,10 @@ public class ProcessingJob {
         return new ProcessingJob(ownerUserId, documentVersionId);
     }
 
-    public void scheduleRetry(Instant nextRetryAt, String errorMessage) {
+    public void scheduleRetry(
+            Instant nextRetryAt,
+            String errorMessage,
+            ProcessingFailureCode failureCode) {
         requireStatus(ProcessingJobStatus.PROCESSING);
         this.status = ProcessingJobStatus.RETRY_WAIT;
         this.retryCount++;
@@ -89,6 +106,9 @@ public class ProcessingJob {
         this.completedAt = null;
         this.leaseExpiresAt = null;
         this.errorMessage = errorMessage;
+        this.completedChunks = null;
+        this.totalChunks = null;
+        this.failureCode = failureCode;
     }
 
     public void complete(Instant completedAt) {
@@ -98,19 +118,31 @@ public class ProcessingJob {
         this.nextRetryAt = null;
         this.leaseExpiresAt = null;
         this.errorMessage = null;
+        this.progressStage = ProcessingProgressStage.COMPLETED;
+        if (this.totalChunks != null) {
+            this.completedChunks = this.totalChunks;
+        }
+        this.failureCode = null;
     }
 
-    public void fail(Instant completedAt, String errorMessage) {
+    public void fail(
+            Instant completedAt,
+            String errorMessage,
+            ProcessingFailureCode failureCode) {
         requireStatus(ProcessingJobStatus.PROCESSING);
         this.status = ProcessingJobStatus.FAILED;
         this.completedAt = completedAt;
         this.nextRetryAt = null;
         this.leaseExpiresAt = null;
         this.errorMessage = errorMessage;
+        this.failureCode = failureCode;
     }
 
     /** 만료된 처리 시도를 무효화하고 DB 시간 기준의 다음 재시도를 예약한다. */
-    public void recoverForRetry(Instant nextRetryAt, String errorMessage) {
+    public void recoverForRetry(
+            Instant nextRetryAt,
+            String errorMessage,
+            ProcessingFailureCode failureCode) {
         requireStatus(ProcessingJobStatus.PROCESSING);
         this.claimVersion++;
         this.retryCount++;
@@ -120,10 +152,16 @@ public class ProcessingJob {
         this.completedAt = null;
         this.leaseExpiresAt = null;
         this.errorMessage = errorMessage;
+        this.completedChunks = null;
+        this.totalChunks = null;
+        this.failureCode = failureCode;
     }
 
     /** 최대 재시도를 사용한 만료 작업을 실패 처리하며 이전 Worker 소유권을 무효화한다. */
-    public void recoverAsFailed(Instant completedAt, String errorMessage) {
+    public void recoverAsFailed(
+            Instant completedAt,
+            String errorMessage,
+            ProcessingFailureCode failureCode) {
         requireStatus(ProcessingJobStatus.PROCESSING);
         this.claimVersion++;
         this.status = ProcessingJobStatus.FAILED;
@@ -131,6 +169,7 @@ public class ProcessingJob {
         this.nextRetryAt = null;
         this.leaseExpiresAt = null;
         this.errorMessage = errorMessage;
+        this.failureCode = failureCode;
     }
 
     /** 상태와 fencing 값이 모두 현재 Worker의 처리 시도와 일치하는지 확인한다. */
@@ -159,5 +198,9 @@ public class ProcessingJob {
     public long getClaimVersion() { return claimVersion; }
     public Instant getLeaseExpiresAt() { return leaseExpiresAt; }
     public String getErrorMessage() { return errorMessage; }
+    public ProcessingProgressStage getProgressStage() { return progressStage; }
+    public Integer getCompletedChunks() { return completedChunks; }
+    public Integer getTotalChunks() { return totalChunks; }
+    public ProcessingFailureCode getFailureCode() { return failureCode; }
     public Instant getCreatedAt() { return createdAt; }
 }

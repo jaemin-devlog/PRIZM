@@ -246,7 +246,7 @@ class PgVectorInfrastructureTest {
                 PgVectorSmokeAssertions.verifyExactCosineSearch(jdbcTemplate);
 
         assertThat(serverVersion).isBetween(160000, 169999);
-        assertThat(successfulMigrations).isEqualTo(14L);
+        assertThat(successfulMigrations).isEqualTo(15L);
         assertThat(result.extensionVersion()).isEqualTo("0.8.2");
         assertThat(documentCount).isZero();
         assertThat(versionCount).isZero();
@@ -942,13 +942,23 @@ class PgVectorInfrastructureTest {
             assertThat(processingJobClaimService.claimNext()).isEmpty();
             assertThat(processingJobRepository.findById(claimed.processingJobId()).orElseThrow().getStatus())
                     .isEqualTo(ProcessingJobStatus.PROCESSING);
+            assertThat(processingJobRepository.findById(claimed.processingJobId()).orElseThrow().getProgressStage())
+                    .isEqualTo(com.prizm.ingestion.entity.ProcessingProgressStage.FILE_READING);
+            assertThat(processingJobRepository.findById(claimed.processingJobId()).orElseThrow().getTotalChunks())
+                    .isNull();
             assertThat(documentVersionRepository.findById(uploaded.versionId()).orElseThrow().getStatus())
                     .isEqualTo(DocumentVersionStatus.PROCESSING);
 
             documentIndexingProcessor.process(claimed);
 
-            assertThat(processingJobRepository.findById(claimed.processingJobId()).orElseThrow().getStatus())
+            com.prizm.ingestion.entity.ProcessingJob completedJob =
+                    processingJobRepository.findById(claimed.processingJobId()).orElseThrow();
+            assertThat(completedJob.getStatus())
                     .isEqualTo(ProcessingJobStatus.COMPLETED);
+            assertThat(completedJob.getProgressStage())
+                    .isEqualTo(com.prizm.ingestion.entity.ProcessingProgressStage.COMPLETED);
+            assertThat(completedJob.getTotalChunks()).isPositive();
+            assertThat(completedJob.getCompletedChunks()).isEqualTo(completedJob.getTotalChunks());
             assertThat(documentVersionRepository.findById(uploaded.versionId()).orElseThrow().getStatus())
                     .isEqualTo(DocumentVersionStatus.ACTIVE);
             assertThat(documentRepository.findById(uploaded.documentId()).orElseThrow().getActiveVersionId())
@@ -1675,6 +1685,7 @@ class PgVectorInfrastructureTest {
             ProcessingJobStatus status = indexingFailureService.handleFailure(
                     claim,
                     indexingFailureClassifier.isRetryable(exception),
+                    indexingFailureClassifier.failureCode(exception),
                     exception.getMessage());
 
             assertThat(status).isEqualTo(ProcessingJobStatus.FAILED);

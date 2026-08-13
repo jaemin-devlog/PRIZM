@@ -44,9 +44,13 @@ public class IndexingCoordinator {
         }
         catch (RuntimeException exception) {
             try {
-                failureService.handleFailure(job, failureClassifier.isRetryable(exception), exception.getMessage());
+                failureService.handleFailure(
+                        job,
+                        failureClassifier.isRetryable(exception),
+                        failureClassifier.failureCode(exception),
+                        exception.getMessage());
                 log.warn("Indexing job {} failed with {}.",
-                        job.processingJobId(), exception.getClass().getSimpleName());
+                        job.processingJobId(), exception.getClass().getSimpleName(), exception);
             }
             catch (StaleProcessingJobClaimException staleClaim) {
                 log.info("Ignored failure from stale indexing claim for job {}.", job.processingJobId());

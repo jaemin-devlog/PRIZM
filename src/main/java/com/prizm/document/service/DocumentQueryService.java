@@ -11,7 +11,9 @@ import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.ingestion.entity.ProcessingJob;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
+import com.prizm.ingestion.entity.ProcessingFailureCode;
 import com.prizm.ingestion.repository.ProcessingJobRepository;
+import com.prizm.ingestion.service.IndexingRetryPolicy;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -100,7 +102,14 @@ public class DocumentQueryService {
                 latestVersion == null ? null : latestVersion.getOriginalFileName(),
                 latestVersion == null ? null : latestVersion.getFileType(),
                 latestProcessingJob.map(ProcessingJob::getStatus).orElse(null),
+                latestProcessingJob.map(ProcessingJob::getProgressStage).orElse(null),
+                latestProcessingJob.map(ProcessingJob::getCompletedChunks).orElse(null),
+                latestProcessingJob.map(ProcessingJob::getTotalChunks).orElse(null),
+                progressPercent(latestProcessingJob),
                 safeErrorCode(latestProcessingJob),
+                latestProcessingJob.map(ProcessingJob::getRetryCount).orElse(0),
+                IndexingRetryPolicy.MAX_RETRIES,
+                latestProcessingJob.map(ProcessingJob::getNextRetryAt).orElse(null),
                 activeVersion == null ? null : activeVersion.getStatus(),
                 versions.size(),
                 document.getCreatedAt(),
@@ -117,8 +126,15 @@ public class DocumentQueryService {
                 version.getFileType(),
                 version.getStatus(),
                 processingJob.map(ProcessingJob::getStatus).orElse(null),
+                processingJob.map(ProcessingJob::getProgressStage).orElse(null),
+                processingJob.map(ProcessingJob::getCompletedChunks).orElse(null),
+                processingJob.map(ProcessingJob::getTotalChunks).orElse(null),
+                progressPercent(processingJob),
                 safeErrorCode(processingJob),
                 processingJob.map(job -> job.getStatus() == ProcessingJobStatus.RETRY_WAIT).orElse(false),
+                processingJob.map(ProcessingJob::getRetryCount).orElse(0),
+                IndexingRetryPolicy.MAX_RETRIES,
+                processingJob.map(ProcessingJob::getNextRetryAt).orElse(null),
                 version.getCreatedAt());
     }
 
@@ -130,12 +146,28 @@ public class DocumentQueryService {
     }
 
     private String safeErrorCode(Optional<ProcessingJob> processingJob) {
-        return processingJob.map(ProcessingJob::getStatus)
-                .map(status -> switch (status) {
-                    case RETRY_WAIT -> "PROCESSING_RETRY_SCHEDULED";
-                    case FAILED -> "PROCESSING_FAILED";
-                    default -> null;
-                })
+        return processingJob
+                .filter(job -> job.getStatus() == ProcessingJobStatus.RETRY_WAIT
+                        || job.getStatus() == ProcessingJobStatus.FAILED)
+                .map(job -> Optional.ofNullable(job.getFailureCode())
+                        .orElse(ProcessingFailureCode.DOCUMENT_PROCESSING_FAILED)
+                        .name())
                 .orElse(null);
+    }
+
+    private Integer progressPercent(Optional<ProcessingJob> processingJob) {
+        if (processingJob.isEmpty()) {
+            return null;
+        }
+        ProcessingJob job = processingJob.orElseThrow();
+        if (job.getStatus() == ProcessingJobStatus.COMPLETED) {
+            return 100;
+        }
+        Integer completed = job.getCompletedChunks();
+        Integer total = job.getTotalChunks();
+        if (completed == null || total == null || total <= 0) {
+            return null;
+        }
+        return Math.floorDiv(completed * 100, total);
     }
 }

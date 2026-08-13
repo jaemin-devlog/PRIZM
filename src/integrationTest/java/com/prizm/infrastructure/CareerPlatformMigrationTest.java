@@ -45,7 +45,8 @@ class CareerPlatformMigrationTest {
         assertChunkSourceSchema(database.jdbcTemplate());
         assertPdfFileTypeSchema(database.jdbcTemplate());
         assertFileCleanupJobSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(14L);
+        assertProcessingProgressSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(15L);
         for (String table : DOCUMENT_TABLES) {
             assertThat(rowCount(database.jdbcTemplate(), table)).isZero();
         }
@@ -65,6 +66,7 @@ class CareerPlatformMigrationTest {
         assertOwnershipSchema(database.jdbcTemplate());
         assertDocumentTypeSchema(database.jdbcTemplate());
         assertFileCleanupJobSchema(database.jdbcTemplate());
+        assertProcessingProgressSchema(database.jdbcTemplate());
         for (String table : DOCUMENT_TABLES) {
             assertThat(rowCount(database.jdbcTemplate(), table)).isZero();
         }
@@ -90,7 +92,8 @@ class CareerPlatformMigrationTest {
         assertChunkSourceSchema(database.jdbcTemplate());
         assertPdfFileTypeSchema(database.jdbcTemplate());
         assertFileCleanupJobSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(14L);
+        assertProcessingProgressSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(15L);
     }
 
     @Test
@@ -161,7 +164,8 @@ class CareerPlatformMigrationTest {
         assertChunkSourceSchema(database.jdbcTemplate());
         assertPdfFileTypeSchema(database.jdbcTemplate());
         assertFileCleanupJobSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(14L);
+        assertProcessingProgressSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(15L);
     }
 
     @Test
@@ -424,6 +428,29 @@ class CareerPlatformMigrationTest {
         assertThat(jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'ix_file_cleanup_jobs_processing_lease'",
                 Long.class)).isEqualTo(1L);
+    }
+
+    private void assertProcessingProgressSchema(JdbcTemplate jdbcTemplate) {
+        for (String columnName : List.of(
+                "progress_stage", "completed_chunks", "total_chunks", "failure_code")) {
+            assertThat(jdbcTemplate.queryForObject(
+                    """
+                    SELECT is_nullable
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public' AND table_name = 'processing_jobs' AND column_name = ?
+                    """,
+                    String.class,
+                    columnName)).isEqualTo("YES");
+        }
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'ck_processing_jobs_progress_stage'",
+                String.class)).contains(
+                        "FILE_READING", "TEXT_EXTRACTION", "CHUNK_CREATION", "EMBEDDING", "SAVING", "COMPLETED");
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'ck_processing_jobs_failure_code'",
+                String.class)).contains(
+                        "OLLAMA_UNAVAILABLE", "OLLAMA_MODEL_NOT_INSTALLED",
+                        "OLLAMA_RUNTIME_FAILURE", "DOCUMENT_PROCESSING_FAILED");
     }
 
     private long ownerColumnCount(JdbcTemplate jdbcTemplate, String tableName) {

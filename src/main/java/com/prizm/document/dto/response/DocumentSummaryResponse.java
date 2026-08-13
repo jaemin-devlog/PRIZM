@@ -4,6 +4,7 @@ import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.entity.DocumentType;
 import com.prizm.document.entity.DocumentVersionStatus;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
+import com.prizm.ingestion.entity.ProcessingProgressStage;
 import java.time.Instant;
 
 public record DocumentSummaryResponse(
@@ -16,7 +17,14 @@ public record DocumentSummaryResponse(
         String latestOriginalFileName,
         DocumentFileType latestFileType,
         ProcessingJobStatus latestProcessingStatus,
+        ProcessingProgressStage latestProcessingStage,
+        Integer latestCompletedChunks,
+        Integer latestTotalChunks,
+        Integer latestProgressPercent,
         String latestProcessingErrorCode,
+        int latestRetryCount,
+        int maxRetries,
+        Instant latestNextRetryAt,
         DocumentVersionStatus activeVersionStatus,
         int versionCount,
         Instant createdAt,

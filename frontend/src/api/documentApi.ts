@@ -26,7 +26,14 @@ export type DocumentSummary = {
   latestOriginalFileName: string | null
   latestFileType: DocumentFileType | null
   latestProcessingStatus: ProcessingJobStatus | null
+  latestProcessingStage: ProcessingProgressStage | null
+  latestCompletedChunks: number | null
+  latestTotalChunks: number | null
+  latestProgressPercent: number | null
   latestProcessingErrorCode: string | null
+  latestRetryCount: number
+  maxRetries: number
+  latestNextRetryAt: string | null
   activeVersionStatus: string | null
   versionCount: number
   createdAt: string
@@ -40,6 +47,14 @@ export type ProcessingJobStatus =
   | 'COMPLETED'
   | 'FAILED'
 
+export type ProcessingProgressStage =
+  | 'FILE_READING'
+  | 'TEXT_EXTRACTION'
+  | 'CHUNK_CREATION'
+  | 'EMBEDDING'
+  | 'SAVING'
+  | 'COMPLETED'
+
 export type DocumentVersion = {
   versionId: number
   versionNo: number
@@ -47,8 +62,15 @@ export type DocumentVersion = {
   fileType: DocumentFileType
   status: string
   processingStatus: ProcessingJobStatus | null
+  processingStage: ProcessingProgressStage | null
+  completedChunks: number | null
+  totalChunks: number | null
+  progressPercent: number | null
   processingErrorCode: string | null
   retryScheduled: boolean
+  retryCount: number
+  maxRetries: number
+  nextRetryAt: string | null
   createdAt: string
 }
 

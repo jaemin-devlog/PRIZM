@@ -9,6 +9,7 @@ import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.ingestion.entity.ProcessingJob;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
+import com.prizm.ingestion.entity.ProcessingFailureCode;
 import com.prizm.ingestion.repository.DocumentChunkRepository;
 import com.prizm.ingestion.repository.ProcessingJobClaimRepository;
 import com.prizm.ingestion.repository.ProcessingJobRepository;
@@ -48,6 +49,7 @@ public class IndexingFailureService {
     public ProcessingJobStatus handleFailure(
             ClaimedProcessingJob claimedJob,
             boolean retryable,
+            ProcessingFailureCode failureCode,
             String errorMessage) {
         ProcessingJob job = processingJobRepository.findByIdForUpdate(claimedJob.processingJobId())
                 .orElseThrow(() -> new IllegalStateException("Processing job was not found."));
@@ -68,10 +70,10 @@ public class IndexingFailureService {
         String safeMessage = truncate(errorMessage == null ? "Indexing failed." : errorMessage);
         Instant now = claimRepository.currentDatabaseTime();
         if (retryable && retryPolicy.canRetry(job.getRetryCount())) {
-            job.scheduleRetry(retryPolicy.nextRetryAt(job.getRetryCount(), now), safeMessage);
+            job.scheduleRetry(retryPolicy.nextRetryAt(job.getRetryCount(), now), safeMessage, failureCode);
         }
         else {
-            job.fail(now, safeMessage);
+            job.fail(now, safeMessage, failureCode);
             if (version.getStatus() == DocumentVersionStatus.PROCESSING) {
                 version.failProcessing();
             }

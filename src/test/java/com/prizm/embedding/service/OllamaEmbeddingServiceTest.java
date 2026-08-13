@@ -52,7 +52,8 @@ class OllamaEmbeddingServiceTest {
 
     @Test
     void classifiesMissingModelResponse() {
-        when(embeddingModel.embed("query")).thenThrow(new RuntimeException("model 'bge-m3' not found"));
+        when(embeddingModel.embed("query")).thenThrow(new RuntimeException(
+                "HTTP 404", new RuntimeException("model 'bge-m3' not found")));
 
         assertThatThrownBy(() -> service().embed("query"))
                 .isInstanceOf(EmbeddingException.class)
@@ -63,6 +64,18 @@ class OllamaEmbeddingServiceTest {
     @Test
     void classifiesConnectionFailure() {
         when(embeddingModel.embed("query")).thenThrow(new RuntimeException("Connection refused"));
+
+        assertThatThrownBy(() -> service().embed("query"))
+                .isInstanceOf(EmbeddingException.class)
+                .extracting(exception -> ((EmbeddingException) exception).code())
+                .isEqualTo(EmbeddingErrorCode.OLLAMA_UNAVAILABLE);
+    }
+
+    @Test
+    void preservesGpuOrModelRunnerCauseForProcessingFailureClassification() {
+        when(embeddingModel.embed("query")).thenThrow(new RuntimeException(
+                "HTTP 500",
+                new RuntimeException("llama runner failed: ROCm error: invalid device function")));
 
         assertThatThrownBy(() -> service().embed("query"))
                 .isInstanceOf(EmbeddingException.class)

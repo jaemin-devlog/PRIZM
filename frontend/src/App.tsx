@@ -33,6 +33,7 @@ import {
   getDocumentThumbnail,
   updateDocumentMetadata,
   type DocumentDetail,
+  type DocumentVersion,
   uploadDocument,
   uploadDocumentVersion,
   type DocumentSummary,
@@ -51,6 +52,7 @@ import {
   saveAccessToken,
   saveCurrentUser,
 } from './auth/tokenStorage'
+import { progressSummary } from './documentProcessingPresentation'
 
 const LOGIN_PATH = '/login'
 const CAREER_VAULT_PATH = '/career-vault'
@@ -60,6 +62,7 @@ const EVIDENCE_PATH = '/career-vault/evidence'
 const UPLOAD_PATH = '/career-vault/upload'
 const MAX_UPLOAD_FILE_SIZE_BYTES = 10 * 1024 * 1024
 const TOP_KEYWORD_LIMIT = 15
+const DOCUMENT_STATUS_POLL_INTERVAL_MS = 2_000
 
 const KEYWORD_CATEGORY_LABELS: Record<CareerKeywordCategory, string> = {
   LANGUAGE: '언어',
@@ -106,6 +109,13 @@ const DOCUMENT_STATUS_LABELS: Readonly<Record<string, string>> = {
   COMPLETED: '처리 완료',
   ACTIVE: '검색 가능',
   FAILED: '처리 실패',
+}
+
+const PROCESSING_ERROR_MESSAGES: Readonly<Record<string, string>> = {
+  OLLAMA_UNAVAILABLE: 'Ollama가 실행되지 않았거나 연결할 수 없어 임베딩을 만들 수 없습니다.',
+  OLLAMA_MODEL_NOT_INSTALLED: '설정된 embedding model이 Ollama에 설치되지 않았습니다.',
+  OLLAMA_RUNTIME_FAILURE: 'Ollama가 GPU 또는 embedding model을 실행하지 못했습니다.',
+  DOCUMENT_PROCESSING_FAILED: '문서를 처리하지 못했습니다. 파일 형식과 내용을 확인해 주세요.',
 }
 
 const PROCESSING_STATUS_OPTIONS: ReadonlyArray<{
@@ -624,6 +634,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
   const [pdfViewerUrl, setPdfViewerUrl] = useState<string | null>(null)
   const [pdfViewerErrorMessage, setPdfViewerErrorMessage] = useState<string | null>(null)
   const [isPdfViewerLoading, setIsPdfViewerLoading] = useState(false)
+  const [processingClock, setProcessingClock] = useState(() => Date.now())
   const detailRequestId = useRef(0)
   const pdfRequestId = useRef(0)
   const pdfAbortController = useRef<AbortController | null>(null)
@@ -670,6 +681,81 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
       isCurrentRequest = false
     }
   }, [appliedTitleQuery, onSessionExpired, reloadKey, selectedDocumentType, selectedProcessingStatus])
+
+  const shouldPollDocumentStatus =
+    documents.some(isDocumentSummaryInFlight) ||
+    (selectedDocument?.versions.some(isDocumentVersionInFlight) ?? false)
+
+  useEffect(() => {
+    if (!shouldPollDocumentStatus) {
+      return
+    }
+
+    let cancelled = false
+    let requestInFlight = false
+    const refreshStatus = async () => {
+      if (requestInFlight) {
+        return
+      }
+      requestInFlight = true
+      try {
+        const documentId = selectedDocument?.documentId ?? null
+        const [nextDocuments, nextDetail] = await Promise.all([
+          getDocuments({
+            documentType: selectedDocumentType,
+            title: appliedTitleQuery,
+            processingStatus: selectedProcessingStatus,
+          }),
+          documentId === null ? Promise.resolve(null) : getDocument(documentId),
+        ])
+        if (cancelled) {
+          return
+        }
+        setDocuments(nextDocuments)
+        if (nextDetail !== null && detailRequestId.current > 0) {
+          setSelectedDocument(nextDetail)
+        }
+      } catch (error) {
+        if (cancelled) {
+          return
+        }
+        if (error instanceof DocumentApiError && (error.status === 401 || error.status === 403)) {
+          onSessionExpired()
+        }
+        // 일시적인 polling 실패는 기존 화면을 유지하고 다음 주기에 다시 시도한다.
+      } finally {
+        requestInFlight = false
+      }
+    }
+    const timer = window.setInterval(() => {
+      void refreshStatus()
+    }, DOCUMENT_STATUS_POLL_INTERVAL_MS)
+
+    return () => {
+      cancelled = true
+      window.clearInterval(timer)
+    }
+  }, [
+    appliedTitleQuery,
+    documents,
+    onSessionExpired,
+    selectedDocument,
+    selectedDocumentType,
+    selectedProcessingStatus,
+    shouldPollDocumentStatus,
+  ])
+
+  const hasRetryCountdown =
+    documents.some((document) => document.latestProcessingStatus === 'RETRY_WAIT') ||
+    (selectedDocument?.versions.some((version) => version.processingStatus === 'RETRY_WAIT') ?? false)
+
+  useEffect(() => {
+    if (!hasRetryCountdown) {
+      return
+    }
+    const timer = window.setInterval(() => setProcessingClock(Date.now()), 1_000)
+    return () => window.clearInterval(timer)
+  }, [hasRetryCountdown])
 
   const handleTitleFilterSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -1080,6 +1166,29 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
                         )}
                       </span>
                     </div>
+                    {document.latestProcessingStatus !== null && (
+                      <p className="document-processing-summary">
+                        {document.latestProcessingStatus === 'RETRY_WAIT'
+                          ? retrySummary(
+                              document.latestRetryCount,
+                              document.maxRetries,
+                              document.latestNextRetryAt,
+                              processingClock,
+                            )
+                          : progressSummary(
+                              document.latestProcessingStatus,
+                              document.latestProcessingStage,
+                              document.latestCompletedChunks,
+                              document.latestTotalChunks,
+                              document.latestProgressPercent,
+                            )}
+                      </p>
+                    )}
+                    {document.latestProcessingErrorCode !== null && (
+                      <p className="processing-safe-message">
+                        {processingErrorMessage(document.latestProcessingErrorCode)}
+                      </p>
+                    )}
                     <p className="document-version-count">버전 {document.versionCount}개</p>
                     <time dateTime={document.createdAt}>{formatCreatedAt(document.createdAt)}</time>
                     <button
@@ -1301,10 +1410,42 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
                       </div>
                       {version.processingErrorCode !== null && (
                         <p className="processing-safe-message">
-                          {version.retryScheduled
-                            ? '처리가 다시 시도됩니다. 실제 진행률은 제공하지 않습니다.'
-                            : '처리에 실패했습니다. 파일과 형식을 확인한 후 새 문서를 등록해 주세요.'}
+                          {processingErrorMessage(version.processingErrorCode)}
                         </p>
+                      )}
+                      {version.processingStatus !== null && (
+                        <div className="processing-progress" role="status">
+                          <p>
+                            {version.progressPercent === null &&
+                              version.processingStatus !== 'RETRY_WAIT' &&
+                              version.processingStatus !== 'FAILED' && (
+                                <span className="state-spinner" aria-hidden="true" />
+                              )}
+                            {version.processingStatus === 'RETRY_WAIT'
+                              ? retrySummary(
+                                  version.retryCount,
+                                  version.maxRetries,
+                                  version.nextRetryAt,
+                                  processingClock,
+                                )
+                              : progressSummary(
+                                  version.processingStatus,
+                                  version.processingStage,
+                                  version.completedChunks,
+                                  version.totalChunks,
+                                  version.progressPercent,
+                                )}
+                          </p>
+                          {version.progressPercent !== null &&
+                            version.processingStatus !== 'FAILED' &&
+                            version.processingStatus !== 'RETRY_WAIT' && (
+                            <progress
+                              max="100"
+                              value={version.progressPercent}
+                              aria-label={`문서 처리 ${version.progressPercent}%`}
+                            />
+                          )}
+                        </div>
                       )}
                     </li>
                   ))}
@@ -2570,6 +2711,46 @@ function documentStatusClassName(status: string | null): string {
     default:
       return 'status-pending'
   }
+}
+
+function isDocumentSummaryInFlight(document: DocumentSummary): boolean {
+  return document.latestVersionStatus === 'QUARANTINED' ||
+    document.latestVersionStatus === 'PROCESSING' ||
+    document.latestProcessingStatus === 'PENDING' ||
+    document.latestProcessingStatus === 'PROCESSING' ||
+    document.latestProcessingStatus === 'RETRY_WAIT'
+}
+
+function isDocumentVersionInFlight(version: DocumentVersion): boolean {
+  return version.status === 'QUARANTINED' ||
+    version.status === 'PROCESSING' ||
+    version.processingStatus === 'PENDING' ||
+    version.processingStatus === 'PROCESSING' ||
+    version.processingStatus === 'RETRY_WAIT'
+}
+
+function retrySummary(
+  retryCount: number,
+  maxRetries: number,
+  nextRetryAt: string | null,
+  now: number,
+): string {
+  const count = `${maxRetries}회 중 ${retryCount}회 재시도`
+  if (nextRetryAt === null) {
+    return count
+  }
+  const remainingSeconds = Math.max(0, Math.floor((Date.parse(nextRetryAt) - now) / 1_000))
+  if (remainingSeconds === 0) {
+    return `곧 재시도 · ${count}`
+  }
+  const minutes = Math.floor(remainingSeconds / 60)
+  const seconds = remainingSeconds % 60
+  const delay = minutes > 0 ? `${minutes}분 ${seconds}초 후 재시도` : `${seconds}초 후 재시도`
+  return `${delay} · ${count}`
+}
+
+function processingErrorMessage(code: string): string {
+  return PROCESSING_ERROR_MESSAGES[code] ?? PROCESSING_ERROR_MESSAGES.DOCUMENT_PROCESSING_FAILED
 }
 
 function formatSearchScore(score: number): string {

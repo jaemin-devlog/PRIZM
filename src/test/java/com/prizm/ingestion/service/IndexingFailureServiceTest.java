@@ -13,6 +13,7 @@ import com.prizm.document.repository.DocumentVersionRepository;
 import com.prizm.document.repository.DocumentRepository;
 import com.prizm.ingestion.entity.ProcessingJob;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
+import com.prizm.ingestion.entity.ProcessingFailureCode;
 import com.prizm.ingestion.exception.StaleProcessingJobClaimException;
 import com.prizm.ingestion.repository.DocumentChunkRepository;
 import com.prizm.ingestion.repository.ProcessingJobClaimRepository;
@@ -59,7 +60,8 @@ class IndexingFailureServiceTest {
         DocumentVersion version = processingVersion();
         stub(job, version);
 
-        ProcessingJobStatus status = service.handleFailure(claimed(job), true, "Ollama unavailable");
+        ProcessingJobStatus status = service.handleFailure(
+                claimed(job), true, ProcessingFailureCode.OLLAMA_UNAVAILABLE, "Ollama unavailable");
 
         assertThat(status).isEqualTo(ProcessingJobStatus.RETRY_WAIT);
         assertThat(job.getRetryCount()).isEqualTo(1);
@@ -79,7 +81,8 @@ class IndexingFailureServiceTest {
         when(claimRepository.currentDatabaseTime()).thenReturn(Instant.parse("2026-07-13T00:00:00Z"));
 
         ProcessingJobStatus status = service.handleFailure(
-                claimed(job), true, "Embedding service returned an invalid response.");
+                claimed(job), true, ProcessingFailureCode.DOCUMENT_PROCESSING_FAILED,
+                "Embedding service returned an invalid response.");
 
         assertThat(status).isEqualTo(ProcessingJobStatus.RETRY_WAIT);
         assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.PROCESSING);
@@ -99,7 +102,8 @@ class IndexingFailureServiceTest {
         when(claimRepository.currentDatabaseTime()).thenReturn(Instant.parse("2026-07-13T00:00:00Z"));
 
         ProcessingJobStatus status = service.handleFailure(
-                claimed(job), true, "Stored document file could not be read.");
+                claimed(job), true, ProcessingFailureCode.DOCUMENT_PROCESSING_FAILED,
+                "Stored document file could not be read.");
 
         assertThat(status).isEqualTo(ProcessingJobStatus.RETRY_WAIT);
         assertThat(job.getRetryCount()).isEqualTo(1);
@@ -115,7 +119,8 @@ class IndexingFailureServiceTest {
         DocumentVersion version = processingVersion();
         stub(job, version);
 
-        ProcessingJobStatus status = service.handleFailure(claimed(job), true, "still unavailable");
+        ProcessingJobStatus status = service.handleFailure(
+                claimed(job), true, ProcessingFailureCode.OLLAMA_UNAVAILABLE, "still unavailable");
 
         assertThat(status).isEqualTo(ProcessingJobStatus.FAILED);
         assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.FAILED);
@@ -127,7 +132,8 @@ class IndexingFailureServiceTest {
         DocumentVersion version = processingVersion();
         stub(job, version);
 
-        ProcessingJobStatus status = service.handleFailure(claimed(job), false, "invalid UTF-8");
+        ProcessingJobStatus status = service.handleFailure(
+                claimed(job), false, ProcessingFailureCode.DOCUMENT_PROCESSING_FAILED, "invalid UTF-8");
 
         assertThat(status).isEqualTo(ProcessingJobStatus.FAILED);
         assertThat(job.getRetryCount()).isZero();
@@ -146,7 +152,8 @@ class IndexingFailureServiceTest {
         when(claimRepository.currentDatabaseTime()).thenReturn(Instant.parse("2026-07-13T00:00:00Z"));
 
         ProcessingJobStatus status = service.handleFailure(
-                claimed(job), false, "PDF document exceeds processing limits.");
+                claimed(job), false, ProcessingFailureCode.DOCUMENT_PROCESSING_FAILED,
+                "PDF document exceeds processing limits.");
 
         assertThat(status).isEqualTo(ProcessingJobStatus.FAILED);
         assertThat(version.getStatus()).isEqualTo(DocumentVersionStatus.FAILED);
@@ -166,7 +173,8 @@ class IndexingFailureServiceTest {
         when(claimRepository.currentDatabaseTime()).thenReturn(Instant.parse("2026-07-13T00:00:00Z"));
 
         ProcessingJobStatus status = service.handleFailure(
-                claimed(job), false, "Stored document file could not be read.");
+                claimed(job), false, ProcessingFailureCode.DOCUMENT_PROCESSING_FAILED,
+                "Stored document file could not be read.");
 
         assertThat(status).isEqualTo(ProcessingJobStatus.FAILED);
         assertThat(job.getRetryCount()).isZero();
@@ -186,7 +194,8 @@ class IndexingFailureServiceTest {
                 job.getClaimVersion() - 1,
                 Instant.parse("2026-07-13T00:10:00Z"));
 
-        assertThatThrownBy(() -> service.handleFailure(staleClaim, true, "late failure"))
+        assertThatThrownBy(() -> service.handleFailure(
+                        staleClaim, true, ProcessingFailureCode.OLLAMA_UNAVAILABLE, "late failure"))
                 .isInstanceOf(StaleProcessingJobClaimException.class);
 
         assertThat(job.getStatus()).isEqualTo(ProcessingJobStatus.PROCESSING);

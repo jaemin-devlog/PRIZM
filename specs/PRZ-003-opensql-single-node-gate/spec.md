@@ -1,8 +1,10 @@
-# PRZ-003: OpenSQL 단일 노드 검증 환경
+# PRZ-003 — OpenSQL 단일 노드 Gate
 
-## 상태
-
-`VERIFIED`
+> **상태:** `VERIFIED`
+> **유형:** Infrastructure Verification
+> **선행 문서:** [PRZ-002](../PRZ-002-open-source-readiness/spec.md)
+> **기준 소스:** `777e184f206d2a2770d055940ddabf139abfed9d`
+> **최종 확인:** 2026-07-30
 
 ## 목적
 
@@ -10,6 +12,26 @@
 PRIZM의 전용 OpenSQL 검증 대상으로 사용한다. 공급사의 서면 승인과 환경 조건은
 비공개 원본으로 보존하고, 공개 저장소에는 고정된 라이선스 귀속 환경·비공개
 네트워크·시간 동기화라는 재현 조건과 검증 결과만 기록한다.
+
+## 기능 구성
+
+- Windows 호스트와 Rocky Linux 9.7 VirtualBox single-node 게스트를 분리한다.
+- NAT는 패키지 접근, Host-only network는 검증 연결에 사용한다.
+- 전용 OpenSQL 대상에서 Flyway, vector와 핵심 Worker SQL을 검증한다.
+
+## 동작 흐름
+
+```text
+VM identity·CPU·시간 동기화 확인
+↓
+OpenSQL single 설치와 license 적용
+↓
+전용 DB·schema 준비
+↓
+Flyway·vector·owner·Worker SQL Gate 실행
+↓
+PostgreSQL 회귀와 분리해 결과 기록
+```
 
 ## 요구사항
 
@@ -47,7 +69,7 @@ PRIZM의 전용 OpenSQL 검증 대상으로 사용한다. 공급사의 서면 �
 
 ## 완료 조건
 
-1. VirtualBox가 설치되어 있고 게스트 구성이 요구사항 1~3과 일치한다.
+1. VirtualBox가 설치되어 있고 게스트 구성이 요구사항 1–3과 일치한다.
 2. hostname, CPU topology, 고정 IP와 시간 동기화는 비공개 운영 근거로 확인한다.
 3. 라이선스 신청서는 Windows 호스트 값이 아니라 확인한 게스트 값을 사용한다.
 4. 공급 자산과 라이선스는 로컬에서만 검증하고 정확한 식별자, fingerprint,

@@ -1,11 +1,14 @@
 # PRZ-011 — 문서 처리 진행 상태 UX
 
-## 상태
+> **상태:** `VERIFIED`
+> **유형:** Feature
+> **선행 문서:** [PRZ-010](../PRZ-010-change-log-sync/spec.md)
+> **기준 소스:** `fbb3481626a3cba6f36f070845ffae502511569e`
+> **최종 확인:** 2026-08-13
 
-`VERIFIED` — IMPLEMENT·VERIFY와 blocking finding 수정 뒤 재-AUDIT Gate를
-통과했다. INTEGRATE는 승인 범위 밖이므로 실행하지 않았다.
-
-기준 source: `main` commit `9b24808b37424f2d11ca0afe374d5703c81868fc`
+IMPLEMENT·VERIFY와 blocking finding 수정 뒤 재-AUDIT Gate를 통과했고, PR #41로
+`main`에 통합됐다. 시작 기준 source는
+`9b24808b37424f2d11ca0afe374d5703c81868fc`이다.
 
 ## 목적
 
@@ -15,6 +18,26 @@
 현재 API는 ProcessingJob 상태와 일반 오류 코드만 반환하고 frontend는 문서 상태를
 한 번만 조회한다. ProcessingJob에는 재시도 횟수와 다음 재시도 시각이 이미 있지만
 API에 노출되지 않으며 단계와 청크 진행 수는 저장하지 않는다.
+
+## 기능 구성과 동작 흐름
+
+- ProcessingJob의 단계, 실제 청크 수, 재시도 시각과 안전한 실패 코드를 DB에
+  저장한다.
+- owner-scoped 문서 API가 진행 정보를 계산해 반환한다.
+- frontend는 비종료 상태만 약 2초 간격으로 polling하고 최종 상태에서 중지한다.
+
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING
+    PENDING --> PROCESSING: claim
+    PROCESSING --> RETRY_WAIT: 재시도 가능 실패
+    RETRY_WAIT --> PROCESSING: 다음 claim
+    PROCESSING --> COMPLETED: 원자적 활성화
+    PROCESSING --> FAILED: 영구 실패
+```
+
+`PROCESSING` 안의 실제 진행 단계는 `FILE_READING → TEXT_EXTRACTION →
+CHUNK_CREATION → EMBEDDING n/N → SAVING → COMPLETED` 순서로 기록한다.
 
 ## 범위
 
@@ -44,12 +67,14 @@ API에 노출되지 않으며 단계와 청크 진행 수는 저장하지 않는
 forward-only Flyway V15로 `processing_jobs`에 다음 nullable 필드만 추가한다. 기존
 migration은 수정하지 않는다.
 
-| 필드 | 계약 |
-|---|---|
-| `progress_stage` | `FILE_READING`, `TEXT_EXTRACTION`, `CHUNK_CREATION`, `EMBEDDING`, `SAVING`, `COMPLETED` 중 현재 실제 단계 |
-| `completed_chunks` | 현재 claim에서 임베딩과 검증을 끝낸 청크 수. 전체 수 확정 전에는 `NULL` |
-| `total_chunks` | 추출·청킹으로 실제 확정된 전체 청크 수. 확정 전에는 `NULL` |
-| `failure_code` | allowlist된 안전한 실패 분류. 원래 예외 메시지가 아님 |
+- **필드:** `progress_stage`
+  - 계약: `FILE_READING`, `TEXT_EXTRACTION`, `CHUNK_CREATION`, `EMBEDDING`, `SAVING`, `COMPLETED` 중 현재 실제 단계
+- **필드:** `completed_chunks`
+  - 계약: 현재 claim에서 임베딩과 검증을 끝낸 청크 수. 전체 수 확정 전에는 `NULL`
+- **필드:** `total_chunks`
+  - 계약: 추출·청킹으로 실제 확정된 전체 청크 수. 확정 전에는 `NULL`
+- **필드:** `failure_code`
+  - 계약: allowlist된 안전한 실패 분류. 원래 예외 메시지가 아님
 
 - claim 시 단계는 `FILE_READING`으로 시작하고 이전 retry의 진행 수와 실패 코드를
   지운다.
@@ -83,12 +108,14 @@ owner-scoped 문서 요약과 버전 응답에 처리 단계, 실제 청크 수,
 
 안전한 실패 코드는 다음 allowlist를 사용한다.
 
-| 코드 | 사용자 의미 |
-|---|---|
-| `OLLAMA_UNAVAILABLE` | Ollama API에 연결할 수 없거나 실행되지 않음 |
-| `OLLAMA_MODEL_NOT_INSTALLED` | 설정된 embedding model이 설치되지 않음 |
-| `OLLAMA_RUNTIME_FAILURE` | Ollama가 응답했으나 GPU/model runner 실행이 실패함 |
-| `DOCUMENT_PROCESSING_FAILED` | 그 밖의 파일 읽기·추출·검증·처리 실패 |
+- **코드:** `OLLAMA_UNAVAILABLE`
+  - 사용자 의미: Ollama API에 연결할 수 없거나 실행되지 않음
+- **코드:** `OLLAMA_MODEL_NOT_INSTALLED`
+  - 사용자 의미: 설정된 embedding model이 설치되지 않음
+- **코드:** `OLLAMA_RUNTIME_FAILURE`
+  - 사용자 의미: Ollama가 응답했으나 GPU/model runner 실행이 실패함
+- **코드:** `DOCUMENT_PROCESSING_FAILED`
+  - 사용자 의미: 그 밖의 파일 읽기·추출·검증·처리 실패
 
 ## 보존 계약
 
@@ -102,16 +129,37 @@ owner-scoped 문서 요약과 버전 응답에 처리 단계, 실제 청크 수,
 
 ## 요구사항 및 완료 조건
 
-| ID | 완료 조건 |
-|---|---|
-| `PRZ-011-R1` | 비종료 문서 목록·상세가 약 2초 간격으로 갱신되고 새로고침 없이 상태 변화가 반영되며 최종 상태에서 추가 polling이 중지된다. |
-| `PRZ-011-R2` | RETRY_WAIT가 실제 `retry_count`, 기존 최대 3회, 실제 `next_retry_at` 기반 횟수와 countdown을 표시한다. |
-| `PRZ-011-R3` | Ollama 연결, model 미설치, GPU/model 실행, 일반 처리 실패가 allowlist 코드로 구분되고 내부 오류는 API에 노출되지 않는다. |
-| `PRZ-011-R4` | FILE_READING → TEXT_EXTRACTION → CHUNK_CREATION → EMBEDDING n/N → SAVING → COMPLETED의 실제 단계가 owner·claim fenced DB 갱신으로 관찰된다. |
-| `PRZ-011-R5` | 전체 청크 수 확정 전에는 퍼센트가 `null`이고 spinner/단계만 보이며, 확정 뒤에는 실제 completed/total 비율만 표시하고 완료는 100%다. |
-| `PRZ-011-R6` | 정상 TXT 또는 PDF가 단계와 실제 진행 수를 거쳐 ACTIVE/COMPLETED가 된다. |
-| `PRZ-011-R7` | 기존 retry 정책, 문서 활성화 원자성, stale-worker 보호, 소유권과 기존 문서 처리 계약이 회귀하지 않는다. |
-| `PRZ-011-R8` | 기존 검색 및 P18 profile을 변경하지 않고 문서 처리 뒤 기존 검색 회귀 검증이 통과한다. |
+### `PRZ-011-R1` — 요구사항
+
+비종료 문서 목록·상세가 약 2초 간격으로 갱신되고 새로고침 없이 상태 변화가 반영되며 최종 상태에서 추가 polling이 중지된다.
+
+### `PRZ-011-R2` — 요구사항
+
+RETRY_WAIT가 실제 `retry_count`, 기존 최대 3회, 실제 `next_retry_at` 기반 횟수와 countdown을 표시한다.
+
+### `PRZ-011-R3` — 요구사항
+
+Ollama 연결, model 미설치, GPU/model 실행, 일반 처리 실패가 allowlist 코드로 구분되고 내부 오류는 API에 노출되지 않는다.
+
+### `PRZ-011-R4` — 요구사항
+
+FILE_READING → TEXT_EXTRACTION → CHUNK_CREATION → EMBEDDING n/N → SAVING → COMPLETED의 실제 단계가 owner·claim fenced DB 갱신으로 관찰된다.
+
+### `PRZ-011-R5` — 요구사항
+
+전체 청크 수 확정 전에는 퍼센트가 `null`이고 spinner/단계만 보이며, 확정 뒤에는 실제 completed/total 비율만 표시하고 완료는 100%다.
+
+### `PRZ-011-R6` — 요구사항
+
+정상 TXT 또는 PDF가 단계와 실제 진행 수를 거쳐 ACTIVE/COMPLETED가 된다.
+
+### `PRZ-011-R7` — 요구사항
+
+기존 retry 정책, 문서 활성화 원자성, stale-worker 보호, 소유권과 기존 문서 처리 계약이 회귀하지 않는다.
+
+### `PRZ-011-R8` — 요구사항
+
+기존 검색 및 P18 profile을 변경하지 않고 문서 처리 뒤 기존 검색 회귀 검증이 통과한다.
 
 ## SPEC Gate
 

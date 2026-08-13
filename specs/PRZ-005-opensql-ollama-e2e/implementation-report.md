@@ -4,37 +4,61 @@
 
 ## 30초 요약
 
-| 확인할 내용 | 현재 결과 |
-|---|---|
-| PRZ-005 최종 상태 | `VERIFIED` |
-| 실제 OpenSQL API E2E | `VERIFIED` |
-| 브라우저 UI E2E | `VERIFIED` |
-| 두 사용자 격리 | `VERIFIED` |
-| 자동 OpenSQL 통합 테스트 | `VERIFIED` |
-| 전체 회귀·OSS·SBOM 감사 | `VERIFIED` |
-| OpenProxy SQL 인증·routing | `AUTH_BLOCKED`·`NOT_VERIFIED`, 적용 `DEFERRED` |
-| 다음 후보 작업 | DB 장애복구 검증 |
+- **확인할 내용:** PRZ-005 최종 상태
+  - 현재 결과: `VERIFIED`
+- **확인할 내용:** 실제 OpenSQL API E2E
+  - 현재 결과: `VERIFIED`
+- **확인할 내용:** 브라우저 UI E2E
+  - 현재 결과: `VERIFIED`
+- **확인할 내용:** 두 사용자 격리
+  - 현재 결과: `VERIFIED`
+- **확인할 내용:** 자동 OpenSQL 통합 테스트
+  - 현재 결과: `VERIFIED`
+- **확인할 내용:** 전체 회귀·OSS·SBOM 감사
+  - 현재 결과: `VERIFIED`
+- **확인할 내용:** OpenProxy SQL 인증·routing
+  - 현재 결과: `AUTH_BLOCKED`·`NOT_VERIFIED`, 적용 `DEFERRED`
+- **확인할 내용:** 다음 후보 작업
+  - 현재 결과: DB 장애복구 검증
 
 ## 최종 검증 결과
 
-| 영역 | 결과 | 핵심 증거 |
-|---|---|---|
-| 애플리케이션 | `VERIFIED` | Spring Boot → OpenSQL `5432` 연결, Ollama `bge-m3`, 로그인, TXT/PDF 업로드, 임베딩, `ACTIVE` 전환, 벡터 검색과 원문 위치를 API와 브라우저에서 확인했다. |
-| 데이터베이스 | `VERIFIED` | Flyway `V1`–`V13` 13개, 현재 V13, pending·실패 0개이며 6개 테이블과 6개 시퀀스의 소유자는 `prizm_owner`다. vector는 `0.8.1`, 소유자는 `postgres`다. |
-| 보안·격리 | `VERIFIED` | `prizm_owner`와 `prizm_app`을 분리했고, 두 USER의 목록·상세·검색 격리와 DB owner 불일치 0건을 확인했다. |
-| 자동 테스트 | `VERIFIED` | 격리된 `prizm_integration_test`에서 OpenSQL opt-in integration test 1개가 성공했고 실패·오류·skip은 0건이었다. |
-| 회귀·OSS | `VERIFIED` | 백엔드 단위 262개·통합 69개, 프론트엔드 lint·typecheck·build, OSS readiness·SBOM·문서·민감정보 감사를 통과했다. 프론트엔드 unit test는 공식 명령이 없어 `NOT_RUN`이다. |
+- **영역:** 애플리케이션
+  - 결과: `VERIFIED`
+  - 핵심 증거: Spring Boot → OpenSQL `5432` 연결, Ollama `bge-m3`, 로그인, TXT/PDF 업로드, 임베딩, `ACTIVE` 전환, 벡터 검색과 원문 위치를 API와 브라우저에서 확인했다.
+- **영역:** 데이터베이스
+  - 결과: `VERIFIED`
+  - 핵심 증거: Flyway `V1`–`V13` 13개, 현재 V13, pending·실패 0개이며 6개 테이블과 6개 시퀀스의 소유자는 `prizm_owner`다. vector는 `0.8.1`, 소유자는 `postgres`다.
+- **영역:** 보안·격리
+  - 결과: `VERIFIED`
+  - 핵심 증거: `prizm_owner`와 `prizm_app`을 분리했고, 두 USER의 목록·상세·검색 격리와 DB owner 불일치 0건을 확인했다.
+- **영역:** 자동 테스트
+  - 결과: `VERIFIED`
+  - 핵심 증거: 격리된 `prizm_integration_test`에서 OpenSQL opt-in integration test 1개가 성공했고 실패·오류·skip은 0건이었다.
+- **영역:** 회귀·OSS
+  - 결과: `VERIFIED`
+  - 핵심 증거: 백엔드 단위 262개·통합 69개, 프론트엔드 lint·typecheck·build, OSS readiness·SBOM·문서·민감정보 감사를 통과했다. 프론트엔드 unit test는 공식 명령이 없어 `NOT_RUN`이다.
 
 ## 현재 보류 범위
 
-| 항목 | 상태 | 현재 판단 |
-|---|---|---|
-| OpenProxy TCP 연결 | `VERIFIED` | Windows Host-only 주소에서 VM의 `6432`까지 연결됐다. |
-| OpenProxy SQL routing | `NOT_VERIFIED` | TCP 연결과 달리 실제 SQL 반환은 확인하지 못했다. |
-| OpenProxy 인증 | `AUTH_BLOCKED` | OpenProxy 1.1.3에서 안전한 외부 비밀정보 주입 방식을 확인하지 못했다. |
-| OpenProxy 적용 | `DEFERRED` | 공급사의 안전한 공식 인증 구성 답변 뒤 별도 Gate로 재개한다. |
-| OpenHA·DB failover | `DEFERRED` | PRZ-005는 single-node 범위이며 별도 DB 장애복구 작업으로 남긴다. |
-| 영구 journal | `DEFERRED` | 적용 필요성과 로그 보존 정책을 별도로 결정한다. |
+- **항목:** OpenProxy TCP 연결
+  - 상태: `VERIFIED`
+  - 현재 판단: Windows Host-only 주소에서 VM의 `6432`까지 연결됐다.
+- **항목:** OpenProxy SQL routing
+  - 상태: `NOT_VERIFIED`
+  - 현재 판단: TCP 연결과 달리 실제 SQL 반환은 확인하지 못했다.
+- **항목:** OpenProxy 인증
+  - 상태: `AUTH_BLOCKED`
+  - 현재 판단: OpenProxy 1.1.3에서 안전한 외부 비밀정보 주입 방식을 확인하지 못했다.
+- **항목:** OpenProxy 적용
+  - 상태: `DEFERRED`
+  - 현재 판단: 공급사의 안전한 공식 인증 구성 답변 뒤 별도 Gate로 재개한다.
+- **항목:** OpenHA·DB failover
+  - 상태: `DEFERRED`
+  - 현재 판단: PRZ-005는 single-node 범위이며 별도 DB 장애복구 작업으로 남긴다.
+- **항목:** 영구 journal
+  - 상태: `DEFERRED`
+  - 현재 판단: 적용 필요성과 로그 보존 정책을 별도로 결정한다.
 
 ## 전체 연결 흐름
 
@@ -57,14 +81,18 @@ OpenSQL single-node SQL Gate 결과는 [PRZ-003 Evidence](../PRZ-003-opensql-sin
 <details>
 <summary>상태 코드 설명 보기</summary>
 
-| 코드 | 의미 |
-|---|---|
-| `VERIFIED` | 실제 실행 결과로 정상 동작을 확인했다. |
-| `PARTIALLY_VERIFIED` | 필요한 구간 중 일부만 확인했다. |
-| `NOT_VERIFIED` | 대상은 준비됐지만 실제 동작을 확인하지 못했다. |
-| `NOT_RUN` | 계획만 있고 실행하지 않았다. |
-| `AUTH_BLOCKED` | 네트워크 연결 뒤 인증 단계에서 보안 요구를 만족하지 못해 중단했다. |
-| `DEFERRED` | 현재 범위에서 제외하고 이후 작업으로 미뤘다. |
+- **코드:** `VERIFIED`
+  - 의미: 실제 실행 결과로 정상 동작을 확인했다.
+- **코드:** `PARTIALLY_VERIFIED`
+  - 의미: 필요한 구간 중 일부만 확인했다.
+- **코드:** `NOT_VERIFIED`
+  - 의미: 대상은 준비됐지만 실제 동작을 확인하지 못했다.
+- **코드:** `NOT_RUN`
+  - 의미: 계획만 있고 실행하지 않았다.
+- **코드:** `AUTH_BLOCKED`
+  - 의미: 네트워크 연결 뒤 인증 단계에서 보안 요구를 만족하지 못해 중단했다.
+- **코드:** `DEFERRED`
+  - 의미: 현재 범위에서 제외하고 이후 작업으로 미뤘다.
 
 </details>
 
@@ -136,19 +164,39 @@ Ollama는 로컬에서 AI 모델을 실행하는 도구다. `bge-m3`는 PRIZM �
 <details>
 <summary>시작 당시 환경과 준비 상태 보기</summary>
 
-| 항목 | 시작 상태 | 의미 |
-|---|---|---|
-| Rocky Linux VM | Rocky Linux 9.7 설치와 고정 Host-only 주소 구성 | 공급사가 제공한 실제 OpenSQL single-node 검증 환경은 준비돼 있었다. |
-| OpenSQL 설치 상태 | single-node 설치 파일과 데이터가 존재 | 제품은 설치됐지만 재부팅 뒤 공식 기동 경로를 다시 확인해야 했다. |
-| OpenSQL `5432` | Windows TCP 연결을 일부 확인 | 포트 연결만으로 애플리케이션 호환성을 증명할 수 없었다. |
-| OpenProxy `6432` | VM에서 구성 요소가 관찰됐으나 기능은 `NOT_VERIFIED` | TCP, 인증과 SQL routing을 분리해 확인해야 했다. |
-| etcd | 설치 구성 요소가 존재 | Patroni보다 먼저 상태와 기동 순서를 확인해야 했다. |
-| Patroni | 프로세스와 설정은 존재했으나 전용 systemd unit이 없었음 | 재부팅 뒤 일관된 서비스 관리 절차가 없었다. |
-| VM 시간 | 시스템 시간이 약 19시간 느리고 동기화되지 않음 | 로그 순서와 검증 시각을 신뢰할 수 없었다. |
-| `prizm` DB | 없음 | PRIZM 전용 저장 공간을 새로 만들어야 했다. |
-| `prizm_owner` | 없음 | Flyway 전용 소유 역할을 새로 만들어야 했다. |
-| `prizm_app` | 없음 | 애플리케이션 최소 권한 역할을 새로 만들어야 했다. |
-| 제품 코드와 migration | 기준 commit의 코드와 `V1`–`V13` 유지 | VM 작업을 위해 제품 구현을 바꿀 이유가 없었다. |
+- **항목:** Rocky Linux VM
+  - 시작 상태: Rocky Linux 9.7 설치와 고정 Host-only 주소 구성
+  - 의미: 공급사가 제공한 실제 OpenSQL single-node 검증 환경은 준비돼 있었다.
+- **항목:** OpenSQL 설치 상태
+  - 시작 상태: single-node 설치 파일과 데이터가 존재
+  - 의미: 제품은 설치됐지만 재부팅 뒤 공식 기동 경로를 다시 확인해야 했다.
+- **항목:** OpenSQL `5432`
+  - 시작 상태: Windows TCP 연결을 일부 확인
+  - 의미: 포트 연결만으로 애플리케이션 호환성을 증명할 수 없었다.
+- **항목:** OpenProxy `6432`
+  - 시작 상태: VM에서 구성 요소가 관찰됐으나 기능은 `NOT_VERIFIED`
+  - 의미: TCP, 인증과 SQL routing을 분리해 확인해야 했다.
+- **항목:** etcd
+  - 시작 상태: 설치 구성 요소가 존재
+  - 의미: Patroni보다 먼저 상태와 기동 순서를 확인해야 했다.
+- **항목:** Patroni
+  - 시작 상태: 프로세스와 설정은 존재했으나 전용 systemd unit이 없었음
+  - 의미: 재부팅 뒤 일관된 서비스 관리 절차가 없었다.
+- **항목:** VM 시간
+  - 시작 상태: 시스템 시간이 약 19시간 느리고 동기화되지 않음
+  - 의미: 로그 순서와 검증 시각을 신뢰할 수 없었다.
+- **항목:** `prizm` DB
+  - 시작 상태: 없음
+  - 의미: PRIZM 전용 저장 공간을 새로 만들어야 했다.
+- **항목:** `prizm_owner`
+  - 시작 상태: 없음
+  - 의미: Flyway 전용 소유 역할을 새로 만들어야 했다.
+- **항목:** `prizm_app`
+  - 시작 상태: 없음
+  - 의미: 애플리케이션 최소 권한 역할을 새로 만들어야 했다.
+- **항목:** 제품 코드와 migration
+  - 시작 상태: 기준 commit의 코드와 `V1`–`V13` 유지
+  - 의미: VM 작업을 위해 제품 구현을 바꿀 이유가 없었다.
 
 </details>
 
@@ -436,15 +484,48 @@ VM 응답 중단 뒤 파일시스템·로그·서비스 구조를 순서대로 �
 
 ## 주요 문제와 해결 과정
 
-| 문제 | 증상 | 확인한 원인 또는 판단 | 대응 | 결과 | 남은 한계 |
-|---|---|---|---|---|---|
-| 시간 동기화와 TSC finding | VM 시간이 약 19시간 느렸고 재부팅 뒤 Chrony가 약 18.4초를 추가 보정했다. | 초기 동기화가 완료되지 않았으며 TSC finding의 영향은 확정되지 않았다. | Chrony 동기화 완료 전 후속 검증을 중단했다. | `System clock synchronized: yes`, 시간 동기화 `VERIFIED` | TSC 영향과 재부팅 뒤 재발 여부는 계속 관찰해야 한다. |
-| journald 오류와 영구 journal 부재 | watchdog·core dump·corrupted journal 메시지가 있었고 이전 부팅 로그 보존이 제한됐다. | 직접 원인은 확정되지 않았고 persistent journal이 구성되지 않았다. | 재부팅 뒤 상태를 점검하고 핵심 DB 연결과 분리했다. | 현재 부팅과 서비스 검증은 가능했다. | 영구 journal과 재발 관찰은 `DEFERRED` |
-| VM 응답 중단·NMI·파일시스템 우려 | `NMI handler took too long` 뒤 SSH `22`와 OpenSQL `5432`가 응답하지 않았다. | `/home/opensql` 확인 중 발생했지만 직접 인과관계와 커널 원인은 확인되지 않았다. | ACPI 정상 종료를 먼저 요청하고 필요 시 강제 종료·재부팅한 뒤 파일 접근과 서비스를 점검했다. | VM과 두 포트가 복구됐고 명백한 손상은 발견되지 않았다. | 커널 원인 `NOT_VERIFIED`, 파일시스템 `PARTIALLY_VERIFIED`, 오프라인 전체 검사 `NOT_RUN` |
-| Patroni·OpenProxy unit 부재 | 재부팅 뒤 표준 서비스 관리 지점이 없었다. | 공급 설치 결과에 두 systemd unit이 없었다. | 최소 unit을 작성·정적 검증·등록했다. | unit 등록 `VERIFIED` | 자동 시작은 의도적으로 `disabled` |
-| Windows `6432` 차단 | OpenProxy가 LISTEN 중이지만 Windows TCP 연결이 실패했다. | Host-only 방화벽에 `6432` 허용 규칙이 없었다. | Windows Host-only 주소 한 개에만 runtime·permanent 규칙을 추가했다. | TCP 연결 `VERIFIED` | SQL routing과 인증 증거는 아니다. |
-| 관리자 인증과 C1 rollback | postgres 네트워크 인증이 실패했고 역할 생성 뒤 권한·결과 검증도 세 번 실패했다. | 관리자 비밀번호를 확인할 수 없었고 일부 검증 가정이 OpenSQL 동작과 달랐다. | 비밀번호를 추측·초기화하지 않고 Unix 소켓 관리자 경로를 사용했으며, 각 실패 실행의 새 객체만 rollback했다. | DB·역할·vector 구성이 최종 성공했다. | 기존 데이터와 서비스 설정에는 영향이 없었다. |
-| OpenProxy 인증·SQL routing | TCP는 성공했지만 `prizm_app` SQL이 백엔드로 전달되지 않았다. | OpenProxy 1.1.3에서 안전한 외부 secret 주입을 확인하지 못했고 현재 구성은 평문 백엔드 비밀번호를 요구했다. | 평문 저장을 거부하고 백업본으로 설정을 복원해 공급사 문의로 전환했다. | 인증 `AUTH_BLOCKED`, routing `NOT_VERIFIED`; 복원 SHA-256 일치 | 안전한 공식 방식 확인 전 적용 `DEFERRED` |
+- **문제:** 시간 동기화와 TSC finding
+  - 증상: VM 시간이 약 19시간 느렸고 재부팅 뒤 Chrony가 약 18.4초를 추가 보정했다.
+  - 확인한 원인 또는 판단: 초기 동기화가 완료되지 않았으며 TSC finding의 영향은 확정되지 않았다.
+  - 대응: Chrony 동기화 완료 전 후속 검증을 중단했다.
+  - 결과: `System clock synchronized: yes`, 시간 동기화 `VERIFIED`
+  - 남은 한계: TSC 영향과 재부팅 뒤 재발 여부는 계속 관찰해야 한다.
+- **문제:** journald 오류와 영구 journal 부재
+  - 증상: watchdog·core dump·corrupted journal 메시지가 있었고 이전 부팅 로그 보존이 제한됐다.
+  - 확인한 원인 또는 판단: 직접 원인은 확정되지 않았고 persistent journal이 구성되지 않았다.
+  - 대응: 재부팅 뒤 상태를 점검하고 핵심 DB 연결과 분리했다.
+  - 결과: 현재 부팅과 서비스 검증은 가능했다.
+  - 남은 한계: 영구 journal과 재발 관찰은 `DEFERRED`
+- **문제:** VM 응답 중단·NMI·파일시스템 우려
+  - 증상: `NMI handler took too long` 뒤 SSH `22`와 OpenSQL `5432`가 응답하지 않았다.
+  - 확인한 원인 또는 판단: `/home/opensql` 확인 중 발생했지만 직접 인과관계와 커널 원인은 확인되지 않았다.
+  - 대응: ACPI 정상 종료를 먼저 요청하고 필요 시 강제 종료·재부팅한 뒤 파일 접근과 서비스를 점검했다.
+  - 결과: VM과 두 포트가 복구됐고 명백한 손상은 발견되지 않았다.
+  - 남은 한계: 커널 원인 `NOT_VERIFIED`, 파일시스템 `PARTIALLY_VERIFIED`, 오프라인 전체 검사 `NOT_RUN`
+- **문제:** Patroni·OpenProxy unit 부재
+  - 증상: 재부팅 뒤 표준 서비스 관리 지점이 없었다.
+  - 확인한 원인 또는 판단: 공급 설치 결과에 두 systemd unit이 없었다.
+  - 대응: 최소 unit을 작성·정적 검증·등록했다.
+  - 결과: unit 등록 `VERIFIED`
+  - 남은 한계: 자동 시작은 의도적으로 `disabled`
+- **문제:** Windows `6432` 차단
+  - 증상: OpenProxy가 LISTEN 중이지만 Windows TCP 연결이 실패했다.
+  - 확인한 원인 또는 판단: Host-only 방화벽에 `6432` 허용 규칙이 없었다.
+  - 대응: Windows Host-only 주소 한 개에만 runtime·permanent 규칙을 추가했다.
+  - 결과: TCP 연결 `VERIFIED`
+  - 남은 한계: SQL routing과 인증 증거는 아니다.
+- **문제:** 관리자 인증과 C1 rollback
+  - 증상: postgres 네트워크 인증이 실패했고 역할 생성 뒤 권한·결과 검증도 세 번 실패했다.
+  - 확인한 원인 또는 판단: 관리자 비밀번호를 확인할 수 없었고 일부 검증 가정이 OpenSQL 동작과 달랐다.
+  - 대응: 비밀번호를 추측·초기화하지 않고 Unix 소켓 관리자 경로를 사용했으며, 각 실패 실행의 새 객체만 rollback했다.
+  - 결과: DB·역할·vector 구성이 최종 성공했다.
+  - 남은 한계: 기존 데이터와 서비스 설정에는 영향이 없었다.
+- **문제:** OpenProxy 인증·SQL routing
+  - 증상: TCP는 성공했지만 `prizm_app` SQL이 백엔드로 전달되지 않았다.
+  - 확인한 원인 또는 판단: OpenProxy 1.1.3에서 안전한 외부 secret 주입을 확인하지 못했고 현재 구성은 평문 백엔드 비밀번호를 요구했다.
+  - 대응: 평문 저장을 거부하고 백업본으로 설정을 복원해 공급사 문의로 전환했다.
+  - 결과: 인증 `AUTH_BLOCKED`, routing `NOT_VERIFIED`; 복원 SHA-256 일치
+  - 남은 한계: 안전한 공식 방식 확인 전 적용 `DEFERRED`
 
 ## 주요 기술 결정
 
@@ -480,22 +561,34 @@ VM 응답 중단 뒤 파일시스템·로그·서비스 구조를 순서대로 �
 
 ## 시스템에 실제로 남은 변경
 
-| 변경 | 현재 상태 |
-|---|---|
-| `patroni.service` | `/etc/systemd/system`에 등록, root 소유 `0644` |
-| `openproxy.service` | `/etc/systemd/system`에 등록, root 소유 `0644` |
-| `patroni-runtime.env` | Patroni 실행에 필요한 제한된 환경 파일 생성, `opensql:opensql 0600` |
-| `patroni.yml` | 내용은 유지하고 접근 권한을 `opensql:opensql 0600`으로 제한 |
-| `openproxy.toml` | 내용은 변경 전 상태로 복원하고 `opensql:opensql 0600` 유지 |
-| `6432/tcp` 방화벽 | Windows Host-only 주소 한 개에만 runtime·permanent 허용 |
-| etcd 실행 상태 | 마지막 검증 시점에 `active`, 재부팅 자동 시작 활성화 |
-| `prizm` 데이터베이스 | owner `prizm_owner`로 생성 |
-| `prizm_owner` | Flyway·객체 소유용 제한된 login 역할로 생성 |
-| `prizm_app` | 애플리케이션용 제한된 login 역할로 생성 |
-| vector 확장 | `prizm` DB에 `0.8.1` 생성, 확장 소유자는 `postgres` |
-| Flyway 객체 | `V1`–`V13`, 6개 도메인 테이블, 6개 BIGSERIAL 시퀀스와 이력 테이블 생성; 소유자 `prizm_owner` |
-| `prizm_app` 권한 | DB CONNECT, schema USAGE와 승인된 객체별 DML·시퀀스 USAGE 부여 |
-| Patroni·OpenProxy 실행 상태 | 마지막 검증 시점에 `active`, 재부팅 자동 시작은 `disabled` |
+- **변경:** `patroni.service`
+  - 현재 상태: `/etc/systemd/system`에 등록, root 소유 `0644`
+- **변경:** `openproxy.service`
+  - 현재 상태: `/etc/systemd/system`에 등록, root 소유 `0644`
+- **변경:** `patroni-runtime.env`
+  - 현재 상태: Patroni 실행에 필요한 제한된 환경 파일 생성, `opensql:opensql 0600`
+- **변경:** `patroni.yml`
+  - 현재 상태: 내용은 유지하고 접근 권한을 `opensql:opensql 0600`으로 제한
+- **변경:** `openproxy.toml`
+  - 현재 상태: 내용은 변경 전 상태로 복원하고 `opensql:opensql 0600` 유지
+- **변경:** `6432/tcp` 방화벽
+  - 현재 상태: Windows Host-only 주소 한 개에만 runtime·permanent 허용
+- **변경:** etcd 실행 상태
+  - 현재 상태: 마지막 검증 시점에 `active`, 재부팅 자동 시작 활성화
+- **변경:** `prizm` 데이터베이스
+  - 현재 상태: owner `prizm_owner`로 생성
+- **변경:** `prizm_owner`
+  - 현재 상태: Flyway·객체 소유용 제한된 login 역할로 생성
+- **변경:** `prizm_app`
+  - 현재 상태: 애플리케이션용 제한된 login 역할로 생성
+- **변경:** vector 확장
+  - 현재 상태: `prizm` DB에 `0.8.1` 생성, 확장 소유자는 `postgres`
+- **변경:** Flyway 객체
+  - 현재 상태: `V1`–`V13`, 6개 도메인 테이블, 6개 BIGSERIAL 시퀀스와 이력 테이블 생성; 소유자 `prizm_owner`
+- **변경:** `prizm_app` 권한
+  - 현재 상태: DB CONNECT, schema USAGE와 승인된 객체별 DML·시퀀스 USAGE 부여
+- **변경:** Patroni·OpenProxy 실행 상태
+  - 현재 상태: 마지막 검증 시점에 `active`, 재부팅 자동 시작은 `disabled`
 
 C2에서 확인한 일치 SHA-256은 설정 내용 자체를 공개하지 않고 복원 무결성을 확인하는
 근거다.

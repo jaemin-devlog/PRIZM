@@ -1,16 +1,35 @@
-# PRZ-007 자체 호스팅 회원가입
+# PRZ-007 — 자체 호스팅 회원가입
 
-## 상태
+> **상태:** `VERIFIED`
+> **유형:** Feature
+> **선행 문서:** [PRZ-006](../PRZ-006-local-single-user-demo/spec.md)
+> **기준 소스:** `2b8b60069c37eea91e485bffe2c54e62cd2117ab`
+> **최종 확인:** 2026-08-05
 
-`VERIFIED`
-
-기준 source: `37bd73756d677963ba26685a27041ef190beb3f7 + uncommitted worktree`
+시작 기준 source는 `37bd73756d677963ba26685a27041ef190beb3f7`이다.
 
 ## 목적과 흐름
 
 로컬 데모 바로 시작을 제거하고 Career Vault의 기본 진입을
 `회원가입 → 로그인 → 기존 기능`으로 바꾼다. 공개 SaaS용 계정 체계가 아니라 자체
 호스팅 사용자가 일반 `USER` 계정을 직접 만드는 최소 기능이다.
+
+## 기능 구성과 동작 흐름
+
+```text
+회원가입 화면 입력
+↓
+POST /api/auth/signup 검증
+↓
+정규화 email과 BCrypt password로 USER 저장
+↓
+201 뒤 로그인 화면 전환
+↓
+기존 로그인·JWT·Career Vault 흐름 사용
+```
+
+회원가입 성공은 JWT나 session을 만들지 않는다. 입력 오류는 `400`, 정규화된 이메일
+중복은 기존 오류 형식의 `409`로 종료한다.
 
 ## API 계약
 

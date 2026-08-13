@@ -1,21 +1,27 @@
-# PRZ-007 자체 호스팅 회원가입 — Tasks
+# PRZ-007 — 자체 호스팅 회원가입 Tasks
 
-최종 상태: `VERIFIED` — source `2b8b600`, merge `f1fb341`, 2026-08-05
+> **현재 상태:** `VERIFIED`
 
-## 구현
+## P1. 회원가입 API와 보안
 
-- [x] `POST /api/auth/signup`과 `201` 빈 응답, 중복 `409`를 구현한다.
-- [x] BCrypt, 정규화된 이메일과 서버 고정 활성 `USER`를 저장한다.
-- [x] 로컬 데모 코드·설정·UI를 제거하고 bootstrap demo user는 유지한다.
-- [x] 회원가입 성공 후 로그인으로 전환하고 양방향 이동을 제공한다.
-- [x] migration·dependency·JWT·소유권 경로를 변경하지 않는다.
+- [x] `POST /api/auth/signup`, `201`, validation `400`과 duplicate `409`를 구현했다.
+- [x] BCrypt, normalized email과 서버 고정 활성 `USER`를 저장했다.
 
-## 검증·감사
+## P2. 로컬 데모 제거
 
-- [x] backend 전체 단위 테스트를 실행한다.
-- [x] PostgreSQL 전체 통합 테스트를 실행한다. — 70개 중 67 pass, 3 skip, 실패·오류 0
-- [x] frontend lint/build와 source compile을 실행한다.
-- [x] Docker Compose runtime과 `http://localhost:5173` 브라우저 흐름을 실행한다.
-- [x] 제거 문자열, 파일 상한, 보호 경로와 최종 diff를 감사한다.
-- [x] bootstrap 도구 회귀와 OSS·Markdown·SBOM 검증을 실행한다.
-- [x] commit·push·PR·merge를 수행한다. — source `2b8b600`, PR #33, check 6건 `PASS`, merge `f1fb341`
+- [x] local-demo 코드·설정·UI를 제거했다.
+- [x] 자동화용 bootstrap demo user는 유지했다.
+- [x] 기존 login·JWT 보호 API와 owner isolation을 검증했다.
+
+## P3. 회원가입 화면
+
+- [x] 회원가입과 로그인 사이의 양방향 전환을 구현했다.
+- [x] 성공 뒤 자동 로그인하지 않고 로그인 화면으로 이동하게 했다.
+- [x] frontend lint·build를 통과했다.
+
+## P4. 검증과 통합
+
+- [x] backend unit과 PostgreSQL integration을 실행했다.
+- [x] Docker runtime과 `http://localhost:5173` browser 흐름을 확인했다.
+- [x] 제거 문자열, 보호 경로, bootstrap, OSS·Markdown·SBOM과 diff를 감사했다.
+- [x] source `2b8b600`, PR #33, check 6건과 merge `f1fb341`을 Evidence에 기록했다.

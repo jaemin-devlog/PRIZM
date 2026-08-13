@@ -1,8 +1,10 @@
 # PRZ-004 — 안전한 clean-clone demo
 
-## 상태
-
-`VERIFIED`
+> **상태:** `VERIFIED`
+> **유형:** Delivery/Documentation
+> **선행 문서:** [PRZ-002](../PRZ-002-open-source-readiness/spec.md)
+> **기준 소스:** `aff3e87a9a912e44fcf217291a45328cf451cfc9`
+> **최종 확인:** 2026-08-01
 
 구현과 필수 `VERIFY`, 독립 최종 `AUDIT`, GitHub PR #25 CI와 `main` 통합을
 완료했다. 환경별 실행 기준과 남은 `NOT_RUN` 항목은 [Evidence](evidence.md)에
@@ -17,6 +19,25 @@
 처음 PRIZM을 clone한 사용자가 기존 계정이나 Docker volume에 기대지 않고,
 PostgreSQL·pgvector와 호스트 Ollama를 이용해 로그인부터 원문 근거 검색까지
 안전하게 재현한다.
+
+## 기능 구성과 동작 흐름
+
+```text
+clean clone과 사전 도구 확인
+↓
+로컬 .env와 격리된 Compose project 준비
+↓
+기본 비활성 demo USER bootstrap
+↓
+합성 TXT·PDF 업로드와 ACTIVE 전환
+↓
+API·브라우저 원문 근거 검색
+↓
+두 독립 clone의 project·volume·데이터 격리 확인
+```
+
+demo bootstrap은 명시적으로 활성화한 경우에만 계정을 만들며, 기존 이메일 또는
+`SYSTEM_ADMIN` bootstrap과 충돌하면 쓰기 전에 실패한다.
 
 ## 범위
 

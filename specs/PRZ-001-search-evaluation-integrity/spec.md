@@ -1,14 +1,37 @@
 # PRZ-001 — 검색 평가 기준선 정합성
 
-## 상태
-
-`VERIFIED`
+> **상태:** `VERIFIED`
+> **유형:** Documentation/Test Integrity
+> **선행 문서:** [PRZ-000](../PRZ-000-platform-baseline/spec.md)
+> **기준 소스:** `36c8610`
+> **최종 확인:** 2026-07-24
 
 ## 평가 범위
 
 이번 교정은 평가 데이터가 실제로 독립적인지와 지표가 문서의 정의와 같은지를
 검증 가능하게 만든다. 실제 OpenSQL, 검색 알고리즘, Reranker, Hybrid Search, 운영
 API와 프런트엔드는 범위에 포함하지 않는다.
+
+## 기능 구성
+
+- Dataset loader는 TUNING·TEST split과 양성 근거 중복을 검증한다.
+- Metric 계산은 직접 근거 질문만 `Direct MRR` 분모에 포함한다.
+- 결과 writer는 같은 시각의 실행도 run token으로 분리한다.
+- 평가 profile은 명시적 전용 endpoint가 없으면 로컬 Ollama만 사용한다.
+
+## 동작 흐름
+
+```text
+평가 dataset 로드
+↓
+split·양성 근거 독립성 검증
+↓
+현재 dense 검색 실행
+↓
+정의된 분모로 metric 계산
+↓
+실행별 JSON·CSV 결과 저장
+```
 
 ## 문제와 시나리오
 
@@ -25,7 +48,7 @@ API와 프런트엔드는 범위에 포함하지 않는다.
 
 - 평가 task는 현재 dense 검색, owner·ACTIVE 조건, top 5·20 검증을 계속 사용한다.
 - 실제 개인 데이터와 결과는 Git에 커밋하지 않는다.
-- 생산 검색 SQL, Flyway V1~V13, 문서·버전 처리, Cleanup Worker 동작은 변경하지 않는다.
+- 생산 검색 SQL, Flyway V1–V13, 문서·버전 처리, Cleanup Worker 동작은 변경하지 않는다.
 - PostgreSQL 성공을 OpenSQL 호환성 성공으로 표현하지 않는다.
 
 ## 완료 조건

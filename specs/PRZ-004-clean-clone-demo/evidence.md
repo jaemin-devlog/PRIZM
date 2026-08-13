@@ -1,4 +1,4 @@
-# PRZ-004 Evidence — 안전한 clean-clone demo
+# PRZ-004 — 안전한 clean-clone demo Evidence
 
 ## 현재 판정
 
@@ -22,6 +22,23 @@
 GitHub check를 통과했다. 두 전체 clean clone을 `aff3e87...`에서 다시 실행한
 것으로 확대하지 않는다.
 
+## 검증한 수직 흐름
+
+```text
+독립 clean clone과 로컬 환경 준비
+↓
+기본 비활성 demo USER를 명시적으로 활성화
+↓
+합성 TXT·PDF 업로드와 ACTIVE 전환
+↓
+API·브라우저 원문 근거 검색
+↓
+두 번째 clone의 project·volume·데이터 격리 확인
+```
+
+이 흐름은 PostgreSQL·pgvector와 host Ollama 기준이다. OpenSQL은 PRZ-004에서
+`NOT_RUN`이다.
+
 ## 2026-08-04 미커밋 확장안 정리
 
 PRZ-004의 원래 clean-clone demo는 위 근거대로 `VERIFIED` 상태를 유지한다. 이후 별도
@@ -35,15 +52,27 @@ Spec으로 범위와 보안·운영 조건을 먼저 정의한다.
 
 ## 요구사항별 상태
 
-| 요구사항 | VERIFY 결과 | 근거 |
-|---|---|---|
-| PRZ-004-R01 안전한 demo USER | `PASS` | one-time `USER` bootstrap, 충돌·중복 계정 fail-closed, BCrypt 경계와 로그인 검증 |
-| PRZ-004-R02 로컬 설정과 Compose 격리 | `PASS` | 두 환경의 project·port·DB/runtime volume 분리, shell override 차단과 CORS 확인 |
-| PRZ-004-R03 합성 fixture | `PASS` | ignored 로컬 경로에 생성한 first-party TXT·PDF와 서로 다른 marker 사용 |
-| PRZ-004-R04 API smoke | `PASS` | 로그인, 업로드, `ACTIVE`, source metadata, 검색 allowlist와 비로그인 `401` 확인 |
-| PRZ-004-R05 기존 계약 보존 | `PASS` | 전체 unit·PostgreSQL integration 실패 0건, 첫 환경 정보의 두 번째 환경 노출 0건 |
-| PRZ-004-R06 재현성과 공급망 기록 | `PASS` | 두 `--no-hardlinks` clone, 모델 identity·1024차원, npm audit·SBOM·OSS readiness와 GitHub CI 통과 |
-| PRZ-004-R07 상태와 Evidence | `PASS` | source·환경별 결과, 독립 감사, PR·CI·review 부재·merge를 구분해 기록 |
+- **요구사항:** PRZ-004-R01 안전한 demo USER
+  - VERIFY 결과: `PASS`
+  - 근거: one-time `USER` bootstrap, 충돌·중복 계정 fail-closed, BCrypt 경계와 로그인 검증
+- **요구사항:** PRZ-004-R02 로컬 설정과 Compose 격리
+  - VERIFY 결과: `PASS`
+  - 근거: 두 환경의 project·port·DB/runtime volume 분리, shell override 차단과 CORS 확인
+- **요구사항:** PRZ-004-R03 합성 fixture
+  - VERIFY 결과: `PASS`
+  - 근거: ignored 로컬 경로에 생성한 first-party TXT·PDF와 서로 다른 marker 사용
+- **요구사항:** PRZ-004-R04 API smoke
+  - VERIFY 결과: `PASS`
+  - 근거: 로그인, 업로드, `ACTIVE`, source metadata, 검색 allowlist와 비로그인 `401` 확인
+- **요구사항:** PRZ-004-R05 기존 계약 보존
+  - VERIFY 결과: `PASS`
+  - 근거: 전체 unit·PostgreSQL integration 실패 0건, 첫 환경 정보의 두 번째 환경 노출 0건
+- **요구사항:** PRZ-004-R06 재현성과 공급망 기록
+  - VERIFY 결과: `PASS`
+  - 근거: 두 `--no-hardlinks` clone, 모델 identity·1024차원, npm audit·SBOM·OSS readiness와 GitHub CI 통과
+- **요구사항:** PRZ-004-R07 상태와 Evidence
+  - VERIFY 결과: `PASS`
+  - 근거: source·환경별 결과, 독립 감사, PR·CI·review 부재·merge를 구분해 기록
 
 전체 사용자 흐름에 대한 위 판정은 `25d09e9...`의 실행 결과를 기준으로 한다.
 플랫폼 경로 교정과 GitHub 통합 근거는 아래 별도 절에서 확인한다.
@@ -52,20 +81,30 @@ Spec으로 범위와 보안·운영 조건을 먼저 정의한다.
 
 검증 기준은 `25d09e9eee9837cf4a63d7461699825ff22743e2`다.
 
-| 명령 | 결과 |
-|---|---|
-| `.\gradlew.bat test --no-daemon` | `247 PASS / 14 SKIP / 0 FAIL` |
-| `.\gradlew.bat integrationTest --no-daemon --rerun-tasks` | `66 PASS / 3 SKIP / 0 FAIL`; PostgreSQL·pgvector 결과 |
-| `node --test scripts/clean-clone-demo.test.mjs` | `26 PASS / 1 SKIP / 0 FAIL` |
-| `npm.cmd --prefix frontend ci` | `PASS` |
-| `npm.cmd --prefix frontend run lint` | `PASS` |
-| `npm.cmd --prefix frontend run build` | `PASS` |
-| `npm.cmd --prefix frontend audit --json` | `PASS`; vulnerability 0 |
-| `npm.cmd --prefix frontend audit --omit=dev --json` | `PASS`; vulnerability 0 |
-| `docker compose config --quiet` | `PASS` |
-| `node scripts/verify-sbom.mjs` | `PASS` |
-| `node scripts/verify-oss-readiness.mjs` | `PASS` |
-| `git diff --check` | `PASS` |
+- **명령:** `.\gradlew.bat test --no-daemon`
+  - 결과: `247 PASS / 14 SKIP / 0 FAIL`
+- **명령:** `.\gradlew.bat integrationTest --no-daemon --rerun-tasks`
+  - 결과: `66 PASS / 3 SKIP / 0 FAIL`; PostgreSQL·pgvector 결과
+- **명령:** `node --test scripts/clean-clone-demo.test.mjs`
+  - 결과: `26 PASS / 1 SKIP / 0 FAIL`
+- **명령:** `npm.cmd --prefix frontend ci`
+  - 결과: `PASS`
+- **명령:** `npm.cmd --prefix frontend run lint`
+  - 결과: `PASS`
+- **명령:** `npm.cmd --prefix frontend run build`
+  - 결과: `PASS`
+- **명령:** `npm.cmd --prefix frontend audit --json`
+  - 결과: `PASS`; vulnerability 0
+- **명령:** `npm.cmd --prefix frontend audit --omit=dev --json`
+  - 결과: `PASS`; vulnerability 0
+- **명령:** `docker compose config --quiet`
+  - 결과: `PASS`
+- **명령:** `node scripts/verify-sbom.mjs`
+  - 결과: `PASS`
+- **명령:** `node scripts/verify-oss-readiness.mjs`
+  - 결과: `PASS`
+- **명령:** `git diff --check`
+  - 결과: `PASS`
 
 총 자동 결과는 `339 PASS / 18 SKIP / 0 FAIL`이다.
 
@@ -75,14 +114,18 @@ GitHub Linux CI에서 Windows 절대 경로 표현에 의존하던 Node test 두
 최종 source `aff3e87a9a912e44fcf217291a45328cf451cfc9`에서 운영체제와 무관한 경로
 표현으로 교정한 뒤 다음을 확인했다.
 
-| 검증 | 결과 |
-|---|---|
-| Windows `node --test scripts/clean-clone-demo.test.mjs` | `26 PASS / 1 SKIP / 0 FAIL` |
-| Linux Node 22.17 Docker의 같은 명령 | `27 PASS / 0 SKIP / 0 FAIL` |
-| GitHub push CI backend·frontend | 2건 `PASS` |
-| GitHub push OSS Readiness·License·Markdown·SBOM | 1건 `PASS` |
-| GitHub PR CI backend·frontend | 2건 `PASS` |
-| GitHub PR OSS Readiness·License·Markdown·SBOM | 1건 `PASS` |
+- **검증:** Windows `node --test scripts/clean-clone-demo.test.mjs`
+  - 결과: `26 PASS / 1 SKIP / 0 FAIL`
+- **검증:** Linux Node 22.17 Docker의 같은 명령
+  - 결과: `27 PASS / 0 SKIP / 0 FAIL`
+- **검증:** GitHub push CI backend·frontend
+  - 결과: 2건 `PASS`
+- **검증:** GitHub push OSS Readiness·License·Markdown·SBOM
+  - 결과: 1건 `PASS`
+- **검증:** GitHub PR CI backend·frontend
+  - 결과: 2건 `PASS`
+- **검증:** GitHub PR OSS Readiness·License·Markdown·SBOM
+  - 결과: 1건 `PASS`
 
 이 교정은 test fixture 경로의 플랫폼 호환성만 바꿨다. 제품 동작이나 앞서 실행한
 두 clean clone 환경은 바꾸지 않았으며, 두 전체 clean clone은 `aff3e87...`에서
@@ -172,29 +215,38 @@ allowlist로 초기 DB와 환경 격리를 확인했다. API의 업로드 전 0�
 
 ## PostgreSQL·OpenSQL 경계
 
-| 대상 | 상태 |
-|---|---|
-| PostgreSQL·pgvector+Ollama clean-clone 전체 흐름 | `PASS` |
-| 실제 OpenSQL single-node SQL Gate | 기존 PRZ-003 `PASS` |
-| OpenSQL+Ollama 전체 사용자 흐름 | `NOT_RUN` |
-| OpenProxy | `NOT_VERIFIED` |
-| OpenHA | `NOT_RUN` |
-| DB failover | `NOT_RUN` |
+- **대상:** PostgreSQL·pgvector+Ollama clean-clone 전체 흐름
+  - 상태: `PASS`
+- **대상:** 실제 OpenSQL single-node SQL Gate
+  - 상태: 기존 PRZ-003 `PASS`
+- **대상:** OpenSQL+Ollama 전체 사용자 흐름
+  - 상태: `NOT_RUN`
+- **대상:** OpenProxy
+  - 상태: `NOT_VERIFIED`
+- **대상:** OpenHA
+  - 상태: `NOT_RUN`
+- **대상:** DB failover
+  - 상태: `NOT_RUN`
 
 이번 PostgreSQL clean-clone 결과를 OpenSQL 전체 흐름이나 고가용성 검증으로
 확대하지 않는다.
 
 ## GitHub 통합 상태
 
-| 항목 | 상태 |
-|---|---|
-| 공개 GitHub main 반영 | `PASS`; merge `1f9a5ad964778a2e72de9949a0fadae042008392` |
-| push | `PASS`; head `aff3e87a9a912e44fcf217291a45328cf451cfc9` |
-| Issue | 없음; 과거 Issue를 소급 생성하지 않음 |
-| PR | `PASS`; [PR #25](https://github.com/jaemin-devlog/PRIZM/pull/25) |
-| GitHub CI | `PASS`; [push CI](https://github.com/jaemin-devlog/PRIZM/actions/runs/30698202866), [push OSS](https://github.com/jaemin-devlog/PRIZM/actions/runs/30698202833), [PR CI](https://github.com/jaemin-devlog/PRIZM/actions/runs/30698204334), [PR OSS](https://github.com/jaemin-devlog/PRIZM/actions/runs/30698204330) |
-| review | `REVIEW_NOT_AVAILABLE_SOLO`; GitHub review 0건이며 review evidence가 아님 |
-| merge | `PASS`; 2026-08-01 20:46:40 KST |
+- **항목:** 공개 GitHub main 반영
+  - 상태: `PASS`; merge `1f9a5ad964778a2e72de9949a0fadae042008392`
+- **항목:** push
+  - 상태: `PASS`; head `aff3e87a9a912e44fcf217291a45328cf451cfc9`
+- **항목:** Issue
+  - 상태: 없음; 과거 Issue를 소급 생성하지 않음
+- **항목:** PR
+  - 상태: `PASS`; [PR #25](https://github.com/jaemin-devlog/PRIZM/pull/25)
+- **항목:** GitHub CI
+  - 상태: `PASS`; [push CI](https://github.com/jaemin-devlog/PRIZM/actions/runs/30698202866), [push OSS](https://github.com/jaemin-devlog/PRIZM/actions/runs/30698202833), [PR CI](https://github.com/jaemin-devlog/PRIZM/actions/runs/30698204334), [PR OSS](https://github.com/jaemin-devlog/PRIZM/actions/runs/30698204330)
+- **항목:** review
+  - 상태: `REVIEW_NOT_AVAILABLE_SOLO`; GitHub review 0건이며 review evidence가 아님
+- **항목:** merge
+  - 상태: `PASS`; 2026-08-01 20:46:40 KST
 
 PR #25의 head에서 push·pull_request event별 backend, frontend, OSS check 6건이
 모두 성공했다. 사용자 병합 승인과 독립 감사는 GitHub review로 계산하지 않는다.

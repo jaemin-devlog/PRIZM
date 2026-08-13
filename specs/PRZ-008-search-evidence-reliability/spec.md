@@ -1,10 +1,19 @@
 # PRZ-008 — 검색 근거 신뢰성
 
+> **상태:** `IN_PROGRESS`
+> **유형:** Search Reliability
+> **선행 문서:** [PRZ-001](../PRZ-001-search-evaluation-integrity/spec.md)
+> **기준 소스:** `2190d47ff013384cf9d8c441449149233f79b0e9`
+> **통합:** [PR #40](https://github.com/jaemin-devlog/PRIZM/pull/40), merge `9b24808b37424f2d11ca0afe374d5703c81868fc`
+> **최종 확인:** 2026-08-13
+
 ## 상태
 
-`IN_PROGRESS` — P0~P18과 snippet·완전중복 표시 보정의 구현·평가·전체 회귀가
+`IN_PROGRESS` — P0–P18과 snippet·완전중복 표시 보정의 구현·평가·전체 회귀가
 완료됐다. 개선 profile의 기본값 승격, 제한적 GENERAL exact-token rescue, v2 세 상태,
-완료 Claim Gate, 전체 backend·frontend 검증을 통과했으며 현재 branch 통합을 기다린다.
+완료 Claim Gate와 전체 backend·frontend 검증을 통과한 제품 범위는 `main`에 통합됐다.
+의미 단위 청킹·batch embedding·PDF 중복 최적화의 제품 적용 Gate가 남아 있어 전체
+Spec 상태는 `IN_PROGRESS`다.
 
 이 문서에서 `CONFIRMED`는 source·test·migration으로 확인한 사실,
 `OPEN_DECISION`은 후속 단계에서 측정 후 확정할 사항을 뜻한다.
@@ -19,11 +28,43 @@ Career Vault 검색이 단순히 가까운 청크를 반환하는 데서 그치�
 Direct MRR 계산을 교정한 완료 Spec이다. PRZ-008은 그 평가 기반을 재사용해
 제품 검색의 근거 판정과 후속 실험을 다룬다.
 
+## 기능 구성
+
+- owner의 ACTIVE version에서 dense 후보를 조회한다.
+- intent, bounded evidence signal과 검증된 profile이 후보를 판정한다.
+- v2 응답은 검색 가능 문서 유무, 관련 결과와 완료 Claim 근거를 구분한다.
+- UI는 결과 snippet과 원문을 제공하며 score를 확률로 표시하지 않는다.
+- 청킹·sparse·reranker 실험은 평가 전용으로 분리하고 Gate를 통과한 변경만 제품에
+  적용한다.
+
+## 동작 흐름과 결과 상태
+
+```text
+질의 정규화와 intent 판정
+↓
+owner·ACTIVE version 후보 조회
+↓
+검증된 profile로 후보 판정·순위화
+↓
+결과 상태와 최대 5개 근거 구성
+↓
+snippet 기본 표시와 owner-scoped 원문 열람
+```
+
+```mermaid
+stateDiagram-v2
+    [*] --> NO_SEARCHABLE_DOCUMENTS: 검색 가능한 ACTIVE 문서 없음
+    [*] --> NO_RELEVANT_RESULTS: GENERAL 관련 후보 없음
+    [*] --> NO_EVIDENCE: 완료 Claim을 뒷받침할 직접 근거 없음
+    [*] --> EVIDENCE_FOUND: 검증된 근거 반환
+```
+
 ## 범위
 
-### 현재 구현 기준선
+### 착수 당시 구현 기준선
 
-`CONFIRMED` 근거 위치:
+아래는 PRZ-008 착수 당시 `CONFIRMED`한 기준선이다. 이후 통합된 현재 동작은 앞의
+기능 구성과 [Evidence](evidence.md)의 최종 판정을 따른다.
 
 - 검색 흐름과 응답: [`SearchService`](../../src/main/java/com/prizm/search/service/SearchService.java),
   [`VectorSearchRepository`](../../src/main/java/com/prizm/search/repository/VectorSearchRepository.java),
@@ -41,36 +82,85 @@ Direct MRR 계산을 교정한 완료 Spec이다. PRZ-008은 그 평가 기반�
   [`SearchEvaluationMetrics`](../../src/searchEvaluation/java/com/prizm/search/evaluation/SearchEvaluationMetrics.java),
   [`questions.jsonl`](../../src/test/resources/search-evaluation/sample/questions.jsonl)
 
-| 항목 | 현재 동작 |
-|---|---|
-| 요청 | 질의를 검증하고 Ollama로 1024차원 임베딩한 뒤 pgvector 검색을 호출한다. |
-| 검색 경계 | 로그인 사용자가 소유한 문서 중 `active_version_id`가 가리키는 `ACTIVE` 버전의 청크만 검색한다. |
-| 순위·점수 | exact cosine distance 오름차순이며 `score = 1 - distance`다. score는 확률이나 검증된 신뢰도가 아니다. |
-| 결과 수 | `/api/search`는 1건, `/api/career-evidence/search`는 최대 5건이다. 제품 검색에 threshold는 없다. |
-| 빈 후보 | 검색 가능한 청크가 없으면 단일 검색은 `404 SEARCH_NO_RESULT`, Career Evidence는 `200`과 빈 배열을 반환한다. |
-| 무관한 질문 | 청크가 하나라도 있으면 의미상 근거가 없어도 가장 가까운 결과를 반환한다. |
-| UI | 빈 배열은 근거 없음으로, 결과 score는 “관련도”로 표시한다. 인증 오류 외 오류는 일반 오류로 표시한다. |
-| 청킹·색인 | TXT와 PDF 각 페이지를 최대 800자·overlap 120자로 나누고 청크마다 Ollama를 순차 호출한다. PDF는 `PAGE`와 page 번호를 저장한다. |
-| 평가 | 합성 문서 11개·질문 30개를 TUNING 20개와 TEST 10개로 나눠 top-20 순위 지표와 전체 지연을 측정한다. |
+- **항목:** 요청
+  - 현재 동작: 질의를 검증하고 Ollama로 1024차원 임베딩한 뒤 pgvector 검색을 호출한다.
+- **항목:** 검색 경계
+  - 현재 동작: 로그인 사용자가 소유한 문서 중 `active_version_id`가 가리키는 `ACTIVE` 버전의 청크만 검색한다.
+- **항목:** 순위·점수
+  - 현재 동작: exact cosine distance 오름차순이며 `score = 1 - distance`다. score는 확률이나 검증된 신뢰도가 아니다.
+- **항목:** 결과 수
+  - 현재 동작: `/api/search`는 1건, `/api/career-evidence/search`는 최대 5건이다. 제품 검색에 threshold는 없다.
+- **항목:** 빈 후보
+  - 현재 동작: 검색 가능한 청크가 없으면 단일 검색은 `404 SEARCH_NO_RESULT`, Career Evidence는 `200`과 빈 배열을 반환한다.
+- **항목:** 무관한 질문
+  - 현재 동작: 청크가 하나라도 있으면 의미상 근거가 없어도 가장 가까운 결과를 반환한다.
+- **항목:** UI
+  - 현재 동작: 빈 배열은 근거 없음으로, 결과 score는 “관련도”로 표시한다. 인증 오류 외 오류는 일반 오류로 표시한다.
+- **항목:** 청킹·색인
+  - 현재 동작: TXT와 PDF 각 페이지를 최대 800자·overlap 120자로 나누고 청크마다 Ollama를 순차 호출한다. PDF는 `PAGE`와 page 번호를 저장한다.
+- **항목:** 평가
+  - 현재 동작: 합성 문서 11개·질문 30개를 TUNING 20개와 TEST 10개로 나눠 top-20 순위 지표와 전체 지연을 측정한다.
 
 현재 상태 문서의 “근거가 없을 때 안내”는 빈 배열 처리만 뜻했다. 검색 가능한
 청크가 있지만 질문과 무관한 경우를 판정하는 기능은 아직 없다.
 
 ### 검색 실패 사례
 
-| 질문 유형 | 목표 결과 | 현재 예상 동작 | 단계 | 평가 |
-|---|---|---|---|---|
-| 문서에 답이 없는 일반 질문 | `NO_RELEVANT_RESULTS` | 가까운 결과 반환 | 1·2 | 포함 |
-| 주제는 비슷하지만 근거가 없는 일반 질문 | `NO_RELEVANT_RESULTS` | 용어가 가까운 결과 반환 가능 | 1·2 | 포함 |
-| 없는 회사·자격증·기술 일반 질문 | `NO_RELEVANT_RESULTS` | 가까운 결과 반환 | 1·2 | 포함 |
-| 실제 역할·수치를 바꾼 일반 질문 | `NO_RELEVANT_RESULTS` | 원래 프로젝트를 반환할 수 있음 | 1·2 | 포함 |
-| 다른 사용자의 문서에만 있는 일반 근거 | 현재 사용자에게 청크가 있으면 `NO_RELEVANT_RESULTS`, 없으면 `NO_SEARCHABLE_DOCUMENTS` | owner 경계 안의 결과만 반환 | 1·2 | 포함 |
-| 과거 버전에만 있는 일반 근거 | active 청크가 있으면 `NO_RELEVANT_RESULTS`, 없으면 `NO_SEARCHABLE_DOCUMENTS` | 과거 버전 제외 | 1·2 | 포함 |
-| 검색 가능한 문서가 없는 사용자 | `NO_SEARCHABLE_DOCUMENTS` | 단일 404, Career Evidence 빈 배열 | 1·2 | 포함 |
-| overlap 구간 반복 | 중복 없는 `EVIDENCE_FOUND` | 같은 사실이 반복될 수 있음 | 1·4A·4B | 포함 |
-| 직접 근거 | `EVIDENCE_FOUND` | 가까운 결과 반환 | 1·2 | 포함 |
-| 의미가 같은 다른 표현 | `EVIDENCE_FOUND` | dense 순위에 따라 반환 | 1·2·4A | 포함 |
-| 날짜·숫자·고유명사 | 정확한 값이 있을 때만 `EVIDENCE_FOUND` | 비슷한 다른 값도 반환 가능 | 1·2·4A | 포함 |
+- **질문 유형:** 문서에 답이 없는 일반 질문
+  - 목표 결과: `NO_RELEVANT_RESULTS`
+  - 현재 예상 동작: 가까운 결과 반환
+  - 단계: 1·2
+  - 평가: 포함
+- **질문 유형:** 주제는 비슷하지만 근거가 없는 일반 질문
+  - 목표 결과: `NO_RELEVANT_RESULTS`
+  - 현재 예상 동작: 용어가 가까운 결과 반환 가능
+  - 단계: 1·2
+  - 평가: 포함
+- **질문 유형:** 없는 회사·자격증·기술 일반 질문
+  - 목표 결과: `NO_RELEVANT_RESULTS`
+  - 현재 예상 동작: 가까운 결과 반환
+  - 단계: 1·2
+  - 평가: 포함
+- **질문 유형:** 실제 역할·수치를 바꾼 일반 질문
+  - 목표 결과: `NO_RELEVANT_RESULTS`
+  - 현재 예상 동작: 원래 프로젝트를 반환할 수 있음
+  - 단계: 1·2
+  - 평가: 포함
+- **질문 유형:** 다른 사용자의 문서에만 있는 일반 근거
+  - 목표 결과: 현재 사용자에게 청크가 있으면 `NO_RELEVANT_RESULTS`, 없으면 `NO_SEARCHABLE_DOCUMENTS`
+  - 현재 예상 동작: owner 경계 안의 결과만 반환
+  - 단계: 1·2
+  - 평가: 포함
+- **질문 유형:** 과거 버전에만 있는 일반 근거
+  - 목표 결과: active 청크가 있으면 `NO_RELEVANT_RESULTS`, 없으면 `NO_SEARCHABLE_DOCUMENTS`
+  - 현재 예상 동작: 과거 버전 제외
+  - 단계: 1·2
+  - 평가: 포함
+- **질문 유형:** 검색 가능한 문서가 없는 사용자
+  - 목표 결과: `NO_SEARCHABLE_DOCUMENTS`
+  - 현재 예상 동작: 단일 404, Career Evidence 빈 배열
+  - 단계: 1·2
+  - 평가: 포함
+- **질문 유형:** overlap 구간 반복
+  - 목표 결과: 중복 없는 `EVIDENCE_FOUND`
+  - 현재 예상 동작: 같은 사실이 반복될 수 있음
+  - 단계: 1·4A·4B
+  - 평가: 포함
+- **질문 유형:** 직접 근거
+  - 목표 결과: `EVIDENCE_FOUND`
+  - 현재 예상 동작: 가까운 결과 반환
+  - 단계: 1·2
+  - 평가: 포함
+- **질문 유형:** 의미가 같은 다른 표현
+  - 목표 결과: `EVIDENCE_FOUND`
+  - 현재 예상 동작: dense 순위에 따라 반환
+  - 단계: 1·2·4A
+  - 평가: 포함
+- **질문 유형:** 날짜·숫자·고유명사
+  - 목표 결과: 정확한 값이 있을 때만 `EVIDENCE_FOUND`
+  - 현재 예상 동작: 비슷한 다른 값도 반환 가능
+  - 단계: 1·2·4A
+  - 평가: 포함
 
 현재 TEST의 `exact-fifty-percent`는 실제 30% 근거를 relevance 1로 두고
 `noEvidence=false`로 분류한다. 새 계약과 맞지 않으므로 1단계에서 dataset
@@ -79,12 +169,18 @@ version과 TEST 정책을 다시 고정한다. 조용히 재라벨링한 뒤 같
 
 ### 검색 상태 계약
 
-| 상태 | 의미 | 결과 배열 |
-|---|---|---|
-| `EVIDENCE_FOUND` | owner 범위의 검색 가능한 `ACTIVE` 청크가 있고 판정 기준을 통과한 근거가 있다. | 1개 이상 |
-| `NO_RELEVANT_RESULTS` | 검색 가능한 `ACTIVE` 청크는 있지만 `GENERAL` 질의에 관련된 결과가 없다. | 비어 있음 |
-| `NO_EVIDENCE` | 검색 가능한 `ACTIVE` 청크는 있지만 `COMPLETED_RELEASE_EVIDENCE` 질의를 검증할 완료 근거가 없다. | 비어 있음 |
-| `NO_SEARCHABLE_DOCUMENTS` | 현재 사용자에게 검색 가능한 `ACTIVE` 청크가 없다. | 비어 있음 |
+- **상태:** `EVIDENCE_FOUND`
+  - 의미: owner 범위의 검색 가능한 `ACTIVE` 청크가 있고 판정 기준을 통과한 근거가 있다.
+  - 결과 배열: 1개 이상
+- **상태:** `NO_RELEVANT_RESULTS`
+  - 의미: 검색 가능한 `ACTIVE` 청크는 있지만 `GENERAL` 질의에 관련된 결과가 없다.
+  - 결과 배열: 비어 있음
+- **상태:** `NO_EVIDENCE`
+  - 의미: 검색 가능한 `ACTIVE` 청크는 있지만 `COMPLETED_RELEASE_EVIDENCE` 질의를 검증할 완료 근거가 없다.
+  - 결과 배열: 비어 있음
+- **상태:** `NO_SEARCHABLE_DOCUMENTS`
+  - 의미: 현재 사용자에게 검색 가능한 `ACTIVE` 청크가 없다.
+  - 결과 배열: 비어 있음
 
 네 상태는 정상적인 검색 결과이므로 `200`이 적합하다. 잘못된 질의는 `400`,
 인증·권한 문제는 `401`·`403`, 임베딩·DB 장애는 기존 `5xx` 계약을 유지한다.
@@ -93,11 +189,12 @@ version과 TEST 정책을 다시 고정한다. 조용히 재라벨링한 뒤 같
 
 기존 client를 깨지 않도록 현재 API를 제거하거나 응답 형태를 바꾸지 않는다.
 
-| API | 제품 적용 후 계약 |
-|---|---|
-| `POST /api/search` | 단일 결과와 검색 가능한 청크가 없을 때의 `404 SEARCH_NO_RESULT`를 그대로 유지한다. PRZ-008 profile 적용 대상이 아니다. |
-| `POST /api/career-evidence/search` | 최대 5개의 기존 JSON 배열을 유지한다. 새 profile을 사용하더라도 v2 상태의 `results`만 반환해 기존 client와 호환한다. |
-| `POST /api/v2/career-evidence/search` | 상태를 구분해야 하는 새 client용 API다. `state`와 `results`를 반환한다. |
+- **API:** `POST /api/search`
+  - 제품 적용 후 계약: 단일 결과와 검색 가능한 청크가 없을 때의 `404 SEARCH_NO_RESULT`를 그대로 유지한다. PRZ-008 profile 적용 대상이 아니다.
+- **API:** `POST /api/career-evidence/search`
+  - 제품 적용 후 계약: 최대 5개의 기존 JSON 배열을 유지한다. 새 profile을 사용하더라도 v2 상태의 `results`만 반환해 기존 client와 호환한다.
+- **API:** `POST /api/v2/career-evidence/search`
+  - 제품 적용 후 계약: 상태를 구분해야 하는 새 client용 API다. `state`와 `results`를 반환한다.
 
 v2의 정상 응답은 다음 두 필드만 필수 계약으로 고정한다.
 
@@ -111,12 +208,12 @@ v2의 정상 응답은 다음 두 필드만 필수 계약으로 고정한다.
 - `state`는 `EVIDENCE_FOUND`, `NO_RELEVANT_RESULTS`, `NO_EVIDENCE`,
   `NO_SEARCHABLE_DOCUMENTS` 중 하나다.
 - `EVIDENCE_FOUND`의 `results`는 기존 전체 `content`를 유지하고, 선택이 끝난 결과
-  안에서 질문 관련 문장과 인접 문장을 뽑은 `snippet`을 함께 제공하며 1~5개다.
+  안에서 질문 관련 문장과 인접 문장을 뽑은 `snippet`을 함께 제공하며 1–5개다.
   snippet 생성은 후보 선택·ranking·score에 관여하지 않고, 생성 실패 시 전체
   `content`를 fallback으로 사용한다. 나머지 세 상태의 `results`는 빈 배열이다.
 - `distance`와 `score`는 기존 결과 호환을 위해 유지하지만 확률·정확도·신뢰도로
   설명하지 않는다.
-- GENERAL 결과가 비어 있고 정규화된 질의가 단일 2~4자 token이며 본문에 동일한
+- GENERAL 결과가 비어 있고 정규화된 질의가 단일 2–4자 token이며 본문에 동일한
   exact token이 있을 때만 원래 dense score가 `0.49` 이상 `0.50` 미만인 후보를
   최대 한 건 복구한다. 부분 문자열은 인정하지 않고 반환 score·distance는 원래
   값을 유지한다. `COMPLETED_RELEASE_EVIDENCE`에는 적용하지 않는다.
@@ -138,20 +235,30 @@ v2는 상태까지 소비한다. 프론트엔드는 제품 적용 Batch에서 v2
 - 관련 청크는 relevance `2`(직접)·`1`(부분)·`0`(무관)으로 표시하고, 같은 사실의
   반복 청크는 같은 `evidenceGroup`으로 묶는다.
 
-| 지표 | 계산 기준 |
-|---|---|
-| Precision@5 | top-5의 relevance 1 이상 청크 수를 5로 나눈 질문별 평균. 정답 청크가 하나뿐이면 질문별 최대값은 0.2다. |
-| Direct MRR@5·@20 | relevance 2가 있는 질문만 대상으로 cutoff 안 첫 직접 근거의 역순위를 평균한다. 거부되면 0이다. |
-| nDCG@5 | gain은 `2^relevance - 1`이며 같은 `evidenceGroup`의 두 번째 결과부터 gain 0으로 계산한다. |
-| 무관 질문 거부율 | 검색 가능한 문서가 있는 no-evidence 질문 중 `NO_EVIDENCE` 비율이다. |
-| 근거 질문 오거부율 | relevance 1 이상 근거가 있는데 `NO_EVIDENCE`로 판정된 비율이다. |
-| top-1 직접 정확도 | 직접 근거 질문 중 첫 결과의 group relevance가 2인 비율이다. |
-| page 인용 정확도 | PDF 직접 근거 질문 중 반환 `PAGE` index가 gold page와 일치한 비율이다. |
-| 중복 결과 비율 | top-5에서 앞선 `evidenceGroup`을 반복한 결과 수 ÷ 실제 반환 수다. |
-| 결과 개수 | 질문별 사용자 반환 수를 상태·split·category별로 기록한다. |
-| 전체 지연 | embedding 시작부터 DB 결과 mapping 종료까지의 p50·p95다. |
-| embedding 지연 | Ollama 요청 시작부터 벡터 검증 종료까지다. |
-| DB 지연 | JDBC 호출 직전부터 row mapping 종료까지다. |
+- **지표:** Precision@5
+  - 계산 기준: top-5의 relevance 1 이상 청크 수를 5로 나눈 질문별 평균. 정답 청크가 하나뿐이면 질문별 최대값은 0.2다.
+- **지표:** Direct MRR@5·@20
+  - 계산 기준: relevance 2가 있는 질문만 대상으로 cutoff 안 첫 직접 근거의 역순위를 평균한다. 거부되면 0이다.
+- **지표:** nDCG@5
+  - 계산 기준: gain은 `2^relevance - 1`이며 같은 `evidenceGroup`의 두 번째 결과부터 gain 0으로 계산한다.
+- **지표:** 무관 질문 거부율
+  - 계산 기준: 검색 가능한 문서가 있는 no-evidence 질문 중 `NO_EVIDENCE` 비율이다.
+- **지표:** 근거 질문 오거부율
+  - 계산 기준: relevance 1 이상 근거가 있는데 `NO_EVIDENCE`로 판정된 비율이다.
+- **지표:** top-1 직접 정확도
+  - 계산 기준: 직접 근거 질문 중 첫 결과의 group relevance가 2인 비율이다.
+- **지표:** page 인용 정확도
+  - 계산 기준: PDF 직접 근거 질문 중 반환 `PAGE` index가 gold page와 일치한 비율이다.
+- **지표:** 중복 결과 비율
+  - 계산 기준: top-5에서 앞선 `evidenceGroup`을 반복한 결과 수 ÷ 실제 반환 수다.
+- **지표:** 결과 개수
+  - 계산 기준: 질문별 사용자 반환 수를 상태·split·category별로 기록한다.
+- **지표:** 전체 지연
+  - 계산 기준: embedding 시작부터 DB 결과 mapping 종료까지의 p50·p95다.
+- **지표:** embedding 지연
+  - 계산 기준: Ollama 요청 시작부터 벡터 검증 종료까지다.
+- **지표:** DB 지연
+  - 계산 기준: JDBC 호출 직전부터 row mapping 종료까지다.
 
 기존 하네스에는 Direct MRR@5, 거부·오거부, top-1 직접 정확도, page 정확도,
 결과 수와 분리 지연이 없다. 1단계에서 순위를 바꾸기 전에 이 측정을 교정한다.
@@ -181,25 +288,43 @@ ASCII 식별자 뒤의 한국어 조사는 명시된 조사만 제거하며, `Ka
 `？`가 붙은 질문형 문장은 완료 사실로 판정하지 않는다. 완료 표현의 문장 양태는 다음
 합성 사례로 고정한다.
 
-| 양태 | 합성 사례 | 완료 사실 판정 |
-|---|---|---|
-| 명확한 완료 서술 | `주문 API를 배포했습니다.` | 맞음 |
-| 직접 질문 | `주문 API를 배포했습니다?` | 아님 |
-| 꼬리질문 | `주문 API를 배포했습니다, 맞나요?` | 아님 |
-| 인용·전언 | `“주문 API를 배포했습니다”라고 했나요?` | 아님 |
-| 완료 여부 | `주문 API 배포 여부를 확인했다.` | 아님 |
-| 바로 다음 문장의 부정·철회 | `배포했습니다. 그러나 실제로는 하지 않았습니다.` | 아님 |
+- **양태:** 명확한 완료 서술
+  - 합성 사례: `주문 API를 배포했습니다.`
+  - 완료 사실 판정: 맞음
+- **양태:** 직접 질문
+  - 합성 사례: `주문 API를 배포했습니다?`
+  - 완료 사실 판정: 아님
+- **양태:** 꼬리질문
+  - 합성 사례: `주문 API를 배포했습니다, 맞나요?`
+  - 완료 사실 판정: 아님
+- **양태:** 인용·전언
+  - 합성 사례: `“주문 API를 배포했습니다”라고 했나요?`
+  - 완료 사실 판정: 아님
+- **양태:** 완료 여부
+  - 합성 사례: `주문 API 배포 여부를 확인했다.`
+  - 완료 사실 판정: 아님
+- **양태:** 바로 다음 문장의 부정·철회
+  - 합성 사례: `배포했습니다. 그러나 실제로는 하지 않았습니다.`
+  - 완료 사실 판정: 아님
 
 임의의 한국어 의미를 판정하는 것은 제품 계약이 아니다. 완료 이력 판정은 다음의
 폐쇄형 지원 문법만 다루며, 문법 밖 표현을 새 동의어로 추정하지 않는다.
 
-| 구분 | 지원 문법 | 문법 밖 처리 |
-|---|---|---|
-| 관형형 질의 | `<대상구> <등록 관형 완료형> <이력·경험·여부> [등록 존재형] <질의 종결부호>*` | marker 누락, 중간 구두점, 비등록 후행 token은 `UNSUPPORTED_COMPLETED_RELEASE_QUERY` |
-| 유한형 질의 | `<대상구> <등록 유한 완료형> <질의 종결부호>*` | 완료형 뒤의 marker·다른 token은 `UNSUPPORTED_COMPLETED_RELEASE_QUERY` |
-| 명사형 질의 | `<대상구> <출시·배포> <바로 인접한 이력·경험·여부> [등록 존재형] <질의 종결부호>*` | 떨어진 다른 절의 marker와 합성하지 않음 |
-| 직접 완료 주장 | `[등록된 날짜·문제없이·실제로] <질의 대상구> [후행 v버전 또는 균형 잡힌 제품 별칭] <등록 완료 평서형> <평서 종결부호>+` | claim unit 전체가 맞지 않으면 `MISSING_ASSERTED_COMPLETED_RELEASE_CLAIM` |
-| 인접 unit | 질문부호·등록된 질문 종결형 또는 등록된 부정·철회 marker가 있으면 앞 주장을 승인하지 않음 | marker 없는 별도 unit은 이 제한 문법에서 독립 unit으로 취급 |
+- **구분:** 관형형 질의
+  - 지원 문법: `<대상구> <등록 관형 완료형> <이력·경험·여부> [등록 존재형] <질의 종결부호>*`
+  - 문법 밖 처리: marker 누락, 중간 구두점, 비등록 후행 token은 `UNSUPPORTED_COMPLETED_RELEASE_QUERY`
+- **구분:** 유한형 질의
+  - 지원 문법: `<대상구> <등록 유한 완료형> <질의 종결부호>*`
+  - 문법 밖 처리: 완료형 뒤의 marker·다른 token은 `UNSUPPORTED_COMPLETED_RELEASE_QUERY`
+- **구분:** 명사형 질의
+  - 지원 문법: `<대상구> <출시·배포> <바로 인접한 이력·경험·여부> [등록 존재형] <질의 종결부호>*`
+  - 문법 밖 처리: 떨어진 다른 절의 marker와 합성하지 않음
+- **구분:** 직접 완료 주장
+  - 지원 문법: `[등록된 날짜·문제없이·실제로] <질의 대상구> [후행 v버전 또는 균형 잡힌 제품 별칭] <등록 완료 평서형> <평서 종결부호>+`
+  - 문법 밖 처리: claim unit 전체가 맞지 않으면 `MISSING_ASSERTED_COMPLETED_RELEASE_CLAIM`
+- **구분:** 인접 unit
+  - 지원 문법: 질문부호·등록된 질문 종결형 또는 등록된 부정·철회 marker가 있으면 앞 주장을 승인하지 않음
+  - 문법 밖 처리: marker 없는 별도 unit은 이 제한 문법에서 독립 unit으로 취급
 
 질의 파서는 `SUPPORTED`·`UNSUPPORTED`·`NONE`의 세 상태를 반환한다. 등록 관형형은
 `출시한`·`출시했다는`·`배포한`·`배포했다는`, 등록 유한형은 동작별
@@ -349,27 +474,36 @@ PDF page 정확도 `1.0`, total p95 `160ms`(legacy `138ms`, +`15.9%`)로 모든 
 
 제품 구현은 다음 Gate를 모두 통과해야 한다.
 
-| 범위 | 필수 검증 |
-|---|---|
-| unit·service | profile 신호와 중복 축약, 세 상태, 최대 5건, owner·`ACTIVE` 경계, 기존 `/api/search` 무변경 |
-| controller·API | v1 배열 호환, v2 세 상태와 빈 배열, 기존 `400`·`401`·`403`·`5xx`, 내부 판정 신호 미노출 |
-| frontend | 세 상태별 안내, 인증·server 오류 분리, score 비확률 표현, lint·typecheck·build |
-| PostgreSQL·pgvector | 후보 20건 exact cosine, owner·version 격리, 근거·무근거·검색 문서 없음과 중복 축약 |
-| OpenSQL | direct `5432` 합성 TXT/PDF API·UI에서 동일 상태와 owner 격리를 별도 검증 |
-| 회귀 | backend 전체 test, frontend 공식 검사, OSS·SBOM·문서·민감정보 검사 |
+- **범위:** unit·service
+  - 필수 검증: profile 신호와 중복 축약, 세 상태, 최대 5건, owner·`ACTIVE` 경계, 기존 `/api/search` 무변경
+- **범위:** controller·API
+  - 필수 검증: v1 배열 호환, v2 세 상태와 빈 배열, 기존 `400`·`401`·`403`·`5xx`, 내부 판정 신호 미노출
+- **범위:** frontend
+  - 필수 검증: 세 상태별 안내, 인증·server 오류 분리, score 비확률 표현, lint·typecheck·build
+- **범위:** PostgreSQL·pgvector
+  - 필수 검증: 후보 20건 exact cosine, owner·version 격리, 근거·무근거·검색 문서 없음과 중복 축약
+- **범위:** OpenSQL
+  - 필수 검증: direct `5432` 합성 TXT/PDF API·UI에서 동일 상태와 owner 격리를 별도 검증
+- **범위:** 회귀
+  - 필수 검증: backend 전체 test, frontend 공식 검사, OSS·SBOM·문서·민감정보 검사
 
 설정과 구현을 고정한 뒤 TEST는 기존 profile과 새 profile을 한 번의 최종 비교에서만
 실행한다. 실패 결과를 보고 TEST에 맞춰 profile을 다시 조정하지 않는다.
 
-| TEST Gate | 통과 조건 |
-|---|---|
-| Direct Recall@20 | `1.0` |
-| top-1 직접 근거 정확도 | `1.0` |
-| 무관 질문 거부율·근거 질문 오거부율 | 각각 `1.0`·`0` |
-| 중복 결과 비율·PDF page 인용 정확도 | 각각 `0`·`1.0` |
-| Direct MRR@5·@20 | 같은 실행의 `legacy-dense-v1` 이상 |
-| nDCG@5 | 같은 실행의 legacy 결과보다 `0.02`를 넘게 낮아지지 않음 |
-| total p95 | 같은 실행의 legacy 결과 대비 20% 초과 증가하지 않음 |
+- **TEST Gate:** Direct Recall@20
+  - 통과 조건: `1.0`
+- **TEST Gate:** top-1 직접 근거 정확도
+  - 통과 조건: `1.0`
+- **TEST Gate:** 무관 질문 거부율·근거 질문 오거부율
+  - 통과 조건: 각각 `1.0`·`0`
+- **TEST Gate:** 중복 결과 비율·PDF page 인용 정확도
+  - 통과 조건: 각각 `0`·`1.0`
+- **TEST Gate:** Direct MRR@5·@20
+  - 통과 조건: 같은 실행의 `legacy-dense-v1` 이상
+- **TEST Gate:** nDCG@5
+  - 통과 조건: 같은 실행의 legacy 결과보다 `0.02`를 넘게 낮아지지 않음
+- **TEST Gate:** total p95
+  - 통과 조건: 같은 실행의 legacy 결과 대비 20% 초과 증가하지 않음
 
 필수 Gate가 실패하거나 OpenSQL 검증이 `NOT_RUN`이면 새 profile은 기본값으로
 승격하지 않는다. Batch 2A 계약 확정 당시에는 제품 source와 TEST를 변경·실행하지
@@ -377,16 +511,37 @@ PDF page 정확도 `1.0`, total p95 `160ms`(legacy `138ms`, +`15.9%`)로 모든 
 
 ## 요구사항
 
-| ID | 요구사항 |
-|---|---|
-| `PRZ-008-R1` | 현재 dense 검색을 재현 가능하게 측정하고 TUNING·TEST 누출을 차단한다. |
-| `PRZ-008-R2` | 세 상태를 배타적으로 판정하고 근거 없는 후보를 사용자 근거로 반환하지 않는다. |
-| `PRZ-008-R3` | owner와 `ACTIVE` version 경계를 유지한다. 다른 사용자·과거 version은 현재 근거가 아니다. |
-| `PRZ-008-R4` | UI는 세 상태와 server·인증 오류를 구분하고 score를 확률처럼 표시하지 않는다. |
-| `PRZ-008-R5` | 의미 단위 청킹은 실험에서 Gate를 통과한 경우에만 제품에 적용한다. |
-| `PRZ-008-R6` | 청킹·batch embedding·PDF 최적화는 source 위치, embedding 검증과 atomic activation을 보존한다. |
-| `PRZ-008-R7` | PostgreSQL과 OpenSQL 결과를 별도로 실행·기록한다. |
-| `PRZ-008-R8` | 각 단계는 별도 branch·PR로 수행하고 이전 Gate 통과 전 후속 구현을 섞지 않는다. |
+### `PRZ-008-R1` — 요구사항
+
+현재 dense 검색을 재현 가능하게 측정하고 TUNING·TEST 누출을 차단한다.
+
+### `PRZ-008-R2` — 요구사항
+
+세 상태를 배타적으로 판정하고 근거 없는 후보를 사용자 근거로 반환하지 않는다.
+
+### `PRZ-008-R3` — 요구사항
+
+owner와 `ACTIVE` version 경계를 유지한다. 다른 사용자·과거 version은 현재 근거가 아니다.
+
+### `PRZ-008-R4` — 요구사항
+
+UI는 세 상태와 server·인증 오류를 구분하고 score를 확률처럼 표시하지 않는다.
+
+### `PRZ-008-R5` — 요구사항
+
+의미 단위 청킹은 실험에서 Gate를 통과한 경우에만 제품에 적용한다.
+
+### `PRZ-008-R6` — 요구사항
+
+청킹·batch embedding·PDF 최적화는 source 위치, embedding 검증과 atomic activation을 보존한다.
+
+### `PRZ-008-R7` — 요구사항
+
+PostgreSQL과 OpenSQL 결과를 별도로 실행·기록한다.
+
+### `PRZ-008-R8` — 요구사항
+
+각 단계는 별도 branch·PR로 수행하고 이전 Gate 통과 전 후속 구현을 섞지 않는다.
 
 ## 보존 계약
 
@@ -422,11 +577,27 @@ migration, dependency, 기존 문서 재색인을 변경하지 않는다.
 
 실측 전 수치를 성능 사실로 확정하지 않는다.
 
-| 항목 | 초기 방향 | TUNING 후 | TEST |
-|---|---|---|---|
-| 무관 질문 거부율 | 현재 semantic rejection 부재보다 개선 | 수치 Gate 확정 | 고정 Gate 검증 |
-| 근거 질문 오거부율 | 낮을수록 좋음 | 직접·부분 근거별 허용치 확정 | 설정 변경 없이 검증 |
-| Direct MRR·nDCG | 의미 있는 회귀 금지 | 허용 하락 폭 확정 | 고정 폭 검증 |
-| 중복률 | 현재 기준선보다 감소 | 4A 적용 Gate 확정 | 4B 결과 검증 |
-| 색인 시간 | 안전·품질을 유지하며 감소 | 동일 corpus budget 확정 | 환경별 검증 |
-| 검색 p50·p95 | 유의한 회귀 금지 | latency budget 확정 | 고정 profile 검증 |
+- **항목:** 무관 질문 거부율
+  - 초기 방향: 현재 semantic rejection 부재보다 개선
+  - TUNING 후: 수치 Gate 확정
+  - TEST: 고정 Gate 검증
+- **항목:** 근거 질문 오거부율
+  - 초기 방향: 낮을수록 좋음
+  - TUNING 후: 직접·부분 근거별 허용치 확정
+  - TEST: 설정 변경 없이 검증
+- **항목:** Direct MRR·nDCG
+  - 초기 방향: 의미 있는 회귀 금지
+  - TUNING 후: 허용 하락 폭 확정
+  - TEST: 고정 폭 검증
+- **항목:** 중복률
+  - 초기 방향: 현재 기준선보다 감소
+  - TUNING 후: 4A 적용 Gate 확정
+  - TEST: 4B 결과 검증
+- **항목:** 색인 시간
+  - 초기 방향: 안전·품질을 유지하며 감소
+  - TUNING 후: 동일 corpus budget 확정
+  - TEST: 환경별 검증
+- **항목:** 검색 p50·p95
+  - 초기 방향: 유의한 회귀 금지
+  - TUNING 후: latency budget 확정
+  - TEST: 고정 profile 검증

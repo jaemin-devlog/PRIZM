@@ -28,6 +28,8 @@
 | `NOT_VERIFIED` | 일부 상태는 확인했지만 목표 기능이 동작한다고 판정할 증거가 부족합니다. |
 | `HISTORICAL_PASS_NOT_RERUN` | 과거에는 통과했지만 현재 기준선에서는 다시 실행하지 않았습니다. |
 | `AS_BUILT_BASELINE` | Spec Registry를 만들기 전에 이미 구현돼 있던 기능을 현재 소스 기준으로 기록한 역사적 기준선입니다. |
+| `IN_PROGRESS` | 구현 또는 검증이 진행 중이며 최종 Gate가 끝나지 않았습니다. |
+| `IMPLEMENTED_UNVERIFIED` | 구현은 있지만 필수 환경 검증이 끝나지 않았습니다. |
 | `VERIFIED` | Spec의 요구사항과 필수 자동·환경 검증을 모두 충족했습니다. |
 | `DEFERRED` | 지금은 진행하지 않으며, 이유와 다시 시작할 조건을 기록했습니다. |
 

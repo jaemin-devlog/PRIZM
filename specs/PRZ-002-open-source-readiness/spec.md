@@ -1,10 +1,33 @@
-# PRZ-002 — Open-source readiness
+# PRZ-002 — 오픈소스 준비
+
+> **상태:** `VERIFIED`
+> **유형:** Open-source Readiness
+> **선행 문서:** [PRZ-000](../PRZ-000-platform-baseline/spec.md)
+> **기준 소스:** `f54e3d98e3eddc20dc3c89d9b3e2b84e1649bea1`
+> **최종 확인:** 2026-07-30
 
 ## 목적
 
 PRIZM의 공개 source와 배포물을 재사용할 수 있도록 출처, 저작권,
 라이선스, 외부 구성요소와 배포 경계를 검증 가능한 형태로 정리한다. 이 작업은
 새 제품 기능이나 OpenSQL 호환성을 구현하는 작업이 아니다.
+
+## 기능 구성과 흐름
+
+```text
+공개 source와 외부 구성요소 목록화
+↓
+license·provenance·재배포 경계 판정
+↓
+LICENSE·NOTICE·SBOM과 공개 문서 동기화
+↓
+자동 검사와 독립 감사
+↓
+source-only 공개 범위 확정
+```
+
+검사 결과는 source-only 배포 경계의 Evidence이며 제품 기능 또는 OpenSQL runtime
+호환성 증거로 사용하지 않는다.
 
 ## 범위
 
@@ -17,21 +40,42 @@ PRIZM의 공개 source와 배포물을 재사용할 수 있도록 출처, 저작
 
 ## 요구사항
 
-| ID | 요구사항 |
-|---|---|
-| `OR-001` | 공개 source에 포함하거나 외부에서 준비하는 구성요소와 자산의 출처·버전·라이선스·재배포 경계를 SBOM과 NOTICE에 기록해야 한다. |
-| `OR-002` | Java/Gradle, frontend npm, Docker/컨테이너, PostgreSQL·pgvector, Ollama와 `bge-m3`, 테스트 fixture·예제·이미지·문서 자산을 대상으로 버전·출처·라이선스·사용 목적·배포 여부·NOTICE 의무를 감사해야 한다. |
-| `OR-003` | 검토 후 사용자가 승인한 OSI 인증 프로젝트 라이선스를 루트 `LICENSE`에 적용하고, 필요한 제3자 고지와 예외를 `NOTICE`와 SBOM 범위 manifest에 일관되게 기록해야 한다. |
-| `OR-004` | PRIZM의 직접 작성 코드 저작권자를 `Jaemin Jeong`으로 기록하고 Codex는 개발 보조도구로 분리해야 한다. AI 사용을 특정 제3자 코드·자산을 복사하지 않았다는 보증으로 바꾸지 않아야 한다. |
-| `OR-005` | CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT와 최소 maintainer 정책은 외부 기여 접수 또는 첫 지원 release·외부 배포 중 먼저 도래하는 시점에 재개해야 한다. 실제 운영 가능한 신고 경로만 사용하고 비밀정보를 공개 Issue에 올리지 않도록 안내해야 한다. |
-| `OR-006` | Bug·feature·documentation Issue form과 PR template은 외부 Issue·PR 접수를 공식 지원하기 전에 재개해야 한다. 템플릿 자체를 review 증거로 주장하지 않아야 한다. |
-| `OR-007` | 공개 진입 문서는 Quickstart, 현재·계획 기능, 검증 환경, 한계와 license·SBOM을 연결해야 한다. OpenSQL single-node 결과를 OpenProxy·OpenHA·DB failover 또는 전체 사용자 흐름으로 확대하지 않고 CareerFact·portfolio·MCP를 구현된 것처럼 표현하지 않아야 한다. |
-| `OR-008` | SBOM과 AI 모델 명세에 재사용 가능한 provenance 구조를 제공하되 업로드 문서, credential, 모델 cache, DB volume과 사용자 로컬 경로를 포함하지 않아야 한다. |
+### `OR-001` — 요구사항
+
+공개 source에 포함하거나 외부에서 준비하는 구성요소와 자산의 출처·버전·라이선스·재배포 경계를 SBOM과 NOTICE에 기록해야 한다.
+
+### `OR-002` — 요구사항
+
+Java/Gradle, frontend npm, Docker/컨테이너, PostgreSQL·pgvector, Ollama와 `bge-m3`, 테스트 fixture·예제·이미지·문서 자산을 대상으로 버전·출처·라이선스·사용 목적·배포 여부·NOTICE 의무를 감사해야 한다.
+
+### `OR-003` — 요구사항
+
+검토 후 사용자가 승인한 OSI 인증 프로젝트 라이선스를 루트 `LICENSE`에 적용하고, 필요한 제3자 고지와 예외를 `NOTICE`와 SBOM 범위 manifest에 일관되게 기록해야 한다.
+
+### `OR-004` — 요구사항
+
+PRIZM의 직접 작성 코드 저작권자를 `Jaemin Jeong`으로 기록하고 Codex는 개발 보조도구로 분리해야 한다. AI 사용을 특정 제3자 코드·자산을 복사하지 않았다는 보증으로 바꾸지 않아야 한다.
+
+### `OR-005` — 요구사항
+
+CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT와 최소 maintainer 정책은 외부 기여 접수 또는 첫 지원 release·외부 배포 중 먼저 도래하는 시점에 재개해야 한다. 실제 운영 가능한 신고 경로만 사용하고 비밀정보를 공개 Issue에 올리지 않도록 안내해야 한다.
+
+### `OR-006` — 요구사항
+
+Bug·feature·documentation Issue form과 PR template은 외부 Issue·PR 접수를 공식 지원하기 전에 재개해야 한다. 템플릿 자체를 review 증거로 주장하지 않아야 한다.
+
+### `OR-007` — 요구사항
+
+공개 진입 문서는 Quickstart, 현재·계획 기능, 검증 환경, 한계와 license·SBOM을 연결해야 한다. OpenSQL single-node 결과를 OpenProxy·OpenHA·DB failover 또는 전체 사용자 흐름으로 확대하지 않고 CareerFact·portfolio·MCP를 구현된 것처럼 표현하지 않아야 한다.
+
+### `OR-008` — 요구사항
+
+SBOM과 AI 모델 명세에 재사용 가능한 provenance 구조를 제공하되 업로드 문서, credential, 모델 cache, DB volume과 사용자 로컬 경로를 포함하지 않아야 한다.
 
 ## 보존 계약
 
 - PRZ-000의 문서·버전·`active_version_id`, owner-scoped 검색, JWT DB 재검증,
-  processing·cleanup lease와 fencing, Flyway V1~V13과 TXT/PDF 계약을 바꾸지 않는다.
+  processing·cleanup lease와 fencing, Flyway V1–V13과 TXT/PDF 계약을 바꾸지 않는다.
 - PostgreSQL 결과를 OpenSQL·OpenProxy·OpenHA 호환성 증거로 바꾸지 않는다.
 - 원본 경력 문서, JWT, 비밀번호, 전체 JDBC URL, 저장 경로, 모델 파일과 빌드
   산출물을 공개 source에 추가하지 않는다.

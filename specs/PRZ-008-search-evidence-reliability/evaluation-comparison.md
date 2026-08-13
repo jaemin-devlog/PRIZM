@@ -2,11 +2,12 @@
 
 ## 문서 목적과 상태
 
-이 문서는 PRZ-008 P0~P15에서 수행한 검색 개선과 평가 실험을 한곳에서 비교하고,
+이 문서는 PRZ-008 P0–P15에서 수행한 검색 개선과 평가 실험을 한곳에서 비교하고,
 각 방식이 왜 적용·보류·비권고됐는지 추적하기 위한 기록이다.
 
-여기서 **Production 적용**은 현재 작업 트리의 Production source와 기본 검색 경로에
-구현됐다는 뜻이다. 아직 commit·push·배포가 완료됐다는 뜻은 아니다. 반대로 P8~P15의
+여기서 **Production 적용**은 통합 source `2190d47ff013384cf9d8c441449149233f79b0e9`의
+Production source와 기본 검색 경로에 구현됐다는 뜻이다. PR #40 merge
+`9b24808b37424f2d11ca0afe374d5703c81868fc`로 `main`에 반영됐다. 반대로 P8–P15의
 실험 profile, PDF 분할안, PostgreSQL FTS, BGE-M3 Sparse, reranker는 평가 전용이며
 Production 검색 경로에 적용되지 않았다.
 
@@ -36,15 +37,21 @@ similarity에서 유도된 정렬 신호이며 정확도나 확률로 해석하�
 P5와 P8 이후 평가는 corpus와 목적이 다르므로 수치를 직접 합치거나 증감률로 비교하지
 않는다.
 
-| 구분 | 데이터 | 질문 | 구성 | 목적 |
-|---|---|---:|---|---|
-| P5 | PRZ-008 v2.3 합성 TUNING | 15 | 근거 8, 무근거 7; 실제 후보는 질의당 11개 | `0.50`·Top20 유지 여부 확인 |
-| P8~P15 | 실제 포트폴리오 PDF 5쪽 + 이력서 PDF 2쪽 | 40 | 근거 34, 무근거 6 | 실문서 검색 품질과 후속 실험 비교 |
+- **구분:** P5
+  - 데이터: PRZ-008 v2.3 합성 TUNING
+  - 질문: 15
+  - 구성: 근거 8, 무근거 7; 실제 후보는 질의당 11개
+  - 목적: `0.50`·Top20 유지 여부 확인
+- **구분:** P8–P15
+  - 데이터: 실제 포트폴리오 PDF 5쪽 + 이력서 PDF 2쪽
+  - 질문: 40
+  - 구성: 근거 34, 무근거 6
+  - 목적: 실문서 검색 품질과 후속 실험 비교
 
 실문서 40문항은 query type별로 직접 기술명 4, 기술명 표기 변형 4, 자연어
 패러프레이즈 4, 프로젝트 4, 트러블슈팅 4, 성과·수치 4, 간접 의미 4, 없는 경험 4,
 짧고 애매한 GENERAL 4, 완료 배포·출시 질문 4개다. Production chunking의 corpus는
-18개 청크라 모든 질의에서 Dense Top20이 실제 corpus 전체를 포함한다. 따라서 P8~P15의
+18개 청크라 모든 질의에서 Dense Top20이 실제 corpus 전체를 포함한다. 따라서 P8–P15의
 결과는 큰 corpus에서의 Top20 candidate recall을 증명하지 않는다.
 
 주요 근거 산출물은 다음과 같다.
@@ -65,20 +72,42 @@ P5와 P8 이후 평가는 corpus와 목적이 다르므로 수치를 직접 합�
 리포트에서 확인했으며 서로 다른 실행의 embedding 지연 차이를 알고리즘 비용으로
 간주하지 않았다.
 
-## P0~P7 Production 검색 개선
+## P0–P7 Production 검색 개선
 
-| 단계 | Production source의 변화 | 검색 결과 영향 | 판정 |
-|---|---|---|---|
-| P0 | 기존 owner·ACTIVE version·embedding·완료 주장 안전 계약과 strict baseline을 regression test로 고정 | 없음 | 적용 |
-| P1 | `GENERAL`과 `COMPLETED_RELEASE_EVIDENCE` intent 경계 추가. unsupported 완료 질문도 completed에 남도록 fail-closed | 없음; 두 intent 모두 당시 strict profile 사용 | 적용 |
-| P2 | GENERAL에서 identifier·숫자·core-term coverage·explicit-evidence 문자열 조건을 hard rejection으로 사용하지 않음 | 의미상 관련 Dense 후보가 문자열 불일치만으로 사라지지 않음 | 적용 |
-| P3 | NFKC·소문자화 후 `Spring Boot`, `SpringBoot`, `Springboot`, `Spring-Boot`, `spring_boot`를 `springboot`로 비교. `C++`, `C#`, `Node.js` 의미 문자는 보존 | 기술명 표기 차이 비교 일관화 | 적용 |
-| P4 | GENERAL에 identifier 최대 `0.020`, core-term 최대 `0.005`, number 최대 `0.005`의 bounded boost 추가 | 총 문자열 boost 최대 `0.030`; Dense가 주 신호이며 불일치 후보는 제거하지 않음 | 적용 |
-| P5 | Dense floor `0.50`, Dense candidate Top20 유지 | 값 변경 없음 | 적용(현행 유지) |
-| P6 | v2 상태를 `EVIDENCE_FOUND`, `NO_SEARCHABLE_DOCUMENTS`, `NO_RELEVANT_RESULTS`, `NO_EVIDENCE`로 구분 | 결과·순위 무변경; GENERAL 빈 결과와 completed 검증 실패 의미 분리 | 적용 |
-| P7 | 선택된 결과에서 질문 관련 문장과 인접 문장을 snippet으로 생성하고 전체 content를 보존 | 후보·순위·score 무변경; UI는 snippet 기본 표시와 원문 펼치기 제공 | 적용 |
+- **단계:** P0
+  - Production source의 변화: 기존 owner·ACTIVE version·embedding·완료 주장 안전 계약과 strict baseline을 regression test로 고정
+  - 검색 결과 영향: 없음
+  - 판정: 적용
+- **단계:** P1
+  - Production source의 변화: `GENERAL`과 `COMPLETED_RELEASE_EVIDENCE` intent 경계 추가. unsupported 완료 질문도 completed에 남도록 fail-closed
+  - 검색 결과 영향: 없음; 두 intent 모두 당시 strict profile 사용
+  - 판정: 적용
+- **단계:** P2
+  - Production source의 변화: GENERAL에서 identifier·숫자·core-term coverage·explicit-evidence 문자열 조건을 hard rejection으로 사용하지 않음
+  - 검색 결과 영향: 의미상 관련 Dense 후보가 문자열 불일치만으로 사라지지 않음
+  - 판정: 적용
+- **단계:** P3
+  - Production source의 변화: NFKC·소문자화 후 `Spring Boot`, `SpringBoot`, `Springboot`, `Spring-Boot`, `spring_boot`를 `springboot`로 비교. `C++`, `C#`, `Node.js` 의미 문자는 보존
+  - 검색 결과 영향: 기술명 표기 차이 비교 일관화
+  - 판정: 적용
+- **단계:** P4
+  - Production source의 변화: GENERAL에 identifier 최대 `0.020`, core-term 최대 `0.005`, number 최대 `0.005`의 bounded boost 추가
+  - 검색 결과 영향: 총 문자열 boost 최대 `0.030`; Dense가 주 신호이며 불일치 후보는 제거하지 않음
+  - 판정: 적용
+- **단계:** P5
+  - Production source의 변화: Dense floor `0.50`, Dense candidate Top20 유지
+  - 검색 결과 영향: 값 변경 없음
+  - 판정: 적용(현행 유지)
+- **단계:** P6
+  - Production source의 변화: v2 상태를 `EVIDENCE_FOUND`, `NO_SEARCHABLE_DOCUMENTS`, `NO_RELEVANT_RESULTS`, `NO_EVIDENCE`로 구분
+  - 검색 결과 영향: 결과·순위 무변경; GENERAL 빈 결과와 completed 검증 실패 의미 분리
+  - 판정: 적용
+- **단계:** P7
+  - Production source의 변화: 선택된 결과에서 질문 관련 문장과 인접 문장을 snippet으로 생성하고 전체 content를 보존
+  - 검색 결과 영향: 후보·순위·score 무변경; UI는 snippet 기본 표시와 원문 펼치기 제공
+  - 판정: 적용
 
-P0~P7 전체에서 owner 범위, 현재 `active_version_id`, `ACTIVE` 상태, 1024차원·finite·
+P0–P7 전체에서 owner 범위, 현재 `active_version_id`, `ACTIVE` 상태, 1024차원·finite·
 non-zero embedding, Dense Top20, 최종 최대 5건, 완료 Claim Gate의 질문·부정·철회·정정
 차단은 유지됐다.
 
@@ -131,15 +160,25 @@ Top1이었다는 점이다. 주요 실패는 다음과 같았다.
 
 P8은 측정 단계이므로 Production 변경이나 채택 판정은 하지 않았다.
 
-## P9~P11: chunking과 page dedup 실험
+## P9–P11: chunking과 page dedup 실험
 
 ### 청크 크기
 
-| 방식 | 청크 수 | 최소 | 평균 | 최대 |
-|---|---:|---:|---:|---:|
-| Production | 18 | 145자 | 637.00자 | 800자 |
-| P9 `section-paragraph-v1` | 33 | 59자 | 306.79자 | 600자 |
-| P11 `section-paragraph-v2` | 32 | 178자 | 320.16자 | 600자 |
+- **방식:** Production
+  - 청크 수: 18
+  - 최소: 145자
+  - 평균: 637.00자
+  - 최대: 800자
+- **방식:** P9 `section-paragraph-v1`
+  - 청크 수: 33
+  - 최소: 59자
+  - 평균: 306.79자
+  - 최대: 600자
+- **방식:** P11 `section-paragraph-v2`
+  - 청크 수: 32
+  - 최소: 178자
+  - 평균: 320.16자
+  - 최대: 600자
 
 P9 v1은 섹션·문단 경계를 살려 이메일/Kakao 통합과 `알림`을 Top1으로 복구했다.
 그러나 59자 조각을 만들고 주변 문맥을 잃어 `FOR UPDATE SKIP LOCKED`가 `0.493406`으로
@@ -149,12 +188,30 @@ P9 v1은 섹션·문단 경계를 살려 이메일/Kakao 통합과 `알림`을 T
 P10은 같은 페이지 청크를 모두 검증·ranking한 뒤 최종 결과에서 dedup하는 방식을
 실험했다.
 
-| P10 방식 | Top1 | Recall@3 | Recall@5 | MRR@5 | 없는 경험 오탐 |
-|---|---:|---:|---:|---:|---:|
-| Production 조기 dedup | 76.47% | 79.41% | 79.41% | 0.7794 | 1/6, 1건 |
-| Production chunking + deferred dedup | 73.53% | 79.41% | 79.41% | 0.7647 | 1/6, 1건 |
-| section-v1 + 조기 dedup | 73.53% | 79.41% | 79.41% | 0.7647 | 2/6, 2건 |
-| section-v1 + deferred dedup | 76.47% | 82.35% | 82.35% | 0.7892 | 2/6, 2건 |
+- **P10 방식:** Production 조기 dedup
+  - Top1: 76.47%
+  - Recall@3: 79.41%
+  - Recall@5: 79.41%
+  - MRR@5: 0.7794
+  - 없는 경험 오탐: 1/6, 1건
+- **P10 방식:** Production chunking + deferred dedup
+  - Top1: 73.53%
+  - Recall@3: 79.41%
+  - Recall@5: 79.41%
+  - MRR@5: 0.7647
+  - 없는 경험 오탐: 1/6, 1건
+- **P10 방식:** section-v1 + 조기 dedup
+  - Top1: 73.53%
+  - Recall@3: 79.41%
+  - Recall@5: 79.41%
+  - MRR@5: 0.7647
+  - 없는 경험 오탐: 2/6, 2건
+- **P10 방식:** section-v1 + deferred dedup
+  - Top1: 76.47%
+  - Recall@3: 82.35%
+  - Recall@5: 82.35%
+  - MRR@5: 0.7892
+  - 없는 경험 오탐: 2/6, 2건
 
 section-v1 + deferred dedup은 외부 API 동시 작업 수를 Top1으로 복구했지만 TourAPI는
 3위로 더 내려갔다. Production chunking에서 deferred dedup만 적용하면 Top1과 MRR이
@@ -165,11 +222,24 @@ P11 v2는 짧은 조각을 같은 섹션의 주변 내용과 합쳐 최소 길�
 분리한 설계가 새로 누락됐다. `알림`과 이메일/Kakao 복구는 유지했으나 전체 지표는
 v1보다도 낮았다.
 
-| 방식 | Top1 | Recall@3 | Recall@5 | MRR@5 | 없는 경험 오탐 |
-|---|---:|---:|---:|---:|---:|
-| Production | 76.47% | 79.41% | 79.41% | 0.7794 | 1/6, 1건 |
-| section-v1 | 73.53% | 79.41% | 79.41% | 0.7647 | 2/6, 2건 |
-| section-v2 | 73.53% | 76.47% | 76.47% | 0.7500 | 2/6, 2건 |
+- **방식:** Production
+  - Top1: 76.47%
+  - Recall@3: 79.41%
+  - Recall@5: 79.41%
+  - MRR@5: 0.7794
+  - 없는 경험 오탐: 1/6, 1건
+- **방식:** section-v1
+  - Top1: 73.53%
+  - Recall@3: 79.41%
+  - Recall@5: 79.41%
+  - MRR@5: 0.7647
+  - 없는 경험 오탐: 2/6, 2건
+- **방식:** section-v2
+  - Top1: 73.53%
+  - Recall@3: 76.47%
+  - Recall@5: 76.47%
+  - MRR@5: 0.7500
+  - 없는 경험 오탐: 2/6, 2건
 
 **판정:** P9 v1, P10 deferred dedup, P11 v2 모두 Production 적용 비권고다. 특정 실패를
 고쳤지만 전체 지표나 오탐이 악화됐고 새로운 회귀가 생겼다.
@@ -179,7 +249,7 @@ v1보다도 낮았다.
 평가 전용 단일 조건은 다음과 같았다.
 
 - intent가 `GENERAL`이고 기존 Production 결과가 비어 있어야 한다.
-- 정규화한 질문이 2~4 code point의 정확히 한 token이어야 한다.
+- 정규화한 질문이 2–4 code point의 정확히 한 token이어야 한다.
 - 후보 본문에 동일한 normalized token이 substring이 아닌 token 단위로 존재해야 한다.
 - 원래 Dense score가 `0.49 <= score < 0.50`이어야 한다.
 - 최대 1건만 살리며 원래 score·distance를 그대로 반환한다.
@@ -236,13 +306,26 @@ Production 적용은 비권고다. P12와 같은 순지표 개선에 추가 SQL 
 `lexical_weights`를 사용했다. Production Dense Top20과 Sparse Top20을 가중치 없는
 RRF `k=60`으로 결합했으며 P12나 PostgreSQL FTS는 섞지 않았다.
 
-| 지표 | Production | P13 | P14 Dense+Sparse |
-|---|---:|---:|---:|
-| Top1 | 76.47% | 82.35% | 79.41% |
-| Recall@3 | 79.41% | 85.29% | 88.24% |
-| Recall@5 | 79.41% | 85.29% | 88.24% |
-| MRR@5 | 0.7794 | 0.8382 | 0.8333 |
-| 없는 경험 오탐 | 1/6, 1건 | 1/6, 1건 | 3/6, 15건 |
+- **지표:** Top1
+  - Production: 76.47%
+  - P13: 82.35%
+  - P14 Dense+Sparse: 79.41%
+- **지표:** Recall@3
+  - Production: 79.41%
+  - P13: 85.29%
+  - P14 Dense+Sparse: 88.24%
+- **지표:** Recall@5
+  - Production: 79.41%
+  - P13: 85.29%
+  - P14 Dense+Sparse: 88.24%
+- **지표:** MRR@5
+  - Production: 0.7794
+  - P13: 0.8382
+  - P14 Dense+Sparse: 0.8333
+- **지표:** 없는 경험 오탐
+  - Production: 1/6, 1건
+  - P13: 1/6, 1건
+  - P14 Dense+Sparse: 3/6, 15건
 
 이메일/Kakao를 Top1으로 새로 복구하고 `배포` 정답을 3위에서 찾았지만, `FOR UPDATE
 SKIP LOCKED` 정답은 Top5 밖으로 밀렸다. Kubernetes와 Kafka가 각각 무관 결과 5건을
@@ -280,17 +363,60 @@ P15는 P14가 이미 찾은 GENERAL 후보만 `BAAI/bge-reranker-v2-m3` raw logi
 
 다음 표는 모두 동일한 P8 실문서 40문항, 즉 관련 질문 34개와 무근거 질문 6개를 쓴다.
 
-| 방식 | Top1 | Recall@3 | Recall@5 | MRR@5 | 없는 경험 오탐 |
-|---|---:|---:|---:|---:|---:|
-| P8 Production baseline | 26/34, 76.47% | 27/34, 79.41% | 27/34, 79.41% | 0.7794 | 1/6, 1건 |
-| P9 section-paragraph-v1 | 25/34, 73.53% | 27/34, 79.41% | 27/34, 79.41% | 0.7647 | 2/6, 2건 |
-| P10 Production chunking + deferred dedup | 25/34, 73.53% | 27/34, 79.41% | 27/34, 79.41% | 0.7647 | 1/6, 1건 |
-| P10 section-v1 + deferred dedup | 26/34, 76.47% | 28/34, 82.35% | 28/34, 82.35% | 0.7892 | 2/6, 2건 |
-| P11 section-paragraph-v2 | 25/34, 73.53% | 26/34, 76.47% | 26/34, 76.47% | 0.7500 | 2/6, 2건 |
-| P12 exact-token rescue | 28/34, 82.35% | 29/34, 85.29% | 29/34, 85.29% | 0.8382 | 1/6, 1건 |
-| P13 Dense + PostgreSQL FTS + RRF | 28/34, 82.35% | 29/34, 85.29% | 29/34, 85.29% | 0.8382 | 1/6, 1건 |
-| P14 Dense + BGE-M3 Sparse | 27/34, 79.41% | 30/34, 88.24% | 30/34, 88.24% | 0.8333 | 3/6, 15건 |
-| P15 P14 후보 + BGE reranker | 24/34, 70.59% | 30/34, 88.24% | 30/34, 88.24% | 0.7892 | 3/6, 15건 |
+- **방식:** P8 Production baseline
+  - Top1: 26/34, 76.47%
+  - Recall@3: 27/34, 79.41%
+  - Recall@5: 27/34, 79.41%
+  - MRR@5: 0.7794
+  - 없는 경험 오탐: 1/6, 1건
+- **방식:** P9 section-paragraph-v1
+  - Top1: 25/34, 73.53%
+  - Recall@3: 27/34, 79.41%
+  - Recall@5: 27/34, 79.41%
+  - MRR@5: 0.7647
+  - 없는 경험 오탐: 2/6, 2건
+- **방식:** P10 Production chunking + deferred dedup
+  - Top1: 25/34, 73.53%
+  - Recall@3: 27/34, 79.41%
+  - Recall@5: 27/34, 79.41%
+  - MRR@5: 0.7647
+  - 없는 경험 오탐: 1/6, 1건
+- **방식:** P10 section-v1 + deferred dedup
+  - Top1: 26/34, 76.47%
+  - Recall@3: 28/34, 82.35%
+  - Recall@5: 28/34, 82.35%
+  - MRR@5: 0.7892
+  - 없는 경험 오탐: 2/6, 2건
+- **방식:** P11 section-paragraph-v2
+  - Top1: 25/34, 73.53%
+  - Recall@3: 26/34, 76.47%
+  - Recall@5: 26/34, 76.47%
+  - MRR@5: 0.7500
+  - 없는 경험 오탐: 2/6, 2건
+- **방식:** P12 exact-token rescue
+  - Top1: 28/34, 82.35%
+  - Recall@3: 29/34, 85.29%
+  - Recall@5: 29/34, 85.29%
+  - MRR@5: 0.8382
+  - 없는 경험 오탐: 1/6, 1건
+- **방식:** P13 Dense + PostgreSQL FTS + RRF
+  - Top1: 28/34, 82.35%
+  - Recall@3: 29/34, 85.29%
+  - Recall@5: 29/34, 85.29%
+  - MRR@5: 0.8382
+  - 없는 경험 오탐: 1/6, 1건
+- **방식:** P14 Dense + BGE-M3 Sparse
+  - Top1: 27/34, 79.41%
+  - Recall@3: 30/34, 88.24%
+  - Recall@5: 30/34, 88.24%
+  - MRR@5: 0.8333
+  - 없는 경험 오탐: 3/6, 15건
+- **방식:** P15 P14 후보 + BGE reranker
+  - Top1: 24/34, 70.59%
+  - Recall@3: 30/34, 88.24%
+  - Recall@5: 30/34, 88.24%
+  - MRR@5: 0.7892
+  - 없는 경험 오탐: 3/6, 15건
 
 P12와 P13은 같은 headline 지표를 냈다. P12는 정확히 두 경계 문항만 복구했고 P13은
 같은 두 문항을 복구하면서 결과 tail과 `배포` 동작까지 바꿨다. P14의 Recall@3/5가 가장
@@ -302,16 +428,38 @@ Top1을 3문항 낮췄다.
 아래 시간은 서로 다른 실행의 평균/P95이므로 Ollama embedding 변동을 포함한다.
 같은 행 안의 측정에는 의미가 있지만 단순 차이를 전부 알고리즘 비용으로 해석하지 않는다.
 
-| 방식 | 평균 / P95 전체 시간 | 직접 추가 비용 | GPU·메모리 |
-|---|---:|---|---|
-| P8 Production baseline | 122.40 / 127ms | 없음 | Dense Ollama 메모리 별도 미측정 |
-| P9 section-v1 | 115.18 / 131ms | 청크 수 18→33; 별도 모델 없음 | 추가 GPU 없음 |
-| P10 section-v1 + deferred dedup | 115.50 / 133ms | Java 후보 검증·최종 dedup | 추가 GPU 없음 |
-| P11 section-v2 | 116.58 / 129ms | 청크 수 18→32; 별도 모델 없음 | 추가 GPU 없음 |
-| P12 exact-token rescue | 114.45 / 132ms | Java exact-token 후처리; 별도 조회 없음 | 추가 GPU 없음 |
-| P13 PostgreSQL FTS + RRF | 132.28 / 202ms | lexical SQL 평균 2.40ms + 질의당 DB 1회; 평가 profile 평균 6.75ms | 추가 GPU 없음; 운영 index 비용 미검증 |
-| P14 BGE-M3 Sparse | 162.98 / 186ms | sparse encode+18문서 score 평균 17.53ms, fusion/profile 평균 17.53ms | 모델 load 3.24s, corpus encode 391ms, peak allocated 약 1.22GB |
-| P15 BGE reranker | 205.55 / 248ms | GENERAL reranker 평균 50.59ms, P95 60.95ms; post-rerank profile 평균 22.91ms | load 3.68s, peak allocated 1.23GiB, reserved 1.65GiB, 관측 RSS 2.79GiB |
+- **방식:** P8 Production baseline
+  - 평균 / P95 전체 시간: 122.40 / 127ms
+  - 직접 추가 비용: 없음
+  - GPU·메모리: Dense Ollama 메모리 별도 미측정
+- **방식:** P9 section-v1
+  - 평균 / P95 전체 시간: 115.18 / 131ms
+  - 직접 추가 비용: 청크 수 18→33; 별도 모델 없음
+  - GPU·메모리: 추가 GPU 없음
+- **방식:** P10 section-v1 + deferred dedup
+  - 평균 / P95 전체 시간: 115.50 / 133ms
+  - 직접 추가 비용: Java 후보 검증·최종 dedup
+  - GPU·메모리: 추가 GPU 없음
+- **방식:** P11 section-v2
+  - 평균 / P95 전체 시간: 116.58 / 129ms
+  - 직접 추가 비용: 청크 수 18→32; 별도 모델 없음
+  - GPU·메모리: 추가 GPU 없음
+- **방식:** P12 exact-token rescue
+  - 평균 / P95 전체 시간: 114.45 / 132ms
+  - 직접 추가 비용: Java exact-token 후처리; 별도 조회 없음
+  - GPU·메모리: 추가 GPU 없음
+- **방식:** P13 PostgreSQL FTS + RRF
+  - 평균 / P95 전체 시간: 132.28 / 202ms
+  - 직접 추가 비용: lexical SQL 평균 2.40ms + 질의당 DB 1회; 평가 profile 평균 6.75ms
+  - GPU·메모리: 추가 GPU 없음; 운영 index 비용 미검증
+- **방식:** P14 BGE-M3 Sparse
+  - 평균 / P95 전체 시간: 162.98 / 186ms
+  - 직접 추가 비용: sparse encode+18문서 score 평균 17.53ms, fusion/profile 평균 17.53ms
+  - GPU·메모리: 모델 load 3.24s, corpus encode 391ms, peak allocated 약 1.22GB
+- **방식:** P15 BGE reranker
+  - 평균 / P95 전체 시간: 205.55 / 248ms
+  - 직접 추가 비용: GENERAL reranker 평균 50.59ms, P95 60.95ms; post-rerank profile 평균 22.91ms
+  - GPU·메모리: load 3.68s, peak allocated 1.23GiB, reserved 1.65GiB, 관측 RSS 2.79GiB
 
 P15 CPU 실행은 기술적으로 가능했지만 16개 후보 한 질의에 6.23초가 걸렸고 관측 최대
 RSS는 2.47GiB였다. 이 값은 한 번의 warm-cache 측정이며 평균/P95가 아니지만 실시간
@@ -323,16 +471,62 @@ RSS는 2.47GiB였다. 이 값은 한 번의 warm-cache 측정이며 평균/P95�
 `TopN`은 첫 관련 결과 순위다. `빈 결과`는 관련·무관 결과가 모두 없음을 뜻하고,
 `오탐 N건`은 관련 근거 없이 무관 결과만 반환했음을 뜻한다.
 
-| 질의 | Production | P9/P11 section 방식 | P12 | P13 | P14 | P15 |
-|---|---|---|---|---|---|---|
-| 알림 | 빈 결과, 정답 `0.494675` | Top1 | Top1 | Top1 | Top1 | Top3 |
-| 동시성 | 빈 결과, 정답 `0.490510` | 빈 결과 | Top1 | Top1 | Top1 | Top2 |
-| 이메일/Kakao 통합 | 빈 결과, 정답 `0.495141` | Top1 | 빈 결과 | 빈 결과 | Top1 | Top1 |
-| FOR UPDATE SKIP LOCKED | Top1 | 빈 결과 | Top1 | Top1 | Top5 소실; pre-final 9위 | Top1 복구 |
-| 배포 | 빈 결과, 라벨 정답 `0.431200` | 빈 결과 | 빈 결과 | 무관 결과 1건 | 관련 Top3, 앞 2건 무관 | 관련 Top2, Top1 무관 |
-| 없는 결제 시스템 | 오탐 1건 | 오탐 1건 | 오탐 1건 | 오탐 1건 | 오탐 5건 | 오탐 5건 |
-| 없는 Kafka GENERAL | 올바른 빈 결과 | 오탐 1건 | 올바른 빈 결과 | 올바른 빈 결과 | 오탐 5건 | 오탐 5건 |
-| 없는 Kubernetes | 올바른 빈 결과 | 올바른 빈 결과 | 올바른 빈 결과 | 올바른 빈 결과 | 오탐 5건 | 오탐 5건 |
+- **질의:** 알림
+  - Production: 빈 결과, 정답 `0.494675`
+  - P9/P11 section 방식: Top1
+  - P12: Top1
+  - P13: Top1
+  - P14: Top1
+  - P15: Top3
+- **질의:** 동시성
+  - Production: 빈 결과, 정답 `0.490510`
+  - P9/P11 section 방식: 빈 결과
+  - P12: Top1
+  - P13: Top1
+  - P14: Top1
+  - P15: Top2
+- **질의:** 이메일/Kakao 통합
+  - Production: 빈 결과, 정답 `0.495141`
+  - P9/P11 section 방식: Top1
+  - P12: 빈 결과
+  - P13: 빈 결과
+  - P14: Top1
+  - P15: Top1
+- **질의:** FOR UPDATE SKIP LOCKED
+  - Production: Top1
+  - P9/P11 section 방식: 빈 결과
+  - P12: Top1
+  - P13: Top1
+  - P14: Top5 소실; pre-final 9위
+  - P15: Top1 복구
+- **질의:** 배포
+  - Production: 빈 결과, 라벨 정답 `0.431200`
+  - P9/P11 section 방식: 빈 결과
+  - P12: 빈 결과
+  - P13: 무관 결과 1건
+  - P14: 관련 Top3, 앞 2건 무관
+  - P15: 관련 Top2, Top1 무관
+- **질의:** 없는 결제 시스템
+  - Production: 오탐 1건
+  - P9/P11 section 방식: 오탐 1건
+  - P12: 오탐 1건
+  - P13: 오탐 1건
+  - P14: 오탐 5건
+  - P15: 오탐 5건
+- **질의:** 없는 Kafka GENERAL
+  - Production: 올바른 빈 결과
+  - P9/P11 section 방식: 오탐 1건
+  - P12: 올바른 빈 결과
+  - P13: 올바른 빈 결과
+  - P14: 오탐 5건
+  - P15: 오탐 5건
+- **질의:** 없는 Kubernetes
+  - Production: 올바른 빈 결과
+  - P9/P11 section 방식: 올바른 빈 결과
+  - P12: 올바른 빈 결과
+  - P13: 올바른 빈 결과
+  - P14: 오탐 5건
+  - P15: 오탐 5건
 
 핵심 해석은 다음과 같다.
 
@@ -349,24 +543,70 @@ RSS는 2.47GiB였다. 이 값은 한 번의 warm-cache 측정이며 평균/P95�
 
 ## 단계별 최종 판정
 
-| 단계·방식 | Production 여부 | 판정 | 근거 |
-|---|---|---|---|
-| P0 안전 regression | Production test | 적용 | 향후 완화 전 안전 계약 고정 |
-| P1 intent 경계 | Production | 적용 | 결과 무변경으로 GENERAL/completed 분리 |
-| P2 GENERAL hard gate 완화 | Production | 적용 | 문자열 불일치만으로 의미 후보 제거 방지 |
-| P3 기술명 정규화 | Production | 적용 | Spring Boot 표기 변형만 제한적으로 통합 |
-| P4 bounded soft ranking | Production | 적용 | 최대 0.030으로 Dense 주 신호 유지 |
-| P5 `0.50 / Top20` | Production | 적용 | 낮춤·확대 필요 근거 없음 |
-| P6 v2 상태 | Production API | 적용 | GENERAL 빈 결과와 completed 검증 실패 분리 |
-| P7 snippet | Production 표현 계층 | 적용 | 결과·순위 무변경 |
-| P8 실문서 baseline | 평가 전용 | 측정 완료 | 후속 비교 기준 |
-| P9 section-v1 | 평가 전용 | 비권고 | Top1·MRR 하락, Kafka 오탐·여러 회귀 |
-| P10 deferred page dedup | 평가 전용 | 비권고 | 일부 복구에도 단독 Production 조합은 악화 |
-| P11 section-v2 | 평가 전용 | 비권고 | 최소 길이는 개선했지만 전체 지표 하락 |
-| P12/P17/P18 exact-token rescue | Production | 적용 | P17 추가 28문항에서 신규 rescue 오탐 0, P18 Product와 평가 프로필 68문항 차이 0 |
-| P13 PostgreSQL FTS + RRF | 평가 전용 | 보류, 현재 형태는 비권고 | P12와 같은 지표지만 추가 DB 비용과 `배포` 회귀 |
-| P14 BGE-M3 Sparse | 평가 전용 | 비권고 | Recall 상승보다 오탐 15건과 순위 회귀가 큼 |
-| P15 BGE reranker | 평가 전용 | 비권고 | Recall·오탐 개선 없이 Top1 하락과 최고 비용 |
+- **단계·방식:** P0 안전 regression
+  - Production 여부: Production test
+  - 판정: 적용
+  - 근거: 향후 완화 전 안전 계약 고정
+- **단계·방식:** P1 intent 경계
+  - Production 여부: Production
+  - 판정: 적용
+  - 근거: 결과 무변경으로 GENERAL/completed 분리
+- **단계·방식:** P2 GENERAL hard gate 완화
+  - Production 여부: Production
+  - 판정: 적용
+  - 근거: 문자열 불일치만으로 의미 후보 제거 방지
+- **단계·방식:** P3 기술명 정규화
+  - Production 여부: Production
+  - 판정: 적용
+  - 근거: Spring Boot 표기 변형만 제한적으로 통합
+- **단계·방식:** P4 bounded soft ranking
+  - Production 여부: Production
+  - 판정: 적용
+  - 근거: 최대 0.030으로 Dense 주 신호 유지
+- **단계·방식:** P5 `0.50 / Top20`
+  - Production 여부: Production
+  - 판정: 적용
+  - 근거: 낮춤·확대 필요 근거 없음
+- **단계·방식:** P6 v2 상태
+  - Production 여부: Production API
+  - 판정: 적용
+  - 근거: GENERAL 빈 결과와 completed 검증 실패 분리
+- **단계·방식:** P7 snippet
+  - Production 여부: Production 표현 계층
+  - 판정: 적용
+  - 근거: 결과·순위 무변경
+- **단계·방식:** P8 실문서 baseline
+  - Production 여부: 평가 전용
+  - 판정: 측정 완료
+  - 근거: 후속 비교 기준
+- **단계·방식:** P9 section-v1
+  - Production 여부: 평가 전용
+  - 판정: 비권고
+  - 근거: Top1·MRR 하락, Kafka 오탐·여러 회귀
+- **단계·방식:** P10 deferred page dedup
+  - Production 여부: 평가 전용
+  - 판정: 비권고
+  - 근거: 일부 복구에도 단독 Production 조합은 악화
+- **단계·방식:** P11 section-v2
+  - Production 여부: 평가 전용
+  - 판정: 비권고
+  - 근거: 최소 길이는 개선했지만 전체 지표 하락
+- **단계·방식:** P12/P17/P18 exact-token rescue
+  - Production 여부: Production
+  - 판정: 적용
+  - 근거: P17 추가 28문항에서 신규 rescue 오탐 0, P18 Product와 평가 프로필 68문항 차이 0
+- **단계·방식:** P13 PostgreSQL FTS + RRF
+  - Production 여부: 평가 전용
+  - 판정: 보류, 현재 형태는 비권고
+  - 근거: P12와 같은 지표지만 추가 DB 비용과 `배포` 회귀
+- **단계·방식:** P14 BGE-M3 Sparse
+  - Production 여부: 평가 전용
+  - 판정: 비권고
+  - 근거: Recall 상승보다 오탐 15건과 순위 회귀가 큼
+- **단계·방식:** P15 BGE reranker
+  - Production 여부: 평가 전용
+  - 판정: 비권고
+  - 근거: Recall·오탐 개선 없이 Top1 하락과 최고 비용
 
 ## 현재 최종 후보와 남은 결정
 

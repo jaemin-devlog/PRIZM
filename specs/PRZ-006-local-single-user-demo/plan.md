@@ -1,68 +1,58 @@
-# PRZ-006 로컬 보관함 빠른 시작 — Plan
+# PRZ-006 — 로컬 보관함 빠른 시작 Plan
 
-## 현재 단계와 범위
+> **문서 상태:** `VERIFIED`
+> **계획 기준선:** `b370cd91f93bd617abebd7afce56fc495eb7b161`
+>
+> 구현 전 계획을 보존한다. 실제 결과는 [Tasks](tasks.md)와
+> [Evidence](evidence.md)를 따른다.
 
-- 현재 단계: `INTEGRATE`
-- 검증 source commit: `bfd86005862aa15927c707250330c70ebf81c133`
-- GitHub Issue: `NOT_CREATED`
-- 이번 구현은 기존 Docker 실행과 로그인 UI 안에 작은 local-session 진입점을 더하는
-  수직 슬라이스다.
+## P1. 선택적 빠른 시작 설계
 
-## 설계 결정
+- 목표: 기존 Docker와 일반 로그인을 유지하면서 로컬 진입 절차를 줄인다.
+- 변경 범위: Compose의 opt-in 환경 변수와 일반 실행 기본값 `false`.
+- 검증: 두 진입 모드가 같은 JWT·owner 계약을 사용하는지 확인한다.
+- Rollback: opt-in 설정과 local-session 경로를 함께 비활성화한다.
+- 중단 조건: 비밀값 자동 생성, 별도 Compose나 migration이 필요하면 중단한다.
 
-### D-01 — 두 실행 모드가 아니라 기존 로그인 위의 선택적 빠른 시작
+## P2. 정상 JWT와 owner 경계
 
-처음에는 `.env`가 전혀 없는 단일 사용자 Docker Compose와 별도 다중 사용자 Compose를
-나누는 방안을 검토했다. 이 방식은 실행 편의성을 높일 수 있지만 secret 생성·DB 초기화·
-Ollama 모델 관리·운영 배포 경계를 한 기능에 동시에 도입한다.
+- 목표: local `USER`를 생성·재사용하고 기존 JWT를 발급한다.
+- 변경 범위: auth config·controller·service·DTO와 backend test.
+- 검증: 활성 상태·role, DB 재검증과 두 사용자 owner isolation을 확인한다.
+- Rollback: auth 변경을 되돌리고 기존 로그인만 유지한다.
+- 중단 조건: 사용자 ID 하드코딩이나 Spring Security 우회가 필요하면 중단한다.
 
-이번에는 기존 `.env` 기반 Docker Compose를 유지한다. 기본 Compose에만
-`PRIZM_LOCAL_DEMO_ENABLED=true`를 넣어 로그인 폼 대신 `PRIZM 시작하기`를 표시하고,
-일반 Spring Boot 실행에서는 이 값을 기본 `false`로 두어 기존 로그인 폼을 유지한다. multi-user 배포 분리와 `.env` 제거는 별도
-SPEC으로 다시 계획한다.
+## P3. 진입 화면과 문서
 
-### D-02 — 빠른 시작도 정상 JWT를 발급
+- 목표: opt-in 실행에서만 `PRIZM 시작하기`를 표시한다.
+- 변경 범위: `App.tsx`, auth API, style과 README·Quickstart.
+- 검증: availability 실패 시 일반 로그인 유지, frontend lint·build와 browser 흐름을
+  확인한다.
+- Rollback: frontend 분기를 제거하고 로그인 화면을 유지한다.
+- 중단 조건: 일반 실행에 local-demo가 노출되면 중단한다.
 
-`userId=1` 하드코딩이나 Spring Security 비활성화 대신 local `USER`를 생성 또는 재사용하고
-기존 `JwtTokenService`로 access token을 발급한다. 이어지는 요청은 현재 JWT DB 재검증과
-owner-scoped repository/service 경로를 그대로 사용한다.
+## P4. 검증과 통합
 
-계정의 password hash는 엔티티 제약을 만족하기 위한 실행 시 난수 hash이며, 원문
-비밀번호는 저장·로그·응답에 포함하지 않는다. 이 계정이 비활성화되었거나 `USER`가 아닌
-role이면 빠른 시작은 실패한다.
+- 목표: backend·PostgreSQL·frontend·Docker 검증과 독립 감사를 완료한다.
+- 변경 범위: test와 Evidence·상태 문서.
+- 검증: unit·integration, lint·build, Compose·browser, diff와 audit을 수행한다.
+- Rollback: 필수 검증 실패 시 `VERIFIED`로 판정하지 않는다.
+- 중단 조건: OpenSQL 미실행을 `PASS`로 기록하면 중단한다.
 
-### D-03 — 실행 방식에 맞는 진입 화면 표시
+## 공통 위험과 대응
 
-frontend는 공개 `GET /api/auth/local-demo`가 활성 상태를 반환하면 로그인 폼을 숨기고
-`PRIZM 시작하기`를 표시한다. 비활성 상태에서는 기존 이메일·비밀번호 로그인 폼을 표시한다.
-endpoint 조회 실패는 일반 로그인에 영향을 주지 않으며,
-local-session 실패는 성공처럼 보이지 않는다.
+- 기존 `.env`, host Ollama, port topology와 일반 로그인 계약을 유지한다.
+- 원문 password는 저장·로그·응답하지 않는다.
+- 회원가입, 비밀번호 재설정과 다중 사용자 배포는 제외한다.
 
-## 예상 변경
+## Dependency 및 license 영향
 
-- `compose.yaml`: 기존 topology에 local-demo 활성 환경 변수 하나만 추가
-- auth config/controller/service/DTO: local-demo availability와 local-session JWT 발급
-- `frontend/src/App.tsx`, `frontend/src/api/authApi.ts`, `frontend/src/styles.css`: local demo와
-  일반 로그인 진입 화면 분기, 문서 목록·경력 근거 검색의 빈 상태와 문구·스타일 정리
-- 관련 backend unit test, README·Quickstart의 최소 실행 안내, `tasks.md`
+- Flyway, dependency, image와 model 배포 경계는 바꾸지 않는다.
 
-Flyway migration, Dockerfile, Ollama 구성, OpenSQL 구성, 검색·문서 API 계약은 변경하지
-않는다.
+## Branch와 통합 경계
 
-## 검증 계획
+- 실제 GitHub 통합 결과는 Evidence에만 기록한다.
 
-1. backend unit: 기능 비활성 기본값, local account 생성·재사용·오류와 JWT 응답
-2. PostgreSQL integration: local token의 DB 재검증과 owner isolation
-3. frontend lint/build; 현재 공식 frontend unit runner가 없으면 이를 `NOT_RUN`으로 기록
-4. Docker Compose config, local start, 일반 로그인 회귀와 브라우저 흐름
-5. 독립 읽기 전용 AUDIT 후 실제 PR/CI 확인
+## 계획 대비 주요 변경
 
-Docker, PostgreSQL, pgvector, Ollama와 OpenSQL/OpenProxy/OpenHA 사용 여부를 VERIFY
-evidence에 분리해 기록한다.
-
-## 중단 조건과 후속 분리
-
-- 새 비밀값 전달 방식, container image, 모델 downloader 또는 migration이 필요해지면
-  IMPLEMENT를 멈추고 새 PLAN을 작성한다.
-- 회원가입·비밀번호 재설정·이메일 인증·운영 다중 사용자 배포는 PRZ-006 범위 밖이다.
-- OpenSQL 검증은 이 기능과 독립적으로 계속 `NOT_RUN` 또는 기존 검증 상태를 유지한다.
+- audit에서 availability 실패 시 일반 로그인 고정 문제와 문서 모순을 교정했다.

@@ -4,37 +4,90 @@
 문서는 구현 증거가 아니며 실제 상태는 source code, 적용된 Flyway migration과
 실행 가능한 test로 판정한다.
 
+## 읽는 순서
+
+각 PRZ는 다음 순서로 읽는다.
+
+1. `spec.md`에서 목적, 기능 구성, 동작·상태 흐름과 보존 계약을 확인한다.
+2. `plan.md`에서 구현 전에 선택한 단계, 검증·rollback과 중단 조건을 확인한다.
+3. `tasks.md`에서 Plan과 같은 단계별 완료 상태를 확인한다.
+4. `evidence.md`에서 실제로 실행한 수직 흐름, source와 환경별 판정을 확인한다.
+
+PRZ-000은 Registry 도입 이전 구현 기준선이라 Plan과 Tasks가 없다. PRZ-005는
+표준 [Evidence](PRZ-005-opensql-ollama-e2e/evidence.md)에서 최종 판정을 먼저 확인하고,
+명령·실패·복구 이력이 필요할 때만
+[상세 작업 보고서](PRZ-005-opensql-ollama-e2e/implementation-report.md)를 읽는다.
+
+## PRZ 전체 흐름
+
+```mermaid
+flowchart TD
+    PRZ000["PRZ-000 플랫폼·Career Vault 기준선"]
+    PRZ001["PRZ-001 검색 평가 정합성"]
+    PRZ002["PRZ-002 오픈소스 준비"]
+    PRZ003["PRZ-003 OpenSQL 단일 노드 Gate"]
+    PRZ004["PRZ-004 clean-clone demo"]
+    PRZ005["PRZ-005 OpenSQL·Ollama E2E"]
+    PRZ006["PRZ-006 로컬 빠른 시작"]
+    PRZ007["PRZ-007 자체 호스팅 회원가입"]
+    PRZ008["PRZ-008 검색 근거 신뢰성"]
+    PRZ009["PRZ-009 경력 키워드 맵"]
+    PRZ010["PRZ-010 변경 로그 동기화"]
+    PRZ011["PRZ-011 처리 진행 상태 UX"]
+
+    PRZ000 --> PRZ001 --> PRZ008
+    PRZ000 --> PRZ002 --> PRZ003 --> PRZ005
+    PRZ002 --> PRZ004 --> PRZ005
+    PRZ004 --> PRZ006 --> PRZ007
+    PRZ000 --> PRZ009
+    PRZ000 --> PRZ010 --> PRZ011
+```
+
+화살표는 제품 전체의 엄격한 build dependency가 아니라, 각 문서가 직접 확장하거나
+검증한 기준선을 나타낸다.
+
 ## 상태
 
-| 상태 | 의미 |
-|---|---|
-| `AS_BUILT_BASELINE` | Spec Registry 도입 전에 존재하던 기능을 현재 구현 근거로 기록한 기준선 |
-| `PLANNED` | 구현 전 요구사항과 범위가 합의된 상태 |
-| `IN_PROGRESS` | 구현 또는 검증이 진행 중인 상태 |
-| `IMPLEMENTED_UNVERIFIED` | 코드가 있으나 필수 환경 검증이 끝나지 않은 상태 |
-| `VERIFIED` | 요구사항과 필수 자동·환경 검증을 모두 충족한 상태 |
-| `DEFERRED` | 범위와 재개 조건을 기록하고 미룬 상태 |
-| `REJECTED` | 검토 또는 실험 후 채택하지 않은 상태 |
+- **상태:** `AS_BUILT_BASELINE`
+  - 의미: Spec Registry 도입 전에 존재하던 기능을 현재 구현 근거로 기록한 기준선
+- **상태:** `PLANNED`
+  - 의미: 구현 전 요구사항과 범위가 합의된 상태
+- **상태:** `IN_PROGRESS`
+  - 의미: 구현 또는 검증이 진행 중인 상태
+- **상태:** `IMPLEMENTED_UNVERIFIED`
+  - 의미: 코드가 있으나 필수 환경 검증이 끝나지 않은 상태
+- **상태:** `VERIFIED`
+  - 의미: 요구사항과 필수 자동·환경 검증을 모두 충족한 상태
+- **상태:** `DEFERRED`
+  - 의미: 범위와 재개 조건을 기록하고 미룬 상태
+- **상태:** `REJECTED`
+  - 의미: 검토 또는 실험 후 채택하지 않은 상태
 
 환경별 결과는 Spec 상태와 분리한다.
 
-| 결과 | 의미 |
-|---|---|
-| `PASS` | 표시한 source commit과 환경에서 실제 검증을 실행해 통과 |
-| `FAIL` | 검증을 실행했으나 실패 |
-| `SKIPPED` | 명시적인 환경 조건 때문에 검증이 실행되지 않음. `PASS`나 구현 증거가 아님 |
-| `NOT_RUN` | 해당 환경이나 명령을 실행하지 않음 |
-| `NOT_VERIFIED` | 일부 사실은 확인했지만 목표 동작을 입증하지 못함 |
-| `HISTORICAL_PASS_NOT_RERUN` | 과거 성공 기록은 있으나 현재 기준선에서 재실행하지 않음 |
+- **결과:** `PASS`
+  - 의미: 표시한 source commit과 환경에서 실제 검증을 실행해 통과
+- **결과:** `FAIL`
+  - 의미: 검증을 실행했으나 실패
+- **결과:** `SKIPPED`
+  - 의미: 명시적인 환경 조건 때문에 검증이 실행되지 않음. `PASS`나 구현 증거가 아님
+- **결과:** `NOT_RUN`
+  - 의미: 해당 환경이나 명령을 실행하지 않음
+- **결과:** `NOT_VERIFIED`
+  - 의미: 일부 사실은 확인했지만 목표 동작을 입증하지 못함
+- **결과:** `HISTORICAL_PASS_NOT_RERUN`
+  - 의미: 과거 성공 기록은 있으나 현재 기준선에서 재실행하지 않음
 
 ## 문서별 역할
 
-| 문서 | 단일 역할 |
-|---|---|
-| `spec.md` | 목적, 범위, 요구사항, 보존 계약, 제외 범위와 측정 가능한 완료 조건 |
-| `plan.md` | 구현·검증 전에 선택한 접근, 예상 변경, 위험, 검증 환경, rollback·중단 조건, dependency·license와 branch·PR 계획 |
-| `tasks.md` | ID, 작업, 최종 상태와 결과 문서 링크만 담은 짧은 체크리스트 |
-| `evidence.md` | 최종 상태, 기준 source commit, 요구사항별 판정, 실제 환경·명령·결과, GitHub 통합·review와 남은 제한 |
+- **문서:** `spec.md`
+  - 단일 역할: 목적, 범위, 요구사항, 보존 계약, 제외 범위와 측정 가능한 완료 조건
+- **문서:** `plan.md`
+  - 단일 역할: 구현·검증 전에 선택한 접근, 예상 변경, 위험, 검증 환경, rollback·중단 조건, dependency·license와 branch·PR 계획
+- **문서:** `tasks.md`
+  - 단일 역할: ID, 작업, 최종 상태와 결과 문서 링크만 담은 짧은 체크리스트
+- **문서:** `evidence.md`
+  - 단일 역할: 최종 상태, 기준 source commit, 요구사항별 판정, 실제 환경·명령·결과, GitHub 통합·review와 남은 제한
 
 최초 실패와 보완 결과 중 현재 판정에 필요한 핵심 이력은 `evidence.md`에 짧게
 남긴다. 날짜별 명령과 상세 과정은 실제 Git commit, PR과 CI 기록으로 확인한다.
@@ -61,39 +114,78 @@
 
 ## Registry
 
-| Spec ID | 이름 | 상태 | Source commit | Last verified |
-|---|---|---|---|---|
-| [PRZ-000](PRZ-000-platform-baseline/spec.md) | 플랫폼 기반 및 Career Vault 기준선 | `AS_BUILT_BASELINE` | `e995a5f` | 2026-07-23 |
-| [PRZ-001](PRZ-001-search-evaluation-integrity/spec.md) | 검색 평가 분할 및 지표 정합성 | `VERIFIED` | `36c8610` | 2026-07-24 |
-| [PRZ-002](PRZ-002-open-source-readiness/spec.md) | 오픈소스 준비: 출처·라이선스·기여 기준선 | `VERIFIED` | `f54e3d9` | 2026-07-30 |
-| [PRZ-003](PRZ-003-opensql-single-node-gate/spec.md) | OpenSQL 단일 노드 검증 환경 | `VERIFIED` | `777e184` | 2026-07-30 |
-| [PRZ-004](PRZ-004-clean-clone-demo/spec.md) | 안전한 demo USER와 clean-clone 전체 흐름 | `VERIFIED` | `aff3e87` | 2026-08-01 |
-| [PRZ-005](PRZ-005-opensql-ollama-e2e/spec.md) | OpenSQL·Ollama 전체 사용자 흐름 | `VERIFIED` | `eab32c8` | 2026-08-02 |
-| [PRZ-006](PRZ-006-local-single-user-demo/spec.md) | 로컬 보관함 빠른 시작 | `VERIFIED` | `bfd8600` | 2026-08-04 |
-| [PRZ-007](PRZ-007-self-hosted-signup/spec.md) | 자체 호스팅 회원가입 | `VERIFIED` | `2b8b600` | 2026-08-05 |
-| [PRZ-008](PRZ-008-search-evidence-reliability/spec.md) | 검색 근거 신뢰성 | `IN_PROGRESS` | — | — |
-| [PRZ-009](PRZ-009-career-keyword-map/spec.md) | 경력 키워드 맵 | `IMPLEMENTED_UNVERIFIED` | 작업 트리 | 2026-08-10 |
-| [PRZ-010](PRZ-010-change-log-sync/spec.md) | 변경 로그 동기화 | `VERIFIED` | `26c546b` | 2026-08-12 |
-| [PRZ-011](PRZ-011-document-processing-status-ux/spec.md) | 문서 처리 진행 상태 UX | `VERIFIED` | `fbb3481` | 2026-08-13 |
+- **Spec ID:** [PRZ-000](PRZ-000-platform-baseline/spec.md)
+  - 이름: 플랫폼 기반 및 Career Vault 기준선
+  - 상태: `AS_BUILT_BASELINE`
+  - Source commit: `e995a5f`
+  - Last verified: 2026-07-23
+- **Spec ID:** [PRZ-001](PRZ-001-search-evaluation-integrity/spec.md)
+  - 이름: 검색 평가 분할 및 지표 정합성
+  - 상태: `VERIFIED`
+  - Source commit: `36c8610`
+  - Last verified: 2026-07-24
+- **Spec ID:** [PRZ-002](PRZ-002-open-source-readiness/spec.md)
+  - 이름: 오픈소스 준비: 출처·라이선스·기여 기준선
+  - 상태: `VERIFIED`
+  - Source commit: `f54e3d9`
+  - Last verified: 2026-07-30
+- **Spec ID:** [PRZ-003](PRZ-003-opensql-single-node-gate/spec.md)
+  - 이름: OpenSQL 단일 노드 검증 환경
+  - 상태: `VERIFIED`
+  - Source commit: `777e184`
+  - Last verified: 2026-07-30
+- **Spec ID:** [PRZ-004](PRZ-004-clean-clone-demo/spec.md)
+  - 이름: 안전한 demo USER와 clean-clone 전체 흐름
+  - 상태: `VERIFIED`
+  - Source commit: `aff3e87`
+  - Last verified: 2026-08-01
+- **Spec ID:** [PRZ-005](PRZ-005-opensql-ollama-e2e/spec.md)
+  - 이름: OpenSQL·Ollama 전체 사용자 흐름
+  - 상태: `VERIFIED`
+  - Source commit: `eab32c8`
+  - Last verified: 2026-08-02
+- **Spec ID:** [PRZ-006](PRZ-006-local-single-user-demo/spec.md)
+  - 이름: 로컬 보관함 빠른 시작
+  - 상태: `VERIFIED`
+  - Source commit: `bfd8600`
+  - Last verified: 2026-08-04
+- **Spec ID:** [PRZ-007](PRZ-007-self-hosted-signup/spec.md)
+  - 이름: 자체 호스팅 회원가입
+  - 상태: `VERIFIED`
+  - Source commit: `2b8b600`
+  - Last verified: 2026-08-05
+- **Spec ID:** [PRZ-008](PRZ-008-search-evidence-reliability/spec.md)
+  - 이름: 검색 근거 신뢰성
+  - 상태: `IN_PROGRESS`
+  - Source commit: `2190d47`
+  - Last verified: 2026-08-13 (통합된 제품 범위)
+- **Spec ID:** [PRZ-009](PRZ-009-career-keyword-map/spec.md)
+  - 이름: 경력 키워드 맵
+  - 상태: `IMPLEMENTED_UNVERIFIED`
+  - Source commit: `d52c6d0`
+  - Last verified: 2026-08-10
+- **Spec ID:** [PRZ-010](PRZ-010-change-log-sync/spec.md)
+  - 이름: 변경 로그 동기화
+  - 상태: `VERIFIED`
+  - Source commit: `26c546b`
+  - Last verified: 2026-08-12
+- **Spec ID:** [PRZ-011](PRZ-011-document-processing-status-ux/spec.md)
+  - 이름: 문서 처리 진행 상태 UX
+  - 상태: `VERIFIED`
+  - Source commit: `fbb3481`
+  - Last verified: 2026-08-13
 
-PRZ-005의 실제 환경 준비 결과와 남은 범위는
-[실제 OpenSQL 통합 작업 보고서](PRZ-005-opensql-ollama-e2e/implementation-report.md)에서
-확인한다.
+## 환경별 판정 주의
 
-PRZ-010은 실제 OpenSQL direct `5432` SQL Gate와 실제 OpenSQL+Ollama `bge-m3`
-V1→V2 E2E, 전체 회귀를 통과했다. PostgreSQL과 OpenSQL 결과, 임시 credential bootstrap
-환경 이력과 남은 범위는 [PRZ-010 Evidence](PRZ-010-change-log-sync/evidence.md)에 기록한다.
+- PRZ-005의 OpenSQL direct `5432` API·브라우저·두 사용자 격리와 격리 opt-in
+  integration test는 `VERIFIED`다. OpenProxy SQL routing은 `NOT_VERIFIED`, 인증은
+  `AUTH_BLOCKED`, 적용과 OpenHA·DB failover·영구 journal은 `DEFERRED`다.
+- PRZ-010은 실제 OpenSQL direct `5432` SQL Gate와 OpenSQL·Ollama `bge-m3` V1→V2
+  흐름을 검증했다. 환경 이력과 남은 범위는
+  [PRZ-010 Evidence](PRZ-010-change-log-sync/evidence.md)를 따른다. 이 결과도
+  OpenProxy, OpenHA 또는 failover 증거가 아니다.
+- PRZ-008의 실험 결과와 PRZ-009의 PostgreSQL 검증을 OpenSQL 결과로 확대하지 않는다.
 
-PRZ-005의 직접 `5432` API·브라우저·두 사용자 격리는 검증됐다. 현재 source의 OpenSQL
-opt-in integration test도 격리된 `prizm_integration_test`에서 통과했다. backend 전체
-회귀, frontend lint·typecheck·build, OSS readiness·SBOM과 최종 감사도 통과해 상태는
-`VERIFIED`다. frontend unit test는 공식 명령이 없어 `NOT_RUN`이다. OpenProxy의 안전한
-인증과 SQL routing, OpenHA와 영구 journal은 별도 후속 범위다.
-
-GitHub 통합 기록은 [PR #26](https://github.com/jaemin-devlog/PRIZM/pull/26),
-source commit `eab32c870f06237d37048b6b8de1287e5e18ae66`, merge commit
-`6dc982227bafe94f0879c22bf4381a6e47adf925`다. GitHub check 6건은 모두
-성공했고 review는 없어 `REVIEW_NOT_AVAILABLE_SOLO`로 기록한다.
-
-다음 신규 Spec의 우선순위는 [개발 로드맵](../docs/roadmap.md)을 따른다. 실제로
-착수하는 작은 수직 슬라이스만 추가한다.
+세부 환경, 자동 검증과 GitHub 통합 기록은 각 PRZ의 Evidence를 따른다. 현재 구현과
+계획 기능의 구분은 [프로젝트 상태](../docs/project-status.md), 개발 순서는
+[로드맵](../docs/roadmap.md)에서 확인한다.

@@ -1,4 +1,4 @@
-# PRZ-011 Evidence — 문서 처리 진행 상태 UX
+# PRZ-011 — 문서 처리 진행 상태 UX Evidence
 
 ## 상태와 범위
 
@@ -16,18 +16,52 @@
 `VERIFIED`로 올렸다. source commit을 push하고 PR #41의 필수 CI가 통과한 뒤
 `main`에 병합했으며, 병합 commit의 CI와 OSS Readiness도 통과했다.
 
+## 판정 요약
+
+PostgreSQL·pgvector Compose와 host Ollama `bge-m3`에서 실제 단계·청크 수, polling,
+재시도 정보와 안전한 실패 표현을 검증했다. AUDIT blocking finding 두 건을 수정하고
+재-AUDIT한 source가 PR #41로 `main`에 통합됐다.
+
+## 검증한 수직 흐름
+
+```text
+합성 TXT 업로드와 PENDING 응답
+↓
+FILE_READING·TEXT_EXTRACTION·CHUNK_CREATION
+↓
+EMBEDDING 0/1 → SAVING
+↓
+ACTIVE·COMPLETED 1/1·100%
+↓
+polling 중지와 기존 Career Evidence 검색 확인
+```
+
 ## 구현 근거
 
-| 요구사항 | source·migration·test 근거 | 판정 |
-|---|---|---|
-| R1 자동 갱신·종료 상태 중지 | `frontend/src/App.tsx`의 2초 polling과 비종료 상태 판정, 실제 browser 전환 및 Nginx 요청 확인 | PASS |
-| R2 실제 재시도 정보 | 기존 `retry_count`, `next_retry_at`, `IndexingRetryPolicy.MAX_RETRIES` API 응답과 DB 근거 browser countdown | PASS |
-| R3 안전 실패 분류 | `ProcessingFailureCode`, `IndexingFailureClassifier`, coordinator·Ollama 단위 테스트, API에서 내부 `error_message` 비노출 | PASS |
-| R4 실제 처리 단계 | V15, claim SQL, `ProcessingJobProgressService`, `DocumentIndexingProcessor`와 claim fencing test | PASS |
-| R5 근거 있는 퍼센트 | `DocumentQueryService`의 nullable/실제 n/N 계산 test, 실제 API의 PENDING null → EMBEDDING 0/1 → COMPLETED 1/1·100 | PASS |
-| R6 정상 완료 | PostgreSQL+pgvector Compose와 host Ollama `bge-m3`에서 합성 TXT가 ACTIVE/COMPLETED | PASS |
-| R7 retry·ownership·fencing 보존 | 전체 unit/integration, owner+status+claim fenced 진행 UPDATE, 기존 completion/failure transaction 회귀 | PASS |
-| R8 검색 회귀 없음 | 전체 integration과 실제 Career Evidence 검색에서 합성 marker 1건 반환 | PASS |
+- **요구사항:** R1 자동 갱신·종료 상태 중지
+  - source·migration·test 근거: `frontend/src/App.tsx`의 2초 polling과 비종료 상태 판정, 실제 browser 전환 및 Nginx 요청 확인
+  - 판정: PASS
+- **요구사항:** R2 실제 재시도 정보
+  - source·migration·test 근거: 기존 `retry_count`, `next_retry_at`, `IndexingRetryPolicy.MAX_RETRIES` API 응답과 DB 근거 browser countdown
+  - 판정: PASS
+- **요구사항:** R3 안전 실패 분류
+  - source·migration·test 근거: `ProcessingFailureCode`, `IndexingFailureClassifier`, coordinator·Ollama 단위 테스트, API에서 내부 `error_message` 비노출
+  - 판정: PASS
+- **요구사항:** R4 실제 처리 단계
+  - source·migration·test 근거: V15, claim SQL, `ProcessingJobProgressService`, `DocumentIndexingProcessor`와 claim fencing test
+  - 판정: PASS
+- **요구사항:** R5 근거 있는 퍼센트
+  - source·migration·test 근거: `DocumentQueryService`의 nullable/실제 n/N 계산 test, 실제 API의 PENDING null → EMBEDDING 0/1 → COMPLETED 1/1·100
+  - 판정: PASS
+- **요구사항:** R6 정상 완료
+  - source·migration·test 근거: PostgreSQL+pgvector Compose와 host Ollama `bge-m3`에서 합성 TXT가 ACTIVE/COMPLETED
+  - 판정: PASS
+- **요구사항:** R7 retry·ownership·fencing 보존
+  - source·migration·test 근거: 전체 unit/integration, owner+status+claim fenced 진행 UPDATE, 기존 completion/failure transaction 회귀
+  - 판정: PASS
+- **요구사항:** R8 검색 회귀 없음
+  - source·migration·test 근거: 전체 integration과 실제 Career Evidence 검색에서 합성 marker 1건 반환
+  - 판정: PASS
 
 ## migration·API·UI 결과
 
@@ -47,17 +81,24 @@
 
 ## 자동 검증
 
-| 명령 | 결과 |
-|---|---|
-| `.\gradlew.bat test --no-daemon --rerun-tasks` | PASS — 464 tests, 15 skipped, 0 failures, 0 errors |
-| `.\gradlew.bat integrationTest --no-daemon --rerun-tasks` | PASS — 112 tests, 7 skipped, 0 failures, 0 errors |
-| `npm --prefix frontend run test:unit` | PASS — status 우선 표시 5 tests |
-| `npm --prefix frontend run lint` | PASS |
-| `npm --prefix frontend run build` | PASS — TypeScript와 Vite production build |
-| `docker compose ... config --quiet` | PASS |
-| `git diff --check` | PASS |
-| [병합 후 CI](https://github.com/jaemin-devlog/PRIZM/actions/runs/31661636117) | PASS — merge commit `e46d55f` |
-| [병합 후 OSS Readiness](https://github.com/jaemin-devlog/PRIZM/actions/runs/31661636156) | PASS — merge commit `e46d55f` |
+- **명령:** `.\gradlew.bat test --no-daemon --rerun-tasks`
+  - 결과: PASS — 464 tests, 15 skipped, 0 failures, 0 errors
+- **명령:** `.\gradlew.bat integrationTest --no-daemon --rerun-tasks`
+  - 결과: PASS — 112 tests, 7 skipped, 0 failures, 0 errors
+- **명령:** `npm --prefix frontend run test:unit`
+  - 결과: PASS — status 우선 표시 5 tests
+- **명령:** `npm --prefix frontend run lint`
+  - 결과: PASS
+- **명령:** `npm --prefix frontend run build`
+  - 결과: PASS — TypeScript와 Vite production build
+- **명령:** `docker compose ... config --quiet`
+  - 결과: PASS
+- **명령:** `git diff --check`
+  - 결과: PASS
+- **명령:** [병합 후 CI](https://github.com/jaemin-devlog/PRIZM/actions/runs/31661636117)
+  - 결과: PASS — merge commit `e46d55f`
+- **명령:** [병합 후 OSS Readiness](https://github.com/jaemin-devlog/PRIZM/actions/runs/31661636156)
+  - 결과: PASS — merge commit `e46d55f`
 
 전체 integration의 최초 재실행에서는 V15 추가 뒤에도 최신 migration을 V14로
 가정한 assertion 3건과 저장소 `.env`의 frontend port가 test CORS 기본값을

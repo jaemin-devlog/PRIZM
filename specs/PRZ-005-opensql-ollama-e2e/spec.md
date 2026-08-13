@@ -1,10 +1,12 @@
-# PRZ-005: OpenSQL·Ollama 전체 사용자 흐름
+# PRZ-005 — OpenSQL·Ollama E2E
 
-## 상태
+> **상태:** `VERIFIED`
+> **유형:** Integration Verification
+> **선행 문서:** [PRZ-003](../PRZ-003-opensql-single-node-gate/spec.md), [PRZ-004](../PRZ-004-clean-clone-demo/spec.md)
+> **기준 소스:** `eab32c870f06237d37048b6b8de1287e5e18ae66`
+> **최종 확인:** 2026-08-02
 
-`VERIFIED`
-
-[최종 구현·검증 결과](implementation-report.md)
+[표준 Evidence](evidence.md) · [상세 구현·검증 보고서](implementation-report.md)
 
 ## 목적
 
@@ -15,6 +17,32 @@ single-node 데이터베이스와 호스트 Ollama `bge-m3`에 연결한다. 안
 
 이 Spec은 PRZ-003의 SQL 호환성 검증과 PRZ-004의 PostgreSQL clean-clone 검증을
 결합한 새로운 환경 검증이다. 두 과거 결과만으로 이 흐름을 `PASS`라고 판단하지 않는다.
+
+## 기능 구성
+
+- Rocky Linux VM은 etcd, Patroni가 관리하는 OpenSQL과 OpenProxy를 실행한다.
+- Flyway `prizm_owner`와 runtime `prizm_app`은 OpenSQL direct `5432`를 사용한다.
+- Windows Spring Boot는 호스트 Ollama `bge-m3`와 실제 OpenSQL을 연결한다.
+- React Career Vault는 합성 TXT·PDF의 업로드, 처리와 근거 검색을 확인한다.
+
+## 동작 흐름
+
+```text
+OpenSQL direct 5432와 최소 권한 확인
+↓
+Spring Boot·Ollama 기동
+↓
+demo USER 로그인
+↓
+합성 TXT·PDF 업로드와 비동기 색인
+↓
+ACTIVE version 전환
+↓
+API·브라우저 검색과 두 USER 격리 확인
+```
+
+OpenProxy `6432` TCP 확인은 이 흐름의 SQL routing 또는 애플리케이션 적용 단계가
+아니다.
 
 ## 범위
 

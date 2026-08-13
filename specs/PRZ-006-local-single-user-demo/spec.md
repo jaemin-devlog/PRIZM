@@ -1,12 +1,13 @@
-# PRZ-006 로컬 보관함 빠른 시작
+# PRZ-006 — 로컬 보관함 빠른 시작
 
-## 상태
+> **상태:** `VERIFIED`
+> **유형:** Feature
+> **선행 문서:** [PRZ-004](../PRZ-004-clean-clone-demo/spec.md)
+> **기준 소스:** `bfd86005862aa15927c707250330c70ebf81c133`
+> **최종 확인:** 2026-08-04
 
-`IN_PROGRESS`
-
-시작 기준 source commit: `b370cd91f93bd617abebd7afce56fc495eb7b161`
-
-GitHub Issue: `NOT_CREATED`
+시작 기준 source commit은 `b370cd91f93bd617abebd7afce56fc495eb7b161`이며,
+별도 GitHub Issue는 만들지 않았다.
 
 ## 목적
 
@@ -17,6 +18,24 @@ GitHub Issue: `NOT_CREATED`
 이 작업은 현재의 `.env` 기반 Docker 실행, 호스트 Ollama, 일반 JWT 로그인을 대체하지
 않는다. Compose 비밀값 자동 생성, Ollama 컨테이너·모델 자동 준비, 다중 사용자 배포
 구성과 회원가입은 후속 기능으로 분리한다.
+
+## 기능 구성과 동작 흐름
+
+```text
+Compose에서 local demo opt-in 확인
+↓
+PRIZM 시작하기 선택
+↓
+고정 local USER 생성 또는 재사용
+↓
+기존 JWT 발급과 DB 사용자 재확인
+↓
+owner-scoped Career Vault 진입
+```
+
+일반 실행이나 opt-in 비활성 상태에서는 기존 이메일·비밀번호 로그인만 노출한다.
+local demo와 `SYSTEM_ADMIN` bootstrap이 함께 활성화되면 계정 쓰기 전에 기동을
+중단한다.
 
 ## 평가 근거
 
@@ -57,7 +76,7 @@ PostgreSQL·pgvector와 backend·frontend, 호스트 Ollama의 기존 연결 방
 ## 보존 계약
 
 - 기존 JWT 인증, DB 사용자 재검증과 사용자별 문서·검색 결과 격리
-- immutable version, `active_version_id`, worker·cleanup·Flyway V1~V13 계약
+- immutable version, `active_version_id`, worker·cleanup·Flyway V1–V13 계약
 - TXT/PDF 처리, PDF 열람, 최대 5개 Career Evidence 검색
 - 문서 목록·경력 근거 검색의 빈 상태와 로그인 문구·스타일 정리. 기능과 API 계약은 변경하지 않는다.
 - PostgreSQL 결과와 OpenSQL·OpenProxy·OpenHA 검증 결과의 분리

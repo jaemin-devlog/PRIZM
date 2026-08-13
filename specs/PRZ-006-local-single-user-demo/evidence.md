@@ -1,4 +1,4 @@
-# PRZ-006 로컬 보관함 빠른 시작 — Evidence
+# PRZ-006 — 로컬 보관함 빠른 시작 Evidence
 
 ## 최종 판정
 
@@ -17,6 +17,20 @@ Docker 브라우저 흐름이 통과했다. local-session JWT의 DB 재검증과
 전체 통합 테스트에 포함됐다. 독립 재감사에서 두 MEDIUM finding이 모두 해소됐고
 CRITICAL/HIGH/MEDIUM finding 없이 `PASS` 판정을 받았다.
 
+## 검증한 수직 흐름
+
+```text
+Docker Compose local demo 기동
+↓
+PRIZM 시작하기로 local-session JWT 발급
+↓
+DB 사용자 상태 재확인
+↓
+Career Vault 진입과 owner 격리
+↓
+합성 문서 업로드·검색과 브라우저 흐름 확인
+```
+
 ## 검증한 source
 
 - branch: `PRZ-006-local-single-user-demo`
@@ -31,32 +45,59 @@ evidence가 아니다.
 
 ## 실행 환경
 
-| 항목 | 실제 환경 |
-|---|---|
-| OS | Windows 개발 호스트 |
-| Java runtime | `21.0.6` |
-| Node.js | `22.17.0` |
-| npm | `10.9.2` |
-| Docker client/server | `29.6.2` / `29.6.2` |
-| Docker Compose | `v5.3.1` |
-| DB container | `pgvector/pgvector:0.8.2-pg16-bookworm` |
+- **항목:** OS
+  - 실제 환경: Windows 개발 호스트
+- **항목:** Java runtime
+  - 실제 환경: `21.0.6`
+- **항목:** Node.js
+  - 실제 환경: `22.17.0`
+- **항목:** npm
+  - 실제 환경: `10.9.2`
+- **항목:** Docker client/server
+  - 실제 환경: `29.6.2` / `29.6.2`
+- **항목:** Docker Compose
+  - 실제 환경: `v5.3.1`
+- **항목:** DB container
+  - 실제 환경: `pgvector/pgvector:0.8.2-pg16-bookworm`
 
 ## 실행 결과
 
-| 범위 | 명령 또는 검증 | 결과 |
-|---|---|---|
-| backend unit | `.\gradlew.bat test --no-daemon --rerun-tasks` | `PASS` — 267개 중 252 pass, 15 skip, failure 0, error 0 |
-| PostgreSQL integration | `.\gradlew.bat integrationTest --no-daemon --rerun-tasks` | `PASS` — 70개 중 67 pass, 3 skip, failure 0, error 0 |
-| local-session PostgreSQL integration | `.\gradlew.bat integrationTest --tests com.prizm.infrastructure.AuthenticationIntegrationTest.localSessionJwtRevalidatesDatabaseUserAndIsolatesDocumentsByOwner --no-daemon --rerun-tasks` | `PASS` — 1개 pass, failure 0 |
-| authentication integration regression | `.\gradlew.bat integrationTest --tests com.prizm.infrastructure.AuthenticationIntegrationTest --no-daemon --rerun-tasks` | `PASS` — 31개 pass, skip 0, failure 0, error 0 |
-| frontend dependency | `npm.cmd --prefix frontend ci --cache .npm-cache` | `PASS` — 152 packages, vulnerability 0 |
-| frontend lint | `npm.cmd --prefix frontend run lint` | `PASS` |
-| frontend build | `npm.cmd --prefix frontend run build` | `PASS` |
-| frontend unit | `npm --prefix frontend test` | `NOT_RUN` — `frontend/package.json`에 공식 test script가 없음 |
-| Compose syntax | `docker compose config --quiet` | `PASS` |
-| Docker build/start | `docker compose up -d --build` | `PASS` |
-| OSS readiness | `node scripts/verify-oss-readiness.mjs` | `PASS` — Markdown 41개·로컬 링크 360개, 추적 파일 315개, SBOM 회귀 12개, 외부 링크 21개 |
-| diff | `git diff --check` | `PASS` |
+- **범위:** backend unit
+  - 명령 또는 검증: `.\gradlew.bat test --no-daemon --rerun-tasks`
+  - 결과: `PASS` — 267개 중 252 pass, 15 skip, failure 0, error 0
+- **범위:** PostgreSQL integration
+  - 명령 또는 검증: `.\gradlew.bat integrationTest --no-daemon --rerun-tasks`
+  - 결과: `PASS` — 70개 중 67 pass, 3 skip, failure 0, error 0
+- **범위:** local-session PostgreSQL integration
+  - 명령 또는 검증: `.\gradlew.bat integrationTest --tests com.prizm.infrastructure.AuthenticationIntegrationTest.localSessionJwtRevalidatesDatabaseUserAndIsolatesDocumentsByOwner --no-daemon --rerun-tasks`
+  - 결과: `PASS` — 1개 pass, failure 0
+- **범위:** authentication integration regression
+  - 명령 또는 검증: `.\gradlew.bat integrationTest --tests com.prizm.infrastructure.AuthenticationIntegrationTest --no-daemon --rerun-tasks`
+  - 결과: `PASS` — 31개 pass, skip 0, failure 0, error 0
+- **범위:** frontend dependency
+  - 명령 또는 검증: `npm.cmd --prefix frontend ci --cache .npm-cache`
+  - 결과: `PASS` — 152 packages, vulnerability 0
+- **범위:** frontend lint
+  - 명령 또는 검증: `npm.cmd --prefix frontend run lint`
+  - 결과: `PASS`
+- **범위:** frontend build
+  - 명령 또는 검증: `npm.cmd --prefix frontend run build`
+  - 결과: `PASS`
+- **범위:** frontend unit
+  - 명령 또는 검증: `npm --prefix frontend test`
+  - 결과: `NOT_RUN` — `frontend/package.json`에 공식 test script가 없음
+- **범위:** Compose syntax
+  - 명령 또는 검증: `docker compose config --quiet`
+  - 결과: `PASS`
+- **범위:** Docker build/start
+  - 명령 또는 검증: `docker compose up -d --build`
+  - 결과: `PASS`
+- **범위:** OSS readiness
+  - 명령 또는 검증: `node scripts/verify-oss-readiness.mjs`
+  - 결과: `PASS` — Markdown 41개·로컬 링크 360개, 추적 파일 315개, SBOM 회귀 12개, 외부 링크 21개
+- **범위:** diff
+  - 명령 또는 검증: `git diff --check`
+  - 결과: `PASS`
 
 통합 테스트의 3개 skip은 OpenSQL opt-in 테스트 1개와 Windows에서
 `SecureDirectoryStream`을 제공하지 않아 실행되지 않은 cleanup 파일시스템 시나리오
@@ -81,27 +122,42 @@ JWT 형태 문자열이 노출되지 않는 것도 확인했다.
 
 ## 실제 사용 여부
 
-| 환경·의존성 | 상태 | 근거 |
-|---|---|---|
-| Docker | `USED` | Compose build/start와 브라우저 smoke |
-| PostgreSQL | `USED` | Testcontainers와 Compose DB |
-| pgvector | `USED` | PostgreSQL integration과 pgvector image |
-| Ollama | `NOT_USED` | 이번 인증·화면 smoke에서는 embedding 요청을 실행하지 않음 |
-| OpenSQL | `NOT_RUN` | 외부 OpenSQL 환경을 사용하지 않음 |
-| OpenProxy | `NOT_RUN` | 구성·실행하지 않음 |
-| OpenHA | `NOT_RUN` | 구성·실행하지 않음 |
+- **환경·의존성:** Docker
+  - 상태: `USED`
+  - 근거: Compose build/start와 브라우저 smoke
+- **환경·의존성:** PostgreSQL
+  - 상태: `USED`
+  - 근거: Testcontainers와 Compose DB
+- **환경·의존성:** pgvector
+  - 상태: `USED`
+  - 근거: PostgreSQL integration과 pgvector image
+- **환경·의존성:** Ollama
+  - 상태: `NOT_USED`
+  - 근거: 이번 인증·화면 smoke에서는 embedding 요청을 실행하지 않음
+- **환경·의존성:** OpenSQL
+  - 상태: `NOT_RUN`
+  - 근거: 외부 OpenSQL 환경을 사용하지 않음
+- **환경·의존성:** OpenProxy
+  - 상태: `NOT_RUN`
+  - 근거: 구성·실행하지 않음
+- **환경·의존성:** OpenHA
+  - 상태: `NOT_RUN`
+  - 근거: 구성·실행하지 않음
 
 PostgreSQL 성공은 OpenSQL·OpenProxy·OpenHA 성공을 의미하지 않는다.
 
 ## GitHub 통합
 
-| 항목 | 결과 |
-|---|---|
-| PR | [#30](https://github.com/jaemin-devlog/PRIZM/pull/30) — `PRZ-006-local-single-user-demo` → `main` |
-| head commit | `4a14e5a76adeab450c444b604c57a197d9cded25` |
-| merge commit | `f1c9b109092b7ffa525999e0b19c5fb64390dc22` |
-| GitHub CI | backend, frontend, License/Markdown/SBOM check 총 6건 `success` |
-| review | `REVIEW_NOT_AVAILABLE_SOLO` — GitHub review 0건 |
+- **항목:** PR
+  - 결과: [#30](https://github.com/jaemin-devlog/PRIZM/pull/30) — `PRZ-006-local-single-user-demo` → `main`
+- **항목:** head commit
+  - 결과: `4a14e5a76adeab450c444b604c57a197d9cded25`
+- **항목:** merge commit
+  - 결과: `f1c9b109092b7ffa525999e0b19c5fb64390dc22`
+- **항목:** GitHub CI
+  - 결과: backend, frontend, License/Markdown/SBOM check 총 6건 `success`
+- **항목:** review
+  - 결과: `REVIEW_NOT_AVAILABLE_SOLO` — GitHub review 0건
 
 PRZ-006은 `main`에 통합됐다. 다음 제품 기능은 이 Evidence가 아니라
 [개발 로드맵](../../docs/roadmap.md)의 순서를 따른다.

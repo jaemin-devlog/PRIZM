@@ -1,4 +1,4 @@
-# PRZ-001 검증 근거
+# PRZ-001 — 검색 평가 기준선 정합성 Evidence
 
 ## 현재 상태
 
@@ -8,15 +8,37 @@
 - GitHub Issue: 생성하지 않음 — 작업 당시 외부 Issue 생성 권한이 없었음
 - OpenSQL/OpenProxy/OpenHA: `NOT_RUN` — 이번 범위 아님
 
+## 검증한 수직 흐름
+
+```text
+30문항 dataset 로드와 split 검증
+↓
+PostgreSQL·pgvector와 로컬 Ollama bge-m3 검색 평가
+↓
+Direct MRR 분모와 결과 schema 확인
+↓
+run token별 JSON·CSV 저장 확인
+```
+
+이 흐름은 PostgreSQL 기반 검색 평가이며 OpenSQL·OpenProxy·OpenHA는 `NOT_RUN`이다.
+
 ## 요구사항 매핑
 
-| 요구사항 | 구현·테스트 근거 | 상태 |
-|---|---|---|
-| split 간 양성 근거 분리 | `SearchEvaluationDatasetLoader`, dataset loader/sample test | `PASS` |
-| Direct MRR@20 정의와 JSON 필드 | `SearchEvaluationMetrics`, `directMrrAt20`, metrics test | `PASS` |
-| 결과 파일 덮어쓰기 방지 | `SearchEvaluationReportWriter`, writer test | `PASS` |
-| 개인 데이터 endpoint 보호 | `application-search-evaluation.yml`, 평가 문서 | `PASS` |
-| 생성물 Git 제외 | `.gitignore`, `git status --ignored` | `PASS` |
+- **요구사항:** split 간 양성 근거 분리
+  - 구현·테스트 근거: `SearchEvaluationDatasetLoader`, dataset loader/sample test
+  - 상태: `PASS`
+- **요구사항:** Direct MRR@20 정의와 JSON 필드
+  - 구현·테스트 근거: `SearchEvaluationMetrics`, `directMrrAt20`, metrics test
+  - 상태: `PASS`
+- **요구사항:** 결과 파일 덮어쓰기 방지
+  - 구현·테스트 근거: `SearchEvaluationReportWriter`, writer test
+  - 상태: `PASS`
+- **요구사항:** 개인 데이터 endpoint 보호
+  - 구현·테스트 근거: `application-search-evaluation.yml`, 평가 문서
+  - 상태: `PASS`
+- **요구사항:** 생성물 Git 제외
+  - 구현·테스트 근거: `.gitignore`, `git status --ignored`
+  - 상태: `PASS`
 
 ## 실행 결과
 

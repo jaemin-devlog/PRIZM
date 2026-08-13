@@ -1,14 +1,23 @@
-# PRZ-001 작업 목록
+# PRZ-001 — 검색 평가 기준선 정합성 Tasks
 
-- [x] split 간 양성 근거 중복과 MRR 정의를 독립 점검으로 확인
-- [x] 양성 근거 split 분리와 로더 검증 추가
-- [x] Direct MRR 분모와 출력 라벨 정정
-- [x] 평가 endpoint·결과 파일·생성물 보호 보강
-- [x] 현재 문서와 평가 기준선 설명 현행화
-- [x] 전체 unit test와 split·metric·writer 테스트 실행
-- [x] Markdown 링크·code fence·trailing whitespace·`git diff --check` 검증
-- [x] Docker 복구 뒤 `searchEvaluation`로 새 Direct MRR@20 기준선 기록
-- [x] 1차 독립 감사의 spec ID·JSON 필드·model cache·역사 기록 finding 보완
-- [x] 병합 뒤 spec 번호 정책을 실제 착수 순서로 정정하고 canonical ID를 PRZ-001로 현행화
-- [x] 독립 read-only audit
-- [x] PR #11 생성·병합과 source·merge commit 기록
+> **현재 상태:** `VERIFIED`
+
+## P1. Dataset split 정합성
+
+- [x] split 간 양성 근거 중복을 독립 점검했다.
+- [x] 양성 근거 split 분리와 loader validation을 추가했다.
+- [x] 합성 30문항의 20/10 split과 category 분포를 보존했다.
+
+## P2. Metric과 결과 보존
+
+- [x] Direct MRR 분모와 `directMrrAt20` 출력 필드를 교정했다.
+- [x] 평가 endpoint와 결과 파일 고유성을 보강했다.
+- [x] 생성물과 model cache의 Git 제외를 확인했다.
+
+## P3. 검증과 통합
+
+- [x] 전체 unit test와 split·metric·writer test를 실행했다.
+- [x] PostgreSQL·pgvector·Ollama `searchEvaluation`을 실행했다.
+- [x] Markdown 링크, code fence와 `git diff --check`를 검증했다.
+- [x] 1차 감사 finding을 보완하고 독립 재감사를 통과했다.
+- [x] 실제 PR·source·merge 기록을 [Evidence](evidence.md)에 남겼다.

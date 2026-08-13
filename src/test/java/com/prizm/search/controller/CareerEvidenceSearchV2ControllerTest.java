@@ -65,6 +65,10 @@ class CareerEvidenceSearchV2ControllerTest {
                                 ChunkSourceType.TEXT_CHUNK,
                                 1,
                                 "텍스트 구간 1",
+                                30L,
+                                ChunkSourceType.TEXT_CHUNK,
+                                1,
+                                "텍스트 구간 1",
                                 0.2d,
                                 0.8d))));
 
@@ -78,6 +82,8 @@ class CareerEvidenceSearchV2ControllerTest {
                 .andExpect(jsonPath("$.results[0].content").value("Spring Boot and Redis experience"))
                 .andExpect(jsonPath("$.results[0].snippet").value("Spring Boot and Redis experience"))
                 .andExpect(jsonPath("$.results[0].sourceType").value("TEXT_CHUNK"))
+                .andExpect(jsonPath("$.results[0].evidenceChunkId").value(30L))
+                .andExpect(jsonPath("$.results[0].evidenceSourceLabel").value("텍스트 구간 1"))
                 .andExpect(jsonPath("$.results[0].score").value(0.8d))
                 .andExpect(jsonPath("$.profile").doesNotExist())
                 .andExpect(jsonPath("$.rejectionReasons").doesNotExist());

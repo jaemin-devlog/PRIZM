@@ -50,7 +50,7 @@
 |---|---|
 | 현재 제품 | Spring Boot 애플리케이션과 React 기반 Career Vault Reference App |
 | 구현됨 | 자체 호스팅 회원가입, 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, ChangeLog 기반 비동기 색인·복구, pgvector 검색, Career Vault 문서 관리 |
-| 현재 단계 | 소스 전용 공개 준비, clean-clone과 실제 OpenSQL 전체 흐름 검증 완료. PRZ-010 변경 로그 동기화와 PRZ-011 문서 처리 상태 UX는 `VERIFIED`; PRZ-008 검색 개선은 `IN_PROGRESS`; PRZ-009 경력 키워드 맵은 `IMPLEMENTED_UNVERIFIED` |
+| 현재 단계 | 소스 전용 공개 준비, clean-clone과 실제 OpenSQL 전체 흐름 검증 완료. PRZ-010 변경 로그 동기화와 PRZ-011 문서 처리 상태 UX는 `VERIFIED`; PRZ-008 검색 개선은 `IN_PROGRESS`; PRZ-009 경력 키워드 맵과 PRZ-012 검색 근거 표현 품질은 `IMPLEMENTED_UNVERIFIED` |
 | 미구현·미검증 | CareerFact, 근거 기반 portfolio, `/api/v1`, MCP, 독립 Engine 패키지, OpenProxy SQL routing·안전한 인증, OpenHA와 DB 장애 전환 |
 
 PRIZM의 장기 목표는 재사용 가능한 Career Intelligence Engine과 Reference App을
@@ -106,7 +106,8 @@ PRZ-005에서는 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 직�
 - PostgreSQL pgvector 기반 원문 근거 검색
 - TXT 텍스트 구간과 PDF 페이지 위치 반환
 - 단일 검색 결과와 최대 5개의 Career Evidence 결과 제공. Career Evidence는 전체
-  원문을 보존하면서 질문 관련 snippet을 기본 표시하고 전체 원문 펼치기를 제공
+  원문을 보존하면서 질문 관련 원문 1–3문장을 핵심 근거로 먼저 표시하고 출처,
+  버전·관련도와 전체 원문 펼치기를 제공
 - GENERAL Career Evidence는 기본 dense `0.50`을 유지하고, 결과가 비어 있는 단일
   2–4자 exact-token 질의에만 `0.49` 이상 후보 한 건을 제한적으로 복구. 완료
   배포·출시 검색과 Claim Gate에는 적용하지 않음
@@ -163,6 +164,7 @@ PRZ-011은 문서 처리의 파일 읽기·텍스트 추출·청크 생성·실�
 | PRZ-009 경력 키워드 맵 | `IMPLEMENTED_UNVERIFIED` | 2026-08-10 source `d52c6d0`, merge `5a8ea8d`: backend unit 323개 중 308 pass·15 skip·실패 0, 전체 integration 71개 중 68 pass·조건부 3 skip·실패 0, frontend lint·build, Docker build/runtime, synthetic browser와 diff 감사 pass. OpenSQL opt-in은 `NOT_RUN` |
 | PRZ-010 변경 로그 동기화 | `VERIFIED` | 2026-08-12 source `26c546b`: PostgreSQL ChangeLog integration, 실제 OpenSQL direct `5432` V14 SQL Gate, 실제 OpenSQL+Ollama `bge-m3` V1→V2 E2E와 실패 시 V1 보존, 전체 integration `104 completed / 7 skipped / 0 failures`, backend test, frontend lint/build, Compose와 diff 감사 통과 |
 | PRZ-011 문서 처리 상태 UX | `VERIFIED` | 2026-08-13 source `fbb3481`: backend unit 464개 중 449 pass·15 skip, integration 112개 중 105 pass·7 skip, frontend unit 5개·lint·build, Compose V15 적용, PostgreSQL+pgvector·Ollama `bge-m3` 문서 처리/검색과 browser polling·retry 표시 통과. AUDIT blocking 2건 수정 뒤 재-AUDIT PASS, PR #41로 `main` 통합 |
+| PRZ-012 검색 근거 표현 품질 | `IMPLEMENTED_UNVERIFIED` | 질문 관련 원문 1–3문장 선택과 근거 중심 UI, PRZ-008 평가 15개 결과 불변, backend unit·integration과 frontend 검증 통과. 실제 개인 문서 대표 7개 Before/After는 owner·authentication 경계 안에서 실행하지 못해 `NOT_RUN`, VERIFY Gate `FAIL` |
 
 세부 실행 환경과 명령은 [PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md),
 [PRZ-002 Evidence](../specs/PRZ-002-open-source-readiness/evidence.md),
@@ -211,7 +213,8 @@ PRZ-011의 검증·통합 결과는
 제품 개발 순서는 [개발 로드맵](roadmap.md)을 따릅니다. 현재
 [PRZ-008 검색 근거 신뢰성](../specs/PRZ-008-search-evidence-reliability/spec.md)은
 통합된 제품 범위 이후 남은 최적화 Gate를, [PRZ-009 경력 키워드 맵](../specs/PRZ-009-career-keyword-map/spec.md)은
-OpenSQL Gate를 분리해 관리합니다. PRZ-009는 `IMPLEMENTED_UNVERIFIED`이며
-검증된 기능이 아닙니다. DB 장애복구는 실제 다중 노드
+OpenSQL Gate를 분리해 관리합니다. [PRZ-012 검색 근거 표현 품질](../specs/PRZ-012-search-evidence-presentation/spec.md)은
+실제 개인 문서 대표 질의 검증을 남겨 두었습니다. PRZ-009와 PRZ-012는
+`IMPLEMENTED_UNVERIFIED`이며 검증된 기능이 아닙니다. DB 장애복구는 실제 다중 노드
 환경과 공식 절차를 확보한 뒤 별도 Spec으로 착수하며, OpenProxy의 안전한 인증과 SQL
 routing도 공급사 지원 방식을 확인한 경우에만 검증합니다.

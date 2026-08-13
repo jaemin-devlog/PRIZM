@@ -247,10 +247,11 @@ PostgreSQL pgvector의 exact cosine distance 연산자 `<=>`로 후보를 정렬
 API는 배열 형식을 유지하고, v2 API는 `EVIDENCE_FOUND`, `NO_RELEVANT_RESULTS`,
 `NO_EVIDENCE`, `NO_SEARCHABLE_DOCUMENTS`와 결과 배열을 반환합니다. GENERAL 질의의
 관련 결과 부재는 `NO_RELEVANT_RESULTS`, 완료 배포·출시 근거 검증 실패는
-`NO_EVIDENCE`로 구분합니다. 최종 결과가 선택된 뒤 질문 토큰과 가장 많이 겹치는
-문장을 중심으로 앞뒤 문장을 포함한 `snippet`을 만들며, ranking과 score는 다시
-계산하지 않습니다. 응답은 전체 `content`도 유지하고 frontend는 snippet을 기본으로
-표시하면서 전체 원문을 펼치거나 접을 수 있습니다. TXT chunk는 `TEXT_CHUNK`와
+`NO_EVIDENCE`로 구분합니다. 최종 결과가 선택된 뒤 질문 핵심어의 포함 범위와
+구현·개선·통합 같은 수행 문맥, 문제·행동·결과 신호를 함께 사용해 기존
+`content`에서 연속된 원문 1–3문장을 `snippet`으로 선택합니다. ranking과 score는
+다시 계산하지 않습니다. 응답은 전체 `content`도 유지합니다. frontend는 핵심 근거,
+출처, 버전·관련도 순서로 표시하고 전체 원문을 펼치거나 접을 수 있습니다. TXT chunk는 `TEXT_CHUNK`와
 텍스트 구간 번호를, PDF chunk는 `PAGE`와 페이지 번호를 원문 위치로 반환합니다.
 PostgreSQL FTS·BGE-M3 Sparse·BGE reranker 실험은 평가 전용이며 Production 경로에
 포함되지 않습니다.

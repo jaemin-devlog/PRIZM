@@ -34,8 +34,9 @@ flowchart TD
     PRZ009["PRZ-009 경력 키워드 맵"]
     PRZ010["PRZ-010 변경 로그 동기화"]
     PRZ011["PRZ-011 처리 진행 상태 UX"]
+    PRZ012["PRZ-012 검색 근거 표현 품질"]
 
-    PRZ000 --> PRZ001 --> PRZ008
+    PRZ000 --> PRZ001 --> PRZ008 --> PRZ012
     PRZ000 --> PRZ002 --> PRZ003 --> PRZ005
     PRZ002 --> PRZ004 --> PRZ005
     PRZ004 --> PRZ006 --> PRZ007
@@ -174,6 +175,11 @@ flowchart TD
   - 상태: `VERIFIED`
   - Source commit: `fbb3481`
   - Last verified: 2026-08-13
+- **Spec ID:** [PRZ-012](PRZ-012-search-evidence-presentation/spec.md)
+  - 이름: 검색 근거 표현 품질 개선
+  - 상태: `VERIFIED`
+  - Source commit: —
+  - Last verified: 2026-08-13 (`VERIFY PASS`: 실제 개인 문서 대표 7개 질의와 검색 불변성 확인)
 
 ## 환경별 판정 주의
 

@@ -26,6 +26,10 @@ export type CareerEvidenceSearchResult = {
   sourceType: 'TEXT_CHUNK' | 'PAGE'
   sourceIndex: number
   sourceLabel: string
+  evidenceChunkId: number
+  evidenceSourceType: 'TEXT_CHUNK' | 'PAGE'
+  evidenceSourceIndex: number
+  evidenceSourceLabel: string
   distance: number
   score: number
 }

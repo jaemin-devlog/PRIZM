@@ -45,6 +45,7 @@ import {
   searchCareerEvidence,
   type CareerEvidenceSearchResult,
 } from './api/searchApi'
+import { getEvidenceContext, getEvidenceSourceLabel } from './searchEvidencePresentation'
 import {
   clearSession,
   getAccessToken,
@@ -2432,43 +2433,66 @@ function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
           </p>
         )}
         {searchState === 'result' && searchResults.length > 0 && (
-          <>
-            <p className="search-result-summary">관련 원문 {searchResults.length}개</p>
+          <section className="search-result-panel" aria-label="검색 결과">
+            <header className="search-result-heading">
+              <div>
+                <p className="search-result-kicker">검색 결과</p>
+                <h2>질문과 관련된 원문 근거</h2>
+              </div>
+              <span className="search-result-count">{searchResults.length}개</span>
+            </header>
             <ol className="search-result-list">
               {searchResults.map((result, index) => (
                 <li key={result.chunkId}>
                   <article className="search-result-card">
-                    <header>
-                      <div>
-                        <span className="result-index">
-                          결과 {String(index + 1).padStart(2, '0')}
-                        </span>
-                        <h2>{result.documentTitle}</h2>
-                      </div>
-                      <span className="score-badge">
-                        관련도 {formatSearchScore(result.score)}
+                    <header className="search-result-card-heading">
+                      <span className="result-index">
+                        결과 {String(index + 1).padStart(2, '0')}
                       </span>
                     </header>
-                    <p className="search-result-meta">
-                      <span>버전 {result.versionNo}</span>
-                      <span>{result.sourceLabel}</span>
-                    </p>
-                    <blockquote className="search-result-snippet">{result.snippet}</blockquote>
+                    <section className="search-result-evidence" aria-label="핵심 근거">
+                      <p className="search-result-section-label">핵심 근거</p>
+                      <blockquote className="search-result-snippet">{result.snippet}</blockquote>
+                    </section>
+                    <footer className="search-result-source" aria-label="출처">
+                      <div>
+                        <p className="search-result-source-label">출처 문서</p>
+                        <h3>{result.documentTitle}</h3>
+                      </div>
+                      <div className="search-result-meta" aria-label="근거 위치와 버전">
+                        <span className="search-result-source-badge">
+                          {getEvidenceSourceLabel(result)}
+                        </span>
+                        <span>버전 {result.versionNo}</span>
+                      </div>
+                    </footer>
                     <details className="search-result-full-content">
                       <summary>
-                        <span className="full-content-open-label">전체 원문 보기</span>
+                        <span className="full-content-open-label">원문 문맥 보기</span>
                         <span className="full-content-close-label">접기</span>
                       </summary>
-                      <blockquote>{result.content}</blockquote>
+                      <EvidenceContextReader
+                        content={result.content}
+                        snippet={result.snippet}
+                      />
                     </details>
                   </article>
                 </li>
               ))}
             </ol>
-          </>
+          </section>
         )}
       </div>
     </section>
+  )
+}
+
+function EvidenceContextReader({ content, snippet }: { content: string; snippet: string }) {
+  const context = getEvidenceContext(content, snippet)
+  return (
+    <div className="search-result-document-reader" role="document">
+      {context}
+    </div>
   )
 }
 
@@ -2751,10 +2775,6 @@ function retrySummary(
 
 function processingErrorMessage(code: string): string {
   return PROCESSING_ERROR_MESSAGES[code] ?? PROCESSING_ERROR_MESSAGES.DOCUMENT_PROCESSING_FAILED
-}
-
-function formatSearchScore(score: number): string {
-  return score.toFixed(2)
 }
 
 function formatCreatedAt(createdAt: string): string {

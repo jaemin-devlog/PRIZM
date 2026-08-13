@@ -49,8 +49,10 @@ import com.prizm.search.dto.response.CareerEvidenceSearchState;
 import com.prizm.search.exception.SearchResultNotFoundException;
 import com.prizm.search.profile.CompositeSearchProfile;
 import com.prizm.search.repository.VectorSearchRepository;
+import com.prizm.search.repository.EvidenceExpansionRepository;
 import com.prizm.search.service.SearchService;
 import com.prizm.search.service.SearchSnippetGenerator;
+import com.prizm.search.service.EvidenceExpansionService;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -1813,7 +1815,9 @@ class PgVectorInfrastructureTest {
                 vectorSearchRepository,
                 new SearchProperties(CompositeSearchProfile.PROFILE_ID),
                 new CompositeSearchProfile(),
-                new SearchSnippetGenerator());
+                new EvidenceExpansionService(
+                        new EvidenceExpansionRepository(jdbcTemplate),
+                        new SearchSnippetGenerator()));
     }
 
     private void deleteTestStoredFile(String storedFilePath) {

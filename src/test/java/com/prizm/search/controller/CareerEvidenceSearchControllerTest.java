@@ -60,6 +60,10 @@ class CareerEvidenceSearchControllerTest {
                         ChunkSourceType.TEXT_CHUNK,
                         1,
                         "텍스트 구간 1",
+                        30L,
+                        ChunkSourceType.TEXT_CHUNK,
+                        1,
+                        "텍스트 구간 1",
                         0.2d,
                         0.8d)));
 
@@ -78,6 +82,10 @@ class CareerEvidenceSearchControllerTest {
                 .andExpect(jsonPath("$[0].sourceType").value("TEXT_CHUNK"))
                 .andExpect(jsonPath("$[0].sourceIndex").value(1))
                 .andExpect(jsonPath("$[0].sourceLabel").value("텍스트 구간 1"))
+                .andExpect(jsonPath("$[0].evidenceChunkId").value(30L))
+                .andExpect(jsonPath("$[0].evidenceSourceType").value("TEXT_CHUNK"))
+                .andExpect(jsonPath("$[0].evidenceSourceIndex").value(1))
+                .andExpect(jsonPath("$[0].evidenceSourceLabel").value("텍스트 구간 1"))
                 .andExpect(jsonPath("$[0].distance").value(0.2d))
                 .andExpect(jsonPath("$[0].score").value(0.8d));
     }

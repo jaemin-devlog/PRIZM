@@ -19,6 +19,10 @@ class CareerEvidenceSearchV2ResponseTest {
             ChunkSourceType.TEXT_CHUNK,
             1,
             "텍스트 구간 1",
+            1L,
+            ChunkSourceType.TEXT_CHUNK,
+            1,
+            "텍스트 구간 1",
             0.2d,
             0.8d);
 

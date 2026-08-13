@@ -18,8 +18,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -32,7 +30,6 @@ import org.springframework.stereotype.Service;
 public class SearchService {
 
     public static final int MAX_QUERY_LENGTH = 500;
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchService.class);
 
     private final EmbeddingService embeddingService;
     private final EmbeddingValidator embeddingValidator;
@@ -40,7 +37,7 @@ public class SearchService {
     private final SearchProperties searchProperties;
     private final CompositeSearchProfile compositeSearchProfile;
     private final ShortGeneralExactTokenRescueProfile shortGeneralExactTokenRescueProfile;
-    private final SearchSnippetGenerator searchSnippetGenerator;
+    private final EvidenceExpansionService evidenceExpansionService;
 
     public SearchService(
             EmbeddingService embeddingService,
@@ -48,7 +45,7 @@ public class SearchService {
             VectorSearchRepository vectorSearchRepository,
             SearchProperties searchProperties,
             CompositeSearchProfile compositeSearchProfile,
-            SearchSnippetGenerator searchSnippetGenerator) {
+            EvidenceExpansionService evidenceExpansionService) {
         this.embeddingService = embeddingService;
         this.embeddingValidator = embeddingValidator;
         this.vectorSearchRepository = vectorSearchRepository;
@@ -56,7 +53,7 @@ public class SearchService {
         this.compositeSearchProfile = compositeSearchProfile;
         this.shortGeneralExactTokenRescueProfile =
                 new ShortGeneralExactTokenRescueProfile(compositeSearchProfile);
-        this.searchSnippetGenerator = searchSnippetGenerator;
+        this.evidenceExpansionService = evidenceExpansionService;
     }
 
     /**
@@ -123,7 +120,7 @@ public class SearchService {
         return new CareerEvidenceSearchV2Response(
                 CareerEvidenceSearchState.EVIDENCE_FOUND,
                 selected.stream()
-                        .map(result -> toCareerEvidenceResponse(query, result))
+                        .map(result -> toCareerEvidenceResponse(ownerUserId, query, result))
                         .toList());
     }
 
@@ -147,8 +144,10 @@ public class SearchService {
     }
 
     private CareerEvidenceSearchResponse toCareerEvidenceResponse(
+            Long ownerUserId,
             String query,
             VectorSearchResult result) {
+        EvidencePresentation evidence = evidenceExpansionService.select(ownerUserId, query, result);
         return new CareerEvidenceSearchResponse(
                 result.chunkId(),
                 result.documentId(),
@@ -156,26 +155,16 @@ public class SearchService {
                 result.documentTitle(),
                 result.versionNo(),
                 result.content(),
-                createSnippet(query, result),
+                evidence.snippet(),
                 result.sourceType(),
                 result.sourceIndex(),
                 result.sourceLabel(),
+                evidence.evidenceChunkId(),
+                evidence.evidenceSourceType(),
+                evidence.evidenceSourceIndex(),
+                evidence.evidenceSourceLabel(),
                 result.distance(),
                 result.score());
-    }
-
-    private String createSnippet(String query, VectorSearchResult result) {
-        String fallback = Objects.requireNonNullElse(result.content(), "");
-        try {
-            String snippet = searchSnippetGenerator.generate(query, result.content());
-            return snippet == null || snippet.isBlank() ? fallback : snippet;
-        } catch (RuntimeException exception) {
-            LOGGER.warn(
-                    "Search snippet generation failed for chunk {}; using full content.",
-                    result.chunkId(),
-                    exception);
-            return fallback;
-        }
     }
 
     private void validateQuery(String query) {

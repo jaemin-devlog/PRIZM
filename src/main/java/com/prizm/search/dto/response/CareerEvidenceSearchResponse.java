@@ -14,6 +14,10 @@ public record CareerEvidenceSearchResponse(
         ChunkSourceType sourceType,
         int sourceIndex,
         String sourceLabel,
+        Long evidenceChunkId,
+        ChunkSourceType evidenceSourceType,
+        int evidenceSourceIndex,
+        String evidenceSourceLabel,
         double distance,
         double score) {
 }

@@ -22,6 +22,7 @@ import com.prizm.search.dto.response.SearchResponse;
 import com.prizm.search.exception.InvalidSearchQueryException;
 import com.prizm.search.exception.SearchResultNotFoundException;
 import com.prizm.search.profile.CompositeSearchProfile;
+import com.prizm.search.repository.EvidenceExpansionRepository;
 import com.prizm.search.repository.VectorSearchRepository;
 import com.prizm.search.repository.VectorSearchResult;
 import java.util.List;
@@ -42,6 +43,9 @@ class SearchServiceTest {
     @Mock
     VectorSearchRepository vectorSearchRepository;
 
+    @Mock
+    EvidenceExpansionRepository evidenceExpansionRepository;
+
     SearchService searchService;
 
     @BeforeEach
@@ -52,7 +56,7 @@ class SearchServiceTest {
                 vectorSearchRepository,
                 new SearchProperties(SearchProfile.LEGACY_DENSE_V1.propertyValue()),
                 new CompositeSearchProfile(),
-                new SearchSnippetGenerator());
+                evidenceExpansionService(new SearchSnippetGenerator()));
     }
 
     @Test
@@ -172,6 +176,10 @@ class SearchServiceTest {
                         ChunkSourceType.TEXT_CHUNK,
                         1,
                         "텍스트 구간 1",
+                        31L,
+                        ChunkSourceType.TEXT_CHUNK,
+                        1,
+                        "텍스트 구간 1",
                         0.1d,
                         0.9d),
                 new CareerEvidenceSearchResponse(
@@ -182,6 +190,10 @@ class SearchServiceTest {
                         2,
                         "Related backend evidence",
                         "Related backend evidence",
+                        ChunkSourceType.TEXT_CHUNK,
+                        2,
+                        "텍스트 구간 2",
+                        32L,
                         ChunkSourceType.TEXT_CHUNK,
                         2,
                         "텍스트 구간 2",
@@ -466,14 +478,14 @@ class SearchServiceTest {
                 vectorSearchRepository,
                 new SearchProperties(SearchProperties.DEFAULT_PROFILE),
                 new CompositeSearchProfile(),
-                failingGenerator);
+                evidenceExpansionService(failingGenerator));
         float[] embedding = nonZeroEmbedding();
         String content = "Redis 캐시를 적용했다. 장애 상황에서도 결과 순서를 보존했다.";
         VectorSearchResult selected = careerEvidenceCandidate(36L, content, 0.82d);
         when(embeddingService.embed("Redis 캐싱 경험")).thenReturn(embedding);
         when(vectorSearchRepository.findCareerEvidenceCandidates(7L, embedding))
                 .thenReturn(List.of(selected));
-        when(failingGenerator.generate("Redis 캐싱 경험", content))
+        when(failingGenerator.select("Redis 캐싱 경험", content))
                 .thenThrow(new IllegalStateException("synthetic snippet failure"));
 
         CareerEvidenceSearchV2Response result =
@@ -488,6 +500,55 @@ class SearchServiceTest {
                         CareerEvidenceSearchResponse::distance,
                         CareerEvidenceSearchResponse::score)
                 .containsExactly(tuple(36L, content, content, selected.distance(), selected.score()));
+    }
+
+    @Test
+    void presentationSnippetCannotChangeSelectedResultIdentityOrderOrScore() {
+        SearchSnippetGenerator presentationGenerator = mock(SearchSnippetGenerator.class);
+        SearchService serviceWithPresentation = new SearchService(
+                embeddingService,
+                new EmbeddingValidator(1024),
+                vectorSearchRepository,
+                new SearchProperties(SearchProperties.DEFAULT_PROFILE),
+                new CompositeSearchProfile(),
+                evidenceExpansionService(presentationGenerator));
+        float[] embedding = nonZeroEmbedding();
+        String query = "Springboot 활용 경험";
+        VectorSearchResult first = careerEvidenceCandidate(
+                201L,
+                10L,
+                20L,
+                "백엔드 이력서",
+                "Java / Spring Boot. Spring Boot로 인증 API를 구현했다.",
+                0.83d);
+        VectorSearchResult second = careerEvidenceCandidate(
+                202L,
+                11L,
+                21L,
+                "백엔드 포트폴리오",
+                "Spring Boot 기반 서비스에서 인증 흐름을 통합했다.",
+                0.79d);
+        when(embeddingService.embed(query)).thenReturn(embedding);
+        when(vectorSearchRepository.findCareerEvidenceCandidates(7L, embedding))
+                .thenReturn(List.of(first, second));
+        when(presentationGenerator.select(query, first.content()))
+                .thenReturn(directSelection("Spring Boot로 인증 API를 구현했다."));
+        when(presentationGenerator.select(query, second.content()))
+                .thenReturn(directSelection("Spring Boot 기반 서비스에서 인증 흐름을 통합했다."));
+
+        CareerEvidenceSearchV2Response result =
+                serviceWithPresentation.searchCareerEvidenceV2(7L, query);
+
+        assertThat(result.results())
+                .extracting(
+                        CareerEvidenceSearchResponse::chunkId,
+                        CareerEvidenceSearchResponse::documentId,
+                        CareerEvidenceSearchResponse::documentVersionId,
+                        CareerEvidenceSearchResponse::score,
+                        CareerEvidenceSearchResponse::distance)
+                .containsExactly(
+                        tuple(201L, 10L, 20L, first.score(), first.distance()),
+                        tuple(202L, 11L, 21L, second.score(), second.distance()));
     }
 
     @Test
@@ -566,7 +627,16 @@ class SearchServiceTest {
                 vectorSearchRepository,
                 new SearchProperties(SearchProperties.DEFAULT_PROFILE),
                 new CompositeSearchProfile(),
-                new SearchSnippetGenerator());
+                evidenceExpansionService(new SearchSnippetGenerator()));
+    }
+
+    private EvidenceExpansionService evidenceExpansionService(SearchSnippetGenerator generator) {
+        return new EvidenceExpansionService(evidenceExpansionRepository, generator);
+    }
+
+    private SearchSnippetGenerator.SnippetSelection directSelection(String snippet) {
+        return new SearchSnippetGenerator.SnippetSelection(
+                snippet, false, 1, 0, true, false, false, 10_000);
     }
 
     private record ShortRescueCase(String query, String content, double score) {

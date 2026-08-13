@@ -5680,6 +5680,42 @@
     },
     {
       "type": "library",
+      "bom-ref": "pkg:npm/pretendard@1.3.9",
+      "name": "pretendard",
+      "version": "1.3.9",
+      "purl": "pkg:npm/pretendard@1.3.9",
+      "properties": [
+        {
+          "name": "prizm:package-lock-path",
+          "value": "node_modules/pretendard"
+        },
+        {
+          "name": "prizm:dependency-scope",
+          "value": "required"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "3da400003c8b639bf89181709294891db492608922ae263fd715f0ef94caa19f54410a9e53eb6f3f4e724dd6405a26e2218a28f192ad46ff0f33bc3421acb04b"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/pretendard/-/pretendard-1.3.9.tgz"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "OFL-1.1"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
       "bom-ref": "pkg:npm/punycode@2.3.1",
       "name": "punycode",
       "version": "2.3.1",

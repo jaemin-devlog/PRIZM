@@ -1,12 +1,17 @@
 # PRZ-009 — 경력 키워드 맵
 
+> **상태:** `IMPLEMENTED_UNVERIFIED`
+> **유형:** Feature
+> **선행 문서:** [PRZ-000](../PRZ-000-platform-baseline/spec.md)
+> **기준 소스:** `d52c6d01a3bef916e80a3c983a43c7b1fad1139b`
+> **통합:** merge `5a8ea8d2b85e7d87342e11e96d1d58d1181ab6b8`
+> **최종 확인:** 2026-08-10
+
 ## 상태
 
 `IMPLEMENTED_UNVERIFIED` — 구현·전체 PostgreSQL integration·최종 감사 완료, OpenSQL opt-in `NOT_RUN`
 
-기준 source: `83631f13c21eab54ac0f32ebb0f893b6c5acea0f`
-
-구현 source: 현재 `PRZ-009-career-keyword-map` 작업 트리(아직 commit하지 않음)
+시작 기준 source는 `83631f13c21eab54ac0f32ebb0f893b6c5acea0f`이다.
 
 ## 목적과 사용자 흐름
 
@@ -22,6 +27,13 @@
 
 이 결과는 CareerFact나 검증된 역량 판정이 아니다. 원문에서 직접 산출한 탐색용
 `문서 키워드 인덱스`이며, PRIZM에 등록되지 않은 기술이나 경험을 생성하지 않는다.
+
+## 기능 구성
+
+- owner의 ACTIVE 이력서·포트폴리오 chunk를 원문 단위로 조립한다.
+- overlap을 제거한 원문에서 등록된 기술명·공학 개념을 canonical keyword로 집계한다.
+- API는 keyword, 빈도, 문서 수와 실제 source 근거를 함께 반환한다.
+- UI는 category·정렬·선택 상태를 적용하고 TXT/PDF owner-scoped viewer로 연결한다.
 
 ## 원문과 키워드 계약
 
@@ -106,7 +118,7 @@
 - original endpoint는 저장 경로를 반환하지 않고 기존 owner-scoped version 확인,
   private no-store, `nosniff`, sandbox와 안전한 파일명 header를 유지한다.
 - 기존 PDF original 계약은 유지하고 TXT에는 `text/plain; charset=UTF-8`을 추가한다.
-- 기존 Flyway V1~V13, chunk·embedding 저장, 처리 job, 활성화·실패 복구와 Career
+- 기존 Flyway V1–V13, chunk·embedding 저장, 처리 job, 활성화·실패 복구와 Career
   Evidence API 계약은 변경하지 않는다.
 
 ## 제외 범위
@@ -119,18 +131,45 @@
 
 ## 요구사항과 완료 조건
 
-| ID | 요구사항 |
-|---|---|
-| `PRZ-009-R1` | owner의 active 이력서·포트폴리오에서만 결정적 키워드 맵을 만든다. |
-| `PRZ-009-R2` | overlap 중복을 줄인 실제 원문 출현 빈도와 문서 수를 반환한다. |
-| `PRZ-009-R3` | 키워드 선택 시 정확한 source 근거와 active 원본 version을 연결한다. |
-| `PRZ-009-R4` | PDF와 TXT 원본을 기존 보안 header와 소유권 경계 안에서 열람한다. |
-| `PRZ-009-R5` | 화면은 loading·empty·error·selection과 반응형·키보드 동작을 구분한다. |
-| `PRZ-009-R6` | 기존 검색·색인·활성화·실패 복구와 PRZ-008 계약을 변경하지 않는다. |
-| `PRZ-009-R7` | 등록된 별칭과 Java 버전 표기는 canonical keyword로 합산되고 실제 표기는 근거에 보존된다. |
-| `PRZ-009-R8` | category 필터와 세 정렬 기준이 같은 keyword 집합에 결정적으로 적용된다. |
-| `PRZ-009-R9` | 같은 document/version의 근거는 문서 카드 하나로 묶이고 추가 근거는 접기·펼치기로 확인한다. |
-| `PRZ-009-R10` | PDF는 해당 페이지, TXT는 첫 일치 표기로 owner-scoped 원본 viewer가 이동한다. |
+### `PRZ-009-R1` — 요구사항
+
+owner의 active 이력서·포트폴리오에서만 결정적 키워드 맵을 만든다.
+
+### `PRZ-009-R2` — 요구사항
+
+overlap 중복을 줄인 실제 원문 출현 빈도와 문서 수를 반환한다.
+
+### `PRZ-009-R3` — 요구사항
+
+키워드 선택 시 정확한 source 근거와 active 원본 version을 연결한다.
+
+### `PRZ-009-R4` — 요구사항
+
+PDF와 TXT 원본을 기존 보안 header와 소유권 경계 안에서 열람한다.
+
+### `PRZ-009-R5` — 요구사항
+
+화면은 loading·empty·error·selection과 반응형·키보드 동작을 구분한다.
+
+### `PRZ-009-R6` — 요구사항
+
+기존 검색·색인·활성화·실패 복구와 PRZ-008 계약을 변경하지 않는다.
+
+### `PRZ-009-R7` — 요구사항
+
+등록된 별칭과 Java 버전 표기는 canonical keyword로 합산되고 실제 표기는 근거에 보존된다.
+
+### `PRZ-009-R8` — 요구사항
+
+category 필터와 세 정렬 기준이 같은 keyword 집합에 결정적으로 적용된다.
+
+### `PRZ-009-R9` — 요구사항
+
+같은 document/version의 근거는 문서 카드 하나로 묶이고 추가 근거는 접기·펼치기로 확인한다.
+
+### `PRZ-009-R10` — 요구사항
+
+PDF는 해당 페이지, TXT는 첫 일치 표기로 owner-scoped 원본 viewer가 이동한다.
 
 완료에는 backend 단위·controller·PostgreSQL integration test, frontend lint·build,
 Docker Compose 구성 확인과 최종 ownership·diff 감사가 필요하다. OpenSQL에서 새 SQL을

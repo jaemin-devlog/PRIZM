@@ -1,5 +1,12 @@
 # PRZ-010 — 변경 로그 동기화
 
+## 최종 실행 상태
+
+`VERIFIED`
+
+아래 상태·기준선 설명은 구현 시작 당시의 frozen specification snapshot이다. 최종 실행
+결과는 [`tasks.md`](tasks.md)와 [`evidence.md`](evidence.md)를 따른다.
+
 ## 상태
 
 `IN_PROGRESS` — SPEC·PLAN·TASKS Gate를 통과했고 P1 migration/domain, P2 upload

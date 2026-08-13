@@ -46,11 +46,13 @@ API로 확인했지만 브라우저로 직접 관찰하지 않아 해당 UI 항�
 
 - 이메일 인증, 비밀번호 재설정, refresh token과 OIDC
 - 외부 네트워크에 공개하는 운영용 multi-user Compose와 공개 SaaS 보호
-- OpenSQL과 Ollama를 함께 사용하는 전체 사용자 흐름
+- 이 PostgreSQL Quickstart에서 OpenSQL과 Ollama를 함께 사용하는 전체 사용자 흐름
 - OpenProxy 애플리케이션 연결과 OpenHA·DB 장애 전환(failover)
 - MCP, CareerFact, portfolio 생성
 
 이 Quickstart의 PostgreSQL·pgvector 성공을 OpenSQL 성공으로 기록하면 안 됩니다.
+별도 OpenSQL direct `5432` 검증 결과는
+[PRZ-005 Evidence](../specs/PRZ-005-opensql-ollama-e2e/evidence.md)를 따릅니다.
 
 ## 사전 준비
 

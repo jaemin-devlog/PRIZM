@@ -36,8 +36,12 @@ Intelligence Engine**과 Reference App을 제공하는 것입니다. 현재 저�
 - UTF-8 TXT와 텍스트가 포함된 PDF를 업로드하고 관리합니다.
 - 등록한 문서 버전은 직접 고치지 않고 바뀌지 않는 새 버전(immutable version)으로
   보존합니다.
+- 새 문서 버전과 owner-scoped ChangeLog를 함께 저장하고, Dispatcher가 기존 색인
+  작업으로 멱등 전달합니다.
 - 문서를 비동기로 추출·분할·임베딩하고, 처리가 끝난 버전만 검색에
   사용합니다. 이 버전을 검색 대상 버전(active version)이라고 합니다.
+- 문서 목록과 상세에서 실제 처리 단계·청크 진행 수·재시도 정보와 안전한 실패
+  원인을 갱신하며, 최종 상태가 되면 polling을 중지합니다.
 - Ollama `bge-m3`와 PostgreSQL pgvector로 원문 근거를 검색합니다.
 - Career Vault에서 문서 목록·필터·상세·수정·삭제, 새 버전 등록, PDF 열람과
   최대 5개의 Career Evidence 검색을 제공합니다.
@@ -83,12 +87,15 @@ PRZ-004에서는 PostgreSQL·pgvector와 호스트 Ollama 기반 전체 흐름�
 
 ## 검증 범위
 
-- 실제 OpenSQL single-node에서 Flyway V1~V13, `vector(1024)`, 검색과 Worker
+- 실제 OpenSQL single-node에서 Flyway V1–V13, `vector(1024)`, 검색과 Worker
   SQL을 실행해 통과했습니다(`PASS`).
 - PRZ-005에서 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 연결해
   로그인→합성 TXT/PDF 업로드→임베딩→`ACTIVE`→원문 검색과 브라우저 흐름,
   두 사용자 격리를 검증했습니다. [PR #26](https://github.com/jaemin-devlog/PRIZM/pull/26)으로
   `main`에 통합했습니다(`VERIFIED`).
+- PRZ-010에서 OpenSQL direct `5432`의 V14 ChangeLog schema·멱등 dispatch와 실제
+  OpenSQL·Ollama V1→V2 흐름을 검증했습니다. V15의 OpenSQL 적용은 검증하지
+  않았습니다.
 - OpenProxy는 Windows 호스트의 TCP 연결만 `VERIFIED`입니다. SQL routing은
   `NOT_VERIFIED`, 인증은 `AUTH_BLOCKED`, 애플리케이션 적용은 `DEFERRED`입니다.
   OpenHA·DB failover도 `DEFERRED`입니다.

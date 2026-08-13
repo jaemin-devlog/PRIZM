@@ -11,10 +11,19 @@
 >
 > 문서 검토 기준일: `2026-08-13`
 >
+> PRZ-010 상태: `VERIFIED` — source
+> `26c546b16eb9ea42d98460dd6e5aa0bf0752212a`, `main` 통합 merge
+> `d616dac95b5d29c6f45babb51435d95d20f39fa8`
+>
+> PRZ-011 상태: `VERIFIED` — source
+> `fbb3481626a3cba6f36f070845ffae502511569e`, `main` 통합 merge
+> `e46d55f0c889bf570fa6fd796cb780b738ab75d7`
+>
 > PRZ-004 상태: `VERIFIED` — 독립 감사, PR #25 CI와 GitHub `main` 통합 완료
 >
-> PRZ-009 상태: `IMPLEMENTED_UNVERIFIED` — 현재 작업 트리의 전체 PostgreSQL integration,
-> browser와 최종 감사는 통과했으나 OpenSQL opt-in 검증은 `NOT_RUN`
+> PRZ-009 상태: `IMPLEMENTED_UNVERIFIED` — source
+> `d52c6d01a3bef916e80a3c983a43c7b1fad1139b`은 `main`에 통합됐고 전체 PostgreSQL
+> integration, browser와 최종 감사는 통과했으나 OpenSQL opt-in 검증은 `NOT_RUN`
 >
 > 범위: 현재 Spring Boot 애플리케이션과 React Career Vault Reference App
 
@@ -69,9 +78,9 @@ flowchart LR
     P <--> O
 ```
 
-로컬 애플리케이션 런타임의 DB는 PostgreSQL 16+pgvector입니다. OpenSQL은 현재
-별도 single-node SQL 호환성 Gate에서만 검증하며, 로컬 배포 그림에 PostgreSQL과
-같은 런타임으로 합치지 않습니다.
+로컬 애플리케이션 런타임의 DB는 PostgreSQL 16+pgvector입니다. OpenSQL은 별도
+single-node 환경에서 SQL 호환성과 direct `5432` 애플리케이션 E2E를 검증했으며,
+로컬 배포 그림에 PostgreSQL과 같은 런타임으로 합치지 않습니다.
 
 ## 4. 로컬 배포 아키텍처
 
@@ -89,6 +98,7 @@ flowchart LR
 
     subgraph BE["Backend container · 하나의 Spring Boot 프로세스"]
         API["REST API<br/>인증 · 문서 관리 · 검색"]
+        CD["ChangeLog Dispatcher"]
         IW["Indexing Scheduler / Worker"]
         CW["Cleanup Scheduler / Worker"]
     end
@@ -103,6 +113,7 @@ flowchart LR
     API <--> DB
     API <--> FS
     API <--> O
+    CD <--> DB
     IW <--> DB
     IW <--> FS
     IW <--> O
@@ -113,9 +124,10 @@ flowchart LR
 
 Frontend 이미지는 Node build stage에서 React 정적 파일을 만든 뒤, 최종 Nginx
 runtime stage에 결과만 복사합니다. 실제 요청은 Nginx가 `/api`와 `/actuator`를
-backend로 전달합니다. Indexing·Cleanup Scheduler와 Worker는 별도 컨테이너나
-서비스가 아니라 API와 같은 Spring Boot 프로세스 안에서 실행됩니다. 검색 요청은
-API 경로에서, 문서 색인은 Indexing Worker 경로에서 Ollama를 호출합니다.
+backend로 전달합니다. ChangeLog Dispatcher와 Indexing·Cleanup Scheduler·Worker는
+별도 컨테이너나 서비스가 아니라 API와 같은 Spring Boot 프로세스 안에서
+실행됩니다. Dispatcher는 짧은 DB transaction만 수행하고, 검색 요청은 API 경로에서,
+문서 색인은 Indexing Worker 경로에서 Ollama를 호출합니다.
 
 근거:
 
@@ -124,6 +136,7 @@ API 경로에서, 문서 색인은 Indexing Worker 경로에서 Ollama를 호출
 - [Nginx reverse proxy 설정](../frontend/nginx.conf)
 - [React 진입점](../frontend/src/App.tsx)
 - [Spring Boot 설정](../src/main/resources/application.yml)
+- [ChangeLog Dispatcher](../src/main/java/com/prizm/changelog/worker/ChangeLogDispatchScheduler.java)
 - [색인 Scheduler](../src/main/java/com/prizm/ingestion/worker/IndexingScheduler.java)
 - [파일 정리 Scheduler](../src/main/java/com/prizm/cleanup/worker/FileCleanupScheduler.java)
 
@@ -134,6 +147,7 @@ API 경로에서, 문서 색인은 Indexing Worker 경로에서 Ollama를 호출
 | React Career Vault | 로그인, 문서 목록·상세·업로드·관리, 검색 결과와 경력 키워드 맵 표시 | 같은 origin의 Nginx `/api` |
 | Nginx | React SPA 정적 파일 제공, `/api`·`/actuator` reverse proxy | Spring Boot backend |
 | Spring Boot API | JWT·DB 사용자 재검증, 문서 관리, 검색과 경력 키워드 요청 처리 | PostgreSQL, 파일 저장소, Ollama |
+| ChangeLog Dispatcher | PENDING 변경 로그 선점, INDEXING 작업 생성·재사용과 DISPATCHED 확정 | PostgreSQL |
 | Indexing Scheduler / Worker | 작업 선점, 추출·청킹·임베딩, ACTIVE 전환과 실패 복구 | PostgreSQL, 파일 저장소, Ollama |
 | Cleanup Scheduler / Worker | 보상 삭제와 문서 삭제에서 생긴 파일 정리 작업의 재시도·복구 | PostgreSQL, 파일 저장소 |
 | PostgreSQL+pgvector | 사용자·문서·버전·작업 상태 저장과 owner-scoped exact cosine 검색 | Spring Boot 프로세스 |
@@ -157,16 +171,19 @@ sequenceDiagram
     participant A as Spring Boot API
     participant DB as PostgreSQL
     participant FS as 원본 저장소
+    participant D as ChangeLog Dispatcher
     participant W as Indexing Worker
     participant O as Ollama bge-m3
 
     U->>N: JWT와 TXT/PDF 업로드
     N->>A: /api 요청 전달
     A->>DB: JWT subject의 enabled·email·role 재확인
-    A->>DB: 문서·QUARANTINED 버전 작성
     A->>FS: 서버 생성 경로에 원본 저장
-    A->>DB: PENDING 작업 저장 후 commit
+    A->>DB: 문서·QUARANTINED 버전·PENDING ChangeLog를 한 transaction으로 commit
     Note over DB: 새 버전은 아직 검색 대상이 아님
+
+    D->>DB: PENDING ChangeLog를 SKIP LOCKED로 선점
+    D->>DB: INDEXING 작업 생성·재사용, ChangeLog DISPATCHED
 
     W->>DB: 작업 선점·버전을 PROCESSING으로 전환
     Note over W,DB: FILE_READING 단계 기록
@@ -202,6 +219,8 @@ sequenceDiagram
 
 - [DB 사용자 재확인](../src/main/java/com/prizm/auth/security/DatabaseJwtAuthenticationConverter.java)
 - [문서 업로드 서비스](../src/main/java/com/prizm/document/service/DocumentUploadService.java)
+- [ChangeLog migration](../src/main/resources/db/migration/V14__create_document_change_logs.sql)
+- [ChangeLog dispatch transaction](../src/main/java/com/prizm/changelog/service/ChangeLogDispatchTransaction.java)
 - [텍스트 추출](../src/main/java/com/prizm/ingestion/service/DocumentTextExtractor.java)
 - [작업 선점 서비스](../src/main/java/com/prizm/ingestion/service/ProcessingJobClaimService.java)
 - [색인 처리](../src/main/java/com/prizm/ingestion/service/DocumentIndexingProcessor.java)
@@ -217,7 +236,7 @@ PostgreSQL pgvector의 exact cosine distance 연산자 `<=>`로 후보를 정렬
 인덱스는 사용하지 않습니다. 기본 `source-dedup-evidence-signals-v1` profile은 상위
 20개 후보에서 같은 PDF page와 TXT overlap을 축약하고, dense score를 주 신호로
 최대 5건을 반환합니다. GENERAL 검색은 기본 `0.50` floor를 유지하되 기존 결과가
-비어 있고 정규화된 질의가 단일 2~4자 token이며 본문 exact token이 일치할 때만
+비어 있고 정규화된 질의가 단일 2–4자 token이며 본문 exact token이 일치할 때만
 `0.49 <= score < 0.50` 후보 한 건을 제한적으로 복구합니다. 부분 문자열은 인정하지
 않고 원래 score와 distance를 반환합니다. 완료 배포·출시 검색은 이 복구 경로를
 사용하지 않으며 기존 Claim Gate와 `0.50` floor를 유지합니다. 명시적
@@ -250,7 +269,7 @@ PostgreSQL FTS·BGE-M3 Sparse·BGE reranker 실험은 평가 전용이며 Produc
 
 ### 경력 키워드 맵의 생성과 해석
 
-PRZ-009 작업 트리는 별도 keyword table이나 생성형 모델 없이 기존 active chunk를
+PRZ-009 구현은 별도 keyword table이나 생성형 모델 없이 기존 active chunk를
 요청 시 읽는다. SQL은 현재 사용자의 document·version·chunk owner를 모두 제한하고,
 `active_version_id`가 가리키는 `ACTIVE` 이력서와 포트폴리오만 선택한다. TXT chunk는
 overlap을 한 번만 남겨 전체 원문으로 조립하고 PDF chunk는 페이지별로 유지한다.
@@ -291,6 +310,7 @@ flowchart TD
     U["UserAccount<br/>id"]
     D["Document<br/>owner_user_id<br/>active_version_id"]
     V["DocumentVersion<br/>owner_user_id<br/>immutable source"]
+    L["DocumentChangeLog<br/>owner_user_id<br/>DOCUMENT_VERSION_CREATED"]
     C["DocumentChunk<br/>owner_user_id<br/>source metadata · vector"]
     P["ProcessingJob<br/>owner_user_id<br/>한 version의 INDEXING 작업"]
     F["FileCleanupJob<br/>storage_key<br/>owner FK 없음"]
@@ -299,12 +319,16 @@ flowchart TD
     U -->|"1 : N 소유"| D
     D -->|"1 : N 버전"| V
     D -.->|"0..1 active_version_id"| V
+    V -->|"0..1 생성 이벤트<br/>신규 version은 1"| L
+    L -.->|"0..1 dispatch 연결"| P
     V -->|"1 : N"| C
     V -->|"1 : 1 INDEXING"| P
     V -->|"stored_file_path"| S
     F -->|"삭제할 storage_key"| S
 ```
 
+`DocumentChangeLog`는 `(document_version_id, event_type)`와 `event_key`가 unique이고,
+연결된 ProcessingJob과 owner·version이 일치하도록 복합 외래 키로 보호됩니다.
 `ProcessingJob`은 `(document_version_id, job_type)`가 unique이고 현재 job type은
 `INDEXING` 하나이므로 버전마다 최대 한 건입니다. `FileCleanupJob`은 사용자나
 버전에 대한 외래 키를 두지 않고 서버가 생성한 `storage_key`만 보관합니다.
@@ -316,13 +340,44 @@ rollback 보상 경로가 정리 작업을 만듭니다.
 - [사용자 entity](../src/main/java/com/prizm/user/entity/UserAccount.java)
 - [문서 entity](../src/main/java/com/prizm/document/entity/Document.java)
 - [문서 버전 entity](../src/main/java/com/prizm/document/entity/DocumentVersion.java)
+- [ChangeLog entity](../src/main/java/com/prizm/changelog/entity/DocumentChangeLog.java)
 - [처리 작업 entity](../src/main/java/com/prizm/ingestion/entity/ProcessingJob.java)
 - [문서·버전 migration](../src/main/resources/db/migration/V3__create_documents_and_document_versions.sql)
 - [처리 작업 migration](../src/main/resources/db/migration/V4__create_processing_jobs.sql)
 - [소유권 migration](../src/main/resources/db/migration/V8__add_document_ownership.sql)
+- [ChangeLog migration](../src/main/resources/db/migration/V14__create_document_change_logs.sql)
 - [파일 정리 migration](../src/main/resources/db/migration/V12__add_file_cleanup_jobs.sql)
 
 ## 8. 상태 전이
+
+### DocumentChangeLog
+
+업로드 transaction이 신규 `DocumentVersion`과 `PENDING` ChangeLog를 함께
+commit합니다. Dispatcher가 ProcessingJob 생성·재사용과 연결을 같은 짧은
+transaction에서 확정하면 `DISPATCHED`가 됩니다. 전달 실패는 별도 failure recorder가
+1분·5분·15분 backoff의 `RETRY_WAIT` 또는 최종 `FAILED`로 기록합니다.
+
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING: version과 함께 commit
+    PENDING --> DISPATCHED: Job 생성·재사용과 연결
+    PENDING --> RETRY_WAIT: 재시도 가능 전달 실패
+    PENDING --> FAILED: 영구 전달 실패
+    RETRY_WAIT --> DISPATCHED: 재전달 성공
+    RETRY_WAIT --> RETRY_WAIT: 재전달 실패·예산 잔여
+    RETRY_WAIT --> FAILED: 재시도 소진
+```
+
+`DISPATCHED`는 색인 완료가 아니라 기존 Indexing Worker에 작업을 전달했다는 뜻입니다.
+그 뒤의 색인 재시도·실패는 ProcessingJob과 DocumentVersion에 기록하며 ChangeLog를
+되돌리지 않습니다. 전달이 최종 실패하면 아직 `QUARANTINED`인 새 version도
+`FAILED`로 전환하지만 기존 `active_version_id`는 유지합니다.
+
+근거:
+
+- [ChangeLog 상태](../src/main/java/com/prizm/changelog/entity/ChangeLogDispatchStatus.java)
+- [ChangeLog dispatch](../src/main/java/com/prizm/changelog/service/ChangeLogDispatchTransaction.java)
+- [ChangeLog 실패 기록](../src/main/java/com/prizm/changelog/service/ChangeLogDispatchFailureRecorder.java)
 
 ### DocumentVersion
 
@@ -345,7 +400,7 @@ stateDiagram-v2
 
 ```mermaid
 stateDiagram-v2
-    [*] --> PENDING: 업로드
+    [*] --> PENDING: ChangeLog Dispatcher
     PENDING --> PROCESSING: claim
     PROCESSING --> COMPLETED: 완료 transaction
     PROCESSING --> RETRY_WAIT: 재시도 가능 실패 또는 lease 만료
@@ -386,7 +441,7 @@ Ollama 연결, model 미설치, GPU/model 실행, 일반 처리 실패의 allowl
   계정이 enabled인지 확인하고 JWT의 email·role이 현재 값과 같은지 비교합니다.
 - 개인 문서와 검색 API는 `USER` 역할에만 열려 있습니다. `SYSTEM_ADMIN`은 개인
   USER 데이터를 대신 조회하는 우회 권한이 없습니다.
-- document·version·chunk·processing job에는 `owner_user_id`가 전달되고, service,
+- document·version·ChangeLog·chunk·processing job에는 `owner_user_id`가 전달되고, service,
   repository SQL과 복합 외래 키가 같은 owner 관계를 확인합니다.
 - 검색 SQL은 cosine distance를 계산하기 전에 document·version·chunk owner와
   `documents.active_version_id`, version의 `ACTIVE` 상태를 모두 제한합니다.
@@ -487,10 +542,22 @@ Windows에서는 `SecureDirectoryStream` 성공 경로를 제공하지 않아 fa
 
 ## 12. PostgreSQL과 OpenSQL 검증 경계
 
-| 환경 | 목적 | 검증한 범위 | 검증하지 않은 범위 |
-|---|---|---|---|
-| PostgreSQL 16+pgvector | 로컬 실행, 자동 통합 테스트와 clean-clone 구성 | 애플리케이션 회귀, migration, 벡터 검색, ownership, Worker·파일 정리와 두 독립 환경의 demo `USER` 로그인→TXT/PDF 업로드→ACTIVE→검색·브라우저 흐름 | OpenSQL 호환성 |
-| OpenSQL single-node | SQL 호환성 Gate와 실제 애플리케이션 환경 검증 | Flyway V1~V13, `vector(1024)`, owner·ACTIVE 검색 조건, processing·cleanup job SQL, Spring Boot·Ollama 직접 `5432` API·브라우저 E2E와 두 사용자 격리 | OpenProxy SQL routing·안전한 인증, OpenHA, DB failover, 영구 journal |
+### PostgreSQL 16+pgvector
+
+- 목적: 로컬 실행, 자동 통합 테스트와 clean-clone 구성
+- 검증한 범위: 애플리케이션 회귀, migration, 벡터 검색, ownership, Worker·파일
+  정리와 두 독립 환경의 demo `USER` 로그인 → TXT/PDF 업로드 → `ACTIVE` →
+  검색·브라우저 흐름
+- 검증하지 않은 범위: OpenSQL 호환성
+
+### OpenSQL single-node
+
+- 목적: SQL 호환성 Gate와 실제 애플리케이션 환경 검증
+- 검증한 범위: Flyway V1–V14, `vector(1024)`, owner·`ACTIVE` 검색 조건,
+  processing·cleanup job SQL, V14 ChangeLog 제약·`SKIP LOCKED`·멱등 dispatch,
+  Spring Boot·Ollama direct `5432` V1→V2 E2E와 실패 시 V1 보존
+- 검증하지 않은 범위: V15 OpenSQL 적용, OpenProxy SQL routing·안전한 인증,
+  OpenHA, DB failover, 영구 journal
 
 OpenSQL single-node SQL Gate는 PRZ-003 Evidence 기준 `PASS`입니다. PRZ-005에서는
 직접 `5432` 경로의 OpenSQL·Ollama 전체 사용자 흐름을 별도로 검증했습니다.
@@ -512,6 +579,12 @@ PRZ-005에서는 실제 OpenSQL single-node에 Spring Boot와 Ollama `bge-m3`를
 흐름을 확인했습니다. 두 사용자 문서·검색 격리와 전용 DB의 OpenSQL opt-in
 integration test도 통과했으며 PR #26으로 `main`에 통합했습니다.
 
+PRZ-010에서는 같은 direct `5432` 경계에서 V14 ChangeLog schema·제약,
+`FOR UPDATE SKIP LOCKED`, ProcessingJob 멱등 생성과 owner isolation을 확인했습니다.
+실제 Ollama `bge-m3`를 사용한 V1 ACTIVE→V2 ChangeLog→ProcessingJob→V2 ACTIVE와
+dispatch·indexing 실패 시 V1 보존도 별도 E2E로 통과했습니다. 이 결과는 OpenProxy,
+OpenHA나 V15 OpenSQL 적용의 근거가 아닙니다.
+
 PostgreSQL 테스트 통과는 OpenSQL 결과가 아니며, OpenSQL SQL Gate 통과도 전체
 사용자 흐름이나 고가용성 근거가 아닙니다.
 
@@ -530,6 +603,7 @@ src/main/java/com/prizm/
 ├─ auth            로그인, JWT와 DB 사용자 재확인
 ├─ user            사용자 계정과 역할
 ├─ document        문서·immutable version 등록과 관리
+├─ changelog       문서 버전 생성 사실과 INDEXING 작업 전달
 ├─ embedding       Ollama 연동과 embedding 검증
 ├─ ingestion       추출·청킹·색인 Worker와 복구
 ├─ search          owner-scoped 원문 근거 검색
@@ -558,7 +632,7 @@ frontend/src/
 - 재사용 가능한 독립 Engine artifact
 - 구조화된 CareerFact 후보·확인·거절
 - 검증된 CareerFact 기반 portfolio 생성
-- 변경 로그 기반 동기화와 MCP
+- MCP와 ChangeLog 다중 consumer별 delivery/checkpoint
 - OpenProxy 애플리케이션 연결, OpenHA와 DB failover
 - 기관용 workspace와 멤버십
 - 여러 vector DB·storage adapter
@@ -577,3 +651,4 @@ frontend/src/
 - [PRZ-000 플랫폼 기준선 Evidence](../specs/PRZ-000-platform-baseline/evidence.md)
 - [PRZ-003 OpenSQL single-node Evidence](../specs/PRZ-003-opensql-single-node-gate/evidence.md)
 - [PRZ-004 clean-clone Evidence](../specs/PRZ-004-clean-clone-demo/evidence.md)
+- [PRZ-010 변경 로그 동기화 Evidence](../specs/PRZ-010-change-log-sync/evidence.md)

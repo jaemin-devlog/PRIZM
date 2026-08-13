@@ -3,16 +3,18 @@
 ## 상태와 범위
 
 - 상태: `VERIFIED`
-- 기준 source: `main` commit `9b24808b37424f2d11ca0afe374d5703c81868fc`에서 시작한
-  `PRZ-011-document-processing-status-ux` 작업 트리
+- 검증 source commit: `fbb3481626a3cba6f36f070845ffae502511569e`
+- 통합: [PR #41](https://github.com/jaemin-devlog/PRIZM/pull/41)을 통해 `main`에
+  merge commit `e46d55f0c889bf570fa6fd796cb780b738ab75d7`로 병합
 - 검증일: 2026-08-13 (Asia/Seoul)
-- 승인 단계: `SPEC → PLAN → IMPLEMENT → VERIFY → AUDIT 수정 → 재-AUDIT`
+- 승인 단계: `SPEC → PLAN → IMPLEMENT → VERIFY → AUDIT 수정 → 재-AUDIT → INTEGRATE`
 - VERIFY Gate: `PASS`
 - AUDIT Gate: `PASS`
-- INTEGRATE: 사용자 승인 범위 밖이므로 `NOT_RUN`
+- INTEGRATE Gate: `PASS`
 
 필수 VERIFY와 재-AUDIT에 blocking finding이 남지 않아 Registry를
-`VERIFIED`로 올렸다. commit, push, PR, merge는 수행하지 않았다.
+`VERIFIED`로 올렸다. source commit을 push하고 PR #41의 필수 CI가 통과한 뒤
+`main`에 병합했으며, 병합 commit의 CI와 OSS Readiness도 통과했다.
 
 ## 구현 근거
 
@@ -54,6 +56,8 @@
 | `npm --prefix frontend run build` | PASS — TypeScript와 Vite production build |
 | `docker compose ... config --quiet` | PASS |
 | `git diff --check` | PASS |
+| [병합 후 CI](https://github.com/jaemin-devlog/PRIZM/actions/runs/31661636117) | PASS — merge commit `e46d55f` |
+| [병합 후 OSS Readiness](https://github.com/jaemin-devlog/PRIZM/actions/runs/31661636156) | PASS — merge commit `e46d55f` |
 
 전체 integration의 최초 재실행에서는 V15 추가 뒤에도 최신 migration을 V14로
 가정한 assertion 3건과 저장소 `.env`의 frontend port가 test CORS 기본값을
@@ -95,7 +99,7 @@ OpenSQL, OpenProxy, OpenHA 또는 DB failover 검증으로 확대하지 않는�
 - Node 22 내장 test runner로 상태 우선 표시 unit test 5개를 추가해 실행했다.
 - OpenSQL opt-in, OpenProxy, OpenHA, DB failover는 이번 요구사항과 검증 범위가
   아니므로 `NOT_RUN` 또는 기존 상태를 유지한다.
-- INTEGRATE는 요청대로 시작하지 않았다.
+- PR #41 병합과 병합 후 필수 CI 확인까지 완료했다.
 
 ## AUDIT finding 수정과 재-AUDIT
 
@@ -122,3 +126,9 @@ fencing, `REQUIRES_NEW` 가시성, retry·검색/P18·ACTIVE version 보존 계�
 
 blocking finding 2건을 수정하고 전체 회귀 검증과 재-AUDIT에서 남은 blocking
 finding 0건을 확인했으므로 `PASS`다.
+
+## INTEGRATE Gate
+
+source commit `fbb3481`을 PR #41로 `main`에 병합했고 merge commit `e46d55f`의
+CI와 OSS Readiness가 모두 통과했다. Registry의 source commit과 검증일을 실제
+통합 결과로 갱신했으므로 `PASS`다.

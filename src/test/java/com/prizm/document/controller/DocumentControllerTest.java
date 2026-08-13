@@ -125,7 +125,8 @@ class DocumentControllerTest {
         when(documentQueryService.list(7L, null, null, null)).thenReturn(List.of(new DocumentSummaryResponse(
                 1L, "Guide", DocumentType.PROJECT_REPORT, null, 2L,
                 DocumentVersionStatus.QUARANTINED, "guide.pdf", DocumentFileType.PDF,
-                ProcessingJobStatus.PENDING, null, null, 1,
+                ProcessingJobStatus.PENDING, null, null, null, null, null,
+                0, 3, null, null, 1,
                 Instant.parse("2026-07-13T00:00:00Z"), Instant.parse("2026-07-13T00:00:00Z"))));
 
         mockMvc.perform(get("/api/documents"))
@@ -141,7 +142,8 @@ class DocumentControllerTest {
         when(documentQueryService.list(7L, DocumentType.PORTFOLIO, null, null)).thenReturn(List.of(new DocumentSummaryResponse(
                 1L, "Portfolio", DocumentType.PORTFOLIO, null, 2L,
                 DocumentVersionStatus.QUARANTINED, "portfolio.txt", DocumentFileType.TXT,
-                ProcessingJobStatus.PENDING, null, null, 1,
+                ProcessingJobStatus.PENDING, null, null, null, null, null,
+                0, 3, null, null, 1,
                 Instant.parse("2026-07-13T00:00:00Z"), Instant.parse("2026-07-13T00:00:00Z"))));
 
         mockMvc.perform(get("/api/documents").param("documentType", "PORTFOLIO"))
@@ -177,13 +179,21 @@ class DocumentControllerTest {
                         DocumentVersionStatus.QUARANTINED,
                         ProcessingJobStatus.PENDING,
                         null,
+                        null,
+                        null,
+                        null,
+                        null,
                         false,
+                        0,
+                        3,
+                        null,
                         createdAt))));
 
         mockMvc.perform(get("/api/documents/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.documentType").value("PORTFOLIO"))
                 .andExpect(jsonPath("$.versions[0].originalFileName").value("guide.txt"))
+                .andExpect(jsonPath("$.versions[0].maxRetries").value(3))
                 .andExpect(jsonPath("$.versions[0].storedFilePath").doesNotExist());
     }
 

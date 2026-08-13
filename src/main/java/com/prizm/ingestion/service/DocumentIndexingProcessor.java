@@ -11,6 +11,7 @@ import com.prizm.infrastructure.storage.FileStorageException;
 import com.prizm.infrastructure.storage.TransientFileStorageException;
 import com.prizm.ingestion.config.IngestionProperties;
 import com.prizm.ingestion.entity.ChunkSourceType;
+import com.prizm.ingestion.entity.ProcessingProgressStage;
 import com.prizm.ingestion.exception.DocumentIndexingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ public class DocumentIndexingProcessor {
     private final IndexingCompletionService completionService;
     private final ProcessingJobLeaseService leaseService;
     private final WorkerLeaseHeartbeat workerLeaseHeartbeat;
+    private final ProcessingJobProgressService progressService;
     private final int leaseRefreshChunkInterval;
 
     public DocumentIndexingProcessor(
@@ -41,6 +43,7 @@ public class DocumentIndexingProcessor {
             IndexingCompletionService completionService,
             ProcessingJobLeaseService leaseService,
             WorkerLeaseHeartbeat workerLeaseHeartbeat,
+            ProcessingJobProgressService progressService,
             IngestionProperties ingestionProperties) {
         this.documentVersionRepository = documentVersionRepository;
         this.fileStorage = fileStorage;
@@ -51,6 +54,7 @@ public class DocumentIndexingProcessor {
         this.completionService = completionService;
         this.leaseService = leaseService;
         this.workerLeaseHeartbeat = workerLeaseHeartbeat;
+        this.progressService = progressService;
         this.leaseRefreshChunkInterval = ingestionProperties.getLeaseRefreshChunkInterval();
     }
 
@@ -64,38 +68,68 @@ public class DocumentIndexingProcessor {
             }
             byte[] fileContent = readFile(version.getStoredFilePath());
             heartbeat.assertOwnership();
+            progressService.updateStage(claimedJob, ProcessingProgressStage.TEXT_EXTRACTION);
             List<PageText> pages = documentTextExtractor.extract(version.getFileType(), fileContent);
             heartbeat.assertOwnership();
             leaseService.renew(claimedJob);
 
-            List<IndexedChunk> indexedChunks = new ArrayList<>();
-            int nextChunkNo = 1;
-            int processedChunkCount = 0;
-            for (PageText page : pages) {
-                for (TextChunk chunk : textChunker.split(page.text())) {
-                    heartbeat.assertOwnership();
-                    float[] embedding = embeddingService.embed(chunk.content());
-                    heartbeat.assertOwnership();
-                    embeddingValidator.validate(embedding);
-                    indexedChunks.add(createIndexedChunk(
-                            version.getFileType(), nextChunkNo++, page.pageNumber(), chunk.content(), embedding));
-                    processedChunkCount++;
-                    if (processedChunkCount % leaseRefreshChunkInterval == 0) {
-                        leaseService.renew(claimedJob);
-                    }
-                }
-            }
-            if (indexedChunks.isEmpty()) {
+            progressService.updateStage(claimedJob, ProcessingProgressStage.CHUNK_CREATION);
+            List<PreparedChunk> preparedChunks = prepareChunks(pages);
+            if (preparedChunks.isEmpty()) {
                 throw new DocumentIndexingException(
                         version.getFileType() == DocumentFileType.TXT
                                 ? "TXT file is empty or contains only whitespace."
                                 : "PDF file contains no searchable text.",
                         false);
             }
+            progressService.startEmbedding(claimedJob, preparedChunks.size());
+
+            List<IndexedChunk> indexedChunks = new ArrayList<>();
+            int processedChunkCount = 0;
+            int lastPersistedPercent = 0;
+            for (PreparedChunk chunk : preparedChunks) {
+                heartbeat.assertOwnership();
+                float[] embedding = embeddingService.embed(chunk.content());
+                heartbeat.assertOwnership();
+                embeddingValidator.validate(embedding);
+                indexedChunks.add(createIndexedChunk(
+                        version.getFileType(), chunk.chunkNo(), chunk.pageNumber(), chunk.content(), embedding));
+                processedChunkCount++;
+                int currentPercent = progressPercent(processedChunkCount, preparedChunks.size());
+                if (shouldPersistProgress(
+                        processedChunkCount, preparedChunks.size(), lastPersistedPercent)) {
+                    progressService.updateCompletedChunks(claimedJob, processedChunkCount);
+                    lastPersistedPercent = currentPercent;
+                }
+                if (processedChunkCount % leaseRefreshChunkInterval == 0) {
+                    leaseService.renew(claimedJob);
+                }
+            }
             leaseService.renew(claimedJob);
             heartbeat.assertOwnership();
+            progressService.updateStage(claimedJob, ProcessingProgressStage.SAVING);
             completionService.complete(claimedJob, List.copyOf(indexedChunks));
         }
+    }
+
+    static int progressPercent(int completedChunks, int totalChunks) {
+        return (int) Math.floorDiv((long) completedChunks * 100, totalChunks);
+    }
+
+    static boolean shouldPersistProgress(int completedChunks, int totalChunks, int lastPersistedPercent) {
+        return completedChunks == totalChunks
+                || progressPercent(completedChunks, totalChunks) != lastPersistedPercent;
+    }
+
+    private List<PreparedChunk> prepareChunks(List<PageText> pages) {
+        List<PreparedChunk> chunks = new ArrayList<>();
+        int nextChunkNo = 1;
+        for (PageText page : pages) {
+            for (TextChunk chunk : textChunker.split(page.text())) {
+                chunks.add(new PreparedChunk(nextChunkNo++, page.pageNumber(), chunk.content()));
+            }
+        }
+        return chunks;
     }
 
     private IndexedChunk createIndexedChunk(
@@ -132,6 +166,9 @@ public class DocumentIndexingProcessor {
                     exception instanceof TransientFileStorageException,
                     exception);
         }
+    }
+
+    private record PreparedChunk(int chunkNo, int pageNumber, String content) {
     }
 
 }

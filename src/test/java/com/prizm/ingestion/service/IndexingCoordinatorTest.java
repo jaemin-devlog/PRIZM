@@ -12,6 +12,7 @@ import com.prizm.infrastructure.storage.TransientFileStorageException;
 import com.prizm.ingestion.exception.DocumentIndexingException;
 import com.prizm.ingestion.exception.DocumentTextExtractionException;
 import com.prizm.ingestion.exception.StaleProcessingJobClaimException;
+import com.prizm.ingestion.entity.ProcessingFailureCode;
 import java.time.Instant;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ class IndexingCoordinatorTest {
 
         assertThat(coordinator.processNext()).isTrue();
 
-        verify(failureService).handleFailure(job, true, "unavailable");
+        verify(failureService).handleFailure(job, true, ProcessingFailureCode.OLLAMA_UNAVAILABLE, "unavailable");
     }
 
     @Test
@@ -56,7 +57,29 @@ class IndexingCoordinatorTest {
 
         assertThat(coordinator.processNext()).isTrue();
 
-        verify(failureService).handleFailure(job, true, "invalid response");
+        verify(failureService).handleFailure(
+                job, true, ProcessingFailureCode.DOCUMENT_PROCESSING_FAILED, "invalid response");
+    }
+
+    @Test
+    void recordsGpuOrModelRunnerFailureSeparatelyFromConnectionFailure() {
+        ClaimedProcessingJob job = claimedJob();
+        when(claimService.claimNext()).thenReturn(Optional.of(job));
+        org.mockito.Mockito.doThrow(new EmbeddingException(
+                        EmbeddingErrorCode.OLLAMA_UNAVAILABLE,
+                        "Ollama embedding service is unavailable.",
+                        new RuntimeException("llama runner failed: ROCm error: invalid device function")))
+                .when(processor).process(job);
+        IndexingCoordinator coordinator = new IndexingCoordinator(
+                claimService, processor, new IndexingFailureClassifier(), failureService);
+
+        assertThat(coordinator.processNext()).isTrue();
+
+        verify(failureService).handleFailure(
+                job,
+                true,
+                ProcessingFailureCode.OLLAMA_RUNTIME_FAILURE,
+                "Ollama embedding service is unavailable.");
     }
 
     @Test
@@ -70,7 +93,9 @@ class IndexingCoordinatorTest {
 
         assertThat(coordinator.processNext()).isTrue();
 
-        verify(failureService).handleFailure(job, false, "PDF document exceeds processing limits.");
+        verify(failureService).handleFailure(
+                job, false, ProcessingFailureCode.DOCUMENT_PROCESSING_FAILED,
+                "PDF document exceeds processing limits.");
     }
 
     @Test
@@ -87,7 +112,9 @@ class IndexingCoordinatorTest {
 
         assertThat(coordinator.processNext()).isTrue();
 
-        verify(failureService).handleFailure(job, true, "Stored document file could not be read.");
+        verify(failureService).handleFailure(
+                job, true, ProcessingFailureCode.DOCUMENT_PROCESSING_FAILED,
+                "Stored document file could not be read.");
     }
 
     @Test
@@ -104,7 +131,9 @@ class IndexingCoordinatorTest {
 
         assertThat(coordinator.processNext()).isTrue();
 
-        verify(failureService).handleFailure(job, false, "Stored document file could not be read.");
+        verify(failureService).handleFailure(
+                job, false, ProcessingFailureCode.DOCUMENT_PROCESSING_FAILED,
+                "Stored document file could not be read.");
     }
 
     @Test
@@ -132,6 +161,7 @@ class IndexingCoordinatorTest {
         verify(failureService, never()).handleFailure(
                 org.mockito.ArgumentMatchers.any(),
                 org.mockito.ArgumentMatchers.anyBoolean(),
+                org.mockito.ArgumentMatchers.any(),
                 org.mockito.ArgumentMatchers.any());
     }
 

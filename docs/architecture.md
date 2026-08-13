@@ -9,7 +9,7 @@
 > 최종 Windows·Linux 경로 교정·CI source commit:
 > `aff3e87a9a912e44fcf217291a45328cf451cfc9`
 >
-> 문서 검토 기준일: `2026-08-10`
+> 문서 검토 기준일: `2026-08-13`
 >
 > PRZ-004 상태: `VERIFIED` — 독립 감사, PR #25 CI와 GitHub `main` 통합 완료
 >
@@ -140,6 +140,11 @@ API 경로에서, 문서 색인은 Indexing Worker 경로에서 Ollama를 호출
 | Local storage | 서버가 만든 상대 경로에 업로드 원본 저장 | Spring Boot 프로세스 |
 | Ollama `bge-m3` | 문서 조각과 검색 질문의 1024차원 임베딩 생성 | Spring Boot 프로세스 |
 
+문서 목록과 열린 상세는 `PENDING`, `PROCESSING`, `RETRY_WAIT` 등 비종료 작업이
+있는 동안 약 2초 간격으로 owner-scoped 문서 API를 다시 조회한다. 응답이
+`COMPLETED`, `FAILED` 또는 다른 종료 상태가 되면 polling을 중지한다. 이 polling은
+별도 push 채널이나 Worker 제어 경로가 아니라 기존 읽기 API의 화면 갱신 책임이다.
+
 ## 6. 문서 업로드부터 검색까지
 
 정상 흐름은 다음과 같습니다. DB 작업을 짧게 나누기 때문에 파일 읽기, PDF 추출,
@@ -164,12 +169,17 @@ sequenceDiagram
     Note over DB: 새 버전은 아직 검색 대상이 아님
 
     W->>DB: 작업 선점·버전을 PROCESSING으로 전환
+    Note over W,DB: FILE_READING 단계 기록
     W->>FS: 원본 읽기
+    W->>DB: TEXT_EXTRACTION → CHUNK_CREATION 단계 기록
     W->>W: TXT/PDF 추출과 chunk 분할
+    W->>DB: EMBEDDING 0/N 기록
     loop 각 chunk
         W->>O: 임베딩 요청
         O-->>W: 검증할 1024차원 벡터
+        W->>DB: completed_chunks 갱신
     end
+    W->>DB: SAVING 단계 기록
     W->>DB: 완료 transaction
     Note over W,DB: chunk 교체·버전 ACTIVE·active_version_id 교체·작업 COMPLETED
 
@@ -345,6 +355,18 @@ stateDiagram-v2
 
 수동 재시도나 terminal 상태에서 되돌아가는 경로는 현재 구현에 없습니다.
 
+현재 claim의 실제 처리 단계는 `FILE_READING → TEXT_EXTRACTION → CHUNK_CREATION →
+EMBEDDING → SAVING → COMPLETED`로 별도 저장한다. 단계와 청크 진행 갱신은
+`processing_job_id`, `owner_user_id`, `PROCESSING`, `claim_version`을 모두 만족하는
+Worker만 수행할 수 있다. 전체 청크 수가 확정되기 전에는 청크 수와 퍼센트를
+제공하지 않으며, 확정 뒤에는 `completed_chunks / total_chunks`만 사용한다.
+임베딩 중 DB 저장은 이 실제 비율의 정수 퍼센트가 바뀌거나 최종 청크가
+완료될 때만 checkpoint로 수행하고, 단계 변경과 완료·실패·재시도 전이는
+기존 짧은 transaction 계약을 유지한다.
+재시도·실패 시 내부 예외는 서버 로그와 제한된 내부 필드에 남기고 API에는
+Ollama 연결, model 미설치, GPU/model 실행, 일반 처리 실패의 allowlist 코드만
+노출한다.
+
 근거:
 
 - [문서 버전 상태 enum](../src/main/java/com/prizm/document/entity/DocumentVersionStatus.java)
@@ -352,6 +374,8 @@ stateDiagram-v2
 - [처리 작업 상태 enum](../src/main/java/com/prizm/ingestion/entity/ProcessingJobStatus.java)
 - [처리 작업 전이](../src/main/java/com/prizm/ingestion/entity/ProcessingJob.java)
 - [자동 처리 전환 migration](../src/main/resources/db/migration/V7__transition_to_automatic_document_processing.sql)
+- [진행 상태 migration](../src/main/resources/db/migration/V15__add_processing_job_progress.sql)
+- [진행 상태 갱신](../src/main/java/com/prizm/ingestion/service/ProcessingJobProgressService.java)
 - [상태 전이 단위 테스트](../src/test/java/com/prizm/document/entity/DocumentVersionStateTest.java)
 
 ## 9. 사용자 소유권과 신뢰 경계

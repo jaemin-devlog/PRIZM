@@ -29,7 +29,11 @@ public class ProcessingJobClaimRepository {
                 started_at = now(),
                 completed_at = NULL,
                 lease_expires_at = now() + make_interval(secs => CAST(? AS double precision) / 1000.0),
-                claim_version = claim_version + 1
+                claim_version = claim_version + 1,
+                progress_stage = 'FILE_READING',
+                completed_chunks = NULL,
+                total_chunks = NULL,
+                failure_code = NULL
             FROM candidate
             WHERE job.id = candidate.id
             RETURNING job.id AS processing_job_id,

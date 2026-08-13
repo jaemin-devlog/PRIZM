@@ -70,6 +70,9 @@ class DocumentIndexingProcessorTest {
     @Mock
     WorkerLeaseHeartbeat.LeaseHeartbeat heartbeat;
 
+    @Mock
+    ProcessingJobProgressService progressService;
+
     DocumentIndexingProcessor processor;
     ClaimedProcessingJob claimedJob;
 
@@ -89,6 +92,7 @@ class DocumentIndexingProcessorTest {
                 completionService,
                 leaseService,
                 workerLeaseHeartbeat,
+                progressService,
                 properties);
         DocumentVersion version = DocumentVersion.quarantined(7L, 1L, "guide.txt", "a".repeat(64));
         ReflectionTestUtils.setField(version, "id", 10L);
@@ -110,6 +114,12 @@ class DocumentIndexingProcessorTest {
 
         verify(leaseService, times(3)).renew(claimedJob);
         verify(workerLeaseHeartbeat).start(claimedJob);
+        verify(progressService).updateStage(claimedJob, com.prizm.ingestion.entity.ProcessingProgressStage.TEXT_EXTRACTION);
+        verify(progressService).updateStage(claimedJob, com.prizm.ingestion.entity.ProcessingProgressStage.CHUNK_CREATION);
+        verify(progressService).startEmbedding(claimedJob, 2);
+        verify(progressService).updateCompletedChunks(claimedJob, 1);
+        verify(progressService).updateCompletedChunks(claimedJob, 2);
+        verify(progressService).updateStage(claimedJob, com.prizm.ingestion.entity.ProcessingProgressStage.SAVING);
         verify(heartbeat).close();
         verify(completionService).complete(any(ClaimedProcessingJob.class), argThat(indexedChunks -> {
             assertThat(indexedChunks).hasSize(2);
@@ -238,6 +248,7 @@ class DocumentIndexingProcessorTest {
                 completionService,
                 leaseService,
                 workerLeaseHeartbeat,
+                progressService,
                 properties);
 
         assertThatThrownBy(() -> limitedProcessor.process(claimedJob))

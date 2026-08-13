@@ -43,7 +43,11 @@ public class OllamaEmbeddingService implements EmbeddingService {
     }
 
     private EmbeddingException classifyFailure(RuntimeException exception) {
-        String message = String.valueOf(exception.getMessage()).toLowerCase(Locale.ROOT);
+        StringBuilder failureMessages = new StringBuilder();
+        for (Throwable current = exception; current != null; current = current.getCause()) {
+            failureMessages.append(' ').append(String.valueOf(current.getMessage()).toLowerCase(Locale.ROOT));
+        }
+        String message = failureMessages.toString();
         if (message.contains("model") && (message.contains("not found") || message.contains("pull"))) {
             return new EmbeddingException(
                     EmbeddingErrorCode.OLLAMA_MODEL_NOT_INSTALLED,

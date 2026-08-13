@@ -97,6 +97,7 @@ class AuthenticationIntegrationTest {
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
         registry.add("prizm.storage.root", STORAGE_ROOT::toString);
+        registry.add("prizm.security.allowed-origins", () -> "http://localhost:5173");
     }
 
     @Autowired

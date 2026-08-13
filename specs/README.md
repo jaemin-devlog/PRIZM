@@ -74,6 +74,7 @@
 | [PRZ-008](PRZ-008-search-evidence-reliability/spec.md) | 검색 근거 신뢰성 | `IN_PROGRESS` | — | — |
 | [PRZ-009](PRZ-009-career-keyword-map/spec.md) | 경력 키워드 맵 | `IMPLEMENTED_UNVERIFIED` | 작업 트리 | 2026-08-10 |
 | [PRZ-010](PRZ-010-change-log-sync/spec.md) | 변경 로그 동기화 | `VERIFIED` | `26c546b` | 2026-08-12 |
+| [PRZ-011](PRZ-011-document-processing-status-ux/spec.md) | 문서 처리 진행 상태 UX | `VERIFIED` | 작업 트리 | 2026-08-13 |
 
 PRZ-005의 실제 환경 준비 결과와 남은 범위는
 [실제 OpenSQL 통합 작업 보고서](PRZ-005-opensql-ollama-e2e/implementation-report.md)에서

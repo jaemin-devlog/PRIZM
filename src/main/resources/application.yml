@@ -16,6 +16,19 @@ spring:
   flyway:
     locations: classpath:db/migration
   ai:
+    mcp:
+      server:
+        protocol: STATELESS
+        name: PRIZM
+        version: 0.0.1
+        type: SYNC
+        capabilities:
+          tool: true
+          resource: false
+          prompt: false
+          completion: false
+        stateless:
+          mcp-endpoint: /mcp
     model:
       chat: none
       embedding: ollama

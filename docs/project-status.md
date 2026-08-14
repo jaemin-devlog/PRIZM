@@ -1,6 +1,6 @@
 # PRIZM 현재 구현 현황
 
-> 현재 상태 기준일: 2026-08-14
+> 현재 상태 기준일: 2026-08-15
 >
 > PRZ-011 검증 source commit: `fbb3481626a3cba6f36f070845ffae502511569e`
 >
@@ -49,9 +49,9 @@
 | 구분 | 현재 상태 |
 |---|---|
 | 현재 제품 | Spring Boot와 React Career Vault로 구현한 자동화된 AI 문서 관리 플랫폼 |
-| 구현됨 | 자체 호스팅 회원가입, 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, ChangeLog 기반 비동기 색인·복구, Ollama 자동 임베딩, pgvector 근거 검색, Career Vault 문서 관리 |
-| 현재 단계 | 소스 전용 공개 준비, clean-clone, 실제 OpenSQL direct 기준선과 PRZ-013 OpenProxy 단일 Primary SQL Gate 검증 완료. PRZ-010 변경 로그 동기화와 PRZ-011 문서 처리 상태 UX는 `VERIFIED`; PRZ-008 검색 개선은 `IN_PROGRESS`; PRZ-009 경력 키워드 맵과 PRZ-012 검색 근거 표현 품질은 `IMPLEMENTED_UNVERIFIED` |
-| 계획된 미구현 | MCP 검색 API, CareerFact, 근거 기반 portfolio, `/api/v1`, 독립 Engine 패키지 |
+| 구현됨 | 자체 호스팅 회원가입, 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, ChangeLog 기반 비동기 색인·복구, Ollama 자동 임베딩, pgvector 근거 검색, Career Vault 문서 관리, 읽기 전용 MCP Career Evidence 검색 |
+| 현재 단계 | 소스 전용 공개 준비, clean-clone, 실제 OpenSQL direct 기준선과 PRZ-013 OpenProxy 단일 Primary SQL Gate 검증 완료. PRZ-010 변경 로그 동기화, PRZ-011 문서 처리 상태 UX와 PRZ-015 MCP 검색은 `VERIFIED`; PRZ-008 검색 개선은 `IN_PROGRESS`; PRZ-009 경력 키워드 맵과 PRZ-012 검색 근거 표현 품질은 `IMPLEMENTED_UNVERIFIED` |
+| 계획된 미구현 | CareerFact, 근거 기반 portfolio, `/api/v1`, 독립 Engine 패키지 |
 | 명시적 범위 제외 | 다중 OpenSQL DB node, DB 장애전환, OpenProxy 이중화·VIP와 서비스 연속성 보장 |
 
 PRIZM의 장기 목표는 재사용 가능한 Career Intelligence Engine과 Reference App을
@@ -119,6 +119,15 @@ PRZ-005에서는 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 직�
 - 검색 가능한 청크가 없어 빈 Career Evidence 결과가 반환되면 등록 문서에서
   찾지 못했다고 안내
 
+### MCP 읽기 전용 검색
+
+- 요청 주소(endpoint)는 `POST /mcp`, 통신 규격(protocol)은 `2025-11-25`
+- 연결 상태를 서버에 저장하지 않는(stateless) Streamable HTTP 사용
+- `search_career_evidence` 도구 하나와 `{"query":"..."}` 입력
+- Bearer JWT와 활성 `ROLE_USER` 필요
+- 기존 Career Evidence Search를 재사용해 사용자별 데이터 격리(owner isolation)와
+  현재 `ACTIVE` 버전만 검색하는 규칙(ACTIVE isolation) 유지
+
 ### 구현됐으나 필수 환경 검증이 남은 기능
 
 - 현재 사용자의 active 이력서·포트폴리오 원문에서 계산하는 경력 키워드 맵
@@ -163,6 +172,7 @@ PRZ-011은 문서 처리의 파일 읽기·텍스트 추출·청크 생성·실�
 | OpenSQL 단일 SQL Gate | `PASS` | 2026-07-30 Rocky Linux 9.7 single-node OpenSQL에서 Flyway·vector·검색·소유권·Worker SQL 통과 |
 | PRZ-005 OpenSQL+Ollama E2E | `VERIFIED` | 실제 OpenSQL 직접 `5432`에서 API·브라우저 E2E, TXT/PDF 원문 검색, 두 사용자 격리와 격리 DB의 OpenSQL opt-in integration test 통과 |
 | OpenProxy 단일 Primary | `VERIFIED` | PRZ-013에서 Windows TCP `:6432`, `prizm_app` SQL SELECT/WRITE, Flyway direct/runtime proxy 분리, TXT/PDF·Ollama focused E2E 통과. 재시작 후 새 SQL 연결은 PASS이며, 지속 application continuity는 Single-only 제품 범위에 포함하지 않음 |
+| PRZ-015 MCP Career Evidence 검색 | `VERIFIED` | 공식 Java MCP Client와 protocol `2025-11-25`, 실제 USER JWT를 사용. Flyway는 OpenSQL `:5432`에 직접 연결하고 애플리케이션은 OpenProxy `:6432/opensql`을 거쳐 실행. Ollama `bge-m3` 전체 흐름(E2E), REST와 MCP 결과 일치, 사용자별 격리와 `ACTIVE` 버전 격리 통과 |
 | 대회 OpenSQL 구성 | `SINGLE_ONLY` | 공식 안내에 따라 단일 서버 설치만 사용. PRZ-014 다중 노드 구성은 `REJECTED` |
 | PRZ-004 demo `USER` clean-clone | `VERIFIED` | `25d09e9`에서 자동 검증 `339 PASS / 18 SKIP / 0 FAIL`과 두 독립 clone 통과. `aff3e87` 경로 교정 뒤 Windows·Linux Node test와 GitHub CI 6건 통과, PR #25 merge `1f9a5ad`. 두 번째 빈 목록 UI 직접 관찰은 `NOT_RUN` |
 | PRZ-008 검색 근거 신뢰성 | `IN_PROGRESS` | 2026-08-13 source `2190d47`, PR #40 merge `9b24808`: 기본 profile, v2 상태, 제한적 exact-token rescue와 OpenSQL direct `5432` API·UI Gate를 통합. 의미 단위 청킹·batch embedding·PDF 중복 최적화의 제품 적용 Gate는 남음 |
@@ -184,7 +194,6 @@ PRZ-011의 검증·통합 결과는
 
 ## 계획된 미구현 기능
 
-- MCP 검색 API
 - CareerFact 후보·확인·거절과 `INSUFFICIENT_EVIDENCE`
 - 검증된 CareerFact를 이용한 JSON·Markdown portfolio와 source manifest
 - `/api/v1`, OpenAPI, webhook/outbox
@@ -226,6 +235,6 @@ OpenSQL Gate를 분리해 관리합니다. [PRZ-012 검색 근거 표현 품질]
 실제 개인 문서 대표 질의 검증을 남겨 두었습니다. PRZ-009와 PRZ-012는
 `IMPLEMENTED_UNVERIFIED`이며 검증된 기능이 아닙니다. OpenProxy 단일 Primary SQL
 routing은 PRZ-013에서 검증했습니다. 대회 제공 OpenSQL의 Single-only 지침에 따라
-다중 노드 구성과 장애 전환은 다음 우선순위나 후속 Gate로 두지 않습니다. 가장
-가까운 신규 기능은 기존 owner-scoped Career Evidence 검색을 재사용하는 읽기 전용
-MCP 검색 API입니다.
+다중 노드 구성과 장애 전환은 다음 작업이나 후속 검증 대상이 아닙니다. PRZ-015의
+읽기 전용 MCP Career Evidence 검색은 실제 OpenSQL/OpenProxy 환경의 P2 전체
+흐름(E2E)까지 통과해 `VERIFIED`입니다.

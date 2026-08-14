@@ -21,6 +21,7 @@ OpenSQL·OpenProxy·Ollama와 PRIZM을 순서대로 확인·실행하는 운영 
 <FLYWAY_NAT_RULE>
 <RUNTIME_NAT_RULE>
 <PRIZM_REPO_ROOT>
+<OPENSQL_HOME>
 ```
 
 상태 표기의 의미는 다음과 같습니다.
@@ -376,21 +377,23 @@ journalctl -u opensql-etcd -b --no-pager -n 100
 확인된 client 경로와 버전은 다음과 같습니다.
 
 ```text
-/home/opensql/bin/psql
+<OPENSQL_HOME>/bin/psql
 psql 17.8
 ```
 
 binary 경로가 일반 로그인 사용자에게 제한될 수 있으므로 다음처럼 확인합니다.
 
 ```bash
-sudo -u opensql /home/opensql/bin/psql --version
+OPENSQL_HOME='<OPENSQL_HOME>'
+sudo -u opensql "$OPENSQL_HOME/bin/psql" --version
 ```
 
 관리자 Unix socket 접근 구조는 다음과 같습니다.
 
 ```bash
-sudo -u opensql /home/opensql/bin/psql \
-  -h /home/opensql/tmp \
+OPENSQL_HOME='<OPENSQL_HOME>'
+sudo -u opensql "$OPENSQL_HOME/bin/psql" \
+  -h "$OPENSQL_HOME/tmp" \
   -p 5432 \
   -U postgres \
   -d postgres
@@ -604,8 +607,8 @@ SQL을 `NOT_RUN`으로 남깁니다. 다른 PostgreSQL/Testcontainers 성공으�
 
 ```text
 Version: 1.1.3
-Binary: /home/opensql/bin/openproxy
-Config: /home/opensql/etc/openproxy/openproxy.toml
+Binary: <OPENSQL_HOME>/bin/openproxy
+Config: <OPENSQL_HOME>/etc/openproxy/openproxy.toml
 systemd unit: openproxy
 Config owner/mode: opensql:opensql 0600
 ```
@@ -626,17 +629,18 @@ systemctl show openproxy \
 정상 핵심 값은 다음과 같습니다.
 
 ```text
-ExecStart=/home/opensql/bin/openproxy /home/opensql/etc/openproxy/openproxy.toml
+ExecStart=<OPENSQL_HOME>/bin/openproxy <OPENSQL_HOME>/etc/openproxy/openproxy.toml
 User=opensql
 Group=opensql
-WorkingDirectory=/home/opensql
+WorkingDirectory=<OPENSQL_HOME>
 ```
 
 version과 config metadata를 확인할 때는 secret 본문을 출력하지 않습니다.
 
 ```bash
-sudo -u opensql /home/opensql/bin/openproxy --version
-sudo stat -c '%U:%G %a %n' /home/opensql/etc/openproxy/openproxy.toml
+OPENSQL_HOME='<OPENSQL_HOME>'
+sudo -u opensql "$OPENSQL_HOME/bin/openproxy" --version
+sudo stat -c '%U:%G %a %n' "$OPENSQL_HOME/etc/openproxy/openproxy.toml"
 ```
 
 로그는 실패 직후의 작은 범위만 봅니다.

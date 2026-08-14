@@ -199,7 +199,7 @@ flowchart TD
 - **Spec ID:** [PRZ-015](PRZ-015-mcp-career-evidence-search/spec.md)
   - 이름: 읽기 전용 MCP Career Evidence 검색
   - 상태: `VERIFIED`
-  - Source commit: —
+  - Source commit: `97c01cb`
   - Last verified: 2026-08-15 (`P2 PASS`: Flyway는 실제 OpenSQL `:5432`에 직접
     연결하고 애플리케이션은 OpenProxy `:6432/opensql`을 거쳐 실행. Ollama `bge-m3`,
     공식 Java MCP Client와 USER JWT 전체 흐름 통과; `P3 PASS`: OSS 문서 통합)

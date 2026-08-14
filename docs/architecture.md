@@ -9,7 +9,7 @@
 > 최종 Windows·Linux 경로 교정·CI source commit:
 > `aff3e87a9a912e44fcf217291a45328cf451cfc9`
 >
-> 문서 검토 기준일: `2026-08-13`
+> 문서 검토 기준일: `2026-08-14`
 >
 > PRZ-010 상태: `VERIFIED` — source
 > `26c546b16eb9ea42d98460dd6e5aa0bf0752212a`, `main` 통합 merge
@@ -557,8 +557,10 @@ Windows에서는 `SecureDirectoryStream` 성공 경로를 제공하지 않아 fa
 - 검증한 범위: Flyway V1–V14, `vector(1024)`, owner·`ACTIVE` 검색 조건,
   processing·cleanup job SQL, V14 ChangeLog 제약·`SKIP LOCKED`·멱등 dispatch,
   Spring Boot·Ollama direct `5432` V1→V2 E2E와 실패 시 V1 보존
-- 검증하지 않은 범위: V15 OpenSQL 적용, OpenProxy SQL routing·안전한 인증,
-  OpenHA, DB failover, 영구 journal
+- 추가 검증 범위: V15 OpenSQL direct 기준선과 OpenProxy 단일 Primary
+  SQL routing·`prizm_app` 인증·focused runtime E2E
+- 검증하지 않은 범위: OpenProxy 이중화·VIP·지속 application continuity와
+  영구 journal
 
 OpenSQL single-node SQL Gate는 PRZ-003 Evidence 기준 `PASS`입니다. PRZ-005에서는
 직접 `5432` 경로의 OpenSQL·Ollama 전체 사용자 흐름을 별도로 검증했습니다.
@@ -566,10 +568,11 @@ OpenSQL single-node SQL Gate는 PRZ-003 Evidence 기준 `PASS`입니다. PRZ-005
 
 - OpenSQL+Ollama 직접 `5432` API·브라우저·두 사용자 격리: `VERIFIED`
 - OpenProxy TCP 연결: `VERIFIED`
-- OpenProxy SQL routing: `NOT_VERIFIED`
-- OpenProxy 인증: `AUTH_BLOCKED`
-- OpenProxy 애플리케이션 적용: `DEFERRED`
-- OpenHA·DB failover·영구 journal: `DEFERRED`
+- OpenProxy 단일 Primary SQL routing과 `prizm_app` 인증: `VERIFIED`
+- Flyway direct `:5432` / runtime OpenProxy `:6432` focused E2E: `VERIFIED`
+- OpenProxy 재시작 후 새 SQL 연결: `VERIFIED`
+- 지속 application process의 무재시작 회복: `NOT_RUN`
+- 대회 OpenSQL 다중 노드 구성: `REJECTED` — 공식 Single-only 설치 범위
 
 PRZ-004에서는 PostgreSQL·pgvector와 호스트 Ollama를 사용한 두 독립 clean clone을
 검증하고 PR #25로 `main`에 통합했습니다. 두 번째 browser의 업로드 전 빈 목록
@@ -634,7 +637,7 @@ frontend/src/
 - 구조화된 CareerFact 후보·확인·거절
 - 검증된 CareerFact 기반 portfolio 생성
 - MCP와 ChangeLog 다중 consumer별 delivery/checkpoint
-- OpenProxy 애플리케이션 연결, OpenHA와 DB failover
+- OpenProxy 이중화·VIP·지속 application continuity
 - 기관용 workspace와 멤버십
 - 여러 vector DB·storage adapter
 

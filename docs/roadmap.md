@@ -1,6 +1,6 @@
 # PRIZM 개발 로드맵
 
-> 기준일: 2026-08-13
+> 기준일: 2026-08-14
 
 이 문서는 제품이 발전하는 순서만 설명합니다. 현재 구현과 검증 결과는
 [현재 구현 현황](project-status.md), 기능별 근거는
@@ -29,6 +29,11 @@ PRZ-011에서는 문서 처리의 실제 단계·청크 진행 수·재시도 �
 owner-scoped API에 연결하고, 비종료 상태 polling과 종료 시 중지를 검증했습니다.
 AUDIT 수정과 재-AUDIT 뒤 PR #41로 `main`에 통합해 `VERIFIED`입니다.
 
+PRZ-013에서는 PRIZM runtime을 OpenProxy `:6432`로, Flyway를 OpenSQL
+Primary direct `:5432`로 분리했습니다. `prizm_app` SQL SELECT/WRITE와
+TXT/PDF·실제 Ollama `bge-m3`·owner isolation focused E2E를 통과해 단일
+Primary Gate는 `VERIFIED`입니다.
+
 ## 다음
 
 1. **검색 근거 신뢰성**
@@ -43,18 +48,14 @@ AUDIT 수정과 재-AUDIT 뒤 PR #41로 `main`에 통합해 `VERIFIED`입니다.
      전체 PostgreSQL integration, synthetic browser와 최종 감사를 마쳤습니다. OpenSQL
      opt-in target이 `NOT_RUN`이므로 상태는 `IMPLEMENTED_UNVERIFIED`이며, 결과를
      CareerFact나 검증된 숙련도 판정으로 사용하지 않습니다.
-3. **DB 장애 전환**
-   - 실제 다중 노드 구성을 확보한 뒤 장애 주입, 애플리케이션 재연결과 검색 복구를
-     측정합니다.
-   - OpenProxy·OpenHA는 실제 사용하고 검증한 경우에만 결과에 적습니다.
-4. **MCP 검색**
+3. **MCP 검색**
    - 현재 Career Evidence 검색을 재사용하는 읽기 전용 MCP 도구를 만듭니다.
    - 사용자 격리, 원문 출처와 근거 없음 응답을 기존 REST 계약과 함께 검증합니다.
 
 ## 향후
 
 CareerFact는 완료된 clean-clone·OpenSQL 전체 흐름과 변경 로그 동기화에 이어,
-검색 근거 신뢰성, DB 장애 전환과 MCP 검색의 필수 Gate를 통과한 뒤 시작합니다.
+검색 근거 신뢰성과 MCP 검색의 필수 Gate를 통과한 뒤 시작합니다.
 첫 범위는 원문 조각과 연결된 최소 후보·확인·거절 흐름입니다.
 
 Portfolio 생성은 검증된 CareerFact 이후에 진행합니다. 확인되지 않은 경력이나

@@ -47,7 +47,7 @@ API로 확인했지만 브라우저로 직접 관찰하지 않아 해당 UI 항�
 - 이메일 인증, 비밀번호 재설정, refresh token과 OIDC
 - 외부 네트워크에 공개하는 운영용 multi-user Compose와 공개 SaaS 보호
 - 이 PostgreSQL Quickstart에서 OpenSQL과 Ollama를 함께 사용하는 전체 사용자 흐름
-- OpenProxy 애플리케이션 연결과 OpenHA·DB 장애 전환(failover)
+- 실제 OpenSQL·OpenProxy 단일 서버 환경과 대회 범위에서 제외한 다중 노드 구성
 - MCP, CareerFact, portfolio 생성
 
 이 Quickstart의 PostgreSQL·pgvector 성공을 OpenSQL 성공으로 기록하면 안 됩니다.

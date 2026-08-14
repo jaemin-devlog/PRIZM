@@ -23,10 +23,14 @@ agent. The detailed delivery procedure lives in
   API and browser flows, including two-user document and search isolation. Its
   isolated OpenSQL opt-in integration test and final backend, frontend,
   OSS-readiness, SBOM, and documentation audit are also complete. PR #26 merged
-  source `eab32c8` into `main` as merge commit `6dc9822`. OpenProxy TCP
-  connectivity is verified, but SQL routing is `NOT_VERIFIED`, authentication
-  is `AUTH_BLOCKED`, and application is `DEFERRED`. OpenHA, DB failover, and the
-  persistent journal remain deferred according to PRZ-005.
+  source `eab32c8` into `main` as merge commit `6dc9822`. PRZ-013 subsequently
+  verified OpenProxy single-Primary TCP and SQL routing, `prizm_app`
+  authentication, and the focused Flyway-direct/runtime-proxy TXT/PDF and
+  Ollama integration flow. The competition-provided OpenSQL environment is
+  restricted to a single-server installation, so PRZ-014 multi-node OpenHA and
+  DB failover were rejected and are not part of the project roadmap. OpenProxy
+  redundancy, long-running application continuity, and the persistent journal
+  remain deferred or not run.
 
 ## Career evidence principle
 
@@ -46,8 +50,9 @@ agent. The detailed delivery procedure lives in
   request, review, commit, or merge.
 - Do not edit an already-applied Flyway migration. Add a forward migration.
 - Do not advertise planned functionality as implemented. CareerFact, portfolio
-  generation, MCP, OpenProxy runtime, OpenHA, and DB failover remain unimplemented
-  or unverified according to the current status documents.
+  generation, MCP, and the independent Engine package remain unimplemented or
+  unverified according to the current status documents. Do not reintroduce
+  multi-node OpenHA or DB failover into the competition scope.
 
 ## Data, security, and behavior invariants
 
@@ -91,10 +96,10 @@ agent. The detailed delivery procedure lives in
 
 - Keep PostgreSQL·pgvector results separate from OpenSQL results. PostgreSQL
   success is not OpenSQL evidence.
-- Verified OpenSQL results are limited to the actual single-node SQL Gate and
-  the PRZ-005 direct-`5432` API, browser, and two-user isolation flows. Do not
-  expand them to OpenProxy SQL routing, OpenHA, DB failover, or service
-  continuity.
+- Verified OpenSQL results are limited to the actual single-node SQL Gates,
+  PRZ-005 direct-`5432` API/browser/two-user isolation, and PRZ-013 OpenProxy
+  single-Primary SQL routing. Do not expand them to OpenProxy redundancy,
+  multi-node DB failover, or service continuity.
 - Record unavailable or unexecuted checks as `NOT_RUN` or `NOT_VERIFIED`, never
   `PASS`. Keep historical results separate from checks rerun on the current
   source.

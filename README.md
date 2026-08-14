@@ -87,18 +87,19 @@ PRZ-004에서는 PostgreSQL·pgvector와 호스트 Ollama 기반 전체 흐름�
 
 ## 검증 범위
 
-- 실제 OpenSQL single-node에서 Flyway V1–V13, `vector(1024)`, 검색과 Worker
+- 실제 OpenSQL single-node에서 Flyway V1–V15, `vector(1024)`, 검색과 Worker
   SQL을 실행해 통과했습니다(`PASS`).
 - PRZ-005에서 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 연결해
   로그인→합성 TXT/PDF 업로드→임베딩→`ACTIVE`→원문 검색과 브라우저 흐름,
   두 사용자 격리를 검증했습니다. [PR #26](https://github.com/jaemin-devlog/PRIZM/pull/26)으로
   `main`에 통합했습니다(`VERIFIED`).
 - PRZ-010에서 OpenSQL direct `5432`의 V14 ChangeLog schema·멱등 dispatch와 실제
-  OpenSQL·Ollama V1→V2 흐름을 검증했습니다. V15의 OpenSQL 적용은 검증하지
-  않았습니다.
-- OpenProxy는 Windows 호스트의 TCP 연결만 `VERIFIED`입니다. SQL routing은
-  `NOT_VERIFIED`, 인증은 `AUTH_BLOCKED`, 애플리케이션 적용은 `DEFERRED`입니다.
-  OpenHA·DB failover도 `DEFERRED`입니다.
+  OpenSQL·Ollama V1→V2 흐름을 검증했고, 후속 G0에서 V15 기준선을 재검증했습니다.
+- PRZ-013에서 OpenProxy `:6432`의 단일 Primary SQL routing, `prizm_app` 인증,
+  Flyway direct/runtime proxy 분리와 focused TXT/PDF·Ollama 흐름을
+  `VERIFIED`했습니다.
+- 대회 제공 OpenSQL은 단일 서버 설치 범위이므로 다중 노드 OpenHA와 DB 장애
+  전환은 현재 대회·제품 로드맵에서 제외합니다.
 - PostgreSQL·pgvector 테스트 성공은 OpenSQL 검증 결과로 사용하지 않습니다.
 
 현재 배포물은 소스와 설정만 제공하는 Apache-2.0 소스 전용(source-only)

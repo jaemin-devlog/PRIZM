@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-013-P6",
+  "purpose": "Known PRZ-008 hybrid, numeric exact/near-miss, and positive identifier regression guards",
+  "queries": [
+    {"id":"LG01","category":"LEGACY_HYBRID","query":"배포","expected":"EVIDENCE_EXISTS","expectedDocument":"정재민 신입 백엔드 이력서","acceptablePages":[2],"anchorAny":["Docker Compose로 세 서비스를","GCP 기반 Docker 배포"]},
+    {"id":"LG02","category":"LEGACY_HYBRID","query":"Kubernetes 운영 경험","expected":"NO_EVIDENCE"},
+    {"id":"LG03","category":"LEGACY_HYBRID","query":"Kafka 운영 경험","expected":"NO_EVIDENCE"},
+
+    {"id":"NX01","category":"NUMERIC_EXACT","query":"4,400회 테스트","expected":"EVIDENCE_EXISTS","expectedDocument":"정재민 백엔드 포트폴리오","acceptablePages":[2],"anchorAny":["4,400회"]},
+    {"id":"NX02","category":"NUMERIC_EXACT","query":"675건 갱신","expected":"EVIDENCE_EXISTS","expectedDocument":"정재민 백엔드 포트폴리오","acceptablePages":[4,5],"anchorAny":["성공 675","675건"]},
+    {"id":"NX03","category":"NUMERIC_EXACT","query":"2,329행 처리","expected":"EVIDENCE_EXISTS","expectedDocument":"정재민 백엔드 포트폴리오","acceptablePages":[4,5],"anchorAny":["2,329행"]},
+    {"id":"NX04","category":"NUMERIC_EXACT","query":"1,480건 선점","expected":"EVIDENCE_EXISTS","expectedDocument":"정재민 백엔드 포트폴리오","acceptablePages":[3],"anchorAny":["1,480건"]},
+    {"id":"NX05","category":"NUMERIC_EXACT","query":"1,654건 제외","expected":"EVIDENCE_EXISTS","expectedDocument":"정재민 백엔드 포트폴리오","acceptablePages":[4,5],"anchorAny":["1,654건"]},
+    {"id":"NN01","category":"NUMERIC_NEAR_MISS","query":"4,401회 테스트","expected":"NO_EVIDENCE"},
+    {"id":"NN02","category":"NUMERIC_NEAR_MISS","query":"676건 갱신","expected":"NO_EVIDENCE"},
+    {"id":"NN03","category":"NUMERIC_NEAR_MISS","query":"2,330행 처리","expected":"NO_EVIDENCE"},
+
+    {"id":"PI01","category":"POSITIVE_IDENTIFIER","query":"Spring Boot 백엔드 경험","expected":"EVIDENCE_EXISTS","expectedDocument":"정재민 신입 백엔드 이력서","acceptablePages":[1,2],"anchorAny":["Spring Boot"]},
+    {"id":"PI02","category":"POSITIVE_IDENTIFIER","query":"Redis 후보 탐색 사용 경험","expected":"EVIDENCE_EXISTS","expectedDocument":"정재민 백엔드 포트폴리오","acceptablePages":[2],"anchorAny":["Redis는 빠른 후보 탐색","Redis List는 후보 조회"]},
+    {"id":"PI03","category":"POSITIVE_IDENTIFIER","query":"Docker Compose 배포 경험","expected":"EVIDENCE_EXISTS","expectedDocument":"정재민 신입 백엔드 이력서","acceptablePages":[2],"anchorAny":["Docker Compose로 세 서비스를","GCP 기반 Docker 배포"]},
+    {"id":"PI04","category":"POSITIVE_IDENTIFIER","query":"Nginx HTTPS 구축 경험","expected":"EVIDENCE_EXISTS","expectedDocument":"정재민 신입 백엔드 이력서","acceptablePages":[2],"anchorAny":["Nginx 리버스 프록시","HTTPS 설정"]},
+    {"id":"PI05","category":"POSITIVE_IDENTIFIER","query":"TourAPI 연동 경험","expected":"EVIDENCE_EXISTS","expectedDocument":"정재민 백엔드 포트폴리오","acceptablePages":[4,5],"anchorAny":["TourAPI 호출","TourAPI 동기화"]},
+    {"id":"PI06","category":"POSITIVE_IDENTIFIER","query":"FOR UPDATE SKIP LOCKED","expected":"EVIDENCE_EXISTS","expectedDocument":"정재민 백엔드 포트폴리오","acceptablePages":[3],"anchorAny":["FOR UPDATE SKIP LOCKED"]}
+  ]
+}

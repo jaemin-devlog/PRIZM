@@ -5,7 +5,8 @@
 - 상태: `VERIFIED`
 - P0 기준 source: `13f6dd970a24a8966e36fab6b12aa4f894ebed4e`
 - 검증 source commit: `97c01cb076acf91e8433894e71a5d3c156b994f2`
-- GitHub 통합: [PR #46](https://github.com/jaemin-devlog/PRIZM/pull/46) (`merge pending`)
+- GitHub 통합: [PR #46](https://github.com/jaemin-devlog/PRIZM/pull/46), merge commit
+  `23166e785899c046bc69974e1d2d27e163064d48`
 - 검증일: 2026-08-15
 - P0 Gate: `PASS`
 - P1 VERIFY: `PASS`
@@ -289,7 +290,7 @@ license·SBOM Gate가 모두 통과해 P1을 `PASS`로 판정한다. P2 실제 �
 - Production source/test 변경: 0
 - commit, push, PR, merge: `NOT_RUN`
 
-## INTEGRATE — 진행 중
+## INTEGRATE — PASS
 
 - 사용자 승인: 2026-08-15 commit, push, PR 생성과 merge commit 병합 승인
 - 검증 source commit: `97c01cb076acf91e8433894e71a5d3c156b994f2`
@@ -299,4 +300,6 @@ license·SBOM Gate가 모두 통과해 P1을 `PASS`로 판정한다. P2 실제 �
 - `REVIEW_NOT_AVAILABLE_SOLO`: 제3자 reviewer가 없는 solo-maintainer 작업으로 독립
   감사와 사용자 승인을 병합 Gate 근거로 사용한다. 이는 GitHub 제3자 review 증거가
   아니다.
-- merge: 필수 CI 확인 전 `NOT_RUN`
+- GitHub CI: backend, frontend, OSS Readiness 모두 `SUCCESS`
+- merge: 한글 merge commit으로 `PASS`
+- merge commit: `23166e785899c046bc69974e1d2d27e163064d48`

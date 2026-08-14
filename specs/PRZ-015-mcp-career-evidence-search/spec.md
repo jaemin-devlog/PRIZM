@@ -5,7 +5,8 @@
 > **선행 문서:** [PRZ-012](../PRZ-012-search-evidence-presentation/spec.md)
 > **P0 기준 소스:** `13f6dd970a24a8966e36fab6b12aa4f894ebed4e`
 > **검증 source commit:** `97c01cb076acf91e8433894e71a5d3c156b994f2`
-> **GitHub 통합:** [PR #46](https://github.com/jaemin-devlog/PRIZM/pull/46) (`merge pending`)
+> **GitHub 통합:** [PR #46](https://github.com/jaemin-devlog/PRIZM/pull/46), merge commit
+> `23166e785899c046bc69974e1d2d27e163064d48`
 > **최종 확인:** 2026-08-15
 
 ## 목적

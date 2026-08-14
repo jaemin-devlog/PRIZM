@@ -203,6 +203,7 @@ flowchart TD
   - Last verified: 2026-08-15 (`P2 PASS`: Flyway는 실제 OpenSQL `:5432`에 직접
     연결하고 애플리케이션은 OpenProxy `:6432/opensql`을 거쳐 실행. Ollama `bge-m3`,
     공식 Java MCP Client와 USER JWT 전체 흐름 통과; `P3 PASS`: OSS 문서 통합)
+  - GitHub: [PR #46](https://github.com/jaemin-devlog/PRIZM/pull/46), merge commit `23166e7`
 
 ## 환경별 판정 주의
 

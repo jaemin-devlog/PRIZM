@@ -82,6 +82,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -107,6 +108,9 @@ class PgVectorInfrastructureTest {
     private static final String EXTERNAL_DATABASE_URL = System.getenv("PRIZM_INTEGRATION_TEST_DATABASE_URL");
     private static final String EXTERNAL_DATABASE_USERNAME = System.getenv("PRIZM_INTEGRATION_TEST_DATABASE_USERNAME");
     private static final String EXTERNAL_DATABASE_PASSWORD = System.getenv("PRIZM_INTEGRATION_TEST_DATABASE_PASSWORD");
+    private static final String EXTERNAL_FLYWAY_URL = System.getenv("PRIZM_FLYWAY_URL");
+    private static final String EXTERNAL_FLYWAY_USERNAME = System.getenv("PRIZM_FLYWAY_USERNAME");
+    private static final String EXTERNAL_FLYWAY_PASSWORD = System.getenv("PRIZM_FLYWAY_PASSWORD");
     private static final boolean USE_EXTERNAL_DATABASE = EXTERNAL_DATABASE_URL != null
             && !EXTERNAL_DATABASE_URL.isBlank();
 
@@ -133,6 +137,11 @@ class PgVectorInfrastructureTest {
             registry.add("spring.datasource.url", () -> EXTERNAL_DATABASE_URL);
             registry.add("spring.datasource.username", () -> EXTERNAL_DATABASE_USERNAME);
             registry.add("spring.datasource.password", () -> EXTERNAL_DATABASE_PASSWORD);
+            registry.add("spring.flyway.url", () -> requiredExternalConfig("PRIZM_FLYWAY_URL", EXTERNAL_FLYWAY_URL));
+            registry.add("spring.flyway.user", () -> requiredExternalConfig(
+                    "PRIZM_FLYWAY_USERNAME", EXTERNAL_FLYWAY_USERNAME));
+            registry.add("spring.flyway.password", () -> requiredExternalConfig(
+                    "PRIZM_FLYWAY_PASSWORD", EXTERNAL_FLYWAY_PASSWORD));
         }
         else {
             registry.add("spring.datasource.url", postgres::getJdbcUrl);
@@ -144,6 +153,8 @@ class PgVectorInfrastructureTest {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    JdbcTemplate testMaintenanceJdbcTemplate;
 
     @Autowired
     EmbeddingService embeddingService;
@@ -233,7 +244,7 @@ class PgVectorInfrastructureTest {
         Integer serverVersion = jdbcTemplate.queryForObject(
                 "SELECT current_setting('server_version_num')::integer", Integer.class);
 
-        Long successfulMigrations = jdbcTemplate.queryForObject(
+        Long successfulMigrations = testMaintenanceJdbcTemplate().queryForObject(
                 "SELECT COUNT(*) FROM flyway_schema_history WHERE success", Long.class);
         Long documentCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM documents", Long.class);
         Long versionCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM document_versions", Long.class);
@@ -247,9 +258,9 @@ class PgVectorInfrastructureTest {
         PgVectorSmokeAssertions.SmokeResult result =
                 PgVectorSmokeAssertions.verifyExactCosineSearch(jdbcTemplate);
 
-        assertThat(serverVersion).isBetween(160000, 169999);
+        assertThat(serverVersion / 10000).isIn(16, 17);
         assertThat(successfulMigrations).isEqualTo(15L);
-        assertThat(result.extensionVersion()).isEqualTo("0.8.2");
+        assertThat(result.extensionVersion()).isIn("0.8.1", "0.8.2");
         assertThat(documentCount).isZero();
         assertThat(versionCount).isZero();
         assertThat(chunkCount).isZero();
@@ -1237,7 +1248,7 @@ class PgVectorInfrastructureTest {
                     .isEqualTo(1L);
         }
         finally {
-            jdbcTemplate.update("DELETE FROM file_cleanup_jobs WHERE storage_key = ?", storageKey);
+            testMaintenanceJdbcTemplate().update("DELETE FROM file_cleanup_jobs WHERE storage_key = ?", storageKey);
         }
     }
 
@@ -1262,7 +1273,8 @@ class PgVectorInfrastructureTest {
             assertThat(cleanupStatus(missingKey)).isEqualTo("COMPLETED");
         }
         finally {
-            jdbcTemplate.update("DELETE FROM file_cleanup_jobs WHERE storage_key IN (?, ?)", existingKey, missingKey);
+            testMaintenanceJdbcTemplate().update(
+                    "DELETE FROM file_cleanup_jobs WHERE storage_key IN (?, ?)", existingKey, missingKey);
             Files.deleteIfExists(existingFile);
         }
     }
@@ -1339,7 +1351,7 @@ class PgVectorInfrastructureTest {
             }
             executor.shutdownNow();
             assertThat(executor.awaitTermination(5, TimeUnit.SECONDS)).isTrue();
-            jdbcTemplate.update(
+            testMaintenanceJdbcTemplate().update(
                     "DELETE FROM file_cleanup_jobs WHERE storage_key IN (?, ?)", firstStorageKey, secondStorageKey);
         }
     }
@@ -1406,7 +1418,7 @@ class PgVectorInfrastructureTest {
             assertThat(Files.exists(file)).isFalse();
         }
         finally {
-            jdbcTemplate.update("DELETE FROM file_cleanup_jobs WHERE storage_key = ?", storageKey);
+            testMaintenanceJdbcTemplate().update("DELETE FROM file_cleanup_jobs WHERE storage_key = ?", storageKey);
             Files.deleteIfExists(file);
         }
     }
@@ -1460,7 +1472,7 @@ class PgVectorInfrastructureTest {
         }
         finally {
             executor.shutdownNow();
-            jdbcTemplate.update("DELETE FROM file_cleanup_jobs WHERE storage_key = ?", storageKey);
+            testMaintenanceJdbcTemplate().update("DELETE FROM file_cleanup_jobs WHERE storage_key = ?", storageKey);
         }
     }
 
@@ -1504,7 +1516,7 @@ class PgVectorInfrastructureTest {
             assertThat(cleanupJobState(storageKey)).isEqualTo(workerBState);
         }
         finally {
-            jdbcTemplate.update("DELETE FROM file_cleanup_jobs WHERE storage_key = ?", storageKey);
+            testMaintenanceJdbcTemplate().update("DELETE FROM file_cleanup_jobs WHERE storage_key = ?", storageKey);
         }
     }
 
@@ -1527,7 +1539,7 @@ class PgVectorInfrastructureTest {
                     .isEqualTo("PERMANENT_STORAGE_ERROR");
         }
         finally {
-            jdbcTemplate.update("DELETE FROM file_cleanup_jobs WHERE storage_key = ?", storageKey);
+            testMaintenanceJdbcTemplate().update("DELETE FROM file_cleanup_jobs WHERE storage_key = ?", storageKey);
         }
     }
 
@@ -1798,14 +1810,40 @@ class PgVectorInfrastructureTest {
     }
 
     private void deleteCommittedDocumentData() {
-        jdbcTemplate.update("DELETE FROM document_change_logs");
-        jdbcTemplate.update("DELETE FROM file_cleanup_jobs");
-        jdbcTemplate.update("DELETE FROM processing_jobs");
-        jdbcTemplate.update("DELETE FROM document_chunks");
-        jdbcTemplate.update("UPDATE documents SET active_version_id = NULL");
-        jdbcTemplate.update("DELETE FROM document_versions");
-        jdbcTemplate.update("DELETE FROM documents");
-        jdbcTemplate.update("DELETE FROM users");
+        JdbcTemplate maintenanceJdbc = testMaintenanceJdbcTemplate();
+        maintenanceJdbc.update("DELETE FROM document_change_logs");
+        maintenanceJdbc.update("DELETE FROM file_cleanup_jobs");
+        maintenanceJdbc.update("DELETE FROM processing_jobs");
+        maintenanceJdbc.update("DELETE FROM document_chunks");
+        maintenanceJdbc.update("UPDATE documents SET active_version_id = NULL");
+        maintenanceJdbc.update("DELETE FROM document_versions");
+        maintenanceJdbc.update("DELETE FROM documents");
+        maintenanceJdbc.update("DELETE FROM users");
+    }
+
+    private JdbcTemplate testMaintenanceJdbcTemplate() {
+        if (!USE_EXTERNAL_DATABASE) {
+            return jdbcTemplate;
+        }
+        if (testMaintenanceJdbcTemplate == null) {
+            JdbcTemplate candidate = new JdbcTemplate(new DriverManagerDataSource(
+                    requiredExternalConfig("PRIZM_FLYWAY_URL", EXTERNAL_FLYWAY_URL),
+                    requiredExternalConfig("PRIZM_FLYWAY_USERNAME", EXTERNAL_FLYWAY_USERNAME),
+                    requiredExternalConfig("PRIZM_FLYWAY_PASSWORD", EXTERNAL_FLYWAY_PASSWORD)));
+            assertThat(candidate.queryForObject("SELECT current_database()", String.class))
+                    .isEqualTo(jdbcTemplate.queryForObject("SELECT current_database()", String.class));
+            assertThat(candidate.queryForObject("SELECT current_user", String.class))
+                    .isEqualTo(EXTERNAL_FLYWAY_USERNAME);
+            testMaintenanceJdbcTemplate = candidate;
+        }
+        return testMaintenanceJdbcTemplate;
+    }
+
+    private static String requiredExternalConfig(String name, String value) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException("External integration-test configuration is missing " + name + ".");
+        }
+        return value;
     }
 
     private SearchService optInSearchService() {

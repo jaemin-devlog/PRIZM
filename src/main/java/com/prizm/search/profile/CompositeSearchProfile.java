@@ -119,8 +119,21 @@ public class CompositeSearchProfile {
     private static final List<String> EXPLANATION_MARKERS = List.of(
             "어떻게", "이유", "왜", "방지", "막았");
 
+    private final EvidenceQualityReranker evidenceQualityReranker = new EvidenceQualityReranker();
+
     public SearchIntent resolveIntent(String query) {
         return resolveIntent(querySignals(query));
+    }
+
+    /** Returns only existing P4 identifiers for an explicit experience or evidence request. */
+    public Set<String> strongIdentifiersForEvidenceGuard(String query) {
+        QuerySignals signals = querySignals(query);
+        if (!signals.positiveClaimQuestion()
+                && !signals.directImplementationEvidenceRequest()
+                && !signals.identifierEvidenceRequest()) {
+            return Set.of();
+        }
+        return signals.requiredIdentifiers();
     }
 
     public Decision apply(String query, List<VectorSearchResult> denseCandidates) {
@@ -167,7 +180,7 @@ public class CompositeSearchProfile {
                 .toList();
         if (intent == SearchIntent.GENERAL) {
             diverseCandidates = diverseCandidates.stream()
-                    .sorted(generalRankingComparator(signals))
+                    .sorted(generalRankingComparator(query, signals))
                     .toList();
         }
         List<VectorSearchResult> diverseResults = diverseCandidates.stream()
@@ -324,17 +337,28 @@ public class CompositeSearchProfile {
         if (candidateMeetsDenseFloor != currentMeetsDenseFloor) {
             return candidateMeetsDenseFloor;
         }
-        return generalRankingScore(signals, candidate) > generalRankingScore(signals, current);
+        return baseGeneralRankingScore(signals, candidate)
+                > baseGeneralRankingScore(signals, current);
     }
 
-    private static Comparator<VectorSearchResult> generalRankingComparator(QuerySignals signals) {
+    private Comparator<VectorSearchResult> generalRankingComparator(
+            String query,
+            QuerySignals signals) {
         return Comparator.comparingDouble(
-                        (VectorSearchResult candidate) -> generalRankingScore(signals, candidate))
+                        (VectorSearchResult candidate) -> generalRankingScore(query, signals, candidate))
                 .reversed()
                 .thenComparing(Comparator.comparingDouble(VectorSearchResult::score).reversed());
     }
 
-    private static double generalRankingScore(
+    private double generalRankingScore(
+            String query,
+            QuerySignals signals,
+            VectorSearchResult candidate) {
+        return baseGeneralRankingScore(signals, candidate)
+                + evidenceQualityReranker.evaluate(query, candidate).adjustment();
+    }
+
+    private static double baseGeneralRankingScore(
             QuerySignals signals,
             VectorSearchResult candidate) {
         CandidateSignals candidateSignals = rankingSignals(candidate);
@@ -348,6 +372,18 @@ public class CompositeSearchProfile {
                         signals.requiredNumbers(), candidateSignals.numbers())
                 * MAX_NUMBER_RANKING_BOOST;
         return candidate.score() + identifierBoost + coreTermBoost + numberBoost;
+    }
+
+    /** Exposes deterministic ranking components for tests and offline evaluation only. */
+    public RankingExplanation explainRanking(String query, VectorSearchResult candidate) {
+        QuerySignals signals = querySignals(query);
+        double base = baseGeneralRankingScore(signals, candidate);
+        double evidenceAdjustment = evidenceQualityReranker.evaluate(query, candidate).adjustment();
+        return new RankingExplanation(
+                candidate.score(),
+                base - candidate.score(),
+                evidenceAdjustment,
+                base + evidenceAdjustment);
     }
 
     private static double matchRatio(Set<String> required, Set<String> candidate) {
@@ -1250,6 +1286,13 @@ public class CompositeSearchProfile {
         return new BigDecimal(value.replace(",", ""))
                 .stripTrailingZeros()
                 .toPlainString();
+    }
+
+    public record RankingExplanation(
+            double denseScore,
+            double existingProfileAdjustment,
+            double evidenceAdjustment,
+            double finalRankingValue) {
     }
 
     public record Decision(

@@ -1,9 +1,10 @@
 package com.prizm.search.repository;
 
 import com.prizm.ingestion.entity.ChunkSourceType;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -45,6 +46,59 @@ public class VectorSearchRepository {
     private static final String NEAREST_CHUNK_SQL = SEARCHABLE_CHUNKS_SQL + "LIMIT 1";
     private static final String CAREER_EVIDENCE_SQL = SEARCHABLE_CHUNKS_SQL + "LIMIT 5";
     private static final String CAREER_EVIDENCE_CANDIDATES_SQL = SEARCHABLE_CHUNKS_SQL + "LIMIT 20";
+    private static final String NUMERIC_ANCHOR_CANDIDATES_PREFIX = """
+            SELECT chunk.id AS chunk_id,
+                   document.id AS document_id,
+                   version.id AS document_version_id,
+                   document.title AS document_title,
+                   version.version_no,
+                   chunk.chunk_no,
+                   chunk.page_no,
+                   chunk.source_type,
+                   chunk.source_index,
+                   chunk.source_label,
+                   chunk.content,
+                   chunk.embedding <=> CAST(? AS vector) AS distance
+            FROM document_chunks chunk
+            JOIN document_versions version
+              ON chunk.document_version_id = version.id
+            JOIN documents document
+              ON document.id = version.document_id
+             AND document.active_version_id = version.id
+            WHERE version.status = 'ACTIVE'
+              AND chunk.document_version_id = version.id
+              AND document.owner_user_id = ?
+              AND version.owner_user_id = ?
+              AND chunk.owner_user_id = ?
+              AND (
+            """;
+    private static final String NUMERIC_ANCHOR_CANDIDATES_SUFFIX = """
+              )
+            ORDER BY chunk.embedding <=> CAST(? AS vector), chunk.id
+            LIMIT 20
+            """;
+    private static final String ACTIVE_IDENTIFIER_EXISTS_SQL = """
+            SELECT EXISTS (
+                SELECT 1
+                FROM document_chunks chunk
+                JOIN document_versions version
+                  ON chunk.document_version_id = version.id
+                 AND version.owner_user_id = chunk.owner_user_id
+                JOIN documents document
+                  ON document.id = version.document_id
+                 AND document.active_version_id = version.id
+                 AND document.owner_user_id = version.owner_user_id
+                WHERE document.owner_user_id = ?
+                  AND version.owner_user_id = ?
+                  AND chunk.owner_user_id = ?
+                  AND version.status = 'ACTIVE'
+                  AND regexp_replace(
+                        lower(document.title || ' ' || chunk.content),
+                        'spring[[:space:]_-]*boot',
+                        'springboot',
+                        'g') ~ ?
+            )
+            """;
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -76,34 +130,83 @@ public class VectorSearchRepository {
         return find(ownerUserId, embedding, CAREER_EVIDENCE_CANDIDATES_SQL);
     }
 
+    /** Returns owner-scoped ACTIVE candidates containing an exact normalized numeric anchor. */
+    public List<VectorSearchResult> findNumericAnchorCandidates(
+            Long ownerUserId,
+            float[] embedding,
+            Set<String> normalizedNumbers) {
+        if (normalizedNumbers.isEmpty()) {
+            return List.of();
+        }
+        String predicates = String.join(
+                " OR ",
+                java.util.Collections.nCopies(
+                        normalizedNumbers.size(),
+                        "regexp_replace(chunk.content, ',', '', 'g') ~ ?"));
+        String sql = NUMERIC_ANCHOR_CANDIDATES_PREFIX + predicates + NUMERIC_ANCHOR_CANDIDATES_SUFFIX;
+        String vector = toVectorLiteral(embedding);
+        List<Object> arguments = new ArrayList<>();
+        arguments.add(vector);
+        arguments.add(ownerUserId);
+        arguments.add(ownerUserId);
+        arguments.add(ownerUserId);
+        normalizedNumbers.stream()
+                .map(VectorSearchRepository::numericBoundaryPattern)
+                .forEach(arguments::add);
+        arguments.add(vector);
+        return jdbcTemplate.query(sql, VectorSearchRepository::mapResult, arguments.toArray());
+    }
+
+    /** Checks explicit P4 identifiers only inside the authenticated owner's ACTIVE versions. */
+    public boolean hasAllActiveIdentifiers(Long ownerUserId, Set<String> identifiers) {
+        return identifiers.stream().allMatch(identifier -> Boolean.TRUE.equals(jdbcTemplate.queryForObject(
+                ACTIVE_IDENTIFIER_EXISTS_SQL,
+                Boolean.class,
+                ownerUserId,
+                ownerUserId,
+                ownerUserId,
+                identifierBoundaryPattern(identifier))));
+    }
+
     private List<VectorSearchResult> find(Long ownerUserId, float[] embedding, String sql) {
         String vector = toVectorLiteral(embedding);
         return jdbcTemplate.query(
                 sql,
-                (resultSet, rowNum) -> {
-                    // pgvector의 <=> 결과는 cosine distance이며 작을수록 가깝다.
-                    double distance = resultSet.getDouble("distance");
-                    return new VectorSearchResult(
-                            resultSet.getLong("chunk_id"),
-                            resultSet.getLong("document_id"),
-                            resultSet.getLong("document_version_id"),
-                            resultSet.getString("document_title"),
-                            resultSet.getInt("version_no"),
-                            resultSet.getInt("chunk_no"),
-                            resultSet.getObject("page_no", Integer.class),
-                            ChunkSourceType.valueOf(resultSet.getString("source_type")),
-                            resultSet.getInt("source_index"),
-                            resultSet.getString("source_label"),
-                            resultSet.getString("content"),
-                            distance,
-                            // distance를 유사도 형태로 보여주기 위해 역변환한다. 정확도나 확률은 아니다.
-                            1.0d - distance);
-                },
+                VectorSearchRepository::mapResult,
                 vector,
                 ownerUserId,
                 ownerUserId,
                 ownerUserId,
                 vector);
+    }
+
+    private static VectorSearchResult mapResult(java.sql.ResultSet resultSet, int rowNum)
+            throws java.sql.SQLException {
+        double distance = resultSet.getDouble("distance");
+        return new VectorSearchResult(
+                resultSet.getLong("chunk_id"),
+                resultSet.getLong("document_id"),
+                resultSet.getLong("document_version_id"),
+                resultSet.getString("document_title"),
+                resultSet.getInt("version_no"),
+                resultSet.getInt("chunk_no"),
+                resultSet.getObject("page_no", Integer.class),
+                ChunkSourceType.valueOf(resultSet.getString("source_type")),
+                resultSet.getInt("source_index"),
+                resultSet.getString("source_label"),
+                resultSet.getString("content"),
+                distance,
+                1.0d - distance);
+    }
+
+    private static String numericBoundaryPattern(String normalizedNumber) {
+        String escaped = normalizedNumber.replace(".", "\\.");
+        return "(^|[^0-9])" + escaped + "([^0-9]|$)";
+    }
+
+    private static String identifierBoundaryPattern(String identifier) {
+        String escaped = identifier.replace(".", "\\.").replace("+", "\\+");
+        return "(^|[^a-z0-9+#._-])" + escaped + "([^a-z0-9+#._-]|$)";
     }
 
     static String toVectorLiteral(float[] embedding) {

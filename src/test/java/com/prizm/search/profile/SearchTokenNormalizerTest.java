@@ -33,6 +33,15 @@ class SearchTokenNormalizerTest {
                 .isEqualTo("springboot를");
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "Spring Boot", "SpringBoot", "Springboot", "springboot"
+    })
+    void canonicalizesSpringBootForEmbeddingVariants(String value) {
+        assertThat(SearchTokenNormalizer.canonicalizeTechnologyNames(value))
+                .isEqualTo("Spring Boot");
+    }
+
     @Test
     void preservesMeaningfulTechnicalIdentifierPunctuation() {
         assertThat(List.of("C++", "C#", "Node.js").stream()

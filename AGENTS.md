@@ -11,6 +11,10 @@ agent. The detailed delivery procedure lives in
 - PRIZM aims to become an open-source Career Intelligence Engine with Reference
   Applications for career-document analysis, information structuring,
   evidence-backed search, and portfolio generation.
+- The current product focus is an automated AI document management platform:
+  upload career documents, preserve immutable versions, dispatch ChangeLog-based
+  indexing, generate embeddings, and provide owner-scoped evidence search. MCP
+  search is the nearest planned interface, not an implemented feature.
 - The current Career Vault is a personal Reference App implemented as one Spring
   Boot application and one React frontend. It is not the whole PRIZM product.
 - Reusable Engine modules, structured CareerFact data, and verified portfolio
@@ -29,8 +33,8 @@ agent. The detailed delivery procedure lives in
   Ollama integration flow. The competition-provided OpenSQL environment is
   restricted to a single-server installation, so PRZ-014 multi-node OpenHA and
   DB failover were rejected and are not part of the project roadmap. OpenProxy
-  redundancy, long-running application continuity, and the persistent journal
-  remain deferred or not run.
+  redundancy and multi-node service-continuity work are explicitly out of scope.
+  The persistent journal remains unimplemented.
 
 ## Career evidence principle
 

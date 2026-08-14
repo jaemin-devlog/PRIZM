@@ -34,6 +34,10 @@
 패키지가 아닙니다. 현재 구현은 하나의 Spring Boot 애플리케이션과 React 기반
 Career Vault Reference App입니다.
 
+제품 관점에서는 문서 업로드, 변경 로그 기반 색인 전달, 자동 임베딩, 안전한
+`ACTIVE` 전환과 사용자별 원문 근거 검색을 연결한 자동화된 AI 문서 관리
+플랫폼입니다. MCP 검색 인터페이스는 다음 구현 목표이며 현재 구성요소가 아닙니다.
+
 장기 목표인 Career Intelligence Engine과 현재 구현을 구분합니다. 세부 기능의
 구현·검증 상태는 [현재 구현 현황](project-status.md), 앞으로의 제품 개발 순서는
 [개발 로드맵](roadmap.md), 설치와 실행 절차는 [로컬 Quickstart](quickstart.md)를
@@ -559,8 +563,8 @@ Windows에서는 `SecureDirectoryStream` 성공 경로를 제공하지 않아 fa
   Spring Boot·Ollama direct `5432` V1→V2 E2E와 실패 시 V1 보존
 - 추가 검증 범위: V15 OpenSQL direct 기준선과 OpenProxy 단일 Primary
   SQL routing·`prizm_app` 인증·focused runtime E2E
-- 검증하지 않은 범위: OpenProxy 이중화·VIP·지속 application continuity와
-  영구 journal
+- 명시적 비범위: OpenProxy 이중화·VIP와 다중 노드 service continuity
+- 현재 미구현: 영구 journal
 
 OpenSQL single-node SQL Gate는 PRZ-003 Evidence 기준 `PASS`입니다. PRZ-005에서는
 직접 `5432` 경로의 OpenSQL·Ollama 전체 사용자 흐름을 별도로 검증했습니다.
@@ -571,7 +575,7 @@ OpenSQL single-node SQL Gate는 PRZ-003 Evidence 기준 `PASS`입니다. PRZ-005
 - OpenProxy 단일 Primary SQL routing과 `prizm_app` 인증: `VERIFIED`
 - Flyway direct `:5432` / runtime OpenProxy `:6432` focused E2E: `VERIFIED`
 - OpenProxy 재시작 후 새 SQL 연결: `VERIFIED`
-- 지속 application process의 무재시작 회복: `NOT_RUN`
+- 지속 application process의 무재시작 회복: 명시적 비범위
 - 대회 OpenSQL 다중 노드 구성: `REJECTED` — 공식 Single-only 설치 범위
 
 PRZ-004에서는 PostgreSQL·pgvector와 호스트 Ollama를 사용한 두 독립 clean clone을
@@ -629,17 +633,20 @@ frontend/src/
 전체 파일 목록보다 책임 단위로 먼저 찾고, 각 절의 근거 링크에서 실제 구현으로
 내려가는 것을 권장합니다.
 
-## 14. 현재 미구현·비범위
+## 14. 현재 미구현·명시적 비범위
 
-다음 항목은 목표 또는 이후 후보이며 현재 구현으로 보지 않습니다.
+다음 항목은 계획된 목표 또는 이후 후보이며 현재 구현으로 보지 않습니다.
 
 - 재사용 가능한 독립 Engine artifact
 - 구조화된 CareerFact 후보·확인·거절
 - 검증된 CareerFact 기반 portfolio 생성
-- MCP와 ChangeLog 다중 consumer별 delivery/checkpoint
-- OpenProxy 이중화·VIP·지속 application continuity
+- 기존 Career Evidence 검색을 재사용하는 읽기 전용 MCP 검색 API
+- ChangeLog 다중 consumer별 delivery/checkpoint
 - 기관용 workspace와 멤버십
 - 여러 vector DB·storage adapter
+
+다중 OpenSQL DB node, DB 장애전환, OpenProxy 이중화·VIP와 서비스 연속성 보장은
+명시적 비범위이며 이후 제품 후보로 두지 않습니다.
 
 상세 상태와 가장 가까운 제품 작업은 [현재 구현 현황](project-status.md)과
 [개발 로드맵](roadmap.md)을 따릅니다.

@@ -12,6 +12,10 @@ PRIZM은 Spring Boot 애플리케이션과 React Career Vault Reference App으�
 업로드, 버전 관리, 비동기 임베딩과 원문 근거 검색을 제공합니다. 재사용 가능한
 독립 Engine 패키지는 아직 아닙니다.
 
+현재 대회 제품 초점은 문서를 넣으면 ChangeLog 기반 색인과 자동 임베딩을 거쳐
+최신 `ACTIVE` 버전의 사용자별 근거를 찾아주는 자동화된 AI 문서 관리
+플랫폼입니다.
+
 소스 전용(source-only) 오픈소스 준비와 실제 OpenSQL single-node SQL Gate를
 완료했습니다. 안전한 demo `USER`, 자동 검증과 두 독립 clean clone도 확인하고
 PRZ-004 독립 감사와 GitHub 통합을 마쳤습니다.
@@ -36,21 +40,24 @@ Primary Gate는 `VERIFIED`입니다.
 
 ## 다음
 
-1. **검색 근거 신뢰성**
+1. **MCP 검색**
+   - 현재 Career Evidence 검색을 재사용하는 읽기 전용 MCP 도구를 만듭니다.
+   - 사용자 격리, 원문 출처와 근거 없음 응답을 기존 REST 계약과 함께 검증합니다.
+2. **검색 근거 신뢰성**
    - dense 검색 평가와 세 상태를 구분하는 개선 제품 profile을 기본값으로 승격했습니다.
      고정 TEST와 실제 OpenSQL direct `5432` API·UI Gate를 통과한 결과입니다.
    - UI와 청킹·색인 최적화는 같은 변경에 섞지 않고, 평가 Gate를 통과한 단계만
      별도 PR로 진행합니다.
-2. **경력 키워드 맵**
+3. **경력 키워드 맵**
    - 현재 사용자의 `ACTIVE` 이력서·포트폴리오 원문에서 실제로 확인한 기술을 정규화하고,
      category와 세 순위 기준으로 표시하며 문서별 근거와 TXT/PDF 원본 위치에 연결합니다.
    - [PRZ-009](../specs/PRZ-009-career-keyword-map/spec.md)는 소스 구현, 단위·정적 검증,
      전체 PostgreSQL integration, synthetic browser와 최종 감사를 마쳤습니다. OpenSQL
      opt-in target이 `NOT_RUN`이므로 상태는 `IMPLEMENTED_UNVERIFIED`이며, 결과를
      CareerFact나 검증된 숙련도 판정으로 사용하지 않습니다.
-3. **MCP 검색**
-   - 현재 Career Evidence 검색을 재사용하는 읽기 전용 MCP 도구를 만듭니다.
-   - 사용자 격리, 원문 출처와 근거 없음 응답을 기존 REST 계약과 함께 검증합니다.
+
+다중 OpenSQL DB node, DB 장애전환, OpenProxy 이중화·VIP와 서비스 연속성 보장은
+로드맵에 포함하지 않습니다.
 
 ## 향후
 

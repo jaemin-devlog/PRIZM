@@ -1,7 +1,7 @@
 # PRIZM
 
-> 이력서·자기소개서·경력기술서처럼 흩어진 커리어 문서의 원본, 버전, 처리 상태와
-> 검색 근거를 한 흐름으로 관리하기 위한 오픈소스 프로젝트입니다.
+> 문서를 업로드하면 원본과 버전을 보존하고, 변경 로그 기반 자동 임베딩과
+> 사용자별 근거 검색까지 한 흐름으로 처리하는 오픈소스 AI 문서 관리 플랫폼입니다.
 
 ## PRIZM이 해결하려는 문제
 
@@ -26,6 +26,10 @@ Intelligence Engine**과 Reference App을 제공하는 것입니다. 현재 저�
 독립 Engine 패키지가 아닙니다. 지금 제공하는 구현은 하나의 Spring Boot
 애플리케이션과 React 기반 **Career Vault Reference App**입니다.
 
+현재 대회 초점은 OpenSQL 실행 경로에서 문서 업로드, 자동 임베딩, ChangeLog
+동기화, 안전한 `ACTIVE` 버전 전환과 원문 근거 검색을 원스톱으로 제공하는
+**자동화된 AI 문서 관리 플랫폼**입니다.
+
 현재 구현은 다음과 같습니다.
 
 - 첫 화면에서 일반 `USER` 계정을 만든 뒤 기존 이메일·비밀번호 로그인으로
@@ -49,6 +53,8 @@ Intelligence Engine**과 Reference App을 제공하는 것입니다. 현재 저�
 CareerFact, 근거 기반 portfolio 생성, `/api/v1`, MCP, 독립 Engine 패키지와
 기관용 workspace는 아직 구현되지 않았습니다. 구체적인 기능과 제한은
 [현재 구현 현황](docs/project-status.md)을 기준으로 확인합니다.
+가장 가까운 신규 기능은 기존 Career Evidence 검색을 재사용하는 읽기 전용
+MCP 검색 API입니다.
 
 ## 인증 진입 흐름
 

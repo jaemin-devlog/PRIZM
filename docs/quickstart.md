@@ -5,6 +5,10 @@
 구현·검증 상태는 [현재 구현 현황](project-status.md)과
 [PRZ-004 Evidence](../specs/PRZ-004-clean-clone-demo/evidence.md)를 함께 확인하세요.
 
+이 절차는 문서 업로드, 자동 임베딩, `ACTIVE` 전환과 사용자별 근거 검색으로
+이어지는 자동화된 AI 문서 관리 플랫폼의 현재 핵심 흐름을 재현합니다. MCP 검색은
+다음 구현 목표이므로 이 Quickstart에 포함하지 않습니다.
+
 현재 저장소는 소스와 실행 설정만 배포하는 소스 전용(source-only) 범위입니다.
 컨테이너 이미지, Ollama 실행 파일과 AI 모델은 저장소에 포함하지 않습니다.
 

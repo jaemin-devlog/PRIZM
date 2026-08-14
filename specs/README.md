@@ -202,7 +202,8 @@ flowchart TD
   integration test는 `VERIFIED`다. PRZ-013은 OpenProxy `:6432` 단일 Primary
   SQL routing·`prizm_app` 인증·focused runtime E2E를 `VERIFIED`했다. 대회 제공
   OpenSQL은 Single 구성만 사용하며 다중 노드 장애전환은 후속 Gate로 두지 않는다.
-  OpenProxy 이중화, 지속 application process 회복과 영구 journal은 검증하지 않았다.
+  OpenProxy 이중화와 지속 application process 회복은 명시적 비범위이며, 영구
+  journal은 구현·검증하지 않았다.
 - PRZ-010은 실제 OpenSQL direct `5432` SQL Gate와 OpenSQL·Ollama `bge-m3` V1→V2
   흐름을 검증했다. 환경 이력과 남은 범위는
   [PRZ-010 Evidence](PRZ-010-change-log-sync/evidence.md)를 따른다. 이 결과도

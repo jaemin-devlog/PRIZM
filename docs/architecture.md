@@ -9,7 +9,7 @@
 > 최종 Windows·Linux 경로 교정·CI source commit:
 > `aff3e87a9a912e44fcf217291a45328cf451cfc9`
 >
-> 문서 검토 기준일: `2026-08-14`
+> 문서 검토 기준일: `2026-08-15`
 >
 > PRZ-010 상태: `VERIFIED` — source
 > `26c546b16eb9ea42d98460dd6e5aa0bf0752212a`, `main` 통합 merge
@@ -36,7 +36,8 @@ Career Vault Reference App입니다.
 
 제품 관점에서는 문서 업로드, 변경 로그 기반 색인 전달, 자동 임베딩, 안전한
 `ACTIVE` 전환과 사용자별 원문 근거 검색을 연결한 자동화된 AI 문서 관리
-플랫폼입니다. MCP 검색 인터페이스는 다음 구현 목표이며 현재 구성요소가 아닙니다.
+플랫폼입니다. 표준 MCP client도 같은 Career Evidence 검색을 읽기 전용으로
+호출할 수 있습니다.
 
 장기 목표인 Career Intelligence Engine과 현재 구현을 구분합니다. 세부 기능의
 구현·검증 상태는 [현재 구현 현황](project-status.md), 앞으로의 제품 개발 순서는
@@ -64,23 +65,38 @@ PRIZM의 구조는 다음 조건을 지키기 위해 선택되었습니다.
 
 ## 3. System context
 
-사용자는 브라우저의 Career Vault를 통해 PRIZM을 사용합니다. PRIZM은 원본 파일과
-관계형·벡터 데이터를 각각 저장하고, 외부 Ollama에 임베딩 생성을 요청합니다.
+사용자는 브라우저의 Career Vault나 Bearer JWT를 설정한 MCP client로 PRIZM을
+사용합니다. PRIZM은 원본 파일과 관계형·벡터 데이터를 각각 저장하고 외부 Ollama에
+임베딩 생성을 요청합니다.
 Ollama는 벡터를 만들 뿐 사용자 권한이나 검색 가능 여부를 판단하지 않습니다.
 
 ```mermaid
 flowchart LR
     U["사용자"]
+    M["표준 MCP client<br/>MCP 호환 프로그램"]
     P["PRIZM<br/>Career Vault와 Spring Boot"]
     DB[("관계형 DB와 vector")]
     FS[("로컬 원본 저장소")]
     O["외부 Ollama<br/>bge-m3"]
 
     U <--> P
+    M -->|"POST /mcp"| P
     P <--> DB
     P <--> FS
     P <--> O
 ```
+
+MCP 경로는 연결 상태를 서버에 저장하지 않는(stateless) Streamable HTTP와 통신
+규격(protocol) `2025-11-25`를 사용합니다.
+`search_career_evidence({"query":"..."})` 도구는 활성 `ROLE_USER`의 Bearer JWT를
+검증한 뒤 `CurrentUserProvider.userId()`와 기존
+`SearchService.searchCareerEvidenceV2(...)`를 호출합니다. 별도 검색 구현이 없으므로
+REST와 마찬가지로 사용자별 데이터와 현재 `ACTIVE` 버전만 반환합니다.
+
+구현·검증 근거:
+
+- [Career Evidence MCP tool](../src/main/java/com/prizm/mcp/CareerEvidenceMcpTool.java)
+- [PRZ-015 Evidence](../specs/PRZ-015-mcp-career-evidence-search/evidence.md)
 
 로컬 애플리케이션 런타임의 DB는 PostgreSQL 16+pgvector입니다. OpenSQL은 별도
 single-node 환경에서 SQL 호환성과 direct `5432` 애플리케이션 E2E를 검증했으며,
@@ -614,6 +630,7 @@ src/main/java/com/prizm/
 ├─ changelog       문서 버전 생성 사실과 INDEXING 작업 전달
 ├─ embedding       Ollama 연동과 embedding 검증
 ├─ ingestion       추출·청킹·색인 Worker와 복구
+├─ mcp             읽기 전용 Career Evidence MCP tool과 응답 매핑
 ├─ search          owner-scoped 원문 근거 검색
 ├─ cleanup         파일 정리 작업·Worker와 복구
 ├─ infrastructure  로컬 파일 저장소 등 외부 인프라 구현
@@ -640,7 +657,6 @@ frontend/src/
 - 재사용 가능한 독립 Engine artifact
 - 구조화된 CareerFact 후보·확인·거절
 - 검증된 CareerFact 기반 portfolio 생성
-- 기존 Career Evidence 검색을 재사용하는 읽기 전용 MCP 검색 API
 - ChangeLog 다중 consumer별 delivery/checkpoint
 - 기관용 workspace와 멤버십
 - 여러 vector DB·storage adapter

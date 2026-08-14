@@ -62,6 +62,7 @@ public class SecurityConfiguration {
                                 "/api/career-keywords",
                                 "/api/career-keywords/**")
                         .hasRole("USER")
+                        .requestMatchers("/mcp").hasRole("USER")
                         .requestMatchers("/api/users/me").authenticated()
                         .anyRequest().denyAll())
                 .oauth2ResourceServer(resourceServer -> resourceServer

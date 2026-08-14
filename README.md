@@ -49,12 +49,28 @@ Intelligence Engine**과 Reference App을 제공하는 것입니다. 현재 저�
 - Ollama `bge-m3`와 PostgreSQL pgvector로 원문 근거를 검색합니다.
 - Career Vault에서 문서 목록·필터·상세·수정·삭제, 새 버전 등록, PDF 열람과
   최대 5개의 Career Evidence 검색을 제공합니다.
+- 표준 MCP client에 Bearer JWT를 설정하면, 활성 `ROLE_USER`가 `POST /mcp`의
+  `search_career_evidence` 도구로 같은 Career Evidence 검색을 읽기 전용으로 실행할
+  수 있습니다.
 
-CareerFact, 근거 기반 portfolio 생성, `/api/v1`, MCP, 독립 Engine 패키지와
+CareerFact, 근거 기반 portfolio 생성, `/api/v1`, 독립 Engine 패키지와
 기관용 workspace는 아직 구현되지 않았습니다. 구체적인 기능과 제한은
 [현재 구현 현황](docs/project-status.md)을 기준으로 확인합니다.
-가장 가까운 신규 기능은 기존 Career Evidence 검색을 재사용하는 읽기 전용
-MCP 검색 API입니다.
+
+### MCP Career Evidence 검색
+
+- 요청 주소(endpoint): `POST /mcp`
+- 통신 방식: 연결 상태를 서버에 저장하지 않는(stateless) Streamable HTTP
+- 통신 규격(protocol): `2025-11-25`
+- 도구와 입력값: `search_career_evidence`, `{"query":"..."}`
+- 인증: `Authorization: Bearer <USER_JWT>` 헤더가 필요하며 활성 `ROLE_USER`만 허용
+
+이 도구는 별도 검색 알고리즘을 두지 않고 기존
+`SearchService.searchCareerEvidenceV2(...)`를 그대로 재사용합니다. 따라서 기존
+사용자별 데이터 격리(owner isolation)와 현재 `ACTIVE` 버전만 검색하는 규칙
+(ACTIVE isolation)도 동일하게 적용됩니다. 로컬 Compose 예제에서 표준 MCP client를
+연결하는 방법은
+[Quickstart](docs/quickstart.md#mcp-career-evidence-검색)를 따릅니다.
 
 ## 인증 진입 흐름
 
@@ -103,6 +119,11 @@ PRZ-004에서는 PostgreSQL·pgvector와 호스트 Ollama 기반 전체 흐름�
   OpenSQL·Ollama V1→V2 흐름을 검증했고, 후속 G0에서 V15 기준선을 재검증했습니다.
 - PRZ-013에서 OpenProxy `:6432`의 단일 Primary SQL routing, `prizm_app` 인증,
   Flyway direct/runtime proxy 분리와 focused TXT/PDF·Ollama 흐름을
+  `VERIFIED`했습니다.
+- PRZ-015에서는 공식 Java MCP Client와 실제 `ROLE_USER` JWT로 MCP 전체 흐름(E2E)을
+  검증했습니다. Flyway는 OpenSQL `:5432`에 직접 연결했고, 애플리케이션은 OpenProxy
+  `:6432/opensql`을 거쳐 실행했으며, Ollama `bge-m3`로 임베딩했습니다. REST와 MCP
+  결과 일치(REST/MCP parity), 사용자별 격리와 `ACTIVE` 버전 격리를 모두 통과해
   `VERIFIED`했습니다.
 - 대회 제공 OpenSQL은 단일 서버 설치 범위이므로 다중 노드 OpenHA와 DB 장애
   전환은 현재 대회·제품 로드맵에서 제외합니다.

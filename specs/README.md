@@ -36,8 +36,9 @@ flowchart TD
     PRZ011["PRZ-011 처리 진행 상태 UX"]
     PRZ012["PRZ-012 검색 근거 표현 품질"]
     PRZ013["PRZ-013 OpenProxy 단일 Primary Gate"]
+    PRZ015["PRZ-015 읽기 전용 MCP Career Evidence 검색"]
 
-    PRZ000 --> PRZ001 --> PRZ008 --> PRZ012
+    PRZ000 --> PRZ001 --> PRZ008 --> PRZ012 --> PRZ015
     PRZ000 --> PRZ002 --> PRZ003 --> PRZ005
     PRZ002 --> PRZ004 --> PRZ005
     PRZ005 --> PRZ013
@@ -195,6 +196,13 @@ flowchart TD
   - Last verified: 2026-08-14 (공식 Single-only 설치 지침에 따라 다중 DB node와
     장애전환을 제품 로드맵에서 제거. etcd는 Node A 단일 member로 복귀했고
     Replica/Witness VM은 삭제 완료)
+- **Spec ID:** [PRZ-015](PRZ-015-mcp-career-evidence-search/spec.md)
+  - 이름: 읽기 전용 MCP Career Evidence 검색
+  - 상태: `VERIFIED`
+  - Source commit: `97c01cb`
+  - Last verified: 2026-08-15 (`P2 PASS`: Flyway는 실제 OpenSQL `:5432`에 직접
+    연결하고 애플리케이션은 OpenProxy `:6432/opensql`을 거쳐 실행. Ollama `bge-m3`,
+    공식 Java MCP Client와 USER JWT 전체 흐름 통과; `P3 PASS`: OSS 문서 통합)
 
 ## 환경별 판정 주의
 

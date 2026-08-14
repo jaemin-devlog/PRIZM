@@ -6,7 +6,8 @@
 
 ## 읽는 순서
 
-각 PRZ는 다음 순서로 읽는다.
+각 PRZ는 다음 순서로 읽는다. Phase를 가진 PRZ는 상위 `spec.md`와 `evidence.md`를 먼저
+읽고, 필요한 Phase의 하위 문서를 확인한다.
 
 1. `spec.md`에서 목적, 기능 구성, 동작·상태 흐름과 보존 계약을 확인한다.
 2. `plan.md`에서 구현 전에 선택한 단계, 검증·rollback과 중단 조건을 확인한다.
@@ -35,8 +36,9 @@ flowchart TD
     PRZ010["PRZ-010 변경 로그 동기화"]
     PRZ011["PRZ-011 처리 진행 상태 UX"]
     PRZ012["PRZ-012 검색 근거 표현 품질"]
+    PRZ013["PRZ-013 Search Performance V2"]
 
-    PRZ000 --> PRZ001 --> PRZ008 --> PRZ012
+    PRZ000 --> PRZ001 --> PRZ008 --> PRZ012 --> PRZ013
     PRZ000 --> PRZ002 --> PRZ003 --> PRZ005
     PRZ002 --> PRZ004 --> PRZ005
     PRZ004 --> PRZ006 --> PRZ007
@@ -102,6 +104,10 @@ flowchart TD
 - Registry 도입 전 기능은 `AS_BUILT_BASELINE`으로만 기록한다. 존재하지 않았던
   Issue·PR·review를 만들거나 과거에 있었던 것처럼 기록하지 않는다.
 - 새 기능과 observable contract 변경은 구현 전에 `spec.md`를 작성한다.
+- PRZ는 독립적인 기능 또는 자체 목적이 있는 기술 목표 단위로만 발급한다. 동일 목표의
+  순차 개선·실험은 새 PRZ를 만들지 않고 상위 PRZ의 `P0`, `P1` 등의 Phase로 관리한다.
+  예를 들어 Search Performance V2의 benchmark, numeric retrieval, reranking과 query
+  understanding은 각각 Phase이며 독립 PRZ가 아니다.
 - 새 기능과 관찰 가능한 계약 변경에는 구현 전에 `plan.md`와 `tasks.md`가
   필요하다. 제품 동작을 바꾸지 않는 문서 전용 수정은 생략 이유와 확인 결과를
   남길 수 있다.
@@ -180,6 +186,11 @@ flowchart TD
   - 상태: `VERIFIED`
   - Source commit: —
   - Last verified: 2026-08-13 (`VERIFY PASS`: 실제 개인 문서 대표 7개 질의와 검색 불변성 확인)
+- **Spec ID:** [PRZ-013](PRZ-013-search-performance-v2/spec.md)
+  - 이름: Search Performance V2
+  - 상태: `IN_PROGRESS`
+  - Source commit: —
+  - Last verified: 2026-08-14 (P0~P4 DONE; P5 `FAIL`; P6 lexical+dense+RRF+literal gate shadow `NO_GO`; P6 production 검색 코드 변경 0)
 
 ## 환경별 판정 주의
 

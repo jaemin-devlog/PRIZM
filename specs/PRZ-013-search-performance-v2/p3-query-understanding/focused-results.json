@@ -1,0 +1,723 @@
+{
+  "executedAt": "2026-08-14T05:41:34.898Z",
+  "summary": {
+    "authenticatedRole": "USER",
+    "targetPassed": 4,
+    "targetImproved": 4,
+    "focusedGatePassed": true,
+    "regressionChecks": 31,
+    "regressionFailures": 0,
+    "ownerAndActiveIsolationPreserved": true
+  },
+  "targetResults": [
+    {
+      "id": "B05",
+      "query": "실제 운영 환경에 배포해본 경험 알려줘",
+      "before": {
+        "state": "NO_EVIDENCE",
+        "correctRank": null
+      },
+      "generatedVariants": [
+        "실제 운영 환경에 배포해본 경험",
+        "운영 환경 배포 환경 구축 경험"
+      ],
+      "variantResults": [
+        {
+          "variant": "실제 운영 환경에 배포해본 경험",
+          "correctRank": 0,
+          "state": "EVIDENCE_FOUND",
+          "chunks": [
+            {
+              "rank": 1,
+              "chunkId": 90,
+              "documentId": 15,
+              "documentVersionId": 15,
+              "page": 1,
+              "score": 0.5042795538902605,
+              "distance": 0.49572044610973953
+            }
+          ]
+        },
+        {
+          "variant": "운영 환경 배포 환경 구축 경험",
+          "correctRank": 1,
+          "state": "EVIDENCE_FOUND",
+          "chunks": [
+            {
+              "rank": 1,
+              "chunkId": 91,
+              "documentId": 15,
+              "documentVersionId": 15,
+              "page": 2,
+              "score": 0.5004852115240751,
+              "distance": 0.4995147884759249
+            }
+          ]
+        }
+      ],
+      "after": {
+        "correctRank": 0,
+        "state": "EVIDENCE_FOUND",
+        "chunks": [
+          {
+            "rank": 1,
+            "chunkId": 90,
+            "documentId": 15,
+            "documentVersionId": 15,
+            "page": 1,
+            "score": 0.5105880524130029,
+            "distance": 0.48941194758699713
+          }
+        ]
+      },
+      "improved": false,
+      "passed": false
+    },
+    {
+      "id": "B12",
+      "query": "실제 사용자가 있는 서비스를 운영해본 경험은?",
+      "before": {
+        "state": "NO_RELEVANT_RESULTS",
+        "correctRank": null
+      },
+      "generatedVariants": [
+        "실사용 서비스를 운영 경험은?",
+        "실사용 서비스 운영 경험"
+      ],
+      "variantResults": [
+        {
+          "variant": "실사용 서비스를 운영 경험은?",
+          "correctRank": 0,
+          "state": "EVIDENCE_FOUND",
+          "chunks": [
+            {
+              "rank": 1,
+              "chunkId": 87,
+              "documentId": 15,
+              "documentVersionId": 15,
+              "page": 1,
+              "score": 0.5109902341944625,
+              "distance": 0.48900976580553746
+            }
+          ]
+        },
+        {
+          "variant": "실사용 서비스 운영 경험",
+          "correctRank": 0,
+          "state": "NO_RELEVANT_RESULTS",
+          "chunks": []
+        }
+      ],
+      "after": {
+        "correctRank": 0,
+        "state": "EVIDENCE_FOUND",
+        "chunks": [
+          {
+            "rank": 1,
+            "chunkId": 87,
+            "documentId": 15,
+            "documentVersionId": 15,
+            "page": 1,
+            "score": 0.5109902341944625,
+            "distance": 0.48900976580553746
+          }
+        ]
+      },
+      "improved": false,
+      "passed": false
+    },
+    {
+      "id": "B14",
+      "query": "스프레드시트에서 기존 데이터만 골라 갱신한 적 있어?",
+      "before": {
+        "state": "NO_RELEVANT_RESULTS",
+        "correctRank": null
+      },
+      "generatedVariants": [
+        "스프레드시트 엑셀에서 기존 데이터 갱신한 적 있어?",
+        "스프레드시트 엑셀 기존 데이터 갱신 경험"
+      ],
+      "variantResults": [
+        {
+          "variant": "스프레드시트 엑셀에서 기존 데이터 갱신한 적 있어?",
+          "correctRank": 1,
+          "state": "EVIDENCE_FOUND",
+          "chunks": [
+            {
+              "rank": 1,
+              "chunkId": 102,
+              "documentId": 16,
+              "documentVersionId": 16,
+              "page": 4,
+              "score": 0.5162940660224705,
+              "distance": 0.4837059339775295
+            }
+          ]
+        },
+        {
+          "variant": "스프레드시트 엑셀 기존 데이터 갱신 경험",
+          "correctRank": 0,
+          "state": "NO_RELEVANT_RESULTS",
+          "chunks": []
+        }
+      ],
+      "after": {
+        "correctRank": 1,
+        "state": "EVIDENCE_FOUND",
+        "chunks": [
+          {
+            "rank": 1,
+            "chunkId": 102,
+            "documentId": 16,
+            "documentVersionId": 16,
+            "page": 4,
+            "score": 0.5162940660224705,
+            "distance": 0.4837059339775295
+          }
+        ]
+      },
+      "improved": true,
+      "passed": true
+    },
+    {
+      "id": "C08",
+      "query": "후보 상태가 바뀌었는지 확정 직전에 다시 확인한 경험은?",
+      "before": {
+        "state": "NO_RELEVANT_RESULTS",
+        "correctRank": null
+      },
+      "generatedVariants": [
+        "후보 상태가 변경 여부 확정 전 재검증한 경험은?",
+        "확정 전 상태 재검증 경험"
+      ],
+      "variantResults": [
+        {
+          "variant": "후보 상태가 변경 여부 확정 전 재검증한 경험은?",
+          "correctRank": 1,
+          "state": "EVIDENCE_FOUND",
+          "chunks": [
+            {
+              "rank": 1,
+              "chunkId": 95,
+              "documentId": 16,
+              "documentVersionId": 16,
+              "page": 2,
+              "score": 0.5272624839418741,
+              "distance": 0.47273751605812586
+            },
+            {
+              "rank": 2,
+              "chunkId": 88,
+              "documentId": 15,
+              "documentVersionId": 15,
+              "page": 1,
+              "score": 0.5405326437315212,
+              "distance": 0.4594673562684788
+            },
+            {
+              "rank": 3,
+              "chunkId": 104,
+              "documentId": 16,
+              "documentVersionId": 16,
+              "page": 5,
+              "score": 0.501275554641503,
+              "distance": 0.498724445358497
+            },
+            {
+              "rank": 4,
+              "chunkId": 93,
+              "documentId": 16,
+              "documentVersionId": 16,
+              "page": 1,
+              "score": 0.5063133828266438,
+              "distance": 0.49368661717335616
+            }
+          ]
+        },
+        {
+          "variant": "확정 전 상태 재검증 경험",
+          "correctRank": 1,
+          "state": "EVIDENCE_FOUND",
+          "chunks": [
+            {
+              "rank": 1,
+              "chunkId": 95,
+              "documentId": 16,
+              "documentVersionId": 16,
+              "page": 2,
+              "score": 0.5104258998025683,
+              "distance": 0.48957410019743175
+            },
+            {
+              "rank": 2,
+              "chunkId": 88,
+              "documentId": 15,
+              "documentVersionId": 15,
+              "page": 1,
+              "score": 0.5405326437315212,
+              "distance": 0.4594673562684788
+            },
+            {
+              "rank": 3,
+              "chunkId": 93,
+              "documentId": 16,
+              "documentVersionId": 16,
+              "page": 1,
+              "score": 0.5063133828266438,
+              "distance": 0.49368661717335616
+            }
+          ]
+        }
+      ],
+      "after": {
+        "correctRank": 1,
+        "state": "EVIDENCE_FOUND",
+        "chunks": [
+          {
+            "rank": 1,
+            "chunkId": 95,
+            "documentId": 16,
+            "documentVersionId": 16,
+            "page": 2,
+            "score": 0.5272624839418741,
+            "distance": 0.47273751605812586
+          },
+          {
+            "rank": 2,
+            "chunkId": 88,
+            "documentId": 15,
+            "documentVersionId": 15,
+            "page": 1,
+            "score": 0.5405326437315212,
+            "distance": 0.4594673562684788
+          },
+          {
+            "rank": 3,
+            "chunkId": 104,
+            "documentId": 16,
+            "documentVersionId": 16,
+            "page": 5,
+            "score": 0.501275554641503,
+            "distance": 0.498724445358497
+          },
+          {
+            "rank": 4,
+            "chunkId": 93,
+            "documentId": 16,
+            "documentVersionId": 16,
+            "page": 1,
+            "score": 0.5063133828266438,
+            "distance": 0.49368661717335616
+          }
+        ]
+      },
+      "improved": true,
+      "passed": true
+    },
+    {
+      "id": "C11",
+      "query": "업로드 파일을 애플리케이션 대신 웹 서버가 제공하게 한 경험은?",
+      "before": {
+        "state": "NO_RELEVANT_RESULTS",
+        "correctRank": null
+      },
+      "generatedVariants": [
+        "업로드 파일을 웹 서버가 직접 서빙 경험은?",
+        "웹 서버 파일 직접 서빙 경험"
+      ],
+      "variantResults": [
+        {
+          "variant": "업로드 파일을 웹 서버가 직접 서빙 경험은?",
+          "correctRank": 0,
+          "state": "EVIDENCE_FOUND",
+          "chunks": [
+            {
+              "rank": 1,
+              "chunkId": 93,
+              "documentId": 16,
+              "documentVersionId": 16,
+              "page": 1,
+              "score": 0.5009831190109395,
+              "distance": 0.4990168809890605
+            }
+          ]
+        },
+        {
+          "variant": "웹 서버 파일 직접 서빙 경험",
+          "correctRank": 0,
+          "state": "EVIDENCE_FOUND",
+          "chunks": [
+            {
+              "rank": 1,
+              "chunkId": 93,
+              "documentId": 16,
+              "documentVersionId": 16,
+              "page": 1,
+              "score": 0.5009831190109395,
+              "distance": 0.4990168809890605
+            }
+          ]
+        }
+      ],
+      "after": {
+        "correctRank": 0,
+        "state": "EVIDENCE_FOUND",
+        "chunks": [
+          {
+            "rank": 1,
+            "chunkId": 93,
+            "documentId": 16,
+            "documentVersionId": 16,
+            "page": 4,
+            "score": 0.5009831190109395,
+            "distance": 0.4990168809890605
+          }
+        ]
+      },
+      "improved": false,
+      "passed": false
+    },
+    {
+      "id": "A04",
+      "query": "Docker Compose 배포 경험",
+      "before": {
+        "state": "NO_EVIDENCE",
+        "correctRank": null
+      },
+      "generatedVariants": [
+        "Docker Compose 배포 환경 구축 경험"
+      ],
+      "variantResults": [
+        {
+          "variant": "Docker Compose 배포 환경 구축 경험",
+          "correctRank": 1,
+          "state": "EVIDENCE_FOUND",
+          "chunks": [
+            {
+              "rank": 1,
+              "chunkId": 91,
+              "documentId": 15,
+              "documentVersionId": 15,
+              "page": 2,
+              "score": 0.5903222266707137,
+              "distance": 0.40967777332928634
+            },
+            {
+              "rank": 2,
+              "chunkId": 88,
+              "documentId": 15,
+              "documentVersionId": 15,
+              "page": 2,
+              "score": 0.5109002538203128,
+              "distance": 0.4890997461796872
+            }
+          ]
+        }
+      ],
+      "after": {
+        "correctRank": 1,
+        "state": "EVIDENCE_FOUND",
+        "chunks": [
+          {
+            "rank": 1,
+            "chunkId": 91,
+            "documentId": 15,
+            "documentVersionId": 15,
+            "page": 2,
+            "score": 0.5903222266707137,
+            "distance": 0.40967777332928634
+          },
+          {
+            "rank": 2,
+            "chunkId": 88,
+            "documentId": 15,
+            "documentVersionId": 15,
+            "page": 2,
+            "score": 0.5109002538203128,
+            "distance": 0.4890997461796872
+          }
+        ]
+      },
+      "improved": true,
+      "passed": true
+    },
+    {
+      "id": "E04",
+      "query": "GCP에서 Docker Compose와 Nginx로 Spring Boot 서비스를 배포한 경험은?",
+      "before": {
+        "state": "NO_EVIDENCE",
+        "correctRank": null
+      },
+      "generatedVariants": [
+        "GCP Docker Compose Nginx Spring Boot 서비스를 배포한 경험은?",
+        "GCP Docker Compose Nginx Spring Boot 서비스 배포 환경 구축 경험은?"
+      ],
+      "variantResults": [
+        {
+          "variant": "GCP Docker Compose Nginx Spring Boot 서비스를 배포한 경험은?",
+          "correctRank": 1,
+          "state": "EVIDENCE_FOUND",
+          "chunks": [
+            {
+              "rank": 1,
+              "chunkId": 91,
+              "documentId": 15,
+              "documentVersionId": 15,
+              "page": 2,
+              "score": 0.6431186112792007,
+              "distance": 0.35688138872079933
+            },
+            {
+              "rank": 2,
+              "chunkId": 88,
+              "documentId": 15,
+              "documentVersionId": 15,
+              "page": 1,
+              "score": 0.5060777944094564,
+              "distance": 0.49392220559054356
+            }
+          ]
+        },
+        {
+          "variant": "GCP Docker Compose Nginx Spring Boot 서비스 배포 환경 구축 경험은?",
+          "correctRank": 1,
+          "state": "EVIDENCE_FOUND",
+          "chunks": [
+            {
+              "rank": 1,
+              "chunkId": 91,
+              "documentId": 15,
+              "documentVersionId": 15,
+              "page": 2,
+              "score": 0.6431186112792007,
+              "distance": 0.35688138872079933
+            },
+            {
+              "rank": 2,
+              "chunkId": 88,
+              "documentId": 15,
+              "documentVersionId": 15,
+              "page": 1,
+              "score": 0.5060777944094564,
+              "distance": 0.49392220559054356
+            }
+          ]
+        }
+      ],
+      "after": {
+        "correctRank": 1,
+        "state": "EVIDENCE_FOUND",
+        "chunks": [
+          {
+            "rank": 1,
+            "chunkId": 91,
+            "documentId": 15,
+            "documentVersionId": 15,
+            "page": 2,
+            "score": 0.64930036395178,
+            "distance": 0.35069963604821996
+          },
+          {
+            "rank": 2,
+            "chunkId": 88,
+            "documentId": 15,
+            "documentVersionId": 15,
+            "page": 1,
+            "score": 0.5060777944094564,
+            "distance": 0.49392220559054356
+          }
+        ]
+      },
+      "improved": true,
+      "passed": true
+    }
+  ],
+  "regression": [
+    {
+      "group": "natural",
+      "query": "AirConnect 프로젝트",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "natural",
+      "query": "AirConnect에서 뭐했어?",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "natural",
+      "query": "Springboot",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "natural",
+      "query": "springboot",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "natural",
+      "query": "Spring Boot",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "natural",
+      "query": "SpringBoot를 활용한 경험",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "natural",
+      "query": "Redis를 왜 사용했어?",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "natural",
+      "query": "배포 경험 알려줘",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "natural",
+      "query": "동시성 문제를 어떻게 해결했어?",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "numeric",
+      "query": "4,400회 테스트",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "numeric",
+      "query": "675건 갱신",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "numeric",
+      "query": "2,329행 처리",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "numeric",
+      "query": "1,480건 선점",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "numeric",
+      "query": "1,654건 제외",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "numeric",
+      "query": "FOR UPDATE SKIP LOCKED",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "numeric",
+      "query": "19분 22초에서 11초",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "numeric",
+      "query": "1,252건 API 처리",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "numeric-near-miss",
+      "query": "4,401회 테스트",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "numeric-near-miss",
+      "query": "676건 갱신",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "numeric-near-miss",
+      "query": "2,330행 처리",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "GraphQL API 구현 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "Kubernetes 운영 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "Kafka 운영 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "결제 시스템 구현 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "AWS Lambda 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "Elasticsearch 운영 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "MongoDB 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "Terraform 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "Jenkins 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "RabbitMQ 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "gRPC 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    }
+  ]
+}

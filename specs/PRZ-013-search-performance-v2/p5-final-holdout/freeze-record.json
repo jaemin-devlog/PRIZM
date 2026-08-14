@@ -1,0 +1,26 @@
+{
+  "phase": "PRZ-013-P5",
+  "frozenAt": "2026-08-14T16:35:40.8394506+09:00",
+  "searchExecutedAtFreeze": false,
+  "queryCounts": {
+    "total": 48,
+    "positive": 36,
+    "negative": 12
+  },
+  "preSearchValidation": {
+    "activeOwnerId": 1,
+    "activeDocuments": 2,
+    "activeChunks": 18,
+    "positiveGroundTruthValidated": 36,
+    "negativeCorpusAbsenceValidated": 12,
+    "exactDevelopmentDuplicates": 0,
+    "nearDuplicatesAtCharacterBigramDice065": 0
+  },
+  "sha256": {
+    "holdoutDataset": "4e28c0fb2b99b31f15640eb39776e04a533938b63db02e1ba0bfec22168532aa",
+    "holdoutGroundTruth": "da915300974c27967e859c0586ec1f76347c314c62f0ca57f77b5b64c3e0180d",
+    "productionSearchSourceAggregate": "32d8e31d7f5eeb3bf64033ce2b9db7c58347cbfe3d6f540b792e44c04951df31"
+  },
+  "productionSearchFileCount": 30,
+  "productionSearchChangesAuthorized": 0
+}

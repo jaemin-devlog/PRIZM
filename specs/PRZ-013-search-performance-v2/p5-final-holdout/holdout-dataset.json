@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-013-P5",
+  "authoredAt": "2026-08-14T16:32:37.0131088+09:00",
+  "status": "FROZEN_PRE_SEARCH",
+  "frozenAt": "2026-08-14T16:35:40.8394506+09:00",
+  "counts": {
+    "total": 48,
+    "positive": 36,
+    "negative": 12
+  },
+  "queries": [
+    {"id":"H01","category":"DIRECT_EXPERIENCE","query":"AirConnect 백엔드에서 직접 담당한 영역을 정리해줘","expected":"EVIDENCE_EXISTS"},
+    {"id":"H02","category":"DIRECT_EXPERIENCE","query":"MoneyWay의 비밀번호 재설정 인증 상태는 어디에 어떻게 보관했나?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H03","category":"DIRECT_EXPERIENCE","query":"FCM 전송 이벤트가 가질 수 있는 처리 상태를 설명해줘","expected":"EVIDENCE_EXISTS"},
+    {"id":"H04","category":"DIRECT_EXPERIENCE","query":"TourAPI 병렬 작업자 수는 무엇을 기준으로 제한했나?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H05","category":"DIRECT_EXPERIENCE","query":"관광데이터 공모전에서 거둔 성과가 있나?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H06","category":"DIRECT_EXPERIENCE","query":"AirConnect 앱 출시 때 서버 기능 중 무엇을 다시 정리했나?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H07","category":"DIRECT_EXPERIENCE","query":"TourAPI 개선 작업에서 본인이 구현한 범위는 어디까지였나?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H08","category":"DIRECT_EXPERIENCE","query":"푸시 발송 대상 데이터는 사용자 안에서 어떤 단위로 나눴나?","expected":"EVIDENCE_EXISTS"},
+
+    {"id":"H09","category":"NATURAL_VARIATION","query":"학교에서 개발 동아리를 직접 만들어 운영한 이력이 있어?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H10","category":"NATURAL_VARIATION","query":"다른 학생들에게 백엔드 개발을 가르쳐본 적도 있나?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H11","category":"NATURAL_VARIATION","query":"중앙 해커톤에서는 어느 정도 성과를 냈어?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H12","category":"NATURAL_VARIATION","query":"창업 아이디어 대회에서 선보인 서비스가 무엇이었어?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H13","category":"NATURAL_VARIATION","query":"제주 여행 서비스 프로젝트에서 맡았던 일을 알려줘","expected":"EVIDENCE_EXISTS"},
+    {"id":"H14","category":"NATURAL_VARIATION","query":"웹서비스를 모바일 앱으로 내놓게 된 배경이 뭐야?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H15","category":"NATURAL_VARIATION","query":"앱 알림 내용과 기기별 전송 기록은 어떤 식으로 분리했어?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H16","category":"NATURAL_VARIATION","query":"카카오 계정과 이메일 계정이 충돌하지 않게 어떤 기준으로 묶었어?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H17","category":"NATURAL_VARIATION","query":"관광지 소개와 상세 정보를 한 작업 흐름으로 합친 이유가 있어?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H18","category":"NATURAL_VARIATION","query":"포트폴리오의 동시 작업 수치는 실제 운영 부하 측정 결과야?","expected":"EVIDENCE_EXISTS"},
+
+    {"id":"H19","category":"INDIRECT_PROBLEM","query":"Redis List의 값만 믿고 매칭을 확정할 수 없었던 이유는 무엇이었나?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H20","category":"INDIRECT_PROBLEM","query":"팀 ID 두 개를 저장 전에 정렬한 설계 의도는 뭐였어?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H21","category":"INDIRECT_PROBLEM","query":"알림 도메인 데이터와 외부 푸시 호출을 한 트랜잭션에 묶지 않은 이유는?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H22","category":"INDIRECT_PROBLEM","query":"유효하지 않은 푸시 토큰이 나오면 발송 기록과 기기 상태를 어떻게 처리했나?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H23","category":"INDIRECT_PROBLEM","query":"병렬 API 호출 도중 요청 제한 응답이 생길 수 있다는 점을 성능 결과에서 어떻게 다뤘나?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H24","category":"INDIRECT_PROBLEM","query":"11.376초라는 측정값이 모든 관광지 반영 성공을 의미하지 않는 이유는?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H25","category":"INDIRECT_PROBLEM","query":"엑셀에만 있고 DB에는 없는 관광지를 제외 건수로 따로 센 목적은 무엇인가?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H26","category":"INDIRECT_PROBLEM","query":"웹 환경의 재방문 흐름 문제가 앱 출시 결정에 어떤 영향을 줬나?","expected":"EVIDENCE_EXISTS"},
+
+    {"id":"H27","category":"NUMERIC_IDENTIFIER","query":"Outbox 220건을 작업자 20개가 13건씩 조회한 검증 결과는?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H28","category":"NUMERIC_IDENTIFIER","query":"현재 코드에서 관광지 680건을 처리하는 데 걸린 시간은?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H29","category":"NUMERIC_IDENTIFIER","query":"관광데이터 활용 공모전 우수상을 받은 날짜가 언제야?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H30","category":"NUMERIC_IDENTIFIER","query":"작업자 30명이 1,100번 시도한 매칭 테스트의 저장·차단 결과는?","expected":"EVIDENCE_EXISTS"},
+
+    {"id":"H31","category":"COMPLEX_NATURAL_LANGUAGE","query":"AirConnect에서 Redis로 후보를 찾은 뒤 DB 확정과 팀 조합 중복을 각각 어떻게 방어했나?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H32","category":"COMPLEX_NATURAL_LANGUAGE","query":"Outbox Worker가 이벤트를 선점하고 재시도하거나 무효 토큰을 제외하는 전체 흐름을 설명해줘","expected":"EVIDENCE_EXISTS"},
+    {"id":"H33","category":"COMPLEX_NATURAL_LANGUAGE","query":"MoneyWay에서 외부 API 동기화와 엑셀 업로드를 서로 어떤 방식으로 개선했나?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H34","category":"COMPLEX_NATURAL_LANGUAGE","query":"모바일 전환을 결정한 문제와 앱 출시 과정에서 손본 백엔드 기능을 함께 알려줘","expected":"EVIDENCE_EXISTS"},
+    {"id":"H35","category":"COMPLEX_NATURAL_LANGUAGE","query":"GCP에서 애플리케이션·DB·캐시를 함께 띄우고 업로드 파일 전달은 어떻게 분리했나?","expected":"EVIDENCE_EXISTS"},
+    {"id":"H36","category":"COMPLEX_NATURAL_LANGUAGE","query":"4,400회 동시성 검증의 결과와 그 수치를 운영 부하 성능으로 볼 수 없는 이유를 함께 설명해줘","expected":"EVIDENCE_EXISTS"},
+
+    {"id":"N01","category":"NEGATIVE","query":"Prometheus와 Grafana로 운영 지표를 수집하고 대시보드를 만든 경험이 있나?","expected":"NO_RELEVANT_RESULTS"},
+    {"id":"N02","category":"NEGATIVE","query":"OpenTelemetry나 Zipkin으로 분산 추적을 구축해본 적 있어?","expected":"NO_RELEVANT_RESULTS"},
+    {"id":"N03","category":"NEGATIVE","query":"Apache Pulsar를 메시지 브로커로 운영한 경험을 알려줘","expected":"NO_RELEVANT_RESULTS"},
+    {"id":"N04","category":"NEGATIVE","query":"서비스 데이터베이스를 PostgreSQL로 마이그레이션한 적이 있나?","expected":"NO_RELEVANT_RESULTS"},
+    {"id":"N05","category":"NEGATIVE","query":"무중단 배포를 위해 블루 그린 전환을 구현한 경험이 있어?","expected":"NO_RELEVANT_RESULTS"},
+    {"id":"N06","category":"NEGATIVE","query":"AWS RDS Multi-AZ 구성으로 데이터베이스 장애에 대비했나?","expected":"NO_RELEVANT_RESULTS"},
+    {"id":"N07","category":"NEGATIVE","query":"CloudFront CDN을 적용해 정적 자산 전송을 최적화한 경험은?","expected":"NO_RELEVANT_RESULTS"},
+    {"id":"N08","category":"NEGATIVE","query":"Spring WebFlux로 리액티브 서버를 개발해본 적 있어?","expected":"NO_RELEVANT_RESULTS"},
+    {"id":"N09","category":"NEGATIVE","query":"Apache Cassandra를 실제 서비스 저장소로 사용한 경험이 있나?","expected":"NO_RELEVANT_RESULTS"},
+    {"id":"N10","category":"NEGATIVE","query":"Argo CD 기반 GitOps 배포 파이프라인을 운영했어?","expected":"NO_RELEVANT_RESULTS"},
+    {"id":"N11","category":"NEGATIVE","query":"HashiCorp Vault로 애플리케이션 비밀값을 관리해봤나?","expected":"NO_RELEVANT_RESULTS"},
+    {"id":"N12","category":"NEGATIVE","query":"트래픽 증가에 대응해 데이터베이스 샤딩을 적용한 경험이 있어?","expected":"NO_RELEVANT_RESULTS"}
+  ]
+}

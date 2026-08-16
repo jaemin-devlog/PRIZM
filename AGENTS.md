@@ -11,6 +11,10 @@ agent. The detailed delivery procedure lives in
 - PRIZM aims to become an open-source Career Intelligence Engine with Reference
   Applications for career-document analysis, information structuring,
   evidence-backed search, and portfolio generation.
+- The current product focus is an automated AI document management platform:
+  upload career documents, preserve immutable versions, dispatch ChangeLog-based
+  indexing, generate embeddings, and provide owner-scoped evidence search.
+  PRZ-015 adds a verified read-only MCP interface that reuses that search.
 - The current Career Vault is a personal Reference App implemented as one Spring
   Boot application and one React frontend. It is not the whole PRIZM product.
 - Reusable Engine modules, structured CareerFact data, and verified portfolio
@@ -23,10 +27,17 @@ agent. The detailed delivery procedure lives in
   API and browser flows, including two-user document and search isolation. Its
   isolated OpenSQL opt-in integration test and final backend, frontend,
   OSS-readiness, SBOM, and documentation audit are also complete. PR #26 merged
-  source `eab32c8` into `main` as merge commit `6dc9822`. OpenProxy TCP
-  connectivity is verified, but SQL routing is `NOT_VERIFIED`, authentication
-  is `AUTH_BLOCKED`, and application is `DEFERRED`. OpenHA, DB failover, and the
-  persistent journal remain deferred according to PRZ-005.
+  source `eab32c8` into `main` as merge commit `6dc9822`. PRZ-013 subsequently
+  verified OpenProxy single-Primary TCP and SQL routing, `prizm_app`
+  authentication, and the focused Flyway-direct/runtime-proxy TXT/PDF and
+  Ollama integration flow. PRZ-015 then verified the read-only
+  `search_career_evidence` MCP tool with the official Java MCP client, a `USER`
+  JWT, REST/MCP parity, owner and ACTIVE-version isolation, OpenProxy runtime
+  routing, and Ollama `bge-m3`. The competition-provided OpenSQL environment is
+  restricted to a single-server installation, so PRZ-014 multi-node OpenHA and
+  DB failover were rejected and are not part of the project roadmap. OpenProxy
+  redundancy and multi-node service-continuity work are explicitly out of scope.
+  The persistent journal remains unimplemented.
 
 ## Career evidence principle
 
@@ -46,8 +57,9 @@ agent. The detailed delivery procedure lives in
   request, review, commit, or merge.
 - Do not edit an already-applied Flyway migration. Add a forward migration.
 - Do not advertise planned functionality as implemented. CareerFact, portfolio
-  generation, MCP, OpenProxy runtime, OpenHA, and DB failover remain unimplemented
-  or unverified according to the current status documents.
+  generation, and the independent Engine package remain unimplemented or
+  unverified according to the current status documents. Do not reintroduce
+  multi-node OpenHA or DB failover into the competition scope.
 
 ## Data, security, and behavior invariants
 
@@ -91,10 +103,11 @@ agent. The detailed delivery procedure lives in
 
 - Keep PostgreSQL·pgvector results separate from OpenSQL results. PostgreSQL
   success is not OpenSQL evidence.
-- Verified OpenSQL results are limited to the actual single-node SQL Gate and
-  the PRZ-005 direct-`5432` API, browser, and two-user isolation flows. Do not
-  expand them to OpenProxy SQL routing, OpenHA, DB failover, or service
-  continuity.
+- Verified OpenSQL results are limited to the actual single-node SQL Gates,
+  PRZ-005 direct-`5432` API/browser/two-user isolation, and PRZ-013 OpenProxy
+  single-Primary SQL routing, plus the PRZ-015 read-only MCP E2E over the same
+  Single-only OpenProxy/OpenSQL path. Do not expand them to OpenProxy redundancy,
+  multi-node DB failover, or service continuity.
 - Record unavailable or unexecuted checks as `NOT_RUN` or `NOT_VERIFIED`, never
   `PASS`. Keep historical results separate from checks rerun on the current
   source.

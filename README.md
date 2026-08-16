@@ -1,7 +1,7 @@
 # PRIZM
 
-> 이력서·자기소개서·경력기술서처럼 흩어진 커리어 문서의 원본, 버전, 처리 상태와
-> 검색 근거를 한 흐름으로 관리하기 위한 오픈소스 프로젝트입니다.
+> 문서를 업로드하면 원본과 버전을 보존하고, 변경 로그 기반 자동 임베딩과
+> 사용자별 근거 검색까지 한 흐름으로 처리하는 오픈소스 AI 문서 관리 플랫폼입니다.
 
 ## PRIZM이 해결하려는 문제
 
@@ -26,6 +26,10 @@ Intelligence Engine**과 Reference App을 제공하는 것입니다. 현재 저�
 독립 Engine 패키지가 아닙니다. 지금 제공하는 구현은 하나의 Spring Boot
 애플리케이션과 React 기반 **Career Vault Reference App**입니다.
 
+현재 대회 초점은 OpenSQL 실행 경로에서 문서 업로드, 자동 임베딩, ChangeLog
+동기화, 안전한 `ACTIVE` 버전 전환과 원문 근거 검색을 원스톱으로 제공하는
+**자동화된 AI 문서 관리 플랫폼**입니다.
+
 현재 구현은 다음과 같습니다.
 
 - 첫 화면에서 일반 `USER` 계정을 만든 뒤 기존 이메일·비밀번호 로그인으로
@@ -45,10 +49,28 @@ Intelligence Engine**과 Reference App을 제공하는 것입니다. 현재 저�
 - Ollama `bge-m3`와 PostgreSQL pgvector로 원문 근거를 검색합니다.
 - Career Vault에서 문서 목록·필터·상세·수정·삭제, 새 버전 등록, PDF 열람과
   최대 5개의 Career Evidence 검색을 제공합니다.
+- 표준 MCP client에 Bearer JWT를 설정하면, 활성 `ROLE_USER`가 `POST /mcp`의
+  `search_career_evidence` 도구로 같은 Career Evidence 검색을 읽기 전용으로 실행할
+  수 있습니다.
 
-CareerFact, 근거 기반 portfolio 생성, `/api/v1`, MCP, 독립 Engine 패키지와
+CareerFact, 근거 기반 portfolio 생성, `/api/v1`, 독립 Engine 패키지와
 기관용 workspace는 아직 구현되지 않았습니다. 구체적인 기능과 제한은
 [현재 구현 현황](docs/project-status.md)을 기준으로 확인합니다.
+
+### MCP Career Evidence 검색
+
+- 요청 주소(endpoint): `POST /mcp`
+- 통신 방식: 연결 상태를 서버에 저장하지 않는(stateless) Streamable HTTP
+- 통신 규격(protocol): `2025-11-25`
+- 도구와 입력값: `search_career_evidence`, `{"query":"..."}`
+- 인증: `Authorization: Bearer <USER_JWT>` 헤더가 필요하며 활성 `ROLE_USER`만 허용
+
+이 도구는 별도 검색 알고리즘을 두지 않고 기존
+`SearchService.searchCareerEvidenceV2(...)`를 그대로 재사용합니다. 따라서 기존
+사용자별 데이터 격리(owner isolation)와 현재 `ACTIVE` 버전만 검색하는 규칙
+(ACTIVE isolation)도 동일하게 적용됩니다. 로컬 Compose 예제에서 표준 MCP client를
+연결하는 방법은
+[Quickstart](docs/quickstart.md#mcp-career-evidence-검색)를 따릅니다.
 
 ## 인증 진입 흐름
 
@@ -87,18 +109,24 @@ PRZ-004에서는 PostgreSQL·pgvector와 호스트 Ollama 기반 전체 흐름�
 
 ## 검증 범위
 
-- 실제 OpenSQL single-node에서 Flyway V1–V13, `vector(1024)`, 검색과 Worker
+- 실제 OpenSQL single-node에서 Flyway V1–V15, `vector(1024)`, 검색과 Worker
   SQL을 실행해 통과했습니다(`PASS`).
 - PRZ-005에서 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 연결해
   로그인→합성 TXT/PDF 업로드→임베딩→`ACTIVE`→원문 검색과 브라우저 흐름,
   두 사용자 격리를 검증했습니다. [PR #26](https://github.com/jaemin-devlog/PRIZM/pull/26)으로
   `main`에 통합했습니다(`VERIFIED`).
 - PRZ-010에서 OpenSQL direct `5432`의 V14 ChangeLog schema·멱등 dispatch와 실제
-  OpenSQL·Ollama V1→V2 흐름을 검증했습니다. V15의 OpenSQL 적용은 검증하지
-  않았습니다.
-- OpenProxy는 Windows 호스트의 TCP 연결만 `VERIFIED`입니다. SQL routing은
-  `NOT_VERIFIED`, 인증은 `AUTH_BLOCKED`, 애플리케이션 적용은 `DEFERRED`입니다.
-  OpenHA·DB failover도 `DEFERRED`입니다.
+  OpenSQL·Ollama V1→V2 흐름을 검증했고, 후속 G0에서 V15 기준선을 재검증했습니다.
+- PRZ-013에서 OpenProxy `:6432`의 단일 Primary SQL routing, `prizm_app` 인증,
+  Flyway direct/runtime proxy 분리와 focused TXT/PDF·Ollama 흐름을
+  `VERIFIED`했습니다.
+- PRZ-015에서는 공식 Java MCP Client와 실제 `ROLE_USER` JWT로 MCP 전체 흐름(E2E)을
+  검증했습니다. Flyway는 OpenSQL `:5432`에 직접 연결했고, 애플리케이션은 OpenProxy
+  `:6432/opensql`을 거쳐 실행했으며, Ollama `bge-m3`로 임베딩했습니다. REST와 MCP
+  결과 일치(REST/MCP parity), 사용자별 격리와 `ACTIVE` 버전 격리를 모두 통과해
+  `VERIFIED`했습니다.
+- 대회 제공 OpenSQL은 단일 서버 설치 범위이므로 다중 노드 OpenHA와 DB 장애
+  전환은 현재 대회·제품 로드맵에서 제외합니다.
 - PostgreSQL·pgvector 테스트 성공은 OpenSQL 검증 결과로 사용하지 않습니다.
 
 현재 배포물은 소스와 설정만 제공하는 Apache-2.0 소스 전용(source-only)

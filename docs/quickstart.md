@@ -5,6 +5,10 @@
 구현·검증 상태는 [현재 구현 현황](project-status.md)과
 [PRZ-004 Evidence](../specs/PRZ-004-clean-clone-demo/evidence.md)를 함께 확인하세요.
 
+이 절차는 문서 업로드, 자동 임베딩, `ACTIVE` 전환과 사용자별 근거 검색으로
+이어지는 자동화된 AI 문서 관리 플랫폼의 현재 핵심 흐름과 같은 검색을 재사용하는
+읽기 전용 MCP 인터페이스를 설명합니다.
+
 현재 저장소는 소스와 실행 설정만 배포하는 소스 전용(source-only) 범위입니다.
 컨테이너 이미지, Ollama 실행 파일과 AI 모델은 저장소에 포함하지 않습니다.
 
@@ -47,8 +51,9 @@ API로 확인했지만 브라우저로 직접 관찰하지 않아 해당 UI 항�
 - 이메일 인증, 비밀번호 재설정, refresh token과 OIDC
 - 외부 네트워크에 공개하는 운영용 multi-user Compose와 공개 SaaS 보호
 - 이 PostgreSQL Quickstart에서 OpenSQL과 Ollama를 함께 사용하는 전체 사용자 흐름
-- OpenProxy 애플리케이션 연결과 OpenHA·DB 장애 전환(failover)
-- MCP, CareerFact, portfolio 생성
+- 실제 OpenSQL·OpenProxy 단일 서버 환경과 대회 범위에서 제외한 다중 노드 구성
+- 아래 MCP 연결 절차의 실제 OpenSQL/OpenProxy 재검증
+- CareerFact와 portfolio 생성
 
 이 Quickstart의 PostgreSQL·pgvector 성공을 OpenSQL 성공으로 기록하면 안 됩니다.
 별도 OpenSQL direct `5432` 검증 결과는
@@ -175,6 +180,46 @@ redirect를 따라가지 않습니다. 로그인 직후 문서 목록이 비어 
 6. token 없는 보호 경로 요청의 `401`
 
 비밀번호와 JWT는 성공·실패 출력에 포함하지 않습니다.
+
+## MCP Career Evidence 검색
+
+5단계까지 로컬 Compose를 실행한 뒤 표준 MCP client를 연결할 수 있습니다. MCP
+client마다 설정 항목의 이름은 다를 수 있지만, 입력할 값은 다음과 같습니다.
+
+```json
+{
+  "transport": "streamable-http",
+  "url": "http://127.0.0.1:18081/mcp",
+  "headers": {
+    "Authorization": "Bearer <USER_JWT>"
+  }
+}
+```
+
+- 요청 주소(endpoint): `POST /mcp`
+- 통신 규격(protocol): `2025-11-25`
+- 호출할 도구(tool): `search_career_evidence`
+- 입력값: `{"query":"..."}`
+- 인증: 기존 `POST /api/auth/login`에서 받은 활성 `ROLE_USER`의 JWT를 Bearer 방식으로 전달
+
+MCP client는 연결 초기화(initialize)와 도구 목록 조회(`tools/list`)를 마친 뒤 위
+도구를 호출해야 합니다. 이 도구는 기존 Career Evidence Search를 재사용하므로 현재
+사용자의 문서 중 현재 `ACTIVE` 버전만 검색합니다. MCP 전용 검색 알고리즘이나 별도
+데이터 경로는 없습니다.
+
+이 Quickstart의 포트를 바꿨다면 URL의 `18081`도 같은 backend host port로
+바꾸세요. JWT를 설정 파일, shell history, 로그나 문서에 저장하지 마세요.
+
+P2에서는 다음 전체 흐름(E2E)을 실제 환경에서 검증했습니다.
+
+- Flyway는 단일 서버 OpenSQL `:5432`에 직접 연결
+- 애플리케이션은 OpenProxy `:6432/opensql`을 거쳐 OpenSQL에 연결
+- Ollama `bge-m3`와 공식 Java MCP Client 사용
+- 실제 USER JWT 인증, REST와 MCP 결과 일치, 사용자별 격리와 `ACTIVE` 버전 격리
+
+위 항목은 모두 `PASS`했습니다. 자세한 근거는
+[PRZ-015 Evidence](../specs/PRZ-015-mcp-career-evidence-search/evidence.md)를 확인하세요.
+이 결과는 단일 서버 구성에만 해당하며 OpenHA나 다중 노드 검증을 뜻하지 않습니다.
 
 ## 7. 브라우저 UI 확인
 

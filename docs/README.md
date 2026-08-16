@@ -4,12 +4,18 @@
 구분합니다. 문서와 구현이 다르면 소스 코드(source code), Flyway migration과
 실행 가능한 테스트(test)를 우선합니다.
 
+현재 제품 문서의 중심은 문서 업로드부터 자동 임베딩, ChangeLog 동기화와
+사용자별 근거 검색까지 연결하는 자동화된 AI 문서 관리 플랫폼입니다. 읽기 전용
+MCP Career Evidence 검색도 구현·검증됐으며 실행 방법은
+[로컬 Quickstart](quickstart.md#mcp-career-evidence-검색)를 따릅니다.
+
 ## 독자별 탐색 경로
 
 | 독자 | 먼저 읽을 문서 | 이어서 볼 문서 |
 |---|---|---|
 | 처음 방문한 사용자 | [프로젝트 소개](../README.md) | [현재 구현 현황](project-status.md), [개발 로드맵](roadmap.md) |
 | 로컬에서 실행하려는 개발자 | [로컬 Quickstart](quickstart.md) | [OpenSQL 기술 Gate](opensql-gate.md) |
+| 연구실 OpenSQL VM 운영자 | [연구실 OpenSQL VM Runbook](lab-opensql-vm-runbook.md) | [OpenSQL 기술 Gate](opensql-gate.md), [PRZ-013 Spec](../specs/PRZ-013-openproxy-single-primary-gate/spec.md) |
 | 프로젝트 구조를 이해하려는 개발자 | [Architecture](architecture.md) | [현재 구현 현황](project-status.md), [대표 문제 해결 사례](showcase/problem-solving-case-studies.md), [검색 품질 평가](evaluation/search-evaluation.md) |
 | 주요 변경과 설계 판단의 흐름을 보려는 사람 | [개발 기록](development-log.md) | [Spec Registry](../specs/README.md), [현재 구현 현황](project-status.md) |
 | 실제 기여자와 AI 에이전트 | [핵심 프로젝트 규칙](../AGENTS.md) | [상세 Contributor Workflow](ai-agent-workflow.md), [Spec Registry](../specs/README.md) |

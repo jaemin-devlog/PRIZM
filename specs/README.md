@@ -36,11 +36,15 @@ flowchart TD
     PRZ010["PRZ-010 변경 로그 동기화"]
     PRZ011["PRZ-011 처리 진행 상태 UX"]
     PRZ012["PRZ-012 검색 근거 표현 품질"]
+    PRZ013["PRZ-013 OpenProxy 단일 Primary Gate"]
+    PRZ015["PRZ-015 읽기 전용 MCP Career Evidence 검색"]
     PRZ016["PRZ-016 Search Performance V2"]
 
-    PRZ000 --> PRZ001 --> PRZ008 --> PRZ012 --> PRZ016
+    PRZ000 --> PRZ001 --> PRZ008 --> PRZ012 --> PRZ015
+    PRZ012 --> PRZ016
     PRZ000 --> PRZ002 --> PRZ003 --> PRZ005
     PRZ002 --> PRZ004 --> PRZ005
+    PRZ005 --> PRZ013
     PRZ004 --> PRZ006 --> PRZ007
     PRZ000 --> PRZ009
     PRZ000 --> PRZ010 --> PRZ011
@@ -186,6 +190,27 @@ flowchart TD
   - 상태: `VERIFIED`
   - Source commit: —
   - Last verified: 2026-08-13 (`VERIFY PASS`: 실제 개인 문서 대표 7개 질의와 검색 불변성 확인)
+- **Spec ID:** [PRZ-013](PRZ-013-openproxy-single-primary-gate/spec.md)
+  - 이름: OpenProxy 단일 Primary SQL Gate
+  - 상태: `VERIFIED`
+  - Source commit: `a65f91d`
+  - Last verified: 2026-08-14 (`G1 PASS`: OpenProxy `:6432` 단일 Primary SQL,
+    Flyway direct/runtime proxy 분리, focused TXT/PDF·Ollama E2E)
+- **Spec ID:** [PRZ-014](PRZ-014-openha-topology-gate/spec.md)
+  - 이름: 대회 OpenHA Topology 시도 거절 기록
+  - 상태: `REJECTED`
+  - Source commit: `a65f91d`
+  - Last verified: 2026-08-14 (공식 Single-only 설치 지침에 따라 다중 DB node와
+    장애전환을 제품 로드맵에서 제거. etcd는 Node A 단일 member로 복귀했고
+    Replica/Witness VM은 삭제 완료)
+- **Spec ID:** [PRZ-015](PRZ-015-mcp-career-evidence-search/spec.md)
+  - 이름: 읽기 전용 MCP Career Evidence 검색
+  - 상태: `VERIFIED`
+  - Source commit: `97c01cb`
+  - Last verified: 2026-08-15 (`P2 PASS`: Flyway는 실제 OpenSQL `:5432`에 직접
+    연결하고 애플리케이션은 OpenProxy `:6432/opensql`을 거쳐 실행. Ollama `bge-m3`,
+    공식 Java MCP Client와 USER JWT 전체 흐름 통과; `P3 PASS`: OSS 문서 통합)
+  - GitHub: [PR #46](https://github.com/jaemin-devlog/PRIZM/pull/46), merge commit `23166e7`
 - **Spec ID:** [PRZ-016](PRZ-016-search-performance-v2/spec.md)
   - 이름: Search Performance V2
   - 상태: `IN_PROGRESS`
@@ -195,8 +220,11 @@ flowchart TD
 ## 환경별 판정 주의
 
 - PRZ-005의 OpenSQL direct `5432` API·브라우저·두 사용자 격리와 격리 opt-in
-  integration test는 `VERIFIED`다. OpenProxy SQL routing은 `NOT_VERIFIED`, 인증은
-  `AUTH_BLOCKED`, 적용과 OpenHA·DB failover·영구 journal은 `DEFERRED`다.
+  integration test는 `VERIFIED`다. PRZ-013은 OpenProxy `:6432` 단일 Primary
+  SQL routing·`prizm_app` 인증·focused runtime E2E를 `VERIFIED`했다. 대회 제공
+  OpenSQL은 Single 구성만 사용하며 다중 노드 장애전환은 후속 Gate로 두지 않는다.
+  OpenProxy 이중화와 지속 application process 회복은 명시적 비범위이며, 영구
+  journal은 구현·검증하지 않았다.
 - PRZ-010은 실제 OpenSQL direct `5432` SQL Gate와 OpenSQL·Ollama `bge-m3` V1→V2
   흐름을 검증했다. 환경 이력과 남은 범위는
   [PRZ-010 Evidence](PRZ-010-change-log-sync/evidence.md)를 따른다. 이 결과도

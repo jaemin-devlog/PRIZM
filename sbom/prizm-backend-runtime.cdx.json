@@ -534,6 +534,87 @@
         },
         {
             "type": "library",
+            "bom-ref": "pkg:maven/io.modelcontextprotocol.sdk/mcp-core@2.0.0",
+            "group": "io.modelcontextprotocol.sdk",
+            "name": "mcp-core",
+            "version": "2.0.0",
+            "purl": "pkg:maven/io.modelcontextprotocol.sdk/mcp-core@2.0.0",
+            "scope": "required",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "56c1f99cc5e9932fcebb57d4d82f89d0b641f90275fc19d0b132f6ce7d1eab2c"
+                }
+            ],
+            "externalReferences": [
+                {
+                    "type": "distribution",
+                    "url": "https://repo1.maven.org/maven2/io/modelcontextprotocol/sdk/mcp-core/2.0.0/mcp-core-2.0.0.jar"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "prizm:configuration",
+                    "value": "runtimeClasspath"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/io.modelcontextprotocol.sdk/mcp-json-jackson3@2.0.0",
+            "group": "io.modelcontextprotocol.sdk",
+            "name": "mcp-json-jackson3",
+            "version": "2.0.0",
+            "purl": "pkg:maven/io.modelcontextprotocol.sdk/mcp-json-jackson3@2.0.0",
+            "scope": "required",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "35544916b481699764bf0f5d2bb78cb2b989385c7d246263fd68e8cb8296513b"
+                }
+            ],
+            "externalReferences": [
+                {
+                    "type": "distribution",
+                    "url": "https://repo1.maven.org/maven2/io/modelcontextprotocol/sdk/mcp-json-jackson3/2.0.0/mcp-json-jackson3-2.0.0.jar"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "prizm:configuration",
+                    "value": "runtimeClasspath"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/io.modelcontextprotocol.sdk/mcp@2.0.0",
+            "group": "io.modelcontextprotocol.sdk",
+            "name": "mcp",
+            "version": "2.0.0",
+            "purl": "pkg:maven/io.modelcontextprotocol.sdk/mcp@2.0.0",
+            "scope": "required",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "765d688a4466b35d789ddd58d76d7a600c6d68987669881eb060e3d1afd8d92c"
+                }
+            ],
+            "externalReferences": [
+                {
+                    "type": "distribution",
+                    "url": "https://repo1.maven.org/maven2/io/modelcontextprotocol/sdk/mcp/2.0.0/mcp-2.0.0.jar"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "prizm:configuration",
+                    "value": "runtimeClasspath"
+                }
+            ]
+        },
+        {
+            "type": "library",
             "bom-ref": "pkg:maven/io.netty/netty-buffer@4.2.15.Final",
             "group": "io.netty",
             "name": "netty-buffer",
@@ -2317,6 +2398,87 @@
         },
         {
             "type": "library",
+            "bom-ref": "pkg:maven/org.springframework.ai/mcp-spring-webmvc@2.0.0",
+            "group": "org.springframework.ai",
+            "name": "mcp-spring-webmvc",
+            "version": "2.0.0",
+            "purl": "pkg:maven/org.springframework.ai/mcp-spring-webmvc@2.0.0",
+            "scope": "required",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "4391cedba51a5e3244ccb0017c65e19f150a3e0ac7da9d2a7e1a69a6e926c120"
+                }
+            ],
+            "externalReferences": [
+                {
+                    "type": "distribution",
+                    "url": "https://repo1.maven.org/maven2/org/springframework/ai/mcp-spring-webmvc/2.0.0/mcp-spring-webmvc-2.0.0.jar"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "prizm:configuration",
+                    "value": "runtimeClasspath"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/org.springframework.ai/spring-ai-autoconfigure-mcp-server-common@2.0.0",
+            "group": "org.springframework.ai",
+            "name": "spring-ai-autoconfigure-mcp-server-common",
+            "version": "2.0.0",
+            "purl": "pkg:maven/org.springframework.ai/spring-ai-autoconfigure-mcp-server-common@2.0.0",
+            "scope": "required",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "c957efa2f8b64c75e53fcc39f1adf54e181fcd9e1147518231f2123170fb20f1"
+                }
+            ],
+            "externalReferences": [
+                {
+                    "type": "distribution",
+                    "url": "https://repo1.maven.org/maven2/org/springframework/ai/spring-ai-autoconfigure-mcp-server-common/2.0.0/spring-ai-autoconfigure-mcp-server-common-2.0.0.jar"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "prizm:configuration",
+                    "value": "runtimeClasspath"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/org.springframework.ai/spring-ai-autoconfigure-mcp-server-webmvc@2.0.0",
+            "group": "org.springframework.ai",
+            "name": "spring-ai-autoconfigure-mcp-server-webmvc",
+            "version": "2.0.0",
+            "purl": "pkg:maven/org.springframework.ai/spring-ai-autoconfigure-mcp-server-webmvc@2.0.0",
+            "scope": "required",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "54acd7faef422c3ada501cb682b17e530320c4d01ca6a41b78584317382035eb"
+                }
+            ],
+            "externalReferences": [
+                {
+                    "type": "distribution",
+                    "url": "https://repo1.maven.org/maven2/org/springframework/ai/spring-ai-autoconfigure-mcp-server-webmvc/2.0.0/spring-ai-autoconfigure-mcp-server-webmvc-2.0.0.jar"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "prizm:configuration",
+                    "value": "runtimeClasspath"
+                }
+            ]
+        },
+        {
+            "type": "library",
             "bom-ref": "pkg:maven/org.springframework.ai/spring-ai-autoconfigure-model-chat-client@2.0.0",
             "group": "org.springframework.ai",
             "name": "spring-ai-autoconfigure-model-chat-client",
@@ -2560,6 +2722,60 @@
         },
         {
             "type": "library",
+            "bom-ref": "pkg:maven/org.springframework.ai/spring-ai-mcp-annotations@2.0.0",
+            "group": "org.springframework.ai",
+            "name": "spring-ai-mcp-annotations",
+            "version": "2.0.0",
+            "purl": "pkg:maven/org.springframework.ai/spring-ai-mcp-annotations@2.0.0",
+            "scope": "required",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "f5d0a0e5746260140a06f26d3cb4fb0b4fdf10226cfdde603a3d0ff81d3793e2"
+                }
+            ],
+            "externalReferences": [
+                {
+                    "type": "distribution",
+                    "url": "https://repo1.maven.org/maven2/org/springframework/ai/spring-ai-mcp-annotations/2.0.0/spring-ai-mcp-annotations-2.0.0.jar"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "prizm:configuration",
+                    "value": "runtimeClasspath"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/org.springframework.ai/spring-ai-mcp@2.0.0",
+            "group": "org.springframework.ai",
+            "name": "spring-ai-mcp",
+            "version": "2.0.0",
+            "purl": "pkg:maven/org.springframework.ai/spring-ai-mcp@2.0.0",
+            "scope": "required",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "5e11f4e1cbc612dba0170f17e905e677070540f866cb197e6ae938cbca3f4650"
+                }
+            ],
+            "externalReferences": [
+                {
+                    "type": "distribution",
+                    "url": "https://repo1.maven.org/maven2/org/springframework/ai/spring-ai-mcp/2.0.0/spring-ai-mcp-2.0.0.jar"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "prizm:configuration",
+                    "value": "runtimeClasspath"
+                }
+            ]
+        },
+        {
+            "type": "library",
             "bom-ref": "pkg:maven/org.springframework.ai/spring-ai-model@2.0.0",
             "group": "org.springframework.ai",
             "name": "spring-ai-model",
@@ -2630,6 +2846,33 @@
                 {
                     "type": "distribution",
                     "url": "https://repo1.maven.org/maven2/org/springframework/ai/spring-ai-retry/2.0.0/spring-ai-retry-2.0.0.jar"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "prizm:configuration",
+                    "value": "runtimeClasspath"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/org.springframework.ai/spring-ai-starter-mcp-server-webmvc@2.0.0",
+            "group": "org.springframework.ai",
+            "name": "spring-ai-starter-mcp-server-webmvc",
+            "version": "2.0.0",
+            "purl": "pkg:maven/org.springframework.ai/spring-ai-starter-mcp-server-webmvc@2.0.0",
+            "scope": "required",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "2747724e5482542e3f6ddbd1fe9efbecf83df076ec02e5e0a291ff14cd7c31af"
+                }
+            ],
+            "externalReferences": [
+                {
+                    "type": "distribution",
+                    "url": "https://repo1.maven.org/maven2/org/springframework/ai/spring-ai-starter-mcp-server-webmvc/2.0.0/spring-ai-starter-mcp-server-webmvc-2.0.0.jar"
                 }
             ],
             "properties": [
@@ -3656,6 +3899,33 @@
                 {
                     "type": "distribution",
                     "url": "https://repo1.maven.org/maven2/org/springframework/boot/spring-boot-starter-validation/4.1.0/spring-boot-starter-validation-4.1.0.jar"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "prizm:configuration",
+                    "value": "runtimeClasspath"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/org.springframework.boot/spring-boot-starter-web@4.1.0",
+            "group": "org.springframework.boot",
+            "name": "spring-boot-starter-web",
+            "version": "4.1.0",
+            "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-web@4.1.0",
+            "scope": "required",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "d2732bdc307d3628d680d32758b300972109f499ec8e023bd663cdad002c67c6"
+                }
+            ],
+            "externalReferences": [
+                {
+                    "type": "distribution",
+                    "url": "https://repo1.maven.org/maven2/org/springframework/boot/spring-boot-starter-web/4.1.0/spring-boot-starter-web-4.1.0.jar"
                 }
             ],
             "properties": [

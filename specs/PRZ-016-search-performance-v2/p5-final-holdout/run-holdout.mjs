@@ -216,6 +216,7 @@ const summary = {
   },
 };
 await writeFile(new URL("holdout-results.json", outputDir), `${JSON.stringify({
+  // Historical frozen artifact label retained after the parent Spec moved to PRZ-016.
   phase: "PRZ-013-P5",
   executedAt: new Date().toISOString(),
   authenticatedUser: { id: login.user.id, role: login.user.role },

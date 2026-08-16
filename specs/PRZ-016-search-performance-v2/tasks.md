@@ -1,9 +1,9 @@
-# PRZ-013 Search Performance V2 Tasks
+# PRZ-016 Search Performance V2 Tasks
 
 ## P6 Retrieval Architecture Shadow Benchmark
 
 - [x] ORIENT: branch/HEAD/worktree, workflow, architecture/status/roadmap, PRZ-008 P13/P14,
-  PRZ-013 P0~P5, 실행 중 PostgreSQL/Ollama/API 확인
+  PRZ-016 P0~P5, 실행 중 PostgreSQL/Ollama/API 확인
 - [x] SPEC: D0/L1/H1/H2, freeze 순서, 보존·비범위와 mandatory gate 확정
 - [x] PLAN: evaluation-only 파일, read-only DB, 검증·중단·Git 계획 확정
 - [x] P6-A: 기존 P13 lexical repository/RRF 재사용 contract 고정

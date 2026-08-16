@@ -1,6 +1,6 @@
 # P3: Query Understanding / 자연어 검색 retrieval fallback
 
-> 역사 보존: 이 Phase는 초기 `PRZ-013 자연어 검색 retrieval fallback` 문서다.
+> 역사 보존: 이 Phase는 통합 전 임시 `PRZ-013 자연어 검색 retrieval fallback` 문서다.
 > 상위 PRZ 관리 구조로 확장하면서 검증된 fallback은 유지하고, 더 넓은 query
 > understanding은 후속 범위로 남긴다.
 

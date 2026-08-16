@@ -1,6 +1,6 @@
 # P1 Numeric + Strong Identifier Evidence
 
-> 역사 보존: 초기 `PRZ-015 Evidence`를 PRZ-013 P1으로 이동했다. 아래 결과는
+> 역사 보존: 초기 `PRZ-015 Evidence`를 PRZ-016 P1으로 이동했다. 아래 결과는
 > 원래 실행 기록을 유지한다.
 
 검증일: 2026-08-14

@@ -1,4 +1,4 @@
-# PRZ-013 Search Performance V2 Evidence
+# PRZ-016 Search Performance V2 Evidence
 
 관리 구조 정리일: 2026-08-14
 
@@ -32,12 +32,21 @@ truth, benchmark 결과, 실행 시점과 production 구현은 변경하지 않�
 
 - production code 변경: 0
 - 검색·API·평가 데이터 변경: 0
-- `PRZ-014` OpenHA 문서: 현재 Registry와 `specs/`에서 확인되지 않음
+- 재번호화 전 branch 기준 `PRZ-014` OpenHA 문서: 당시에는 확인되지 않았으며, 이후 최신
+  `main`의 공식 Registry에서 별도 Spec으로 확인됨
 - 내부 문서 경로: 새 Phase 구조로 갱신
 
 ## 현재 Phase 상태
 
 P0·P1·P2·P3·P4는 `DONE`이다. P5는 `DONE — FAIL`, P6는 `DONE — NO_GO`다. P6의 H1은
 Dense보다 Candidate Recall@20을 개선하지 못했고 H2는 안전성 개선과 함께 positive regression을
-만들었다. PRZ-013은 `IN_PROGRESS`를 유지하며 Search Performance V2는 동결하지 않는다.
+만들었다. PRZ-016은 `IN_PROGRESS`를 유지하며 Search Performance V2는 동결하지 않는다.
 production 검색 코드는 P5와 P6에서 변경하지 않았다.
+
+## Spec ID 충돌 해소
+
+2026-08-16에 최신 `main`이 `PRZ-013` OpenProxy, `PRZ-014` OpenHA, `PRZ-015` MCP를
+공식 Registry에서 사용 중임을 확인했다. 이 검색 작업은 아직 `main`에 병합되지 않았으므로
+다음 빈 ID `PRZ-016`으로 재번호화했다. 파일 경로와 현재 문서·실행 코드 참조만 바꾸고,
+frozen dataset/ground truth/raw result 내부의 역사적 phase·benchmark 라벨과 측정값은
+변경하지 않았다.

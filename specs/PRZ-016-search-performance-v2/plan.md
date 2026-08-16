@@ -1,4 +1,4 @@
-# PRZ-013 Search Performance V2 Plan
+# PRZ-016 Search Performance V2 Plan
 
 ## P6 Retrieval Architecture Shadow Benchmark
 
@@ -8,7 +8,7 @@
   P6 전용 runner, channel diagnostics와 literal gate를 둔다.
 - `src/test/java/com/prizm/search/evaluation/`에는 RRF 재사용·literal anchor/gate·owner/ACTIVE·
   score/distance 불변 계약의 실행 가능한 test를 둔다.
-- `specs/PRZ-013-search-performance-v2/p6-retrieval-shadow/`에 stress dataset/ground truth/freeze,
+- `specs/PRZ-016-search-performance-v2/p6-retrieval-shadow/`에 stress dataset/ground truth/freeze,
   P6-A/P6-B raw·summary 결과와 evidence를 둔다.
 - `src/main`, Flyway, API, runtime configuration, dependency와 frontend는 수정하지 않는다.
 
@@ -61,5 +61,5 @@ PostgreSQL `15433`, 실제 Ollama `bge-m3` `11434`, 현재 source의 production 
 
 ### Git
 
-현재 `PRZ-013-natural-query-retrieval-fallback` branch의 기존 P0~P5 변경을 보존한다.
+재번호화 뒤 `PRZ-016-search-performance-v2` branch의 기존 P0~P6 변경을 보존한다.
 사용자 지시에 따라 P6에서는 commit, push, PR과 branch 정리를 수행하지 않는다.

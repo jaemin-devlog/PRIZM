@@ -1,7 +1,8 @@
 # P0: Search Benchmark / Baseline
 
 > 역사 보존: 이 Phase는 초기 `PRZ-014 Search Benchmark V2` 경로에서 생성됐다.
-> 2026-08-14 관리 구조 정리로 PRZ-013 Search Performance V2의 P0로 이동했으며,
+> 2026-08-14 관리 구조 정리로 Search Performance V2의 P0로 이동했고, 상위 Spec은
+> 2026-08-16 공식 Registry 충돌 해소를 위해 PRZ-016으로 재번호화했다.
 > dataset·ground truth·baseline 결과는 변경하지 않았다.
 
 ## 목적

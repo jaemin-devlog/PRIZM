@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Evaluation-only generic literal anchor extraction for PRZ-013 P6 H2. */
+/** Evaluation-only generic literal anchor extraction for PRZ-016 P6 H2. */
 final class SearchEvaluationLiteralAnchorExtractor {
 
     private static final Pattern NUMBER_WITH_UNIT = Pattern.compile(

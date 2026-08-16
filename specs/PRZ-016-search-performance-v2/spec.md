@@ -1,4 +1,4 @@
-# PRZ-013: Search Performance V2
+# PRZ-016: Search Performance V2
 
 - 상태: `IN_PROGRESS`
 - 목표: PRIZM 커리어 근거 검색의 retrieval, ranking, query understanding과 evidence
@@ -15,8 +15,8 @@ PRZ는 독립적인 기능 또는 자체적으로 완료·폐기할 수 있는 �
 |---|---|---|---|
 | P0 Benchmark / Baseline | `DONE` | 72-query dataset, ground truth, baseline, failure taxonomy, latency | 초기 `PRZ-014` 문서 |
 | P1 Numeric + Strong Identifier | `DONE` | 숫자+단위 fallback, near-miss 보호, identifier guard | 초기 `PRZ-015` 문서 |
-| P2 Evidence-aware Lightweight Reranking | `DONE` | 기존 candidate 내부 deterministic evidence-quality reranking | 초기 `PRZ-016` 문서 |
-| P3 Query Understanding | `DONE` | 자연어 fallback, 보수적 semantic alias와 최대 2개 limited multi-query dense retrieval | 초기 `PRZ-013` 문서 |
+| P2 Evidence-aware Lightweight Reranking | `DONE` | 기존 candidate 내부 deterministic evidence-quality reranking | 통합 전 임시 `PRZ-016` 문서 |
+| P3 Query Understanding | `DONE` | 자연어 fallback, 보수적 semantic alias와 최대 2개 limited multi-query dense retrieval | 통합 전 임시 `PRZ-013` 문서 |
 | P4 Evidence Localization | `DONE` | 맞는 문서의 상세 근거 page/chunk 정확도 개선 | — |
 | P5 Final Holdout Validation | `DONE — FAIL` | 별도 unseen holdout으로 과적합 여부와 최종 성능 확인 | — |
 | P6 Retrieval Architecture Shadow Benchmark | `DONE — NO_GO` | D0/L1/H1/H2 평가 전용 비교, frozen identifier stress set, regression·격리·계약 검증 | PRZ-008 P13/P14 |
@@ -106,8 +106,10 @@ Top20, max5, P4, P18, PRZ-012 Evidence Presentation/Expansion 계약을 명시�
 
 ## 관리 구조 정리 기록
 
-2026-08-14에 Search Benchmark V2(`PRZ-014`), Numeric + Strong Identifier
-(`PRZ-015`), Evidence-aware Reranking(`PRZ-016`)의 작업 문서를 이 상위 PRZ의
-Phase로 이동했다. 이는 문서 관리 단위를 정리한 것이며 과거 측정값·시점·구현 사실을
-소급 변경하지 않는다. `PRZ-014`에 OpenHA Topology Gate 문서가 있었다는 근거는 현재
-Registry와 `specs/`에서 확인되지 않았다.
+2026-08-14에 당시 branch-local Search Benchmark V2(`PRZ-014`), Numeric + Strong
+Identifier(`PRZ-015`), Evidence-aware Reranking(`PRZ-016`) 작업 문서를 하나의 상위
+Search Performance V2 Phase로 이동했다. 이후 최신 `main`에서 공식 Registry의
+`PRZ-013`~`PRZ-015`가 각각 OpenProxy, OpenHA, MCP에 사용된 사실을 확인하여 2026-08-16에
+이 상위 Spec을 다음 빈 ID인 `PRZ-016`으로 재번호화했다. frozen JSON과 raw result 안의
+기존 `PRZ-013-P5/P6`, `PRZ-014` benchmark 라벨은 당시 산출물의 해시와 역사 보존을 위해
+바꾸지 않는다. 이 정리는 과거 측정값·시점·구현 사실을 소급 변경하지 않는다.

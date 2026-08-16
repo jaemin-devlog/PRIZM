@@ -38,9 +38,9 @@ import tools.jackson.databind.ObjectMapper;
 class P6StressSetFreezeTest {
 
     private static final Path DATASET = Path.of(
-            "specs/PRZ-013-search-performance-v2/p6-retrieval-shadow/identifier-stress-dataset.json");
+            "specs/PRZ-016-search-performance-v2/p6-retrieval-shadow/identifier-stress-dataset.json");
     private static final Path GROUND_TRUTH = Path.of(
-            "specs/PRZ-013-search-performance-v2/p6-retrieval-shadow/identifier-stress-ground-truth.json");
+            "specs/PRZ-016-search-performance-v2/p6-retrieval-shadow/identifier-stress-ground-truth.json");
     private static final Path PRODUCTION_SEARCH = Path.of("src/main/java/com/prizm/search");
     private static final String EXPECTED_PRODUCTION_HASH =
             "32d8e31d7f5eeb3bf64033ce2b9db7c58347cbfe3d6f540b792e44c04951df31";
@@ -70,6 +70,7 @@ class P6StressSetFreezeTest {
         assertThat(production.aggregate()).isEqualTo(EXPECTED_PRODUCTION_HASH);
 
         Map<String, Object> freeze = new LinkedHashMap<>();
+        // Preserve the historical frozen artifact label after the parent Spec moved to PRZ-016.
         freeze.put("phase", "PRZ-013-P6");
         freeze.put("frozenAt", Instant.now().toString());
         freeze.put("h2ImplementedAtFreeze", false);

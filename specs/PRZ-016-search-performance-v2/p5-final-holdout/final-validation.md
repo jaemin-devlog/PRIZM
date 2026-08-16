@@ -89,7 +89,7 @@ Recall@5, MRR@5가 모두 권장 기준보다 낮아 실패했다.
 
 - P5 평가 상태: `DONE — FAIL`
 - P5 최종 판정: `FAIL`
-- PRZ-013 상태: `IN_PROGRESS`
+- PRZ-016 상태: `IN_PROGRESS`
 - Search Performance V2: `NOT_FROZEN`
 - production 검색 코드 수정: 없음
 - 후속 P6·새 PRZ: 생성하지 않음

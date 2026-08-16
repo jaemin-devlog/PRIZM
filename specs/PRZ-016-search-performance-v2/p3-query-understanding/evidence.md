@@ -1,6 +1,6 @@
 # P3 Query Understanding Evidence
 
-> 역사 보존: 초기 `PRZ-013 Evidence`를 PRZ-013 Search Performance V2의 P3
+> 역사 보존: 통합 전 임시 `PRZ-013 Evidence`를 PRZ-016 Search Performance V2의 P3
 > evidence로 편입했다. 아래 fallback 검증 결과는 변경하지 않았다.
 
 - 판정일: 2026-08-14

@@ -20,7 +20,7 @@ class EvidenceRerankingFocusedExplanationTest {
         Assumptions.assumeTrue("true".equals(System.getenv("PRIZM_FOCUSED_EXPLANATION")));
         Path root = Path.of("").toAbsolutePath();
         Path input = root.resolve(
-                "specs/PRZ-013-search-performance-v2/p2-evidence-reranking/focused-candidates.tsv");
+                "specs/PRZ-016-search-performance-v2/p2-evidence-reranking/focused-candidates.tsv");
         CompositeSearchProfile profile = new CompositeSearchProfile();
         List<String> output = new ArrayList<>();
         output.add("id\trank\tchunk_id\tdense_score\tp4_adjustment\tevidence_adjustment\tfinal_ranking_value");
@@ -59,7 +59,7 @@ class EvidenceRerankingFocusedExplanationTest {
         }
 
         Path target = root.resolve(
-                "specs/PRZ-013-search-performance-v2/p2-evidence-reranking/focused-ranking.tsv");
+                "specs/PRZ-016-search-performance-v2/p2-evidence-reranking/focused-ranking.tsv");
         Files.write(target, output, StandardCharsets.UTF_8);
         assertThat(output).hasSizeGreaterThan(6);
     }

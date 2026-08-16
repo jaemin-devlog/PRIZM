@@ -36,9 +36,9 @@ flowchart TD
     PRZ010["PRZ-010 변경 로그 동기화"]
     PRZ011["PRZ-011 처리 진행 상태 UX"]
     PRZ012["PRZ-012 검색 근거 표현 품질"]
-    PRZ013["PRZ-013 Search Performance V2"]
+    PRZ016["PRZ-016 Search Performance V2"]
 
-    PRZ000 --> PRZ001 --> PRZ008 --> PRZ012 --> PRZ013
+    PRZ000 --> PRZ001 --> PRZ008 --> PRZ012 --> PRZ016
     PRZ000 --> PRZ002 --> PRZ003 --> PRZ005
     PRZ002 --> PRZ004 --> PRZ005
     PRZ004 --> PRZ006 --> PRZ007
@@ -186,7 +186,7 @@ flowchart TD
   - 상태: `VERIFIED`
   - Source commit: —
   - Last verified: 2026-08-13 (`VERIFY PASS`: 실제 개인 문서 대표 7개 질의와 검색 불변성 확인)
-- **Spec ID:** [PRZ-013](PRZ-013-search-performance-v2/spec.md)
+- **Spec ID:** [PRZ-016](PRZ-016-search-performance-v2/spec.md)
   - 이름: Search Performance V2
   - 상태: `IN_PROGRESS`
   - Source commit: —

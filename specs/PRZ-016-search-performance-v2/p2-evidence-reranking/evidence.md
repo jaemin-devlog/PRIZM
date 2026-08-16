@@ -1,6 +1,6 @@
 # P2 Evidence-aware Reranking Evidence
 
-> 역사 보존: 초기 `PRZ-016 Evidence`를 PRZ-013 P2로 이동했다. 아래 결과는
+> 역사 보존: 통합 전 임시 `PRZ-016 Evidence`를 현재 PRZ-016 P2로 이동했다. 아래 결과는
 > 원래 실행 기록을 유지한다.
 
 검증일: 2026-08-14

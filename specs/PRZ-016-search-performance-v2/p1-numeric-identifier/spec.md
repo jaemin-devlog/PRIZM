@@ -1,7 +1,7 @@
 # P1: Numeric + Strong Identifier Retrieval
 
 > 역사 보존: 이 Phase는 초기 `PRZ-015` 문서에서 생성됐으며, 2026-08-14에
-> PRZ-013 Search Performance V2의 P1으로 이동했다.
+> PRZ-016 Search Performance V2의 P1으로 이동했다.
 
 - 상태: `VERIFIED`
 - 범위: 명시적인 숫자+단위 근거의 제한적 fallback과, 명시적 기술 경험 질의의 false-positive 차단

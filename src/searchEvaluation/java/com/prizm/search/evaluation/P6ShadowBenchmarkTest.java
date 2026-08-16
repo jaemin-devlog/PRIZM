@@ -45,7 +45,7 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * PRZ-013 P6 evaluation-only runner against the already-running external PostgreSQL corpus.
+ * PRZ-016 P6 evaluation-only runner against the already-running external PostgreSQL corpus.
  * It never seeds, updates, migrates, or deletes application data.
  */
 @ActiveProfiles("local")
@@ -66,17 +66,17 @@ class P6ShadowBenchmarkTest {
             "32d8e31d7f5eeb3bf64033ce2b9db7c58347cbfe3d6f540b792e44c04951df31";
     private static final int EXPECTED_PRODUCTION_SEARCH_FILES = 30;
     private static final Path DEVELOPMENT_DATASET = Path.of(
-            "specs/PRZ-013-search-performance-v2/p0-benchmark/evaluation-dataset.json");
+            "specs/PRZ-016-search-performance-v2/p0-benchmark/evaluation-dataset.json");
     private static final Path P5_DATASET = Path.of(
-            "specs/PRZ-013-search-performance-v2/p5-final-holdout/holdout-dataset.json");
+            "specs/PRZ-016-search-performance-v2/p5-final-holdout/holdout-dataset.json");
     private static final Path P5_GROUND_TRUTH = Path.of(
-            "specs/PRZ-013-search-performance-v2/p5-final-holdout/holdout-ground-truth.json");
+            "specs/PRZ-016-search-performance-v2/p5-final-holdout/holdout-ground-truth.json");
     private static final Path STRESS_DATASET = Path.of(
-            "specs/PRZ-013-search-performance-v2/p6-retrieval-shadow/identifier-stress-dataset.json");
+            "specs/PRZ-016-search-performance-v2/p6-retrieval-shadow/identifier-stress-dataset.json");
     private static final Path STRESS_GROUND_TRUTH = Path.of(
-            "specs/PRZ-013-search-performance-v2/p6-retrieval-shadow/identifier-stress-ground-truth.json");
+            "specs/PRZ-016-search-performance-v2/p6-retrieval-shadow/identifier-stress-ground-truth.json");
     private static final Path REGRESSION_GUARDS = Path.of(
-            "specs/PRZ-013-search-performance-v2/p6-retrieval-shadow/regression-guards.json");
+            "specs/PRZ-016-search-performance-v2/p6-retrieval-shadow/regression-guards.json");
     private static final String FROZEN_STRESS_DATASET_HASH =
             "0dfdd5aa5d51fb8f5116904ef4f998b5f4ce73e35a5657159f35d80fc15859f5";
     private static final String FROZEN_STRESS_GROUND_TRUTH_HASH =
@@ -136,6 +136,7 @@ class P6ShadowBenchmarkTest {
         ProductionHash productionAfter = hashProductionSearch();
         assertThat(productionAfter).isEqualTo(productionBefore);
         Map<String, Object> report = new LinkedHashMap<>();
+        // Preserve the historical raw-result label after the parent Spec moved to PRZ-016.
         report.put("phase", h2Enabled ? "PRZ-013-P6-B" : "PRZ-013-P6-A");
         report.put("executedAt", Instant.now().toString());
         report.put("environment", Map.of(

@@ -1,6 +1,6 @@
 # P0 Search Benchmark / Baseline 결과와 실패 분석
 
-> 역사 보존: 초기 `PRZ-014 Search Benchmark V2`에서 기록한 분석을 PRZ-013의 P0로
+> 역사 보존: 초기 `PRZ-014 Search Benchmark V2`에서 기록한 분석을 PRZ-016의 P0로
 > 이동했다. 아래 측정값과 failure taxonomy는 변경하지 않았다.
 
 ## 고정 조건

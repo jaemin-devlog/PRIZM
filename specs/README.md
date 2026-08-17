@@ -213,9 +213,10 @@ flowchart TD
   - GitHub: [PR #46](https://github.com/jaemin-devlog/PRIZM/pull/46), merge commit `23166e7`
 - **Spec ID:** [PRZ-016](PRZ-016-search-performance-v2/spec.md)
   - 이름: Search Performance V2
-  - 상태: `IN_PROGRESS`
+  - 상태: `DEFERRED`
   - Source commit: —
-  - Last verified: 2026-08-14 (P0~P4 DONE; P5 `FAIL`; P6 lexical+dense+RRF+literal gate shadow `NO_GO`; P6 production 검색 코드 변경 0)
+  - Last verified: 2026-08-17 (P0~P4 adopted; P5/P7-B generalization `FAIL`;
+    Hybrid·rule·NLI·GPT/Qwen shadow `NO_GO`; `PRZ_016_STATE_FROZEN`)
 
 ## 환경별 판정 주의
 

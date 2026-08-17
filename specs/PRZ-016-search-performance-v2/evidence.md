@@ -40,12 +40,15 @@ truth, benchmark 결과, 실행 시점과 production 구현은 변경하지 않�
 
 ## 현재 Phase 상태
 
-P0·P1·P2·P3·P4는 `DONE`이다. P5는 `DONE — FAIL`, P6와 GPT-J1은 `DONE — NO_GO`다.
-P6의 H1은 Dense보다 Candidate Recall@20을 개선하지 못했고 H2는 안전성 개선과 함께 positive
-regression을 만들었다. GPT-J1도 Negative FPR 0%는 관측했지만 완료 positive 회귀와 incomplete를
-남겼다. GPT-J1 판정 당시 Search Performance V2는 `DONE — NO_GO`로 종료했고 production 적용을
-시작하지 않았다. 이후 사용자 지시로 검색 개선이 아닌 독립 일반화 검증용 P7-A dataset freeze만
-수행했다. production 검색 코드는 P5·P6·GPT-J1·P7-A에서 변경하지 않았다.
+P0·P1·P2·P3·P4는 `DONE`이며 해당 deterministic 검색 구현은 채택했다. P5와 P7-B는
+`DONE — FAIL`, P6·GPT-J1과 후속 rule/NLI/Qwen/Hybrid shadow는 `DONE — NO_GO`다.
+P7-B는 frozen v2 corpus와 질문 48개를 독립 실행해 Top1 33.33%, Recall@5 58.33%,
+Negative FPR 41.67%를 기록했다. Owner와 ACTIVE version 격리는 통과했지만 일반화 Gate는
+실패했다. P7-B는 앞으로 diagnostic/historical 자료로만 보존하고 추가 tuning에 사용하지 않는다.
+
+현재 PRZ-016 상태는 `DEFERRED / PRZ_016_STATE_FROZEN`이다. 재개 조건은 P7-B를 재사용하지
+않는 `FRESH_GENERALIZATION_EVALUATION_V2`다. P5 이후 실험은 production 검색에 연결하지
+않았으며, PR 생성 전 감사에서 확인된 완료 경험 질의의 빈 결과 상태 계약만 별도로 교정했다.
 
 ## Spec ID 충돌 해소
 
@@ -75,7 +78,7 @@ P7-A v1은 검색 실행 전에 보존했지만 PDF가 1페이지 요약 카드 
 주변 정보가 부족했다. v1 27개 frozen asset은 hash mismatch 0으로 그대로 보존하고
 `SUPERSEDED_BEFORE_RUN` 처리했다.
 
-- v2 결과: `DATASET_FROZEN — READY_FOR_INDEPENDENT_RUN`
+- v2 결과: `DATASET_FROZEN — USED_BY_P7-B`
 - PDF 이력서 4개 × 2페이지, 장문 TXT 포트폴리오 4개
 - 질문 48개(Positive 36/Negative 12), Positive anchor 67개와 Negative 부재 12개 검증
 - P0/P5/v1 exact·normalized duplicate 및 threshold 초과 near duplicate: 0
@@ -87,3 +90,38 @@ P7-A v1은 검색 실행 전에 보존했지만 PDF가 1페이지 요약 카드 
   `fd7525da3a00df4d7eccf42022b54a63cb2571be9f20111d2d6de740aa5f9680`
 - production 변경 0, 검색·benchmark·GPT Judge `NOT_RUN`
 - 상세: [P7-A v2 evidence](p7-cross-document-generalization-v2/evidence.md)
+
+## P7-B Independent Generalization
+
+- 입력: P7-A v2 frozen corpus·questions·ground truth
+- 실행: 48/48, Positive 36 / Negative 12
+- Top1: 33.33%
+- Recall@5: 58.33%
+- Negative FPR: 5/12, 41.67%
+- Owner isolation: `PASS`
+- ACTIVE version isolation: `PASS`
+- 최종 판정: `P7-B FAIL`
+- 후속 정책: `DIAGNOSTIC / HISTORICAL DATASET`, further tuning `NOT_ALLOWED`
+- 상세: [P7-B evidence](p7-b-independent-generalization/evidence.md)
+
+## 종료 상태
+
+- 채택: P1 Numeric + Strong Identifier, P2 Evidence-Aware Reranking,
+  P3 Query Understanding, P4 Evidence Localization
+- 비채택: Hybrid/FTS/RRF/Sparse, GPT Judge, rule-based rejection,
+  NLI model swap, Qwen 4B verifier와 fail-closed semantic filtering
+- 현재 상태: `DEFERRED / PRZ_016_STATE_FROZEN`
+- 재개 조건: `FRESH_GENERALIZATION_EVALUATION_V2`
+
+## PR 생성 전 최종 검증
+
+- 완료 경험 질의의 identifier guard 빈 결과를 기존 `NO_EVIDENCE` 계약에 맞췄다.
+  검색 순위, threshold, retrieval과 P7-B frozen 입력은 변경하지 않았다.
+- `SearchServiceTest`: 29개 PASS
+- 전체 unit: 533개 중 실패 0, skip 16
+- 전체 integration: 113개 중 실패 0, skip 8
+- frontend lint와 production build: PASS
+- Docker Compose config: PASS
+- P7-A v2 frozen asset 31개, v1 manifest와 corpus/questions/ground truth hash: PASS
+- Markdown 로컬 링크와 `git diff --check origin/main`: PASS
+- 검색 benchmark와 모델 inference: `NOT_RUN` (state freeze 이후 재실행 금지)

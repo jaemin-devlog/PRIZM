@@ -52,3 +52,24 @@
 - [x] P0/P5/v1 exact·normalized·near duplicate 검사 PASS
 - [x] production 변경 0, 검색·benchmark·GPT Judge·commit·push·PR `NOT_RUN`
 - [x] `P7-A v2 DATASET_FROZEN — READY_FOR_INDEPENDENT_RUN`에서 종료
+
+## P7-B와 State Freeze
+
+- [x] frozen P7-A v2 자산 hash를 검증하고 독립 P7-B 48/48 실행
+- [x] Top1 33.33%, Recall@5 58.33%, Negative FPR 41.67%와 `P7-B FAIL` 보존
+- [x] Owner/ACTIVE version isolation PASS 기록
+- [x] Hybrid, rule, NLI, GPT/Qwen과 후속 filter/localizer 실험의 NO_GO 결과 보존
+- [x] P7-B를 `DIAGNOSTIC / HISTORICAL DATASET`으로 전환하고 추가 tuning 금지
+- [x] `PRZ_016_STATE_FROZEN`, 재개 조건 `FRESH_GENERALIZATION_EVALUATION_V2` 기록
+
+## PR 생성 전 감사 보완
+
+- [x] 완료 경험 질의의 identifier guard 빈 결과를 `NO_EVIDENCE`로 정합화
+- [x] 일반 질의의 `NO_RELEVANT_RESULTS`와 owner/ACTIVE guard 보존 test 추가
+- [x] Spec·Evidence·Registry·R&D History의 P7-B와 state freeze 표현 정합화
+- [x] frozen 파일 byte/hash를 유지하는 path-specific whitespace attribute 추가
+- [x] focused unit/integration test PASS
+- [x] 전체 unit/integration test PASS
+- [x] frozen 31개 자산·v1 manifest hash 재검증 PASS
+- [x] Markdown link와 `git diff --check` PASS
+- [x] 최종 AUDIT blocking finding 0

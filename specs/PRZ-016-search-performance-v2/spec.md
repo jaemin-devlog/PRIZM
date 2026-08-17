@@ -1,6 +1,6 @@
 # PRZ-016: Search Performance V2
 
-- 상태: `IN_PROGRESS`
+- 상태: `DEFERRED`
 - 목표: PRIZM 커리어 근거 검색의 retrieval, ranking, query understanding과 evidence
   localization을 같은 평가 기준으로 측정하고 단계적으로 개선한다.
 
@@ -22,12 +22,15 @@ PRZ는 독립적인 기능 또는 자체적으로 완료·폐기할 수 있는 �
 | P6 Retrieval Architecture Shadow Benchmark | `DONE — NO_GO` | D0/L1/H1/H2 평가 전용 비교, frozen identifier stress set, regression·격리·계약 검증 | PRZ-008 P13/P14 |
 | GPT-J1 Evidence Judge Shadow Spike | `DONE — NO_GO` | P5 48개에서 현재 P4와 GPT evidence 판정을 비교. Negative FPR 0%지만 정상 완료 positive 회귀 2건과 judge incomplete 4건으로 종료 | — |
 | P7-A v1 Cross-Document Dataset Freeze | `PRESERVED — SUPERSEDED_BEFORE_RUN` | 최초 synthetic holdout. 검색 전에 보존했으나 PDF 문서 밀도 부족으로 사용하지 않음 | [v1 evidence](p7-cross-document-generalization/evidence.md) |
-| P7-A v2 Cross-Document Dataset Freeze | `DATASET_FROZEN — READY_FOR_INDEPENDENT_RUN` | 2페이지 PDF 이력서 4개·장문 TXT 포트폴리오 4개·신규 질문 48개와 pre-search ground truth 동결 | [v2 evidence](p7-cross-document-generalization-v2/evidence.md) |
-| P7-B Independent Generalization Run | `NOT_STARTED` | 새 Codex 세션에서 frozen P7-A v2 자산으로 현재 검색만 실행하고 PASS/FAIL 판정 | — |
+| P7-A v2 Cross-Document Dataset Freeze | `DATASET_FROZEN — USED_BY_P7-B` | 2페이지 PDF 이력서 4개·장문 TXT 포트폴리오 4개·신규 질문 48개와 pre-search ground truth 동결 | [v2 evidence](p7-cross-document-generalization-v2/evidence.md) |
+| P7-B Independent Generalization Run | `DONE — FAIL` | 독립 Codex 세션에서 frozen P7-A v2 자산으로 48/48 실행. Top1 33.33%, Recall@5 58.33%, Negative FPR 41.67% | [P7-B evidence](p7-b-independent-generalization/evidence.md) |
 
-P4는 focused 검증과 동일 72-query benchmark를 통과했다. P5 평가는 완료했지만 sealed
-48-query holdout에서 Negative FPR 25%와 검색 품질 기준 미달이 확인되어 최종 판정은
-`FAIL`이다. production 검색 코드는 수정하지 않았고 Search Performance V2는 동결하지 않는다.
+P4는 focused 검증과 동일 72-query benchmark를 통과했다. P5와 P7-B는 서로 다른 unseen
+조건에서 모두 일반화 Gate를 통과하지 못했다. P7-B는 앞으로 `DIAGNOSTIC / HISTORICAL
+DATASET`으로만 보존하며 threshold, prompt, rule 또는 model tuning에 다시 사용하지 않는다.
+P1~P4의 deterministic 검색 구현은 유지하되 현재 연구 Phase는 `STATE_FROZEN`으로 닫고,
+새 사용자·문서·질문과 multiple acceptable evidence 계약을 갖춘
+`FRESH_GENERALIZATION_EVALUATION_V2`에서만 재개한다.
 
 ## P6 Retrieval Architecture Shadow Benchmark
 

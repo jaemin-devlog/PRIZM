@@ -79,3 +79,15 @@ frozen hash 검증 뒤 수행하며 P7-A에서는 검색·benchmark를 실행하
 v1 PDF의 문서 밀도 부족은 frozen v1을 수정하지 않고
 [P7-A v2 Plan](p7-cross-document-generalization-v2/plan.md)으로 대체한다. P7-B는 v2 manifest만
 권위 있는 입력으로 사용한다.
+
+## State Freeze와 PR 감사 보완
+
+- P7-B 완료 뒤 frozen query·corpus·ground truth는 diagnostic/historical 자료로만 보존한다.
+- 검색 순위·threshold·retrieval은 추가 조정하지 않는다.
+- PR 감사에서 확인된 완료 경험 질의의 빈 결과 상태만 기존 `NO_EVIDENCE` 계약에 맞춘다.
+- 동일 identifier guard의 일반 질의 `NO_RELEVANT_RESULTS` 계약은 유지한다.
+- frozen 파일의 SHA를 바꾸지 않고, 기존 EOF 빈 줄은 정확한 파일에 한정한 Git whitespace
+  attribute로만 처리한다.
+- focused SearchService test와 실패했던 PostgreSQL integration test를 먼저 실행한 뒤,
+  전체 unit·integration과 `git diff --check`를 수행한다.
+- P7-B 결과에 맞춘 검색 tuning, 새 benchmark, 모델 inference는 수행하지 않는다.

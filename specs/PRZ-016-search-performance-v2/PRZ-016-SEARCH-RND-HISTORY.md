@@ -26,9 +26,11 @@ PRIZM 검색의 목표는 사용자의 이력서·포트폴리오·경력 문서
 
 이 문서가 추적하는 판정 단위는 **36개 주요 R&D milestone**이다. P0–P6 7개, GPT-J1 1개, P7 v1/v2 freeze와 P7-B 3개, rejection baseline·v1·v2·adversarial·veto 5개, NLI/numeric 4개, P7 C0/C1/C2/localizer 4개, Qwen v1/v2/v3/v3+numeric 4개, candidate/result-level과 stage audit 3개, PRZ-008 선행 chunking family·exact rescue·FTS/RRF·Sparse·reranker 5개를 센 수다. 단순 smoke·syntax check와 P8 reference baseline은 제외했다.
 
-### 문서 간 상태 충돌 기록
+### 문서 상태 정합성
 
-상위 [`spec.md`](spec.md)의 Phase 표에는 P7-B가 아직 `NOT_STARTED`로 남아 있다. 그러나 후속 authoritative artifact인 [`p7-b-independent-generalization/evidence.md`](p7-b-independent-generalization/evidence.md)와 [`evaluated-results.json`](p7-b-independent-generalization/evaluated-results.json)은 P7-B가 48/48 실행되어 `P7-B FAIL`로 종료됐음을 증명한다. 이 문서는 artifact 우선 원칙에 따라 완료된 실패로 기록하며, 이번 documentation-only 작업에서 기존 spec은 수정하지 않는다.
+상위 [`spec.md`](spec.md), [`evidence.md`](evidence.md)와 Registry는 P7-B 48/48 실행,
+`P7-B FAIL`, `DEFERRED / PRZ_016_STATE_FROZEN` 상태로 정리했다. P7-A v2 manifest의
+`p7bStatus: NOT_STARTED`는 실행 전 동결된 역사적 입력이므로 수정하지 않는다.
 
 ## 2. 검색 시스템 시작점
 
@@ -657,7 +659,8 @@ PostgreSQL FTS/RRF, BGE-M3 Sparse, deterministic rejection, multilingual·Korean
 
 - 기준 branch: `PRZ-016-search-performance-v2`
 - 기준 HEAD: `4a5c5b6bbd3cfd06f1313dee09e6695fdd68179e`
-- Production `src/main` diff: 없음
+- State Freeze 이후 production 변경: 완료 경험 질의의 identifier guard 빈 결과 상태를
+  기존 `NO_EVIDENCE` 계약에 맞춘 `SearchService` 1파일 교정
 - [`CompositeSearchProfile.java`](../../src/main/java/com/prizm/search/profile/CompositeSearchProfile.java)는 HEAD와 같으며, GENERAL candidate의 dense score `0.50` hard floor가 유지된다.
 - Dense-floor 제거 실험, Qwen, GPT, NLI, Hybrid, post-search numeric verifier, Claim-Aware localizer는 Production 요청 경로에 남아 있지 않다.
 

@@ -1,0 +1,887 @@
+{
+  "model": "C:\\Users\\정재민\\.cache\\prizm-nli\\mdeberta",
+  "device": "cpu",
+  "results": [
+    {
+      "id": "V2-U01-D02#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.002323150634765625,
+      "contradictionProbability": 0.0021724700927734375,
+      "unknownProbability": 0.99560546875,
+      "correct": true,
+      "latencyMs": 996.0316000069724
+    },
+    {
+      "id": "V2-U01-D02#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.00226593017578125,
+      "contradictionProbability": 0.001201629638671875,
+      "unknownProbability": 0.99658203125,
+      "correct": true,
+      "latencyMs": 866.7509000079008
+    },
+    {
+      "id": "V2-U01-NV01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "CONTRADICT",
+      "supportProbability": 0.01194000244140625,
+      "contradictionProbability": 0.86181640625,
+      "unknownProbability": 0.1260986328125,
+      "correct": false,
+      "latencyMs": 1160.3175000054762
+    },
+    {
+      "id": "V2-U01-NV01#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.9775390625,
+      "contradictionProbability": 0.01085662841796875,
+      "unknownProbability": 0.01172637939453125,
+      "correct": false,
+      "latencyMs": 1118.9320999983465
+    },
+    {
+      "id": "V2-U01-NV01#r3",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.99755859375,
+      "contradictionProbability": 0.0003249645233154297,
+      "unknownProbability": 0.0023021697998046875,
+      "correct": false,
+      "latencyMs": 1212.0186999964062
+    },
+    {
+      "id": "V2-U01-NV01#r4",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0008678436279296875,
+      "contradictionProbability": 0.018951416015625,
+      "unknownProbability": 0.97998046875,
+      "correct": true,
+      "latencyMs": 1204.1070999985095
+    },
+    {
+      "id": "V2-U01-NV02#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0002605915069580078,
+      "contradictionProbability": 0.004459381103515625,
+      "unknownProbability": 0.9951171875,
+      "correct": true,
+      "latencyMs": 873.8064000062877
+    },
+    {
+      "id": "V2-U01-NV02#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.06512451171875,
+      "contradictionProbability": 0.01166534423828125,
+      "unknownProbability": 0.92333984375,
+      "correct": true,
+      "latencyMs": 854.5442000031471
+    },
+    {
+      "id": "V2-U01-IP01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "CONTRADICT",
+      "supportProbability": 0.0010051727294921875,
+      "contradictionProbability": 0.998046875,
+      "unknownProbability": 0.0011386871337890625,
+      "correct": false,
+      "latencyMs": 1066.8769000039902
+    },
+    {
+      "id": "V2-U01-IP01#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0006690025329589844,
+      "contradictionProbability": 0.002262115478515625,
+      "unknownProbability": 0.9970703125,
+      "correct": true,
+      "latencyMs": 1254.4067999988329
+    },
+    {
+      "id": "V2-U01-IP01#r3",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0078277587890625,
+      "contradictionProbability": 0.0092926025390625,
+      "unknownProbability": 0.98291015625,
+      "correct": true,
+      "latencyMs": 1194.2086000053678
+    },
+    {
+      "id": "V2-U01-IP01#r4",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.004558563232421875,
+      "contradictionProbability": 0.0007987022399902344,
+      "unknownProbability": 0.99462890625,
+      "correct": true,
+      "latencyMs": 896.4134999987436
+    },
+    {
+      "id": "V2-U01-IP02#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "CONTRADICT",
+      "supportProbability": 8.744001388549805e-05,
+      "contradictionProbability": 0.9990234375,
+      "unknownProbability": 0.0010423660278320312,
+      "correct": false,
+      "latencyMs": 746.9620999909239
+    },
+    {
+      "id": "V2-U01-IP02#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "CONTRADICT",
+      "supportProbability": 0.2467041015625,
+      "contradictionProbability": 0.73193359375,
+      "unknownProbability": 0.0211944580078125,
+      "correct": false,
+      "latencyMs": 853.7783000065247
+    },
+    {
+      "id": "V2-U01-IP02#r3",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0005588531494140625,
+      "contradictionProbability": 0.1285400390625,
+      "unknownProbability": 0.87109375,
+      "correct": true,
+      "latencyMs": 1291.522100000293
+    },
+    {
+      "id": "V2-U01-IP02#r4",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.00041556358337402344,
+      "contradictionProbability": 0.1126708984375,
+      "unknownProbability": 0.88671875,
+      "correct": true,
+      "latencyMs": 1172.531699994579
+    },
+    {
+      "id": "V2-U01-NI01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.9990234375,
+      "contradictionProbability": 0.0001577138900756836,
+      "unknownProbability": 0.000888824462890625,
+      "correct": false,
+      "latencyMs": 759.806000001845
+    },
+    {
+      "id": "V2-U01-CN01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.17236328125,
+      "contradictionProbability": 0.01204681396484375,
+      "unknownProbability": 0.8154296875,
+      "correct": true,
+      "latencyMs": 956.5340999979526
+    },
+    {
+      "id": "V2-U01-CN01#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.01654052734375,
+      "contradictionProbability": 0.02459716796875,
+      "unknownProbability": 0.958984375,
+      "correct": true,
+      "latencyMs": 815.7543999986956
+    },
+    {
+      "id": "V2-U01-CN01#r3",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.007415771484375,
+      "contradictionProbability": 0.032623291015625,
+      "unknownProbability": 0.9599609375,
+      "correct": true,
+      "latencyMs": 849.472899993998
+    },
+    {
+      "id": "V2-U01-CN02#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.9892578125,
+      "contradictionProbability": 0.0006537437438964844,
+      "unknownProbability": 0.01010894775390625,
+      "correct": false,
+      "latencyMs": 996.7942999937804
+    },
+    {
+      "id": "V2-U01-CN02#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.99755859375,
+      "contradictionProbability": 0.001522064208984375,
+      "unknownProbability": 0.0009741783142089844,
+      "correct": false,
+      "latencyMs": 1162.8593000059482
+    },
+    {
+      "id": "V2-U01-CN02#r3",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.9970703125,
+      "contradictionProbability": 0.0007839202880859375,
+      "unknownProbability": 0.0022678375244140625,
+      "correct": false,
+      "latencyMs": 1265.991499996744
+    },
+    {
+      "id": "V2-U01-N01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "CONTRADICT",
+      "supportProbability": 0.0005011558532714844,
+      "contradictionProbability": 0.98388671875,
+      "unknownProbability": 0.015716552734375,
+      "correct": false,
+      "latencyMs": 1135.5991000018548
+    },
+    {
+      "id": "V2-U01-N03#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.8759765625,
+      "contradictionProbability": 0.11639404296875,
+      "unknownProbability": 0.007476806640625,
+      "correct": false,
+      "latencyMs": 1008.5384999983944
+    },
+    {
+      "id": "V2-U02-D01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.016937255859375,
+      "contradictionProbability": 0.1727294921875,
+      "unknownProbability": 0.810546875,
+      "correct": true,
+      "latencyMs": 857.5301000091713
+    },
+    {
+      "id": "V2-U02-D01#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.061614990234375,
+      "contradictionProbability": 0.00124359130859375,
+      "unknownProbability": 0.93701171875,
+      "correct": true,
+      "latencyMs": 898.076299999957
+    },
+    {
+      "id": "V2-U02-D02#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0014162063598632812,
+      "contradictionProbability": 0.003856658935546875,
+      "unknownProbability": 0.99462890625,
+      "correct": true,
+      "latencyMs": 616.8062999931863
+    },
+    {
+      "id": "V2-U02-D02#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.91259765625,
+      "contradictionProbability": 0.047149658203125,
+      "unknownProbability": 0.04046630859375,
+      "correct": false,
+      "latencyMs": 1048.0136999976821
+    },
+    {
+      "id": "V2-U02-NV01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0012617111206054688,
+      "contradictionProbability": 0.00029206275939941406,
+      "unknownProbability": 0.99853515625,
+      "correct": true,
+      "latencyMs": 982.2796000080416
+    },
+    {
+      "id": "V2-U02-NV01#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0007653236389160156,
+      "contradictionProbability": 0.017852783203125,
+      "unknownProbability": 0.9814453125,
+      "correct": true,
+      "latencyMs": 1075.0244999944698
+    },
+    {
+      "id": "V2-U02-NV02#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.984375,
+      "contradictionProbability": 0.0014972686767578125,
+      "unknownProbability": 0.0142059326171875,
+      "correct": false,
+      "latencyMs": 883.5260999912862
+    },
+    {
+      "id": "V2-U02-IP01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0005841255187988281,
+      "contradictionProbability": 0.001117706298828125,
+      "unknownProbability": 0.99853515625,
+      "correct": true,
+      "latencyMs": 966.3097000011476
+    },
+    {
+      "id": "V2-U02-IP01#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0008974075317382812,
+      "contradictionProbability": 0.0013685226440429688,
+      "unknownProbability": 0.99755859375,
+      "correct": true,
+      "latencyMs": 1101.4286999998149
+    },
+    {
+      "id": "V2-U02-IP01#r3",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0014371871948242188,
+      "contradictionProbability": 0.0007352828979492188,
+      "unknownProbability": 0.998046875,
+      "correct": true,
+      "latencyMs": 654.1468000068562
+    },
+    {
+      "id": "V2-U02-IP02#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0004067420959472656,
+      "contradictionProbability": 0.00809478759765625,
+      "unknownProbability": 0.99169921875,
+      "correct": true,
+      "latencyMs": 938.3330999989994
+    },
+    {
+      "id": "V2-U02-NI01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.00040531158447265625,
+      "contradictionProbability": 0.0016222000122070312,
+      "unknownProbability": 0.998046875,
+      "correct": true,
+      "latencyMs": 1053.9579999895068
+    },
+    {
+      "id": "V2-U02-CN01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0008234977722167969,
+      "contradictionProbability": 0.0012340545654296875,
+      "unknownProbability": 0.998046875,
+      "correct": true,
+      "latencyMs": 965.0113000097917
+    },
+    {
+      "id": "V2-U03-D01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "CONTRADICT",
+      "supportProbability": 0.0002467632293701172,
+      "contradictionProbability": 0.99755859375,
+      "unknownProbability": 0.00231170654296875,
+      "correct": false,
+      "latencyMs": 762.7581999986432
+    },
+    {
+      "id": "V2-U03-D01#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0005345344543457031,
+      "contradictionProbability": 0.0007681846618652344,
+      "unknownProbability": 0.99853515625,
+      "correct": true,
+      "latencyMs": 947.2529999911785
+    },
+    {
+      "id": "V2-U03-D01#r3",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.004169464111328125,
+      "contradictionProbability": 0.0283050537109375,
+      "unknownProbability": 0.96728515625,
+      "correct": true,
+      "latencyMs": 616.4486999914516
+    },
+    {
+      "id": "V2-U03-D01#r4",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.002422332763671875,
+      "contradictionProbability": 0.0030975341796875,
+      "unknownProbability": 0.99462890625,
+      "correct": true,
+      "latencyMs": 902.6143999944907
+    },
+    {
+      "id": "V2-U03-D02#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.9931640625,
+      "contradictionProbability": 0.0009250640869140625,
+      "unknownProbability": 0.006099700927734375,
+      "correct": false,
+      "latencyMs": 1004.8003999982029
+    },
+    {
+      "id": "V2-U03-D02#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.46533203125,
+      "contradictionProbability": 0.1734619140625,
+      "unknownProbability": 0.361083984375,
+      "correct": false,
+      "latencyMs": 997.167299996363
+    },
+    {
+      "id": "V2-U03-D02#r3",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "CONTRADICT",
+      "supportProbability": 0.00634765625,
+      "contradictionProbability": 0.73291015625,
+      "unknownProbability": 0.260498046875,
+      "correct": false,
+      "latencyMs": 1112.0873000036227
+    },
+    {
+      "id": "V2-U03-NV01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0059356689453125,
+      "contradictionProbability": 0.0013723373413085938,
+      "unknownProbability": 0.99267578125,
+      "correct": true,
+      "latencyMs": 763.3138000092003
+    },
+    {
+      "id": "V2-U03-NV01#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0020599365234375,
+      "contradictionProbability": 0.00024056434631347656,
+      "unknownProbability": 0.99755859375,
+      "correct": true,
+      "latencyMs": 934.2540000070585
+    },
+    {
+      "id": "V2-U03-NV01#r3",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.00038933753967285156,
+      "contradictionProbability": 0.00286865234375,
+      "unknownProbability": 0.99658203125,
+      "correct": true,
+      "latencyMs": 825.6177000002936
+    },
+    {
+      "id": "V2-U03-NV01#r4",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0007090568542480469,
+      "contradictionProbability": 0.0007009506225585938,
+      "unknownProbability": 0.99853515625,
+      "correct": true,
+      "latencyMs": 939.8396000033244
+    },
+    {
+      "id": "V2-U03-NV02#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.99853515625,
+      "contradictionProbability": 0.0002608299255371094,
+      "unknownProbability": 0.0012311935424804688,
+      "correct": false,
+      "latencyMs": 983.5305000015069
+    },
+    {
+      "id": "V2-U03-NV02#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.533203125,
+      "contradictionProbability": 0.07379150390625,
+      "unknownProbability": 0.39306640625,
+      "correct": false,
+      "latencyMs": 794.1298999940045
+    },
+    {
+      "id": "V2-U03-IP01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.53564453125,
+      "contradictionProbability": 0.339111328125,
+      "unknownProbability": 0.125,
+      "correct": false,
+      "latencyMs": 997.360800000024
+    },
+    {
+      "id": "V2-U03-IP01#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.9990234375,
+      "contradictionProbability": 9.018182754516602e-05,
+      "unknownProbability": 0.0010766983032226562,
+      "correct": false,
+      "latencyMs": 923.9719000033801
+    },
+    {
+      "id": "V2-U03-IP02#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.000888824462890625,
+      "contradictionProbability": 0.00140380859375,
+      "unknownProbability": 0.99755859375,
+      "correct": true,
+      "latencyMs": 812.6668999902904
+    },
+    {
+      "id": "V2-U03-IP02#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0116119384765625,
+      "contradictionProbability": 0.0014324188232421875,
+      "unknownProbability": 0.98681640625,
+      "correct": true,
+      "latencyMs": 957.2565999988001
+    },
+    {
+      "id": "V2-U03-IP02#r3",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.99609375,
+      "contradictionProbability": 0.0001437664031982422,
+      "unknownProbability": 0.0036468505859375,
+      "correct": false,
+      "latencyMs": 746.0451000079047
+    },
+    {
+      "id": "V2-U03-NI01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.9990234375,
+      "contradictionProbability": 0.0001289844512939453,
+      "unknownProbability": 0.0007987022399902344,
+      "correct": false,
+      "latencyMs": 816.9311000092421
+    },
+    {
+      "id": "V2-U03-CN01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "CONTRADICT",
+      "supportProbability": 0.175048828125,
+      "contradictionProbability": 0.80859375,
+      "unknownProbability": 0.0162353515625,
+      "correct": false,
+      "latencyMs": 1108.9987000013934
+    },
+    {
+      "id": "V2-U03-CN01#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.6005859375,
+      "contradictionProbability": 0.04345703125,
+      "unknownProbability": 0.35595703125,
+      "correct": false,
+      "latencyMs": 1135.109900002135
+    },
+    {
+      "id": "V2-U03-CN01#r3",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.9970703125,
+      "contradictionProbability": 0.0006079673767089844,
+      "unknownProbability": 0.0024242401123046875,
+      "correct": false,
+      "latencyMs": 992.8945999999996
+    },
+    {
+      "id": "V2-U03-CN01#r4",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.9521484375,
+      "contradictionProbability": 0.001667022705078125,
+      "unknownProbability": 0.046234130859375,
+      "correct": false,
+      "latencyMs": 1055.4630999977235
+    },
+    {
+      "id": "V2-U03-CN02#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.99853515625,
+      "contradictionProbability": 0.00030922889709472656,
+      "unknownProbability": 0.000946044921875,
+      "correct": false,
+      "latencyMs": 1278.0574000062188
+    },
+    {
+      "id": "V2-U03-CN02#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.79150390625,
+      "contradictionProbability": 0.16650390625,
+      "unknownProbability": 0.04217529296875,
+      "correct": false,
+      "latencyMs": 796.3733999931719
+    },
+    {
+      "id": "V2-U03-N01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.00113677978515625,
+      "contradictionProbability": 0.007266998291015625,
+      "unknownProbability": 0.99169921875,
+      "correct": true,
+      "latencyMs": 787.2267999919131
+    },
+    {
+      "id": "V2-U04-D01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.001461029052734375,
+      "contradictionProbability": 0.11712646484375,
+      "unknownProbability": 0.88134765625,
+      "correct": true,
+      "latencyMs": 795.0311000022339
+    },
+    {
+      "id": "V2-U04-D01#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0009546279907226562,
+      "contradictionProbability": 0.078857421875,
+      "unknownProbability": 0.92041015625,
+      "correct": true,
+      "latencyMs": 697.5574000098277
+    },
+    {
+      "id": "V2-U04-D02#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0002624988555908203,
+      "contradictionProbability": 0.0007567405700683594,
+      "unknownProbability": 0.9990234375,
+      "correct": true,
+      "latencyMs": 905.4416999861132
+    },
+    {
+      "id": "V2-U04-D02#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.0003075599670410156,
+      "contradictionProbability": 0.0007109642028808594,
+      "unknownProbability": 0.9990234375,
+      "correct": true,
+      "latencyMs": 1065.4088000010233
+    },
+    {
+      "id": "V2-U04-NV01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.99365234375,
+      "contradictionProbability": 0.0008378028869628906,
+      "unknownProbability": 0.005496978759765625,
+      "correct": false,
+      "latencyMs": 1127.5080000050366
+    },
+    {
+      "id": "V2-U04-NV01#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.020111083984375,
+      "contradictionProbability": 0.0003864765167236328,
+      "unknownProbability": 0.9794921875,
+      "correct": true,
+      "latencyMs": 821.8099999940023
+    },
+    {
+      "id": "V2-U04-NV02#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "CONTRADICT",
+      "supportProbability": 0.004032135009765625,
+      "contradictionProbability": 0.99365234375,
+      "unknownProbability": 0.0023555755615234375,
+      "correct": false,
+      "latencyMs": 954.5089000021107
+    },
+    {
+      "id": "V2-U04-NV02#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.9912109375,
+      "contradictionProbability": 0.006473541259765625,
+      "unknownProbability": 0.0023212432861328125,
+      "correct": false,
+      "latencyMs": 704.2732999980217
+    },
+    {
+      "id": "V2-U04-IP02#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.1904296875,
+      "contradictionProbability": 0.003314971923828125,
+      "unknownProbability": 0.80615234375,
+      "correct": true,
+      "latencyMs": 1045.9818000090308
+    },
+    {
+      "id": "V2-U04-NI01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.99853515625,
+      "contradictionProbability": 0.00012767314910888672,
+      "unknownProbability": 0.0012407302856445312,
+      "correct": false,
+      "latencyMs": 877.3834999883547
+    },
+    {
+      "id": "V2-U04-CN01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.97802734375,
+      "contradictionProbability": 0.019989013671875,
+      "unknownProbability": 0.00200653076171875,
+      "correct": false,
+      "latencyMs": 1145.9229000029154
+    },
+    {
+      "id": "V2-U04-CN01#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.49609375,
+      "contradictionProbability": 0.49267578125,
+      "unknownProbability": 0.0111846923828125,
+      "correct": false,
+      "latencyMs": 774.6970000007423
+    },
+    {
+      "id": "V2-U04-CN01#r3",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "CONTRADICT",
+      "supportProbability": 0.00041222572326660156,
+      "contradictionProbability": 0.9990234375,
+      "unknownProbability": 0.000354766845703125,
+      "correct": false,
+      "latencyMs": 1070.773100000224
+    },
+    {
+      "id": "V2-U04-CN01#r4",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "CONTRADICT",
+      "supportProbability": 0.09033203125,
+      "contradictionProbability": 0.9072265625,
+      "unknownProbability": 0.0024318695068359375,
+      "correct": false,
+      "latencyMs": 915.1834000076633
+    },
+    {
+      "id": "V2-U04-CN02#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.001552581787109375,
+      "contradictionProbability": 0.0004241466522216797,
+      "unknownProbability": 0.998046875,
+      "correct": true,
+      "latencyMs": 883.6482999904547
+    },
+    {
+      "id": "V2-U04-CN02#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "SUPPORT",
+      "supportProbability": 0.99609375,
+      "contradictionProbability": 0.0001647472381591797,
+      "unknownProbability": 0.003574371337890625,
+      "correct": false,
+      "latencyMs": 852.7608000003966
+    },
+    {
+      "id": "V2-U04-CN02#r3",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.000621795654296875,
+      "contradictionProbability": 0.0012731552124023438,
+      "unknownProbability": 0.998046875,
+      "correct": true,
+      "latencyMs": 988.7126999965403
+    },
+    {
+      "id": "V2-U04-N01#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "CONTRADICT",
+      "supportProbability": 0.0009255409240722656,
+      "contradictionProbability": 0.99560546875,
+      "unknownProbability": 0.0036792755126953125,
+      "correct": false,
+      "latencyMs": 986.9019000034314
+    },
+    {
+      "id": "V2-U04-N01#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "CONTRADICT",
+      "supportProbability": 0.0009303092956542969,
+      "contradictionProbability": 0.99658203125,
+      "unknownProbability": 0.0024814605712890625,
+      "correct": false,
+      "latencyMs": 841.618100006599
+    },
+    {
+      "id": "V2-U04-N02#r1",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "CONTRADICT",
+      "supportProbability": 0.00023365020751953125,
+      "contradictionProbability": 0.99951171875,
+      "unknownProbability": 0.0003674030303955078,
+      "correct": false,
+      "latencyMs": 641.254599991953
+    },
+    {
+      "id": "V2-U04-N02#r2",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "CONTRADICT",
+      "supportProbability": 0.01413726806640625,
+      "contradictionProbability": 0.7763671875,
+      "unknownProbability": 0.2095947265625,
+      "correct": false,
+      "latencyMs": 847.4638000043342
+    },
+    {
+      "id": "V2-U04-N02#r3",
+      "groundTruth": "UNKNOWN",
+      "predictedLabel": "UNKNOWN",
+      "supportProbability": 0.000514984130859375,
+      "contradictionProbability": 0.0005927085876464844,
+      "unknownProbability": 0.9990234375,
+      "correct": true,
+      "latencyMs": 917.081399995368
+    }
+  ],
+  "summary": {
+    "byGroundTruth": {
+      "SUPPORT": {
+        "SUPPORT": 0,
+        "CONTRADICT": 0,
+        "UNKNOWN": 0
+      },
+      "CONTRADICT": {
+        "SUPPORT": 0,
+        "CONTRADICT": 0,
+        "UNKNOWN": 0
+      },
+      "UNKNOWN": {
+        "SUPPORT": 28,
+        "CONTRADICT": 15,
+        "UNKNOWN": 43
+      }
+    },
+    "averageLatencyMs": 948.9313534883644,
+    "p95LatencyMs": 1212.0186999964062
+  }
+}

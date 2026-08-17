@@ -1,0 +1,27 @@
+{
+  "userKey": "SYN2-U03",
+  "name": "LEE DO-HYUN / 합성 프로필",
+  "role": "Distributed Systems Engineer · Simulation Safety",
+  "notice": "PRIZM P7-A v2 synthetic resume — 실제 인물·철도·안전 인증과 무관",
+  "summary": "망 분할과 메시지 재전달이 있는 시뮬레이션 환경에서 오래된 제어권과 중복 명령을 차단하는 가상 분산 시스템 엔지니어. 안전 주장과 시험 조건을 수치·ledger·event log로 함께 남긴다.",
+  "metrics": [["12,800", "virtual trains"], ["420", "partition scenarios"], ["9.6s → 2.7s", "permit failover P95"], ["0", "conflicting permits"]],
+  "pages": [
+    {
+      "label": "DISTRIBUTED CONTROL EXPERIENCE",
+      "sections": [
+        {"heading":"Synthetic Mobility Lab · Distributed Systems Engineer","meta":"2022.11 - 2026.04 | RailPulse Lab","paragraphs":["interlocking simulator의 route permit control plane을 Go로 개발했다. ConnectRPC 요청, NATS JetStream 전달, CockroachDB command ledger, simulator node 검증을 하나의 failure model로 문서화했다."],"bullets":["route_id·train_id·command_id·permit_epoch를 갖는 명령 contract 설계", "JetStream pull consumer와 max ack pending으로 느린 zone 격리", "command_id unique ledger로 ack wait 이후 재전달 멱등 처리", "simulator가 마지막 수락 epoch보다 오래된 permit을 거절하도록 구현"]},
+        {"heading":"Controller state and retry","meta":"ACTIVE v1 architecture","paragraphs":["CockroachDB lease row와 serializable transaction으로 controller state를 보존했다. SQLSTATE 40001은 decorrelated jitter로 최대 4회만 재시도하고 한도 초과 시 permit 생성을 중단했다."],"bullets":["재시도 동안 동일 command_id 유지", "무한 retry 대신 호출자에게 retryable error 반환", "ledger와 simulator event를 correlation id로 연결"]},
+        {"heading":"Safety-oriented validation","meta":"독립 scenario와 대조 검증","paragraphs":["12,800개 virtual train을 16개 zone에서 실행했다. leader 중단 뒤 permit 발급 P95는 9.6초에서 2.7초로 줄었고 420개 network-partition scenario의 conflicting route permit은 0건이었다."],"bullets":["event log와 DB ledger 결과 대조", "clock skew·message redelivery·process pause 조합", "실제 철도 안전 인증 수치로 사용하지 않음"]}
+      ]
+    },
+    {
+      "label": "INTEGRITY, PRACTICE & SCOPE",
+      "sections": [
+        {"heading":"Signed timetable delivery","meta":"configuration integrity","paragraphs":["운행표와 simulator 설정을 Ed25519로 서명한 timetable package로 배포했다. node는 서명과 package sequence를 모두 검증하고 변조 파일과 이전 sequence를 거절했다."],"bullets":["승인자 key id와 package digest 기록", "roll-forward package로만 설정 교체", "거절 사유를 zone별 audit event로 저장"]},
+        {"heading":"Engineering practice","meta":"실패 경계의 분리","paragraphs":["leader election, stale command fencing, redelivery idempotency, package integrity를 서로 다른 통제로 유지했다. 한 지표의 개선을 전체 안전성으로 확대 해석하지 않았다."],"bullets":["Go · ConnectRPC · NATS JetStream", "CockroachDB · serializable transaction", "fault injection · deterministic simulator", "protocol review · incident rehearsal"]},
+        {"heading":"Writing & mentoring","meta":"합성 활동","paragraphs":["신규 팀원을 위한 network-partition lab과 command-ledger walkthrough를 만들었다. 설계 review에서는 가정, invariant, 반례, 관측 방법 순으로 문서를 작성했다."],"bullets":["분기별 failure-mode workshop 진행", "운영자용 permit replay 판독 가이드 작성"]},
+        {"heading":"Explicit scope boundaries","meta":"ACTIVE와 과거 version 구분","paragraphs":["etcd lease controller prototype은 철회된 resume v0에만 있고 ACTIVE v1 경력에는 없다. 현재 설계는 CockroachDB lease row를 사용한다. 차량 CAN bus gateway firmware는 embedded team 범위였고 직접 구현하지 않았다."],"bullets":["YardLens Kotlin batch는 인접 검토 업무", "RailPulse는 실제 열차 제어 제품이 아닌 simulator"]}
+      ]
+    }
+  ]
+}

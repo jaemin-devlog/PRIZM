@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-unseen-rejection-shadow-validation",
+  "status": "FROZEN_PRE_RUN",
+  "datasetSha256": "1f404a1e18a17c2d7234dc30338f6560ca72b21ba518ab732bb6142ae91617f0",
+  "groundTruthSha256": "9631cc5cca80402e2a3d261d54257c1bc7c4673766f8263aacc65cd4697873d4",
+  "counts": {
+    "total": 24,
+    "positive": 8,
+    "explicitDenial": 3,
+    "comparedNotAdopted": 3,
+    "planOnly": 3,
+    "pastPrototypeRetired": 3,
+    "numericContradiction": 4
+  },
+  "immutabilityRule": "Do not modify dataset.json or ground-truth.json after this freeze. Run the evaluator once only."
+}

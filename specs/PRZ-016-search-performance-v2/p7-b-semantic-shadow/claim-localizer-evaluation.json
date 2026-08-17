@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-B-CLAIM-AWARE-CONTENT-LOCALIZER-SHADOW-FINAL-EVALUATION",
+  "evaluatedAt": "2026-08-17T01:37:20.1422246+09:00",
+  "productionImpact": "NONE",
+  "inputIntegrity": {
+    "status": "PASS",
+    "allRequiredHashesMatchedBeforeGroundTruthRead": true,
+    "groundTruthUsedBeforeHashCheck": false,
+    "files": {
+      "rawResults": {
+        "path": "../p7-b-independent-generalization/raw-results.json",
+        "sha256": "defc5e35dbf26f48a640f3df673e2247c14437b0cb65e8c8c05a0bd3b6e2cb2e"
+      },
+      "c0Pairs": {
+        "path": "pairs.json",
+        "sha256": "e48fb53e26c2c88960d054d8fcea2a0df33f38774c235258e06dafbe5f4ee758"
+      },
+      "c0NumericResults": {
+        "path": "numeric-shadow-results.json",
+        "sha256": "fa72410888fd8c80aaeb8302a0fb1be1a29d80a19bac08d5d22086fef82b70be"
+      },
+      "localizerCandidates": {
+        "path": "claim-localizer-candidates.json",
+        "sha256": "5ad9fd999e67f236c8480339786de1b6f0d8ef4bd6cb478da815f945c20dbacb"
+      },
+      "localizerRunnerPairs": {
+        "path": "claim-localizer-runner-pairs.json",
+        "sha256": "9b7f3d30d6876f62d87824dc851d6e42a23db02cc67ab298f1e50c059bd966c9"
+      },
+      "localizerNliResults": {
+        "path": "claim-localizer-nli-results.json",
+        "sha256": "d57d107da22c52ba7d429e1e6663fd7ce3170fa9c8f9e834eb349c0bccaeebdb"
+      },
+      "localizerNumericResults": {
+        "path": "claim-localizer-numeric-results.json",
+        "sha256": "68f21d7f161cf09769ac373f64729a13109f59e439cacb2692d883a5cf8694cb"
+      },
+      "evaluatedResults": {
+        "path": "../p7-b-independent-generalization/evaluated-results.json",
+        "sha256": "a1b85aafcf516c2370724e7a7c311619da4692269e2b0971f54da88b9de696b8"
+      },
+      "groundTruth": {
+        "path": "../p7-cross-document-generalization-v2/dataset/ground-truth.json",
+        "sha256": "fd7525da3a00df4d7eccf42022b54a63cb2571be9f20111d2d6de740aa5f9680"
+      }
+    }
+  },
+  "policy": {
+    "c0Support": "PRESERVE_WITHOUT_FALLBACK",
+    "c0NonSupport": "USE_FIRST_FROZEN_CANDIDATE_WITH_COMBINED_SUPPORT",
+    "candidateOrder": "FROZEN_PRESELECTION_ORDER",
+    "nonSupport": "FILTER",
+    "rankPolicy": "PRESERVE_ORIGINAL_RESULT_ORDER_AND_RECOMPRESS_SUPPORT_RESULTS",
+    "newEvidenceAllowed": false
+  },
+  "invariants": {
+    "resultIdentity": "PRESERVED",
+    "chunkId": "PRESERVED",
+    "documentAndVersion": "PRESERVED",
+    "content": "PRESERVED",
+    "scoreAndDistance": "PRESERVED",
+    "originalResultOrder": "PRESERVED",
+    "userVisibleSnippet": "PRESERVED"
+  },
+  "comparison": {
+    "baseline": {
+      "top1": { "correct": 12, "total": 36, "rate": 0.3333333333333333 },
+      "recallAt3": { "correct": 21, "total": 36, "rate": 0.5833333333333334 },
+      "recallAt5": { "correct": 21, "total": 36, "rate": 0.5833333333333334 },
+      "mrrAt5": 0.44907407407407407,
+      "negativeFalsePositive": { "count": 5, "total": 12, "rate": 0.4166666666666667 },
+      "pass": 28,
+      "fail": 20
+    },
+    "c0SemanticNumeric": {
+      "top1": { "correct": 5, "total": 36, "rate": 0.1388888888888889 },
+      "recallAt3": { "correct": 7, "total": 36, "rate": 0.19444444444444445 },
+      "recallAt5": { "correct": 7, "total": 36, "rate": 0.19444444444444445 },
+      "mrrAt5": 0.16666666666666666,
+      "negativeFalsePositive": { "count": 1, "total": 12, "rate": 0.08333333333333333 },
+      "baselineCorrectPositiveRetained": { "count": 7, "total": 21 }
+    },
+    "claimAware": {
+      "top1": { "correct": 11, "total": 36, "rate": 0.3055555555555556 },
+      "recallAt3": { "correct": 14, "total": 36, "rate": 0.3888888888888889 },
+      "recallAt5": { "correct": 14, "total": 36, "rate": 0.3888888888888889 },
+      "mrrAt5": 0.3472222222222222,
+      "negativeFalsePositive": { "count": 1, "total": 12, "rate": 0.08333333333333333 },
+      "pass": 25,
+      "fail": 23
+    }
+  },
+  "positive": {
+    "baselineCorrect": 21,
+    "retained": {
+      "count": 14,
+      "total": 21
+    },
+    "regression": {
+      "count": 7,
+      "total": 21,
+      "ids": [
+        "V2-U01-IP01",
+        "V2-U01-CN01",
+        "V2-U02-D01",
+        "V2-U02-NV01",
+        "V2-U02-IP01",
+        "V2-U03-NV01",
+        "V2-U04-IP02"
+      ]
+    },
+    "c0RegressionsRecovered": {
+      "count": 7,
+      "total": 14,
+      "ids": [
+        "V2-U01-D02",
+        "V2-U01-NV01",
+        "V2-U01-IP02",
+        "V2-U03-D01",
+        "V2-U03-IP02",
+        "V2-U04-NV02",
+        "V2-U04-CN01"
+      ]
+    },
+    "c0SupportNewRegression": {
+      "count": 0,
+      "ids": []
+    }
+  },
+  "rootCauseRecovery": {
+    "sameResultContentNonAdjacent": {
+      "recovered": 5,
+      "total": 7,
+      "recoveredIds": [
+        "V2-U01-D02",
+        "V2-U01-NV01",
+        "V2-U03-D01",
+        "V2-U03-IP02",
+        "V2-U04-NV02"
+      ],
+      "notRecoveredIds": [
+        "V2-U01-CN01",
+        "V2-U03-NV01"
+      ]
+    },
+    "multiSentenceContextLoss": {
+      "recovered": 1,
+      "total": 3,
+      "recoveredIds": ["V2-U04-CN01"],
+      "notRecoveredIds": ["V2-U01-IP01", "V2-U02-NV01"]
+    },
+    "nliSemanticFailure": {
+      "recovered": 1,
+      "total": 3,
+      "recoveredIds": ["V2-U01-IP02"],
+      "notRecoveredIds": ["V2-U02-IP01", "V2-U04-IP02"]
+    },
+    "V2-U02-D01": "NOT_RECOVERED"
+  },
+  "ranking": {
+    "rankImproved": 2,
+    "ids": ["V2-U03-D01", "V2-U03-IP02"]
+  },
+  "negative": {
+    "baselineFalsePositive": {
+      "count": 5,
+      "total": 12
+    },
+    "blockedBaselineFalsePositive": {
+      "count": 4,
+      "ids": ["V2-U01-N01", "V2-U03-N01", "V2-U04-N01", "V2-U04-N02"]
+    },
+    "finalFalsePositive": {
+      "count": 1,
+      "total": 12,
+      "ids": ["V2-U01-N03"]
+    },
+    "newFalsePositive": {
+      "count": 0,
+      "ids": []
+    },
+    "V2-U01-N03": "REMAINING: C0 was already SUPPORT, so fallback was not applied; the existing metric-binding miss remains unchanged"
+  },
+  "filter": {
+    "originalResultPairs": 86,
+    "c0Support": 22,
+    "fallbackEligible": 64,
+    "fallbackCandidatePairs": 320,
+    "fallbackRecoveredResults": 16,
+    "fallbackStillNonSupportResults": 48,
+    "finalSupportResults": 38,
+    "finalNonSupportResults": 48,
+    "newEvidenceCreated": 0
+  },
+  "latency": {
+    "candidatePairCount": 320,
+    "averageCandidatePairMs": 915.6763034382493,
+    "p95CandidatePairMs": 1327.7033000049414,
+    "candidateInferenceTotalMs": 293016.4171002398,
+    "productionRisk": "CPU inference can require up to five NLI calls per fallback-eligible result; latency is not part of this quality gate"
+  },
+  "gate": {
+    "negativeFprAtMostOneOfTwelve": { "passed": true, "actual": "1/12" },
+    "baselineCorrectPositiveRetainedAtLeastTwentyOfTwentyOne": { "passed": false, "actual": "14/21" },
+    "top1AtLeastBaseline": { "passed": false, "actual": "11/36 (30.56%)", "required": "at least 33.33%" },
+    "recallAt5AtLeastBaseline": { "passed": false, "actual": "14/36 (38.89%)", "required": "at least 58.33%" },
+    "localizationRecoveryAtLeastSixOfSeven": { "passed": false, "actual": "5/7" },
+    "newEvidenceZero": { "passed": true, "actual": 0 },
+    "allPassed": false
+  },
+  "final": "CLAIM_AWARE_LOCALIZER_SHADOW_FAIL",
+  "next": "MIXED"
+}

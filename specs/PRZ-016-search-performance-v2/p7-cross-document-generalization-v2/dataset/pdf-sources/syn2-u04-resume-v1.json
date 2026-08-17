@@ -1,0 +1,27 @@
+{
+  "userKey": "SYN2-U04",
+  "name": "CHOI ARI / 합성 프로필",
+  "role": "Product Backend Engineer · Rights Metadata",
+  "notice": "PRIZM P7-A v2 synthetic resume — 실제 인물·창작자·계약·정산과 무관",
+  "summary": "서로 다른 음악 식별자와 계약 원본을 버전별로 보존하고, 검색 index를 중단 없이 교체하는 가상 제품 백엔드 엔지니어. 자동화가 판단할 수 없는 권리 충돌은 사람의 review 경계에 남긴다.",
+  "metrics": [["2.3M", "work records"], ["1.6s → 240ms", "search P95"], ["14", "alias cutovers"], ["18,600", "monthly statements"]],
+  "pages": [
+    {
+      "label": "PRODUCT & SEARCH EXPERIENCE",
+      "sections": [
+        {"heading":"Synthetic Rights Studio · Product Backend Engineer","meta":"2023.01 - 2026.05 | ScoreRights Catalog","paragraphs":["work, recording, contract 자료를 연결하는 catalog ingestion과 검색 API를 담당했다. NestJS, Cloudflare R2·Queues, Meilisearch를 사용하고 source organization과 extraction version을 명시적으로 보존했다."],"bullets":["ISWC·ISRC 형식 정규화와 source별 원본 식별자 유지", "content hash 중복이면 OCR·metadata extraction job 생성을 생략", "식별자 없는 legacy 자료는 자동 병합하지 않고 review queue로 격리", "extraction key 기반 queue consumer 멱등 처리"]},
+        {"heading":"Search index lifecycle","meta":"2,300,000 work records","paragraphs":["권리자, 작품명, ISWC prefix, territory를 filterable attribute로 구성했다. 새 schema는 versioned index에서 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다."],"bullets":["index build 동안 기존 alias가 요청 처리", "frequent-owner filter cardinality와 ranking rule 순서 조정", "14회 cutover에서 empty-result 노출 0건"]},
+        {"heading":"Measured outcome","meta":"동일 warm 20-query replay","paragraphs":["검색 P95를 1.6초에서 240밀리초로 낮췄다. 첫 index build와 cache cold start를 warm replay 성과에 포함하지 않았으며 corpus snapshot id를 결과에 함께 기록했다."],"bullets":["query class별 latency 분리", "alias 전후 result-count diff 확인", "rollback은 이전 index alias 재지정으로 수행"]}
+      ]
+    },
+    {
+      "label": "GOVERNANCE, DELIVERY & SCOPE",
+      "sections": [
+        {"heading":"Rights conflict workflow","meta":"자동 선택을 피한 영역","paragraphs":["두 source가 같은 territory의 지분을 각각 100%로 주장하면 source priority, 계약 유효 기간, review 상태를 conflict record에 남겼다. 검색은 미해결 배지를 보여주지만 정산 비율을 임의로 결정하지 않는다."],"bullets":["원본 contract object와 extraction version 연결", "review 결정의 actor·timestamp·reason 보존", "해결 전 statement export 차단"]},
+        {"heading":"SettleBoard export","meta":"adjacent product responsibility","paragraphs":["월별 18,600개 statement export를 운영하고 catalog snapshot id로 계산 기준을 재현했다. 이 수치는 검색 record 수나 검색 latency와 별도 지표로 관리했다."],"bullets":["재실행 가능한 immutable snapshot", "export checksum과 전달 receipt 기록", "오류 statement만 분리 재생성"]},
+        {"heading":"Technical profile","meta":"synthetic skills","paragraphs":["Node.js · TypeScript · NestJS · Meilisearch · Cloudflare R2 · Cloudflare Queues를 중심으로 작업했다. contract test와 schema migration rehearsal을 배포 전에 수행했다."],"bullets":["Vitest · API contract test", "content-addressed object workflow", "index diff · replay benchmark", "product decision record · support runbook"]},
+        {"heading":"Explicit scope boundaries","meta":"평가와 production을 구분","paragraphs":["Typesense는 50,000개 sample record 비교에만 사용했고 production 검색 엔진으로 전환하지 않았다. 블록체인 기반 정산 원장은 제품 범위에 없었고 설계하거나 구현하지 않았다. 현재 추천 표시는 규칙형 facet이다."],"bullets":["production search: Meilisearch", "권리 충돌 최종 판단: human review"]}
+      ]
+    }
+  ]
+}

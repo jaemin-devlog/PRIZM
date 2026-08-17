@@ -1,0 +1,27 @@
+{
+  "userKey": "SYN2-U01",
+  "name": "HAN MIN-JUN / 합성 프로필",
+  "role": "Backend Engineer · Industrial Logistics",
+  "notice": "PRIZM P7-A v2 synthetic resume — 실제 인물·회사·현장과 무관",
+  "summary": "현장 장비의 불안정한 통신을 업무 정합성 경계로 흡수하고, C# 기반 배차·계근 서비스를 운영한 가상 백엔드 엔지니어. 메시지 전달보다 전표 식별자, 감사 이력, 복구 가능한 운영 절차를 먼저 정의한다.",
+  "metrics": [["3.2M", "tickets / year"], ["28", "dispatch depots"], ["1.4s → 380ms", "quote API P95"], ["0", "duplicate shipments in replay"]],
+  "pages": [
+    {
+      "label": "EXPERIENCE & IMPACT",
+      "sections": [
+        {"heading":"Synthetic Aggregates Platform · Backend Engineer","meta":"2023.04 - 2026.06 | QuarryFlow Dispatch","paragraphs":["골재·아스콘 주문을 출하 거점에 배정하고 계근 완료 중량을 운송 전표로 확정하는 서비스의 API와 비동기 처리 경로를 담당했다. 5명 팀에서 장비 연동 contract, SQL transaction 경계, 운영 replay 절차를 설계했다."],"bullets":["C# 및 .NET 8 API가 접수한 명령을 Azure Service Bus topic으로 분리", "depot code와 material class subscription filter로 거점·자재별 worker 격리", "source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리", "SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존"]},
+        {"heading":"Operational outcome","meta":"검증 조건을 분리해 기록","paragraphs":["동일 부하 replay에서 견적 API P95를 1.4초에서 380밀리초로 낮췄다. 72시간 장비 단절을 모사한 46,200개 callback 재생에서는 duplicate shipment가 0건이었고 운영 DB row를 수동 수정하지 않았다."],"bullets":["장비별 circuit breaker와 짧은 timeout으로 thread 고갈 방지", "최근 검증 tare weight는 임시 견적에만 사용하고 실제 출하 확정에는 사용 금지", "거점별 처리량·거절 원인을 replay dashboard로 노출"]},
+        {"heading":"How I worked","meta":"협업과 책임 경계","paragraphs":["현장 운영자와 callback 식별자의 수명, 재전송 조건, 수동 정정 절차를 먼저 문서화했다. QA와 fault-injection 시나리오를 만들고 재고·운임 정산 담당자와 전표 불변 조건을 합의했다."],"bullets":["API schema review 및 consumer runbook 작성", "주간 incident review에서 복구 시간과 수동 개입 횟수 추적"]}
+      ]
+    },
+    {
+      "label": "ADDITIONAL EXPERIENCE & PROFILE",
+      "sections": [
+        {"heading":"KilnWatch · Integration Developer","meta":"2022.01 - 2023.03 | adjacent telemetry project","paragraphs":["소성로 센서 11,000개의 온도·진동 신호를 MQTT로 수집하고 InfluxDB retention policy를 운영했다. 임계치 알림과 장비 정비용 dashboard를 지원했으며 QuarryFlow의 운송 전표 업무와 지표를 분리했다."],"bullets":["sensor id·captured_at 기준의 늦은 telemetry 정렬", "현장 gateway clock drift를 관측 지표로 분리", "보존 기간별 downsampling job 운영"]},
+        {"heading":"Selected engineering practices","meta":"재현성과 fail-closed 경계","paragraphs":["DB constraint와 transaction을 업무 확정 기준으로 사용하고, 메시지 broker는 전달·격리 수단으로 다룬다. 성과 수치는 warm/cold 조건과 replay corpus를 함께 남긴다."],"bullets":["C# · .NET 8 · xUnit · SQL Server", "Azure Service Bus · MQTT · InfluxDB", "OpenTelemetry trace correlation · structured logging", "contract test · fault injection · incident runbook"]},
+        {"heading":"Education & community","meta":"모두 합성 이력","paragraphs":["가상 북부공과대학 정보시스템 전공. 사내 메시징 스터디에서 idempotency와 poison-message 대응 사례를 발표했고 신규 입사자용 장비 simulator 실습을 만들었다."],"bullets":["합성 졸업 프로젝트: 창고 dock scheduling simulator", "지역 개발자 모임에서 transaction boundary 워크숍 진행"]},
+        {"heading":"Explicit scope boundaries","meta":"질문 판정용 경계","paragraphs":["Solace PubSub+는 비교 문서와 소규모 실험만 수행했으며 production에 도입하지 않았다. 동적 가격 머신러닝 모델은 아이디어 단계였고 설계하거나 구현하지 않았다. 모바일 운전기사 앱은 별도 팀 소유였다."],"bullets":["운영 메시지 broker: Azure Service Bus", "가격 결정: 승인된 SQL rule table"]}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+PRIZM P7-A v2 합성 포트폴리오 — SYN2-U03
+RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험
+
+평가 전용 합성 설계 기록. 실제 철도 시설, 노선, 안전 인증과 관계없다.
+
+[DECISION 01 — 명령 모델]
+RailPulse Lab은 실제 열차를 제어하지 않는 interlocking simulator다. Go control plane이 ConnectRPC로 route permit 요청을 받고, 각 요청을 NATS JetStream stream에 기록했다. permit에는 route_id, train_id, command_id와 controller가 발급한 permit_epoch가 포함됐다. simulator node는 자신이 마지막으로 수락한 epoch보다 작은 명령을 실행하지 않았다.
+
+[DECISION 02 — 재전달]
+JetStream pull consumer는 max ack pending을 제한해 느린 simulator가 전체 stream을 막지 않게 했다. ack wait가 지나면 메시지가 재전달될 수 있으므로 command ledger의 command_id unique key를 먼저 확인했다. 같은 명령의 두 번째 전달은 상태 전이를 만들지 않고 이전 결과를 돌려줬다. 메시지 ack 자체를 업무 완료의 유일한 근거로 사용하지 않았다.
+
+[DECISION 03 — 제어권 저장]
+ACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다. SQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다. retry 한도를 넘으면 새 permit을 만들지 않고 호출자에게 재요청 가능한 오류를 반환했다. 무한 재시도로 지연을 숨기지 않았다.
+
+[DECISION 04 — 배포 무결성]
+운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다. node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다. 설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다.
+
+[VALIDATION — 규모와 장애]
+12,800개 virtual train을 16개 zone에 나눠 시험했다. leader process 중단 뒤 새 permit 발급 가능 시점까지의 P95는 9.6초에서 2.7초로 줄었다. 독립적으로 만든 420개 network-partition scenario에서 서로 충돌하는 route permit은 0건이었다. 이 수치는 simulator event log와 CockroachDB ledger를 대조해 확인했다.
+
+[HISTORICAL VERSION]
+초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다. 이후 operational review에서 해당 경력을 ACTIVE resume에서 제외했고, 현재 RailPulse 설계는 CockroachDB lease row를 사용한다. P7-B는 v0를 비활성 version으로만 등록해야 한다.
+
+[NOT MY SCOPE]
+차량의 CAN bus gateway firmware는 embedded team이 담당했다. control plane은 firmware가 노출한 simulator contract만 사용했다. 직접 작성한 경력으로 간주하지 않는다.
+
+[ADJACENT PROJECT]
+YardLens에서는 역사 내 혼잡도를 집계하는 Kotlin batch를 검토했지만 RailPulse 명령 경로에 포함하지 않았다. 이력서의 관측·문서화 활동은 안전 허가 명령 구현 성과와 구분한다.
+
+[RETROSPECTIVE]
+핵심은 leader 선출 자체가 아니라 오래된 leader의 명령을 소비자가 식별할 수 있게 한 점이었다. permit_epoch, command ledger, signed package가 서로 다른 실패를 담당했고 어느 하나도 다른 경계를 대신하지 않았다.
+

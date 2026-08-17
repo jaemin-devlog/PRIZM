@@ -11,13 +11,23 @@ import com.prizm.search.dto.response.SearchResponse;
 import com.prizm.search.exception.InvalidSearchQueryException;
 import com.prizm.search.exception.SearchResultNotFoundException;
 import com.prizm.search.profile.CompositeSearchProfile;
+import com.prizm.search.profile.NaturalLanguageQueryFallback;
+import com.prizm.search.profile.NumericAnchorRescueProfile;
+import com.prizm.search.profile.NumericQueryAnchors;
+import com.prizm.search.profile.SearchIntent;
 import com.prizm.search.profile.ShortGeneralExactTokenRescueProfile;
 import com.prizm.search.repository.VectorSearchRepository;
 import com.prizm.search.repository.VectorSearchResult;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -30,6 +40,7 @@ import org.springframework.stereotype.Service;
 public class SearchService {
 
     public static final int MAX_QUERY_LENGTH = 500;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchService.class);
 
     private final EmbeddingService embeddingService;
     private final EmbeddingValidator embeddingValidator;
@@ -37,6 +48,7 @@ public class SearchService {
     private final SearchProperties searchProperties;
     private final CompositeSearchProfile compositeSearchProfile;
     private final ShortGeneralExactTokenRescueProfile shortGeneralExactTokenRescueProfile;
+    private final NumericAnchorRescueProfile numericAnchorRescueProfile;
     private final EvidenceExpansionService evidenceExpansionService;
 
     public SearchService(
@@ -53,6 +65,7 @@ public class SearchService {
         this.compositeSearchProfile = compositeSearchProfile;
         this.shortGeneralExactTokenRescueProfile =
                 new ShortGeneralExactTokenRescueProfile(compositeSearchProfile);
+        this.numericAnchorRescueProfile = new NumericAnchorRescueProfile(compositeSearchProfile);
         this.evidenceExpansionService = evidenceExpansionService;
     }
 
@@ -107,15 +120,80 @@ public class SearchService {
             return emptyOutcome(CareerEvidenceSearchState.NO_SEARCHABLE_DOCUMENTS);
         }
 
-        List<VectorSearchResult> selected = selectedProfile == SearchProfile.LEGACY_DENSE_V1
-                ? candidates
-                : shortGeneralExactTokenRescueProfile.apply(query, candidates).results();
+        Set<String> guardedIdentifiers = selectedProfile == SearchProfile.LEGACY_DENSE_V1
+                ? Set.of()
+                : compositeSearchProfile.strongIdentifiersForEvidenceGuard(query);
+        if (selectedProfile != SearchProfile.LEGACY_DENSE_V1) {
+            if (!guardedIdentifiers.isEmpty()
+                    && !vectorSearchRepository.hasAllActiveIdentifiers(
+                            ownerUserId, guardedIdentifiers)) {
+                return emptyOutcome(emptyStateFor(query));
+            }
+        }
+
+        List<VectorSearchResult> selected;
+        if (selectedProfile == SearchProfile.LEGACY_DENSE_V1) {
+            selected = candidates;
+        } else {
+            selected = selectCompositeResults(
+                    query,
+                    List.of(query),
+                    candidates,
+                    NaturalLanguageQueryFallback.requiresDirectAnchor(query));
+            selected = keepExactContextualNumericEvidence(query, selected);
+            boolean fallbackAllowed = compositeSearchProfile.resolveIntent(query) == SearchIntent.GENERAL
+                    || NaturalLanguageQueryFallback.isExperienceRequest(query);
+            if (selected.isEmpty() && fallbackAllowed) {
+                List<String> variants = NaturalLanguageQueryFallback.variants(query).stream()
+                        .filter(variant -> NaturalLanguageQueryFallback.preservesRequiredAnchors(
+                                query, variant, guardedIdentifiers))
+                        .toList();
+                List<VectorSearchResult> mergedCandidates = candidates;
+                List<String> anchorQueries = new ArrayList<>();
+                anchorQueries.add(query);
+                int executedVariants = 0;
+                for (String fallbackQuery : variants) {
+                    float[] fallbackEmbedding = embeddingService.embed(fallbackQuery);
+                    embeddingValidator.validate(fallbackEmbedding);
+                    List<VectorSearchResult> fallbackCandidates =
+                            vectorSearchRepository.findCareerEvidenceCandidates(
+                                    ownerUserId,
+                                    fallbackEmbedding);
+                    executedVariants++;
+                    anchorQueries.add(fallbackQuery);
+                    mergedCandidates = mergeCandidates(mergedCandidates, fallbackCandidates);
+                    selected = selectCompositeResults(
+                            fallbackQuery,
+                            anchorQueries,
+                            mergedCandidates,
+                            true);
+                    selected = keepExactContextualNumericEvidence(query, selected);
+                    if (!selected.isEmpty()) {
+                        break;
+                    }
+                }
+                if (executedVariants > 0) {
+                    LOGGER.info("P3_VARIANT_FALLBACK variants={}", executedVariants);
+                }
+            }
+            if (selected.isEmpty()) {
+                Set<String> normalizedNumbers = NumericQueryAnchors.extract(query).stream()
+                        .filter(NumericQueryAnchors.NumericAnchor::hasUnit)
+                        .map(NumericQueryAnchors.NumericAnchor::number)
+                        .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+                if (!normalizedNumbers.isEmpty()) {
+                    List<VectorSearchResult> numericCandidates =
+                            vectorSearchRepository.findNumericAnchorCandidates(
+                                    ownerUserId,
+                                    queryEmbedding,
+                                    normalizedNumbers);
+                    selected = numericAnchorRescueProfile.apply(query, numericCandidates);
+                }
+            }
+        }
         selected = deduplicateExactPresentationContent(selected);
         if (selected.isEmpty()) {
-            return emptyOutcome(switch (compositeSearchProfile.resolveIntent(query)) {
-                case GENERAL -> CareerEvidenceSearchState.NO_RELEVANT_RESULTS;
-                case COMPLETED_RELEASE_EVIDENCE -> CareerEvidenceSearchState.NO_EVIDENCE;
-            });
+            return emptyOutcome(emptyStateFor(query));
         }
         return new CareerEvidenceSearchV2Response(
                 CareerEvidenceSearchState.EVIDENCE_FOUND,
@@ -124,8 +202,64 @@ public class SearchService {
                         .toList());
     }
 
+    private static List<VectorSearchResult> keepExactContextualNumericEvidence(
+            String query,
+            List<VectorSearchResult> selected) {
+        boolean hasContextualNumericAnchor = NumericQueryAnchors.extract(query).stream()
+                .anyMatch(NumericQueryAnchors.NumericAnchor::hasUnit);
+        if (!hasContextualNumericAnchor) {
+            return selected;
+        }
+        return selected.stream()
+                .filter(candidate -> NumericQueryAnchors.hasContextualMatch(query, candidate.content()))
+                .toList();
+    }
+
+    private List<VectorSearchResult> selectCompositeResults(
+            String searchQuery,
+            List<String> anchorQueries,
+            List<VectorSearchResult> candidates,
+            boolean requireDirectAnchor) {
+        List<VectorSearchResult> selected =
+                shortGeneralExactTokenRescueProfile.apply(searchQuery, candidates).results();
+        if (!requireDirectAnchor) {
+            return selected;
+        }
+        return selected.stream()
+                .filter(candidate -> anchorQueries.stream().anyMatch(anchorQuery ->
+                        NaturalLanguageQueryFallback.hasDirectAnchor(
+                                anchorQuery,
+                                candidate.content())))
+                .toList();
+    }
+
+    static List<VectorSearchResult> mergeCandidates(
+            List<VectorSearchResult> existing,
+            List<VectorSearchResult> incoming) {
+        Map<Long, VectorSearchResult> byChunkId = new LinkedHashMap<>();
+        existing.forEach(candidate -> byChunkId.put(candidate.chunkId(), candidate));
+        incoming.forEach(candidate -> byChunkId.merge(
+                candidate.chunkId(),
+                candidate,
+                (current, replacement) -> replacement.score() > current.score()
+                        ? replacement
+                        : current));
+        return byChunkId.values().stream()
+                .sorted(Comparator.comparingDouble(VectorSearchResult::score)
+                        .reversed()
+                        .thenComparing(VectorSearchResult::chunkId))
+                .toList();
+    }
+
     private static CareerEvidenceSearchV2Response emptyOutcome(CareerEvidenceSearchState state) {
         return new CareerEvidenceSearchV2Response(state, List.of());
+    }
+
+    private CareerEvidenceSearchState emptyStateFor(String query) {
+        return switch (compositeSearchProfile.resolveIntent(query)) {
+            case GENERAL -> CareerEvidenceSearchState.NO_RELEVANT_RESULTS;
+            case COMPLETED_RELEASE_EVIDENCE -> CareerEvidenceSearchState.NO_EVIDENCE;
+        };
     }
 
     private static List<VectorSearchResult> deduplicateExactPresentationContent(

@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-013-P5",
+  "authoredAt": "2026-08-14T16:32:37.0131088+09:00",
+  "status": "FROZEN_PRE_SEARCH",
+  "frozenAt": "2026-08-14T16:35:40.8394506+09:00",
+  "ownerId": 1,
+  "activeCorpus": [
+    {"documentId":15,"title":"정재민 신입 백엔드 이력서","versionId":15,"versionNo":1,"status":"ACTIVE","chunkRange":[87,92]},
+    {"documentId":16,"title":"정재민 백엔드 포트폴리오","versionId":16,"versionNo":1,"status":"ACTIVE","chunkRange":[93,104]}
+  ],
+  "positives": [
+    {"id":"H01","acceptableEvidence":[{"documentId":15,"versionId":15,"pages":[1],"chunkIds":[88],"anchorsAny":["담당 범위 매칭 확정 트랜잭션 설계","알림 Outbox/Worker 처리","그룹 채팅 읽음 상태 API 설계"]}]},
+    {"id":"H02","acceptableEvidence":[{"documentId":15,"versionId":15,"pages":[2],"chunkIds":[90],"anchorsAny":["Redis TTL로 비밀번호 재설정 인증 상태 관리"]}]},
+    {"id":"H03","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[3],"chunkIds":[99],"anchorsAny":["대기 / 처리 중 / 발송 완료 / 최종 실패 / 발송 제외"]}]},
+    {"id":"H04","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[5],"chunkIds":[103],"anchorsAny":["서버 코어 수를 기준으로 작업자 수를 제한"]}]},
+    {"id":"H05","acceptableEvidence":[{"documentId":15,"versionId":15,"pages":[2],"chunkIds":[90,92],"anchorsAny":["2025년 관광데이터 활용 공모전 우수상","한국관광공사 사장상"]}]},
+    {"id":"H06","acceptableEvidence":[{"documentId":15,"versionId":15,"pages":[1],"chunkIds":[87],"anchorsAny":["AirConnect 앱 출시 과정에서 그룹 매칭, Outbox 기반 알림 처리, 채팅 읽음 기준"]}]},
+    {"id":"H07","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[4],"chunkIds":[101,102],"anchorsAny":["상세/소개 동기화 흐름을 통합","관광지별 API 호출을 병렬 작업 단위","엑셀 업로드 관광지 ID 기준"]}]},
+    {"id":"H08","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[3],"chunkIds":[98],"anchorsAny":["사용자별 디바이스 단위","디바이스별 발송 이벤트"]}]},
+
+    {"id":"H09","acceptableEvidence":[{"documentId":15,"versionId":15,"pages":[2],"chunkIds":[92],"anchorsAny":["교내 개발 동아리 창설과 운영"]}]},
+    {"id":"H10","acceptableEvidence":[{"documentId":15,"versionId":15,"pages":[2],"chunkIds":[92],"anchorsAny":["백엔드 커리큘럼 및 실습 세션 운영","백엔드 교육"]}]},
+    {"id":"H11","acceptableEvidence":[{"documentId":15,"versionId":15,"pages":[2],"chunkIds":[92],"anchorsAny":["멋쟁이사자처럼 중앙해커톤 상위 10%"]}]},
+    {"id":"H12","acceptableEvidence":[{"documentId":15,"versionId":15,"pages":[2],"chunkIds":[92],"anchorsAny":["실시간 건설기계 정비 매칭 서비스 '뚝닥터'"]}]},
+    {"id":"H13","acceptableEvidence":[{"documentId":15,"versionId":15,"pages":[2],"chunkIds":[90],"anchorsAny":["TourAPI/엑셀 데이터 처리 설계 및 구현","인증 흐름 통합 설계 및 구현","GCP Docker 배포 환경 구축"]}]},
+    {"id":"H14","acceptableEvidence":[{"documentId":15,"versionId":15,"pages":[1],"chunkIds":[87],"anchorsAny":["모바일 접근성 부족","앱 출시와 알림 시스템 개선"]}]},
+    {"id":"H15","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[3],"chunkIds":[98],"anchorsAny":["알림 생성 트랜잭션에서는 원본과 디바이스별 발송 이벤트만 저장","FCM 호출은 커밋 이후 Worker"]}]},
+    {"id":"H16","acceptableEvidence":[{"documentId":15,"versionId":15,"pages":[2],"chunkIds":[90],"anchorsAny":["단일 사용자 계정 기준으로 OAuth2/JWT 흐름을 통합","동일 이메일 계정 연결과 닉네임 충돌 처리"]}]},
+    {"id":"H17","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[4,5],"chunkIds":[101,103],"anchorsAny":["소개 정보 동기화를 상세 동기화 흐름에 통합","같은 관광지를 다시 순회하는 단계를 제거"]}]},
+    {"id":"H18","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[1,2,3],"chunkIds":[94,97,99],"anchorsAny":["운영 부하테스트가 아니라","운영 환경 부하테스트 수치가 아닙니다","운영 부하테스트나 FCM 네트워크 성공률 측정이 아닙니다"]}]},
+
+    {"id":"H19","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[2],"chunkIds":[95],"anchorsAny":["Redis List는 후보 조회에 적합하지만","변경된 팀방 상태까지 보장하지 못했습니다"]}]},
+    {"id":"H20","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[2],"chunkIds":[96],"anchorsAny":["두 팀 ID를 항상 같은 순서로 정렬","A+B와 B+A를 같은 조합으로 차단"]}]},
+    {"id":"H21","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[3],"chunkIds":[98],"anchorsAny":["FCM은 외부 서비스 호출이므로 두 흐름의 실패 전파를 분리","FCM 호출은 커밋 이후 Worker"]}]},
+    {"id":"H22","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[3],"chunkIds":[98,100],"anchorsAny":["무효 토큰이면 디바이스 비활성화","무효 토큰 발송 제외"]}]},
+    {"id":"H23","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[5],"chunkIds":[104],"anchorsAny":["일부 외부 API 요청 제한 응답이 발생할 수 있어","전체 성공률이나 모든 데이터 반영 완료율이 아니라"]}]},
+    {"id":"H24","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[5],"chunkIds":[104],"anchorsAny":["11.376초는 리팩토링 직후 병렬 상세 동기화의 호출 시도 처리 시간","전체 성공률이나 모든 데이터 반영 완료율이 아니라"]}]},
+    {"id":"H25","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[5],"chunkIds":[104],"anchorsAny":["미존재 항목은 제외 건수로 분리해 누락 데이터를 저장 오류와 구분"]}]},
+    {"id":"H26","acceptableEvidence":[{"documentId":15,"versionId":15,"pages":[1],"chunkIds":[87],"anchorsAny":["서비스 사용 시점과 재방문 흐름을 이어가기 어렵다고 판단","앱 출시"]}]},
+
+    {"id":"H27","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[3],"chunkIds":[99],"anchorsAny":["20개 Outbox 220건 / 13건씩 조회 / 2회 440건 선점 / 중복 선점 0건"]}]},
+    {"id":"H28","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[5],"chunkIds":[104],"anchorsAny":["680건 상세 동기화가 약 6.8초"]}]},
+    {"id":"H29","acceptableEvidence":[{"documentId":15,"versionId":15,"pages":[2],"chunkIds":[92],"anchorsAny":["2025년 관광데이터 활용 공모전 우수상 / 한국관광공사 사장상 2025.11.20"]}]},
+    {"id":"H30","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[2],"chunkIds":[96],"anchorsAny":["작업자 2/5/10/30 / 1,100회 저장 200 / 중복 차단 900"]}]},
+
+    {"id":"H31","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[2],"chunkIds":[95,96],"anchorsAny":["Redis는 빠른 후보 탐색","DB row lock","unique constraint"]}]},
+    {"id":"H32","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[3],"chunkIds":[98,99,100],"anchorsAny":["FOR UPDATE SKIP LOCKED","재시도 대기","무효 토큰 발송 제외"]}]},
+    {"id":"H33","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[4,5],"chunkIds":[101,102,103,104],"anchorsAny":["관광지별 API 호출을 병렬 작업 단위","DB에 존재하는 관광지만 갱신","미존재 항목은 제외 건수"]}]},
+    {"id":"H34","acceptableEvidence":[{"documentId":15,"versionId":15,"pages":[1],"chunkIds":[87],"anchorsAny":["모바일 접근성 부족","AirConnect 앱 출시 과정에서 그룹 매칭, Outbox 기반 알림 처리, 채팅 읽음 기준"]}]},
+    {"id":"H35","acceptableEvidence":[{"documentId":15,"versionId":15,"pages":[2],"chunkIds":[91],"anchorsAny":["GCP Ubuntu 서버에서 Docker Compose로 세 서비스를 함께 실행","업로드 파일은 Nginx가 직접 서빙"]}]},
+    {"id":"H36","acceptableEvidence":[{"documentId":16,"versionId":16,"pages":[2],"chunkIds":[96,97],"anchorsAny":["4,400회 성공 800 / 예상 차단 3,600 / 중복 저장 0건","운영 환경 부하테스트 수치가 아닙니다"]}]}
+  ],
+  "negatives": [
+    {"id":"N01","directEvidenceFound":false,"checkedActiveVersions":[15,16],"absentConcepts":["Prometheus","Grafana","metrics dashboard"]},
+    {"id":"N02","directEvidenceFound":false,"checkedActiveVersions":[15,16],"absentConcepts":["OpenTelemetry","Zipkin","distributed tracing"]},
+    {"id":"N03","directEvidenceFound":false,"checkedActiveVersions":[15,16],"absentConcepts":["Apache Pulsar"]},
+    {"id":"N04","directEvidenceFound":false,"checkedActiveVersions":[15,16],"absentConcepts":["PostgreSQL migration"]},
+    {"id":"N05","directEvidenceFound":false,"checkedActiveVersions":[15,16],"absentConcepts":["blue-green deployment"]},
+    {"id":"N06","directEvidenceFound":false,"checkedActiveVersions":[15,16],"absentConcepts":["AWS RDS","Multi-AZ"]},
+    {"id":"N07","directEvidenceFound":false,"checkedActiveVersions":[15,16],"absentConcepts":["CloudFront","CDN"]},
+    {"id":"N08","directEvidenceFound":false,"checkedActiveVersions":[15,16],"absentConcepts":["Spring WebFlux","reactive server"]},
+    {"id":"N09","directEvidenceFound":false,"checkedActiveVersions":[15,16],"absentConcepts":["Apache Cassandra"]},
+    {"id":"N10","directEvidenceFound":false,"checkedActiveVersions":[15,16],"absentConcepts":["Argo CD","GitOps"]},
+    {"id":"N11","directEvidenceFound":false,"checkedActiveVersions":[15,16],"absentConcepts":["HashiCorp Vault"]},
+    {"id":"N12","directEvidenceFound":false,"checkedActiveVersions":[15,16],"absentConcepts":["database sharding"]}
+  ]
+}

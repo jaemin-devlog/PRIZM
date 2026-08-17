@@ -1,0 +1,2321 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-B-RESULT-LEVEL-EVIDENCE-SET-JUDGE-NUMERIC-SHADOW",
+  "runnerVersion": "PRZ-016-P7-RESULT-LEVEL-EVIDENCE-SET-NUMERIC-SHADOW-v1",
+  "sources": {
+    "pairs": {
+      "path": "specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\p7-result-level-evidence-set-pairs.json",
+      "sha256": "b0156ec5ac2ec243f6b23976ffbb433939c487af142c1142de2e25e0f16cd160"
+    },
+    "judgeResults": {
+      "path": "specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\p7-result-level-evidence-set-judge-results.json",
+      "sha256": "5f638f413895198de82e9108e680e6b0832c031c9da053cc1f2c2d18bcc19244"
+    },
+    "judgeCheckpoint": {
+      "path": "specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\p7-result-level-evidence-set-judge-checkpoint.jsonl",
+      "sha256": "b0feb229a96b150e608b46e4daf41409d6392742fdaee2a0b4bf74082a4482b4"
+    },
+    "numericVerifier": {
+      "path": "C:\\Users\\정재민\\Project\\PRIZM\\scripts\\evaluation\\run_semantic_nli_numeric_shadow.py",
+      "sha256": "c7aa71b249ca16d77f9c6bac18cee6dd6de76f4debcd334159834191c6187118"
+    }
+  },
+  "policy": {
+    "numericContradiction": "REFUTED",
+    "numericConsistentOrNotApplicable": "PRESERVE_JUDGE_LABEL",
+    "numericUnresolved": "FAIL_CLOSED_NON_SUPPORT",
+    "groundTruthScoring": "NOT_RUN"
+  },
+  "results": [
+    {
+      "id": "V2-U01-D02#r1",
+      "queryId": "V2-U01-D02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 8,
+        "documentId": 2,
+        "documentVersionId": 3,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "919bcc869eb61dee7f3d449c6797cc49e56c895f3283238a8d0b3599c2583531",
+        "score": 0.5477674432632881,
+        "distance": 0.4522325567367119
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-D02#r2",
+      "queryId": "V2-U01-D02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 13,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "c9deef88081ca2edcb4ba97349adc70ad1434462fe0c3a941ab8bc53e5f0defe",
+        "score": 0.5101936143290575,
+        "distance": 0.4898063856709425
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U01-NV01#r1",
+      "queryId": "V2-U01-NV01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 12,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "a279b9930a02d898d7c4df790104968b8361aa6fdeb9d80173a52e9b40dfcc67",
+        "score": 0.5910116921649388,
+        "distance": 0.40898830783506124
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-NV01#r2",
+      "queryId": "V2-U01-NV01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 11,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "9953ca9ccd00346d9409c8b84f4ed7be372500b6a4344dbc99d4526698f76e3e",
+        "score": 0.574446882340507,
+        "distance": 0.425553117659493
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-NV01#r3",
+      "queryId": "V2-U01-NV01",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 13,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "c9deef88081ca2edcb4ba97349adc70ad1434462fe0c3a941ab8bc53e5f0defe",
+        "score": 0.5609108922151063,
+        "distance": 0.43908910778489374
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-NV01#r4",
+      "queryId": "V2-U01-NV01",
+      "originalRank": 4,
+      "resultIdentity": {
+        "chunkId": 7,
+        "documentId": 2,
+        "documentVersionId": 3,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "c5e24b287ab84997750347a8c2ec121e6e499e620edb075a90beadad7c397c06",
+        "score": 0.5304461085264591,
+        "distance": 0.4695538914735409
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U01-NV02#r1",
+      "queryId": "V2-U01-NV02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 13,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "c9deef88081ca2edcb4ba97349adc70ad1434462fe0c3a941ab8bc53e5f0defe",
+        "score": 0.5466070660097481,
+        "distance": 0.45339293399025193
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U01-NV02#r2",
+      "queryId": "V2-U01-NV02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 8,
+        "documentId": 2,
+        "documentVersionId": 3,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "919bcc869eb61dee7f3d449c6797cc49e56c895f3283238a8d0b3599c2583531",
+        "score": 0.547112117422556,
+        "distance": 0.45288788257744395
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-IP01#r1",
+      "queryId": "V2-U01-IP01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 12,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "a279b9930a02d898d7c4df790104968b8361aa6fdeb9d80173a52e9b40dfcc67",
+        "score": 0.5905039526233729,
+        "distance": 0.40949604737662715
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-IP01#r2",
+      "queryId": "V2-U01-IP01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 11,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "9953ca9ccd00346d9409c8b84f4ed7be372500b6a4344dbc99d4526698f76e3e",
+        "score": 0.5274820707685051,
+        "distance": 0.47251792923149494
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-IP01#r3",
+      "queryId": "V2-U01-IP01",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 13,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "c9deef88081ca2edcb4ba97349adc70ad1434462fe0c3a941ab8bc53e5f0defe",
+        "score": 0.511814028728889,
+        "distance": 0.48818597127111096
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U01-IP01#r4",
+      "queryId": "V2-U01-IP01",
+      "originalRank": 4,
+      "resultIdentity": {
+        "chunkId": 8,
+        "documentId": 2,
+        "documentVersionId": 3,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "919bcc869eb61dee7f3d449c6797cc49e56c895f3283238a8d0b3599c2583531",
+        "score": 0.5245580047896834,
+        "distance": 0.4754419952103166
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U01-IP02#r1",
+      "queryId": "V2-U01-IP02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 8,
+        "documentId": 2,
+        "documentVersionId": 3,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "919bcc869eb61dee7f3d449c6797cc49e56c895f3283238a8d0b3599c2583531",
+        "score": 0.6213877814351347,
+        "distance": 0.37861221856486527
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-IP02#r2",
+      "queryId": "V2-U01-IP02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 13,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "c9deef88081ca2edcb4ba97349adc70ad1434462fe0c3a941ab8bc53e5f0defe",
+        "score": 0.5831078341281919,
+        "distance": 0.4168921658718081
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-IP02#r3",
+      "queryId": "V2-U01-IP02",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 12,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "a279b9930a02d898d7c4df790104968b8361aa6fdeb9d80173a52e9b40dfcc67",
+        "score": 0.5514177618720855,
+        "distance": 0.44858223812791453
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-IP02#r4",
+      "queryId": "V2-U01-IP02",
+      "originalRank": 4,
+      "resultIdentity": {
+        "chunkId": 11,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "9953ca9ccd00346d9409c8b84f4ed7be372500b6a4344dbc99d4526698f76e3e",
+        "score": 0.5098749095276134,
+        "distance": 0.4901250904723866
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-NI01#r1",
+      "queryId": "V2-U01-NI01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 8,
+        "documentId": 2,
+        "documentVersionId": 3,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "919bcc869eb61dee7f3d449c6797cc49e56c895f3283238a8d0b3599c2583531",
+        "score": 0.6135086607306417,
+        "distance": 0.3864913392693583
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "CONSISTENT",
+        "reason": "EXACT_VALUE_UNIT_METRIC_MATCH",
+        "expectedValues": [
+          {
+            "value": "1.4",
+            "unit": "초"
+          },
+          {
+            "value": "380",
+            "unit": "밀리초"
+          }
+        ],
+        "metricTokens": [
+          "API",
+          "P95"
+        ],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-CN01#r1",
+      "queryId": "V2-U01-CN01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 13,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "c9deef88081ca2edcb4ba97349adc70ad1434462fe0c3a941ab8bc53e5f0defe",
+        "score": 0.5540323990486873,
+        "distance": 0.4459676009513127
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-CN01#r2",
+      "queryId": "V2-U01-CN01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 8,
+        "documentId": 2,
+        "documentVersionId": 3,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "919bcc869eb61dee7f3d449c6797cc49e56c895f3283238a8d0b3599c2583531",
+        "score": 0.5406731173166823,
+        "distance": 0.45932688268331767
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-CN01#r3",
+      "queryId": "V2-U01-CN01",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 11,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "9953ca9ccd00346d9409c8b84f4ed7be372500b6a4344dbc99d4526698f76e3e",
+        "score": 0.5393851673969613,
+        "distance": 0.4606148326030387
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-CN02#r1",
+      "queryId": "V2-U01-CN02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 8,
+        "documentId": 2,
+        "documentVersionId": 3,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "919bcc869eb61dee7f3d449c6797cc49e56c895f3283238a8d0b3599c2583531",
+        "score": 0.5279616894882063,
+        "distance": 0.4720383105117937
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-CN02#r2",
+      "queryId": "V2-U01-CN02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 12,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "a279b9930a02d898d7c4df790104968b8361aa6fdeb9d80173a52e9b40dfcc67",
+        "score": 0.5205328750292743,
+        "distance": 0.47946712497072574
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-CN02#r3",
+      "queryId": "V2-U01-CN02",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 13,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "c9deef88081ca2edcb4ba97349adc70ad1434462fe0c3a941ab8bc53e5f0defe",
+        "score": 0.5170412022969277,
+        "distance": 0.48295879770307226
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U01-N01#r1",
+      "queryId": "V2-U01-N01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 11,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "9953ca9ccd00346d9409c8b84f4ed7be372500b6a4344dbc99d4526698f76e3e",
+        "score": 0.5314504541695659,
+        "distance": 0.46854954583043407
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U01-N03#r1",
+      "queryId": "V2-U01-N03",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 13,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "c9deef88081ca2edcb4ba97349adc70ad1434462fe0c3a941ab8bc53e5f0defe",
+        "score": 0.5337335584400962,
+        "distance": 0.4662664415599038
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U02-D01#r1",
+      "queryId": "V2-U02-D01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 19,
+        "documentId": 5,
+        "documentVersionId": 6,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "ce13f5c9daa5a2b77e0e119d61e03115e412ba93bc7f90400d5787c76c66be9c",
+        "score": 0.5813113104515579,
+        "distance": 0.4186886895484421
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U02-D01#r2",
+      "queryId": "V2-U02-D01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 15,
+        "documentId": 4,
+        "documentVersionId": 5,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "f7f64adbdb2a80fdffcc4605a260eb9f729eeb91f51da26fb0523d49fe420623",
+        "score": 0.5717926366205605,
+        "distance": 0.42820736337943954
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U02-D02#r1",
+      "queryId": "V2-U02-D02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 18,
+        "documentId": 4,
+        "documentVersionId": 5,
+        "sourceType": "PAGE",
+        "sourceIndex": 2,
+        "contentSha256": "85f7d16b384a1ec59e03f2ca485fd2695a9784885520adb3927bf02464897243",
+        "score": 0.5929965397725976,
+        "distance": 0.4070034602274024
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U02-D02#r2",
+      "queryId": "V2-U02-D02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 20,
+        "documentId": 5,
+        "documentVersionId": 6,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "160f4c1065a3c4686b9e1e7c6c6718e819b81a5ad4e19249bca67c24bde4f540",
+        "score": 0.5221976558455416,
+        "distance": 0.47780234415445844
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U02-NV01#r1",
+      "queryId": "V2-U02-NV01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 19,
+        "documentId": 5,
+        "documentVersionId": 6,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "ce13f5c9daa5a2b77e0e119d61e03115e412ba93bc7f90400d5787c76c66be9c",
+        "score": 0.5384254409759749,
+        "distance": 0.4615745590240251
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U02-NV01#r2",
+      "queryId": "V2-U02-NV01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 20,
+        "documentId": 5,
+        "documentVersionId": 6,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "160f4c1065a3c4686b9e1e7c6c6718e819b81a5ad4e19249bca67c24bde4f540",
+        "score": 0.5177847392008715,
+        "distance": 0.48221526079912846
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U02-NV02#r1",
+      "queryId": "V2-U02-NV02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 16,
+        "documentId": 4,
+        "documentVersionId": 5,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "e27afe74410ad36feacc04874ac2f1ac6c2d1a94eb76a80648b07d68aa87dae7",
+        "score": 0.5199358725662543,
+        "distance": 0.4800641274337457
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U02-IP01#r1",
+      "queryId": "V2-U02-IP01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 21,
+        "documentId": 5,
+        "documentVersionId": 6,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "0dd1c1c612f8a78661ca57849d87c15b45bc1eb6a65ac204345ffae7bb27a72f",
+        "score": 0.5514416716709951,
+        "distance": 0.4485583283290049
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U02-IP01#r2",
+      "queryId": "V2-U02-IP01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 20,
+        "documentId": 5,
+        "documentVersionId": 6,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "160f4c1065a3c4686b9e1e7c6c6718e819b81a5ad4e19249bca67c24bde4f540",
+        "score": 0.5510717265092938,
+        "distance": 0.4489282734907062
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U02-IP01#r3",
+      "queryId": "V2-U02-IP01",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 18,
+        "documentId": 4,
+        "documentVersionId": 5,
+        "sourceType": "PAGE",
+        "sourceIndex": 2,
+        "contentSha256": "85f7d16b384a1ec59e03f2ca485fd2695a9784885520adb3927bf02464897243",
+        "score": 0.5501559941938049,
+        "distance": 0.4498440058061951
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U02-IP02#r1",
+      "queryId": "V2-U02-IP02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 19,
+        "documentId": 5,
+        "documentVersionId": 6,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "ce13f5c9daa5a2b77e0e119d61e03115e412ba93bc7f90400d5787c76c66be9c",
+        "score": 0.5646109580993813,
+        "distance": 0.43538904190061867
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U02-NI01#r1",
+      "queryId": "V2-U02-NI01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 20,
+        "documentId": 5,
+        "documentVersionId": 6,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "160f4c1065a3c4686b9e1e7c6c6718e819b81a5ad4e19249bca67c24bde4f540",
+        "score": 0.5413557564404935,
+        "distance": 0.4586442435595065
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NUMERIC_UNRESOLVED",
+        "reason": "PREMISE_METRIC_MISSING",
+        "expectedValues": [
+          {
+            "value": "138",
+            "unit": "분"
+          },
+          {
+            "value": "41",
+            "unit": "분"
+          }
+        ],
+        "metricTokens": [
+          "TB"
+        ],
+        "numericVeto": null
+      },
+      "combinedLabel": "NUMERIC_UNRESOLVED",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U02-CN01#r1",
+      "queryId": "V2-U02-CN01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 15,
+        "documentId": 4,
+        "documentVersionId": 5,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "f7f64adbdb2a80fdffcc4605a260eb9f729eeb91f51da26fb0523d49fe420623",
+        "score": 0.607563021052811,
+        "distance": 0.392436978947189
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U03-D01#r1",
+      "queryId": "V2-U03-D01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 22,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "7dcd35d703b5ca125b80418c81f6fefda45c5c3346cb0b95e2e50ae21a36f0c9",
+        "score": 0.5593671627286645,
+        "distance": 0.4406328372713355
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U03-D01#r2",
+      "queryId": "V2-U03-D01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 2,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "e467e466f610ff631b5fb2a02b4d52be9c5cb90345dfde4ce137a32a86d4e011",
+        "score": 0.531343951866142,
+        "distance": 0.46865604813385797
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U03-D01#r3",
+      "queryId": "V2-U03-D01",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 6,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 2,
+        "contentSha256": "79989999a5a2d75712ba9ee28fecc4dcaacfc83a40ea9450b1c179b267d5ee96",
+        "score": 0.5165371318504693,
+        "distance": 0.48346286814953066
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U03-D01#r4",
+      "queryId": "V2-U03-D01",
+      "originalRank": 4,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5111117998761742,
+        "distance": 0.48888820012382583
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U03-D02#r1",
+      "queryId": "V2-U03-D02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 3,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "59319c67a0946abd30befbc6126efc16da20cba8fd41b3aed210b645c4f4ccf0",
+        "score": 0.593786709945206,
+        "distance": 0.406213290054794
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U03-D02#r2",
+      "queryId": "V2-U03-D02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5449098077362671,
+        "distance": 0.45509019226373293
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U03-D02#r3",
+      "queryId": "V2-U03-D02",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 24,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "82916349cf5913b2e1e638698fe22454dd3c5afa5e7953b5252166807c2f3374",
+        "score": 0.5210031321056241,
+        "distance": 0.4789968678943759
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U03-NV01#r1",
+      "queryId": "V2-U03-NV01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 4,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "c46ab7663f30f8e1e3caf9a3311a6f0d95c4ca6a515212f794dc6ffffb23bdc2",
+        "score": 0.5575154022844916,
+        "distance": 0.4424845977155084
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U03-NV01#r2",
+      "queryId": "V2-U03-NV01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 24,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "82916349cf5913b2e1e638698fe22454dd3c5afa5e7953b5252166807c2f3374",
+        "score": 0.5359814805962573,
+        "distance": 0.4640185194037427
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U03-NV01#r3",
+      "queryId": "V2-U03-NV01",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 22,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "7dcd35d703b5ca125b80418c81f6fefda45c5c3346cb0b95e2e50ae21a36f0c9",
+        "score": 0.534725885011566,
+        "distance": 0.46527411498843396
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U03-NV01#r4",
+      "queryId": "V2-U03-NV01",
+      "originalRank": 4,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5050555762615465,
+        "distance": 0.4949444237384535
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U03-NV02#r1",
+      "queryId": "V2-U03-NV02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5441533537642878,
+        "distance": 0.45584664623571225
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U03-NV02#r2",
+      "queryId": "V2-U03-NV02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 3,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "59319c67a0946abd30befbc6126efc16da20cba8fd41b3aed210b645c4f4ccf0",
+        "score": 0.5160818330464629,
+        "distance": 0.48391816695353707
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U03-IP01#r1",
+      "queryId": "V2-U03-IP01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 3,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "59319c67a0946abd30befbc6126efc16da20cba8fd41b3aed210b645c4f4ccf0",
+        "score": 0.5891719040027831,
+        "distance": 0.4108280959972169
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U03-IP01#r2",
+      "queryId": "V2-U03-IP01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5239887237548828,
+        "distance": 0.4760112762451172
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U03-IP02#r1",
+      "queryId": "V2-U03-IP02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 22,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "7dcd35d703b5ca125b80418c81f6fefda45c5c3346cb0b95e2e50ae21a36f0c9",
+        "score": 0.5584692873911592,
+        "distance": 0.4415307126088408
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U03-IP02#r2",
+      "queryId": "V2-U03-IP02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5388263717126249,
+        "distance": 0.46117362828737507
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U03-IP02#r3",
+      "queryId": "V2-U03-IP02",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 3,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "59319c67a0946abd30befbc6126efc16da20cba8fd41b3aed210b645c4f4ccf0",
+        "score": 0.5486852969781605,
+        "distance": 0.4513147030218395
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U03-NI01#r1",
+      "queryId": "V2-U03-NI01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5314323231143332,
+        "distance": 0.4685676768856668
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NUMERIC_UNRESOLVED",
+        "reason": "HYPOTHESIS_METRIC_MISSING",
+        "expectedValues": [
+          {
+            "value": "16",
+            "unit": "개"
+          }
+        ],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "NUMERIC_UNRESOLVED",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U03-CN01#r1",
+      "queryId": "V2-U03-CN01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 24,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "82916349cf5913b2e1e638698fe22454dd3c5afa5e7953b5252166807c2f3374",
+        "score": 0.5447707445304625,
+        "distance": 0.4552292554695375
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U03-CN01#r2",
+      "queryId": "V2-U03-CN01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 22,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "7dcd35d703b5ca125b80418c81f6fefda45c5c3346cb0b95e2e50ae21a36f0c9",
+        "score": 0.5476278130536633,
+        "distance": 0.45237218694633674
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U03-CN01#r3",
+      "queryId": "V2-U03-CN01",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 3,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "59319c67a0946abd30befbc6126efc16da20cba8fd41b3aed210b645c4f4ccf0",
+        "score": 0.5416986395953474,
+        "distance": 0.45830136040465264
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U03-CN01#r4",
+      "queryId": "V2-U03-CN01",
+      "originalRank": 4,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5150728686219059,
+        "distance": 0.48492713137809407
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U03-CN02#r1",
+      "queryId": "V2-U03-CN02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 22,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "7dcd35d703b5ca125b80418c81f6fefda45c5c3346cb0b95e2e50ae21a36f0c9",
+        "score": 0.5218941984801249,
+        "distance": 0.47810580151987514
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U03-CN02#r2",
+      "queryId": "V2-U03-CN02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 3,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "59319c67a0946abd30befbc6126efc16da20cba8fd41b3aed210b645c4f4ccf0",
+        "score": 0.5402272874591116,
+        "distance": 0.45977271254088836
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U03-N01#r1",
+      "queryId": "V2-U03-N01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5761233134049305,
+        "distance": 0.4238766865950695
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U04-D01#r1",
+      "queryId": "V2-U04-D01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 29,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "3ee287ff047f64e97e2b288ba520d6ba7b5228c3c71baa82dda7e4ac82aa7e57",
+        "score": 0.5983780021602092,
+        "distance": 0.4016219978397908
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U04-D01#r2",
+      "queryId": "V2-U04-D01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 28,
+        "documentId": 7,
+        "documentVersionId": 8,
+        "sourceType": "PAGE",
+        "sourceIndex": 2,
+        "contentSha256": "6dbe8f20261789cd396e52d90a3eac0b61f2e79e6e8526ffd0867e97d2256f25",
+        "score": 0.5261406991985045,
+        "distance": 0.4738593008014955
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U04-D02#r1",
+      "queryId": "V2-U04-D02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 29,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "3ee287ff047f64e97e2b288ba520d6ba7b5228c3c71baa82dda7e4ac82aa7e57",
+        "score": 0.5347562951831301,
+        "distance": 0.46524370481686994
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U04-D02#r2",
+      "queryId": "V2-U04-D02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 30,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "f5162299c87dbf00adfd561d0f08f25ba8023f60a9b67bd7f733edc021a31b54",
+        "score": 0.5285888033264396,
+        "distance": 0.47141119667356035
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U04-NV01#r1",
+      "queryId": "V2-U04-NV01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 29,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "3ee287ff047f64e97e2b288ba520d6ba7b5228c3c71baa82dda7e4ac82aa7e57",
+        "score": 0.5505688233977228,
+        "distance": 0.44943117660227716
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U04-NV01#r2",
+      "queryId": "V2-U04-NV01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 26,
+        "documentId": 7,
+        "documentVersionId": 8,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "8c9f002f677764cf691cc69314748b7f49f51d6949def5baeacf247ffaafeb7a",
+        "score": 0.520750507094003,
+        "distance": 0.47924949290599705
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U04-NV02#r1",
+      "queryId": "V2-U04-NV02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 30,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "f5162299c87dbf00adfd561d0f08f25ba8023f60a9b67bd7f733edc021a31b54",
+        "score": 0.5394497976392822,
+        "distance": 0.46055020236071775
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U04-NV02#r2",
+      "queryId": "V2-U04-NV02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 26,
+        "documentId": 7,
+        "documentVersionId": 8,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "8c9f002f677764cf691cc69314748b7f49f51d6949def5baeacf247ffaafeb7a",
+        "score": 0.5382546620478488,
+        "distance": 0.4617453379521512
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U04-IP02#r1",
+      "queryId": "V2-U04-IP02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 29,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "3ee287ff047f64e97e2b288ba520d6ba7b5228c3c71baa82dda7e4ac82aa7e57",
+        "score": 0.5368720264909548,
+        "distance": 0.4631279735090452
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U04-NI01#r1",
+      "queryId": "V2-U04-NI01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 30,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "f5162299c87dbf00adfd561d0f08f25ba8023f60a9b67bd7f733edc021a31b54",
+        "score": 0.5593415023858848,
+        "distance": 0.44065849761411524
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "CONSISTENT",
+        "reason": "EXACT_VALUE_UNIT_METRIC_MATCH",
+        "expectedValues": [
+          {
+            "value": "1.6",
+            "unit": "초"
+          },
+          {
+            "value": "240",
+            "unit": "밀리초"
+          }
+        ],
+        "metricTokens": [
+          "P95"
+        ],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U04-CN01#r1",
+      "queryId": "V2-U04-CN01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 29,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "3ee287ff047f64e97e2b288ba520d6ba7b5228c3c71baa82dda7e4ac82aa7e57",
+        "score": 0.546896945217531,
+        "distance": 0.45310305478246904
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U04-CN01#r2",
+      "queryId": "V2-U04-CN01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 26,
+        "documentId": 7,
+        "documentVersionId": 8,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "8c9f002f677764cf691cc69314748b7f49f51d6949def5baeacf247ffaafeb7a",
+        "score": 0.5444388876353993,
+        "distance": 0.45556111236460073
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U04-CN01#r3",
+      "queryId": "V2-U04-CN01",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 31,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "1234bdc7fa0dc4090fe34a0ce168f021e412566edae39ac6f36b588fa7ad6375",
+        "score": 0.512732088565841,
+        "distance": 0.48726791143415904
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U04-CN01#r4",
+      "queryId": "V2-U04-CN01",
+      "originalRank": 4,
+      "resultIdentity": {
+        "chunkId": 30,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "f5162299c87dbf00adfd561d0f08f25ba8023f60a9b67bd7f733edc021a31b54",
+        "score": 0.5125210255334316,
+        "distance": 0.4874789744665684
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U04-CN02#r1",
+      "queryId": "V2-U04-CN02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 30,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "f5162299c87dbf00adfd561d0f08f25ba8023f60a9b67bd7f733edc021a31b54",
+        "score": 0.5443824691886642,
+        "distance": 0.4556175308113358
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U04-CN02#r2",
+      "queryId": "V2-U04-CN02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 31,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "1234bdc7fa0dc4090fe34a0ce168f021e412566edae39ac6f36b588fa7ad6375",
+        "score": 0.5397408264180257,
+        "distance": 0.4602591735819743
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U04-CN02#r3",
+      "queryId": "V2-U04-CN02",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 29,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "3ee287ff047f64e97e2b288ba520d6ba7b5228c3c71baa82dda7e4ac82aa7e57",
+        "score": 0.5341488482026224,
+        "distance": 0.46585115179737757
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U04-N01#r1",
+      "queryId": "V2-U04-N01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 29,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "3ee287ff047f64e97e2b288ba520d6ba7b5228c3c71baa82dda7e4ac82aa7e57",
+        "score": 0.5586632709914252,
+        "distance": 0.4413367290085748
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    },
+    {
+      "id": "V2-U04-N01#r2",
+      "queryId": "V2-U04-N01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 30,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "f5162299c87dbf00adfd561d0f08f25ba8023f60a9b67bd7f733edc021a31b54",
+        "score": 0.5626824459945206,
+        "distance": 0.43731755400547945
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U04-N02#r1",
+      "queryId": "V2-U04-N02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 28,
+        "documentId": 7,
+        "documentVersionId": 8,
+        "sourceType": "PAGE",
+        "sourceIndex": 2,
+        "contentSha256": "6dbe8f20261789cd396e52d90a3eac0b61f2e79e6e8526ffd0867e97d2256f25",
+        "score": 0.5239962779284747,
+        "distance": 0.4760037220715253
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U04-N02#r2",
+      "queryId": "V2-U04-N02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 29,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "3ee287ff047f64e97e2b288ba520d6ba7b5228c3c71baa82dda7e4ac82aa7e57",
+        "score": 0.5612394903982204,
+        "distance": 0.4387605096017796
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT",
+      "finalSupport": false
+    },
+    {
+      "id": "V2-U04-N02#r3",
+      "queryId": "V2-U04-N02",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 30,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "f5162299c87dbf00adfd561d0f08f25ba8023f60a9b67bd7f733edc021a31b54",
+        "score": 0.5123019189114764,
+        "distance": 0.48769808108852364
+      },
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED",
+      "finalSupport": true
+    }
+  ],
+  "summary": {
+    "resultCount": 86,
+    "queryCountWithResults": 38,
+    "labelDistribution": {
+      "SUPPORTED": 58,
+      "INSUFFICIENT": 23,
+      "REFUTED": 3,
+      "NUMERIC_UNRESOLVED": 2
+    },
+    "modelOutputInvalid": 0,
+    "numericUnresolved": 2,
+    "numericBlocked": 0,
+    "finalSupport": 58,
+    "groundTruthScoring": "NOT_RUN"
+  }
+}

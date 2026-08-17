@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 2,
+  "phase": "PRZ-016-P7-A-v2",
+  "status": "DATASET_FROZEN_READY_FOR_INDEPENDENT_RUN",
+  "frozenAt": "2026-08-16T19:01:30.7494013+09:00",
+  "searchExecutedAtFreeze": false,
+  "benchmarkExecutedAtFreeze": false,
+  "gptJudgeExecutedAtFreeze": false,
+  "p7bStatus": "NOT_STARTED",
+  "supersession": {
+    "v1Status": "PRESERVED_SUPERSEDED_BEFORE_RUN",
+    "v1FreezeManifestSha256": "0b46f12562050c58c6d7ccefe940378a5c42550192d0f35dffc7e2599eae3b79",
+    "v1FrozenAssetCount": 27,
+    "v1HashMismatches": 0
+  },
+  "baseline": {
+    "branch": "PRZ-016-search-performance-v2",
+    "head": "4a5c5b6bbd3cfd06f1313dee09e6695fdd68179e",
+    "originMain": "af6145a975031770f807ef4466a78f084e8223a2",
+    "originMainContainedInHead": true,
+    "productionSearchFileCount": 30,
+    "productionSearchSourceAggregateSha256": "32d8e31d7f5eeb3bf64033ce2b9db7c58347cbfe3d6f540b792e44c04951df31"
+  },
+  "counts": {
+    "syntheticUsers": 4,
+    "activeDocuments": 8,
+    "pdfResumes": 4,
+    "pdfResumePages": 8,
+    "txtPortfolios": 4,
+    "inactiveVersionFixtures": 1,
+    "questions": 48,
+    "positive": 36,
+    "negative": 12,
+    "groundTruthEntries": 48
+  },
+  "categories": {
+    "DIRECT_EXPERIENCE": 8,
+    "NATURAL_VARIATION": 8,
+    "INDIRECT_PROBLEM": 8,
+    "NUMERIC_IDENTIFIER": 4,
+    "COMPLEX_NATURAL_LANGUAGE": 8,
+    "NEGATIVE": 12
+  },
+  "documentDensity": {
+    "pdfPageNormalizedCharacterRange": {"min": 1076, "max": 1294},
+    "txtPortfolioByteRange": {"min": 3194, "max": 4270},
+    "pdfPages": {
+      "SYN2-U01-RESUME": [1138, 1084],
+      "SYN2-U02-RESUME": [1294, 1124],
+      "SYN2-U03-RESUME": [1264, 1076],
+      "SYN2-U04-RESUME": [1156, 1085]
+    }
+  },
+  "validation": {
+    "status": "PASS",
+    "positiveAnchorsVerified": 67,
+    "negativeActiveCorpusAbsenceVerified": 12,
+    "p0QueriesCompared": 72,
+    "p5QueriesCompared": 48,
+    "p7V1QueriesCompared": 48,
+    "exactDuplicates": {"P0":0,"P5":0,"P7_V1":0},
+    "normalizedDuplicates": {"P0":0,"P5":0,"P7_V1":0},
+    "nearDuplicateReviewCandidates": 0,
+    "manualNearDuplicates": 0,
+    "verbatimDocumentQueryCopies": 0,
+    "priorProjectFactReuse": 0,
+    "pdfPagesExtracted": 8,
+    "pdfPagesRenderedAndVisuallyInspected": 8,
+    "pdfVisualDefects": 0,
+    "sensitiveDataFindings": 0,
+    "productionChanges": 0,
+    "gitDiffCheck": "PASS"
+  },
+  "hashing": {
+    "algorithm": "SHA-256",
+    "individualFileInput": "raw file bytes",
+    "activeCorpusAggregateInput": "For active documents sorted by manifest path: UTF-8 path + NUL + raw bytes + NUL"
+  },
+  "requiredHashes": {
+    "activeCorpusAggregate": "fef6cb0b38fea658b03dfd06a43212acb84b57922acec764c49a5032fd795498",
+    "questions": "85c2e41bba5c293ca5172b48f77f41587d49be996252479ce5a71ed17763b868",
+    "groundTruth": "fd7525da3a00df4d7eccf42022b54a63cb2571be9f20111d2d6de740aa5f9680"
+  },
+  "activeDocumentHashes": [
+    {"documentKey":"SYN2-U01-PORTFOLIO","path":"dataset/documents/syn2-u01-portfolio-v1.txt","bytes":4270,"sha256":"3a05519952533eee6624c14866d1bfbb4cb77de1d2f2b2d55945eb821bf838c3"},
+    {"documentKey":"SYN2-U01-RESUME","path":"dataset/documents/syn2-u01-resume-v1.pdf","bytes":98353,"sha256":"ed3093b74eb6f3989a07e3dbe016ec9cede378d8173cc70a81e9bd0fe2d703a6"},
+    {"documentKey":"SYN2-U02-PORTFOLIO","path":"dataset/documents/syn2-u02-portfolio-v1.txt","bytes":3692,"sha256":"2f8d9d54af0feb9ab8a7b3417dc105946184369c4d132b02b2f82072da2b7475"},
+    {"documentKey":"SYN2-U02-RESUME","path":"dataset/documents/syn2-u02-resume-v1.pdf","bytes":89931,"sha256":"4df6d6132ff510ad73764597efb4b638612afba9445809facc79089e8690cb44"},
+    {"documentKey":"SYN2-U03-PORTFOLIO","path":"dataset/documents/syn2-u03-portfolio-v1.txt","bytes":3353,"sha256":"4d3c3c51bc9a91ea8bca8c1e34e31b61382ee0d4fde026167caae2dbfba2d18b"},
+    {"documentKey":"SYN2-U03-RESUME","path":"dataset/documents/syn2-u03-resume-v1.pdf","bytes":89822,"sha256":"6b6768cc42b2fd97c307e814bc35ad8d449de61060dafb73ec71559da10b148e"},
+    {"documentKey":"SYN2-U04-PORTFOLIO","path":"dataset/documents/syn2-u04-portfolio-v1.txt","bytes":3194,"sha256":"7959487dfc6c57321c839a4b575dcf0aac29bc174c1b8e53490b760ed5121fd3"},
+    {"documentKey":"SYN2-U04-RESUME","path":"dataset/documents/syn2-u04-resume-v1.pdf","bytes":88516,"sha256":"92fbd03f115844fc3b6ce84bb5340fbf6c7cf1acdccd29703628477236e1eaa7"}
+  ],
+  "otherFrozenAssetHashes": [
+    {"path":"baseline.json","bytes":774,"sha256":"cb7b6fab4fa3282fc73b110989b135ea380f627d3e0109cf6ba730e20485eaed"},
+    {"path":"dataset/corpus-manifest.json","bytes":3043,"sha256":"f0860b6588b7f270ad20cf352a9a538e5946e68b05e375b6eed0a37235fd5fae"},
+    {"path":"dataset/ground-truth.json","bytes":23045,"sha256":"fd7525da3a00df4d7eccf42022b54a63cb2571be9f20111d2d6de740aa5f9680"},
+    {"path":"dataset/inactive-versions/syn2-u03-resume-v0.txt","bytes":300,"sha256":"7fa71ff65f1f354195ce927e68c8c09089cf2176af386405272284e1b7a1ac6e"},
+    {"path":"dataset/pdf-sources/syn2-u01-resume-v1.json","bytes":4663,"sha256":"ddc14aaa949a58d55c6bd8ad821560b7ead44fedf149541f7da221add76d8b5c"},
+    {"path":"dataset/pdf-sources/syn2-u02-resume-v1.json","bytes":4413,"sha256":"a19b11116f342ae76669755cc4ceec2c534ccfca15ae187d13280dbe41a06622"},
+    {"path":"dataset/pdf-sources/syn2-u03-resume-v1.json","bytes":4261,"sha256":"14518c46c97b2e329872940db18dd0ad306d6daaad735b9e772557cfb76cba0a"},
+    {"path":"dataset/pdf-sources/syn2-u04-resume-v1.json","bytes":4221,"sha256":"3940d94bde298a3d88586bb17f1b112be75ae89172a75ec22d315ca005b73e8e"},
+    {"path":"dataset/questions.json","bytes":10744,"sha256":"85c2e41bba5c293ca5172b48f77f41587d49be996252479ce5a71ed17763b868"},
+    {"path":"evidence.md","bytes":2813,"sha256":"aae83b7c2a9440bd116454a053a5d720bed6c8f7f9d3d38b5290dd1b8f059e41"},
+    {"path":"plan.md","bytes":2785,"sha256":"2cc1787e0b3c93d1b8aca924852f5e9f79813e66a67af35bd57abf295f65b5a6"},
+    {"path":"rendered/syn2-u01-resume-v1-1.png","bytes":217630,"sha256":"3e9042c878941da464181ca1cfe1f1396e8b6dc163e130e531a414fb23f3ab13"},
+    {"path":"rendered/syn2-u01-resume-v1-2.png","bytes":190364,"sha256":"7f7acae4b9c62bb477a9b9424b4e866577e7d5d5e82f7f645cd74d2a88013ef0"},
+    {"path":"rendered/syn2-u02-resume-v1-1.png","bytes":220032,"sha256":"70ac1798453ec05fffae1769efd2af71196872906d15c50b6c4369edc4e2ced0"},
+    {"path":"rendered/syn2-u02-resume-v1-2.png","bytes":180345,"sha256":"dbd7321dba79739ce64eebd83b205f596c85646dd2ee05cda644313aa146a66e"},
+    {"path":"rendered/syn2-u03-resume-v1-1.png","bytes":202379,"sha256":"4a999ad746eb7dcfacf2fd0e548a972e54894f7f082cf56f609674b8a14a8763"},
+    {"path":"rendered/syn2-u03-resume-v1-2.png","bytes":179667,"sha256":"23980ed502dfa3b3642cb9afbabfd66f6687f175ef9975475dab8a337122ba37"},
+    {"path":"rendered/syn2-u04-resume-v1-1.png","bytes":200106,"sha256":"eadcf5e8a1c488854c9c254351c165ab1f435c81f70ae0dac9e4443aa4a9f320"},
+    {"path":"rendered/syn2-u04-resume-v1-2.png","bytes":184643,"sha256":"858366222953e7c544927f1d30198844214a8b8f6d977883e7485dd85be878b9"},
+    {"path":"spec.md","bytes":4095,"sha256":"b821cb11e2c5c1fe851d8fabb84aec3c070741b927f723459d527a93d0f6e002"},
+    {"path":"tasks.md","bytes":896,"sha256":"89a924c921329dfad19d5ad5374b4bde5b2e755557d1dbeeb2d1f9435e25690d"},
+    {"path":"tools/generate-pdfs.py","bytes":6425,"sha256":"3c7080cd9bb469d64277a86b441004b6df67e2d7ad7dfd28c34c56aca08b899b"},
+    {"path":"tools/validate-p7-v2.py","bytes":13276,"sha256":"4fdd7c7964581fb4175fa842c34b18eb9e25a2e531aa0328dd4da27a6f819a4e"}
+  ],
+  "immutabilityRule": "Do not modify P7-A v2 files after this manifest. P7-B must fail closed on any hash mismatch and must use v2, not v1."
+}

@@ -1,0 +1,438 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-semantic-nli-capability",
+  "pairs": [
+    {
+      "id": "v1-Q01",
+      "premise": "2024년에 지역 기록보관소의 접수 번호를 검증하는 Ruby on Rails API를 직접 구현해 운영팀에 배포했다. 담당자는 매일 이 서비스로 기증 기록을 등록했다.",
+      "hypothesis": "Ruby on Rails API를 운영팀에 배포했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "v1-Q02",
+      "premise": "조력 발전 센서 대시보드에 Grafana Loki 로그 상관관계를 도입하고 야간 장애 대응 절차를 운영했다. 알람 담당자가 trace ID로 수집기 오류를 추적했다.",
+      "hypothesis": "Grafana Loki 로그 상관관계를 도입해 야간 장애 대응을 운영했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "v1-Q03",
+      "premise": "시청 제설 차량 배차 도구에 OSRM 기반 경로 계산 모듈을 구현했다. 현장 관리자가 폭설 당일 실제 운행 순서를 이 도구로 조정했다.",
+      "hypothesis": "OSRM 경로 계산 모듈로 제설 차량 운행 순서를 조정했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "v1-Q04",
+      "premise": "대학 식물 표본 이미지 목록을 Solr에서 OpenSearch로 이전하고 사서용 검색 화면을 운영했다. 학명과 채집 지역 필터를 직접 구성했다.",
+      "hypothesis": "OpenSearch로 식물 표본 검색을 이전해 운영했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "v1-Q05",
+      "premise": "Electron 기반 출고 라벨 도구에 WebAssembly 바코드 판독 기능을 구현했다. 창고 직원은 외부 스캐너 없이 노트북 카메라로 라벨을 확인했다.",
+      "hypothesis": "WebAssembly 바코드 판독 기능을 구현했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "v1-Q06",
+      "premise": "연구 지원금 심사 포털을 Django와 Celery로 구현해 심사위원에게 배포했다. 마감 시점의 대량 첨부 파일 검증 작업을 비동기로 처리했다.",
+      "hypothesis": "Django와 Celery로 심사 포털을 배포했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "v1-Q07",
+      "premise": "자원봉사 일정 앱에 FIDO2 passkey 로그인을 구현하고 기존 비밀번호 로그인과 함께 실제 사용자에게 출시했다.",
+      "hypothesis": "FIDO2 passkey 로그인을 실제 출시했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "v1-Q08",
+      "premise": "하천 수질 관측 스트림에 Apache Flink checkpoint 복구를 구현하고 운영했다. 작업 재시작 뒤에도 마지막 확정 수위 측정값부터 처리했다.",
+      "hypothesis": "Apache Flink checkpoint 복구를 운영했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "v1-Q09",
+      "premise": "얼굴 인식 출입 통제는 직접 구현하지 않았다. 보안 조직의 시연을 검토했을 뿐이며 현재 서비스에는 해당 기능이 없다.",
+      "hypothesis": "얼굴 인식 출입 통제를 직접 구현해 운영했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v1-Q10",
+      "premise": "Cassandra 운영 경험은 없다. 초기 설계 메모에 이름만 있었고 데이터 저장소로 설치하거나 관리하지 않았다.",
+      "hypothesis": "Cassandra 클러스터를 설치하고 운영했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v1-Q11",
+      "premise": "iOS 앱을 작성한 적은 없다. 모바일 팀이 담당했고 나는 브라우저용 관리자 화면만 유지했다.",
+      "hypothesis": "iOS 앱을 직접 작성했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v1-Q12",
+      "premise": "드론 자율비행 모델을 만들거나 학습하지 않았다. 외부 업체의 비행 영상 품질 보고서만 읽었다.",
+      "hypothesis": "드론 자율비행 모델을 직접 학습하고 만들었다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v1-Q13",
+      "premise": "YugabyteDB 전환 가능성을 검증했지만 MariaDB를 계속 사용했다. 성능 비교 보고서만 남기고 production migration은 진행하지 않았다.",
+      "hypothesis": "YugabyteDB를 production 데이터베이스로 전환해 운영했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v1-Q14",
+      "premise": "Istio를 staging 환경에서 짧게 시험했지만 채택하지 않았다. 운영 서비스는 기존 reverse proxy 구성을 유지했다.",
+      "hypothesis": "Istio를 운영 서비스에 채택했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v1-Q15",
+      "premise": "Hasura를 비교 대상으로 살펴봤으나 production에 넣지 않았다. 공개 API는 기존 REST endpoint로 계속 제공했다.",
+      "hypothesis": "Hasura를 production API에 도입했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v1-Q16",
+      "premise": "다음 회계연도 계획에는 hardware security key 지원 검토가 적혀 있다. 아직 개발 일정도 확정되지 않았고 출시한 기능은 없다.",
+      "hypothesis": "hardware security key 로그인을 이미 출시했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v1-Q17",
+      "premise": "문서 이미지의 AVIF 변환은 아키텍처 검토 안건일 뿐이다. 구현, 배포, 변환 작업은 시작하지 않았다.",
+      "hypothesis": "문서 이미지를 AVIF로 변환하는 기능을 구현해 배포했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v1-Q18",
+      "premise": "서버리스 이전은 분기 계획 회의에서 논의만 했다. 승인된 설계나 실행한 migration은 없다.",
+      "hypothesis": "서버리스 이전 migration을 실제 실행했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v1-Q19",
+      "premise": "2018년 hackweek prototype에서 Apache Storm을 잠시 사용했지만 조직 서비스가 시작되기 전에 폐기했다. 현재 경력의 운영 시스템에는 포함되지 않는다.",
+      "hypothesis": "Apache Storm을 현재 운영 서비스에 사용했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v1-Q20",
+      "premise": "대학 연구실에서 Prolog 규칙 엔진을 만든 실험은 있었다. 고객 서비스에 연결하지 않았고 이후 제품으로 전환하지 않았다.",
+      "hypothesis": "Prolog 규칙 엔진을 고객 서비스 제품으로 운영했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v1-Q21",
+      "premise": "예전 데모는 Mapbox GL로 지도를 렌더링했지만 현재 제품 출시 전에 제거했다. 현행 화면에는 그 코드가 없다.",
+      "hypothesis": "Mapbox GL 지도를 현재 출시 제품에 구현했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v1-Q22",
+      "premise": "자료 정합성 검사는 97.8%에서 통과했다. 99.8%라는 수치는 기록이나 운영 보고서에 없다.",
+      "hypothesis": "자료 정합성 99.8%를 달성했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v1-Q23",
+      "premise": "야간 집계의 실제 P95는 680밀리초였다. 580밀리초 개선을 달성했다는 근거는 없다.",
+      "hypothesis": "야간 집계 P95를 580밀리초로 낮췄다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v1-Q24",
+      "premise": "현장 점검은 43개 경로를 대상으로 완료했다. 34개 경로라는 숫자는 사용하지 않았다.",
+      "hypothesis": "현장 점검을 34개 경로에서 완료했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v2-U01",
+      "premise": "공공도서관의 반납 알림을 위해 Quarkus 서비스를 구현해 사서용 환경에 배포했다. 매일 연체 안내 작업을 운영했다.",
+      "hypothesis": "Quarkus 서비스를 구현해 배포했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "v2-U02",
+      "premise": "지역 축제 자원봉사 신청 화면을 SvelteKit으로 구현하고 시민에게 출시했다. 접수 기간 동안 운영 담당자가 신청 현황을 확인했다.",
+      "hypothesis": "SvelteKit 신청 화면을 실제 출시했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "v2-U03",
+      "premise": "농산물 공동구매의 주문 확인 작업에 RabbitMQ 큐를 도입하고 운영했다. 중복 접수는 소비자에게 전송되기 전에 분리했다.",
+      "hypothesis": "RabbitMQ를 도입해 주문 확인 작업을 운영했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "v2-U04",
+      "premise": "시민 체육관 예약의 중복 시간을 검사하는 Kotlin 모듈을 구현해 예약 서버에 배포했다. 안내 데스크가 이를 사용했다.",
+      "hypothesis": "Kotlin 예약 검증 기능을 구현해 배포했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "v2-U05",
+      "premise": "양봉장 온도 센서에 Prometheus 알림 규칙을 도입하고 계절별 경보 절차를 운영했다. 관리자는 임계치 초과를 바로 확인했다.",
+      "hypothesis": "Prometheus 알림 규칙을 도입해 운영했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "v2-U06",
+      "premise": "박물관 전시 안내판의 배포 절차에 Argo CD를 도입해 자동 배포를 운영했다. 전시 교체일에 운영자가 승인했다.",
+      "hypothesis": "Argo CD로 배포를 자동화해 운영했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "v2-U07",
+      "premise": "농업 장비의 상태를 조회하는 gRPC 인터페이스를 구현하고 현장 관제 화면에서 운영했다. 장비 점검원이 응답을 확인했다.",
+      "hypothesis": "gRPC 상태 조회를 구현해 운영했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "v2-U08",
+      "premise": "산림 조사원이 저장한 기록을 SQLite 파일에서 가져오는 기능을 구현해 조사 도구에 배포했다. 오프라인 작업 뒤에도 기록이 보존됐다.",
+      "hypothesis": "SQLite 기록 가져오기 기능을 구현해 배포했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "v2-U09",
+      "premise": "Elasticsearch 클러스터는 직접 설치하거나 운영하지 않았다. 검색팀의 월간 보고서만 검토했다.",
+      "hypothesis": "Elasticsearch 클러스터를 직접 설치하고 운영했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v2-U10",
+      "premise": "Flutter 앱을 작성한 경험은 없다. 현장 안내는 종이 지도와 웹 안내문으로만 제공했다.",
+      "hypothesis": "Flutter 앱을 작성했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v2-U11",
+      "premise": "PyTorch 모델을 만들거나 학습하지 않았다. 외부 연구소의 분류 결과만 받아 품질을 점검했다.",
+      "hypothesis": "PyTorch 모델을 직접 학습했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v2-U12",
+      "premise": "CockroachDB를 비교 환경에서 측정했지만 운영 데이터베이스로 채택하지 않았다. 기존 저장소를 계속 사용했다.",
+      "hypothesis": "CockroachDB를 운영 데이터베이스로 채택했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v2-U13",
+      "premise": "Temporal을 짧은 실험에서 비교했으나 도입하지 않았다. 정기 작업은 기존 스케줄러에 남겼다.",
+      "hypothesis": "Temporal을 운영 작업에 도입했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v2-U14",
+      "premise": "Kubernetes의 운영 복잡도를 검토했지만 채택하지 않았다. 배포 방식은 바꾸지 않았다.",
+      "hypothesis": "Kubernetes를 서비스 운영에 채택했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v2-U15",
+      "premise": "GraphQL 조회 기능은 다음 분기 검토 항목이다. 개발 일정은 확정되지 않았고 출시한 기능은 없다.",
+      "hypothesis": "GraphQL 조회 기능을 이미 출시했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v2-U16",
+      "premise": "WebRTC 상담 화면은 제안서에만 적혀 있다. 구현이나 배포 작업은 시작하지 않았다.",
+      "hypothesis": "WebRTC 상담 화면을 구현해 배포했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v2-U17",
+      "premise": "Redpanda 스트림 이전은 예산 검토 단계다. 승인된 작업이나 실행한 이전은 없다.",
+      "hypothesis": "Redpanda 스트림 이전을 실제 실행했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v2-U18",
+      "premise": "Backbone.js는 오래전 행사 안내 prototype에서 잠시 사용했지만 출시 전에 폐기했다. 현재 서비스에는 포함되지 않는다.",
+      "hypothesis": "Backbone.js를 현재 출시 서비스에 사용했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v2-U19",
+      "premise": "Hadoop으로 만든 교육용 prototype은 있었지만 운영 전 제거했다. 현행 파이프라인에는 사용하지 않는다.",
+      "hypothesis": "Hadoop을 현재 운영 파이프라인에 사용했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v2-U20",
+      "premise": "jQuery로 만든 예전 지도 데모는 실제 출시 전에 retired 처리했다. 현재 제품 화면에는 남아 있지 않다.",
+      "hypothesis": "jQuery 지도를 현재 제품에 구현했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v2-U21",
+      "premise": "SLA 측정은 98.4%였다. 99.4%를 달성했다는 기록은 없다.",
+      "hypothesis": "SLA를 99.4%로 달성했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v2-U22",
+      "premise": "LCP의 실제 값은 820밀리초였다. 720밀리초 개선을 달성했다는 근거는 없다.",
+      "hypothesis": "LCP를 720밀리초로 낮췄다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v2-U23",
+      "premise": "QPS는 1,040건으로 측정됐다. 1,400건 처리 결과는 보고서에 없다.",
+      "hypothesis": "QPS를 1,400건으로 처리했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "v2-U24",
+      "premise": "RTO 복구 시간은 15분이었다. 12분 달성 수치는 검증 기록에 없다.",
+      "hypothesis": "RTO를 12분으로 달성했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "adv-A01",
+      "premise": "운영 요구사항을 검토한 뒤 Cilium을 production 네트워크 정책에 도입해 현재 운영했다.",
+      "hypothesis": "Cilium을 production 네트워크 정책에 도입해 현재 운영했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "adv-A02",
+      "premise": "Liquibase 변경 계획을 수립한 후 관람권 데이터베이스 migration을 완료하고 production에 배포했다.",
+      "hypothesis": "Liquibase migration을 완료해 production에 배포했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "adv-A03",
+      "premise": "Deno 기반 민원 알림 서비스를 단계적으로 production에 배포하고 현재 운영했다.",
+      "hypothesis": "Deno 서비스를 단계적으로 production에 배포해 운영했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "adv-A04",
+      "premise": "InfluxDB 수집기를 계절 관측 기간 내내 중단 없이 현재까지 운영했다.",
+      "hypothesis": "InfluxDB 수집기를 중단 없이 현재까지 운영했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "adv-A05",
+      "premise": "OpenCV를 이용해 사진 접수 화면의 배경 제거 기능을 구현하고 production에서 운영했다.",
+      "hypothesis": "OpenCV로 배경 제거 기능을 production에서 운영했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "adv-A06",
+      "premise": "ChirpStack으로 폐기물 수거함 센서 상태를 수집하는 기능을 구현해 현재 운영했다.",
+      "hypothesis": "ChirpStack으로 폐기물 수거 센서를 현재 운영했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "adv-A07",
+      "premise": "Astro 사이트는 행사 prototype에서 시작했지만 이후 production으로 승격해 현재 운영했다.",
+      "hypothesis": "Astro 사이트를 production으로 승격해 현재 운영했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "adv-A08",
+      "premise": "deprecated된 Struts 화면을 교체하고 Ktor API를 구현해 현재 실제 운영했다.",
+      "hypothesis": "Ktor API를 현재 실제 운영했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "adv-A09",
+      "premise": "Vitess를 다른 분산 저장소와 비교 시험한 뒤 production에 최종 도입하고 운영했다.",
+      "hypothesis": "Vitess를 비교 시험 뒤 production에 최종 도입했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "adv-A10",
+      "premise": "초기 계획 단계에서 여러 경보 방식을 비교했으나 SLO를 96.6%로 실제 달성해 운영 보고서에 기록했다.",
+      "hypothesis": "SLO를 96.6%로 실제 달성했다.",
+      "groundTruth": "SUPPORT"
+    },
+    {
+      "id": "adv-A11",
+      "premise": "Bun 기반 변환기는 다음 반기 계획에만 포함돼 있다. 구현과 배포는 아직 시작하지 않았다.",
+      "hypothesis": "Bun 기반 변환기를 이미 배포했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "adv-A12",
+      "premise": "Nginx Unit을 비교 시험했지만 운영 서비스에는 채택하지 않았다. 기존 구성을 유지했다.",
+      "hypothesis": "Nginx Unit을 운영 서비스에 채택했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "adv-A13",
+      "premise": "Cordova로 만든 과거 안내 앱은 제품 개편 전에 retired 처리했다. 현재 출시 제품에는 사용하지 않는다.",
+      "hypothesis": "Cordova를 현재 출시 제품에 사용했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "adv-A14",
+      "premise": "ONNX 모델을 직접 변환하거나 운영하지 않았다. 공급사가 제공한 결과 파일만 확인했다.",
+      "hypothesis": "ONNX 모델을 직접 변환하고 운영했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "adv-A15",
+      "premise": "MTTR은 실제로 31분이었다. 27분 달성 수치는 운영 기록에 없다.",
+      "hypothesis": "MTTR을 27분으로 달성했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "adv-A16",
+      "premise": "Three.js 전시 화면은 연구실 prototype으로만 만들었고 고객 서비스에는 연결하지 않았다.",
+      "hypothesis": "Three.js 전시 화면을 현재 서비스에서 운영했다.",
+      "groundTruth": "CONTRADICT"
+    },
+    {
+      "id": "unknown-01",
+      "premise": "지역 축제 자원봉사 신청 화면을 SvelteKit으로 구현하고 시민에게 출시했다. 접수 기간 동안 운영 담당자가 신청 현황을 확인했다.",
+      "hypothesis": "Ruby on Rails API를 운영팀에 배포했다.",
+      "groundTruth": "UNKNOWN"
+    },
+    {
+      "id": "unknown-02",
+      "premise": "시민 체육관 예약의 중복 시간을 검사하는 Kotlin 모듈을 구현해 예약 서버에 배포했다. 안내 데스크가 이를 사용했다.",
+      "hypothesis": "Grafana Loki 로그 상관관계를 도입해 야간 장애 대응을 운영했다.",
+      "groundTruth": "UNKNOWN"
+    },
+    {
+      "id": "unknown-03",
+      "premise": "양봉장 온도 센서에 Prometheus 알림 규칙을 도입하고 계절별 경보 절차를 운영했다. 관리자는 임계치 초과를 바로 확인했다.",
+      "hypothesis": "OSRM 경로 계산 모듈로 제설 차량 운행 순서를 조정했다.",
+      "groundTruth": "UNKNOWN"
+    },
+    {
+      "id": "unknown-04",
+      "premise": "농업 장비의 상태를 조회하는 gRPC 인터페이스를 구현하고 현장 관제 화면에서 운영했다. 장비 점검원이 응답을 확인했다.",
+      "hypothesis": "OpenSearch로 식물 표본 검색을 이전해 운영했다.",
+      "groundTruth": "UNKNOWN"
+    },
+    {
+      "id": "unknown-05",
+      "premise": "운영 요구사항을 검토한 뒤 Cilium을 production 네트워크 정책에 도입해 현재 운영했다.",
+      "hypothesis": "WebAssembly 바코드 판독 기능을 구현했다.",
+      "groundTruth": "UNKNOWN"
+    },
+    {
+      "id": "unknown-06",
+      "premise": "InfluxDB 수집기를 계절 관측 기간 내내 중단 없이 현재까지 운영했다.",
+      "hypothesis": "Django와 Celery로 심사 포털을 배포했다.",
+      "groundTruth": "UNKNOWN"
+    },
+    {
+      "id": "unknown-07",
+      "premise": "ChirpStack으로 폐기물 수거함 센서 상태를 수집하는 기능을 구현해 현재 운영했다.",
+      "hypothesis": "FIDO2 passkey 로그인을 실제 출시했다.",
+      "groundTruth": "UNKNOWN"
+    },
+    {
+      "id": "unknown-08",
+      "premise": "Vitess를 다른 분산 저장소와 비교 시험한 뒤 production에 최종 도입하고 운영했다.",
+      "hypothesis": "Apache Flink checkpoint 복구를 운영했다.",
+      "groundTruth": "UNKNOWN"
+    }
+  ]
+}

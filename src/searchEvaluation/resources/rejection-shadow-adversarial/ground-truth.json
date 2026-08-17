@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-adversarial-rejection-shadow-validation",
+  "expectations": [
+    {"id":"A01","expected":"ACCEPT"},{"id":"A02","expected":"ACCEPT"},{"id":"A03","expected":"ACCEPT"},{"id":"A04","expected":"ACCEPT"},{"id":"A05","expected":"ACCEPT"},
+    {"id":"A06","expected":"ACCEPT"},{"id":"A07","expected":"ACCEPT"},{"id":"A08","expected":"ACCEPT"},{"id":"A09","expected":"ACCEPT"},{"id":"A10","expected":"ACCEPT"},
+    {"id":"A11","expected":"REJECT"},{"id":"A12","expected":"REJECT"},{"id":"A13","expected":"REJECT"},{"id":"A14","expected":"REJECT"},{"id":"A15","expected":"REJECT"},{"id":"A16","expected":"REJECT"}
+  ]
+}

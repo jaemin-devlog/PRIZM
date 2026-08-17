@@ -1,0 +1,23 @@
+PRIZM P7 합성 이력서 — SYN-U01
+이 문서는 평가 전용 합성 자료이며 실제 인물이나 조직을 나타내지 않습니다.
+
+[PROFILE]
+콜드체인 물류의 배차·운송 이벤트를 다루는 백엔드 엔지니어.
+짧은 bullet과 운영 결과 중심으로 경력을 기록한다.
+
+[FROSTLINE DISPATCH]
+- 프로젝트: FrostLine Dispatch (냉장 화물 배차 제어)
+- API: C# / .NET 8 Minimal APIs
+- 메시징: Azure Service Bus sessions로 컨테이너 단위 이벤트 순서를 보존
+- 저장소: SQL Server temporal tables로 배차 변경 감사 이력을 유지
+- 중복 방지: shipment-event key와 inbox table을 조합해 재전송을 멱등 처리
+
+[OUTCOMES]
+- 배차 확인 API P95: 2.8초에서 740밀리초로 단축
+- dead-letter 복구 훈련: 18,420개 메시지를 47분 안에 재처리
+- 복구 중 운영 DB 행을 수동으로 고치지 않음
+
+[BOUNDARIES]
+- Azure Event Hubs는 대량 위치 스트림 후보로 검토했지만 운영에 도입하지 않음
+- 경로 예측 머신러닝은 제품 범위에 없었고 구현하지 않음
+

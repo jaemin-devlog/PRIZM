@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-adversarial-rejection-shadow-validation",
+  "status": "FROZEN_PRE_RUN",
+  "datasetSha256": "1475d0cc867dcc7eca2bbbdb8f3da242e0a8cbb1597d7f9026400078cd5e9c8f",
+  "groundTruthSha256": "a2bbd3b66d181adb62cb7192e4000f8a4c9d753fa1eab715889e8c65aa670b3d",
+  "counts": {"total": 16, "adversarialPositive": 10, "negative": 6},
+  "immutabilityRule": "Do not modify dataset.json or ground-truth.json after this freeze. Run the current evaluator once only."
+}

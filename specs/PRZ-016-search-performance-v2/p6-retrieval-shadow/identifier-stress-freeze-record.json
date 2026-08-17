@@ -1,0 +1,25 @@
+{
+  "phase" : "PRZ-013-P6",
+  "frozenAt" : "2026-08-14T09:57:29.561165300Z",
+  "h2ImplementedAtFreeze" : false,
+  "queryCounts" : {
+    "positive" : 14,
+    "negative" : 14,
+    "total" : 28
+  },
+  "directCorpusValidation" : {
+    "activeDocuments" : 2,
+    "ownerId" : 1,
+    "positiveValidated" : 14,
+    "corpusAggregate" : "ab09ef6d206ca62b7773fa0a1d604192bf06bdbff9cebbb59907abb4d73c8d81",
+    "negativeValidated" : 14,
+    "activeChunks" : 18
+  },
+  "sha256" : {
+    "identifierStressDataset" : "0dfdd5aa5d51fb8f5116904ef4f998b5f4ce73e35a5657159f35d80fc15859f5",
+    "identifierStressGroundTruth" : "f356a3ce914343caf49ed8edc4131cc29c933599708cc390c0eec3d9f8b218d8",
+    "productionSearchSourceAggregate" : "32d8e31d7f5eeb3bf64033ce2b9db7c58347cbfe3d6f540b792e44c04951df31"
+  },
+  "productionSearchFileCount" : 30,
+  "productionSearchChangesAuthorized" : 0
+}

@@ -1,0 +1,688 @@
+{
+  "executedAt": "2026-08-14T07:12:43.499Z",
+  "summary": {
+    "authenticatedRole": "USER",
+    "localizationPassed": true,
+    "regressionPassed": true,
+    "guardChecks": 19,
+    "guardFailures": 0,
+    "candidateContractPreserved": true,
+    "activeIsolationPreserved": true,
+    "focusedGatePassed": true
+  },
+  "targetResults": [
+    {
+      "id": "B02",
+      "group": "target",
+      "query": "데이터가 중복 저장되는 문제 해결한 적 있어?",
+      "beforeCorrectRank": null,
+      "afterCorrectRank": 1,
+      "rankingContractPreserved": true,
+      "state": "EVIDENCE_FOUND",
+      "results": [
+        {
+          "rank": 1,
+          "chunkId": 99,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 3,
+          "evidenceChunkId": 96,
+          "evidenceSourceIndex": 2,
+          "score": 0.5902797619092096,
+          "distance": 0.4097202380907904,
+          "snippet": "MySQL 합계 4방식 × 4조건 / 4,400회 성공 800 / 예상 차단 3,600 / 중복 저장 0건\nRedis 후보 중복 [501 / 501 / 502 / 502] 팀방별 DB 조회 1회 / 매칭 결과 저장 1회\nA+B와 B+A를 번갈아 저장해도 정렬된 팀 조합을 같은 조합으로 판단하는지 확인했습니다."
+        },
+        {
+          "rank": 2,
+          "chunkId": 88,
+          "documentId": 15,
+          "documentVersionId": 15,
+          "documentTitle": "정재민 신입 백엔드 이력서",
+          "sourceIndex": 1,
+          "evidenceChunkId": 88,
+          "evidenceSourceIndex": 1,
+          "score": 0.5773197916364959,
+          "distance": 0.42268020836350406,
+          "snippet": "4,400회 동시성 검증에서 성공 800건 / 예상 차단 3,600건 / 중복 저장 0건 확인."
+        },
+        {
+          "rank": 3,
+          "chunkId": 97,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 2,
+          "evidenceChunkId": 96,
+          "evidenceSourceIndex": 2,
+          "score": 0.577724507126275,
+          "distance": 0.422275492873725,
+          "snippet": "MySQL 합계 4방식 × 4조건 / 4,400회 성공 800 / 예상 차단 3,600 / 중복 저장 0건\nRedis 후보 중복 [501 / 501 / 502 / 502] 팀방별 DB 조회 1회 / 매칭 결과 저장 1회\nA+B와 B+A를 번갈아 저장해도 정렬된 팀 조합을 같은 조합으로 판단하는지 확인했습니다."
+        },
+        {
+          "rank": 4,
+          "chunkId": 104,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 5,
+          "evidenceChunkId": 104,
+          "evidenceSourceIndex": 5,
+          "score": 0.5577711170894124,
+          "distance": 0.4422288829105876,
+          "snippet": " 엑셀 업로드는 DB에 존재하는 관광지만 갱신하고 미존재 항목은 제외 건수로 분리해 누락 데이터를 저장 오류와 구분했습니다."
+        },
+        {
+          "rank": 5,
+          "chunkId": 101,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 4,
+          "evidenceChunkId": 96,
+          "evidenceSourceIndex": 2,
+          "score": 0.5364836018229606,
+          "distance": 0.4635163981770394,
+          "snippet": "MySQL 합계 4방식 × 4조건 / 4,400회 성공 800 / 예상 차단 3,600 / 중복 저장 0건\nRedis 후보 중복 [501 / 501 / 502 / 502] 팀방별 DB 조회 1회 / 매칭 결과 저장 1회\nA+B와 B+A를 번갈아 저장해도 정렬된 팀 조합을 같은 조합으로 판단하는지 확인했습니다."
+        }
+      ]
+    },
+    {
+      "id": "B04",
+      "group": "target",
+      "query": "서버에 서비스를 올려본 적 있어?",
+      "beforeCorrectRank": null,
+      "afterCorrectRank": 1,
+      "rankingContractPreserved": true,
+      "state": "EVIDENCE_FOUND",
+      "results": [
+        {
+          "rank": 1,
+          "chunkId": 87,
+          "documentId": 15,
+          "documentVersionId": 15,
+          "documentTitle": "정재민 신입 백엔드 이력서",
+          "sourceIndex": 1,
+          "evidenceChunkId": 91,
+          "evidenceSourceIndex": 2,
+          "score": 0.5056331740301534,
+          "distance": 0.4943668259698466,
+          "snippet": "서버 재시작이나 배포 시 Spring Boot / MySQL / Redis를 각각 관리해야 하는 운영 부담 확인.\n배포 환경 구축을 담당해 GCP Ubuntu 서버에서 Docker Compose로 세 서비스를 함께 실행하도록 구성.\n도메인 연결과 Nginx 리버스 프록시 및 HTTPS 설정을 적용하고 업로드 파일은 Nginx가 직접 서빙하도록 분리."
+        },
+        {
+          "rank": 2,
+          "chunkId": 93,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 1,
+          "evidenceChunkId": 98,
+          "evidenceSourceIndex": 3,
+          "score": 0.5005522963093265,
+          "distance": 0.4994477036906735,
+          "snippet": " 내부 알림은 사용자가 앱 안에서 반드시 확인해야 하는 데이터이고 FCM은 외부 서비스 호출이므로 두 흐름의 실패 전파를 분리해야 했습니다.\n 푸시 대상은 사용자별 디바이스 단위로 나뉘기 때문에 일부 무효 토큰이 다른 디바이스 발송을 막지 않아야 했습니다."
+        }
+      ]
+    },
+    {
+      "id": "C06",
+      "group": "target",
+      "query": "오래 멈춘 작업을 다시 처리할 수 있게 한 경험은?",
+      "beforeCorrectRank": null,
+      "afterCorrectRank": 1,
+      "rankingContractPreserved": true,
+      "state": "EVIDENCE_FOUND",
+      "results": [
+        {
+          "rank": 1,
+          "chunkId": 103,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 5,
+          "evidenceChunkId": 100,
+          "evidenceSourceIndex": 3,
+          "score": 0.5000768900009298,
+          "distance": 0.4999231099990702,
+          "snippet": "오래 멈춘 작업 복구 재처리 대상 복구 만료 3건 복구 / 최근 1건 유지\n통합 테스트 9개가 실패와 오류 없이 통과했으며 표에는 Worker 선점 조건과 성공 / 재시도 가능 실패 / 최종 실패 / 무효 토큰 / 오래 멈춘 작업 복구 대표 케이스를\n요약했습니다."
+        }
+      ]
+    },
+    {
+      "id": "E07",
+      "group": "target",
+      "query": "TourAPI를 병렬 처리하고 엑셀 2,329행 중 675건을 갱신한 경험은?",
+      "beforeCorrectRank": null,
+      "afterCorrectRank": null,
+      "rankingContractPreserved": true,
+      "state": "EVIDENCE_FOUND",
+      "results": [
+        {
+          "rank": 1,
+          "chunkId": 90,
+          "documentId": 15,
+          "documentVersionId": 15,
+          "documentTitle": "정재민 신입 백엔드 이력서",
+          "sourceIndex": 2,
+          "evidenceChunkId": 90,
+          "evidenceSourceIndex": 2,
+          "score": 0.6249861828954074,
+          "distance": 0.3750138171045926,
+          "snippet": "TourAPI 상세/소개 정보를 관광지별로 순차 호출하면서 외부 API 대기 시간이 누적되는 문제 확인.\n담당 구현 범위에서 상세/소개 동기화 흐름을 통합하고 관광지 단위 병렬 처리로 개선해 1,252건 기준 호출 처리 시간을 약 19분 22초에서 약 11.3초로 단축.\n엑셀 업로드는 DB에 존재하는 관광지만 선별 갱신하도록 구성해 2,329행 중 갱신 675건 / 제외 1,654건 분리."
+        }
+      ]
+    },
+    {
+      "id": "B05",
+      "group": "target",
+      "query": "실제 운영 환경에 배포해본 경험 알려줘",
+      "beforeCorrectRank": null,
+      "afterCorrectRank": null,
+      "rankingContractPreserved": true,
+      "state": "EVIDENCE_FOUND",
+      "results": [
+        {
+          "rank": 1,
+          "chunkId": 90,
+          "documentId": 15,
+          "documentVersionId": 15,
+          "documentTitle": "정재민 신입 백엔드 이력서",
+          "sourceIndex": 2,
+          "evidenceChunkId": 87,
+          "evidenceSourceIndex": 1,
+          "score": 0.5105880524130029,
+          "distance": 0.48941194758699713,
+          "snippet": "직접 기획한 웹서비스를 운영하며 모바일 접근성 부족, 실시간 알림 한계, 그룹 매칭 수요를 사용자 피드백으로 확인.\n기존 웹 환경에서는 서비스 사용 시점과 재방문 흐름을 이어가기 어렵다고 판단.\nAirConnect 앱 출시 과정에서 그룹 매칭, Outbox 기반 알림 처리, 채팅 읽음 기준을 앱 환경에 맞게 재정리."
+        }
+      ]
+    },
+    {
+      "id": "A01",
+      "group": "regression",
+      "query": "Spring Boot 백엔드 경험",
+      "beforeCorrectRank": 1,
+      "afterCorrectRank": 1,
+      "rankingContractPreserved": true,
+      "state": "EVIDENCE_FOUND",
+      "results": [
+        {
+          "rank": 1,
+          "chunkId": 90,
+          "documentId": 15,
+          "documentVersionId": 15,
+          "documentTitle": "정재민 신입 백엔드 이력서",
+          "sourceIndex": 2,
+          "evidenceChunkId": 91,
+          "evidenceSourceIndex": 2,
+          "score": 0.5186012674212152,
+          "distance": 0.48139873257878485,
+          "snippet": "서버 재시작이나 배포 시 Spring Boot / MySQL / Redis를 각각 관리해야 하는 운영 부담 확인.\n배포 환경 구축을 담당해 GCP Ubuntu 서버에서 Docker Compose로 세 서비스를 함께 실행하도록 구성."
+        },
+        {
+          "rank": 2,
+          "chunkId": 93,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 1,
+          "evidenceChunkId": 93,
+          "evidenceSourceIndex": 1,
+          "score": 0.5891038456783888,
+          "distance": 0.4108961543216112,
+          "snippet": "흐름에 직접 영향을 주는 백엔드 문제를 개선했습니다."
+        }
+      ]
+    },
+    {
+      "id": "A03",
+      "group": "regression",
+      "query": "동시성 처리 경험",
+      "beforeCorrectRank": 1,
+      "afterCorrectRank": 1,
+      "rankingContractPreserved": true,
+      "state": "EVIDENCE_FOUND",
+      "results": [
+        {
+          "rank": 1,
+          "chunkId": 96,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 2,
+          "evidenceChunkId": 99,
+          "evidenceSourceIndex": 3,
+          "score": 0.5138921754232575,
+          "distance": 0.4861078245767425,
+          "snippet": " 상태를 대기 / 처리 중 / 발송 완료 / 최종 실패 / 발송 제외로 나누어 장애 시점과 후속 조치를 데이터로 추적했습니다.\n Worker는 처리 대상 이벤트를 FOR UPDATE SKIP LOCKED로 조회해 여러 Worker가 동시에 실행되어도 같은 이벤트를 중복 처리하지\n않도록 했습니다.\n03"
+        },
+        {
+          "rank": 2,
+          "chunkId": 88,
+          "documentId": 15,
+          "documentVersionId": 15,
+          "documentTitle": "정재민 신입 백엔드 이력서",
+          "sourceIndex": 1,
+          "evidenceChunkId": 88,
+          "evidenceSourceIndex": 1,
+          "score": 0.5612173822445035,
+          "distance": 0.43878261775549654,
+          "snippet": "4,400회 동시성 검증에서 성공 800건 / 예상 차단 3,600건 / 중복 저장 0건 확인."
+        },
+        {
+          "rank": 3,
+          "chunkId": 104,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 5,
+          "evidenceChunkId": 104,
+          "evidenceSourceIndex": 5,
+          "score": 0.5423372801865028,
+          "distance": 0.45766271981349715,
+          "snippet": " 동일 1,252건 기준 상세/소개 TourAPI 호출 시도 처리 시간을 약 19분 22초에서 11.376초로 줄였습니다.\n 현재 코드에서도 680건 상세 동기화가 약 6.8초에 완료되어 병렬 처리와 통합 동기화 구조가 유지되는 것을 확인했습니다.\n 엑셀 업로드는 DB에 존재하는 관광지만 갱신하고 미존재 항목은 제외 건수로 분리해 누락 데이터를 저장 오류와 구분했습니다."
+        },
+        {
+          "rank": 4,
+          "chunkId": 90,
+          "documentId": 15,
+          "documentVersionId": 15,
+          "documentTitle": "정재민 신입 백엔드 이력서",
+          "sourceIndex": 2,
+          "evidenceChunkId": 90,
+          "evidenceSourceIndex": 2,
+          "score": 0.5115054013460129,
+          "distance": 0.48849459865398714,
+          "snippet": "동일 이메일 계정 연결과 닉네임 충돌 처리를 구현하고 Redis TTL로 비밀번호 재설정 인증 상태 관리."
+        },
+        {
+          "rank": 5,
+          "chunkId": 99,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 3,
+          "evidenceChunkId": 99,
+          "evidenceSourceIndex": 3,
+          "score": 0.5095676684911815,
+          "distance": 0.4904323315088185,
+          "snippet": " 상태를 대기 / 처리 중 / 발송 완료 / 최종 실패 / 발송 제외로 나누어 장애 시점과 후속 조치를 데이터로 추적했습니다.\n Worker는 처리 대상 이벤트를 FOR UPDATE SKIP LOCKED로 조회해 여러 Worker가 동시에 실행되어도 같은 이벤트를 중복 처리하지\n않도록 했습니다."
+        }
+      ]
+    },
+    {
+      "id": "E01",
+      "group": "regression",
+      "query": "Redis와 DB lock을 같이 사용해서 동시성 문제를 해결한 경험이 있어?",
+      "beforeCorrectRank": 1,
+      "afterCorrectRank": 1,
+      "rankingContractPreserved": true,
+      "state": "EVIDENCE_FOUND",
+      "results": [
+        {
+          "rank": 1,
+          "chunkId": 96,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 2,
+          "evidenceChunkId": 96,
+          "evidenceSourceIndex": 2,
+          "score": 0.6533303674066047,
+          "distance": 0.34666963259339534,
+          "snippet": "Redis 후보 중복 [501 / 501 / 502 / 502] 팀방별 DB 조회 1회 / 매칭 결과 저장 1회"
+        },
+        {
+          "rank": 2,
+          "chunkId": 88,
+          "documentId": 15,
+          "documentVersionId": 15,
+          "documentTitle": "정재민 신입 백엔드 이력서",
+          "sourceIndex": 1,
+          "evidenceChunkId": 88,
+          "evidenceSourceIndex": 1,
+          "score": 0.6631269454956243,
+          "distance": 0.33687305450437566,
+          "snippet": "Redis는 후보 탐색으로 제한하고 최종 확정은 DB row lock과 unique constraint로 검증하도록 변경.\n4,400회 동시성 검증에서 성공 800건 / 예상 차단 3,600건 / 중복 저장 0건 확인."
+        }
+      ]
+    },
+    {
+      "id": "B14",
+      "group": "regression",
+      "query": "스프레드시트에서 기존 데이터만 골라 갱신한 적 있어?",
+      "beforeCorrectRank": 1,
+      "afterCorrectRank": 1,
+      "rankingContractPreserved": true,
+      "state": "EVIDENCE_FOUND",
+      "results": [
+        {
+          "rank": 1,
+          "chunkId": 102,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 4,
+          "evidenceChunkId": 102,
+          "evidenceSourceIndex": 4,
+          "score": 0.5162940660224705,
+          "distance": 0.4837059339775295,
+          "snippet": "엑셀 업로드 관광지 ID 기준으로 한 번에 조회한 뒤 메모리에서 매칭해 DB에 존재하는 관광지만 갱신하고 미존재 항목은 제외 건수로"
+        }
+      ]
+    },
+    {
+      "id": "C08",
+      "group": "regression",
+      "query": "후보 상태가 바뀌었는지 확정 직전에 다시 확인한 경험은?",
+      "beforeCorrectRank": 1,
+      "afterCorrectRank": 1,
+      "rankingContractPreserved": true,
+      "state": "EVIDENCE_FOUND",
+      "results": [
+        {
+          "rank": 1,
+          "chunkId": 95,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 2,
+          "evidenceChunkId": 95,
+          "evidenceSourceIndex": 2,
+          "score": 0.5272624839418741,
+          "distance": 0.47273751605812586,
+          "snippet": " Redis는 빠른 후보 탐색에 사용하고 데이터 정합성의 최종 기준은 DB 트랜잭션과 제약 조건으로 두었습니다.\n 후보 확정 직전에 DB row lock으로 후보 팀방 row를 선점하고 대기 중 상태를 다시 확인한 뒤에만 매칭을 확정했습니다."
+        },
+        {
+          "rank": 2,
+          "chunkId": 88,
+          "documentId": 15,
+          "documentVersionId": 15,
+          "documentTitle": "정재민 신입 백엔드 이력서",
+          "sourceIndex": 1,
+          "evidenceChunkId": 88,
+          "evidenceSourceIndex": 1,
+          "score": 0.5405326437315212,
+          "distance": 0.4594673562684788,
+          "snippet": "누적 사용자 1천여 명의 교내 친구찾기 서비스에서 매칭 확정 정합성부터 알림 발송 실패 격리와 그룹 채팅 읽음 상태 동기화 개선."
+        },
+        {
+          "rank": 3,
+          "chunkId": 104,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 5,
+          "evidenceChunkId": 95,
+          "evidenceSourceIndex": 2,
+          "score": 0.501275554641503,
+          "distance": 0.498724445358497,
+          "snippet": " Redis는 빠른 후보 탐색에 사용하고 데이터 정합성의 최종 기준은 DB 트랜잭션과 제약 조건으로 두었습니다.\n 후보 확정 직전에 DB row lock으로 후보 팀방 row를 선점하고 대기 중 상태를 다시 확인한 뒤에만 매칭을 확정했습니다."
+        },
+        {
+          "rank": 4,
+          "chunkId": 93,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 1,
+          "evidenceChunkId": 95,
+          "evidenceSourceIndex": 2,
+          "score": 0.5063133828266438,
+          "distance": 0.49368661717335616,
+          "snippet": " Redis는 빠른 후보 탐색에 사용하고 데이터 정합성의 최종 기준은 DB 트랜잭션과 제약 조건으로 두었습니다.\n 후보 확정 직전에 DB row lock으로 후보 팀방 row를 선점하고 대기 중 상태를 다시 확인한 뒤에만 매칭을 확정했습니다."
+        }
+      ]
+    },
+    {
+      "id": "A04",
+      "group": "regression",
+      "query": "Docker Compose 배포 경험",
+      "beforeCorrectRank": 1,
+      "afterCorrectRank": 1,
+      "rankingContractPreserved": true,
+      "state": "EVIDENCE_FOUND",
+      "results": [
+        {
+          "rank": 1,
+          "chunkId": 91,
+          "documentId": 15,
+          "documentVersionId": 15,
+          "documentTitle": "정재민 신입 백엔드 이력서",
+          "sourceIndex": 2,
+          "evidenceChunkId": 91,
+          "evidenceSourceIndex": 2,
+          "score": 0.5903222266707137,
+          "distance": 0.40967777332928634,
+          "snippet": "서버 재시작이나 배포 시 Spring Boot / MySQL / Redis를 각각 관리해야 하는 운영 부담 확인.\n배포 환경 구축을 담당해 GCP Ubuntu 서버에서 Docker Compose로 세 서비스를 함께 실행하도록 구성.\n도메인 연결과 Nginx 리버스 프록시 및 HTTPS 설정을 적용하고 업로드 파일은 Nginx가 직접 서빙하도록 분리."
+        },
+        {
+          "rank": 2,
+          "chunkId": 88,
+          "documentId": 15,
+          "documentVersionId": 15,
+          "documentTitle": "정재민 신입 백엔드 이력서",
+          "sourceIndex": 1,
+          "evidenceChunkId": 88,
+          "evidenceSourceIndex": 1,
+          "score": 0.5109002538203128,
+          "distance": 0.4890997461796872,
+          "snippet": "누적 사용자 1천여 명의 교내 친구찾기 서비스에서 매칭 확정 정합성부터 알림 발송 실패 격리와 그룹 채팅 읽음 상태 동기화 개선."
+        }
+      ]
+    },
+    {
+      "id": "E04",
+      "group": "regression",
+      "query": "GCP에서 Docker Compose와 Nginx로 Spring Boot 서비스를 배포한 경험은?",
+      "beforeCorrectRank": 1,
+      "afterCorrectRank": 1,
+      "rankingContractPreserved": true,
+      "state": "EVIDENCE_FOUND",
+      "results": [
+        {
+          "rank": 1,
+          "chunkId": 91,
+          "documentId": 15,
+          "documentVersionId": 15,
+          "documentTitle": "정재민 신입 백엔드 이력서",
+          "sourceIndex": 2,
+          "evidenceChunkId": 91,
+          "evidenceSourceIndex": 2,
+          "score": 0.64930036395178,
+          "distance": 0.35069963604821996,
+          "snippet": "서버 재시작이나 배포 시 Spring Boot / MySQL / Redis를 각각 관리해야 하는 운영 부담 확인.\n배포 환경 구축을 담당해 GCP Ubuntu 서버에서 Docker Compose로 세 서비스를 함께 실행하도록 구성.\n도메인 연결과 Nginx 리버스 프록시 및 HTTPS 설정을 적용하고 업로드 파일은 Nginx가 직접 서빙하도록 분리."
+        },
+        {
+          "rank": 2,
+          "chunkId": 88,
+          "documentId": 15,
+          "documentVersionId": 15,
+          "documentTitle": "정재민 신입 백엔드 이력서",
+          "sourceIndex": 1,
+          "evidenceChunkId": 88,
+          "evidenceSourceIndex": 1,
+          "score": 0.5060777944094564,
+          "distance": 0.49392220559054356,
+          "snippet": "누적 사용자 1천여 명의 교내 친구찾기 서비스에서 매칭 확정 정합성부터 알림 발송 실패 격리와 그룹 채팅 읽음 상태 동기화 개선."
+        }
+      ]
+    },
+    {
+      "id": "D05",
+      "group": "regression",
+      "query": "19분 22초에서 11초",
+      "beforeCorrectRank": 1,
+      "afterCorrectRank": 1,
+      "rankingContractPreserved": true,
+      "state": "EVIDENCE_FOUND",
+      "results": [
+        {
+          "rank": 1,
+          "chunkId": 94,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 1,
+          "evidenceChunkId": 103,
+          "evidenceSourceIndex": 5,
+          "score": 0.507203385877923,
+          "distance": 0.492796614122077,
+          "snippet": "1,252건 약 19분 22초 → 약 11초"
+        }
+      ]
+    },
+    {
+      "id": "E06",
+      "group": "regression",
+      "query": "row lock과 unique constraint로 중복 매칭을 차단한 결과는?",
+      "beforeCorrectRank": 1,
+      "afterCorrectRank": 1,
+      "rankingContractPreserved": true,
+      "state": "EVIDENCE_FOUND",
+      "results": [
+        {
+          "rank": 1,
+          "chunkId": 96,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 2,
+          "evidenceChunkId": 96,
+          "evidenceSourceIndex": 2,
+          "score": 0.6406947131784525,
+          "distance": 0.3593052868215475,
+          "snippet": "매칭 결과 조합 작업자 2/5/10/30 / 1,100회 저장 200 / 중복 차단 900 / 예상 밖 예외 0건\n최종 그룹방 조합 작업자 2/5/10/30 / 1,100회 저장 200 / 중복 차단 900 / 예상 밖 예외 0건\n최종 그룹방 결과 ID 작업자 2/5/10/30 / 1,100회 저장 200 / 중복 차단 900 / 예상 밖 예외 0건"
+        },
+        {
+          "rank": 2,
+          "chunkId": 99,
+          "documentId": 16,
+          "documentVersionId": 16,
+          "documentTitle": "정재민 백엔드 포트폴리오",
+          "sourceIndex": 3,
+          "evidenceChunkId": 99,
+          "evidenceSourceIndex": 3,
+          "score": 0.5493284837412994,
+          "distance": 0.4506715162587006,
+          "snippet": " Outbox는 알림 ID와 디바이스 ID 조합에 unique constraint를 적용해 같은 알림의 중복 발송 이벤트를 차단했습니다.\n 상태를 대기 / 처리 중 / 발송 완료 / 최종 실패 / 발송 제외로 나누어 장애 시점과 후속 조치를 데이터로 추적했습니다.\n Worker는 처리 대상 이벤트를 FOR UPDATE SKIP LOCKED로 조회해 여러 Worker가 동시에 실행되어도 같은 이벤트를 중복 처리하지\n않도록 했습니다."
+        }
+      ]
+    }
+  ],
+  "guards": [
+    {
+      "group": "numeric",
+      "query": "4,400회 테스트",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "numeric",
+      "query": "675건 갱신",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "numeric",
+      "query": "2,329행 처리",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "numeric",
+      "query": "1,480건 선점",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "numeric",
+      "query": "1,654건 제외",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "group": "near-miss",
+      "query": "4,401회 테스트",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "near-miss",
+      "query": "676건 갱신",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "near-miss",
+      "query": "2,330행 처리",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "GraphQL API 구현 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "Kubernetes 운영 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "Kafka 운영 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "결제 시스템 구현 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "AWS Lambda 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "Elasticsearch 운영 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "MongoDB 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "Terraform 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "Jenkins 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "RabbitMQ 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "group": "strong-negative",
+      "query": "gRPC 경험",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    }
+  ]
+}

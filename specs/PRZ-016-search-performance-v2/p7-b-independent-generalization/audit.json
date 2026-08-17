@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-B",
+  "auditedAt": "2026-08-16T10:20:08.2552100Z",
+  "preRunGate": "PASS",
+  "postRunFrozen": {
+    "v2AssetCount": 31,
+    "v2Mismatches": [],
+    "corpusActual": "fef6cb0b38fea658b03dfd06a43212acb84b57922acec764c49a5032fd795498",
+    "corpusExpected": "fef6cb0b38fea658b03dfd06a43212acb84b57922acec764c49a5032fd795498",
+    "questionsActual": "85c2e41bba5c293ca5172b48f77f41587d49be996252479ce5a71ed17763b868",
+    "questionsExpected": "85c2e41bba5c293ca5172b48f77f41587d49be996252479ce5a71ed17763b868",
+    "groundTruthActual": "fd7525da3a00df4d7eccf42022b54a63cb2571be9f20111d2d6de740aa5f9680",
+    "groundTruthExpected": "fd7525da3a00df4d7eccf42022b54a63cb2571be9f20111d2d6de740aa5f9680",
+    "v1ManifestActual": "0b46f12562050c58c6d7ccefe940378a5c42550192d0f35dffc7e2599eae3b79",
+    "v1ManifestExpected": "0b46f12562050c58c6d7ccefe940378a5c42550192d0f35dffc7e2599eae3b79",
+    "v1AssetCount": 27,
+    "v1Mismatches": []
+  },
+  "productionSearch": {
+    "fileCount": 30,
+    "before": "32d8e31d7f5eeb3bf64033ce2b9db7c58347cbfe3d6f540b792e44c04951df31",
+    "after": "32d8e31d7f5eeb3bf64033ce2b9db7c58347cbfe3d6f540b792e44c04951df31",
+    "changed": false,
+    "workingTreeEntries": []
+  },
+  "raw": {
+    "actualSha256": "defc5e35dbf26f48a640f3df673e2247c14437b0cb65e8c8c05a0bd3b6e2cb2e",
+    "frozenSha256": "defc5e35dbf26f48a640f3df673e2247c14437b0cb65e8c8c05a0bd3b6e2cb2e",
+    "unchanged": true,
+    "bytes": 225850,
+    "queryCount": 48
+  },
+  "artifacts": {
+    "runContractSha256": "11feadf5410eacb8275b718678d3bf4fb7badad0ab622a0781f01e70fdfcab81",
+    "rawFreezeSha256": "f95840376d2133b350706ca66f22b5c1f61738f312692acb4d37a6253739fa5e",
+    "evaluatedResultsSha256": "a1b85aafcf516c2370724e7a7c311619da4692269e2b0971f54da88b9de696b8",
+    "orchestrationScriptSha256": "db774737912f22e1ed322bc2a26942831ab10fb3887a99a543777a23551b22fd",
+    "composeOverrideSha256": "39d43a4371175c844810da24ccc8327af1fce6b7fc49c3590f12fdc5f2f90aa3",
+    "tempEnvSha256": "5a29e706c17fd8ca3807caa3f4b789c79046707c8691c9e202d5c73cd576539b"
+  },
+  "cleanup": {
+    "dockerProject": "prizm-p7b-20260816",
+    "remainingContainers": 0,
+    "removedVolumes": [
+      "prizm-p7b-20260816_prizm-postgres-data",
+      "prizm-p7b-20260816_prizm-runtime-data"
+    ],
+    "remainingVolumes": 0,
+    "temporaryDirectoryRemoved": true
+  },
+  "git": {
+    "diffCheck": "PASS",
+    "frozenTrackedDiff": [],
+    "head": "4a5c5b6bbd3cfd06f1313dee09e6695fdd68179e",
+    "branch": "PRZ-016-search-performance-v2"
+  }
+}

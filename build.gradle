@@ -119,6 +119,61 @@ tasks.register('searchEvaluation', Test) {
     }
 }
 
+tasks.register('p6ShadowBenchmark', Test) {
+    description = 'Runs the PRZ-016 P6 external-corpus retrieval shadow benchmark.'
+    group = 'verification'
+    testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
+    classpath = sourceSets.searchEvaluation.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching 'com.prizm.search.evaluation.P6ShadowBenchmarkTest'
+    }
+    outputs.upToDateWhen { false }
+    systemProperty 'prizm.p6.output-dir',
+            providers.gradleProperty('p6Output')
+                    .getOrElse('specs/PRZ-016-search-performance-v2/p6-retrieval-shadow')
+    systemProperty 'prizm.p6.phase',
+            providers.gradleProperty('p6Phase').getOrElse('B')
+
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+tasks.register('p6FreezeIdentifierStressSet', Test) {
+    description = 'Validates and freezes the PRZ-016 P6 identifier stress set before H2.'
+    group = 'verification'
+    testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
+    classpath = sourceSets.searchEvaluation.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching 'com.prizm.search.evaluation.P6StressSetFreezeTest'
+    }
+    outputs.upToDateWhen { false }
+    systemProperty 'prizm.p6.output-dir',
+            providers.gradleProperty('p6Output')
+                    .getOrElse('specs/PRZ-016-search-performance-v2/p6-retrieval-shadow')
+}
+
+tasks.register('gptEvidenceJudgeShadow', Test) {
+    description = 'Runs the PRZ-016 GPT-J1 P5 evidence-judge shadow comparison.'
+    group = 'verification'
+    testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
+    classpath = sourceSets.searchEvaluation.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching 'com.prizm.search.evaluation.GptEvidenceJudgeShadowBenchmarkTest'
+    }
+    outputs.upToDateWhen { false }
+    systemProperty 'prizm.gpt-evidence-judge.output',
+            providers.gradleProperty('gptJudgeOutput')
+                    .getOrElse('local/gpt-evidence-judge/results.json')
+
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
 tasks.named('check') {
     dependsOn tasks.named('integrationTest')
 }

@@ -1,0 +1,4137 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-B-RESULT-LEVEL-EVIDENCE-SET-JUDGE-INPUT",
+  "datasetRole": "SHADOW_INFERENCE_INPUT_NO_GROUND_TRUTH",
+  "sourceCandidatePairsSha256": "e2c7538a86411075c929c09651823e72c458126fac75921b03761b15b162c1c5",
+  "sourceClaimAwareCandidatesSha256": "5ad9fd999e67f236c8480339786de1b6f0d8ef4bd6cb478da815f945c20dbacb",
+  "results": [
+    {
+      "id": "V2-U01-D02#r1",
+      "queryId": "V2-U01-D02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 8,
+        "documentId": 2,
+        "documentVersionId": 3,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "919bcc869eb61dee7f3d449c6797cc49e56c895f3283238a8d0b3599c2583531",
+        "score": 0.5477674432632881,
+        "distance": 0.4522325567367119
+      },
+      "hypothesis": "단가 규칙이 바뀐 과정을 SQL Server에서 시점별로 추적하도록 구현했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-D02#r1#w1",
+          "candidateRank": 1,
+          "text": "• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-D02#r1#w2",
+          "candidateRank": 2,
+          "text": "• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리\n• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-D02#r1#w3",
+          "candidateRank": 3,
+          "text": "• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존\nOperational outcome"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-D02#r1#w4",
+          "candidateRank": 4,
+          "text": "• depot code와 material class subscription filter로 거점·자재별 worker 격리\n• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리\n• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-D02#r1#w5",
+          "candidateRank": 5,
+          "text": "• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리\n• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존\nOperational outcome"
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-D02#r2",
+      "queryId": "V2-U01-D02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 13,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "c9deef88081ca2edcb4ba97349adc70ad1434462fe0c3a941ab8bc53e5f0defe",
+        "score": 0.5101936143290575,
+        "distance": 0.4898063856709425
+      },
+      "hypothesis": "단가 규칙이 바뀐 과정을 SQL Server에서 시점별로 추적하도록 구현했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-D02#r2#w1",
+          "candidateRank": 1,
+          "text": "가격 규칙은 사람이 승인한 테이블이었다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-D02#r2#w2",
+          "candidateRank": 2,
+          "text": "동적 가격을 추천하는 머신러닝 모델은 아이디어 회의만 있었고 설계·구현하지 않았다.\n가격 규칙은 사람이 승인한 테이블이었다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-D02#r2#w3",
+          "candidateRank": 3,
+          "text": "가격 규칙은 사람이 승인한 테이블이었다.\n모바일 운전기사 앱도 다른 팀이 담당했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-D02#r2#w4",
+          "candidateRank": 4,
+          "text": "범위]\n동적 가격을 추천하는 머신러닝 모델은 아이디어 회의만 있었고 설계·구현하지 않았다.\n가격 규칙은 사람이 승인한 테이블이었다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-D02#r2#w5",
+          "candidateRank": 5,
+          "text": "동적 가격을 추천하는 머신러닝 모델은 아이디어 회의만 있었고 설계·구현하지 않았다.\n가격 규칙은 사람이 승인한 테이블이었다.\n모바일 운전기사 앱도 다른 팀이 담당했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-NV01#r1",
+      "queryId": "V2-U01-NV01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 12,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "a279b9930a02d898d7c4df790104968b8361aa6fdeb9d80173a52e9b40dfcc67",
+        "score": 0.5910116921649388,
+        "distance": 0.40898830783506124
+      },
+      "hypothesis": "현장 계근기가 연결을 되찾은 뒤 완료 신호를 거듭 보내도 전표가 늘어나지 않게 했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-NV01#r1#w1",
+          "candidateRank": 1,
+          "text": "lace PubSub+도 후보로 비교했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-NV01#r1#w2",
+          "candidateRank": 2,
+          "text": "transaction이 끝난 뒤 같은 callback이 다시 도착하면 이미 처리된 inbox row를 확인하고 성공 응답만 반환했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-NV01#r1#w3",
+          "candidateRank": 3,
+          "text": "lace PubSub+도 후보로 비교했다.\n다만 운영 인력의 진단 경험, 기존 Azure 관측 도구, 전환 비용을 종합해 실험 문서만 남기고 도입하지 않았다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-NV01#r1#w4",
+          "candidateRank": 4,
+          "text": "consumer는 이 값을 owner 거점과 함께 inbox table의 unique key로 저장한 뒤에만 shipment 상태를 바꿨다.\ntransaction이 끝난 뒤 같은 callback이 다시 도착하면 이미 처리된 inbox row를 확인하고 성공 응답만 반환했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-NV01#r1#w5",
+          "candidateRank": 5,
+          "text": "transaction이 끝난 뒤 같은 callback이 다시 도착하면 이미 처리된 inbox row를 확인하고 성공 응답만 반환했다.\n단순 메모리 캐시가 아니라 SQL Server transaction을 최종 기준으로 삼았기 때문에 worker 재시작 뒤에도 중복을 막을 수 있었다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-NV01#r2",
+      "queryId": "V2-U01-NV01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 11,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "9953ca9ccd00346d9409c8b84f4ed7be372500b6a4344dbc99d4526698f76e3e",
+        "score": 0.574446882340507,
+        "distance": 0.425553117659493
+      },
+      "hypothesis": "현장 계근기가 연결을 되찾은 뒤 완료 신호를 거듭 보내도 전표가 늘어나지 않게 했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-NV01#r2#w1",
+          "candidateRank": 1,
+          "text": "연간 처리량은 약 3,200,000개 전표였다.\n주문 API 자체보다 어려운 부분은 현장 장비였다.\n일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-NV01#r2#w2",
+          "candidateRank": 2,
+          "text": "주문 API 자체보다 어려운 부분은 현장 장비였다.\n일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다.\n같은 전표가 두 번 확정되면 재고와 운임 정산이 함께 어긋났다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-NV01#r2#w3",
+          "candidateRank": 3,
+          "text": "주문 API 자체보다 어려운 부분은 현장 장비였다.\n일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-NV01#r2#w4",
+          "candidateRank": 4,
+          "text": "일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다.\n같은 전표가 두 번 확정되면 재고와 운임 정산이 함께 어긋났다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-NV01#r2#w5",
+          "candidateRank": 5,
+          "text": "일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다.\n같은 전표가 두 번 확정되면 재고와 운임 정산이 함께 어긋났다.\n[02."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-NV01#r3",
+      "queryId": "V2-U01-NV01",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 13,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "c9deef88081ca2edcb4ba97349adc70ad1434462fe0c3a941ab8bc53e5f0defe",
+        "score": 0.5609108922151063,
+        "distance": 0.43908910778489374
+      },
+      "hypothesis": "현장 계근기가 연결을 되찾은 뒤 완료 신호를 거듭 보내도 전표가 늘어나지 않게 했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-NV01#r3#w1",
+          "candidateRank": 1,
+          "text": "별도 KilnWatch 프로젝트에서는 MQTT로 11,000개 소성로 센서 신호를 받고 InfluxDB에 보관했다.\n이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-NV01#r3#w2",
+          "candidateRank": 2,
+          "text": "주변 경험]\n별도 KilnWatch 프로젝트에서는 MQTT로 11,000개 소성로 센서 신호를 받고 InfluxDB에 보관했다.\n이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-NV01#r3#w3",
+          "candidateRank": 3,
+          "text": "별도 KilnWatch 프로젝트에서는 MQTT로 11,000개 소성로 센서 신호를 받고 InfluxDB에 보관했다.\n이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다.\n두 프로젝트를 하나의 성과로 합치지 않는다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-NV01#r3#w4",
+          "candidateRank": 4,
+          "text": "별도 KilnWatch 프로젝트에서는 MQTT로 11,000개 소성로 센서 신호를 받고 InfluxDB에 보관했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-NV01#r3#w5",
+          "candidateRank": 5,
+          "text": "실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했다.\n이 경계 덕분에 정확하지 않은 값을 최종 전표로 저장하지 않으면서도 배차 상담은 계속할 수 있었다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-NV01#r4",
+      "queryId": "V2-U01-NV01",
+      "originalRank": 4,
+      "resultIdentity": {
+        "chunkId": 7,
+        "documentId": 2,
+        "documentVersionId": 3,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "c5e24b287ab84997750347a8c2ec121e6e499e620edb075a90beadad7c397c06",
+        "score": 0.5304461085264591,
+        "distance": 0.4695538914735409
+      },
+      "hypothesis": "현장 계근기가 연결을 되찾은 뒤 완료 신호를 거듭 보내도 전표가 늘어나지 않게 했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-NV01#r4#w1",
+          "candidateRank": 1,
+          "text": "골재·아스콘 주문을 출하 거점에 배정하고 계근 완료 중량을 운송 전표로 확정하는 서비스의 API와 비동기 처리 경로를 담당했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-NV01#r4#w2",
+          "candidateRank": 2,
+          "text": "2023.04 - 2026.06 | QuarryFlow Dispatch\n골재·아스콘 주문을 출하 거점에 배정하고 계근 완료 중량을 운송 전표로 확정하는 서비스의 API와 비동기 처리 경로를 담당했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-NV01#r4#w3",
+          "candidateRank": 3,
+          "text": "골재·아스콘 주문을 출하 거점에 배정하고 계근 완료 중량을 운송 전표로 확정하는 서비스의 API와 비동기 처리 경로를 담당했다.\n5명 팀에서 장비 연동 contract, SQL transaction 경계, 운영 replay 절차를 설계했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-NV01#r4#w4",
+          "candidateRank": 4,
+          "text": "Synthetic Aggregates Platform · Backend Engineer\n2023.04 - 2026.06 | QuarryFlow Dispatch\n골재·아스콘 주문을 출하 거점에 배정하고 계근 완료 중량을 운송 전표로 확정하는 서비스의 API와 비동기 처리 경로를 담당했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-NV01#r4#w5",
+          "candidateRank": 5,
+          "text": "2023.04 - 2026.06 | QuarryFlow Dispatch\n골재·아스콘 주문을 출하 거점에 배정하고 계근 완료 중량을 운송 전표로 확정하는 서비스의 API와 비동기 처리 경로를 담당했다.\n5명 팀에서 장비 연동 contract, SQL transaction 경계, 운영 replay 절차를 설계했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-NV02#r1",
+      "queryId": "V2-U01-NV02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 13,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "c9deef88081ca2edcb4ba97349adc70ad1434462fe0c3a941ab8bc53e5f0defe",
+        "score": 0.5466070660097481,
+        "distance": 0.45339293399025193
+      },
+      "hypothesis": "거점과 자재 종류에 따라 필요한 작업자만 배차 메시지를 받도록 나눴다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-NV02#r1#w1",
+          "candidateRank": 1,
+          "text": "가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다.\ntopic filter는 격리와 확장에 도움을 줬지만, 중복 방지의 근거는 source_ticket_id와 owner 거점이 결합된 DB 제약이었다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-NV02#r1#w2",
+          "candidateRank": 2,
+          "text": "회고]\n가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다.\ntopic filter는 격리와 확장에 도움을 줬지만, 중복 방지의 근거는 source_ticket_id와 owner 거점이 결합된 DB 제약이었다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-NV02#r1#w3",
+          "candidateRank": 3,
+          "text": "가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-NV02#r1#w4",
+          "candidateRank": 4,
+          "text": "회고]\n가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-NV02#r1#w5",
+          "candidateRank": 5,
+          "text": "[09.\n회고]\n가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-NV02#r2",
+      "queryId": "V2-U01-NV02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 8,
+        "documentId": 2,
+        "documentVersionId": 3,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "919bcc869eb61dee7f3d449c6797cc49e56c895f3283238a8d0b3599c2583531",
+        "score": 0.547112117422556,
+        "distance": 0.45288788257744395
+      },
+      "hypothesis": "거점과 자재 종류에 따라 필요한 작업자만 배차 메시지를 받도록 나눴다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-NV02#r2#w1",
+          "candidateRank": 1,
+          "text": "• depot code와 material class subscription filter로 거점·자재별 worker 격리"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-NV02#r2#w2",
+          "candidateRank": 2,
+          "text": "opic으로 분리\n• depot code와 material class subscription filter로 거점·자재별 worker 격리"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-NV02#r2#w3",
+          "candidateRank": 3,
+          "text": "• depot code와 material class subscription filter로 거점·자재별 worker 격리\n• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-NV02#r2#w4",
+          "candidateRank": 4,
+          "text": "opic으로 분리\n• depot code와 material class subscription filter로 거점·자재별 worker 격리\n• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-NV02#r2#w5",
+          "candidateRank": 5,
+          "text": "• depot code와 material class subscription filter로 거점·자재별 worker 격리\n• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리\n• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존"
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-IP01#r1",
+      "queryId": "V2-U01-IP01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 12,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "a279b9930a02d898d7c4df790104968b8361aa6fdeb9d80173a52e9b40dfcc67",
+        "score": 0.5905039526233729,
+        "distance": 0.40949604737662715
+      },
+      "hypothesis": "계근 제어기가 응답하지 않을 때 요청 스레드가 모두 묶이는 상황을 피했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-IP01#r1#w1",
+          "candidateRank": 1,
+          "text": "계근 제어기가 응답하지 않을 때 매 요청이 timeout까지 기다리면 API thread가 고갈됐다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-IP01#r1#w2",
+          "candidateRank": 2,
+          "text": "장비 장애 시 동작]\n계근 제어기가 응답하지 않을 때 매 요청이 timeout까지 기다리면 API thread가 고갈됐다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-IP01#r1#w3",
+          "candidateRank": 3,
+          "text": "계근 제어기가 응답하지 않을 때 매 요청이 timeout까지 기다리면 API thread가 고갈됐다.\n장비별 circuit breaker와 짧은 timeout을 적용하고, 최근 검증된 tare weight가 있는 경우에는 화면에 ‘임시 견적’임을 표시한 값을 돌려줬다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-IP01#r1#w4",
+          "candidateRank": 4,
+          "text": "[05.\n장비 장애 시 동작]\n계근 제어기가 응답하지 않을 때 매 요청이 timeout까지 기다리면 API thread가 고갈됐다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-IP01#r1#w5",
+          "candidateRank": 5,
+          "text": "장비 장애 시 동작]\n계근 제어기가 응답하지 않을 때 매 요청이 timeout까지 기다리면 API thread가 고갈됐다.\n장비별 circuit breaker와 짧은 timeout을 적용하고, 최근 검증된 tare weight가 있는 경우에는 화면에 ‘임시 견적’임을 표시한 값을 돌려줬다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-IP01#r2",
+      "queryId": "V2-U01-IP01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 11,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "9953ca9ccd00346d9409c8b84f4ed7be372500b6a4344dbc99d4526698f76e3e",
+        "score": 0.5274820707685051,
+        "distance": 0.47251792923149494
+      },
+      "hypothesis": "계근 제어기가 응답하지 않을 때 요청 스레드가 모두 묶이는 상황을 피했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-IP01#r2#w1",
+          "candidateRank": 1,
+          "text": "일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-IP01#r2#w2",
+          "candidateRank": 2,
+          "text": "주문 API 자체보다 어려운 부분은 현장 장비였다.\n일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-IP01#r2#w3",
+          "candidateRank": 3,
+          "text": "일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다.\n같은 전표가 두 번 확정되면 재고와 운임 정산이 함께 어긋났다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-IP01#r2#w4",
+          "candidateRank": 4,
+          "text": "연간 처리량은 약 3,200,000개 전표였다.\n주문 API 자체보다 어려운 부분은 현장 장비였다.\n일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-IP01#r2#w5",
+          "candidateRank": 5,
+          "text": "주문 API 자체보다 어려운 부분은 현장 장비였다.\n일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다.\n같은 전표가 두 번 확정되면 재고와 운임 정산이 함께 어긋났다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-IP01#r3",
+      "queryId": "V2-U01-IP01",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 13,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "c9deef88081ca2edcb4ba97349adc70ad1434462fe0c3a941ab8bc53e5f0defe",
+        "score": 0.511814028728889,
+        "distance": 0.48818597127111096
+      },
+      "hypothesis": "계근 제어기가 응답하지 않을 때 요청 스레드가 모두 묶이는 상황을 피했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-IP01#r3#w1",
+          "candidateRank": 1,
+          "text": "이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-IP01#r3#w2",
+          "candidateRank": 2,
+          "text": "별도 KilnWatch 프로젝트에서는 MQTT로 11,000개 소성로 센서 신호를 받고 InfluxDB에 보관했다.\n이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-IP01#r3#w3",
+          "candidateRank": 3,
+          "text": "이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다.\n두 프로젝트를 하나의 성과로 합치지 않는다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-IP01#r3#w4",
+          "candidateRank": 4,
+          "text": "주변 경험]\n별도 KilnWatch 프로젝트에서는 MQTT로 11,000개 소성로 센서 신호를 받고 InfluxDB에 보관했다.\n이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-IP01#r3#w5",
+          "candidateRank": 5,
+          "text": "별도 KilnWatch 프로젝트에서는 MQTT로 11,000개 소성로 센서 신호를 받고 InfluxDB에 보관했다.\n이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다.\n두 프로젝트를 하나의 성과로 합치지 않는다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-IP01#r4",
+      "queryId": "V2-U01-IP01",
+      "originalRank": 4,
+      "resultIdentity": {
+        "chunkId": 8,
+        "documentId": 2,
+        "documentVersionId": 3,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "919bcc869eb61dee7f3d449c6797cc49e56c895f3283238a8d0b3599c2583531",
+        "score": 0.5245580047896834,
+        "distance": 0.4754419952103166
+      },
+      "hypothesis": "계근 제어기가 응답하지 않을 때 요청 스레드가 모두 묶이는 상황을 피했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-IP01#r4#w1",
+          "candidateRank": 1,
+          "text": "opic으로 분리"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-IP01#r4#w2",
+          "candidateRank": 2,
+          "text": "• depot code와 material class subscription filter로 거점·자재별 worker 격리"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-IP01#r4#w3",
+          "candidateRank": 3,
+          "text": "• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-IP01#r4#w4",
+          "candidateRank": 4,
+          "text": "• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-IP01#r4#w5",
+          "candidateRank": 5,
+          "text": "Operational outcome"
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-IP02#r1",
+      "queryId": "V2-U01-IP02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 8,
+        "documentId": 2,
+        "documentVersionId": 3,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "919bcc869eb61dee7f3d449c6797cc49e56c895f3283238a8d0b3599c2583531",
+        "score": 0.6213877814351347,
+        "distance": 0.37861221856486527
+      },
+      "hypothesis": "사흘 동안 밀린 현장 callback을 DB 수작업 없이 안전하게 복구했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-IP02#r1#w1",
+          "candidateRank": 1,
+          "text": "72시간 장비 단절을 모사한 46,200개 callback 재생에서는\nduplicate shipment가 0건이었고 운영 DB row를 수동 수정하지 않았다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-IP02#r1#w2",
+          "candidateRank": 2,
+          "text": "동일 부하 replay에서 견적 API P95를 1.4초에서 380밀리초로 낮췄다.\n72시간 장비 단절을 모사한 46,200개 callback 재생에서는\nduplicate shipment가 0건이었고 운영 DB row를 수동 수정하지 않았다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-IP02#r1#w3",
+          "candidateRank": 3,
+          "text": "72시간 장비 단절을 모사한 46,200개 callback 재생에서는\nduplicate shipment가 0건이었고 운영 DB row를 수동 수정하지 않았다.\n• 장비별 circuit breaker와 짧은 timeout으로 thread 고갈 방지"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-IP02#r1#w4",
+          "candidateRank": 4,
+          "text": "현장 운영자와 callback 식별자의 수명, 재전송 조건, 수동 정정 절차를 먼저 문서화했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-IP02#r1#w5",
+          "candidateRank": 5,
+          "text": "협업과 책임 경계\n현장 운영자와 callback 식별자의 수명, 재전송 조건, 수동 정정 절차를 먼저 문서화했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-IP02#r2",
+      "queryId": "V2-U01-IP02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 13,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "c9deef88081ca2edcb4ba97349adc70ad1434462fe0c3a941ab8bc53e5f0defe",
+        "score": 0.5831078341281919,
+        "distance": 0.4168921658718081
+      },
+      "hypothesis": "사흘 동안 밀린 현장 callback을 DB 수작업 없이 안전하게 복구했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-IP02#r2#w1",
+          "candidateRank": 1,
+          "text": "72시간 통신 단절을 모사해 46,200개 callback을 순서를 섞어 재생했다.\ninbox key 검증 결과 중복 shipment 생성은 0건이었다.\n운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-IP02#r2#w2",
+          "candidateRank": 2,
+          "text": "실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-IP02#r2#w3",
+          "candidateRank": 3,
+          "text": "72시간 통신 단절을 모사해 46,200개 callback을 순서를 섞어 재생했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-IP02#r2#w4",
+          "candidateRank": 4,
+          "text": "er와 짧은 timeout을 적용하고, 최근 검증된 tare weight가 있는 경우에는 화면에 ‘임시 견적’임을 표시한 값을 돌려줬다.\n실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-IP02#r2#w5",
+          "candidateRank": 5,
+          "text": "실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했다.\n이 경계 덕분에 정확하지 않은 값을 최종 전표로 저장하지 않으면서도 배차 상담은 계속할 수 있었다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-IP02#r3",
+      "queryId": "V2-U01-IP02",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 12,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "a279b9930a02d898d7c4df790104968b8361aa6fdeb9d80173a52e9b40dfcc67",
+        "score": 0.5514177618720855,
+        "distance": 0.44858223812791453
+      },
+      "hypothesis": "사흘 동안 밀린 현장 callback을 DB 수작업 없이 안전하게 복구했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-IP02#r3#w1",
+          "candidateRank": 1,
+          "text": "계근 callback에는 장비가 생성한 source_ticket_id가 있었다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-IP02#r3#w2",
+          "candidateRank": 2,
+          "text": "transaction이 끝난 뒤 같은 callback이 다시 도착하면 이미 처리된 inbox row를 확인하고 성공 응답만 반환했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-IP02#r3#w3",
+          "candidateRank": 3,
+          "text": "실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-IP02#r3#w4",
+          "candidateRank": 4,
+          "text": "중복 전표 방지]\n계근 callback에는 장비가 생성한 source_ticket_id가 있었다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-IP02#r3#w5",
+          "candidateRank": 5,
+          "text": "계근 callback에는 장비가 생성한 source_ticket_id가 있었다.\nconsumer는 이 값을 owner 거점과 함께 inbox table의 unique key로 저장한 뒤에만 shipment 상태를 바꿨다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-IP02#r4",
+      "queryId": "V2-U01-IP02",
+      "originalRank": 4,
+      "resultIdentity": {
+        "chunkId": 11,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "9953ca9ccd00346d9409c8b84f4ed7be372500b6a4344dbc99d4526698f76e3e",
+        "score": 0.5098749095276134,
+        "distance": 0.4901250904723866
+      },
+      "hypothesis": "사흘 동안 밀린 현장 callback을 DB 수작업 없이 안전하게 복구했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-IP02#r4#w1",
+          "candidateRank": 1,
+          "text": "주문 API 자체보다 어려운 부분은 현장 장비였다.\n일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-IP02#r4#w2",
+          "candidateRank": 2,
+          "text": "연간 처리량은 약 3,200,000개 전표였다.\n주문 API 자체보다 어려운 부분은 현장 장비였다.\n일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-IP02#r4#w3",
+          "candidateRank": 3,
+          "text": "주문 API 자체보다 어려운 부분은 현장 장비였다.\n일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다.\n같은 전표가 두 번 확정되면 재고와 운임 정산이 함께 어긋났다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-IP02#r4#w4",
+          "candidateRank": 4,
+          "text": "일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-IP02#r4#w5",
+          "candidateRank": 5,
+          "text": "계근 callback에는 장"
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-NI01#r1",
+      "queryId": "V2-U01-NI01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 8,
+        "documentId": 2,
+        "documentVersionId": 3,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "919bcc869eb61dee7f3d449c6797cc49e56c895f3283238a8d0b3599c2583531",
+        "score": 0.6135086607306417,
+        "distance": 0.3864913392693583
+      },
+      "hypothesis": "견적 API의 P95를 1.4초에서 380밀리초로 줄였다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-NI01#r1#w1",
+          "candidateRank": 1,
+          "text": "동일 부하 replay에서 견적 API P95를 1.4초에서 380밀리초로 낮췄다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-NI01#r1#w2",
+          "candidateRank": 2,
+          "text": "검증 조건을 분리해 기록\n동일 부하 replay에서 견적 API P95를 1.4초에서 380밀리초로 낮췄다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-NI01#r1#w3",
+          "candidateRank": 3,
+          "text": "동일 부하 replay에서 견적 API P95를 1.4초에서 380밀리초로 낮췄다.\n72시간 장비 단절을 모사한 46,200개 callback 재생에서는"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-NI01#r1#w4",
+          "candidateRank": 4,
+          "text": "Operational outcome\n검증 조건을 분리해 기록\n동일 부하 replay에서 견적 API P95를 1.4초에서 380밀리초로 낮췄다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-NI01#r1#w5",
+          "candidateRank": 5,
+          "text": "검증 조건을 분리해 기록\n동일 부하 replay에서 견적 API P95를 1.4초에서 380밀리초로 낮췄다.\n72시간 장비 단절을 모사한 46,200개 callback 재생에서는"
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-CN01#r1",
+      "queryId": "V2-U01-CN01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 13,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "c9deef88081ca2edcb4ba97349adc70ad1434462fe0c3a941ab8bc53e5f0defe",
+        "score": 0.5540323990486873,
+        "distance": 0.4459676009513127
+      },
+      "hypothesis": "메시지는 거점별로 격리하되 재전송의 최종 중복 판정은 데이터베이스가 맡도록 설계했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-CN01#r1#w1",
+          "candidateRank": 1,
+          "text": "inbox key 검증 결과 중복 shipment 생성은 0건이었다.\n운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-CN01#r1#w2",
+          "candidateRank": 2,
+          "text": "가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다.\ntopic filter는 격리와 확장에 도움을 줬지만, 중복 방지의 근거는 source_ticket_id와 owner 거점이 결합된 DB 제약이었다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-CN01#r1#w3",
+          "candidateRank": 3,
+          "text": "72시간 통신 단절을 모사해 46,200개 callback을 순서를 섞어 재생했다.\ninbox key 검증 결과 중복 shipment 생성은 0건이었다.\n운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-CN01#r1#w4",
+          "candidateRank": 4,
+          "text": "inbox key 검증 결과 중복 shipment 생성은 0건이었다.\n운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다.\n동일 부하 조건에서 견적 API P95는 1.4초에서 380밀리초로 줄었다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-CN01#r1#w5",
+          "candidateRank": 5,
+          "text": "회고]\n가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다.\ntopic filter는 격리와 확장에 도움을 줬지만, 중복 방지의 근거는 source_ticket_id와 owner 거점이 결합된 DB 제약이었다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-CN01#r2",
+      "queryId": "V2-U01-CN01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 8,
+        "documentId": 2,
+        "documentVersionId": 3,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "919bcc869eb61dee7f3d449c6797cc49e56c895f3283238a8d0b3599c2583531",
+        "score": 0.5406731173166823,
+        "distance": 0.45932688268331767
+      },
+      "hypothesis": "메시지는 거점별로 격리하되 재전송의 최종 중복 판정은 데이터베이스가 맡도록 설계했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-CN01#r2#w1",
+          "candidateRank": 1,
+          "text": "• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-CN01#r2#w2",
+          "candidateRank": 2,
+          "text": "• 거점별 처리량·거절 원인을 replay dashboard로 노출"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-CN01#r2#w3",
+          "candidateRank": 3,
+          "text": "현장 운영자와 callback 식별자의 수명, 재전송 조건, 수동 정정 절차를 먼저 문서화했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-CN01#r2#w4",
+          "candidateRank": 4,
+          "text": "• depot code와 material class subscription filter로 거점·자재별 worker 격리\n• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-CN01#r2#w5",
+          "candidateRank": 5,
+          "text": "• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리\n• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존"
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-CN01#r3",
+      "queryId": "V2-U01-CN01",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 11,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "9953ca9ccd00346d9409c8b84f4ed7be372500b6a4344dbc99d4526698f76e3e",
+        "score": 0.5393851673969613,
+        "distance": 0.4606148326030387
+      },
+      "hypothesis": "메시지는 거점별로 격리하되 재전송의 최종 중복 판정은 데이터베이스가 맡도록 설계했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-CN01#r3#w1",
+          "candidateRank": 1,
+          "text": "QuarryFlow Dispatch: 계근소 재전송과 자재 배차 정합성"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-CN01#r3#w2",
+          "candidateRank": 2,
+          "text": "이 방식으로 각 worker는 자신이 담당하는 거점·자재 메시지만 받았고, 새로운 거점 추가 때 API 배포가 필요하지 않았다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-CN01#r3#w3",
+          "candidateRank": 3,
+          "text": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U01\nQuarryFlow Dispatch: 계근소 재전송과 자재 배차 정합성"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-CN01#r3#w4",
+          "candidateRank": 4,
+          "text": "QuarryFlow Dispatch: 계근소 재전송과 자재 배차 정합성\n이 문서는 평가용 합성 사례다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-CN01#r3#w5",
+          "candidateRank": 5,
+          "text": "subscription filter는 depot code와 material class를 기준으로 구성했다.\n이 방식으로 각 worker는 자신이 담당하는 거점·자재 메시지만 받았고, 새로운 거점 추가 때 API 배포가 필요하지 않았다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-CN02#r1",
+      "queryId": "V2-U01-CN02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 8,
+        "documentId": 2,
+        "documentVersionId": 3,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "919bcc869eb61dee7f3d449c6797cc49e56c895f3283238a8d0b3599c2583531",
+        "score": 0.5279616894882063,
+        "distance": 0.4720383105117937
+      },
+      "hypothesis": "과거 가격을 재현할 수 있으면서도 이미 적용된 단가 이력은 고쳐 쓰지 않는 방식으로 운영했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-CN02#r1#w1",
+          "candidateRank": 1,
+          "text": "• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-CN02#r1#w2",
+          "candidateRank": 2,
+          "text": "• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리\n• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-CN02#r1#w3",
+          "candidateRank": 3,
+          "text": "• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존\nOperational outcome"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-CN02#r1#w4",
+          "candidateRank": 4,
+          "text": "• depot code와 material class subscription filter로 거점·자재별 worker 격리\n• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리\n• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-CN02#r1#w5",
+          "candidateRank": 5,
+          "text": "• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리\n• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존\nOperational outcome"
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-CN02#r2",
+      "queryId": "V2-U01-CN02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 12,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "a279b9930a02d898d7c4df790104968b8361aa6fdeb9d80173a52e9b40dfcc67",
+        "score": 0.5205328750292743,
+        "distance": 0.47946712497072574
+      },
+      "hypothesis": "과거 가격을 재현할 수 있으면서도 이미 적용된 단가 이력은 고쳐 쓰지 않는 방식으로 운영했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-CN02#r2#w1",
+          "candidateRank": 1,
+          "text": "운영자는 특정 전표가 만들어진 시점의 규칙을 재구성할 수 있었고, 잘못 배포된 단가표는 과거 row를 복사해 새 유효 구간으로 되돌렸다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-CN02#r2#w2",
+          "candidateRank": 2,
+          "text": "가격 규칙 감사]\n운임과 자재 단가는 적용 날짜, 고객 등급, 운송 거리로 결정됐다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-CN02#r2#w3",
+          "candidateRank": 3,
+          "text": "규칙 변경은 SQL Server system-versioned table에 남겼다.\n운영자는 특정 전표가 만들어진 시점의 규칙을 재구성할 수 있었고, 잘못 배포된 단가표는 과거 row를 복사해 새 유효 구간으로 되돌렸다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-CN02#r2#w4",
+          "candidateRank": 4,
+          "text": "운영자는 특정 전표가 만들어진 시점의 규칙을 재구성할 수 있었고, 잘못 배포된 단가표는 과거 row를 복사해 새 유효 구간으로 되돌렸다.\n과거 row 자체를 수정하지는 않았다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-CN02#r2#w5",
+          "candidateRank": 5,
+          "text": "[04.\n가격 규칙 감사]\n운임과 자재 단가는 적용 날짜, 고객 등급, 운송 거리로 결정됐다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-CN02#r3",
+      "queryId": "V2-U01-CN02",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 13,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "c9deef88081ca2edcb4ba97349adc70ad1434462fe0c3a941ab8bc53e5f0defe",
+        "score": 0.5170412022969277,
+        "distance": 0.48295879770307226
+      },
+      "hypothesis": "과거 가격을 재현할 수 있으면서도 이미 적용된 단가 이력은 고쳐 쓰지 않는 방식으로 운영했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-CN02#r3#w1",
+          "candidateRank": 1,
+          "text": "두 프로젝트를 하나의 성과로 합치지 않는다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-CN02#r3#w2",
+          "candidateRank": 2,
+          "text": "동적 가격을 추천하는 머신러닝 모델은 아이디어 회의만 있었고 설계·구현하지 않았다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-CN02#r3#w3",
+          "candidateRank": 3,
+          "text": "가격 규칙은 사람이 승인한 테이블이었다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-CN02#r3#w4",
+          "candidateRank": 4,
+          "text": "이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다.\n두 프로젝트를 하나의 성과로 합치지 않는다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-CN02#r3#w5",
+          "candidateRank": 5,
+          "text": "두 프로젝트를 하나의 성과로 합치지 않는다.\n[08."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-N01#r1",
+      "queryId": "V2-U01-N01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 11,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "9953ca9ccd00346d9409c8b84f4ed7be372500b6a4344dbc99d4526698f76e3e",
+        "score": 0.5314504541695659,
+        "distance": 0.46854954583043407
+      },
+      "hypothesis": "Solace PubSub+를 QuarryFlow의 실제 메시지 인프라로 전환했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-N01#r1#w1",
+          "candidateRank": 1,
+          "text": "이 방식으로 각 worker는 자신이 담당하는 거점·자재 메시지만 받았고, 새로운 거점 추가 때 API 배포가 필요하지 않았다.\nSolace PubSub+도 후보로 비교했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-N01#r1#w2",
+          "candidateRank": 2,
+          "text": "subscription filter는 depot code와 material class를 기준으로 구성했다.\n이 방식으로 각 worker는 자신이 담당하는 거점·자재 메시지만 받았고, 새로운 거점 추가 때 API 배포가 필요하지 않았다.\nSolace PubSub+도 후보로 비교했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-N01#r1#w3",
+          "candidateRank": 3,
+          "text": "이 방식으로 각 worker는 자신이 담당하는 거점·자재 메시지만 받았고, 새로운 거점 추가 때 API 배포가 필요하지 않았다.\nSolace PubSub+도 후보로 비교했다.\n다만 운영 인력의 진단 경험, 기존 Azure 관측 도구, 전환 비용을 종합해 실험 문서만 남기고 도입하지 않았다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-N01#r1#w4",
+          "candidateRank": 4,
+          "text": "Solace PubSub+도 후보로 비교했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-N01#r1#w5",
+          "candidateRank": 5,
+          "text": "Solace PubSub+도 후보로 비교했다.\n다만 운영 인력의 진단 경험, 기존 Azure 관측 도구, 전환 비용을 종합해 실험 문서만 남기고 도입하지 않았다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-N03#r1",
+      "queryId": "V2-U01-N03",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 13,
+        "documentId": 3,
+        "documentVersionId": 4,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "c9deef88081ca2edcb4ba97349adc70ad1434462fe0c3a941ab8bc53e5f0defe",
+        "score": 0.5337335584400962,
+        "distance": 0.4662664415599038
+      },
+      "hypothesis": "동일 견적 replay의 세 자릿수 지연 값은 340ms였다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U01-N03#r1#w1",
+          "candidateRank": 1,
+          "text": "운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다.\n동일 부하 조건에서 견적 API P95는 1.4초에서 380밀리초로 줄었다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U01-N03#r1#w2",
+          "candidateRank": 2,
+          "text": "inbox key 검증 결과 중복 shipment 생성은 0건이었다.\n운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다.\n동일 부하 조건에서 견적 API P95는 1.4초에서 380밀리초로 줄었다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U01-N03#r1#w3",
+          "candidateRank": 3,
+          "text": "운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다.\n동일 부하 조건에서 견적 API P95는 1.4초에서 380밀리초로 줄었다.\n[07."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U01-N03#r1#w4",
+          "candidateRank": 4,
+          "text": "동일 부하 조건에서 견적 API P95는 1.4초에서 380밀리초로 줄었다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U01-N03#r1#w5",
+          "candidateRank": 5,
+          "text": "동일 부하 조건에서 견적 API P95는 1.4초에서 380밀리초로 줄었다.\n[07."
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-D01#r1",
+      "queryId": "V2-U02-D01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 19,
+        "documentId": 5,
+        "documentVersionId": 6,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "ce13f5c9daa5a2b77e0e119d61e03115e412ba93bc7f90400d5787c76c66be9c",
+        "score": 0.5813113104515579,
+        "distance": 0.4186886895484421
+      },
+      "hypothesis": "위성 영상 처리 작업을 접수하는 FastAPI 인터페이스를 만들었다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U02-D01#r1#w1",
+          "candidateRank": 1,
+          "text": "OrbitMosaic: 위성 영상 배치의 대기, 품질 격리, 재처리"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U02-D01#r1#w2",
+          "candidateRank": 2,
+          "text": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U02\nOrbitMosaic: 위성 영상 배치의 대기, 품질 격리, 재처리"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U02-D01#r1#w3",
+          "candidateRank": 3,
+          "text": "OrbitMosaic: 위성 영상 배치의 대기, 품질 격리, 재처리\n본 문서는 검색 일반화 평가를 위해 만든 합성 데이터다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U02-D01#r1#w4",
+          "candidateRank": 4,
+          "text": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U02\nOrbitMosaic: 위성 영상 배치의 대기, 품질 격리, 재처리\n본 문서는 검색 일반화 평가를 위해 만든 합성 데이터다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U02-D01#r1#w5",
+          "candidateRank": 5,
+          "text": "OrbitMosaic: 위성 영상 배치의 대기, 품질 격리, 재처리\n본 문서는 검색 일반화 평가를 위해 만든 합성 데이터다.\n실제 위성 사업자·기관·촬영 자료와 관련이 없다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-D01#r2",
+      "queryId": "V2-U02-D01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 15,
+        "documentId": 4,
+        "documentVersionId": 5,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "f7f64adbdb2a80fdffcc4605a260eb9f729eeb91f51da26fb0523d49fe420623",
+        "score": 0.5717926366205605,
+        "distance": 0.42820736337943954
+      },
+      "hypothesis": "위성 영상 처리 작업을 접수하는 FastAPI 인터페이스를 만들었다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U02-D01#r2#w1",
+          "candidateRank": 1,
+          "text": "• FastAPI manifest endpoint에서 scene_id, revision, orbit, checksum, object URI 검증"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U02-D01#r2#w2",
+          "candidateRank": 2,
+          "text": "e revision 모델을 한 흐름으로 운영했다.\n• FastAPI manifest endpoint에서 scene_id, revision, orbit, checksum, object URI 검증"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U02-D01#r2#w3",
+          "candidateRank": 3,
+          "text": "• FastAPI manifest endpoint에서 scene_id, revision, orbit, checksum, object URI 검증\n• Airflow deferrable operator로 object-ready event 대기 중 worker slot 반환"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U02-D01#r2#w4",
+          "candidateRank": 4,
+          "text": "e revision 모델을 한 흐름으로 운영했다.\n• FastAPI manifest endpoint에서 scene_id, revision, orbit, checksum, object URI 검증\n• Airflow deferrable operator로 object-ready event 대기 중 worker slot 반환"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U02-D01#r2#w5",
+          "candidateRank": 5,
+          "text": "• FastAPI manifest endpoint에서 scene_id, revision, orbit, checksum, object URI 검증\n• Airflow deferrable operator로 object-ready event 대기 중 worker slot 반환\n• acquisition_date·orbit partition과 Spark adaptive query execution으로 skew 완화"
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-D02#r1",
+      "queryId": "V2-U02-D02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 18,
+        "documentId": 4,
+        "documentVersionId": 5,
+        "sourceType": "PAGE",
+        "sourceIndex": 2,
+        "contentSha256": "85f7d16b384a1ec59e03f2ca485fd2695a9784885520adb3927bf02464897243",
+        "score": 0.5929965397725976,
+        "distance": 0.4070034602274024
+      },
+      "hypothesis": "Airflow로 조정하고 Spark로 계산하는 영상 데이터 파이프라인을 운영했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U02-D02#r1#w1",
+          "candidateRank": 1,
+          "text": "Python · FastAPI · Pytest · Airflow · Spark SQL · Delta Lake를 중심으로 작업했다.\n데이터 계약은 JSON Schema와"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U02-D02#r1#w2",
+          "candidateRank": 2,
+          "text": "synthetic skills\nPython · FastAPI · Pytest · Airflow · Spark SQL · Delta Lake를 중심으로 작업했다.\n데이터 계약은 JSON Schema와"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U02-D02#r1#w3",
+          "candidateRank": 3,
+          "text": "Python · FastAPI · Pytest · Airflow · Spark SQL · Delta Lake를 중심으로 작업했다.\n데이터 계약은 JSON Schema와\nproperty-based test로 검증했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U02-D02#r1#w4",
+          "candidateRank": 4,
+          "text": "Python · FastAPI · Pytest · Airflow · Spark SQL · Delta Lake를 중심으로 작업했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U02-D02#r1#w5",
+          "candidateRank": 5,
+          "text": "• Airflow task duration과 deferred duration 분리\n• Spark stage skew dashboard"
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-D02#r2",
+      "queryId": "V2-U02-D02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 20,
+        "documentId": 5,
+        "documentVersionId": 6,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "160f4c1065a3c4686b9e1e7c6c6718e819b81a5ad4e19249bca67c24bde4f540",
+        "score": 0.5221976558455416,
+        "distance": 0.47780234415445844
+      },
+      "hypothesis": "Airflow로 조정하고 Spark로 계산하는 영상 데이터 파이프라인을 운영했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U02-D02#r2#w1",
+          "candidateRank": 1,
+          "text": "오류가 있는 package 전체를 버리지는 않았지만, 격리된 scene은 모자이크 계산과 공개 catalog에 들어갈 수 없었다.\n운영자는 원본 checksum, 발견 단계, 재전송 ticket을 함께 확인했다.\n[실험 노트 E — 과거 데이터 재적재]"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U02-D02#r2#w2",
+          "candidateRank": 2,
+          "text": "acquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U02-D02#r2#w3",
+          "candidateRank": 3,
+          "text": "촬영 건수가 적은 극지방 orbit과 수천 장이 몰리는 중위도 orbit의 partition 크기가 크게 달랐다.\nacquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U02-D02#r2#w4",
+          "candidateRank": 4,
+          "text": "acquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다.\n작은 중간 파일은 모자이크 완료 시점에 병합했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U02-D02#r2#w5",
+          "candidateRank": 5,
+          "text": "6.4TB였다.\n촬영 건수가 적은 극지방 orbit과 수천 장이 몰리는 중위도 orbit의 partition 크기가 크게 달랐다.\nacquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-NV01#r1",
+      "queryId": "V2-U02-NV01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 19,
+        "documentId": 5,
+        "documentVersionId": 6,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "ce13f5c9daa5a2b77e0e119d61e03115e412ba93bc7f90400d5787c76c66be9c",
+        "score": 0.5384254409759749,
+        "distance": 0.4615745590240251
+      },
+      "hypothesis": "큰 영상 파일이 아직 도착하지 않았을 때 계산 worker를 계속 붙잡지 않도록 바꿨다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U02-NV01#r1#w1",
+          "candidateRank": 1,
+          "text": "계산 worker는 파일이 준비된 작업에만 사용됐다.\nsequencer가 아니라 영상 제공자의 업로드 지연을 흡수하기 위한 설계였다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U02-NV01#r1#w2",
+          "candidateRank": 2,
+          "text": "이를 deferrable operator로 바꿔 object-ready event가 올 때까지 triggerer가 기다리게 했다.\n계산 worker는 파일이 준비된 작업에만 사용됐다.\nsequencer가 아니라 영상 제공자의 업로드 지연을 흡수하기 위한 설계였다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U02-NV01#r1#w3",
+          "candidateRank": 3,
+          "text": "계산 worker는 파일이 준비된 작업에만 사용됐다.\nsequencer가 아니라 영상 제공자의 업로드 지연을 흡수하기 위한 설계였다.\n[실험 노트 C — Spark 병목]"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U02-NV01#r1#w4",
+          "candidateRank": 4,
+          "text": "계산 worker는 파일이 준비된 작업에만 사용됐다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U02-NV01#r1#w5",
+          "candidateRank": 5,
+          "text": "이를 deferrable operator로 바꿔 object-ready event가 올 때까지 triggerer가 기다리게 했다.\n계산 worker는 파일이 준비된 작업에만 사용됐다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-NV01#r2",
+      "queryId": "V2-U02-NV01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 20,
+        "documentId": 5,
+        "documentVersionId": 6,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "160f4c1065a3c4686b9e1e7c6c6718e819b81a5ad4e19249bca67c24bde4f540",
+        "score": 0.5177847392008715,
+        "distance": 0.48221526079912846
+      },
+      "hypothesis": "큰 영상 파일이 아직 도착하지 않았을 때 계산 worker를 계속 붙잡지 않도록 바꿨다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U02-NV01#r2#w1",
+          "candidateRank": 1,
+          "text": "오류가 있는 package 전체를 버리지는 않았지만, 격리된 scene은 모자이크 계산과 공개 catalog에 들어갈 수 없었다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U02-NV01#r2#w2",
+          "candidateRank": 2,
+          "text": "해당 scene은 quarantine table과 별도 object prefix로 이동했다.\n오류가 있는 package 전체를 버리지는 않았지만, 격리된 scene은 모자이크 계산과 공개 catalog에 들어갈 수 없었다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U02-NV01#r2#w3",
+          "candidateRank": 3,
+          "text": "오류가 있는 package 전체를 버리지는 않았지만, 격리된 scene은 모자이크 계산과 공개 catalog에 들어갈 수 없었다.\n운영자는 원본 checksum, 발견 단계, 재전송 ticket을 함께 확인했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U02-NV01#r2#w4",
+          "candidateRank": 4,
+          "text": "8,750개 delivery package를 받은 검증 주간에 checksum 또는 TIFF directory가 손상된 GeoTIFF 64개를 찾았다.\n해당 scene은 quarantine table과 별도 object prefix로 이동했다.\n오류가 있는 package 전체를 버리지는 않았지만, 격리된 scene은 모자이크 계산과 공개 catalog에 들어갈 수 없었다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U02-NV01#r2#w5",
+          "candidateRank": 5,
+          "text": "해당 scene은 quarantine table과 별도 object prefix로 이동했다.\n오류가 있는 package 전체를 버리지는 않았지만, 격리된 scene은 모자이크 계산과 공개 catalog에 들어갈 수 없었다.\n운영자는 원본 checksum, 발견 단계, 재전송 ticket을 함께 확인했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-NV02#r1",
+      "queryId": "V2-U02-NV02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 16,
+        "documentId": 4,
+        "documentVersionId": 5,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "e27afe74410ad36feacc04874ac2f1ac6c2d1a94eb76a80648b07d68aa87dae7",
+        "score": 0.5199358725662543,
+        "distance": 0.4800641274337457
+      },
+      "hypothesis": "같은 촬영 장면의 보정판과 단순 재전송을 구별해서 적재하는 기준을 문서화했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U02-NV02#r1#w1",
+          "candidateRank": 1,
+          "text": "모자이크와 공개 catalog에 들어가지 못하며 재전송 ticket을 추적했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U02-NV02#r1#w2",
+          "candidateRank": 2,
+          "text": "격리 scene은\n모자이크와 공개 catalog에 들어가지 못하며 재전송 ticket을 추적했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U02-NV02#r1#w3",
+          "candidateRank": 3,
+          "text": "모자이크와 공개 catalog에 들어가지 못하며 재전송 ticket을 추적했다.\n• 오류 scene 단위 격리로 정상 package 내용은 보존"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U02-NV02#r1#w4",
+          "candidateRank": 4,
+          "text": "손상된 GeoTIFF 64개를 quarantine table과 별도 object prefix로 옮겼다.\n격리 scene은\n모자이크와 공개 catalog에 들어가지 못하며 재전송 ticket을 추적했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U02-NV02#r1#w5",
+          "candidateRank": 5,
+          "text": "격리 scene은\n모자이크와 공개 catalog에 들어가지 못하며 재전송 ticket을 추적했다.\n• 오류 scene 단위 격리로 정상 package 내용은 보존"
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-IP01#r1",
+      "queryId": "V2-U02-IP01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 21,
+        "documentId": 5,
+        "documentVersionId": 6,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "0dd1c1c612f8a78661ca57849d87c15b45bc1eb6a65ac204345ffae7bb27a72f",
+        "score": 0.5514416716709951,
+        "distance": 0.4485583283290049
+      },
+      "hypothesis": "궤도별 데이터 쏠림 때문에 일부 Spark 작업만 오래 남는 병목을 줄였다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U02-IP01#r1#w1",
+          "candidateRank": 1,
+          "text": "운영 scheduler와 분산 계산 엔진은 Airflow와 Spark를 유지했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U02-IP01#r1#w2",
+          "candidateRank": 2,
+          "text": "이 기능은 대규모 OrbitMosaic Spark 성능 수치에 포함하지 않았다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U02-IP01#r1#w3",
+          "candidateRank": 3,
+          "text": "on-call 문서에는 object 지연, checksum 오류, Spark executor 손실을 서로 다른 복구 절차로 나눴다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U02-IP01#r1#w4",
+          "candidateRank": 4,
+          "text": "Dask는 로컬 prototype으로 동일 변환 30개를 비교하는 데만 사용했다.\n운영 scheduler와 분산 계산 엔진은 Airflow와 Spark를 유지했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U02-IP01#r1#w5",
+          "candidateRank": 5,
+          "text": "운영 scheduler와 분산 계산 엔진은 Airflow와 Spark를 유지했다.\n외부 팀이 제공한 cloud mask model은 inference input으로 소비했지만, 객체 탐지나 cloud model을 직접 학습하지 않았다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-IP01#r2",
+      "queryId": "V2-U02-IP01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 20,
+        "documentId": 5,
+        "documentVersionId": 6,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "160f4c1065a3c4686b9e1e7c6c6718e819b81a5ad4e19249bca67c24bde4f540",
+        "score": 0.5510717265092938,
+        "distance": 0.4489282734907062
+      },
+      "hypothesis": "궤도별 데이터 쏠림 때문에 일부 Spark 작업만 오래 남는 병목을 줄였다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U02-IP01#r2#w1",
+          "candidateRank": 1,
+          "text": "acquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U02-IP01#r2#w2",
+          "candidateRank": 2,
+          "text": "촬영 건수가 적은 극지방 orbit과 수천 장이 몰리는 중위도 orbit의 partition 크기가 크게 달랐다.\nacquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U02-IP01#r2#w3",
+          "candidateRank": 3,
+          "text": "acquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다.\n작은 중간 파일은 모자이크 완료 시점에 병합했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U02-IP01#r2#w4",
+          "candidateRank": 4,
+          "text": "6.4TB였다.\n촬영 건수가 적은 극지방 orbit과 수천 장이 몰리는 중위도 orbit의 partition 크기가 크게 달랐다.\nacquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U02-IP01#r2#w5",
+          "candidateRank": 5,
+          "text": "촬영 건수가 적은 극지방 orbit과 수천 장이 몰리는 중위도 orbit의 partition 크기가 크게 달랐다.\nacquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다.\n작은 중간 파일은 모자이크 완료 시점에 병합했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-IP01#r3",
+      "queryId": "V2-U02-IP01",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 18,
+        "documentId": 4,
+        "documentVersionId": 5,
+        "sourceType": "PAGE",
+        "sourceIndex": 2,
+        "contentSha256": "85f7d16b384a1ec59e03f2ca485fd2695a9784885520adb3927bf02464897243",
+        "score": 0.5501559941938049,
+        "distance": 0.4498440058061951
+      },
+      "hypothesis": "궤도별 데이터 쏠림 때문에 일부 Spark 작업만 오래 남는 병목을 줄였다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U02-IP01#r3#w1",
+          "candidateRank": 1,
+          "text": "Python · FastAPI · Pytest · Airflow · Spark SQL · Delta Lake를 중심으로 작업했다.\n데이터 계약은 JSON Schema와"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U02-IP01#r3#w2",
+          "candidateRank": 2,
+          "text": "synthetic skills\nPython · FastAPI · Pytest · Airflow · Spark SQL · Delta Lake를 중심으로 작업했다.\n데이터 계약은 JSON Schema와"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U02-IP01#r3#w3",
+          "candidateRank": 3,
+          "text": "Python · FastAPI · Pytest · Airflow · Spark SQL · Delta Lake를 중심으로 작업했다.\n데이터 계약은 JSON Schema와\nproperty-based test로 검증했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U02-IP01#r3#w4",
+          "candidateRank": 4,
+          "text": "• Spark stage skew dashboard"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U02-IP01#r3#w5",
+          "candidateRank": 5,
+          "text": "Python · FastAPI · Pytest · Airflow · Spark SQL · Delta Lake를 중심으로 작업했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-IP02#r1",
+      "queryId": "V2-U02-IP02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 19,
+        "documentId": 5,
+        "documentVersionId": 6,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "ce13f5c9daa5a2b77e0e119d61e03115e412ba93bc7f90400d5787c76c66be9c",
+        "score": 0.5646109580993813,
+        "distance": 0.43538904190061867
+      },
+      "hypothesis": "깨진 위성 파일이 모자이크와 공개 목록에 섞이기 전에 차단했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U02-IP02#r1#w1",
+          "candidateRank": 1,
+          "text": "실제 위성 사업자·기관·촬영 자료와 관련이 없다.\n[실험 노트 A — 입력 계약]\nOrbitMosaic는 촬영 궤도별 GeoTIFF를 받아 구름 마스크와 좌표계를 확인하고 일 단위 모자이크를 생성했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U02-IP02#r1#w2",
+          "candidateRank": 2,
+          "text": "OrbitMosaic는 촬영 궤도별 GeoTIFF를 받아 구름 마스크와 좌표계를 확인하고 일 단위 모자이크를 생성했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U02-IP02#r1#w3",
+          "candidateRank": 3,
+          "text": "[실험 노트 A — 입력 계약]\nOrbitMosaic는 촬영 궤도별 GeoTIFF를 받아 구름 마스크와 좌표계를 확인하고 일 단위 모자이크를 생성했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U02-IP02#r1#w4",
+          "candidateRank": 4,
+          "text": "OrbitMosaic는 촬영 궤도별 GeoTIFF를 받아 구름 마스크와 좌표계를 확인하고 일 단위 모자이크를 생성했다.\n외부 제공자는 FastAPI endpoint에 manifest를 등록했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U02-IP02#r1#w5",
+          "candidateRank": 5,
+          "text": "[실험 노트 A — 입력 계약]\nOrbitMosaic는 촬영 궤도별 GeoTIFF를 받아 구름 마스크와 좌표계를 확인하고 일 단위 모자이크를 생성했다.\n외부 제공자는 FastAPI endpoint에 manifest를 등록했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-NI01#r1",
+      "queryId": "V2-U02-NI01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 20,
+        "documentId": 5,
+        "documentVersionId": 6,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "160f4c1065a3c4686b9e1e7c6c6718e819b81a5ad4e19249bca67c24bde4f540",
+        "score": 0.5413557564404935,
+        "distance": 0.4586442435595065
+      },
+      "hypothesis": "하루 6.4TB 영상 처리를 138분에서 41분으로 단축했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U02-NI01#r1#w1",
+          "candidateRank": 1,
+          "text": "동일한 40-node 조건에서 end-to-end 처리 시간은 138분에서 41분으로 줄었다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U02-NI01#r1#w2",
+          "candidateRank": 2,
+          "text": "작은 중간 파일은 모자이크 완료 시점에 병합했다.\n동일한 40-node 조건에서 end-to-end 처리 시간은 138분에서 41분으로 줄었다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U02-NI01#r1#w3",
+          "candidateRank": 3,
+          "text": "동일한 40-node 조건에서 end-to-end 처리 시간은 138분에서 41분으로 줄었다.\n[실험 노트 D — 품질 격리]"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U02-NI01#r1#w4",
+          "candidateRank": 4,
+          "text": "acquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다.\n작은 중간 파일은 모자이크 완료 시점에 병합했다.\n동일한 40-node 조건에서 end-to-end 처리 시간은 138분에서 41분으로 줄었다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U02-NI01#r1#w5",
+          "candidateRank": 5,
+          "text": "작은 중간 파일은 모자이크 완료 시점에 병합했다.\n동일한 40-node 조건에서 end-to-end 처리 시간은 138분에서 41분으로 줄었다.\n[실험 노트 D — 품질 격리]"
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-CN01#r1",
+      "queryId": "V2-U02-CN01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 15,
+        "documentId": 4,
+        "documentVersionId": 5,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "f7f64adbdb2a80fdffcc4605a260eb9f729eeb91f51da26fb0523d49fe420623",
+        "score": 0.607563021052811,
+        "distance": 0.392436978947189
+      },
+      "hypothesis": "960만 건의 과거 scene을 다시 넣으면서 중단 지점부터 이어가고 동일 revision 중복도 막았다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U02-CN01#r1#w1",
+          "candidateRank": 1,
+          "text": "• Delta MERGE의 scene_id + revision key로 동일 revision 재전송 중복 차단"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U02-CN01#r1#w2",
+          "candidateRank": 2,
+          "text": "• acquisition_date·orbit partition과 Spark adaptive query execution으로 skew 완화\n• Delta MERGE의 scene_id + revision key로 동일 revision 재전송 중복 차단"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U02-CN01#r1#w3",
+          "candidateRank": 3,
+          "text": "• Delta MERGE의 scene_id + revision key로 동일 revision 재전송 중복 차단\nMeasured outcomes"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U02-CN01#r1#w4",
+          "candidateRank": 4,
+          "text": "• Airflow deferrable operator로 object-ready event 대기 중 worker slot 반환\n• acquisition_date·orbit partition과 Spark adaptive query execution으로 skew 완화\n• Delta MERGE의 scene_id + revision key로 동일 revision 재전송 중복 차단"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U02-CN01#r1#w5",
+          "candidateRank": 5,
+          "text": "• acquisition_date·orbit partition과 Spark adaptive query execution으로 skew 완화\n• Delta MERGE의 scene_id + revision key로 동일 revision 재전송 중복 차단\nMeasured outcomes"
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-D01#r1",
+      "queryId": "V2-U03-D01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 22,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "7dcd35d703b5ca125b80418c81f6fefda45c5c3346cb0b95e2e50ae21a36f0c9",
+        "score": 0.5593671627286645,
+        "distance": 0.4406328372713355
+      },
+      "hypothesis": "Go와 ConnectRPC로 철도 운행 허가 시뮬레이터의 제어 API를 개발했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-D01#r1#w1",
+          "candidateRank": 1,
+          "text": "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n평가 전용 합성 설계 기록.\n실제 철도 시설, 노선, 안전 인증과 관계없다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-D01#r1#w2",
+          "candidateRank": 2,
+          "text": "RailPulse Lab은 실제 열차를 제어하지 않는 interlocking simulator다.\nGo control plane이 ConnectRPC로 route permit 요청을 받고, 각 요청을 NATS JetStream stream에 기록했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-D01#r1#w3",
+          "candidateRank": 3,
+          "text": "[DECISION 01 — 명령 모델]\nRailPulse Lab은 실제 열차를 제어하지 않는 interlocking simulator다.\nGo control plane이 ConnectRPC로 route permit 요청을 받고, 각 요청을 NATS JetStream stream에 기록했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-D01#r1#w4",
+          "candidateRank": 4,
+          "text": "RailPulse Lab은 실제 열차를 제어하지 않는 interlocking simulator다.\nGo control plane이 ConnectRPC로 route permit 요청을 받고, 각 요청을 NATS JetStream stream에 기록했다.\npermit에는 route_id, train_id, command_id와 controller가 발급한 permit_epoch가 포함됐다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-D01#r1#w5",
+          "candidateRank": 5,
+          "text": "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험"
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-D01#r2",
+      "queryId": "V2-U03-D01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 2,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "e467e466f610ff631b5fb2a02b4d52be9c5cb90345dfde4ce137a32a86d4e011",
+        "score": 0.531343951866142,
+        "distance": 0.46865604813385797
+      },
+      "hypothesis": "Go와 ConnectRPC로 철도 운행 허가 시뮬레이터의 제어 API를 개발했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-D01#r2#w1",
+          "candidateRank": 1,
+          "text": "interlocking simulator의 route permit control plane을 Go로 개발했다.\nConnectRPC 요청, NATS JetStream 전달, CockroachDB"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-D01#r2#w2",
+          "candidateRank": 2,
+          "text": "2022.11 - 2026.04 | RailPulse Lab\ninterlocking simulator의 route permit control plane을 Go로 개발했다.\nConnectRPC 요청, NATS JetStream 전달, CockroachDB"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-D01#r2#w3",
+          "candidateRank": 3,
+          "text": "interlocking simulator의 route permit control plane을 Go로 개발했다.\nConnectRPC 요청, NATS JetStream 전달, CockroachDB\ncommand ledger, simulator node 검증을 하나의 failure model로 문서화했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-D01#r2#w4",
+          "candidateRank": 4,
+          "text": "interlocking simulator의 route permit control plane을 Go로 개발했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-D01#r2#w5",
+          "candidateRank": 5,
+          "text": "2022.11 - 2026.04 | RailPulse Lab\ninterlocking simulator의 route permit control plane을 Go로 개발했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-D01#r3",
+      "queryId": "V2-U03-D01",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 6,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 2,
+        "contentSha256": "79989999a5a2d75712ba9ee28fecc4dcaacfc83a40ea9450b1c179b267d5ee96",
+        "score": 0.5165371318504693,
+        "distance": 0.48346286814953066
+      },
+      "hypothesis": "Go와 ConnectRPC로 철도 운행 허가 시뮬레이터의 제어 API를 개발했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-D01#r3#w1",
+          "candidateRank": 1,
+          "text": "• RailPulse는 실제 열차 제어 제품이 아닌 simulator"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-D01#r3#w2",
+          "candidateRank": 2,
+          "text": "• YardLens Kotlin batch는 인접 검토 업무\n• RailPulse는 실제 열차 제어 제품이 아닌 simulator"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-D01#r3#w3",
+          "candidateRank": 3,
+          "text": "차량 CAN bus gateway firmware는 embedded team 범위였고 직접 구현하지 않았다.\n• YardLens Kotlin batch는 인접 검토 업무\n• RailPulse는 실제 열차 제어 제품이 아닌 simulator"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-D01#r3#w4",
+          "candidateRank": 4,
+          "text": "• CockroachDB · serializable transaction"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-D01#r3#w5",
+          "candidateRank": 5,
+          "text": "• fault injection · deterministic simulator"
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-D01#r4",
+      "queryId": "V2-U03-D01",
+      "originalRank": 4,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5111117998761742,
+        "distance": 0.48888820012382583
+      },
+      "hypothesis": "Go와 ConnectRPC로 철도 운행 허가 시뮬레이터의 제어 API를 개발했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-D01#r4#w1",
+          "candidateRank": 1,
+          "text": "ISION 03 — 제어권 저장]"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-D01#r4#w2",
+          "candidateRank": 2,
+          "text": "운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-D01#r4#w3",
+          "candidateRank": 3,
+          "text": "ISION 03 — 제어권 저장]\nACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-D01#r4#w4",
+          "candidateRank": 4,
+          "text": "[DECISION 04 — 배포 무결성]\n운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-D01#r4#w5",
+          "candidateRank": 5,
+          "text": "운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다.\nnode는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-D02#r1",
+      "queryId": "V2-U03-D02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 3,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "59319c67a0946abd30befbc6126efc16da20cba8fd41b3aed210b645c4f4ccf0",
+        "score": 0.593786709945206,
+        "distance": 0.406213290054794
+      },
+      "hypothesis": "느린 시뮬레이터 구역이 전체 명령 스트림을 막지 않게 pull 방식과 ack 상한을 뒀다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-D02#r1#w1",
+          "candidateRank": 1,
+          "text": "• route_id·train_id·command_id·permit_epoch를 갖는 명령 contract 설계\n• JetStream pull consumer와 max ack pending으로 느린 zone 격리"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-D02#r1#w2",
+          "candidateRank": 2,
+          "text": "문서화했다.\n• route_id·train_id·command_id·permit_epoch를 갖는 명령 contract 설계\n• JetStream pull consumer와 max ack pending으로 느린 zone 격리"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-D02#r1#w3",
+          "candidateRank": 3,
+          "text": "• route_id·train_id·command_id·permit_epoch를 갖는 명령 contract 설계\n• JetStream pull consumer와 max ack pending으로 느린 zone 격리\n• command_id unique ledger로 ack wait 이후 재전달 멱등 처리"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-D02#r1#w4",
+          "candidateRank": 4,
+          "text": "• JetStream pull consumer와 max ack pending으로 느린 zone 격리"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-D02#r1#w5",
+          "candidateRank": 5,
+          "text": "• JetStream pull consumer와 max ack pending으로 느린 zone 격리\n• command_id unique ledger로 ack wait 이후 재전달 멱등 처리"
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-D02#r2",
+      "queryId": "V2-U03-D02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5449098077362671,
+        "distance": 0.45509019226373293
+      },
+      "hypothesis": "느린 시뮬레이터 구역이 전체 명령 스트림을 막지 않게 pull 방식과 ack 상한을 뒀다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-D02#r2#w1",
+          "candidateRank": 1,
+          "text": "운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-D02#r2#w2",
+          "candidateRank": 2,
+          "text": "node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-D02#r2#w3",
+          "candidateRank": 3,
+          "text": "[DECISION 04 — 배포 무결성]\n운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-D02#r2#w4",
+          "candidateRank": 4,
+          "text": "운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다.\nnode는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-D02#r2#w5",
+          "candidateRank": 5,
+          "text": "node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다.\n설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-D02#r3",
+      "queryId": "V2-U03-D02",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 24,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "82916349cf5913b2e1e638698fe22454dd3c5afa5e7953b5252166807c2f3374",
+        "score": 0.5210031321056241,
+        "distance": 0.4789968678943759
+      },
+      "hypothesis": "느린 시뮬레이터 구역이 전체 명령 스트림을 막지 않게 pull 방식과 ack 상한을 뒀다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-D02#r3#w1",
+          "candidateRank": 1,
+          "text": "핵심은 leader 선출 자체가 아니라 오래된 leader의 명령을 소비자가 식별할 수 있게 한 점이었다.\npermit_epoch, command ledger, signed package가 서로 다른 실패를 담당했고 어느 하나도 다른 경계를 대신하지 않았다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-D02#r3#w2",
+          "candidateRank": 2,
+          "text": "[RETROSPECTIVE]\n핵심은 leader 선출 자체가 아니라 오래된 leader의 명령을 소비자가 식별할 수 있게 한 점이었다.\npermit_epoch, command ledger, signed package가 서로 다른 실패를 담당했고 어느 하나도 다른 경계를 대신하지 않았다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-D02#r3#w3",
+          "candidateRank": 3,
+          "text": "permit_epoch, command ledger, signed package가 서로 다른 실패를 담당했고 어느 하나도 다른 경계를 대신하지 않았다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-D02#r3#w4",
+          "candidateRank": 4,
+          "text": "YardLens에서는 역사 내 혼잡도를 집계하는 Kotlin batch를 검토했지만 RailPulse 명령 경로에 포함하지 않았다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-D02#r3#w5",
+          "candidateRank": 5,
+          "text": "이력서의 관측·문서화 활동은 안전 허가 명령 구현 성과와 구분한다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-NV01#r1",
+      "queryId": "V2-U03-NV01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 4,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "c46ab7663f30f8e1e3caf9a3311a6f0d95c4ca6a515212f794dc6ffffb23bdc2",
+        "score": 0.5575154022844916,
+        "distance": 0.4424845977155084
+      },
+      "hypothesis": "이전 제어기가 늦게 보낸 운행 허가를 장비 쪽에서 알아보고 거절하게 했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-NV01#r1#w1",
+          "candidateRank": 1,
+          "text": "rtition scenario의 conflicting route permit은 0건이었다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-NV01#r1#w2",
+          "candidateRank": 2,
+          "text": "• event log와 DB ledger 결과 대조"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-NV01#r1#w3",
+          "candidateRank": 3,
+          "text": "• clock skew·message redelivery·process pause 조합"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-NV01#r1#w4",
+          "candidateRank": 4,
+          "text": "• 실제 철도 안전 인증 수치로 사용하지 않음"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-NV01#r1#w5",
+          "candidateRank": 5,
+          "text": "rtition scenario의 conflicting route permit은 0건이었다.\n• event log와 DB ledger 결과 대조"
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-NV01#r2",
+      "queryId": "V2-U03-NV01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 24,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "82916349cf5913b2e1e638698fe22454dd3c5afa5e7953b5252166807c2f3374",
+        "score": 0.5359814805962573,
+        "distance": 0.4640185194037427
+      },
+      "hypothesis": "이전 제어기가 늦게 보낸 운행 허가를 장비 쪽에서 알아보고 거절하게 했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-NV01#r2#w1",
+          "candidateRank": 1,
+          "text": "차량의 CAN bus gateway firmware는 embedded team이 담당했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-NV01#r2#w2",
+          "candidateRank": 2,
+          "text": "control plane은 firmware가 노출한 simulator contract만 사용했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-NV01#r2#w3",
+          "candidateRank": 3,
+          "text": "[NOT MY SCOPE]\n차량의 CAN bus gateway firmware는 embedded team이 담당했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-NV01#r2#w4",
+          "candidateRank": 4,
+          "text": "차량의 CAN bus gateway firmware는 embedded team이 담당했다.\ncontrol plane은 firmware가 노출한 simulator contract만 사용했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-NV01#r2#w5",
+          "candidateRank": 5,
+          "text": "control plane은 firmware가 노출한 simulator contract만 사용했다.\n직접 작성한 경력으로 간주하지 않는다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-NV01#r3",
+      "queryId": "V2-U03-NV01",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 22,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "7dcd35d703b5ca125b80418c81f6fefda45c5c3346cb0b95e2e50ae21a36f0c9",
+        "score": 0.534725885011566,
+        "distance": 0.46527411498843396
+      },
+      "hypothesis": "이전 제어기가 늦게 보낸 운행 허가를 장비 쪽에서 알아보고 거절하게 했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-NV01#r3#w1",
+          "candidateRank": 1,
+          "text": "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-NV01#r3#w2",
+          "candidateRank": 2,
+          "text": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U03\nRailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-NV01#r3#w3",
+          "candidateRank": 3,
+          "text": "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n평가 전용 합성 설계 기록."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-NV01#r3#w4",
+          "candidateRank": 4,
+          "text": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U03\nRailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n평가 전용 합성 설계 기록."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-NV01#r3#w5",
+          "candidateRank": 5,
+          "text": "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n평가 전용 합성 설계 기록.\n실제 철도 시설, 노선, 안전 인증과 관계없다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-NV01#r4",
+      "queryId": "V2-U03-NV01",
+      "originalRank": 4,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5050555762615465,
+        "distance": 0.4949444237384535
+      },
+      "hypothesis": "이전 제어기가 늦게 보낸 운행 허가를 장비 쪽에서 알아보고 거절하게 했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-NV01#r4#w1",
+          "candidateRank": 1,
+          "text": "운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다.\nnode는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-NV01#r4#w2",
+          "candidateRank": 2,
+          "text": "[DECISION 04 — 배포 무결성]\n운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다.\nnode는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-NV01#r4#w3",
+          "candidateRank": 3,
+          "text": "운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다.\nnode는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다.\n설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-NV01#r4#w4",
+          "candidateRank": 4,
+          "text": "운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-NV01#r4#w5",
+          "candidateRank": 5,
+          "text": "node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-NV02#r1",
+      "queryId": "V2-U03-NV02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5441533537642878,
+        "distance": 0.45584664623571225
+      },
+      "hypothesis": "분산 DB 직렬화 충돌을 무한히 숨기지 않고 정해진 횟수만 다시 시도했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-NV02#r1#w1",
+          "candidateRank": 1,
+          "text": "SQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다.\nretry 한도를 넘으면 새 permit을 만들지 않고 호출자에게 재요청 가능한 오류를 반환했다.\n무한 재시도로 지연을 숨기지 않았다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-NV02#r1#w2",
+          "candidateRank": 2,
+          "text": "ACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다.\nSQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다.\nretry 한도를 넘으면 새 permit을 만들지 않고 호출자에게 재요청 가능한 오류를 반환했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-NV02#r1#w3",
+          "candidateRank": 3,
+          "text": "ACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다.\nSQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-NV02#r1#w4",
+          "candidateRank": 4,
+          "text": "SQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다.\nretry 한도를 넘으면 새 permit을 만들지 않고 호출자에게 재요청 가능한 오류를 반환했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-NV02#r1#w5",
+          "candidateRank": 5,
+          "text": "ISION 03 — 제어권 저장]\nACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다.\nSQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-NV02#r2",
+      "queryId": "V2-U03-NV02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 3,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "59319c67a0946abd30befbc6126efc16da20cba8fd41b3aed210b645c4f4ccf0",
+        "score": 0.5160818330464629,
+        "distance": 0.48391816695353707
+      },
+      "hypothesis": "분산 DB 직렬화 충돌을 무한히 숨기지 않고 정해진 횟수만 다시 시도했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-NV02#r2#w1",
+          "candidateRank": 1,
+          "text": "• event log와 DB ledger 결과 대조"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-NV02#r2#w2",
+          "candidateRank": 2,
+          "text": "network-partition scenario의 conflicting route permit은 0건이었다.\n• event log와 DB ledger 결과 대조"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-NV02#r2#w3",
+          "candidateRank": 3,
+          "text": "• event log와 DB ledger 결과 대조\n• clock skew·message redelivery·process"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-NV02#r2#w4",
+          "candidateRank": 4,
+          "text": "leader 중단 뒤 permit 발급 P95는 9.6초에서 2.7초로 줄었고 420개\nnetwork-partition scenario의 conflicting route permit은 0건이었다.\n• event log와 DB ledger 결과 대조"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-NV02#r2#w5",
+          "candidateRank": 5,
+          "text": "network-partition scenario의 conflicting route permit은 0건이었다.\n• event log와 DB ledger 결과 대조\n• clock skew·message redelivery·process"
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-IP01#r1",
+      "queryId": "V2-U03-IP01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 3,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "59319c67a0946abd30befbc6126efc16da20cba8fd41b3aed210b645c4f4ccf0",
+        "score": 0.5891719040027831,
+        "distance": 0.4108280959972169
+      },
+      "hypothesis": "리더 프로세스가 멈춘 뒤 새 운행 허가를 낼 수 있을 때까지의 시간을 줄였다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-IP01#r1#w1",
+          "candidateRank": 1,
+          "text": "문서화했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-IP01#r1#w2",
+          "candidateRank": 2,
+          "text": "• route_id·train_id·command_id·permit_epoch를 갖는 명령 contract 설계"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-IP01#r1#w3",
+          "candidateRank": 3,
+          "text": "• JetStream pull consumer와 max ack pending으로 느린 zone 격리"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-IP01#r1#w4",
+          "candidateRank": 4,
+          "text": "• command_id unique ledger로 ack wait 이후 재전달 멱등 처리"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-IP01#r1#w5",
+          "candidateRank": 5,
+          "text": "• simulator가 마지막 수락 epoch보다 오래된 permit을 거절하도록 구현"
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-IP01#r2",
+      "queryId": "V2-U03-IP01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5239887237548828,
+        "distance": 0.4760112762451172
+      },
+      "hypothesis": "리더 프로세스가 멈춘 뒤 새 운행 허가를 낼 수 있을 때까지의 시간을 줄였다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-IP01#r2#w1",
+          "candidateRank": 1,
+          "text": "운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-IP01#r2#w2",
+          "candidateRank": 2,
+          "text": "[DECISION 04 — 배포 무결성]\n운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-IP01#r2#w3",
+          "candidateRank": 3,
+          "text": "운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다.\nnode는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-IP01#r2#w4",
+          "candidateRank": 4,
+          "text": "무한 재시도로 지연을 숨기지 않았다.\n[DECISION 04 — 배포 무결성]\n운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-IP01#r2#w5",
+          "candidateRank": 5,
+          "text": "[DECISION 04 — 배포 무결성]\n운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다.\nnode는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-IP02#r1",
+      "queryId": "V2-U03-IP02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 22,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "7dcd35d703b5ca125b80418c81f6fefda45c5c3346cb0b95e2e50ae21a36f0c9",
+        "score": 0.5584692873911592,
+        "distance": 0.4415307126088408
+      },
+      "hypothesis": "네트워크가 여러 구간으로 갈라져도 충돌하는 진로 허가가 생기지 않는지 시험했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-IP02#r1#w1",
+          "candidateRank": 1,
+          "text": "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-IP02#r1#w2",
+          "candidateRank": 2,
+          "text": "SQLSTATE 40001 충돌은 decorrelated ji"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-IP02#r1#w3",
+          "candidateRank": 3,
+          "text": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U03\nRailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-IP02#r1#w4",
+          "candidateRank": 4,
+          "text": "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n평가 전용 합성 설계 기록."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-IP02#r1#w5",
+          "candidateRank": 5,
+          "text": "ACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다.\nSQLSTATE 40001 충돌은 decorrelated ji"
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-IP02#r2",
+      "queryId": "V2-U03-IP02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5388263717126249,
+        "distance": 0.46117362828737507
+      },
+      "hypothesis": "네트워크가 여러 구간으로 갈라져도 충돌하는 진로 허가가 생기지 않는지 시험했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-IP02#r2#w1",
+          "candidateRank": 1,
+          "text": "12,800개 virtual train을 16개 zone에 나눠 시험했다.\nleader process 중단 뒤 새 permit 발급 가능 시점까지의 P95는 9.6초에서 2.7초로 줄었다.\n독립적으로 만든 420개 network-partition scenario에서 서로 충돌하는 route permit은 0건이었다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-IP02#r2#w2",
+          "candidateRank": 2,
+          "text": "12,800개 virtual train을 16개 zone에 나눠 시험했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-IP02#r2#w3",
+          "candidateRank": 3,
+          "text": "[VALIDATION — 규모와 장애]\n12,800개 virtual train을 16개 zone에 나눠 시험했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-IP02#r2#w4",
+          "candidateRank": 4,
+          "text": "12,800개 virtual train을 16개 zone에 나눠 시험했다.\nleader process 중단 뒤 새 permit 발급 가능 시점까지의 P95는 9.6초에서 2.7초로 줄었다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-IP02#r2#w5",
+          "candidateRank": 5,
+          "text": "설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다.\n[VALIDATION — 규모와 장애]\n12,800개 virtual train을 16개 zone에 나눠 시험했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-IP02#r3",
+      "queryId": "V2-U03-IP02",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 3,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "59319c67a0946abd30befbc6126efc16da20cba8fd41b3aed210b645c4f4ccf0",
+        "score": 0.5486852969781605,
+        "distance": 0.4513147030218395
+      },
+      "hypothesis": "네트워크가 여러 구간으로 갈라져도 충돌하는 진로 허가가 생기지 않는지 시험했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-IP02#r3#w1",
+          "candidateRank": 1,
+          "text": "문서화했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-IP02#r3#w2",
+          "candidateRank": 2,
+          "text": "• route_id·train_id·command_id·permit_epoch를 갖는 명령 contract 설계"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-IP02#r3#w3",
+          "candidateRank": 3,
+          "text": "• JetStream pull consumer와 max ack pending으로 느린 zone 격리"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-IP02#r3#w4",
+          "candidateRank": 4,
+          "text": "• command_id unique ledger로 ack wait 이후 재전달 멱등 처리"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-IP02#r3#w5",
+          "candidateRank": 5,
+          "text": "• simulator가 마지막 수락 epoch보다 오래된 permit을 거절하도록 구현"
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-NI01#r1",
+      "queryId": "V2-U03-NI01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5314323231143332,
+        "distance": 0.4685676768856668
+      },
+      "hypothesis": "12,800대의 가상 열차를 16개 구역에서 실행해 검증했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-NI01#r1#w1",
+          "candidateRank": 1,
+          "text": "12,800개 virtual train을 16개 zone에 나눠 시험했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-NI01#r1#w2",
+          "candidateRank": 2,
+          "text": "[VALIDATION — 규모와 장애]\n12,800개 virtual train을 16개 zone에 나눠 시험했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-NI01#r1#w3",
+          "candidateRank": 3,
+          "text": "12,800개 virtual train을 16개 zone에 나눠 시험했다.\nleader process 중단 뒤 새 permit 발급 가능 시점까지의 P95는 9.6초에서 2.7초로 줄었다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-NI01#r1#w4",
+          "candidateRank": 4,
+          "text": "설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다.\n[VALIDATION — 규모와 장애]\n12,800개 virtual train을 16개 zone에 나눠 시험했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-NI01#r1#w5",
+          "candidateRank": 5,
+          "text": "[VALIDATION — 규모와 장애]\n12,800개 virtual train을 16개 zone에 나눠 시험했다.\nleader process 중단 뒤 새 permit 발급 가능 시점까지의 P95는 9.6초에서 2.7초로 줄었다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-CN01#r1",
+      "queryId": "V2-U03-CN01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 24,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "82916349cf5913b2e1e638698fe22454dd3c5afa5e7953b5252166807c2f3374",
+        "score": 0.5447707445304625,
+        "distance": 0.4552292554695375
+      },
+      "hypothesis": "운행표 파일의 변조와 오래된 제어 명령을 서로 다른 버전 값으로 막았다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-CN01#r1#w1",
+          "candidateRank": 1,
+          "text": "핵심은 leader 선출 자체가 아니라 오래된 leader의 명령을 소비자가 식별할 수 있게 한 점이었다.\npermit_epoch, command ledger, signed package가 서로 다른 실패를 담당했고 어느 하나도 다른 경계를 대신하지 않았다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-CN01#r1#w2",
+          "candidateRank": 2,
+          "text": "[RETROSPECTIVE]\n핵심은 leader 선출 자체가 아니라 오래된 leader의 명령을 소비자가 식별할 수 있게 한 점이었다.\npermit_epoch, command ledger, signed package가 서로 다른 실패를 담당했고 어느 하나도 다른 경계를 대신하지 않았다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-CN01#r1#w3",
+          "candidateRank": 3,
+          "text": "permit_epoch, command ledger, signed package가 서로 다른 실패를 담당했고 어느 하나도 다른 경계를 대신하지 않았다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-CN01#r1#w4",
+          "candidateRank": 4,
+          "text": "핵심은 leader 선출 자체가 아니라 오래된 leader의 명령을 소비자가 식별할 수 있게 한 점이었다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-CN01#r1#w5",
+          "candidateRank": 5,
+          "text": "[RETROSPECTIVE]\n핵심은 leader 선출 자체가 아니라 오래된 leader의 명령을 소비자가 식별할 수 있게 한 점이었다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-CN01#r2",
+      "queryId": "V2-U03-CN01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 22,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "7dcd35d703b5ca125b80418c81f6fefda45c5c3346cb0b95e2e50ae21a36f0c9",
+        "score": 0.5476278130536633,
+        "distance": 0.45237218694633674
+      },
+      "hypothesis": "운행표 파일의 변조와 오래된 제어 명령을 서로 다른 버전 값으로 막았다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-CN01#r2#w1",
+          "candidateRank": 1,
+          "text": "[DECISION 01 — 명령 모델]\nRailPulse Lab은 실제 열차를 제어하지 않는 interlocking simulator다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-CN01#r2#w2",
+          "candidateRank": 2,
+          "text": "실제 철도 시설, 노선, 안전 인증과 관계없다.\n[DECISION 01 — 명령 모델]\nRailPulse Lab은 실제 열차를 제어하지 않는 interlocking simulator다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-CN01#r2#w3",
+          "candidateRank": 3,
+          "text": "[DECISION 01 — 명령 모델]\nRailPulse Lab은 실제 열차를 제어하지 않는 interlocking simulator다.\nGo control plane이 ConnectRPC로 route permit 요청을 받고, 각 요청을 NATS JetStream stream에 기록했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-CN01#r2#w4",
+          "candidateRank": 4,
+          "text": "같은 명령의 두 번째 전달은 상태 전이를 만들지 않고 이전 결과를 돌려줬다.\n메시지 ack 자체를 업무 완료의 유일한 근거로 사용하지 않았다.\n[DECISION 03 — 제어권 저장]"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-CN01#r2#w5",
+          "candidateRank": 5,
+          "text": "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험"
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-CN01#r3",
+      "queryId": "V2-U03-CN01",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 3,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "59319c67a0946abd30befbc6126efc16da20cba8fd41b3aed210b645c4f4ccf0",
+        "score": 0.5416986395953474,
+        "distance": 0.45830136040465264
+      },
+      "hypothesis": "운행표 파일의 변조와 오래된 제어 명령을 서로 다른 버전 값으로 막았다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-CN01#r3#w1",
+          "candidateRank": 1,
+          "text": "• simulator가 마지막 수락 epoch보다 오래된 permit을 거절하도록 구현"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-CN01#r3#w2",
+          "candidateRank": 2,
+          "text": "• command_id unique ledger로 ack wait 이후 재전달 멱등 처리\n• simulator가 마지막 수락 epoch보다 오래된 permit을 거절하도록 구현"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-CN01#r3#w3",
+          "candidateRank": 3,
+          "text": "• simulator가 마지막 수락 epoch보다 오래된 permit을 거절하도록 구현\nController state and retry"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-CN01#r3#w4",
+          "candidateRank": 4,
+          "text": "• JetStream pull consumer와 max ack pending으로 느린 zone 격리\n• command_id unique ledger로 ack wait 이후 재전달 멱등 처리\n• simulator가 마지막 수락 epoch보다 오래된 permit을 거절하도록 구현"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-CN01#r3#w5",
+          "candidateRank": 5,
+          "text": "• command_id unique ledger로 ack wait 이후 재전달 멱등 처리\n• simulator가 마지막 수락 epoch보다 오래된 permit을 거절하도록 구현\nController state and retry"
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-CN01#r4",
+      "queryId": "V2-U03-CN01",
+      "originalRank": 4,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5150728686219059,
+        "distance": 0.48492713137809407
+      },
+      "hypothesis": "운행표 파일의 변조와 오래된 제어 명령을 서로 다른 버전 값으로 막았다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-CN01#r4#w1",
+          "candidateRank": 1,
+          "text": "운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다.\nnode는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다.\n설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-CN01#r4#w2",
+          "candidateRank": 2,
+          "text": "운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다.\nnode는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-CN01#r4#w3",
+          "candidateRank": 3,
+          "text": "[DECISION 04 — 배포 무결성]\n운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다.\nnode는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-CN01#r4#w4",
+          "candidateRank": 4,
+          "text": "설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-CN01#r4#w5",
+          "candidateRank": 5,
+          "text": "node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다.\n설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-CN02#r1",
+      "queryId": "V2-U03-CN02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 22,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "7dcd35d703b5ca125b80418c81f6fefda45c5c3346cb0b95e2e50ae21a36f0c9",
+        "score": 0.5218941984801249,
+        "distance": 0.47810580151987514
+      },
+      "hypothesis": "메시지가 재전달되더라도 같은 허가를 두 번 실행하지 않고 이전 처리 결과를 돌려줬다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-CN02#r1#w1",
+          "candidateRank": 1,
+          "text": "ack wait가 지나면 메시지가 재전달될 수 있으므로 command ledger의 command_id unique key를 먼저 확인했다.\n같은 명령의 두 번째 전달은 상태 전이를 만들지 않고 이전 결과를 돌려줬다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-CN02#r1#w2",
+          "candidateRank": 2,
+          "text": "같은 명령의 두 번째 전달은 상태 전이를 만들지 않고 이전 결과를 돌려줬다.\n메시지 ack 자체를 업무 완료의 유일한 근거로 사용하지 않았다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-CN02#r1#w3",
+          "candidateRank": 3,
+          "text": "JetStream pull consumer는 max ack pending을 제한해 느린 simulator가 전체 stream을 막지 않게 했다.\nack wait가 지나면 메시지가 재전달될 수 있으므로 command ledger의 command_id unique key를 먼저 확인했다.\n같은 명령의 두 번째 전달은 상태 전이를 만들지 않고 이전 결과를 돌려줬다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-CN02#r1#w4",
+          "candidateRank": 4,
+          "text": "ack wait가 지나면 메시지가 재전달될 수 있으므로 command ledger의 command_id unique key를 먼저 확인했다.\n같은 명령의 두 번째 전달은 상태 전이를 만들지 않고 이전 결과를 돌려줬다.\n메시지 ack 자체를 업무 완료의 유일한 근거로 사용하지 않았다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-CN02#r1#w5",
+          "candidateRank": 5,
+          "text": "같은 명령의 두 번째 전달은 상태 전이를 만들지 않고 이전 결과를 돌려줬다.\n메시지 ack 자체를 업무 완료의 유일한 근거로 사용하지 않았다.\n[DECISION 03 — 제어권 저장]"
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-CN02#r2",
+      "queryId": "V2-U03-CN02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 3,
+        "documentId": 1,
+        "documentVersionId": 2,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "59319c67a0946abd30befbc6126efc16da20cba8fd41b3aed210b645c4f4ccf0",
+        "score": 0.5402272874591116,
+        "distance": 0.45977271254088836
+      },
+      "hypothesis": "메시지가 재전달되더라도 같은 허가를 두 번 실행하지 않고 이전 처리 결과를 돌려줬다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-CN02#r2#w1",
+          "candidateRank": 1,
+          "text": "• command_id unique ledger로 ack wait 이후 재전달 멱등 처리"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-CN02#r2#w2",
+          "candidateRank": 2,
+          "text": "• event log와 DB ledger 결과 대조"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-CN02#r2#w3",
+          "candidateRank": 3,
+          "text": "• JetStream pull consumer와 max ack pending으로 느린 zone 격리\n• command_id unique ledger로 ack wait 이후 재전달 멱등 처리"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-CN02#r2#w4",
+          "candidateRank": 4,
+          "text": "• command_id unique ledger로 ack wait 이후 재전달 멱등 처리\n• simulator가 마지막 수락 epoch보다 오래된 permit을 거절하도록 구현"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-CN02#r2#w5",
+          "candidateRank": 5,
+          "text": "network-partition scenario의 conflicting route permit은 0건이었다.\n• event log와 DB ledger 결과 대조"
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-N01#r1",
+      "queryId": "V2-U03-N01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 23,
+        "documentId": 6,
+        "documentVersionId": 7,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "c9370508bc1f3697c092a6a727921582e2ff9e98dfe0ecadfb3cfad936cf66ad",
+        "score": 0.5761233134049305,
+        "distance": 0.4238766865950695
+      },
+      "hypothesis": "현재 ACTIVE 경력에서 etcd lease로 RailPulse 제어기 선출을 운영했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U03-N01#r1#w1",
+          "candidateRank": 1,
+          "text": "초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U03-N01#r1#w2",
+          "candidateRank": 2,
+          "text": "[HISTORICAL VERSION]\n초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U03-N01#r1#w3",
+          "candidateRank": 3,
+          "text": "초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다.\n이후 operational review에서 해당 경력을 ACT"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U03-N01#r1#w4",
+          "candidateRank": 4,
+          "text": "이 수치는 simulator event log와 CockroachDB ledger를 대조해 확인했다.\n[HISTORICAL VERSION]\n초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U03-N01#r1#w5",
+          "candidateRank": 5,
+          "text": "[HISTORICAL VERSION]\n초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다.\n이후 operational review에서 해당 경력을 ACT"
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-D01#r1",
+      "queryId": "V2-U04-D01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 29,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "3ee287ff047f64e97e2b288ba520d6ba7b5228c3c71baa82dda7e4ac82aa7e57",
+        "score": 0.5983780021602092,
+        "distance": 0.4016219978397908
+      },
+      "hypothesis": "음악 저작권 자료를 받는 NestJS 수집 API를 개발했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-D01#r1#w1",
+          "candidateRank": 1,
+          "text": "ScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-D01#r1#w2",
+          "candidateRank": 2,
+          "text": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U04\nScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-D01#r1#w3",
+          "candidateRank": 3,
+          "text": "ScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다.\n실제 창작자, 음원, 계약 또는 정산 정보는 없다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-D01#r1#w4",
+          "candidateRank": 4,
+          "text": "ScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-D01#r1#w5",
+          "candidateRank": 5,
+          "text": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U04\nScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체"
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-D01#r2",
+      "queryId": "V2-U04-D01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 28,
+        "documentId": 7,
+        "documentVersionId": 8,
+        "sourceType": "PAGE",
+        "sourceIndex": 2,
+        "contentSha256": "6dbe8f20261789cd396e52d90a3eac0b61f2e79e6e8526ffd0867e97d2256f25",
+        "score": 0.5261406991985045,
+        "distance": 0.4738593008014955
+      },
+      "hypothesis": "음악 저작권 자료를 받는 NestJS 수집 API를 개발했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-D01#r2#w1",
+          "candidateRank": 1,
+          "text": "Node.js · TypeScript · NestJS · Meilisearch · Cloudflare R2 · Cloudflare Queues를 중심으로 작업했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-D01#r2#w2",
+          "candidateRank": 2,
+          "text": "synthetic skills\nNode.js · TypeScript · NestJS · Meilisearch · Cloudflare R2 · Cloudflare Queues를 중심으로 작업했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-D01#r2#w3",
+          "candidateRank": 3,
+          "text": "Node.js · TypeScript · NestJS · Meilisearch · Cloudflare R2 · Cloudflare Queues를 중심으로 작업했다.\ncontract test와 schema"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-D01#r2#w4",
+          "candidateRank": 4,
+          "text": "Technical profile\nsynthetic skills\nNode.js · TypeScript · NestJS · Meilisearch · Cloudflare R2 · Cloudflare Queues를 중심으로 작업했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-D01#r2#w5",
+          "candidateRank": 5,
+          "text": "synthetic skills\nNode.js · TypeScript · NestJS · Meilisearch · Cloudflare R2 · Cloudflare Queues를 중심으로 작업했다.\ncontract test와 schema"
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-D02#r1",
+      "queryId": "V2-U04-D02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 29,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "3ee287ff047f64e97e2b288ba520d6ba7b5228c3c71baa82dda7e4ac82aa7e57",
+        "score": 0.5347562951831301,
+        "distance": 0.46524370481686994
+      },
+      "hypothesis": "음악 저작물 230만 건을 이름·권리자·지역 조건으로 조회할 색인을 만들었다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-D02#r1#w1",
+          "candidateRank": 1,
+          "text": "2,300,000개 work record를 Meilisearch에 색인했다.\n권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-D02#r1#w2",
+          "candidateRank": 2,
+          "text": "[2025-05 — 검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다.\n권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-D02#r1#w3",
+          "candidateRank": 3,
+          "text": "2,300,000개 work record를 Meilisearch에 색인했다.\n권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다.\n새 sc"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-D02#r1#w4",
+          "candidateRank": 4,
+          "text": "권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-D02#r1#w5",
+          "candidateRank": 5,
+          "text": "권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다.\n새 sc"
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-D02#r2",
+      "queryId": "V2-U04-D02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 30,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "f5162299c87dbf00adfd561d0f08f25ba8023f60a9b67bd7f733edc021a31b54",
+        "score": 0.5285888033264396,
+        "distance": 0.47141119667356035
+      },
+      "hypothesis": "음악 저작물 230만 건을 이름·권리자·지역 조건으로 조회할 색인을 만들었다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-D02#r2#w1",
+          "candidateRank": 1,
+          "text": "2,300,000개 work record를 Meilisearch에 색인했다.\n권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-D02#r2#w2",
+          "candidateRank": 2,
+          "text": "검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다.\n권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-D02#r2#w3",
+          "candidateRank": 3,
+          "text": "2,300,000개 work record를 Meilisearch에 색인했다.\n권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다.\n새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-D02#r2#w4",
+          "candidateRank": 4,
+          "text": "권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다.\n새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다.\n색인 구축 중에도 기존 index가 요청을 처리했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-D02#r2#w5",
+          "candidateRank": 5,
+          "text": "권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-NV01#r1",
+      "queryId": "V2-U04-NV01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 29,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "3ee287ff047f64e97e2b288ba520d6ba7b5228c3c71baa82dda7e4ac82aa7e57",
+        "score": 0.5505688233977228,
+        "distance": 0.44943117660227716
+      },
+      "hypothesis": "같은 계약 파일이 다시 올라오면 OCR 작업을 또 만들지 않도록 했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-NV01#r1#w1",
+          "candidateRank": 1,
+          "text": "계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다.\nupload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다.\n원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-NV01#r1#w2",
+          "candidateRank": 2,
+          "text": "upload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다.\n원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다.\n비동기 작업은 Cloudflare Queues로 전달했으며 consumer는 extraction key를 기준으로 멱등 처리했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-NV01#r1#w3",
+          "candidateRank": 3,
+          "text": "계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다.\nupload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-NV01#r1#w4",
+          "candidateRank": 4,
+          "text": "[2025-03 — 원본과 파생물]\n계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다.\nupload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-NV01#r1#w5",
+          "candidateRank": 5,
+          "text": "upload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다.\n원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-NV01#r2",
+      "queryId": "V2-U04-NV01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 26,
+        "documentId": 7,
+        "documentVersionId": 8,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "8c9f002f677764cf691cc69314748b7f49f51d6949def5baeacf247ffaafeb7a",
+        "score": 0.520750507094003,
+        "distance": 0.47924949290599705
+      },
+      "hypothesis": "같은 계약 파일이 다시 올라오면 OCR 작업을 또 만들지 않도록 했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-NV01#r2#w1",
+          "candidateRank": 1,
+          "text": "• content hash 중복이면 OCR·metadata extraction job 생성을 생략"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-NV01#r2#w2",
+          "candidateRank": 2,
+          "text": "정규화와 source별 원본 식별자 유지\n• content hash 중복이면 OCR·metadata extraction job 생성을 생략"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-NV01#r2#w3",
+          "candidateRank": 3,
+          "text": "• content hash 중복이면 OCR·metadata extraction job 생성을 생략\n• 식별자 없는 legacy 자료는 자동 병합하지 않고 review queue로 격리"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-NV01#r2#w4",
+          "candidateRank": 4,
+          "text": "정규화와 source별 원본 식별자 유지\n• content hash 중복이면 OCR·metadata extraction job 생성을 생략\n• 식별자 없는 legacy 자료는 자동 병합하지 않고 review queue로 격리"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-NV01#r2#w5",
+          "candidateRank": 5,
+          "text": "• content hash 중복이면 OCR·metadata extraction job 생성을 생략\n• 식별자 없는 legacy 자료는 자동 병합하지 않고 review queue로 격리\n• extraction key 기반 queue consumer 멱등 처리"
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-NV02#r1",
+      "queryId": "V2-U04-NV02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 30,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "f5162299c87dbf00adfd561d0f08f25ba8023f60a9b67bd7f733edc021a31b54",
+        "score": 0.5394497976392822,
+        "distance": 0.46055020236071775
+      },
+      "hypothesis": "새 검색 스키마를 준비하는 동안 기존 검색을 살려 두고 검증 후 교체했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-NV02#r1#w1",
+          "candidateRank": 1,
+          "text": "새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다.\n색인 구축 중에도 기존 index가 요청을 처리했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-NV02#r1#w2",
+          "candidateRank": 2,
+          "text": "권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다.\n새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다.\n색인 구축 중에도 기존 index가 요청을 처리했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-NV02#r1#w3",
+          "candidateRank": 3,
+          "text": "새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다.\n색인 구축 중에도 기존 index가 요청을 처리했다.\n[2025-07 — 성능과 검증]"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-NV02#r1#w4",
+          "candidateRank": 4,
+          "text": "새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-NV02#r1#w5",
+          "candidateRank": 5,
+          "text": "권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다.\n새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-NV02#r2",
+      "queryId": "V2-U04-NV02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 26,
+        "documentId": 7,
+        "documentVersionId": 8,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "8c9f002f677764cf691cc69314748b7f49f51d6949def5baeacf247ffaafeb7a",
+        "score": 0.5382546620478488,
+        "distance": 0.4617453379521512
+      },
+      "hypothesis": "새 검색 스키마를 준비하는 동안 기존 검색을 살려 두고 검증 후 교체했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-NV02#r2#w1",
+          "candidateRank": 1,
+          "text": "검증 뒤 alias를 원자적으로 교체했다.\n• index build 동안 기존 alias가 요청 처리"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-NV02#r2#w2",
+          "candidateRank": 2,
+          "text": "새 schema는 versioned index에서 만들고 sample query\n검증 뒤 alias를 원자적으로 교체했다.\n• index build 동안 기존 alias가 요청 처리"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-NV02#r2#w3",
+          "candidateRank": 3,
+          "text": "검증 뒤 alias를 원자적으로 교체했다.\n• index build 동안 기존 alias가 요청 처리\n• frequent-owner filter cardinality와 ranking rule 순서 조정"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-NV02#r2#w4",
+          "candidateRank": 4,
+          "text": "• index build 동안 기존 alias가 요청 처리"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-NV02#r2#w5",
+          "candidateRank": 5,
+          "text": "• index build 동안 기존 alias가 요청 처리\n• frequent-owner filter cardinality와 ranking rule 순서 조정"
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-IP02#r1",
+      "queryId": "V2-U04-IP02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 29,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "3ee287ff047f64e97e2b288ba520d6ba7b5228c3c71baa82dda7e4ac82aa7e57",
+        "score": 0.5368720264909548,
+        "distance": 0.4631279735090452
+      },
+      "hypothesis": "표준 음악 식별자가 없는 오래된 자료가 잘못 합쳐지는 문제를 막았다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-IP02#r1#w1",
+          "candidateRank": 1,
+          "text": "같은 곡이 제목 표기만 달라 여러 번 들어오는 문제가 있었다.\nNestJS ingestion API는 ISWC와 ISRC를 형식별로 정규화하고 source organization을 함께 저장했다.\n식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-IP02#r1#w2",
+          "candidateRank": 2,
+          "text": "식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-IP02#r1#w3",
+          "candidateRank": 3,
+          "text": "NestJS ingestion API는 ISWC와 ISRC를 형식별로 정규화하고 source organization을 함께 저장했다.\n식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-IP02#r1#w4",
+          "candidateRank": 4,
+          "text": "식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다.\n[2025-03 — 원본과 파생물]"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-IP02#r1#w5",
+          "candidateRank": 5,
+          "text": "NestJS ingestion API는 ISWC와 ISRC를 형식별로 정규화하고 source organization을 함께 저장했다.\n식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다.\n[2025-03 — 원본과 파생물]"
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-NI01#r1",
+      "queryId": "V2-U04-NI01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 30,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "f5162299c87dbf00adfd561d0f08f25ba8023f60a9b67bd7f733edc021a31b54",
+        "score": 0.5593415023858848,
+        "distance": 0.44065849761411524
+      },
+      "hypothesis": "검색 P95를 1.6초에서 240밀리초로 낮췄다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-NI01#r1#w1",
+          "candidateRank": 1,
+          "text": "동일 20-query replay에서 검색 P95는 1.6초에서 240밀리초로 낮아졌다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-NI01#r1#w2",
+          "candidateRank": 2,
+          "text": "frequent-owner filter의 cardinality 문제를 줄이고 ranking rule 순서를 조정했다.\n동일 20-query replay에서 검색 P95는 1.6초에서 240밀리초로 낮아졌다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-NI01#r1#w3",
+          "candidateRank": 3,
+          "text": "동일 20-query replay에서 검색 P95는 1.6초에서 240밀리초로 낮아졌다.\nalias 전환 14회 동안 빈 결과가 노출된 횟수는 0건이었다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-NI01#r1#w4",
+          "candidateRank": 4,
+          "text": "[2025-07 — 성능과 검증]\nfrequent-owner filter의 cardinality 문제를 줄이고 ranking rule 순서를 조정했다.\n동일 20-query replay에서 검색 P95는 1.6초에서 240밀리초로 낮아졌다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-NI01#r1#w5",
+          "candidateRank": 5,
+          "text": "frequent-owner filter의 cardinality 문제를 줄이고 ranking rule 순서를 조정했다.\n동일 20-query replay에서 검색 P95는 1.6초에서 240밀리초로 낮아졌다.\nalias 전환 14회 동안 빈 결과가 노출된 횟수는 0건이었다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-CN01#r1",
+      "queryId": "V2-U04-CN01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 29,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "3ee287ff047f64e97e2b288ba520d6ba7b5228c3c71baa82dda7e4ac82aa7e57",
+        "score": 0.546896945217531,
+        "distance": 0.45310305478246904
+      },
+      "hypothesis": "계약 원본은 보존하면서 파싱 결과와 검색 인덱스를 각각 새 버전으로 교체했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-CN01#r1#w1",
+          "candidateRank": 1,
+          "text": "계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다.\nupload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다.\n원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-CN01#r1#w2",
+          "candidateRank": 2,
+          "text": "ScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다.\n실제 창작자, 음원, 계약 또는 정산 정보는 없다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-CN01#r1#w3",
+          "candidateRank": 3,
+          "text": "계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-CN01#r1#w4",
+          "candidateRank": 4,
+          "text": "원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-CN01#r1#w5",
+          "candidateRank": 5,
+          "text": "[2025-03 — 원본과 파생물]\n계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-CN01#r2",
+      "queryId": "V2-U04-CN01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 26,
+        "documentId": 7,
+        "documentVersionId": 8,
+        "sourceType": "PAGE",
+        "sourceIndex": 1,
+        "contentSha256": "8c9f002f677764cf691cc69314748b7f49f51d6949def5baeacf247ffaafeb7a",
+        "score": 0.5444388876353993,
+        "distance": 0.45556111236460073
+      },
+      "hypothesis": "계약 원본은 보존하면서 파싱 결과와 검색 인덱스를 각각 새 버전으로 교체했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-CN01#r2#w1",
+          "candidateRank": 1,
+          "text": "검증 뒤 alias를 원자적으로 교체했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-CN01#r2#w2",
+          "candidateRank": 2,
+          "text": "새 schema는 versioned index에서 만들고 sample query\n검증 뒤 alias를 원자적으로 교체했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-CN01#r2#w3",
+          "candidateRank": 3,
+          "text": "검증 뒤 alias를 원자적으로 교체했다.\n• index build 동안 기존 alias가 요청 처리"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-CN01#r2#w4",
+          "candidateRank": 4,
+          "text": "권리자, 작품명, ISWC prefix, territory를 filterable attribute로 구성했다.\n새 schema는 versioned index에서 만들고 sample query\n검증 뒤 alias를 원자적으로 교체했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-CN01#r2#w5",
+          "candidateRank": 5,
+          "text": "새 schema는 versioned index에서 만들고 sample query\n검증 뒤 alias를 원자적으로 교체했다.\n• index build 동안 기존 alias가 요청 처리"
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-CN01#r3",
+      "queryId": "V2-U04-CN01",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 31,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "1234bdc7fa0dc4090fe34a0ce168f021e412566edae39ac6f36b588fa7ad6375",
+        "score": 0.512732088565841,
+        "distance": 0.48726791143415904
+      },
+      "hypothesis": "계약 원본은 보존하면서 파싱 결과와 검색 인덱스를 각각 새 버전으로 교체했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-CN01#r3#w1",
+          "candidateRank": 1,
+          "text": "검색 속도보다 먼저 원본, 파생 extraction, 검색 index, conflict 상태의 버전을 분리해야 했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-CN01#r3#w2",
+          "candidateRank": 2,
+          "text": "[회고]\n검색 속도보다 먼저 원본, 파생 extraction, 검색 index, conflict 상태의 버전을 분리해야 했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-CN01#r3#w3",
+          "candidateRank": 3,
+          "text": "검색 속도보다 먼저 원본, 파생 extraction, 검색 index, conflict 상태의 버전을 분리해야 했다.\ncontent hash는 중복 작업을 줄였고 alias 교체는 검색 연속성을 지켰지만, 권리 충돌의 진실을 자동으로 결정하는 도구는 아니었다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-CN01#r3#w4",
+          "candidateRank": 4,
+          "text": "현재 추천 표시는 장르와 territory에 대한 규칙형 facet뿐이다.\n[회고]\n검색 속도보다 먼저 원본, 파생 extraction, 검색 index, conflict 상태의 버전을 분리해야 했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-CN01#r3#w5",
+          "candidateRank": 5,
+          "text": "[회고]\n검색 속도보다 먼저 원본, 파생 extraction, 검색 index, conflict 상태의 버전을 분리해야 했다.\ncontent hash는 중복 작업을 줄였고 alias 교체는 검색 연속성을 지켰지만, 권리 충돌의 진실을 자동으로 결정하는 도구는 아니었다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-CN01#r4",
+      "queryId": "V2-U04-CN01",
+      "originalRank": 4,
+      "resultIdentity": {
+        "chunkId": 30,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "f5162299c87dbf00adfd561d0f08f25ba8023f60a9b67bd7f733edc021a31b54",
+        "score": 0.5125210255334316,
+        "distance": 0.4874789744665684
+      },
+      "hypothesis": "계약 원본은 보존하면서 파싱 결과와 검색 인덱스를 각각 새 버전으로 교체했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-CN01#r4#w1",
+          "candidateRank": 1,
+          "text": "두 source가 같은 territory의 지분을 각각 100%로 주장하면 자동으로 한쪽을 선택하지 않았다.\nsource priority, 계약 유효 기간, 수동 review 상태를 conflict record에 남겼다.\n검색 결과는 미해결 충돌 배지를 보여줬지만 정산 비율을 임의로 계산하지 않았다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-CN01#r4#w2",
+          "candidateRank": 2,
+          "text": "두 source가 같은 territory의 지분을 각각 100%로 주장하면 자동으로 한쪽을 선택하지 않았다.\nsource priority, 계약 유효 기간, 수동 review 상태를 conflict record에 남겼다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-CN01#r4#w3",
+          "candidateRank": 3,
+          "text": "source priority, 계약 유효 기간, 수동 review 상태를 conflict record에 남겼다.\n검색 결과는 미해결 충돌 배지를 보여줬지만 정산 비율을 임의로 계산하지 않았다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-CN01#r4#w4",
+          "candidateRank": 4,
+          "text": "성능 수치는 warm replay 결과이며 첫 색인 build 시간과 섞지 않았다.\n[2025-09 — 권리 충돌]\n두 source가 같은 territory의 지분을 각각 100%로 주장하면 자동으로 한쪽을 선택하지 않았다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-CN01#r4#w5",
+          "candidateRank": 5,
+          "text": "[2025-09 — 권리 충돌]\n두 source가 같은 territory의 지분을 각각 100%로 주장하면 자동으로 한쪽을 선택하지 않았다.\nsource priority, 계약 유효 기간, 수동 review 상태를 conflict record에 남겼다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-CN02#r1",
+      "queryId": "V2-U04-CN02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 30,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "f5162299c87dbf00adfd561d0f08f25ba8023f60a9b67bd7f733edc021a31b54",
+        "score": 0.5443824691886642,
+        "distance": 0.4556175308113358
+      },
+      "hypothesis": "월별 정산 파일이 어느 시점의 권리 상태로 계산됐는지 나중에 재현할 수 있게 했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-CN02#r1#w1",
+          "candidateRank": 1,
+          "text": "SettleBoard export는 월별 18,600개 statement를 생성했다.\n이 숫자는 검색 corpus 규모와 다른 업무 지표다.\nexport는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-CN02#r1#w2",
+          "candidateRank": 2,
+          "text": "export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-CN02#r1#w3",
+          "candidateRank": 3,
+          "text": "이 숫자는 검색 corpus 규모와 다른 업무 지표다.\nexport는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-CN02#r1#w4",
+          "candidateRank": 4,
+          "text": "[2025-10 — 정산 주변 기능]\nSettleBoard export는 월별 18,600개 statement를 생성했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-CN02#r1#w5",
+          "candidateRank": 5,
+          "text": "검색 결과는 미해결 충돌 배지를 보여줬지만 정산 비율을 임의로 계산하지 않았다.\n[2025-10 — 정산 주변 기능]\nSettleBoard export는 월별 18,600개 statement를 생성했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-CN02#r2",
+      "queryId": "V2-U04-CN02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 31,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 3,
+        "contentSha256": "1234bdc7fa0dc4090fe34a0ce168f021e412566edae39ac6f36b588fa7ad6375",
+        "score": 0.5397408264180257,
+        "distance": 0.4602591735819743
+      },
+      "hypothesis": "월별 정산 파일이 어느 시점의 권리 상태로 계산됐는지 나중에 재현할 수 있게 했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-CN02#r2#w1",
+          "candidateRank": 1,
+          "text": "Board export는 월별 18,600개 statement를 생성했다.\n이 숫자는 검색 corpus 규모와 다른 업무 지표다.\nexport는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는지 재현 가능하게 했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-CN02#r2#w2",
+          "candidateRank": 2,
+          "text": "export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는지 재현 가능하게 했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-CN02#r2#w3",
+          "candidateRank": 3,
+          "text": "이 숫자는 검색 corpus 규모와 다른 업무 지표다.\nexport는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는지 재현 가능하게 했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-CN02#r2#w4",
+          "candidateRank": 4,
+          "text": "export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는지 재현 가능하게 했다.\n[검토했지만 선택하지 않은 것]"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-CN02#r2#w5",
+          "candidateRank": 5,
+          "text": "이 숫자는 검색 corpus 규모와 다른 업무 지표다.\nexport는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는지 재현 가능하게 했다.\n[검토했지만 선택하지 않은 것]"
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-CN02#r3",
+      "queryId": "V2-U04-CN02",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 29,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "3ee287ff047f64e97e2b288ba520d6ba7b5228c3c71baa82dda7e4ac82aa7e57",
+        "score": 0.5341488482026224,
+        "distance": 0.46585115179737757
+      },
+      "hypothesis": "월별 정산 파일이 어느 시점의 권리 상태로 계산됐는지 나중에 재현할 수 있게 했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-CN02#r3#w1",
+          "candidateRank": 1,
+          "text": "권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-CN02#r3#w2",
+          "candidateRank": 2,
+          "text": "2,300,000개 work record를 Meilisearch에 색인했다.\n권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-CN02#r3#w3",
+          "candidateRank": 3,
+          "text": "권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다.\n새 sc"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-CN02#r3#w4",
+          "candidateRank": 4,
+          "text": "실제 창작자, 음원, 계약 또는 정산 정보는 없다.\n[2025-01 — 서로 다른 식별자]\nScoreRights Catalog는 출판사와 유통사에서 받은 work, recording, contract 자료를 연결했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-CN02#r3#w5",
+          "candidateRank": 5,
+          "text": "[2025-05 — 검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다.\n권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-N01#r1",
+      "queryId": "V2-U04-N01",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 29,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "3ee287ff047f64e97e2b288ba520d6ba7b5228c3c71baa82dda7e4ac82aa7e57",
+        "score": 0.5586632709914252,
+        "distance": 0.4413367290085748
+      },
+      "hypothesis": "ScoreRights의 production 검색을 Typesense로 운영했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-N01#r1#w1",
+          "candidateRank": 1,
+          "text": "ScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-N01#r1#w2",
+          "candidateRank": 2,
+          "text": "ScoreRights Catalog는 출판사와 유통사에서 받은 work, recording, contract 자료를 연결했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-N01#r1#w3",
+          "candidateRank": 3,
+          "text": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U04\nScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-N01#r1#w4",
+          "candidateRank": 4,
+          "text": "ScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-N01#r1#w5",
+          "candidateRank": 5,
+          "text": "[2025-01 — 서로 다른 식별자]\nScoreRights Catalog는 출판사와 유통사에서 받은 work, recording, contract 자료를 연결했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-N01#r2",
+      "queryId": "V2-U04-N01",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 30,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "f5162299c87dbf00adfd561d0f08f25ba8023f60a9b67bd7f733edc021a31b54",
+        "score": 0.5626824459945206,
+        "distance": 0.43731755400547945
+      },
+      "hypothesis": "ScoreRights의 production 검색을 Typesense로 운영했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-N01#r2#w1",
+          "candidateRank": 1,
+          "text": "검색 구조]"
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-N01#r2#w2",
+          "candidateRank": 2,
+          "text": "2,300,000개 work record를 Meilisearch에 색인했다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-N01#r2#w3",
+          "candidateRank": 3,
+          "text": "권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-N01#r2#w4",
+          "candidateRank": 4,
+          "text": "새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-N01#r2#w5",
+          "candidateRank": 5,
+          "text": "색인 구축 중에도 기존 index가 요청을 처리했다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-N02#r1",
+      "queryId": "V2-U04-N02",
+      "originalRank": 1,
+      "resultIdentity": {
+        "chunkId": 28,
+        "documentId": 7,
+        "documentVersionId": 8,
+        "sourceType": "PAGE",
+        "sourceIndex": 2,
+        "contentSha256": "6dbe8f20261789cd396e52d90a3eac0b61f2e79e6e8526ffd0867e97d2256f25",
+        "score": 0.5239962779284747,
+        "distance": 0.4760037220715253
+      },
+      "hypothesis": "저작권 정산 이력을 블록체인 원장에 기록하도록 구현했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-N02#r1#w1",
+          "candidateRank": 1,
+          "text": "블록체인 기반 정산\n원장은 제품 범위에 없었고 설계하거나 구현하지 않았다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-N02#r1#w2",
+          "candidateRank": 2,
+          "text": "Typesense는 50,000개 sample record 비교에만 사용했고 production 검색 엔진으로 전환하지 않았다.\n블록체인 기반 정산\n원장은 제품 범위에 없었고 설계하거나 구현하지 않았다."
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-N02#r1#w3",
+          "candidateRank": 3,
+          "text": "블록체인 기반 정산\n원장은 제품 범위에 없었고 설계하거나 구현하지 않았다.\n현재 추천 표시는 규칙형 facet이다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-N02#r1#w4",
+          "candidateRank": 4,
+          "text": "블록체인 기반 정산"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-N02#r1#w5",
+          "candidateRank": 5,
+          "text": "Typesense는 50,000개 sample record 비교에만 사용했고 production 검색 엔진으로 전환하지 않았다.\n블록체인 기반 정산"
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-N02#r2",
+      "queryId": "V2-U04-N02",
+      "originalRank": 2,
+      "resultIdentity": {
+        "chunkId": 29,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 1,
+        "contentSha256": "3ee287ff047f64e97e2b288ba520d6ba7b5228c3c71baa82dda7e4ac82aa7e57",
+        "score": 0.5612394903982204,
+        "distance": 0.4387605096017796
+      },
+      "hypothesis": "저작권 정산 이력을 블록체인 원장에 기록하도록 구현했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-N02#r2#w1",
+          "candidateRank": 1,
+          "text": "ScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다.\n실제 창작자, 음원, 계약 또는 정산 정보는 없다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-N02#r2#w2",
+          "candidateRank": 2,
+          "text": "ScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-N02#r2#w3",
+          "candidateRank": 3,
+          "text": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U04\nScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체"
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-N02#r2#w4",
+          "candidateRank": 4,
+          "text": "ScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다."
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-N02#r2#w5",
+          "candidateRank": 5,
+          "text": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U04\nScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다."
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-N02#r3",
+      "queryId": "V2-U04-N02",
+      "originalRank": 3,
+      "resultIdentity": {
+        "chunkId": 30,
+        "documentId": 8,
+        "documentVersionId": 9,
+        "sourceType": "TEXT_CHUNK",
+        "sourceIndex": 2,
+        "contentSha256": "f5162299c87dbf00adfd561d0f08f25ba8023f60a9b67bd7f733edc021a31b54",
+        "score": 0.5123019189114764,
+        "distance": 0.48769808108852364
+      },
+      "hypothesis": "저작권 정산 이력을 블록체인 원장에 기록하도록 구현했다.",
+      "evidenceWindows": [
+        {
+          "id": "W1",
+          "sourceCandidateId": "V2-U04-N02#r3#w1",
+          "candidateRank": 1,
+          "text": "검색 결과는 미해결 충돌 배지를 보여줬지만 정산 비율을 임의로 계산하지 않았다."
+        },
+        {
+          "id": "W2",
+          "sourceCandidateId": "V2-U04-N02#r3#w2",
+          "candidateRank": 2,
+          "text": "[2025-10 — 정산 주변 기능]"
+        },
+        {
+          "id": "W3",
+          "sourceCandidateId": "V2-U04-N02#r3#w3",
+          "candidateRank": 3,
+          "text": "source priority, 계약 유효 기간, 수동 review 상태를 conflict record에 남겼다.\n검색 결과는 미해결 충돌 배지를 보여줬지만 정산 비율을 임의로 계산하지 않았다."
+        },
+        {
+          "id": "W4",
+          "sourceCandidateId": "V2-U04-N02#r3#w4",
+          "candidateRank": 4,
+          "text": "검색 결과는 미해결 충돌 배지를 보여줬지만 정산 비율을 임의로 계산하지 않았다.\n[2025-10 — 정산 주변 기능]"
+        },
+        {
+          "id": "W5",
+          "sourceCandidateId": "V2-U04-N02#r3#w5",
+          "candidateRank": 5,
+          "text": "[2025-10 — 정산 주변 기능]\nSettleBoard export는 월별 18,600개 statement를 생성했다."
+        }
+      ]
+    }
+  ]
+}

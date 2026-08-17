@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "dataset": "PRZ-016-P7-A-v2-cross-document-generalization",
+  "syntheticOnly": true,
+  "activeCorpusRule": "Only activeDocuments may be loaded by P7-B.",
+  "supersedes": "../p7-cross-document-generalization/freeze-manifest.json",
+  "users": [
+    {"userKey":"SYN2-U01","domain":"construction-material dispatch and weighbridge integration","style":"operations-heavy resume and incident case study"},
+    {"userKey":"SYN2-U02","domain":"satellite imagery data platform","style":"data engineering resume and experiment notebook"},
+    {"userKey":"SYN2-U03","domain":"rail control simulation","style":"invariant-oriented resume and design decision record"},
+    {"userKey":"SYN2-U04","domain":"music rights metadata and search","style":"product resume and chronological portfolio"}
+  ],
+  "activeDocuments": [
+    {"documentKey":"SYN2-U01-RESUME","userKey":"SYN2-U01","documentType":"RESUME","format":"PDF","versionKey":"SYN2-U01-RESUME-V1","path":"dataset/documents/syn2-u01-resume-v1.pdf","active":true,"expectedPages":2},
+    {"documentKey":"SYN2-U01-PORTFOLIO","userKey":"SYN2-U01","documentType":"PORTFOLIO","format":"TXT","versionKey":"SYN2-U01-PORTFOLIO-V1","path":"dataset/documents/syn2-u01-portfolio-v1.txt","active":true},
+    {"documentKey":"SYN2-U02-RESUME","userKey":"SYN2-U02","documentType":"RESUME","format":"PDF","versionKey":"SYN2-U02-RESUME-V1","path":"dataset/documents/syn2-u02-resume-v1.pdf","active":true,"expectedPages":2},
+    {"documentKey":"SYN2-U02-PORTFOLIO","userKey":"SYN2-U02","documentType":"PORTFOLIO","format":"TXT","versionKey":"SYN2-U02-PORTFOLIO-V1","path":"dataset/documents/syn2-u02-portfolio-v1.txt","active":true},
+    {"documentKey":"SYN2-U03-RESUME","userKey":"SYN2-U03","documentType":"RESUME","format":"PDF","versionKey":"SYN2-U03-RESUME-V1","path":"dataset/documents/syn2-u03-resume-v1.pdf","active":true,"expectedPages":2},
+    {"documentKey":"SYN2-U03-PORTFOLIO","userKey":"SYN2-U03","documentType":"PORTFOLIO","format":"TXT","versionKey":"SYN2-U03-PORTFOLIO-V1","path":"dataset/documents/syn2-u03-portfolio-v1.txt","active":true},
+    {"documentKey":"SYN2-U04-RESUME","userKey":"SYN2-U04","documentType":"RESUME","format":"PDF","versionKey":"SYN2-U04-RESUME-V1","path":"dataset/documents/syn2-u04-resume-v1.pdf","active":true,"expectedPages":2},
+    {"documentKey":"SYN2-U04-PORTFOLIO","userKey":"SYN2-U04","documentType":"PORTFOLIO","format":"TXT","versionKey":"SYN2-U04-PORTFOLIO-V1","path":"dataset/documents/syn2-u04-portfolio-v1.txt","active":true}
+  ],
+  "inactiveVersionFixtures": [
+    {"documentKey":"SYN2-U03-RESUME","userKey":"SYN2-U03","documentType":"RESUME","format":"TXT","versionKey":"SYN2-U03-RESUME-V0","path":"dataset/inactive-versions/syn2-u03-resume-v0.txt","active":false,"purpose":"inactive-version-only negative"}
+  ],
+  "pdfSources": [
+    "dataset/pdf-sources/syn2-u01-resume-v1.json",
+    "dataset/pdf-sources/syn2-u02-resume-v1.json",
+    "dataset/pdf-sources/syn2-u03-resume-v1.json",
+    "dataset/pdf-sources/syn2-u04-resume-v1.json"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-semantic-nli-fresh-validation",
+  "status": "FROZEN_PRE_RUN",
+  "pairsSha256": "5614b910c5a7747627d0033cc797d7f0970872d58692705ac3b6e46e6427e002",
+  "groundTruthSha256": "d632ad219d55a009ac00773c907b6b413a9f950c9a5ee7724019fd74d472642b",
+  "counts": {"SUPPORT": 14, "CONTRADICT": 14, "UNKNOWN": 8, "TOTAL": 36},
+  "gate": {"supportMin": 13, "contradictFalseSupportMax": 1, "unknownFalseSupportMax": 1, "supportContradictMax": 1},
+  "immutabilityRule": "Do not modify pairs.json, ground-truth.json, hypotheses, or gates after this freeze. Run the local model once only."
+}

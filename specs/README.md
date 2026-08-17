@@ -6,7 +6,8 @@
 
 ## 읽는 순서
 
-각 PRZ는 다음 순서로 읽는다.
+각 PRZ는 다음 순서로 읽는다. Phase를 가진 PRZ는 상위 `spec.md`와 `evidence.md`를 먼저
+읽고, 필요한 Phase의 하위 문서를 확인한다.
 
 1. `spec.md`에서 목적, 기능 구성, 동작·상태 흐름과 보존 계약을 확인한다.
 2. `plan.md`에서 구현 전에 선택한 단계, 검증·rollback과 중단 조건을 확인한다.
@@ -37,8 +38,10 @@ flowchart TD
     PRZ012["PRZ-012 검색 근거 표현 품질"]
     PRZ013["PRZ-013 OpenProxy 단일 Primary Gate"]
     PRZ015["PRZ-015 읽기 전용 MCP Career Evidence 검색"]
+    PRZ016["PRZ-016 Search Performance V2"]
 
     PRZ000 --> PRZ001 --> PRZ008 --> PRZ012 --> PRZ015
+    PRZ012 --> PRZ016
     PRZ000 --> PRZ002 --> PRZ003 --> PRZ005
     PRZ002 --> PRZ004 --> PRZ005
     PRZ005 --> PRZ013
@@ -105,6 +108,10 @@ flowchart TD
 - Registry 도입 전 기능은 `AS_BUILT_BASELINE`으로만 기록한다. 존재하지 않았던
   Issue·PR·review를 만들거나 과거에 있었던 것처럼 기록하지 않는다.
 - 새 기능과 observable contract 변경은 구현 전에 `spec.md`를 작성한다.
+- PRZ는 독립적인 기능 또는 자체 목적이 있는 기술 목표 단위로만 발급한다. 동일 목표의
+  순차 개선·실험은 새 PRZ를 만들지 않고 상위 PRZ의 `P0`, `P1` 등의 Phase로 관리한다.
+  예를 들어 Search Performance V2의 benchmark, numeric retrieval, reranking과 query
+  understanding은 각각 Phase이며 독립 PRZ가 아니다.
 - 새 기능과 관찰 가능한 계약 변경에는 구현 전에 `plan.md`와 `tasks.md`가
   필요하다. 제품 동작을 바꾸지 않는 문서 전용 수정은 생략 이유와 확인 결과를
   남길 수 있다.
@@ -204,6 +211,12 @@ flowchart TD
     연결하고 애플리케이션은 OpenProxy `:6432/opensql`을 거쳐 실행. Ollama `bge-m3`,
     공식 Java MCP Client와 USER JWT 전체 흐름 통과; `P3 PASS`: OSS 문서 통합)
   - GitHub: [PR #46](https://github.com/jaemin-devlog/PRIZM/pull/46), merge commit `23166e7`
+- **Spec ID:** [PRZ-016](PRZ-016-search-performance-v2/spec.md)
+  - 이름: Search Performance V2
+  - 상태: `DEFERRED`
+  - Source commit: —
+  - Last verified: 2026-08-17 (P0~P4 adopted; P5/P7-B generalization `FAIL`;
+    Hybrid·rule·NLI·GPT/Qwen shadow `NO_GO`; `PRZ_016_STATE_FROZEN`)
 
 ## 환경별 판정 주의
 

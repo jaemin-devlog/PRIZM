@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-B-EVIDENCE-CONTEXT-FINAL-COMPARISON",
+  "evaluatedAt": "2026-08-17T00:52:30.3150524+09:00",
+  "integrity": {
+    "result": "PASS",
+    "allHashesCheckedBeforeGroundTruth": true,
+    "inputs": {
+      "raw": "defc5e35dbf26f48a640f3df673e2247c14437b0cb65e8c8c05a0bd3b6e2cb2e",
+      "c0Pairs": "e48fb53e26c2c88960d054d8fcea2a0df33f38774c235258e06dafbe5f4ee758",
+      "c0Nli": "1d1e42f7f9d42bde7a67fe3c574e7848334f6d9970ed7ee021465a6f18060f78",
+      "c0Numeric": "fa72410888fd8c80aaeb8302a0fb1be1a29d80a19bac08d5d22086fef82b70be",
+      "c1Pairs": "6d4405fa2b550bf9cc229a58e6ed955f23e16559b430cddd66c129847612ba03",
+      "c1Nli": "1ad13ee7acd0ba9cecba42978bbc35c263472bd1be912542634e771abe39f1f0",
+      "c1Numeric": "007920fa6bac1f07fa7378a1f8080bf75ba0455b48b62182aacdf3081c703c61",
+      "c2Pairs": "92dbf81e8ce91294d84613a3dfea3625d5d3f746757d68244cedf82def488edc",
+      "c2Nli": "a4b36724f5c1d36955cd75df7cbd4e282c316e09a5a28777ed79973d6798f21f",
+      "c2Numeric": "cee144e6bdfbf2c49beab1584c05f25df686993e387c63f7a3f3a9f49d129ca0"
+    }
+  },
+  "baseline": {
+    "top1": { "count": 12, "total": 36, "rate": 0.3333333333333333 },
+    "recallAt3": { "count": 21, "total": 36, "rate": 0.5833333333333334 },
+    "recallAt5": { "count": 21, "total": 36, "rate": 0.5833333333333334 },
+    "mrrAt5": 0.44907407407407407,
+    "negativeFpr": { "count": 5, "total": 12, "rate": 0.4166666666666667 },
+    "pass": 28,
+    "fail": 20
+  },
+  "c0": {
+    "top1": { "count": 5, "total": 36, "rate": 0.1388888888888889 },
+    "recallAt3": { "count": 7, "total": 36, "rate": 0.19444444444444445 },
+    "recallAt5": { "count": 7, "total": 36, "rate": 0.19444444444444445 },
+    "mrrAt5": 0.16666666666666666,
+    "negativeFpr": { "count": 1, "total": 12, "rate": 0.08333333333333333 },
+    "positiveRetained": 7,
+    "positiveRegression": 14,
+    "pass": 18,
+    "fail": 30
+  },
+  "c1": {
+    "top1": { "count": 6, "total": 36, "rate": 0.16666666666666666 },
+    "recallAt3": { "count": 8, "total": 36, "rate": 0.2222222222222222 },
+    "recallAt5": { "count": 8, "total": 36, "rate": 0.2222222222222222 },
+    "mrrAt5": 0.19444444444444445,
+    "negativeFpr": { "count": 1, "total": 12, "rate": 0.08333333333333333, "ids": ["V2-U01-N03"] },
+    "positiveRetained": 8,
+    "positiveRegression": 13,
+    "regressionIds": [
+      "V2-U01-D02", "V2-U01-NV01", "V2-U01-IP01", "V2-U01-CN01",
+      "V2-U02-D01", "V2-U02-NV01", "V2-U02-IP01", "V2-U03-D01",
+      "V2-U03-NV01", "V2-U03-IP02", "V2-U04-NV01", "V2-U04-NV02",
+      "V2-U04-IP02"
+    ],
+    "recoveredFromC0": { "count": 2, "total": 14, "ids": ["V2-U01-IP02", "V2-U04-CN01"] },
+    "rootCauseRecovery": {
+      "snippetLocalization": { "count": 0, "total": 8, "ids": [] },
+      "multiSentenceContextLoss": { "count": 1, "total": 3, "ids": ["V2-U04-CN01"] },
+      "nliSemanticFailure": { "count": 1, "total": 3, "ids": ["V2-U01-IP02"] }
+    },
+    "rankImproved": { "count": 1, "ids": ["V2-U01-IP02"] },
+    "filtering": { "support": 24, "nonSupport": 62, "numericVeto": 0 },
+    "latencyMs": { "average": 905.4288453480694, "p95": 1299.5069000025978, "total": 77866.88069993397 },
+    "pass": 19,
+    "fail": 29,
+    "gate": {
+      "negativeFpr": "PASS",
+      "top1": "FAIL",
+      "recallAt5": "FAIL",
+      "positiveRegression": "FAIL",
+      "newEvidence": "PASS",
+      "final": "CONTEXT_CANDIDATE_FAIL"
+    }
+  },
+  "c2": {
+    "top1": { "count": 7, "total": 36, "rate": 0.19444444444444445 },
+    "recallAt3": { "count": 8, "total": 36, "rate": 0.2222222222222222 },
+    "recallAt5": { "count": 8, "total": 36, "rate": 0.2222222222222222 },
+    "mrrAt5": 0.20833333333333334,
+    "negativeFpr": { "count": 1, "total": 12, "rate": 0.08333333333333333, "ids": ["V2-U01-N03"] },
+    "positiveRetained": 8,
+    "positiveRegression": 13,
+    "regressionIds": [
+      "V2-U01-D02", "V2-U01-NV01", "V2-U01-IP01", "V2-U01-IP02",
+      "V2-U01-CN01", "V2-U02-D01", "V2-U02-NV01", "V2-U02-IP01",
+      "V2-U03-D01", "V2-U03-NV01", "V2-U03-IP02", "V2-U04-NV02",
+      "V2-U04-IP02"
+    ],
+    "recoveredFromC0": { "count": 1, "total": 14, "ids": ["V2-U04-CN01"] },
+    "rootCauseRecovery": {
+      "snippetLocalization": { "count": 0, "total": 8, "ids": [] },
+      "multiSentenceContextLoss": { "count": 1, "total": 3, "ids": ["V2-U04-CN01"] },
+      "nliSemanticFailure": { "count": 0, "total": 3, "ids": [] }
+    },
+    "rankImproved": { "count": 1, "ids": ["V2-U03-CN01"] },
+    "filtering": { "support": 28, "nonSupport": 58, "numericVeto": 0 },
+    "latencyMs": { "average": 948.9313534883644, "p95": 1212.0186999964062, "total": 81608.09639999934 },
+    "pass": 19,
+    "fail": 29,
+    "gate": {
+      "negativeFpr": "PASS",
+      "top1": "FAIL",
+      "recallAt5": "FAIL",
+      "positiveRegression": "FAIL",
+      "newEvidence": "PASS",
+      "final": "CONTEXT_CANDIDATE_FAIL"
+    }
+  },
+  "negativeNumericIssue": {
+    "id": "V2-U01-N03",
+    "classification": "METRIC_BINDING_MISS",
+    "c1": { "combinedLabel": "SUPPORT", "numericVeto": null, "falsePositiveRemains": true },
+    "c2": { "combinedLabel": "SUPPORT", "numericVeto": null, "falsePositiveRemains": true }
+  },
+  "newEvidenceGenerated": 0,
+  "best": "NONE",
+  "next": "EVIDENCE_LOCALIZATION_REDESIGN"
+}

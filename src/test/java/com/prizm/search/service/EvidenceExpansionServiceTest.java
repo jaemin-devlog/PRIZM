@@ -133,6 +133,132 @@ class EvidenceExpansionServiceTest {
         verify(repository, never()).findActiveVersionChunks(7L, 10L, 20L);
     }
 
+    @Test
+    void prefersDetailedDuplicateStorageEvidenceOverOutboxAndSummaryEvidence() {
+        VectorSearchResult result = result(
+                99L,
+                "Outbox는 알림 ID와 디바이스 ID 조합에 unique constraint를 적용해 "
+                        + "같은 알림의 중복 발송 이벤트를 차단했습니다.",
+                3,
+                "3페이지");
+        EvidenceChunk summary = chunk(
+                93L,
+                1,
+                "1페이지",
+                "이 포트폴리오는 대표 문제 해결 사례를 요약했습니다.\n"
+                        + "4,400회 재현 테스트 / 중복 저장 0건");
+        EvidenceChunk detail = chunk(
+                96L,
+                2,
+                "2페이지",
+                "03 동시성 정합성 테스트 결과\n"
+                        + "MySQL 합계 4방식 × 4조건 / 4,400회 성공 800 / 예상 차단 3,600 / 중복 저장 0건");
+        when(repository.findActiveVersionChunks(7L, 10L, 20L))
+                .thenReturn(List.of(summary, detail));
+
+        EvidencePresentation presentation = service.select(
+                7L,
+                "데이터가 중복 저장되는 문제 해결한 적 있어?",
+                result);
+
+        assertThat(presentation.evidenceChunkId()).isEqualTo(96L);
+        assertThat(presentation.evidenceSourceLabel()).isEqualTo("2페이지");
+        assertThat(presentation.snippet()).contains("중복 저장 0건");
+    }
+
+    @Test
+    void expandsFromGenericServerSummaryToDeploymentAction() {
+        VectorSearchResult result = result(
+                87L,
+                "기능 구현에서 끝나지 않고 외부 서비스 실패 상황에서도 사용자 흐름이 "
+                        + "끊기지 않는 서버 구조를 설계하는 백엔드",
+                1,
+                "1페이지");
+        EvidenceChunk deployment = chunk(
+                91L,
+                2,
+                "2페이지",
+                "서버 재시작이나 배포 시 Spring Boot / MySQL / Redis를 각각 관리해야 하는 운영 부담 확인.\n"
+                        + "배포 환경 구축을 담당해 GCP Ubuntu 서버에서 Docker Compose로 세 서비스를 함께 실행하도록 구성.");
+        when(repository.findActiveVersionChunks(7L, 10L, 20L)).thenReturn(List.of(deployment));
+
+        EvidencePresentation presentation = service.select(
+                7L,
+                "서버에 서비스를 올려본 적 있어?",
+                result);
+
+        assertThat(presentation.evidenceChunkId()).isEqualTo(91L);
+        assertThat(presentation.evidenceSourceLabel()).isEqualTo("2페이지");
+        assertThat(presentation.snippet()).contains("GCP Ubuntu 서버").contains("Docker Compose");
+    }
+
+    @Test
+    void localizesStalledWorkQuestionToNumericRecoveryEvidenceRow() {
+        VectorSearchResult result = result(
+                103L,
+                "별도였던 소개 정보 동기화를 상세 동기화 흐름에 통합해 같은 관광지를 "
+                        + "다시 순회하는 단계를 제거했습니다.",
+                5,
+                "5페이지");
+        EvidenceChunk recovery = chunk(
+                100L,
+                3,
+                "3페이지",
+                "오래 멈춘 작업 복구 재처리 대상 복구 만료 3건 복구 / 최근 1건 유지");
+        when(repository.findActiveVersionChunks(7L, 10L, 20L)).thenReturn(List.of(recovery));
+
+        EvidencePresentation presentation = service.select(
+                7L,
+                "오래 멈춘 작업을 다시 처리할 수 있게 한 경험은?",
+                result);
+
+        assertThat(presentation.evidenceChunkId()).isEqualTo(100L);
+        assertThat(presentation.evidenceSourceLabel()).isEqualTo("3페이지");
+        assertThat(presentation.snippet()).isEqualTo(
+                "오래 멈춘 작업 복구 재처리 대상 복구 만료 3건 복구 / 최근 1건 유지");
+    }
+
+    @Test
+    void replacesNumericSummaryWithStructuredDetailEvidence() {
+        VectorSearchResult result = result(
+                94L,
+                "검증 기준\n1,252건 기준 / 19분 22초 → 11초",
+                1,
+                "1페이지");
+        EvidenceChunk detail = chunk(
+                104L,
+                5,
+                "5페이지",
+                "03 결과\n동일 1,252건 기준 TourAPI 호출 시간을 약 19분 22초에서 11초로 줄였습니다.\n"
+                        + "성능 측정 결과");
+        when(repository.findActiveVersionChunks(7L, 10L, 20L)).thenReturn(List.of(detail));
+
+        EvidencePresentation presentation = service.select(7L, "19분 22초에서 11초", result);
+
+        assertThat(presentation.evidenceChunkId()).isEqualTo(104L);
+        assertThat(presentation.evidenceSourceLabel()).isEqualTo("5페이지");
+        assertThat(presentation.snippet()).contains("19분 22초에서 11초");
+    }
+
+    @Test
+    void keepsDetailedLocalEvidenceAheadOfNearbySummaryEvidence() {
+        VectorSearchResult result = result(
+                96L,
+                "후보 확정 직전에 DB row lock으로 팀방을 선점했습니다.\n"
+                        + "두 팀 ID를 정렬해 저장하고 unique constraint를 적용해 중복 매칭을 차단했습니다.",
+                2,
+                "2페이지");
+        EvidencePresentation presentation = service.select(
+                7L,
+                "row lock과 unique constraint로 중복 매칭을 차단한 결과는?",
+                result);
+
+        assertThat(presentation.evidenceChunkId()).isEqualTo(96L);
+        assertThat(presentation.evidenceSourceLabel()).isEqualTo("2페이지");
+        assertThat(presentation.snippet()).contains("unique constraint");
+        verify(repository, never()).findActiveVersionChunks(7L, 10L, 20L);
+    }
+
     private static VectorSearchResult result(
             long chunkId,
             String content,

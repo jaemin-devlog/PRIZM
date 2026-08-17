@@ -73,6 +73,14 @@ public class SearchSnippetGenerator {
      * whether same-document evidence expansion is necessary.
      */
     public SnippetSelection select(String query, String content) {
+        return select(query, content, false);
+    }
+
+    SnippetSelection selectForLocalization(String query, String content) {
+        return select(query, content, true);
+    }
+
+    private SnippetSelection select(String query, String content, boolean localization) {
         if (content == null || content.isBlank()) {
             return SnippetSelection.empty();
         }
@@ -82,7 +90,7 @@ public class SearchSnippetGenerator {
             return new SnippetSelection(content.trim(), false, 0, 0, false, false, false, 0);
         }
 
-        Set<String> queryTerms = queryTerms(query);
+        Set<String> queryTerms = queryTerms(query, localization);
         String normalizedQuery = normalizeForMatching(query == null ? "" : query).trim();
         boolean experienceQuery = containsAnyNormalizedToken(query, EXPERIENCE_QUERY_TERMS);
         List<SentenceEvidence> evidence = new ArrayList<>(sentences.size());
@@ -92,7 +100,8 @@ public class SearchSnippetGenerator {
                     sentences.get(index),
                     queryTerms,
                     normalizedQuery,
-                    experienceQuery));
+                    experienceQuery,
+                    localization));
         }
 
         SentenceEvidence anchor = evidence.stream()
@@ -211,7 +220,8 @@ public class SearchSnippetGenerator {
             String sentence,
             Set<String> queryTerms,
             String normalizedQuery,
-            boolean experienceQuery) {
+            boolean experienceQuery,
+            boolean localization) {
         String normalizedSentence = normalizeForMatching(sentence);
         int queryCoverage = (int) queryTerms.stream().filter(normalizedSentence::contains).count();
         int lexicalWeight = queryTerms.stream()
@@ -222,19 +232,31 @@ public class SearchSnippetGenerator {
                 .filter(SearchSnippetGenerator::isNumeric)
                 .filter(normalizedSentence::contains)
                 .count();
+        int localizationPhraseMatches = localization
+                ? adjacentQueryPhraseMatches(queryTerms, normalizedSentence)
+                : 0;
+        boolean action = ACTION_TERMS.stream().anyMatch(normalizedSentence::contains);
+        boolean problem = PROBLEM_TERMS.stream().anyMatch(normalizedSentence::contains);
+        boolean result = RESULT_TERMS.stream().anyMatch(normalizedSentence::contains);
         boolean metadata = isTitleOrMetadata(sentence, normalizedSentence);
+        if (localization
+                && metadata
+                && queryCoverage >= 2
+                && numericMatches == 0
+                && sentence.codePoints().anyMatch(Character::isDigit)
+                && (action || problem || result)) {
+            metadata = false;
+        }
         boolean exactPhrase = !metadata
                 && !normalizedQuery.isBlank()
                 && normalizedQuery.codePointCount(0, normalizedQuery.length()) >= 4
                 && normalizedSentence.contains(normalizedQuery);
-        boolean action = ACTION_TERMS.stream().anyMatch(normalizedSentence::contains);
-        boolean problem = PROBLEM_TERMS.stream().anyMatch(normalizedSentence::contains);
-        boolean result = RESULT_TERMS.stream().anyMatch(normalizedSentence::contains);
         boolean narrative = TERMINAL_PUNCTUATION.matcher(sentence).find()
                 && (action || problem || result);
         boolean technicalList = isTechnicalList(sentence);
 
         int score = queryCoverage * 10_000 + lexicalWeight * 20 + numericMatches * 1_500;
+        score += localizationPhraseMatches * 2_000;
         score += exactPhrase ? 100_000 : 0;
         score += experienceQuery && narrative ? 3_000 : 0;
         if (queryCoverage > 0) {
@@ -292,7 +314,7 @@ public class SearchSnippetGenerator {
         return right;
     }
 
-    private static Set<String> queryTerms(String query) {
+    private static Set<String> queryTerms(String query, boolean localization) {
         if (query == null || query.isBlank()) {
             return Set.of();
         }
@@ -300,12 +322,27 @@ public class SearchSnippetGenerator {
         Matcher matcher = TOKEN_PATTERN.matcher(normalizeForMatching(query));
         Set<String> terms = new LinkedHashSet<>();
         while (matcher.find()) {
-            String term = normalizeQueryTerm(matcher.group());
+            String term = normalizeQueryTerm(matcher.group(), localization);
             if (term.length() > 1 && !GENERIC_QUERY_TERMS.contains(term)) {
                 terms.add(term);
             }
         }
-        return Set.copyOf(terms);
+        return localization
+                ? java.util.Collections.unmodifiableSet(terms)
+                : Set.copyOf(terms);
+    }
+
+    private static int adjacentQueryPhraseMatches(
+            Set<String> orderedQueryTerms,
+            String normalizedSentence) {
+        List<String> terms = List.copyOf(orderedQueryTerms);
+        int matches = 0;
+        for (int index = 0; index < terms.size() - 1; index++) {
+            if (normalizedSentence.contains(terms.get(index) + " " + terms.get(index + 1))) {
+                matches++;
+            }
+        }
+        return matches;
     }
 
     private static boolean containsAnyNormalizedToken(String value, Set<String> expectedTerms) {
@@ -352,10 +389,13 @@ public class SearchSnippetGenerator {
         return value.codePoints().allMatch(Character::isDigit);
     }
 
-    private static String normalizeQueryTerm(String value) {
+    private static String normalizeQueryTerm(String value, boolean localization) {
         Matcher numericUnit = NUMERIC_UNIT_PATTERN.matcher(value);
         if (numericUnit.matches()) {
             return numericUnit.group(1);
+        }
+        if (localization && value.endsWith("되는") && value.length() > "되는".length() + 1) {
+            return value.substring(0, value.length() - "되는".length());
         }
         for (String suffix : KOREAN_QUERY_SUFFIXES) {
             if (value.endsWith(suffix)

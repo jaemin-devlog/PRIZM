@@ -1,0 +1,206 @@
+{
+  "authenticatedRole": "USER",
+  "summary": {
+    "focusedTop1": 4,
+    "focusedGatePassed": true,
+    "regressionChecks": 20,
+    "regressionFailures": 0,
+    "ownerAndActiveIsolationPreserved": true
+  },
+  "results": [
+    {
+      "id": "R01",
+      "query": "Spring Boot 백엔드 경험",
+      "state": "EVIDENCE_FOUND",
+      "correctRank": 1,
+      "topChunkId": 90,
+      "topDocument": "정재민 신입 백엔드 이력서",
+      "topPage": 2
+    },
+    {
+      "id": "R02",
+      "query": "동시성 처리 경험",
+      "state": "EVIDENCE_FOUND",
+      "correctRank": 1,
+      "topChunkId": 96,
+      "topDocument": "정재민 백엔드 포트폴리오",
+      "topPage": 3
+    },
+    {
+      "id": "R03",
+      "query": "TourAPI 연동 경험",
+      "state": "EVIDENCE_FOUND",
+      "correctRank": 2,
+      "topChunkId": 90,
+      "topDocument": "정재민 신입 백엔드 이력서",
+      "topPage": 2
+    },
+    {
+      "id": "R04",
+      "query": "여러 요청이 동시에 들어오면 어떻게 처리했어?",
+      "state": "EVIDENCE_FOUND",
+      "correctRank": 3,
+      "topChunkId": 103,
+      "topDocument": "정재민 백엔드 포트폴리오",
+      "topPage": 5
+    },
+    {
+      "id": "R05",
+      "query": "외부 호출 대기 시간이 누적되는 문제를 줄인 방법은?",
+      "state": "EVIDENCE_FOUND",
+      "correctRank": 1,
+      "topChunkId": 101,
+      "topDocument": "정재민 백엔드 포트폴리오",
+      "topPage": 4
+    },
+    {
+      "id": "R06",
+      "query": "Redis와 DB lock을 같이 사용해서 동시성 문제를 해결한 경험이 있어?",
+      "state": "EVIDENCE_FOUND",
+      "correctRank": 1,
+      "topChunkId": 96,
+      "topDocument": "정재민 백엔드 포트폴리오",
+      "topPage": 2
+    },
+    {
+      "id": "G13",
+      "query": "관광지 데이터를 가져오는 작업이 오래 걸렸을 때 뭘 했어?",
+      "state": "EVIDENCE_FOUND",
+      "correctRank": 1,
+      "topChunkId": 101,
+      "topDocument": "정재민 백엔드 포트폴리오",
+      "topPage": 4
+    },
+    {
+      "id": "G16",
+      "query": "서버 재시작 때 여러 서비스를 따로 관리하던 부담을 줄인 경험은?",
+      "state": "EVIDENCE_FOUND",
+      "correctRank": 1,
+      "topChunkId": 91,
+      "topDocument": "정재민 신입 백엔드 이력서",
+      "topPage": 2
+    }
+  ],
+  "regression": [
+    {
+      "query": "AirConnect 프로젝트",
+      "expected": "EVIDENCE_FOUND",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "query": "AirConnect에서 뭐했어?",
+      "expected": "EVIDENCE_FOUND",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "query": "Springboot",
+      "expected": "EVIDENCE_FOUND",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "query": "springboot",
+      "expected": "EVIDENCE_FOUND",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "query": "Spring Boot",
+      "expected": "EVIDENCE_FOUND",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "query": "Redis를 왜 사용했어?",
+      "expected": "EVIDENCE_FOUND",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "query": "배포 경험 알려줘",
+      "expected": "EVIDENCE_FOUND",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "query": "동시성 문제를 어떻게 해결했어?",
+      "expected": "EVIDENCE_FOUND",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "query": "FOR UPDATE SKIP LOCKED",
+      "expected": "EVIDENCE_FOUND",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "query": "19분 22초에서 11초",
+      "expected": "EVIDENCE_FOUND",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "query": "1,252건 API 처리",
+      "expected": "EVIDENCE_FOUND",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "query": "2,329행 처리",
+      "expected": "EVIDENCE_FOUND",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "query": "1,480건 선점",
+      "expected": "EVIDENCE_FOUND",
+      "state": "EVIDENCE_FOUND",
+      "passed": true
+    },
+    {
+      "query": "GraphQL API 구현 경험",
+      "expected": "NO_EVIDENCE",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "query": "Kubernetes 운영 경험",
+      "expected": "NO_EVIDENCE",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "query": "Kafka 운영 경험",
+      "expected": "NO_EVIDENCE",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "query": "결제 시스템 구현 경험",
+      "expected": "NO_EVIDENCE",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "query": "AWS Lambda 경험",
+      "expected": "NO_EVIDENCE",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "query": "Terraform 경험",
+      "expected": "NO_EVIDENCE",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    },
+    {
+      "query": "Jenkins 경험",
+      "expected": "NO_EVIDENCE",
+      "state": "NO_RELEVANT_RESULTS",
+      "passed": true
+    }
+  ]
+}

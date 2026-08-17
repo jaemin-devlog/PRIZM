@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-B-EVIDENCE-CONTEXT-SHADOW",
+  "frozenAt": "2026-08-16T15:41:19.2355025Z",
+  "groundTruthUsedBeforeFreeze": false,
+  "source": {
+    "rawResults": {
+      "path": "../p7-b-independent-generalization/raw-results.json",
+      "sha256": "defc5e35dbf26f48a640f3df673e2247c14437b0cb65e8c8c05a0bd3b6e2cb2e"
+    },
+    "frozenPairs": {
+      "path": "pairs.json",
+      "sha256": "e48fb53e26c2c88960d054d8fcea2a0df33f38774c235258e06dafbe5f4ee758"
+    },
+    "runnerPairs": {
+      "path": "runner-pairs.json",
+      "sha256": "603b0202bbbc02c1bc0ffad6a0a14eefd2e00c3c5b81f00349209ef99081ccc4"
+    }
+  },
+  "algorithms": {
+    "c1": "Split same-result content on sentence punctuation/newlines; when the normalized frozen snippet is locatable, retain its containing sentence span plus at most one previous and one next sentence; otherwise preserve C0 verbatim.",
+    "c2": "Split same-result content on sentence punctuation/newlines; score sentence-like units by character-trigram overlap with frozen hypothesis (weight 2) and frozen snippet (weight 1); select the earliest highest-scoring contiguous window of at most four units; preserve C0 when no positive overlap exists."
+  },
+  "c1": {
+    "path": "context-pairs-c1.json",
+    "sha256": "6d4405fa2b550bf9cc229a58e6ed955f23e16559b430cddd66c129847612ba03",
+    "pairCount": 86,
+    "maxSentenceCount": 6,
+    "derivedFromSameResultContent": 60,
+    "c0FallbackCount": 26,
+    "crossResultContamination": 0
+  },
+  "c2": {
+    "path": "context-pairs-c2.json",
+    "sha256": "92dbf81e8ce91294d84613a3dfea3625d5d3f746757d68244cedf82def488edc",
+    "pairCount": 86,
+    "maxSentenceCount": 4,
+    "derivedFromSameResultContent": 86,
+    "c0FallbackCount": 0,
+    "crossResultContamination": 0
+  },
+  "integrity": {
+    "queryIdRankOneToOne": true,
+    "hypothesisByteEquivalent": true,
+    "hypothesisMismatchCount": 0,
+    "duplicatePairCount": 0,
+    "parse": "PASS",
+    "freeze": "PASS"
+  },
+  "nliInference": "NOT_RUN",
+  "groundTruthScoring": "NOT_RUN"
+}

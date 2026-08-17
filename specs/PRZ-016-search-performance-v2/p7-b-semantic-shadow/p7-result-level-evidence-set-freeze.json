@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-B-RESULT-LEVEL-EVIDENCE-SET-FREEZE",
+  "frozenAt": "2026-08-16T20:18:37.746823+00:00",
+  "groundTruthUsedBeforeFreeze": false,
+  "sources": {
+    "candidatePairs": {
+      "path": "specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\p7-full-judge-v3-candidate-pairs.json",
+      "sha256": "e2c7538a86411075c929c09651823e72c458126fac75921b03761b15b162c1c5"
+    },
+    "claimAwareCandidates": {
+      "path": "specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\claim-localizer-candidates.json",
+      "sha256": "5ad9fd999e67f236c8480339786de1b6f0d8ef4bd6cb478da815f945c20dbacb"
+    }
+  },
+  "resultLevelDataset": {
+    "path": "specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\p7-result-level-evidence-set-pairs.json",
+    "sha256": "b0156ec5ac2ec243f6b23976ffbb433939c487af142c1142de2e25e0f16cd160",
+    "resultCount": 86,
+    "queryCountWithResults": 38,
+    "windowCount": 430,
+    "windowsPerResult": {
+      "min": 5,
+      "max": 5
+    }
+  },
+  "judge": {
+    "version": "PRZ-016-RESULT-LEVEL-EVIDENCE-SET-JUDGE-v1",
+    "model": "qwen3:4b-instruct",
+    "schemaSha256": "5a10a1b834ea8cce9caefe1c1f6f37452e94ba13b6bec2dec8be68dc371a0bf1",
+    "promptSha256": "969ab4310a22e51ae7a8a73125062005d1bce77204bab8a8f112537c1fed5180",
+    "adapter": {
+      "path": "C:\\Users\\정재민\\Project\\PRIZM\\scripts\\evaluation\\run_p7_result_level_evidence_set_judge.py",
+      "sha256": "dbe96b98c4da41fadbcc91b2f25d053a4616001024d5dacb6d91d96f8327ad4d"
+    }
+  },
+  "numeric": {
+    "adapter": {
+      "path": "C:\\Users\\정재민\\Project\\PRIZM\\scripts\\evaluation\\run_p7_result_level_evidence_set_numeric_shadow.py",
+      "sha256": "d55348497847c8ad7f0771c177a2e0b248dee104c331364b9e94f42334216473"
+    },
+    "verifier": {
+      "path": "C:\\Users\\정재민\\Project\\PRIZM\\scripts\\evaluation\\run_semantic_nli_numeric_shadow.py",
+      "sha256": "c7aa71b249ca16d77f9c6bac18cee6dd6de76f4debcd334159834191c6187118"
+    },
+    "unresolvedPolicy": "FAIL_CLOSED_NON_SUPPORT"
+  },
+  "builder": {
+    "version": "PRZ-016-P7-RESULT-LEVEL-EVIDENCE-SET-BUILDER-v1",
+    "path": "C:\\Users\\정재민\\Project\\PRIZM\\scripts\\evaluation\\build_p7_result_level_evidence_set_pairs.py",
+    "sha256": "4b9d79a4373270afa46dce1a25576df572802c9ae45686268e76523bfb9b4e0e"
+  },
+  "integrity": {
+    "sourceResultKeysMatch": true,
+    "sourceWindowTextMatch": true,
+    "candidateOrderPreserved": true,
+    "hypothesisChanged": 0,
+    "identityMismatch": 0,
+    "duplicateSourceCandidateIds": 0
+  },
+  "inference": "NOT_RUN",
+  "groundTruthScoring": "NOT_RUN"
+}

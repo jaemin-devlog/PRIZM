@@ -1,0 +1,19 @@
+PRIZM P7 합성 포트폴리오 — SYN-U02
+평가 전용 가상 사례. 실제 환자·기관·유전체 정보는 포함하지 않는다.
+
+사건 기록 01 — 입력 품질
+GeneTrail QC는 실험실에서 도착한 sample manifest를 FastAPI로 접수했다.
+12,600개 manifest를 검사하는 동안 checksum이 맞지 않은 317개를 격리했고,
+해당 항목은 Spark 계산 단계로 넘어가지 못하도록 차단했다.
+
+사건 기록 02 — 스케줄러 압력
+sequencer gateway가 동시에 받을 수 있는 연결 수가 제한되어 있었다.
+Airflow pool을 12개 task로 제한해 재시도 폭주와 외부 장비의 과부하를 막았다.
+
+사건 기록 03 — 재처리
+Delta Lake MERGE의 키는 lab-batch와 sample-id의 조합이었다.
+2,400,000개 record backfill을 실행했고 중복 반영 없이 정확히 한 번의 결과를 만들었다.
+
+사건 기록 04 — 선택하지 않은 것
+Apache Iceberg는 비교 실험만 수행했다. 운영 저장 형식은 Delta Lake를 유지했다.
+

@@ -1,0 +1,618 @@
+{
+  "schemaVersion": 1,
+  "mode": "NLI_PLUS_NUMERIC_SHADOW",
+  "results": [
+    {
+      "id": "v1-Q01",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q02",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q03",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q04",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q05",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q06",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q07",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q08",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q09",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q10",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q11",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q12",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q13",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q14",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q15",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q16",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q17",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q18",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q19",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q20",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q21",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q22",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v1-Q23",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": "SAME_METRIC_DIFFERENT_VALUE",
+      "correct": true
+    },
+    {
+      "id": "v1-Q24",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U01",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U02",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U03",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U04",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U05",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U06",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U07",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U08",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U09",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U10",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U11",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U12",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U13",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U14",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U15",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U16",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U17",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U18",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U19",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U20",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "v2-U21",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": "SAME_METRIC_DIFFERENT_VALUE",
+      "correct": true
+    },
+    {
+      "id": "v2-U22",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": "SAME_METRIC_DIFFERENT_VALUE",
+      "correct": true
+    },
+    {
+      "id": "v2-U23",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": "SAME_METRIC_DIFFERENT_VALUE",
+      "correct": true
+    },
+    {
+      "id": "v2-U24",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": "SAME_METRIC_DIFFERENT_VALUE",
+      "correct": true
+    },
+    {
+      "id": "adv-A01",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "adv-A02",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "adv-A03",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "adv-A04",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "adv-A05",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "adv-A06",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "adv-A07",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "adv-A08",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "adv-A09",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "adv-A10",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "adv-A11",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "adv-A12",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "adv-A13",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "adv-A14",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "adv-A15",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": "SAME_METRIC_DIFFERENT_VALUE",
+      "correct": true
+    },
+    {
+      "id": "adv-A16",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "unknown-01",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "unknown-02",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "unknown-03",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "unknown-04",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "unknown-05",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "unknown-06",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "unknown-07",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "unknown-08",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    }
+  ],
+  "summary": {
+    "nliOnly": {
+      "SUPPORT": {
+        "SUPPORT": 26,
+        "CONTRADICT": 0,
+        "UNKNOWN": 0
+      },
+      "CONTRADICT": {
+        "SUPPORT": 2,
+        "CONTRADICT": 36,
+        "UNKNOWN": 0
+      },
+      "UNKNOWN": {
+        "SUPPORT": 0,
+        "CONTRADICT": 5,
+        "UNKNOWN": 3
+      }
+    },
+    "combined": {
+      "SUPPORT": {
+        "SUPPORT": 26,
+        "CONTRADICT": 0,
+        "UNKNOWN": 0
+      },
+      "CONTRADICT": {
+        "SUPPORT": 0,
+        "CONTRADICT": 38,
+        "UNKNOWN": 0
+      },
+      "UNKNOWN": {
+        "SUPPORT": 0,
+        "CONTRADICT": 5,
+        "UNKNOWN": 3
+      }
+    }
+  }
+}

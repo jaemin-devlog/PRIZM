@@ -1,0 +1,27 @@
+{
+  "userKey": "SYN2-U02",
+  "name": "PARK SEO-YUN / 합성 프로필",
+  "role": "Data Platform Engineer · Earth Observation",
+  "notice": "PRIZM P7-A v2 synthetic resume — 실제 인물·기관·위성 자료와 무관",
+  "summary": "대규모 위성 영상 batch에서 대기 작업, 손상 입력, skew partition과 재처리 의미를 분리해 다루는 가상 데이터 엔지니어. Python API부터 Airflow orchestration, Spark 계산, Delta 품질 경계까지 연결한다.",
+  "metrics": [["6.4TB", "maximum daily imagery"], ["138 → 41 min", "mosaic pipeline"], ["9.6M", "scene backfill"], ["64", "corrupt GeoTIFF quarantined"]],
+  "pages": [
+    {
+      "label": "DATA PLATFORM EXPERIENCE",
+      "sections": [
+        {"heading":"Synthetic Orbital Analytics · Data Platform Engineer","meta":"2023.02 - 2026.05 | OrbitMosaic","paragraphs":["촬영 궤도별 GeoTIFF를 검증하고 일 단위 모자이크와 검색용 metadata를 만드는 pipeline을 담당했다. Python/FastAPI 입력 계약, Airflow scheduling, Spark transform, Delta Lake revision 모델을 한 흐름으로 운영했다."],"bullets":["FastAPI manifest endpoint에서 scene_id, revision, orbit, checksum, object URI 검증", "Airflow deferrable operator로 object-ready event 대기 중 worker slot 반환", "acquisition_date·orbit partition과 Spark adaptive query execution으로 skew 완화", "Delta MERGE의 scene_id + revision key로 동일 revision 재전송 중복 차단"]},
+        {"heading":"Measured outcomes","meta":"동일 40-node 조건","paragraphs":["최대 6.4TB 일일 입력의 end-to-end 시간을 138분에서 41분으로 줄였다. 9,600,000개 scene metadata backfill에서 active row 중복은 0건이었으며 날짜 범위 checkpoint로 중단 지점부터 재개했다."],"bullets":["작은 중간 파일을 모자이크 완료 시 병합", "executor 손실·object 지연·품질 오류를 별도 retry 정책으로 분리", "성능 결과에 quarantine 재전송 시간은 포함하지 않음"]},
+        {"heading":"Input quality gate","meta":"8,750 delivery package validation","paragraphs":["checksum 또는 TIFF directory가 손상된 GeoTIFF 64개를 quarantine table과 별도 object prefix로 옮겼다. 격리 scene은 모자이크와 공개 catalog에 들어가지 못하며 재전송 ticket을 추적했다."],"bullets":["오류 scene 단위 격리로 정상 package 내용은 보존", "원본 checksum과 발견 단계 기록", "재수신 뒤 revision·checksum을 다시 검증"]}
+      ]
+    },
+    {
+      "label": "OPERATIONS, TOOLS & BOUNDARIES",
+      "sections": [
+        {"heading":"CloudCal · Data Tooling Engineer","meta":"2021.08 - 2023.01 | calibration support","paragraphs":["분석가가 작은 보정 표본을 로컬에서 검토할 수 있도록 DuckDB export와 품질 report를 제공했다. 이 workload는 OrbitMosaic의 Spark 처리량과 분리해 측정했다."],"bullets":["schema drift report와 sample lineage 생성", "분석 notebook용 read-only snapshot 배포", "재현 가능한 calibration parameter bundle 관리"]},
+        {"heading":"Operational ownership","meta":"실행보다 실패 분류를 먼저","paragraphs":["on-call runbook을 object-not-ready, checksum mismatch, executor loss, Delta conflict로 나눴다. 같은 retry로 모든 오류를 숨기지 않고 각 경계의 소유자와 종료 조건을 기록했다."],"bullets":["Airflow task duration과 deferred duration 분리", "Spark stage skew dashboard", "quarantine aging 및 재전송 SLA 관측"]},
+        {"heading":"Technical profile","meta":"synthetic skills","paragraphs":["Python · FastAPI · Pytest · Airflow · Spark SQL · Delta Lake를 중심으로 작업했다. 데이터 계약은 JSON Schema와 property-based test로 검증했다."],"bullets":["DuckDB · GeoTIFF metadata · object storage", "structured event log · OpenLineage concepts", "backfill rehearsal · checkpoint recovery"]},
+        {"heading":"Explicit scope boundaries","meta":"검토와 구현을 구분","paragraphs":["Dask는 로컬 prototype 30건 비교에만 사용했고 production scheduler나 계산 엔진으로 채택하지 않았다. 외부 cloud mask model의 inference output은 소비했지만 객체 탐지 또는 cloud model을 직접 학습하지 않았다."],"bullets":["production orchestration: Airflow", "production distributed compute: Spark"]}
+      ]
+    }
+  ]
+}

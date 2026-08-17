@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-013-P6",
+  "authoredAt": "2026-08-14T19:00:00+09:00",
+  "status": "FROZEN_PRE_H2",
+  "ownerId": 1,
+  "activeCorpus": [
+    {"documentId":15,"title":"정재민 신입 백엔드 이력서","versionId":15,"status":"ACTIVE","chunkIds":[87,88,89,90,91,92]},
+    {"documentId":16,"title":"정재민 백엔드 포트폴리오","versionId":16,"status":"ACTIVE","chunkIds":[93,94,95,96,97,98,99,100,101,102,103,104]}
+  ],
+  "positives": [
+    {"id":"SP01","documentId":15,"versionId":15,"boundedChunkIds":[90,91],"anchorsAll":["Spring Boot","Docker Compose"]},
+    {"id":"SP02","documentId":15,"versionId":15,"boundedChunkIds":[91],"anchorsAll":["GCP Ubuntu","Nginx","HTTPS"]},
+    {"id":"SP03","documentId":15,"versionId":15,"boundedChunkIds":[90],"anchorsAll":["OAuth2/JWT"]},
+    {"id":"SP04","documentId":16,"versionId":16,"boundedChunkIds":[95],"anchorsAll":["Redis List","DB row lock"]},
+    {"id":"SP05","documentId":16,"versionId":16,"boundedChunkIds":[98,99],"anchorsAll":["FOR UPDATE SKIP LOCKED","Outbox"]},
+    {"id":"SP06","documentId":16,"versionId":16,"boundedChunkIds":[104],"anchorsAll":["680건","6.8초"]},
+    {"id":"SP07","documentId":16,"versionId":16,"boundedChunkIds":[96,97],"anchorsAll":["4,400회","중복 저장 0건"]},
+    {"id":"SP08","documentId":16,"versionId":16,"boundedChunkIds":[99],"anchorsAll":["Outbox 220건","13건씩 조회"]},
+    {"id":"SP09","documentId":16,"versionId":16,"boundedChunkIds":[96],"anchorsAll":["작업자 2/5/10/30","1,100회"]},
+    {"id":"SP10","documentId":15,"versionId":15,"boundedChunkIds":[87,88],"anchorsAll":["AirConnect"]},
+    {"id":"SP11","documentId":15,"versionId":15,"boundedChunkIds":[90],"anchorsAll":["MoneyWay","Redis TTL"]},
+    {"id":"SP12","documentId":16,"versionId":16,"boundedChunkIds":[98,99,100],"anchorsAll":["FCM","Worker"]},
+    {"id":"SP13","documentId":15,"versionId":15,"boundedChunkIds":[91],"anchorsAll":["Docker Compose","MySQL","Redis"]},
+    {"id":"SP14","documentId":16,"versionId":16,"boundedChunkIds":[101,102,103,104],"anchorsAll":["TourAPI","병렬"]}
+  ],
+  "negatives": [
+    {"id":"SN01","absentAnchors":["Spring Cloud Gateway"]},
+    {"id":"SN02","absentAnchors":["Redis Streams"]},
+    {"id":"SN03","absentAnchors":["Docker Swarm"]},
+    {"id":"SN04","absentAnchors":["MySQL Group Replication"]},
+    {"id":"SN05","absentAnchors":["OAuth2 Device Authorization Grant"]},
+    {"id":"SN06","absentAnchors":["Nginx Unit"]},
+    {"id":"SN07","absentAnchors":["GCP Cloud Run"]},
+    {"id":"SN08","absentAnchors":["TourAPI v2"]},
+    {"id":"SN09","absentAnchors":["4,401회"]},
+    {"id":"SN10","absentAnchors":["221건"]},
+    {"id":"SN11","absentAnchors":["FOR UPDATE NOWAIT"]},
+    {"id":"SN12","absentAnchors":["AirConnect Pro"]},
+    {"id":"SN13","absentAnchors":["FCM Topics"]},
+    {"id":"SN14","absentAnchors":["Spring Boot 3.5"]}
+  ]
+}

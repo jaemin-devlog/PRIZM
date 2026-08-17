@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-B-semantic-shadow-phase-a",
+  "status": "FROZEN_PRE_GROUND_TRUTH",
+  "sourceRawResult": "../p7-b-independent-generalization/raw-results.json",
+  "sourceRawResultSha256": "defc5e35dbf26f48a640f3df673e2247c14437b0cb65e8c8c05a0bd3b6e2cb2e",
+  "pairsFile": "pairs.json",
+  "pairsSha256": "e48fb53e26c2c88960d054d8fcea2a0df33f38774c235258e06dafbe5f4ee758",
+  "queryCount": 38,
+  "pairCount": 86,
+  "rank1PairCount": 38,
+  "rank2PlusPairCount": 48,
+  "createdAt": "2026-08-16T15:13:59.396055+00:00",
+  "nliModelId": "MoritzLaurer/mDeBERTa-v3-base-mnli-xnli",
+  "numericVerifier": "scripts/evaluation/run_semantic_nli_numeric_shadow.py@sha256:c7aa71b249ca16d77f9c6bac18cee6dd6de76f4debcd334159834191c6187118",
+  "groundTruthUsedBeforeFreeze": false,
+  "immutabilityRule": "Do not modify pairs.json after this freeze. Phase B may read evaluated or ground-truth artifacts only after this file is frozen."
+}

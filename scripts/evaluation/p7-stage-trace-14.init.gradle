@@ -1,0 +1,54 @@
+allprojects {
+    tasks.register('compileP7StageTrace14', JavaCompile) {
+        source = files(rootProject.file('scripts/evaluation/P7StageTrace14.java'))
+        classpath = sourceSets.main.runtimeClasspath
+        destinationDirectory = rootProject.layout.buildDirectory.dir('classes/java/p7StageTrace14')
+        options.encoding = 'UTF-8'
+    }
+
+    tasks.register('runP7StageTrace14', JavaExec) {
+        dependsOn tasks.named('compileP7StageTrace14')
+        classpath = files(rootProject.layout.buildDirectory.dir('classes/java/p7StageTrace14')) +
+                sourceSets.main.runtimeClasspath
+        mainClass = 'com.prizm.search.evaluation.P7StageTrace14'
+        args rootProject.file('specs/PRZ-016-search-performance-v2/p7-b-stage-ceiling-audit').absolutePath
+    }
+
+    tasks.register('compileP7FilterRejectionTrace14', JavaCompile) {
+        source = files(rootProject.file('scripts/evaluation/P7FilterRejectionTrace14.java'))
+        classpath = sourceSets.main.runtimeClasspath
+        destinationDirectory = rootProject.layout.buildDirectory.dir('classes/java/p7FilterRejectionTrace14')
+        options.encoding = 'UTF-8'
+    }
+
+    tasks.register('runP7FilterRejectionTrace14', JavaExec) {
+        dependsOn tasks.named('compileP7FilterRejectionTrace14')
+        classpath = files(rootProject.layout.buildDirectory.dir('classes/java/p7FilterRejectionTrace14')) +
+                sourceSets.main.runtimeClasspath
+        mainClass = 'com.prizm.search.evaluation.P7FilterRejectionTrace14'
+        def traceInput = providers.gradleProperty('p7TraceInput')
+                .getOrElse('specs/PRZ-016-search-performance-v2/p7-b-stage-ceiling-audit')
+        def traceOutput = providers.gradleProperty('p7TraceOutput')
+                .getOrElse(traceInput)
+        args rootProject.file(traceInput).absolutePath, rootProject.file(traceOutput).absolutePath
+    }
+
+    tasks.register('compileP7DenseFloorPolicyP1Evaluation', JavaCompile) {
+        source = files(rootProject.file('scripts/evaluation/P7DenseFloorPolicyP1Evaluation.java'))
+        classpath = sourceSets.main.runtimeClasspath
+        destinationDirectory = rootProject.layout.buildDirectory.dir('classes/java/p7DenseFloorPolicyP1Evaluation')
+        options.encoding = 'UTF-8'
+    }
+
+    tasks.register('runP7DenseFloorPolicyP1Evaluation', JavaExec) {
+        dependsOn tasks.named('compileP7DenseFloorPolicyP1Evaluation')
+        classpath = files(rootProject.layout.buildDirectory.dir('classes/java/p7DenseFloorPolicyP1Evaluation')) +
+                sourceSets.main.runtimeClasspath
+        mainClass = 'com.prizm.search.evaluation.P7DenseFloorPolicyP1Evaluation'
+        def evaluationOutput = providers.gradleProperty('p7CurrentOutput')
+                .getOrElse('specs/PRZ-016-search-performance-v2/dense-floor-policy-p1')
+        def evaluationPhase = providers.gradleProperty('p7CurrentPhase')
+                .getOrElse('PRZ-016-DENSE-FLOOR-POLICY-P1-P7-B-RECHECK')
+        args rootProject.file(evaluationOutput).absolutePath, evaluationPhase
+    }
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-adversarial-rejection-shadow-validation",
+  "syntheticOnly": true,
+  "cases": [
+    {"id":"A01","category":"ADVERSARIAL_POSITIVE","query":"Cilium을 production 네트워크 정책에 도입해 현재 운영했나요?","candidate":"운영 요구사항을 검토한 뒤 Cilium을 production 네트워크 정책에 도입해 현재 운영했다."},
+    {"id":"A02","category":"ADVERSARIAL_POSITIVE","query":"Liquibase migration을 완료해 production에 배포했나요?","candidate":"Liquibase 변경 계획을 수립한 후 관람권 데이터베이스 migration을 완료하고 production에 배포했다."},
+    {"id":"A03","category":"ADVERSARIAL_POSITIVE","query":"Deno 서비스를 단계적으로 production에 배포해 운영했나요?","candidate":"Deno 기반 민원 알림 서비스를 단계적으로 production에 배포하고 현재 운영했다."},
+    {"id":"A04","category":"ADVERSARIAL_POSITIVE","query":"InfluxDB 수집기를 중단 없이 현재까지 운영했나요?","candidate":"InfluxDB 수집기를 계절 관측 기간 내내 중단 없이 현재까지 운영했다."},
+    {"id":"A05","category":"ADVERSARIAL_POSITIVE","query":"OpenCV로 배경 제거 기능을 production에서 운영했나요?","candidate":"OpenCV를 이용해 사진 접수 화면의 배경 제거 기능을 구현하고 production에서 운영했다."},
+    {"id":"A06","category":"ADVERSARIAL_POSITIVE","query":"ChirpStack으로 폐기물 수거 센서를 현재 운영했나요?","candidate":"ChirpStack으로 폐기물 수거함 센서 상태를 수집하는 기능을 구현해 현재 운영했다."},
+    {"id":"A07","category":"ADVERSARIAL_POSITIVE","query":"Astro 사이트를 prototype 이후 production으로 승격해 현재 운영했나요?","candidate":"Astro 사이트는 행사 prototype에서 시작했지만 이후 production으로 승격해 현재 운영했다."},
+    {"id":"A08","category":"ADVERSARIAL_POSITIVE","query":"Ktor API를 현재 실제 운영했나요?","candidate":"deprecated된 Struts 화면을 교체하고 Ktor API를 구현해 현재 실제 운영했다."},
+    {"id":"A09","category":"ADVERSARIAL_POSITIVE","query":"Vitess를 비교 시험 뒤 production에 최종 도입했나요?","candidate":"Vitess를 다른 분산 저장소와 비교 시험한 뒤 production에 최종 도입하고 운영했다."},
+    {"id":"A10","category":"ADVERSARIAL_POSITIVE","query":"SLO를 96.6%로 실제 달성했나요?","candidate":"초기 계획 단계에서 여러 경보 방식을 비교했으나 SLO를 96.6%로 실제 달성해 운영 보고서에 기록했다."},
+    {"id":"A11","category":"PLAN_ONLY","query":"Bun 기반 변환기를 이미 배포했나요?","candidate":"Bun 기반 변환기는 다음 반기 계획에만 포함돼 있다. 구현과 배포는 아직 시작하지 않았다."},
+    {"id":"A12","category":"COMPARED_NOT_ADOPTED","query":"Nginx Unit을 운영 서비스에 채택했나요?","candidate":"Nginx Unit을 비교 시험했지만 운영 서비스에는 채택하지 않았다. 기존 구성을 유지했다."},
+    {"id":"A13","category":"RETIRED_CURRENT_CONFLICT","query":"Cordova를 현재 출시 제품에 사용했나요?","candidate":"Cordova로 만든 과거 안내 앱은 제품 개편 전에 retired 처리했다. 현재 출시 제품에는 사용하지 않는다."},
+    {"id":"A14","category":"EXPLICIT_DENIAL","query":"ONNX 모델을 직접 변환하고 운영했나요?","candidate":"ONNX 모델을 직접 변환하거나 운영하지 않았다. 공급사가 제공한 결과 파일만 확인했다."},
+    {"id":"A15","category":"NUMERIC_CONTRADICTION","query":"MTTR을 27분으로 달성했나요?","candidate":"MTTR은 실제로 31분이었다. 27분 달성 수치는 운영 기록에 없다."},
+    {"id":"A16","category":"PROTOTYPE_ONLY","query":"Three.js 전시 화면을 현재 서비스에서 운영했나요?","candidate":"Three.js 전시 화면은 연구실 prototype으로만 만들었고 고객 서비스에는 연결하지 않았다."}
+  ]
+}

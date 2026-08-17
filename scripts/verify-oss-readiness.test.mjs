@@ -2,8 +2,10 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import {
+  assertTrackedSafety,
   classifyExternalStatus,
   extractMarkdownLinks,
+  isApprovedBinaryFixture,
   markdownFindings,
   sensitiveContentFindings,
 } from './verify-oss-readiness.mjs'
@@ -55,4 +57,17 @@ test('GitHub token detection requires a token-shaped value, not only a prefix', 
   assert.deepEqual(sensitiveContentFindings('fixture.txt', token), [
     'fixture.txt:1 contains GitHub token',
   ])
+})
+
+test('allows only an exact SHA-256 match for an approved synthetic PDF fixture', () => {
+  const path = 'specs/PRZ-016-search-performance-v2/fixture.pdf'
+  const allowed = new Map([[path, 'a'.repeat(64)]])
+
+  assert.equal(isApprovedBinaryFixture(path, 'a'.repeat(64), allowed), true)
+  assert.equal(isApprovedBinaryFixture(path, 'b'.repeat(64), allowed), false)
+  assert.equal(isApprovedBinaryFixture('specs/other.pdf', 'a'.repeat(64), allowed), false)
+})
+
+test('allows only the verified frozen synthetic PDF fixtures in the repository', () => {
+  assert.doesNotThrow(() => assertTrackedSafety())
 })

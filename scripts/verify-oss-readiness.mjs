@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync } from 'node:fs'
-import { dirname, extname, isAbsolute, resolve } from 'node:path'
+import { dirname, extname, isAbsolute, relative, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { pathToFileURL } from 'node:url'
 
@@ -21,6 +21,9 @@ const generatedSbomFiles = [
   'sbom/prizm-backend-runtime.cdx.json',
   'sbom/prizm-frontend.cdx.json',
 ]
+const syntheticBinaryFixtureAllowlist = 'scripts/oss-readiness-binary-fixtures.json'
+const syntheticFixtureDocumentKey = /^SYN(?:\d+)?-U\d{2}-(?:PORTFOLIO|RESUME)$/
+const sha256Pattern = /^[a-f0-9]{64}$/
 const forbiddenLicenseIdentifiers = new Set([
   'NONE',
   'NOASSERTION',
@@ -85,6 +88,98 @@ function candidateFiles() {
 
 function sha256(relativePath) {
   return createHash('sha256').update(readFileSync(resolve(root, relativePath))).digest('hex')
+}
+
+function normalizedRepositoryPath(path, fieldName) {
+  if (
+    typeof path !== 'string'
+    || path.length === 0
+    || isAbsolute(path)
+    || /[*?\[\]{}]/.test(path)
+  ) {
+    fail(`${fieldName} must be an exact relative path without wildcard characters`)
+  }
+  const normalized = relative(root, resolve(root, path)).replaceAll('\\', '/')
+  if (
+    normalized === ''
+    || normalized === '..'
+    || normalized.startsWith('../')
+    || normalized !== path
+  ) {
+    fail(`${fieldName} must be a canonical path within the repository`)
+  }
+  return normalized
+}
+
+function loadSyntheticBinaryFixtures(tracked) {
+  if (!existsSync(resolve(root, syntheticBinaryFixtureAllowlist))) {
+    fail(`synthetic binary fixture allowlist is missing: ${syntheticBinaryFixtureAllowlist}`)
+  }
+  if (!tracked.includes(syntheticBinaryFixtureAllowlist)) {
+    fail(`synthetic binary fixture allowlist must be tracked: ${syntheticBinaryFixtureAllowlist}`)
+  }
+
+  let allowlist
+  try {
+    allowlist = JSON.parse(readFileSync(resolve(root, syntheticBinaryFixtureAllowlist), 'utf8'))
+  } catch (error) {
+    fail(`synthetic binary fixture allowlist is invalid: ${error.message}`)
+  }
+  if (
+    allowlist.format !== 'PRIZM-OSS-SYNTHETIC-BINARY-FIXTURE-ALLOWLIST'
+    || allowlist.formatVersion !== 1
+    || !Array.isArray(allowlist.fixtures)
+    || allowlist.fixtures.length !== 8
+  ) {
+    fail('synthetic binary fixture allowlist must contain exactly 8 version-1 entries')
+  }
+
+  const approved = new Map()
+  for (const fixture of allowlist.fixtures) {
+    const fileName = normalizedRepositoryPath(fixture.path, 'synthetic fixture path')
+    const manifestName = normalizedRepositoryPath(fixture.freezeManifest, 'synthetic fixture manifest')
+    if (
+      !fileName.startsWith('specs/')
+      || extname(fileName).toLowerCase() !== '.pdf'
+      || !manifestName.startsWith('specs/')
+      || !manifestName.endsWith('/freeze-manifest.json')
+      || !sha256Pattern.test(fixture.sha256 ?? '')
+      || approved.has(fileName)
+    ) {
+      fail(`invalid synthetic binary fixture allowlist entry: ${fixture.path ?? '<missing>'}`)
+    }
+    if (!tracked.includes(fileName) || !tracked.includes(manifestName)) {
+      fail(`synthetic binary fixture and manifest must both be tracked: ${fileName}`)
+    }
+    if (sha256(fileName) !== fixture.sha256) {
+      fail(`synthetic binary fixture SHA-256 mismatch: ${fileName}`)
+    }
+
+    let manifest
+    try {
+      manifest = JSON.parse(readFileSync(resolve(root, manifestName), 'utf8'))
+    } catch (error) {
+      fail(`synthetic fixture freeze manifest is invalid: ${manifestName}: ${error.message}`)
+    }
+    const manifestDirectory = dirname(resolve(root, manifestName))
+    const sourceRecord = manifest.activeDocumentHashes?.find((entry) => {
+      const sourcePath = relative(root, resolve(manifestDirectory, entry.path)).replaceAll('\\', '/')
+      return sourcePath === fileName
+    })
+    if (
+      sourceRecord?.sha256 !== fixture.sha256
+      || !syntheticFixtureDocumentKey.test(sourceRecord?.documentKey ?? '')
+      || manifest.validation?.sensitiveDataFindings !== 0
+    ) {
+      fail(`synthetic fixture is not a verified frozen synthetic document: ${fileName}`)
+    }
+    approved.set(fileName, fixture.sha256)
+  }
+  return approved
+}
+
+export function isApprovedBinaryFixture(fileName, actualSha256, approvedFixtures) {
+  return approvedFixtures.get(fileName) === actualSha256
 }
 
 function lineNumberAt(content, index) {
@@ -211,8 +306,9 @@ export function sensitiveContentFindings(fileName, content) {
   return findings
 }
 
-function assertTrackedSafety() {
+export function assertTrackedSafety() {
   const tracked = gitFileList(['--cached'])
+  const approvedFixtures = loadSyntheticBinaryFixtures(tracked)
   const pathFindings = []
   const contentFindings = []
 
@@ -228,6 +324,7 @@ function assertTrackedSafety() {
       || /(?:^|\/)(?:model-cache|\.ollama)(?:\/|$)/.test(lower)
     )
     const forbiddenBinary = forbiddenBinaryExtensions.has(extension)
+      && !isApprovedBinaryFixture(fileName, sha256(fileName), approvedFixtures)
     if (forbiddenPath || forbiddenBinary) {
       pathFindings.push(fileName)
     }

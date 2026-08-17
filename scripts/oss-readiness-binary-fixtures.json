@@ -1,0 +1,46 @@
+{
+  "format": "PRIZM-OSS-SYNTHETIC-BINARY-FIXTURE-ALLOWLIST",
+  "formatVersion": 1,
+  "fixtures": [
+    {
+      "path": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization/dataset/documents/syn-u01-portfolio-v1.pdf",
+      "sha256": "cc58aa5f3050d57b2cf908e5585f38ef26b6b748900d2c0dfcff9b88c932186c",
+      "freezeManifest": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization/freeze-manifest.json"
+    },
+    {
+      "path": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization/dataset/documents/syn-u02-resume-v1.pdf",
+      "sha256": "e76501faeed05c1477d94d671afb04b636cca4cc6ed5e2e6610ee01faa7aea8e",
+      "freezeManifest": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization/freeze-manifest.json"
+    },
+    {
+      "path": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization/dataset/documents/syn-u03-portfolio-v1.pdf",
+      "sha256": "94107a86899e5925e73cb65b2e9c77d88a8ba81d6ebec36dad0ae6b90e3cb4a4",
+      "freezeManifest": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization/freeze-manifest.json"
+    },
+    {
+      "path": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization/dataset/documents/syn-u04-resume-v1.pdf",
+      "sha256": "de382a9047401e7c04ddfdfec0bae69237c5bcdb6a18228449303a4bb857b4ed",
+      "freezeManifest": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization/freeze-manifest.json"
+    },
+    {
+      "path": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization-v2/dataset/documents/syn2-u01-resume-v1.pdf",
+      "sha256": "ed3093b74eb6f3989a07e3dbe016ec9cede378d8173cc70a81e9bd0fe2d703a6",
+      "freezeManifest": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization-v2/freeze-manifest.json"
+    },
+    {
+      "path": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization-v2/dataset/documents/syn2-u02-resume-v1.pdf",
+      "sha256": "4df6d6132ff510ad73764597efb4b638612afba9445809facc79089e8690cb44",
+      "freezeManifest": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization-v2/freeze-manifest.json"
+    },
+    {
+      "path": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization-v2/dataset/documents/syn2-u03-resume-v1.pdf",
+      "sha256": "6b6768cc42b2fd97c307e814bc35ad8d449de61060dafb73ec71559da10b148e",
+      "freezeManifest": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization-v2/freeze-manifest.json"
+    },
+    {
+      "path": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization-v2/dataset/documents/syn2-u04-resume-v1.pdf",
+      "sha256": "92fbd03f115844fc3b6ce84bb5340fbf6c7cf1acdccd29703628477236e1eaa7",
+      "freezeManifest": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization-v2/freeze-manifest.json"
+    }
+  ]
+}

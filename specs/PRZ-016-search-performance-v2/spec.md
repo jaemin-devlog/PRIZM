@@ -20,6 +20,10 @@ PRZ는 독립적인 기능 또는 자체적으로 완료·폐기할 수 있는 �
 | P4 Evidence Localization | `DONE` | 맞는 문서의 상세 근거 page/chunk 정확도 개선 | — |
 | P5 Final Holdout Validation | `DONE — FAIL` | 별도 unseen holdout으로 과적합 여부와 최종 성능 확인 | — |
 | P6 Retrieval Architecture Shadow Benchmark | `DONE — NO_GO` | D0/L1/H1/H2 평가 전용 비교, frozen identifier stress set, regression·격리·계약 검증 | PRZ-008 P13/P14 |
+| GPT-J1 Evidence Judge Shadow Spike | `DONE — NO_GO` | P5 48개에서 현재 P4와 GPT evidence 판정을 비교. Negative FPR 0%지만 정상 완료 positive 회귀 2건과 judge incomplete 4건으로 종료 | — |
+| P7-A v1 Cross-Document Dataset Freeze | `PRESERVED — SUPERSEDED_BEFORE_RUN` | 최초 synthetic holdout. 검색 전에 보존했으나 PDF 문서 밀도 부족으로 사용하지 않음 | [v1 evidence](p7-cross-document-generalization/evidence.md) |
+| P7-A v2 Cross-Document Dataset Freeze | `DATASET_FROZEN — READY_FOR_INDEPENDENT_RUN` | 2페이지 PDF 이력서 4개·장문 TXT 포트폴리오 4개·신규 질문 48개와 pre-search ground truth 동결 | [v2 evidence](p7-cross-document-generalization-v2/evidence.md) |
+| P7-B Independent Generalization Run | `NOT_STARTED` | 새 Codex 세션에서 frozen P7-A v2 자산으로 현재 검색만 실행하고 PASS/FAIL 판정 | — |
 
 P4는 focused 검증과 동일 72-query benchmark를 통과했다. P5 평가는 완료했지만 sealed
 48-query holdout에서 Negative FPR 25%와 검색 품질 기준 미달이 확인되어 최종 판정은
@@ -97,6 +101,14 @@ P6는 2026-08-14에 `DONE — NO_GO`로 종료했다. H1은 D0보다 Candidate R
 `integrationTest`의 기존 production 검색 contract 실패 1건도 재현됐다. Production search
 source 30개의 P6 전후 hash는 동일했고 production 적용, P7, 새 final holdout은 시작하지 않았다.
 상세 근거는 [P6 evidence](p6-retrieval-shadow/evidence.md)에 있다.
+
+## GPT-J1 Evidence Judge Shadow Spike
+
+GPT-J1은 검색 알고리즘을 더 확장하는 P7이 아니라, 현재 P4가 사용하는 owner-scoped
+ACTIVE dense 후보 중 상위 10개에 자연어 evidence 판정만 추가하는 작은 shadow 실험이다.
+Production 요청 경로와 응답에는 연결하지 않는다. 상세 계약과 결과는
+[GPT-J1 Spec](gpt-evidence-judge-shadow/spec.md)과
+[Evidence](gpt-evidence-judge-shadow/evidence.md)에서 관리한다.
 
 ## 보존 계약
 

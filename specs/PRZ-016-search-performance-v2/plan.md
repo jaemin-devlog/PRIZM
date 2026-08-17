@@ -63,3 +63,19 @@ PostgreSQL `15433`, 실제 Ollama `bge-m3` `11434`, 현재 source의 production 
 
 재번호화 뒤 `PRZ-016-search-performance-v2` branch의 기존 P0~P6 변경을 보존한다.
 사용자 지시에 따라 P6에서는 commit, push, PR과 branch 정리를 수행하지 않는다.
+
+## GPT-J1 Evidence Judge Shadow Spike
+
+GPT-J1의 구현·검증 계획은
+[전용 Plan](gpt-evidence-judge-shadow/plan.md)에서 관리한다. P6의 `NO_GO` 결과와
+P4 production source를 그대로 기준선으로 사용하며 검색·API runtime에는 연결하지 않는다.
+
+## P7-A Cross-Document Dataset Freeze
+
+검색 개선이나 측정 없이 새로운 synthetic corpus와 pre-search Ground Truth만 만드는 절차는
+[P7-A Plan](p7-cross-document-generalization/plan.md)에서 관리한다. P7-B는 새 Codex 세션에서
+frozen hash 검증 뒤 수행하며 P7-A에서는 검색·benchmark를 실행하지 않는다.
+
+v1 PDF의 문서 밀도 부족은 frozen v1을 수정하지 않고
+[P7-A v2 Plan](p7-cross-document-generalization-v2/plan.md)으로 대체한다. P7-B는 v2 manifest만
+권위 있는 입력으로 사용한다.

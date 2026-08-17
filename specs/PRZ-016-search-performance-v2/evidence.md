@@ -16,6 +16,7 @@ truth, benchmark 결과, 실행 시점과 production 구현은 변경하지 않�
 | P4 | Top1 82.14%, Recall@3/5 85.71%, MRR@5 0.8363, Negative FPR 0%; Evidence Localization 완료 |
 | P5 | 48-query holdout: Top1 50.00%, Recall@3/5 61.11%, MRR@5 0.5509, Negative FPR 25%; `FAIL` |
 | P6 | PostgreSQL lexical+dense+RRF+literal gate shadow: H1 candidate recall 개선 0pp, H2 stress FPR 0%이나 72-query 회귀 5건; `NO_GO` |
+| GPT-J1 | GPT Evidence Judge shadow: Negative FPR 0%이나 완료 positive 회귀 2건·incomplete 4건; `NO_GO` |
 
 - P0 자산: [dataset](p0-benchmark/evaluation-dataset.json),
   [baseline](p0-benchmark/baseline-results.json),
@@ -27,6 +28,7 @@ truth, benchmark 결과, 실행 시점과 production 구현은 변경하지 않�
 - P5 최종 평가: [final validation](p5-final-holdout/final-validation.md)
 - P6 shadow 평가: [56-item evidence](p6-retrieval-shadow/evidence.md),
   [authoritative raw result](p6-retrieval-shadow/p6-b-results.json)
+- GPT-J1 shadow 평가: [evidence](gpt-evidence-judge-shadow/evidence.md)
 
 ## 관리 구조 정리 당시 확인 결과
 
@@ -38,10 +40,12 @@ truth, benchmark 결과, 실행 시점과 production 구현은 변경하지 않�
 
 ## 현재 Phase 상태
 
-P0·P1·P2·P3·P4는 `DONE`이다. P5는 `DONE — FAIL`, P6는 `DONE — NO_GO`다. P6의 H1은
-Dense보다 Candidate Recall@20을 개선하지 못했고 H2는 안전성 개선과 함께 positive regression을
-만들었다. PRZ-016은 `IN_PROGRESS`를 유지하며 Search Performance V2는 동결하지 않는다.
-production 검색 코드는 P5와 P6에서 변경하지 않았다.
+P0·P1·P2·P3·P4는 `DONE`이다. P5는 `DONE — FAIL`, P6와 GPT-J1은 `DONE — NO_GO`다.
+P6의 H1은 Dense보다 Candidate Recall@20을 개선하지 못했고 H2는 안전성 개선과 함께 positive
+regression을 만들었다. GPT-J1도 Negative FPR 0%는 관측했지만 완료 positive 회귀와 incomplete를
+남겼다. GPT-J1 판정 당시 Search Performance V2는 `DONE — NO_GO`로 종료했고 production 적용을
+시작하지 않았다. 이후 사용자 지시로 검색 개선이 아닌 독립 일반화 검증용 P7-A dataset freeze만
+수행했다. production 검색 코드는 P5·P6·GPT-J1·P7-A에서 변경하지 않았다.
 
 ## Spec ID 충돌 해소
 
@@ -50,3 +54,36 @@ production 검색 코드는 P5와 P6에서 변경하지 않았다.
 다음 빈 ID `PRZ-016`으로 재번호화했다. 파일 경로와 현재 문서·실행 코드 참조만 바꾸고,
 frozen dataset/ground truth/raw result 내부의 역사적 phase·benchmark 라벨과 측정값은
 변경하지 않았다.
+
+## P7-A Cross-Document Dataset Freeze
+
+- 결과: `DATASET_FROZEN — READY_FOR_INDEPENDENT_RUN`
+- 합성 사용자 4명, ACTIVE 문서 8개(TXT 4/PDF 4), 질문 48개(Positive 36/Negative 12)
+- P0/P5 exact·normalized duplicate 0, 명백한 near duplicate 0
+- corpus SHA-256:
+  `4ad8a564bee353c877a9c0938d6cf1f866d6d824750b01c5bf5f976b71a25ae1`
+- questions SHA-256:
+  `7e1055db772034e0d7257de781944c9d5ba368888b5d1757baea7f864fcab957`
+- ground truth SHA-256:
+  `cbb78a66f3563ab82d86702220c409a3674ce2a6f5db1ad366795d085e6186f9`
+- production 변경 0, 검색·benchmark·GPT Judge `NOT_RUN`
+- 상세: [P7-A evidence](p7-cross-document-generalization/evidence.md)
+
+## P7-A v2 Document Density Replacement
+
+P7-A v1은 검색 실행 전에 보존했지만 PDF가 1페이지 요약 카드 수준이라 실제 이력서의 문서 밀도와
+주변 정보가 부족했다. v1 27개 frozen asset은 hash mismatch 0으로 그대로 보존하고
+`SUPERSEDED_BEFORE_RUN` 처리했다.
+
+- v2 결과: `DATASET_FROZEN — READY_FOR_INDEPENDENT_RUN`
+- PDF 이력서 4개 × 2페이지, 장문 TXT 포트폴리오 4개
+- 질문 48개(Positive 36/Negative 12), Positive anchor 67개와 Negative 부재 12개 검증
+- P0/P5/v1 exact·normalized duplicate 및 threshold 초과 near duplicate: 0
+- corpus SHA-256:
+  `fef6cb0b38fea658b03dfd06a43212acb84b57922acec764c49a5032fd795498`
+- questions SHA-256:
+  `85c2e41bba5c293ca5172b48f77f41587d49be996252479ce5a71ed17763b868`
+- ground truth SHA-256:
+  `fd7525da3a00df4d7eccf42022b54a63cb2571be9f20111d2d6de740aa5f9680`
+- production 변경 0, 검색·benchmark·GPT Judge `NOT_RUN`
+- 상세: [P7-A v2 evidence](p7-cross-document-generalization-v2/evidence.md)

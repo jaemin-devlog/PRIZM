@@ -45,7 +45,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @ActiveProfiles("test")
 @SpringBootTest(
         webEnvironment = WebEnvironment.RANDOM_PORT,
-        properties = "prizm.change-log.scheduler.enabled=false")
+        properties = {
+                "prizm.change-log.scheduler.enabled=false",
+                "prizm.security.allowed-origins=http://localhost:5173"
+        })
 class McpCareerEvidenceProtocolTest {
 
     private static final String QUERY = "Spring Boot experience";

@@ -296,6 +296,27 @@ class SearchServiceTest {
     }
 
     @Test
+    void strongIdentifierGuardReportsNoEvidenceForCompletedReleaseQuestion() {
+        SearchService optInService = defaultSearchService();
+        float[] embedding = nonZeroEmbedding();
+        String query = "PRIZM API를 출시한 이력이 있나요?";
+        VectorSearchResult differentlyFormattedIdentifier = careerEvidenceCandidate(
+                232L, "PRIZM- API를 배포했습니다.", 0.80d);
+        when(embeddingService.embed(query)).thenReturn(embedding);
+        when(vectorSearchRepository.findCareerEvidenceCandidates(7L, embedding))
+                .thenReturn(List.of(differentlyFormattedIdentifier));
+        when(vectorSearchRepository.hasAllActiveIdentifiers(7L, Set.of("prizm")))
+                .thenReturn(false);
+
+        CareerEvidenceSearchV2Response result =
+                optInService.searchCareerEvidenceV2(7L, query);
+
+        assertThat(result.state()).isEqualTo(CareerEvidenceSearchState.NO_EVIDENCE);
+        assertThat(result.results()).isEmpty();
+        verify(vectorSearchRepository).hasAllActiveIdentifiers(7L, Set.of("prizm"));
+    }
+
+    @Test
     void strongIdentifierGuardKeepsExistingTechnologyEvidence() {
         SearchService optInService = defaultSearchService();
         float[] embedding = nonZeroEmbedding();

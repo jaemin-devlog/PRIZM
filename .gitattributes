@@ -8,3 +8,18 @@
 *.jpeg binary
 *.gif binary
 *.pdf binary
+
+# Preserve frozen PRZ-016 bytes while excluding their intentional terminal blank
+# line from `git diff --check`. Keep this list path-specific so new files retain
+# the repository default whitespace checks.
+specs/PRZ-016-search-performance-v2/p7-b-independent-generalization/run-contract.md whitespace=-blank-at-eof
+specs/PRZ-016-search-performance-v2/p7-cross-document-generalization-v2/dataset/documents/syn2-u02-portfolio-v1.txt whitespace=-blank-at-eof
+specs/PRZ-016-search-performance-v2/p7-cross-document-generalization-v2/dataset/documents/syn2-u03-portfolio-v1.txt whitespace=-blank-at-eof
+specs/PRZ-016-search-performance-v2/p7-cross-document-generalization-v2/dataset/inactive-versions/syn2-u03-resume-v0.txt whitespace=-blank-at-eof
+specs/PRZ-016-search-performance-v2/p7-cross-document-generalization-v2/plan.md whitespace=-blank-at-eof
+specs/PRZ-016-search-performance-v2/p7-cross-document-generalization/dataset/documents/syn-u01-resume-v1.txt whitespace=-blank-at-eof
+specs/PRZ-016-search-performance-v2/p7-cross-document-generalization/dataset/documents/syn-u02-portfolio-v1.txt whitespace=-blank-at-eof
+specs/PRZ-016-search-performance-v2/p7-cross-document-generalization/dataset/documents/syn-u03-resume-v1.txt whitespace=-blank-at-eof
+specs/PRZ-016-search-performance-v2/p7-cross-document-generalization/dataset/documents/syn-u04-portfolio-v1.txt whitespace=-blank-at-eof
+specs/PRZ-016-search-performance-v2/p7-cross-document-generalization/dataset/inactive-versions/syn-u03-resume-v0.txt whitespace=-blank-at-eof
+specs/PRZ-016-search-performance-v2/p7-cross-document-generalization/plan.md whitespace=-blank-at-eof

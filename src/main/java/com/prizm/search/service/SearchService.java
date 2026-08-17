@@ -127,7 +127,7 @@ public class SearchService {
             if (!guardedIdentifiers.isEmpty()
                     && !vectorSearchRepository.hasAllActiveIdentifiers(
                             ownerUserId, guardedIdentifiers)) {
-                return emptyOutcome(CareerEvidenceSearchState.NO_RELEVANT_RESULTS);
+                return emptyOutcome(emptyStateFor(query));
             }
         }
 
@@ -193,10 +193,7 @@ public class SearchService {
         }
         selected = deduplicateExactPresentationContent(selected);
         if (selected.isEmpty()) {
-            return emptyOutcome(switch (compositeSearchProfile.resolveIntent(query)) {
-                case GENERAL -> CareerEvidenceSearchState.NO_RELEVANT_RESULTS;
-                case COMPLETED_RELEASE_EVIDENCE -> CareerEvidenceSearchState.NO_EVIDENCE;
-            });
+            return emptyOutcome(emptyStateFor(query));
         }
         return new CareerEvidenceSearchV2Response(
                 CareerEvidenceSearchState.EVIDENCE_FOUND,
@@ -256,6 +253,13 @@ public class SearchService {
 
     private static CareerEvidenceSearchV2Response emptyOutcome(CareerEvidenceSearchState state) {
         return new CareerEvidenceSearchV2Response(state, List.of());
+    }
+
+    private CareerEvidenceSearchState emptyStateFor(String query) {
+        return switch (compositeSearchProfile.resolveIntent(query)) {
+            case GENERAL -> CareerEvidenceSearchState.NO_RELEVANT_RESULTS;
+            case COMPLETED_RELEASE_EVIDENCE -> CareerEvidenceSearchState.NO_EVIDENCE;
+        };
     }
 
     private static List<VectorSearchResult> deduplicateExactPresentationContent(

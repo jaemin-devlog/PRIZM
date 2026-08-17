@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-semantic-nli-capability",
+  "status": "FROZEN_PRE_MODEL_RUN",
+  "pairFile": "pairs.json",
+  "pairSha256": "83078b2c794add9e23e5e43f5c70dd6046a4302962521ba81018952d20e53555",
+  "counts": {"SUPPORT": 26, "CONTRADICT": 38, "UNKNOWN": 8, "TOTAL": 72},
+  "immutabilityRule": "Do not modify pairs.json after this freeze. Use argmax labels only; do not tune thresholds or hypotheses after model execution."
+}

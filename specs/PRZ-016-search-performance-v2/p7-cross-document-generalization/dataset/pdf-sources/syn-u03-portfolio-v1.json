@@ -1,0 +1,32 @@
+{
+  "title": "HarborMesh Control — Failure Design Case",
+  "subtitle": "PRIZM P7 합성 포트폴리오 / SYN-U03",
+  "sections": [
+    {
+      "heading": "제어권 충돌",
+      "paragraphs": [
+        "네트워크 단절 뒤 두 controller가 동시에 살아났을 때 오래된 명령이 장비에 도달할 수 있었다. 각 command에 monotonic lease epoch를 포함하고 장비 측 검증기가 이전 epoch를 거절하도록 했다."
+      ]
+    },
+    {
+      "heading": "메시지와 저장소",
+      "paragraphs": [
+        "Go control plane은 ConnectRPC로 명령을 받고 NATS JetStream durable consumer로 전달했다. ack wait가 지난 메시지는 다시 전달되므로 command id도 함께 검사했다.",
+        "CockroachDB의 serializable transaction에서 SQLSTATE 40001이 발생하면 bounded jitter를 적용해 제한된 횟수만 재시도했다."
+      ]
+    },
+    {
+      "heading": "검증 결과",
+      "paragraphs": [
+        "6,400개 simulated node 시험에서 controller recovery를 11초에서 3.4초로 줄였다. partition 시나리오 전체에서 split-brain command는 0건이었다.",
+        "설정 파일은 서명된 configuration bundle로 배포해 변조된 설정을 장비가 거절하게 했다."
+      ]
+    },
+    {
+      "heading": "담당하지 않은 범위",
+      "paragraphs": [
+        "LoRaWAN gateway firmware는 하드웨어 팀이 담당했다. 이 프로젝트 경력에는 해당 firmware 구현이 포함되지 않는다."
+      ]
+    }
+  ]
+}

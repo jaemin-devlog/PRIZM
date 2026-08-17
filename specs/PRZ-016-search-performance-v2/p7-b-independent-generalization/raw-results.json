@@ -1,0 +1,2928 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-B",
+  "executedAt": "2026-08-16T10:18:04.638Z",
+  "source": {
+    "branch": "PRZ-016-search-performance-v2",
+    "head": "4a5c5b6bbd3cfd06f1313dee09e6695fdd68179e"
+  },
+  "environment": {
+    "dockerProject": "prizm-p7b-20260816",
+    "database": "prizm_p7b_20260816",
+    "backendUrl": "http://127.0.0.1:28081",
+    "searchProfile": "source-dedup-evidence-signals-v1",
+    "embeddingModel": "bge-m3",
+    "embeddingDimensions": 1024,
+    "maxChunkLength": 800,
+    "chunkOverlap": 120
+  },
+  "frozenInputs": {
+    "corpusManifestSha256": "f0860b6588b7f270ad20cf352a9a538e5946e68b05e375b6eed0a37235fd5fae",
+    "questionsSha256": "85c2e41bba5c293ca5172b48f77f41587d49be996252479ce5a71ed17763b868",
+    "groundTruthReadByOrchestrator": false
+  },
+  "accounts": [
+    {
+      "userKey": "SYN2-U01",
+      "userId": 1,
+      "role": "USER",
+      "signupHttpStatus": 201
+    },
+    {
+      "userKey": "SYN2-U02",
+      "userId": 2,
+      "role": "USER",
+      "signupHttpStatus": 201
+    },
+    {
+      "userKey": "SYN2-U03",
+      "userId": 3,
+      "role": "USER",
+      "signupHttpStatus": 201
+    },
+    {
+      "userKey": "SYN2-U04",
+      "userId": 4,
+      "role": "USER",
+      "signupHttpStatus": 201
+    }
+  ],
+  "uploads": [
+    {
+      "documentKey": "SYN2-U03-RESUME",
+      "versionKey": "SYN2-U03-RESUME-V0",
+      "activeExpected": false,
+      "upload": {
+        "documentId": 1,
+        "versionId": 1,
+        "title": "SYN2-U03 Resume",
+        "originalFileName": "syn2-u03-resume-v0.txt",
+        "documentType": "RESUME",
+        "status": "QUARANTINED",
+        "createdAt": "2026-08-16T10:17:18.535515253Z"
+      },
+      "activeAfterInitialProcessing": true
+    },
+    {
+      "documentKey": "SYN2-U03-RESUME",
+      "versionKey": "SYN2-U03-RESUME-V1",
+      "activeExpected": true,
+      "upload": {
+        "documentId": 1,
+        "versionId": 2,
+        "title": "SYN2-U03 Resume",
+        "originalFileName": "syn2-u03-resume-v1.pdf",
+        "documentType": "RESUME",
+        "status": "QUARANTINED",
+        "createdAt": "2026-08-16T10:17:22.913125745Z"
+      },
+      "replacedVersionId": 1,
+      "finalActiveVersionId": 2
+    },
+    {
+      "documentKey": "SYN2-U01-RESUME",
+      "versionKey": "SYN2-U01-RESUME-V1",
+      "activeExpected": true,
+      "upload": {
+        "documentId": 2,
+        "versionId": 3,
+        "title": "SYN2-U01-RESUME",
+        "originalFileName": "syn2-u01-resume-v1.pdf",
+        "documentType": "RESUME",
+        "status": "QUARANTINED",
+        "createdAt": "2026-08-16T10:17:27.079309631Z"
+      },
+      "finalActiveVersionId": 3
+    },
+    {
+      "documentKey": "SYN2-U01-PORTFOLIO",
+      "versionKey": "SYN2-U01-PORTFOLIO-V1",
+      "activeExpected": true,
+      "upload": {
+        "documentId": 3,
+        "versionId": 4,
+        "title": "SYN2-U01-PORTFOLIO",
+        "originalFileName": "syn2-u01-portfolio-v1.txt",
+        "documentType": "PORTFOLIO",
+        "status": "QUARANTINED",
+        "createdAt": "2026-08-16T10:17:31.204365858Z"
+      },
+      "finalActiveVersionId": 4
+    },
+    {
+      "documentKey": "SYN2-U02-RESUME",
+      "versionKey": "SYN2-U02-RESUME-V1",
+      "activeExpected": true,
+      "upload": {
+        "documentId": 4,
+        "versionId": 5,
+        "title": "SYN2-U02-RESUME",
+        "originalFileName": "syn2-u02-resume-v1.pdf",
+        "documentType": "RESUME",
+        "status": "QUARANTINED",
+        "createdAt": "2026-08-16T10:17:35.329363270Z"
+      },
+      "finalActiveVersionId": 5
+    },
+    {
+      "documentKey": "SYN2-U02-PORTFOLIO",
+      "versionKey": "SYN2-U02-PORTFOLIO-V1",
+      "activeExpected": true,
+      "upload": {
+        "documentId": 5,
+        "versionId": 6,
+        "title": "SYN2-U02-PORTFOLIO",
+        "originalFileName": "syn2-u02-portfolio-v1.txt",
+        "documentType": "PORTFOLIO",
+        "status": "QUARANTINED",
+        "createdAt": "2026-08-16T10:17:39.439947945Z"
+      },
+      "finalActiveVersionId": 6
+    },
+    {
+      "documentKey": "SYN2-U03-PORTFOLIO",
+      "versionKey": "SYN2-U03-PORTFOLIO-V1",
+      "activeExpected": true,
+      "upload": {
+        "documentId": 6,
+        "versionId": 7,
+        "title": "SYN2-U03-PORTFOLIO",
+        "originalFileName": "syn2-u03-portfolio-v1.txt",
+        "documentType": "PORTFOLIO",
+        "status": "QUARANTINED",
+        "createdAt": "2026-08-16T10:17:41.506049065Z"
+      },
+      "finalActiveVersionId": 7
+    },
+    {
+      "documentKey": "SYN2-U04-RESUME",
+      "versionKey": "SYN2-U04-RESUME-V1",
+      "activeExpected": true,
+      "upload": {
+        "documentId": 7,
+        "versionId": 8,
+        "title": "SYN2-U04-RESUME",
+        "originalFileName": "syn2-u04-resume-v1.pdf",
+        "documentType": "RESUME",
+        "status": "QUARANTINED",
+        "createdAt": "2026-08-16T10:17:45.620731213Z"
+      },
+      "finalActiveVersionId": 8
+    },
+    {
+      "documentKey": "SYN2-U04-PORTFOLIO",
+      "versionKey": "SYN2-U04-PORTFOLIO-V1",
+      "activeExpected": true,
+      "upload": {
+        "documentId": 8,
+        "versionId": 9,
+        "title": "SYN2-U04-PORTFOLIO",
+        "originalFileName": "syn2-u04-portfolio-v1.txt",
+        "documentType": "PORTFOLIO",
+        "status": "QUARANTINED",
+        "createdAt": "2026-08-16T10:17:49.716030008Z"
+      },
+      "finalActiveVersionId": 9
+    }
+  ],
+  "documentMap": {
+    "SYN2-U03-RESUME": {
+      "documentId": 1,
+      "versionId": 2,
+      "userKey": "SYN2-U03",
+      "documentType": "RESUME"
+    },
+    "SYN2-U01-RESUME": {
+      "documentId": 2,
+      "versionId": 3,
+      "userKey": "SYN2-U01",
+      "documentType": "RESUME"
+    },
+    "SYN2-U01-PORTFOLIO": {
+      "documentId": 3,
+      "versionId": 4,
+      "userKey": "SYN2-U01",
+      "documentType": "PORTFOLIO"
+    },
+    "SYN2-U02-RESUME": {
+      "documentId": 4,
+      "versionId": 5,
+      "userKey": "SYN2-U02",
+      "documentType": "RESUME"
+    },
+    "SYN2-U02-PORTFOLIO": {
+      "documentId": 5,
+      "versionId": 6,
+      "userKey": "SYN2-U02",
+      "documentType": "PORTFOLIO"
+    },
+    "SYN2-U03-PORTFOLIO": {
+      "documentId": 6,
+      "versionId": 7,
+      "userKey": "SYN2-U03",
+      "documentType": "PORTFOLIO"
+    },
+    "SYN2-U04-RESUME": {
+      "documentId": 7,
+      "versionId": 8,
+      "userKey": "SYN2-U04",
+      "documentType": "RESUME"
+    },
+    "SYN2-U04-PORTFOLIO": {
+      "documentId": 8,
+      "versionId": 9,
+      "userKey": "SYN2-U04",
+      "documentType": "PORTFOLIO"
+    }
+  },
+  "inactiveVersion": {
+    "documentKey": "SYN2-U03-RESUME",
+    "versionKey": "SYN2-U03-RESUME-V0",
+    "versionId": 1,
+    "wasActiveBeforeReplacement": true,
+    "replacementVersionKey": "SYN2-U03-RESUME-V1",
+    "replacementVersionId": 2,
+    "finalActiveVersionId": 2
+  },
+  "ownerSnapshots": [
+    {
+      "userKey": "SYN2-U01",
+      "userId": 1,
+      "documents": [
+        {
+          "documentId": 3,
+          "title": "SYN2-U01-PORTFOLIO",
+          "documentType": "PORTFOLIO",
+          "activeVersionId": 4,
+          "latestVersionId": 4,
+          "latestVersionStatus": "ACTIVE",
+          "latestOriginalFileName": "syn2-u01-portfolio-v1.txt",
+          "latestFileType": "TXT",
+          "latestProcessingStatus": "COMPLETED",
+          "latestProcessingStage": "COMPLETED",
+          "latestCompletedChunks": 3,
+          "latestTotalChunks": 3,
+          "latestProgressPercent": 100,
+          "latestProcessingErrorCode": null,
+          "latestRetryCount": 0,
+          "maxRetries": 3,
+          "latestNextRetryAt": null,
+          "activeVersionStatus": "ACTIVE",
+          "versionCount": 1,
+          "createdAt": "2026-08-16T10:17:31.202981Z",
+          "updatedAt": "2026-08-16T10:17:33.425906Z"
+        },
+        {
+          "documentId": 2,
+          "title": "SYN2-U01-RESUME",
+          "documentType": "RESUME",
+          "activeVersionId": 3,
+          "latestVersionId": 3,
+          "latestVersionStatus": "ACTIVE",
+          "latestOriginalFileName": "syn2-u01-resume-v1.pdf",
+          "latestFileType": "PDF",
+          "latestProcessingStatus": "COMPLETED",
+          "latestProcessingStage": "COMPLETED",
+          "latestCompletedChunks": 4,
+          "latestTotalChunks": 4,
+          "latestProgressPercent": 100,
+          "latestProcessingErrorCode": null,
+          "latestRetryCount": 0,
+          "maxRetries": 3,
+          "latestNextRetryAt": null,
+          "activeVersionStatus": "ACTIVE",
+          "versionCount": 1,
+          "createdAt": "2026-08-16T10:17:27.077245Z",
+          "updatedAt": "2026-08-16T10:17:29.475170Z"
+        }
+      ],
+      "details": [
+        {
+          "documentId": 3,
+          "title": "SYN2-U01-PORTFOLIO",
+          "documentType": "PORTFOLIO",
+          "ownerConfirmed": true,
+          "activeVersionId": 4,
+          "createdAt": "2026-08-16T10:17:31.202981Z",
+          "updatedAt": "2026-08-16T10:17:33.425906Z",
+          "versions": [
+            {
+              "versionId": 4,
+              "versionNo": 1,
+              "originalFileName": "syn2-u01-portfolio-v1.txt",
+              "fileType": "TXT",
+              "status": "ACTIVE",
+              "processingStatus": "COMPLETED",
+              "processingStage": "COMPLETED",
+              "completedChunks": 3,
+              "totalChunks": 3,
+              "progressPercent": 100,
+              "processingErrorCode": null,
+              "retryScheduled": false,
+              "retryCount": 0,
+              "maxRetries": 3,
+              "nextRetryAt": null,
+              "createdAt": "2026-08-16T10:17:31.204366Z"
+            }
+          ]
+        },
+        {
+          "documentId": 2,
+          "title": "SYN2-U01-RESUME",
+          "documentType": "RESUME",
+          "ownerConfirmed": true,
+          "activeVersionId": 3,
+          "createdAt": "2026-08-16T10:17:27.077245Z",
+          "updatedAt": "2026-08-16T10:17:29.475170Z",
+          "versions": [
+            {
+              "versionId": 3,
+              "versionNo": 1,
+              "originalFileName": "syn2-u01-resume-v1.pdf",
+              "fileType": "PDF",
+              "status": "ACTIVE",
+              "processingStatus": "COMPLETED",
+              "processingStage": "COMPLETED",
+              "completedChunks": 4,
+              "totalChunks": 4,
+              "progressPercent": 100,
+              "processingErrorCode": null,
+              "retryScheduled": false,
+              "retryCount": 0,
+              "maxRetries": 3,
+              "nextRetryAt": null,
+              "createdAt": "2026-08-16T10:17:27.079310Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "userKey": "SYN2-U02",
+      "userId": 2,
+      "documents": [
+        {
+          "documentId": 5,
+          "title": "SYN2-U02-PORTFOLIO",
+          "documentType": "PORTFOLIO",
+          "activeVersionId": 6,
+          "latestVersionId": 6,
+          "latestVersionStatus": "ACTIVE",
+          "latestOriginalFileName": "syn2-u02-portfolio-v1.txt",
+          "latestFileType": "TXT",
+          "latestProcessingStatus": "COMPLETED",
+          "latestProcessingStage": "COMPLETED",
+          "latestCompletedChunks": 3,
+          "latestTotalChunks": 3,
+          "latestProgressPercent": 100,
+          "latestProcessingErrorCode": null,
+          "latestRetryCount": 0,
+          "maxRetries": 3,
+          "latestNextRetryAt": null,
+          "activeVersionStatus": "ACTIVE",
+          "versionCount": 1,
+          "createdAt": "2026-08-16T10:17:39.438533Z",
+          "updatedAt": "2026-08-16T10:17:41.344855Z"
+        },
+        {
+          "documentId": 4,
+          "title": "SYN2-U02-RESUME",
+          "documentType": "RESUME",
+          "activeVersionId": 5,
+          "latestVersionId": 5,
+          "latestVersionStatus": "ACTIVE",
+          "latestOriginalFileName": "syn2-u02-resume-v1.pdf",
+          "latestFileType": "PDF",
+          "latestProcessingStatus": "COMPLETED",
+          "latestProcessingStage": "COMPLETED",
+          "latestCompletedChunks": 5,
+          "latestTotalChunks": 5,
+          "latestProgressPercent": 100,
+          "latestProcessingErrorCode": null,
+          "latestRetryCount": 0,
+          "maxRetries": 3,
+          "latestNextRetryAt": null,
+          "activeVersionStatus": "ACTIVE",
+          "versionCount": 1,
+          "createdAt": "2026-08-16T10:17:35.326974Z",
+          "updatedAt": "2026-08-16T10:17:37.574400Z"
+        }
+      ],
+      "details": [
+        {
+          "documentId": 5,
+          "title": "SYN2-U02-PORTFOLIO",
+          "documentType": "PORTFOLIO",
+          "ownerConfirmed": true,
+          "activeVersionId": 6,
+          "createdAt": "2026-08-16T10:17:39.438533Z",
+          "updatedAt": "2026-08-16T10:17:41.344855Z",
+          "versions": [
+            {
+              "versionId": 6,
+              "versionNo": 1,
+              "originalFileName": "syn2-u02-portfolio-v1.txt",
+              "fileType": "TXT",
+              "status": "ACTIVE",
+              "processingStatus": "COMPLETED",
+              "processingStage": "COMPLETED",
+              "completedChunks": 3,
+              "totalChunks": 3,
+              "progressPercent": 100,
+              "processingErrorCode": null,
+              "retryScheduled": false,
+              "retryCount": 0,
+              "maxRetries": 3,
+              "nextRetryAt": null,
+              "createdAt": "2026-08-16T10:17:39.439948Z"
+            }
+          ]
+        },
+        {
+          "documentId": 4,
+          "title": "SYN2-U02-RESUME",
+          "documentType": "RESUME",
+          "ownerConfirmed": true,
+          "activeVersionId": 5,
+          "createdAt": "2026-08-16T10:17:35.326974Z",
+          "updatedAt": "2026-08-16T10:17:37.574400Z",
+          "versions": [
+            {
+              "versionId": 5,
+              "versionNo": 1,
+              "originalFileName": "syn2-u02-resume-v1.pdf",
+              "fileType": "PDF",
+              "status": "ACTIVE",
+              "processingStatus": "COMPLETED",
+              "processingStage": "COMPLETED",
+              "completedChunks": 5,
+              "totalChunks": 5,
+              "progressPercent": 100,
+              "processingErrorCode": null,
+              "retryScheduled": false,
+              "retryCount": 0,
+              "maxRetries": 3,
+              "nextRetryAt": null,
+              "createdAt": "2026-08-16T10:17:35.329363Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "userKey": "SYN2-U03",
+      "userId": 3,
+      "documents": [
+        {
+          "documentId": 6,
+          "title": "SYN2-U03-PORTFOLIO",
+          "documentType": "PORTFOLIO",
+          "activeVersionId": 7,
+          "latestVersionId": 7,
+          "latestVersionStatus": "ACTIVE",
+          "latestOriginalFileName": "syn2-u03-portfolio-v1.txt",
+          "latestFileType": "TXT",
+          "latestProcessingStatus": "COMPLETED",
+          "latestProcessingStage": "COMPLETED",
+          "latestCompletedChunks": 3,
+          "latestTotalChunks": 3,
+          "latestProgressPercent": 100,
+          "latestProcessingErrorCode": null,
+          "latestRetryCount": 0,
+          "maxRetries": 3,
+          "latestNextRetryAt": null,
+          "activeVersionStatus": "ACTIVE",
+          "versionCount": 1,
+          "createdAt": "2026-08-16T10:17:41.504890Z",
+          "updatedAt": "2026-08-16T10:17:44.047580Z"
+        },
+        {
+          "documentId": 1,
+          "title": "SYN2-U03 Resume",
+          "documentType": "RESUME",
+          "activeVersionId": 2,
+          "latestVersionId": 2,
+          "latestVersionStatus": "ACTIVE",
+          "latestOriginalFileName": "syn2-u03-resume-v1.pdf",
+          "latestFileType": "PDF",
+          "latestProcessingStatus": "COMPLETED",
+          "latestProcessingStage": "COMPLETED",
+          "latestCompletedChunks": 5,
+          "latestTotalChunks": 5,
+          "latestProgressPercent": 100,
+          "latestProcessingErrorCode": null,
+          "latestRetryCount": 0,
+          "maxRetries": 3,
+          "latestNextRetryAt": null,
+          "activeVersionStatus": "ACTIVE",
+          "versionCount": 2,
+          "createdAt": "2026-08-16T10:17:18.532504Z",
+          "updatedAt": "2026-08-16T10:17:25.383320Z"
+        }
+      ],
+      "details": [
+        {
+          "documentId": 6,
+          "title": "SYN2-U03-PORTFOLIO",
+          "documentType": "PORTFOLIO",
+          "ownerConfirmed": true,
+          "activeVersionId": 7,
+          "createdAt": "2026-08-16T10:17:41.504890Z",
+          "updatedAt": "2026-08-16T10:17:44.047580Z",
+          "versions": [
+            {
+              "versionId": 7,
+              "versionNo": 1,
+              "originalFileName": "syn2-u03-portfolio-v1.txt",
+              "fileType": "TXT",
+              "status": "ACTIVE",
+              "processingStatus": "COMPLETED",
+              "processingStage": "COMPLETED",
+              "completedChunks": 3,
+              "totalChunks": 3,
+              "progressPercent": 100,
+              "processingErrorCode": null,
+              "retryScheduled": false,
+              "retryCount": 0,
+              "maxRetries": 3,
+              "nextRetryAt": null,
+              "createdAt": "2026-08-16T10:17:41.506049Z"
+            }
+          ]
+        },
+        {
+          "documentId": 1,
+          "title": "SYN2-U03 Resume",
+          "documentType": "RESUME",
+          "ownerConfirmed": true,
+          "activeVersionId": 2,
+          "createdAt": "2026-08-16T10:17:18.532504Z",
+          "updatedAt": "2026-08-16T10:17:25.383320Z",
+          "versions": [
+            {
+              "versionId": 2,
+              "versionNo": 2,
+              "originalFileName": "syn2-u03-resume-v1.pdf",
+              "fileType": "PDF",
+              "status": "ACTIVE",
+              "processingStatus": "COMPLETED",
+              "processingStage": "COMPLETED",
+              "completedChunks": 5,
+              "totalChunks": 5,
+              "progressPercent": 100,
+              "processingErrorCode": null,
+              "retryScheduled": false,
+              "retryCount": 0,
+              "maxRetries": 3,
+              "nextRetryAt": null,
+              "createdAt": "2026-08-16T10:17:22.913126Z"
+            },
+            {
+              "versionId": 1,
+              "versionNo": 1,
+              "originalFileName": "syn2-u03-resume-v0.txt",
+              "fileType": "TXT",
+              "status": "ACTIVE",
+              "processingStatus": "COMPLETED",
+              "processingStage": "COMPLETED",
+              "completedChunks": 1,
+              "totalChunks": 1,
+              "progressPercent": 100,
+              "processingErrorCode": null,
+              "retryScheduled": false,
+              "retryCount": 0,
+              "maxRetries": 3,
+              "nextRetryAt": null,
+              "createdAt": "2026-08-16T10:17:18.535515Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "userKey": "SYN2-U04",
+      "userId": 4,
+      "documents": [
+        {
+          "documentId": 8,
+          "title": "SYN2-U04-PORTFOLIO",
+          "documentType": "PORTFOLIO",
+          "activeVersionId": 9,
+          "latestVersionId": 9,
+          "latestVersionStatus": "ACTIVE",
+          "latestOriginalFileName": "syn2-u04-portfolio-v1.txt",
+          "latestFileType": "TXT",
+          "latestProcessingStatus": "COMPLETED",
+          "latestProcessingStage": "COMPLETED",
+          "latestCompletedChunks": 3,
+          "latestTotalChunks": 3,
+          "latestProgressPercent": 100,
+          "latestProcessingErrorCode": null,
+          "latestRetryCount": 0,
+          "maxRetries": 3,
+          "latestNextRetryAt": null,
+          "activeVersionStatus": "ACTIVE",
+          "versionCount": 1,
+          "createdAt": "2026-08-16T10:17:49.714935Z",
+          "updatedAt": "2026-08-16T10:17:51.722988Z"
+        },
+        {
+          "documentId": 7,
+          "title": "SYN2-U04-RESUME",
+          "documentType": "RESUME",
+          "activeVersionId": 8,
+          "latestVersionId": 8,
+          "latestVersionStatus": "ACTIVE",
+          "latestOriginalFileName": "syn2-u04-resume-v1.pdf",
+          "latestFileType": "PDF",
+          "latestProcessingStatus": "COMPLETED",
+          "latestProcessingStage": "COMPLETED",
+          "latestCompletedChunks": 4,
+          "latestTotalChunks": 4,
+          "latestProgressPercent": 100,
+          "latestProcessingErrorCode": null,
+          "latestRetryCount": 0,
+          "maxRetries": 3,
+          "latestNextRetryAt": null,
+          "activeVersionStatus": "ACTIVE",
+          "versionCount": 1,
+          "createdAt": "2026-08-16T10:17:45.619033Z",
+          "updatedAt": "2026-08-16T10:17:47.977803Z"
+        }
+      ],
+      "details": [
+        {
+          "documentId": 8,
+          "title": "SYN2-U04-PORTFOLIO",
+          "documentType": "PORTFOLIO",
+          "ownerConfirmed": true,
+          "activeVersionId": 9,
+          "createdAt": "2026-08-16T10:17:49.714935Z",
+          "updatedAt": "2026-08-16T10:17:51.722988Z",
+          "versions": [
+            {
+              "versionId": 9,
+              "versionNo": 1,
+              "originalFileName": "syn2-u04-portfolio-v1.txt",
+              "fileType": "TXT",
+              "status": "ACTIVE",
+              "processingStatus": "COMPLETED",
+              "processingStage": "COMPLETED",
+              "completedChunks": 3,
+              "totalChunks": 3,
+              "progressPercent": 100,
+              "processingErrorCode": null,
+              "retryScheduled": false,
+              "retryCount": 0,
+              "maxRetries": 3,
+              "nextRetryAt": null,
+              "createdAt": "2026-08-16T10:17:49.716030Z"
+            }
+          ]
+        },
+        {
+          "documentId": 7,
+          "title": "SYN2-U04-RESUME",
+          "documentType": "RESUME",
+          "ownerConfirmed": true,
+          "activeVersionId": 8,
+          "createdAt": "2026-08-16T10:17:45.619033Z",
+          "updatedAt": "2026-08-16T10:17:47.977803Z",
+          "versions": [
+            {
+              "versionId": 8,
+              "versionNo": 1,
+              "originalFileName": "syn2-u04-resume-v1.pdf",
+              "fileType": "PDF",
+              "status": "ACTIVE",
+              "processingStatus": "COMPLETED",
+              "processingStage": "COMPLETED",
+              "completedChunks": 4,
+              "totalChunks": 4,
+              "progressPercent": 100,
+              "processingErrorCode": null,
+              "retryScheduled": false,
+              "retryCount": 0,
+              "maxRetries": 3,
+              "nextRetryAt": null,
+              "createdAt": "2026-08-16T10:17:45.620731Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "queryCount": 48,
+  "queries": [
+    {
+      "id": "V2-U01-D01",
+      "userKey": "SYN2-U01",
+      "category": "DIRECT_EXPERIENCE",
+      "polarity": "POSITIVE",
+      "query": "여러 출하 거점의 건설 자재 배차와 계근 전표를 처리하는 서비스를 맡아 본 이력이 있어?",
+      "httpStatus": 200,
+      "latencyMs": 280.13559999999416,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "V2-U01-D02",
+      "userKey": "SYN2-U01",
+      "category": "DIRECT_EXPERIENCE",
+      "polarity": "POSITIVE",
+      "query": "단가 규칙이 바뀐 과정을 SQL Server에서 시점별로 추적하도록 구현했나요?",
+      "httpStatus": 200,
+      "latencyMs": 296.84070000000065,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 8,
+            "documentId": 2,
+            "documentVersionId": 3,
+            "documentTitle": "SYN2-U01-RESUME",
+            "versionNo": 1,
+            "content": "opic으로 분리\n• depot code와 material class subscription filter로 거점·자재별 worker 격리\n• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리\n• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존\nOperational outcome\n검증 조건을 분리해 기록\n동일 부하 replay에서 견적 API P95를 1.4초에서 380밀리초로 낮췄다. 72시간 장비 단절을 모사한 46,200개 callback 재생에서는\nduplicate shipment가 0건이었고 운영 DB row를 수동 수정하지 않았다.\n• 장비별 circuit breaker와 짧은 timeout으로 thread 고갈 방지\n• 최근 검증 tare weight는 임시 견적에만 사용하고 실제 출하 확정에는 사용 금지\n• 거점별 처리량·거절 원인을 replay dashboard로 노출\nHow I worked\n협업과 책임 경계\n현장 운영자와 callback 식별자의 수명, 재전송 조건, 수동 정정 절차를 먼저 문서화했다. QA와 fault-injection 시나리오를 만들고\n재고·운임 정산 담당자와 전표 불변 조건을 합의했다.\n• API schema review 및 consumer runbook 작성\n• 주간 incident review에서 복구 시간과 수동 개입 횟수 추적",
+            "snippet": "duplicate shipment가 0건이었고 운영 DB row를 수동 수정하지 않았다.\n• 장비별 circuit breaker와 짧은 timeout으로 thread 고갈 방지",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 8,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.4522325567367119,
+            "score": 0.5477674432632881
+          },
+          {
+            "chunkId": 13,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "er와 짧은 timeout을 적용하고, 최근 검증된 tare weight가 있는 경우에는 화면에 ‘임시 견적’임을 표시한 값을 돌려줬다. 실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했다. 이 경계 덕분에 정확하지 않은 값을 최종 전표로 저장하지 않으면서도 배차 상담은 계속할 수 있었다.\n\n[06. 복구 훈련]\n72시간 통신 단절을 모사해 46,200개 callback을 순서를 섞어 재생했다. inbox key 검증 결과 중복 shipment 생성은 0건이었다. 운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다. 동일 부하 조건에서 견적 API P95는 1.4초에서 380밀리초로 줄었다.\n\n[07. 주변 경험]\n별도 KilnWatch 프로젝트에서는 MQTT로 11,000개 소성로 센서 신호를 받고 InfluxDB에 보관했다. 이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다. 두 프로젝트를 하나의 성과로 합치지 않는다.\n\n[08. 범위]\n동적 가격을 추천하는 머신러닝 모델은 아이디어 회의만 있었고 설계·구현하지 않았다. 가격 규칙은 사람이 승인한 테이블이었다. 모바일 운전기사 앱도 다른 팀이 담당했다.\n\n[09. 회고]\n가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다. topic filter는 격리와 확장에 도움을 줬지만, 중복 방지의 근거는 source_ticket_id와 owner 거점이 결합된 DB 제약이었다.",
+            "snippet": "운임과 자재 단가는 적용 날짜, 고객 등급, 운송 거리로 결정됐다.\n규칙 변경은 SQL Server system-versioned table에 남겼다.\n운영자는 특정 전표가 만들어진 시점의 규칙을 재구성할 수 있었고, 잘못 배포된 단가표는 과거 row를 복사해 새 유효 구간으로 되돌렸다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 12,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.4898063856709425,
+            "score": 0.5101936143290575
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U01-NV01",
+      "userKey": "SYN2-U01",
+      "category": "NATURAL_VARIATION",
+      "polarity": "POSITIVE",
+      "query": "현장 계근기가 연결을 되찾은 뒤 완료 신호를 거듭 보내도 전표가 늘어나지 않게 한 방법이 궁금해.",
+      "httpStatus": 200,
+      "latencyMs": 301.1171000000031,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 12,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "lace PubSub+도 후보로 비교했다. 다만 운영 인력의 진단 경험, 기존 Azure 관측 도구, 전환 비용을 종합해 실험 문서만 남기고 도입하지 않았다.\n\n[03. 중복 전표 방지]\n계근 callback에는 장비가 생성한 source_ticket_id가 있었다. consumer는 이 값을 owner 거점과 함께 inbox table의 unique key로 저장한 뒤에만 shipment 상태를 바꿨다. transaction이 끝난 뒤 같은 callback이 다시 도착하면 이미 처리된 inbox row를 확인하고 성공 응답만 반환했다. 단순 메모리 캐시가 아니라 SQL Server transaction을 최종 기준으로 삼았기 때문에 worker 재시작 뒤에도 중복을 막을 수 있었다.\n\n[04. 가격 규칙 감사]\n운임과 자재 단가는 적용 날짜, 고객 등급, 운송 거리로 결정됐다. 규칙 변경은 SQL Server system-versioned table에 남겼다. 운영자는 특정 전표가 만들어진 시점의 규칙을 재구성할 수 있었고, 잘못 배포된 단가표는 과거 row를 복사해 새 유효 구간으로 되돌렸다. 과거 row 자체를 수정하지는 않았다.\n\n[05. 장비 장애 시 동작]\n계근 제어기가 응답하지 않을 때 매 요청이 timeout까지 기다리면 API thread가 고갈됐다. 장비별 circuit breaker와 짧은 timeout을 적용하고, 최근 검증된 tare weight가 있는 경우에는 화면에 ‘임시 견적’임을 표시한 값을 돌려줬다. 실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했",
+            "snippet": "운영자는 특정 전표가 만들어진 시점의 규칙을 재구성할 수 있었고, 잘못 배포된 단가표는 과거 row를 복사해 새 유효 구간으로 되돌렸다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 12,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.40898830783506124,
+            "score": 0.5910116921649388
+          },
+          {
+            "chunkId": 11,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U01\nQuarryFlow Dispatch: 계근소 재전송과 자재 배차 정합성\n\n이 문서는 평가용 합성 사례다. 등장하는 인물, 회사, 현장, 수치와 사건은 모두 가상이며 실제 개인정보나 영업 정보를 포함하지 않는다.\n\n[01. 배경]\nQuarryFlow Dispatch는 골재·아스콘 주문을 28개 출하 거점에 배정하고, 현장 계근소에서 확정된 중량을 운송 전표로 만드는 시스템이다. 연간 처리량은 약 3,200,000개 전표였다. 주문 API 자체보다 어려운 부분은 현장 장비였다. 일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다. 같은 전표가 두 번 확정되면 재고와 운임 정산이 함께 어긋났다.\n\n[02. 제약과 선택]\n거점마다 취급 자재와 운송 규칙이 달랐고, 한 거점의 장비 장애가 다른 거점의 배차를 지연시키면 안 됐다. C#과 .NET 8로 작성한 접수 API는 요청을 짧게 끝내고 Azure Service Bus topic에 명령을 발행했다. subscription filter는 depot code와 material class를 기준으로 구성했다. 이 방식으로 각 worker는 자신이 담당하는 거점·자재 메시지만 받았고, 새로운 거점 추가 때 API 배포가 필요하지 않았다.\n\nSolace PubSub+도 후보로 비교했다. 다만 운영 인력의 진단 경험, 기존 Azure 관측 도구, 전환 비용을 종합해 실험 문서만 남기고 도입하지 않았다.\n\n[03. 중복 전표 방지]\n계근 callback에는 장",
+            "snippet": "주문 API 자체보다 어려운 부분은 현장 장비였다.\n일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다.\n같은 전표가 두 번 확정되면 재고와 운임 정산이 함께 어긋났다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 11,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.425553117659493,
+            "score": 0.574446882340507
+          },
+          {
+            "chunkId": 13,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "er와 짧은 timeout을 적용하고, 최근 검증된 tare weight가 있는 경우에는 화면에 ‘임시 견적’임을 표시한 값을 돌려줬다. 실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했다. 이 경계 덕분에 정확하지 않은 값을 최종 전표로 저장하지 않으면서도 배차 상담은 계속할 수 있었다.\n\n[06. 복구 훈련]\n72시간 통신 단절을 모사해 46,200개 callback을 순서를 섞어 재생했다. inbox key 검증 결과 중복 shipment 생성은 0건이었다. 운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다. 동일 부하 조건에서 견적 API P95는 1.4초에서 380밀리초로 줄었다.\n\n[07. 주변 경험]\n별도 KilnWatch 프로젝트에서는 MQTT로 11,000개 소성로 센서 신호를 받고 InfluxDB에 보관했다. 이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다. 두 프로젝트를 하나의 성과로 합치지 않는다.\n\n[08. 범위]\n동적 가격을 추천하는 머신러닝 모델은 아이디어 회의만 있었고 설계·구현하지 않았다. 가격 규칙은 사람이 승인한 테이블이었다. 모바일 운전기사 앱도 다른 팀이 담당했다.\n\n[09. 회고]\n가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다. topic filter는 격리와 확장에 도움을 줬지만, 중복 방지의 근거는 source_ticket_id와 owner 거점이 결합된 DB 제약이었다.",
+            "snippet": "이 경계 덕분에 정확하지 않은 값을 최종 전표로 저장하지 않으면서도 배차 상담은 계속할 수 있었다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 13,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.43908910778489374,
+            "score": 0.5609108922151063
+          },
+          {
+            "chunkId": 7,
+            "documentId": 2,
+            "documentVersionId": 3,
+            "documentTitle": "SYN2-U01-RESUME",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2  |  SYNTHETIC RESUME  |  NOT A REAL PERSON PAGE 1 / 2\nHAN MIN-JUN / 합성 프로필\nBackend Engineer · Industrial Logistics\nPRIZM P7-A v2 synthetic resume — 실제 인물·회사·현장과 무관\n현장 장비의 불안정한 통신을 업무 정합성 경계로 흡수하고, C# 기반 배차·계근 서비스를 운영한 가상 백엔드 엔지니어.\n메시지 전달보다 전표 식별자, 감사 이력, 복구 가능한 운영 절차를 먼저 정의한다.\n3.2M\ntickets / year\n28\ndispatch depots\n1.4s → 380ms\nquote API P95\n0\nduplicate shipments in replay\nEXPERIENCE & IMPACT\nSynthetic Aggregates Platform · Backend Engineer\n2023.04 - 2026.06 | QuarryFlow Dispatch\n골재·아스콘 주문을 출하 거점에 배정하고 계근 완료 중량을 운송 전표로 확정하는 서비스의 API와 비동기 처리 경로를 담당했다.\n5명 팀에서 장비 연동 contract, SQL transaction 경계, 운영 replay 절차를 설계했다.\n• C# 및 .NET 8 API가 접수한 명령을 Azure Service Bus topic으로 분리\n• depot code와 material class subscription filter로 거점·자재별 worker 격리\n• source_ticket_id와 owner depot을 inbox uniq",
+            "snippet": "골재·아스콘 주문을 출하 거점에 배정하고 계근 완료 중량을 운송 전표로 확정하는 서비스의 API와 비동기 처리 경로를 담당했다.",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 7,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.4695538914735409,
+            "score": 0.5304461085264591
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U01-NV02",
+      "userKey": "SYN2-U01",
+      "category": "NATURAL_VARIATION",
+      "polarity": "POSITIVE",
+      "query": "거점과 자재 종류에 따라 필요한 작업자만 배차 메시지를 받도록 나눈 경험이 있나요?",
+      "httpStatus": 200,
+      "latencyMs": 260.97379999999976,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 13,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "er와 짧은 timeout을 적용하고, 최근 검증된 tare weight가 있는 경우에는 화면에 ‘임시 견적’임을 표시한 값을 돌려줬다. 실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했다. 이 경계 덕분에 정확하지 않은 값을 최종 전표로 저장하지 않으면서도 배차 상담은 계속할 수 있었다.\n\n[06. 복구 훈련]\n72시간 통신 단절을 모사해 46,200개 callback을 순서를 섞어 재생했다. inbox key 검증 결과 중복 shipment 생성은 0건이었다. 운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다. 동일 부하 조건에서 견적 API P95는 1.4초에서 380밀리초로 줄었다.\n\n[07. 주변 경험]\n별도 KilnWatch 프로젝트에서는 MQTT로 11,000개 소성로 센서 신호를 받고 InfluxDB에 보관했다. 이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다. 두 프로젝트를 하나의 성과로 합치지 않는다.\n\n[08. 범위]\n동적 가격을 추천하는 머신러닝 모델은 아이디어 회의만 있었고 설계·구현하지 않았다. 가격 규칙은 사람이 승인한 테이블이었다. 모바일 운전기사 앱도 다른 팀이 담당했다.\n\n[09. 회고]\n가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다. topic filter는 격리와 확장에 도움을 줬지만, 중복 방지의 근거는 source_ticket_id와 owner 거점이 결합된 DB 제약이었다.",
+            "snippet": "가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다. topic filter는 격리와 확장에 도움을 줬지만, 중복 방지의 근거는 source_ticket_id와 owner 거점이 결합된 DB 제약이었다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 13,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.45339293399025193,
+            "score": 0.5466070660097481
+          },
+          {
+            "chunkId": 8,
+            "documentId": 2,
+            "documentVersionId": 3,
+            "documentTitle": "SYN2-U01-RESUME",
+            "versionNo": 1,
+            "content": "opic으로 분리\n• depot code와 material class subscription filter로 거점·자재별 worker 격리\n• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리\n• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존\nOperational outcome\n검증 조건을 분리해 기록\n동일 부하 replay에서 견적 API P95를 1.4초에서 380밀리초로 낮췄다. 72시간 장비 단절을 모사한 46,200개 callback 재생에서는\nduplicate shipment가 0건이었고 운영 DB row를 수동 수정하지 않았다.\n• 장비별 circuit breaker와 짧은 timeout으로 thread 고갈 방지\n• 최근 검증 tare weight는 임시 견적에만 사용하고 실제 출하 확정에는 사용 금지\n• 거점별 처리량·거절 원인을 replay dashboard로 노출\nHow I worked\n협업과 책임 경계\n현장 운영자와 callback 식별자의 수명, 재전송 조건, 수동 정정 절차를 먼저 문서화했다. QA와 fault-injection 시나리오를 만들고\n재고·운임 정산 담당자와 전표 불변 조건을 합의했다.\n• API schema review 및 consumer runbook 작성\n• 주간 incident review에서 복구 시간과 수동 개입 횟수 추적",
+            "snippet": "• depot code와 material class subscription filter로 거점·자재별 worker 격리\n• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 8,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.45288788257744395,
+            "score": 0.547112117422556
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U01-IP01",
+      "userKey": "SYN2-U01",
+      "category": "INDIRECT_PROBLEM",
+      "polarity": "POSITIVE",
+      "query": "계근 제어기가 응답하지 않을 때 요청 스레드가 모두 묶이는 상황을 어떻게 피했어?",
+      "httpStatus": 200,
+      "latencyMs": 257.4122000000061,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 12,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "lace PubSub+도 후보로 비교했다. 다만 운영 인력의 진단 경험, 기존 Azure 관측 도구, 전환 비용을 종합해 실험 문서만 남기고 도입하지 않았다.\n\n[03. 중복 전표 방지]\n계근 callback에는 장비가 생성한 source_ticket_id가 있었다. consumer는 이 값을 owner 거점과 함께 inbox table의 unique key로 저장한 뒤에만 shipment 상태를 바꿨다. transaction이 끝난 뒤 같은 callback이 다시 도착하면 이미 처리된 inbox row를 확인하고 성공 응답만 반환했다. 단순 메모리 캐시가 아니라 SQL Server transaction을 최종 기준으로 삼았기 때문에 worker 재시작 뒤에도 중복을 막을 수 있었다.\n\n[04. 가격 규칙 감사]\n운임과 자재 단가는 적용 날짜, 고객 등급, 운송 거리로 결정됐다. 규칙 변경은 SQL Server system-versioned table에 남겼다. 운영자는 특정 전표가 만들어진 시점의 규칙을 재구성할 수 있었고, 잘못 배포된 단가표는 과거 row를 복사해 새 유효 구간으로 되돌렸다. 과거 row 자체를 수정하지는 않았다.\n\n[05. 장비 장애 시 동작]\n계근 제어기가 응답하지 않을 때 매 요청이 timeout까지 기다리면 API thread가 고갈됐다. 장비별 circuit breaker와 짧은 timeout을 적용하고, 최근 검증된 tare weight가 있는 경우에는 화면에 ‘임시 견적’임을 표시한 값을 돌려줬다. 실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했",
+            "snippet": "장비 장애 시 동작]\n계근 제어기가 응답하지 않을 때 매 요청이 timeout까지 기다리면 API thread가 고갈됐다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 12,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.40949604737662715,
+            "score": 0.5905039526233729
+          },
+          {
+            "chunkId": 11,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U01\nQuarryFlow Dispatch: 계근소 재전송과 자재 배차 정합성\n\n이 문서는 평가용 합성 사례다. 등장하는 인물, 회사, 현장, 수치와 사건은 모두 가상이며 실제 개인정보나 영업 정보를 포함하지 않는다.\n\n[01. 배경]\nQuarryFlow Dispatch는 골재·아스콘 주문을 28개 출하 거점에 배정하고, 현장 계근소에서 확정된 중량을 운송 전표로 만드는 시스템이다. 연간 처리량은 약 3,200,000개 전표였다. 주문 API 자체보다 어려운 부분은 현장 장비였다. 일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다. 같은 전표가 두 번 확정되면 재고와 운임 정산이 함께 어긋났다.\n\n[02. 제약과 선택]\n거점마다 취급 자재와 운송 규칙이 달랐고, 한 거점의 장비 장애가 다른 거점의 배차를 지연시키면 안 됐다. C#과 .NET 8로 작성한 접수 API는 요청을 짧게 끝내고 Azure Service Bus topic에 명령을 발행했다. subscription filter는 depot code와 material class를 기준으로 구성했다. 이 방식으로 각 worker는 자신이 담당하는 거점·자재 메시지만 받았고, 새로운 거점 추가 때 API 배포가 필요하지 않았다.\n\nSolace PubSub+도 후보로 비교했다. 다만 운영 인력의 진단 경험, 기존 Azure 관측 도구, 전환 비용을 종합해 실험 문서만 남기고 도입하지 않았다.\n\n[03. 중복 전표 방지]\n계근 callback에는 장",
+            "snippet": "일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 11,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.47251792923149494,
+            "score": 0.5274820707685051
+          },
+          {
+            "chunkId": 13,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "er와 짧은 timeout을 적용하고, 최근 검증된 tare weight가 있는 경우에는 화면에 ‘임시 견적’임을 표시한 값을 돌려줬다. 실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했다. 이 경계 덕분에 정확하지 않은 값을 최종 전표로 저장하지 않으면서도 배차 상담은 계속할 수 있었다.\n\n[06. 복구 훈련]\n72시간 통신 단절을 모사해 46,200개 callback을 순서를 섞어 재생했다. inbox key 검증 결과 중복 shipment 생성은 0건이었다. 운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다. 동일 부하 조건에서 견적 API P95는 1.4초에서 380밀리초로 줄었다.\n\n[07. 주변 경험]\n별도 KilnWatch 프로젝트에서는 MQTT로 11,000개 소성로 센서 신호를 받고 InfluxDB에 보관했다. 이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다. 두 프로젝트를 하나의 성과로 합치지 않는다.\n\n[08. 범위]\n동적 가격을 추천하는 머신러닝 모델은 아이디어 회의만 있었고 설계·구현하지 않았다. 가격 규칙은 사람이 승인한 테이블이었다. 모바일 운전기사 앱도 다른 팀이 담당했다.\n\n[09. 회고]\n가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다. topic filter는 격리와 확장에 도움을 줬지만, 중복 방지의 근거는 source_ticket_id와 owner 거점이 결합된 DB 제약이었다.",
+            "snippet": "장비 장애 시 동작]\n계근 제어기가 응답하지 않을 때 매 요청이 timeout까지 기다리면 API thread가 고갈됐다.\n장비별 circuit breaker와 짧은 timeout을 적용하고, 최근 검증된 tare weight가 있는 경우에는 화면에 ‘임시 견적’임을 표시한 값을 돌려줬다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 12,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.48818597127111096,
+            "score": 0.511814028728889
+          },
+          {
+            "chunkId": 8,
+            "documentId": 2,
+            "documentVersionId": 3,
+            "documentTitle": "SYN2-U01-RESUME",
+            "versionNo": 1,
+            "content": "opic으로 분리\n• depot code와 material class subscription filter로 거점·자재별 worker 격리\n• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리\n• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존\nOperational outcome\n검증 조건을 분리해 기록\n동일 부하 replay에서 견적 API P95를 1.4초에서 380밀리초로 낮췄다. 72시간 장비 단절을 모사한 46,200개 callback 재생에서는\nduplicate shipment가 0건이었고 운영 DB row를 수동 수정하지 않았다.\n• 장비별 circuit breaker와 짧은 timeout으로 thread 고갈 방지\n• 최근 검증 tare weight는 임시 견적에만 사용하고 실제 출하 확정에는 사용 금지\n• 거점별 처리량·거절 원인을 replay dashboard로 노출\nHow I worked\n협업과 책임 경계\n현장 운영자와 callback 식별자의 수명, 재전송 조건, 수동 정정 절차를 먼저 문서화했다. QA와 fault-injection 시나리오를 만들고\n재고·운임 정산 담당자와 전표 불변 조건을 합의했다.\n• API schema review 및 consumer runbook 작성\n• 주간 incident review에서 복구 시간과 수동 개입 횟수 추적",
+            "snippet": "현장 장비의 불안정한 통신을 업무 정합성 경계로 흡수하고, C# 기반 배차·계근 서비스를 운영한 가상 백엔드 엔지니어.\n메시지 전달보다 전표 식별자, 감사 이력, 복구 가능한 운영 절차를 먼저 정의한다.",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 7,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.4754419952103166,
+            "score": 0.5245580047896834
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U01-IP02",
+      "userKey": "SYN2-U01",
+      "category": "INDIRECT_PROBLEM",
+      "polarity": "POSITIVE",
+      "query": "사흘 동안 밀린 현장 callback을 DB 수작업 없이 안전하게 복구한 사례가 있을까?",
+      "httpStatus": 200,
+      "latencyMs": 254.4760000000024,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 8,
+            "documentId": 2,
+            "documentVersionId": 3,
+            "documentTitle": "SYN2-U01-RESUME",
+            "versionNo": 1,
+            "content": "opic으로 분리\n• depot code와 material class subscription filter로 거점·자재별 worker 격리\n• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리\n• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존\nOperational outcome\n검증 조건을 분리해 기록\n동일 부하 replay에서 견적 API P95를 1.4초에서 380밀리초로 낮췄다. 72시간 장비 단절을 모사한 46,200개 callback 재생에서는\nduplicate shipment가 0건이었고 운영 DB row를 수동 수정하지 않았다.\n• 장비별 circuit breaker와 짧은 timeout으로 thread 고갈 방지\n• 최근 검증 tare weight는 임시 견적에만 사용하고 실제 출하 확정에는 사용 금지\n• 거점별 처리량·거절 원인을 replay dashboard로 노출\nHow I worked\n협업과 책임 경계\n현장 운영자와 callback 식별자의 수명, 재전송 조건, 수동 정정 절차를 먼저 문서화했다. QA와 fault-injection 시나리오를 만들고\n재고·운임 정산 담당자와 전표 불변 조건을 합의했다.\n• API schema review 및 consumer runbook 작성\n• 주간 incident review에서 복구 시간과 수동 개입 횟수 추적",
+            "snippet": "현장 운영자와 callback 식별자의 수명, 재전송 조건, 수동 정정 절차를 먼저 문서화했다.",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 8,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.37861221856486527,
+            "score": 0.6213877814351347
+          },
+          {
+            "chunkId": 13,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "er와 짧은 timeout을 적용하고, 최근 검증된 tare weight가 있는 경우에는 화면에 ‘임시 견적’임을 표시한 값을 돌려줬다. 실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했다. 이 경계 덕분에 정확하지 않은 값을 최종 전표로 저장하지 않으면서도 배차 상담은 계속할 수 있었다.\n\n[06. 복구 훈련]\n72시간 통신 단절을 모사해 46,200개 callback을 순서를 섞어 재생했다. inbox key 검증 결과 중복 shipment 생성은 0건이었다. 운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다. 동일 부하 조건에서 견적 API P95는 1.4초에서 380밀리초로 줄었다.\n\n[07. 주변 경험]\n별도 KilnWatch 프로젝트에서는 MQTT로 11,000개 소성로 센서 신호를 받고 InfluxDB에 보관했다. 이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다. 두 프로젝트를 하나의 성과로 합치지 않는다.\n\n[08. 범위]\n동적 가격을 추천하는 머신러닝 모델은 아이디어 회의만 있었고 설계·구현하지 않았다. 가격 규칙은 사람이 승인한 테이블이었다. 모바일 운전기사 앱도 다른 팀이 담당했다.\n\n[09. 회고]\n가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다. topic filter는 격리와 확장에 도움을 줬지만, 중복 방지의 근거는 source_ticket_id와 owner 거점이 결합된 DB 제약이었다.",
+            "snippet": "복구 훈련]\n72시간 통신 단절을 모사해 46,200개 callback을 순서를 섞어 재생했다. inbox key 검증 결과 중복 shipment 생성은 0건이었다.\n운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 13,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.4168921658718081,
+            "score": 0.5831078341281919
+          },
+          {
+            "chunkId": 12,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "lace PubSub+도 후보로 비교했다. 다만 운영 인력의 진단 경험, 기존 Azure 관측 도구, 전환 비용을 종합해 실험 문서만 남기고 도입하지 않았다.\n\n[03. 중복 전표 방지]\n계근 callback에는 장비가 생성한 source_ticket_id가 있었다. consumer는 이 값을 owner 거점과 함께 inbox table의 unique key로 저장한 뒤에만 shipment 상태를 바꿨다. transaction이 끝난 뒤 같은 callback이 다시 도착하면 이미 처리된 inbox row를 확인하고 성공 응답만 반환했다. 단순 메모리 캐시가 아니라 SQL Server transaction을 최종 기준으로 삼았기 때문에 worker 재시작 뒤에도 중복을 막을 수 있었다.\n\n[04. 가격 규칙 감사]\n운임과 자재 단가는 적용 날짜, 고객 등급, 운송 거리로 결정됐다. 규칙 변경은 SQL Server system-versioned table에 남겼다. 운영자는 특정 전표가 만들어진 시점의 규칙을 재구성할 수 있었고, 잘못 배포된 단가표는 과거 row를 복사해 새 유효 구간으로 되돌렸다. 과거 row 자체를 수정하지는 않았다.\n\n[05. 장비 장애 시 동작]\n계근 제어기가 응답하지 않을 때 매 요청이 timeout까지 기다리면 API thread가 고갈됐다. 장비별 circuit breaker와 짧은 timeout을 적용하고, 최근 검증된 tare weight가 있는 경우에는 화면에 ‘임시 견적’임을 표시한 값을 돌려줬다. 실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했",
+            "snippet": "계근 callback에는 장비가 생성한 source_ticket_id가 있었다. consumer는 이 값을 owner 거점과 함께 inbox table의 unique key로 저장한 뒤에만 shipment 상태를 바꿨다. transaction이 끝난 뒤 같은 callback이 다시 도착하면 이미 처리된 inbox row를 확인하고 성공 응답만 반환했다.\n단순 메모리 캐시가 아니라 SQL Server transaction을 최종 기준으로 삼았기 때문에 worker 재시작 뒤에도 중복을 막을 수 있었다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 12,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.44858223812791453,
+            "score": 0.5514177618720855
+          },
+          {
+            "chunkId": 11,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U01\nQuarryFlow Dispatch: 계근소 재전송과 자재 배차 정합성\n\n이 문서는 평가용 합성 사례다. 등장하는 인물, 회사, 현장, 수치와 사건은 모두 가상이며 실제 개인정보나 영업 정보를 포함하지 않는다.\n\n[01. 배경]\nQuarryFlow Dispatch는 골재·아스콘 주문을 28개 출하 거점에 배정하고, 현장 계근소에서 확정된 중량을 운송 전표로 만드는 시스템이다. 연간 처리량은 약 3,200,000개 전표였다. 주문 API 자체보다 어려운 부분은 현장 장비였다. 일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다. 같은 전표가 두 번 확정되면 재고와 운임 정산이 함께 어긋났다.\n\n[02. 제약과 선택]\n거점마다 취급 자재와 운송 규칙이 달랐고, 한 거점의 장비 장애가 다른 거점의 배차를 지연시키면 안 됐다. C#과 .NET 8로 작성한 접수 API는 요청을 짧게 끝내고 Azure Service Bus topic에 명령을 발행했다. subscription filter는 depot code와 material class를 기준으로 구성했다. 이 방식으로 각 worker는 자신이 담당하는 거점·자재 메시지만 받았고, 새로운 거점 추가 때 API 배포가 필요하지 않았다.\n\nSolace PubSub+도 후보로 비교했다. 다만 운영 인력의 진단 경험, 기존 Azure 관측 도구, 전환 비용을 종합해 실험 문서만 남기고 도입하지 않았다.\n\n[03. 중복 전표 방지]\n계근 callback에는 장",
+            "snippet": "주문 API 자체보다 어려운 부분은 현장 장비였다.\n일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 11,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.4901250904723866,
+            "score": 0.5098749095276134
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U01-NI01",
+      "userKey": "SYN2-U01",
+      "category": "NUMERIC_IDENTIFIER",
+      "polarity": "POSITIVE",
+      "query": "견적 API의 P95를 1.4초에서 380밀리초로 줄였다는 기록을 찾아줘.",
+      "httpStatus": 200,
+      "latencyMs": 265.4033999999956,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 8,
+            "documentId": 2,
+            "documentVersionId": 3,
+            "documentTitle": "SYN2-U01-RESUME",
+            "versionNo": 1,
+            "content": "opic으로 분리\n• depot code와 material class subscription filter로 거점·자재별 worker 격리\n• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리\n• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존\nOperational outcome\n검증 조건을 분리해 기록\n동일 부하 replay에서 견적 API P95를 1.4초에서 380밀리초로 낮췄다. 72시간 장비 단절을 모사한 46,200개 callback 재생에서는\nduplicate shipment가 0건이었고 운영 DB row를 수동 수정하지 않았다.\n• 장비별 circuit breaker와 짧은 timeout으로 thread 고갈 방지\n• 최근 검증 tare weight는 임시 견적에만 사용하고 실제 출하 확정에는 사용 금지\n• 거점별 처리량·거절 원인을 replay dashboard로 노출\nHow I worked\n협업과 책임 경계\n현장 운영자와 callback 식별자의 수명, 재전송 조건, 수동 정정 절차를 먼저 문서화했다. QA와 fault-injection 시나리오를 만들고\n재고·운임 정산 담당자와 전표 불변 조건을 합의했다.\n• API schema review 및 consumer runbook 작성\n• 주간 incident review에서 복구 시간과 수동 개입 횟수 추적",
+            "snippet": "동일 부하 replay에서 견적 API P95를 1.4초에서 380밀리초로 낮췄다. 72시간 장비 단절을 모사한 46,200개 callback 재생에서는\nduplicate shipment가 0건이었고 운영 DB row를 수동 수정하지 않았다.",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 8,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.3864913392693583,
+            "score": 0.6135086607306417
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U01-CN01",
+      "userKey": "SYN2-U01",
+      "category": "COMPLEX_NATURAL_LANGUAGE",
+      "polarity": "POSITIVE",
+      "query": "메시지는 거점별로 격리하되 재전송의 최종 중복 판정은 데이터베이스가 맡도록 설계한 근거가 있어?",
+      "httpStatus": 200,
+      "latencyMs": 232.10519999999815,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 13,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "er와 짧은 timeout을 적용하고, 최근 검증된 tare weight가 있는 경우에는 화면에 ‘임시 견적’임을 표시한 값을 돌려줬다. 실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했다. 이 경계 덕분에 정확하지 않은 값을 최종 전표로 저장하지 않으면서도 배차 상담은 계속할 수 있었다.\n\n[06. 복구 훈련]\n72시간 통신 단절을 모사해 46,200개 callback을 순서를 섞어 재생했다. inbox key 검증 결과 중복 shipment 생성은 0건이었다. 운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다. 동일 부하 조건에서 견적 API P95는 1.4초에서 380밀리초로 줄었다.\n\n[07. 주변 경험]\n별도 KilnWatch 프로젝트에서는 MQTT로 11,000개 소성로 센서 신호를 받고 InfluxDB에 보관했다. 이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다. 두 프로젝트를 하나의 성과로 합치지 않는다.\n\n[08. 범위]\n동적 가격을 추천하는 머신러닝 모델은 아이디어 회의만 있었고 설계·구현하지 않았다. 가격 규칙은 사람이 승인한 테이블이었다. 모바일 운전기사 앱도 다른 팀이 담당했다.\n\n[09. 회고]\n가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다. topic filter는 격리와 확장에 도움을 줬지만, 중복 방지의 근거는 source_ticket_id와 owner 거점이 결합된 DB 제약이었다.",
+            "snippet": "가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다. topic filter는 격리와 확장에 도움을 줬지만, 중복 방지의 근거는 source_ticket_id와 owner 거점이 결합된 DB 제약이었다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 13,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.4459676009513127,
+            "score": 0.5540323990486873
+          },
+          {
+            "chunkId": 8,
+            "documentId": 2,
+            "documentVersionId": 3,
+            "documentTitle": "SYN2-U01-RESUME",
+            "versionNo": 1,
+            "content": "opic으로 분리\n• depot code와 material class subscription filter로 거점·자재별 worker 격리\n• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리\n• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존\nOperational outcome\n검증 조건을 분리해 기록\n동일 부하 replay에서 견적 API P95를 1.4초에서 380밀리초로 낮췄다. 72시간 장비 단절을 모사한 46,200개 callback 재생에서는\nduplicate shipment가 0건이었고 운영 DB row를 수동 수정하지 않았다.\n• 장비별 circuit breaker와 짧은 timeout으로 thread 고갈 방지\n• 최근 검증 tare weight는 임시 견적에만 사용하고 실제 출하 확정에는 사용 금지\n• 거점별 처리량·거절 원인을 replay dashboard로 노출\nHow I worked\n협업과 책임 경계\n현장 운영자와 callback 식별자의 수명, 재전송 조건, 수동 정정 절차를 먼저 문서화했다. QA와 fault-injection 시나리오를 만들고\n재고·운임 정산 담당자와 전표 불변 조건을 합의했다.\n• API schema review 및 consumer runbook 작성\n• 주간 incident review에서 복구 시간과 수동 개입 횟수 추적",
+            "snippet": "현장 운영자와 callback 식별자의 수명, 재전송 조건, 수동 정정 절차를 먼저 문서화했다.",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 8,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.45932688268331767,
+            "score": 0.5406731173166823
+          },
+          {
+            "chunkId": 11,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U01\nQuarryFlow Dispatch: 계근소 재전송과 자재 배차 정합성\n\n이 문서는 평가용 합성 사례다. 등장하는 인물, 회사, 현장, 수치와 사건은 모두 가상이며 실제 개인정보나 영업 정보를 포함하지 않는다.\n\n[01. 배경]\nQuarryFlow Dispatch는 골재·아스콘 주문을 28개 출하 거점에 배정하고, 현장 계근소에서 확정된 중량을 운송 전표로 만드는 시스템이다. 연간 처리량은 약 3,200,000개 전표였다. 주문 API 자체보다 어려운 부분은 현장 장비였다. 일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다. 같은 전표가 두 번 확정되면 재고와 운임 정산이 함께 어긋났다.\n\n[02. 제약과 선택]\n거점마다 취급 자재와 운송 규칙이 달랐고, 한 거점의 장비 장애가 다른 거점의 배차를 지연시키면 안 됐다. C#과 .NET 8로 작성한 접수 API는 요청을 짧게 끝내고 Azure Service Bus topic에 명령을 발행했다. subscription filter는 depot code와 material class를 기준으로 구성했다. 이 방식으로 각 worker는 자신이 담당하는 거점·자재 메시지만 받았고, 새로운 거점 추가 때 API 배포가 필요하지 않았다.\n\nSolace PubSub+도 후보로 비교했다. 다만 운영 인력의 진단 경험, 기존 Azure 관측 도구, 전환 비용을 종합해 실험 문서만 남기고 도입하지 않았다.\n\n[03. 중복 전표 방지]\n계근 callback에는 장",
+            "snippet": "중복 전표 방지]",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 11,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.4606148326030387,
+            "score": 0.5393851673969613
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U01-CN02",
+      "userKey": "SYN2-U01",
+      "category": "COMPLEX_NATURAL_LANGUAGE",
+      "polarity": "POSITIVE",
+      "query": "과거 가격을 재현할 수 있으면서도 이미 적용된 단가 이력은 고쳐 쓰지 않는 운영 방식을 설명해 줘.",
+      "httpStatus": 200,
+      "latencyMs": 245.4536999999982,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 8,
+            "documentId": 2,
+            "documentVersionId": 3,
+            "documentTitle": "SYN2-U01-RESUME",
+            "versionNo": 1,
+            "content": "opic으로 분리\n• depot code와 material class subscription filter로 거점·자재별 worker 격리\n• source_ticket_id와 owner depot을 inbox unique key로 사용해 callback 재전송 멱등 처리\n• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존\nOperational outcome\n검증 조건을 분리해 기록\n동일 부하 replay에서 견적 API P95를 1.4초에서 380밀리초로 낮췄다. 72시간 장비 단절을 모사한 46,200개 callback 재생에서는\nduplicate shipment가 0건이었고 운영 DB row를 수동 수정하지 않았다.\n• 장비별 circuit breaker와 짧은 timeout으로 thread 고갈 방지\n• 최근 검증 tare weight는 임시 견적에만 사용하고 실제 출하 확정에는 사용 금지\n• 거점별 처리량·거절 원인을 replay dashboard로 노출\nHow I worked\n협업과 책임 경계\n현장 운영자와 callback 식별자의 수명, 재전송 조건, 수동 정정 절차를 먼저 문서화했다. QA와 fault-injection 시나리오를 만들고\n재고·운임 정산 담당자와 전표 불변 조건을 합의했다.\n• API schema review 및 consumer runbook 작성\n• 주간 incident review에서 복구 시간과 수동 개입 횟수 추적",
+            "snippet": "duplicate shipment가 0건이었고 운영 DB row를 수동 수정하지 않았다.\n• 장비별 circuit breaker와 짧은 timeout으로 thread 고갈 방지",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 8,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.4720383105117937,
+            "score": 0.5279616894882063
+          },
+          {
+            "chunkId": 12,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "lace PubSub+도 후보로 비교했다. 다만 운영 인력의 진단 경험, 기존 Azure 관측 도구, 전환 비용을 종합해 실험 문서만 남기고 도입하지 않았다.\n\n[03. 중복 전표 방지]\n계근 callback에는 장비가 생성한 source_ticket_id가 있었다. consumer는 이 값을 owner 거점과 함께 inbox table의 unique key로 저장한 뒤에만 shipment 상태를 바꿨다. transaction이 끝난 뒤 같은 callback이 다시 도착하면 이미 처리된 inbox row를 확인하고 성공 응답만 반환했다. 단순 메모리 캐시가 아니라 SQL Server transaction을 최종 기준으로 삼았기 때문에 worker 재시작 뒤에도 중복을 막을 수 있었다.\n\n[04. 가격 규칙 감사]\n운임과 자재 단가는 적용 날짜, 고객 등급, 운송 거리로 결정됐다. 규칙 변경은 SQL Server system-versioned table에 남겼다. 운영자는 특정 전표가 만들어진 시점의 규칙을 재구성할 수 있었고, 잘못 배포된 단가표는 과거 row를 복사해 새 유효 구간으로 되돌렸다. 과거 row 자체를 수정하지는 않았다.\n\n[05. 장비 장애 시 동작]\n계근 제어기가 응답하지 않을 때 매 요청이 timeout까지 기다리면 API thread가 고갈됐다. 장비별 circuit breaker와 짧은 timeout을 적용하고, 최근 검증된 tare weight가 있는 경우에는 화면에 ‘임시 견적’임을 표시한 값을 돌려줬다. 실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했",
+            "snippet": "운영자는 특정 전표가 만들어진 시점의 규칙을 재구성할 수 있었고, 잘못 배포된 단가표는 과거 row를 복사해 새 유효 구간으로 되돌렸다.\n과거 row 자체를 수정하지는 않았다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 12,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.47946712497072574,
+            "score": 0.5205328750292743
+          },
+          {
+            "chunkId": 13,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "er와 짧은 timeout을 적용하고, 최근 검증된 tare weight가 있는 경우에는 화면에 ‘임시 견적’임을 표시한 값을 돌려줬다. 실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했다. 이 경계 덕분에 정확하지 않은 값을 최종 전표로 저장하지 않으면서도 배차 상담은 계속할 수 있었다.\n\n[06. 복구 훈련]\n72시간 통신 단절을 모사해 46,200개 callback을 순서를 섞어 재생했다. inbox key 검증 결과 중복 shipment 생성은 0건이었다. 운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다. 동일 부하 조건에서 견적 API P95는 1.4초에서 380밀리초로 줄었다.\n\n[07. 주변 경험]\n별도 KilnWatch 프로젝트에서는 MQTT로 11,000개 소성로 센서 신호를 받고 InfluxDB에 보관했다. 이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다. 두 프로젝트를 하나의 성과로 합치지 않는다.\n\n[08. 범위]\n동적 가격을 추천하는 머신러닝 모델은 아이디어 회의만 있었고 설계·구현하지 않았다. 가격 규칙은 사람이 승인한 테이블이었다. 모바일 운전기사 앱도 다른 팀이 담당했다.\n\n[09. 회고]\n가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다. topic filter는 격리와 확장에 도움을 줬지만, 중복 방지의 근거는 source_ticket_id와 owner 거점이 결합된 DB 제약이었다.",
+            "snippet": "운영자는 특정 전표가 만들어진 시점의 규칙을 재구성할 수 있었고, 잘못 배포된 단가표는 과거 row를 복사해 새 유효 구간으로 되돌렸다.\n과거 row 자체를 수정하지는 않았다.\n[05.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 12,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.48295879770307226,
+            "score": 0.5170412022969277
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U01-N01",
+      "userKey": "SYN2-U01",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "query": "Solace PubSub+를 QuarryFlow의 실제 메시지 인프라로 전환했나요?",
+      "httpStatus": 200,
+      "latencyMs": 237.74399999999878,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 11,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U01\nQuarryFlow Dispatch: 계근소 재전송과 자재 배차 정합성\n\n이 문서는 평가용 합성 사례다. 등장하는 인물, 회사, 현장, 수치와 사건은 모두 가상이며 실제 개인정보나 영업 정보를 포함하지 않는다.\n\n[01. 배경]\nQuarryFlow Dispatch는 골재·아스콘 주문을 28개 출하 거점에 배정하고, 현장 계근소에서 확정된 중량을 운송 전표로 만드는 시스템이다. 연간 처리량은 약 3,200,000개 전표였다. 주문 API 자체보다 어려운 부분은 현장 장비였다. 일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다. 같은 전표가 두 번 확정되면 재고와 운임 정산이 함께 어긋났다.\n\n[02. 제약과 선택]\n거점마다 취급 자재와 운송 규칙이 달랐고, 한 거점의 장비 장애가 다른 거점의 배차를 지연시키면 안 됐다. C#과 .NET 8로 작성한 접수 API는 요청을 짧게 끝내고 Azure Service Bus topic에 명령을 발행했다. subscription filter는 depot code와 material class를 기준으로 구성했다. 이 방식으로 각 worker는 자신이 담당하는 거점·자재 메시지만 받았고, 새로운 거점 추가 때 API 배포가 필요하지 않았다.\n\nSolace PubSub+도 후보로 비교했다. 다만 운영 인력의 진단 경험, 기존 Azure 관측 도구, 전환 비용을 종합해 실험 문서만 남기고 도입하지 않았다.\n\n[03. 중복 전표 방지]\n계근 callback에는 장",
+            "snippet": "이 방식으로 각 worker는 자신이 담당하는 거점·자재 메시지만 받았고, 새로운 거점 추가 때 API 배포가 필요하지 않았다.\nSolace PubSub+도 후보로 비교했다.\n다만 운영 인력의 진단 경험, 기존 Azure 관측 도구, 전환 비용을 종합해 실험 문서만 남기고 도입하지 않았다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 11,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.46854954583043407,
+            "score": 0.5314504541695659
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U01-N02",
+      "userKey": "SYN2-U01",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "query": "수요를 학습해 자재 가격을 자동 결정하는 머신러닝 모델을 개발했어?",
+      "httpStatus": 200,
+      "latencyMs": 255.47720000000118,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "V2-U01-N03",
+      "userKey": "SYN2-U01",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "query": "동일 견적 replay의 세 자릿수 지연 값이 340ms였다고 볼 자료가 있어?",
+      "httpStatus": 200,
+      "latencyMs": 267.3197,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 13,
+            "documentId": 3,
+            "documentVersionId": 4,
+            "documentTitle": "SYN2-U01-PORTFOLIO",
+            "versionNo": 1,
+            "content": "er와 짧은 timeout을 적용하고, 최근 검증된 tare weight가 있는 경우에는 화면에 ‘임시 견적’임을 표시한 값을 돌려줬다. 실제 출하 확정은 장비가 회복되어 실측 callback이 들어온 뒤에만 가능했다. 이 경계 덕분에 정확하지 않은 값을 최종 전표로 저장하지 않으면서도 배차 상담은 계속할 수 있었다.\n\n[06. 복구 훈련]\n72시간 통신 단절을 모사해 46,200개 callback을 순서를 섞어 재생했다. inbox key 검증 결과 중복 shipment 생성은 0건이었다. 운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다. 동일 부하 조건에서 견적 API P95는 1.4초에서 380밀리초로 줄었다.\n\n[07. 주변 경험]\n별도 KilnWatch 프로젝트에서는 MQTT로 11,000개 소성로 센서 신호를 받고 InfluxDB에 보관했다. 이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다. 두 프로젝트를 하나의 성과로 합치지 않는다.\n\n[08. 범위]\n동적 가격을 추천하는 머신러닝 모델은 아이디어 회의만 있었고 설계·구현하지 않았다. 가격 규칙은 사람이 승인한 테이블이었다. 모바일 운전기사 앱도 다른 팀이 담당했다.\n\n[09. 회고]\n가장 중요한 결정은 메시지 제품보다 전표의 업무 식별자와 transaction 경계를 먼저 정의한 것이었다. topic filter는 격리와 확장에 도움을 줬지만, 중복 방지의 근거는 source_ticket_id와 owner 거점이 결합된 DB 제약이었다.",
+            "snippet": "72시간 통신 단절을 모사해 46,200개 callback을 순서를 섞어 재생했다. inbox key 검증 결과 중복 shipment 생성은 0건이었다.\n운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다.\n동일 부하 조건에서 견적 API P95는 1.4초에서 380밀리초로 줄었다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 13,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.4662664415599038,
+            "score": 0.5337335584400962
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U02-D01",
+      "userKey": "SYN2-U02",
+      "category": "DIRECT_EXPERIENCE",
+      "polarity": "POSITIVE",
+      "query": "위성 영상 처리 작업을 접수하는 FastAPI 인터페이스를 만든 경험이 있나요?",
+      "httpStatus": 200,
+      "latencyMs": 251.26650000000518,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 19,
+            "documentId": 5,
+            "documentVersionId": 6,
+            "documentTitle": "SYN2-U02-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U02\nOrbitMosaic: 위성 영상 배치의 대기, 품질 격리, 재처리\n\n본 문서는 검색 일반화 평가를 위해 만든 합성 데이터다. 실제 위성 사업자·기관·촬영 자료와 관련이 없다.\n\n[실험 노트 A — 입력 계약]\nOrbitMosaic는 촬영 궤도별 GeoTIFF를 받아 구름 마스크와 좌표계를 확인하고 일 단위 모자이크를 생성했다. 외부 제공자는 FastAPI endpoint에 manifest를 등록했다. API는 scene_id, revision, orbit, checksum, object URI를 검증하고 job key를 반환했다. 실제 영상 파일은 API 서버를 통과하지 않았고 object storage에서 직접 읽었다.\n\n[실험 노트 B — 기다리는 작업]\nmanifest가 먼저 도착하고 큰 영상 객체는 수분 뒤에 보이는 경우가 있었다. 초기 구현은 Airflow worker가 polling하면서 slot을 점유했다. 이를 deferrable operator로 바꿔 object-ready event가 올 때까지 triggerer가 기다리게 했다. 계산 worker는 파일이 준비된 작업에만 사용됐다. sequencer가 아니라 영상 제공자의 업로드 지연을 흡수하기 위한 설계였다.\n\n[실험 노트 C — Spark 병목]\n하루 입력은 최대 6.4TB였다. 촬영 건수가 적은 극지방 orbit과 수천 장이 몰리는 중위도 orbit의 partition 크기가 크게 달랐다. acquisition_date와 orbit을 1차 partition으로 두고 Spar",
+            "snippet": "계산 worker는 파일이 준비된 작업에만 사용됐다. sequencer가 아니라 영상 제공자의 업로드 지연을 흡수하기 위한 설계였다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 19,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.4186886895484421,
+            "score": 0.5813113104515579
+          },
+          {
+            "chunkId": 15,
+            "documentId": 4,
+            "documentVersionId": 5,
+            "documentTitle": "SYN2-U02-RESUME",
+            "versionNo": 1,
+            "content": "e revision 모델을 한 흐름으로 운영했다.\n• FastAPI manifest endpoint에서 scene_id, revision, orbit, checksum, object URI 검증\n• Airflow deferrable operator로 object-ready event 대기 중 worker slot 반환\n• acquisition_date·orbit partition과 Spark adaptive query execution으로 skew 완화\n• Delta MERGE의 scene_id + revision key로 동일 revision 재전송 중복 차단\nMeasured outcomes\n동일 40-node 조건\n최대 6.4TB 일일 입력의 end-to-end 시간을 138분에서 41분으로 줄였다. 9,600,000개 scene metadata backfill에서 active row\n중복은 0건이었으며 날짜 범위 checkpoint로 중단 지점부터 재개했다.\n• 작은 중간 파일을 모자이크 완료 시 병합\n• executor 손실·object 지연·품질 오류를 별도 retry 정책으로 분리\n• 성능 결과에 quarantine 재전송 시간은 포함하지 않음\nInput quality gate\n8,750 delivery package validation\nchecksum 또는 TIFF directory가 손상된 GeoTIFF 64개를 quarantine table과 별도 object prefix로 옮겼다. 격리 scene은\n모자이크와 공개 catalog에 들어가지 못하며 재전송 ticket을 추적했다.\n• 오류 sc",
+            "snippet": "대규모 위성 영상 batch에서 대기 작업, 손상 입력, skew partition과 재처리 의미를 분리해 다루는 가상 데이터 엔지니어.\nPython API부터 Airflow orchestration, Spark 계산, Delta 품질 경계까지 연결한다.",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 14,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.42820736337943954,
+            "score": 0.5717926366205605
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U02-D02",
+      "userKey": "SYN2-U02",
+      "category": "DIRECT_EXPERIENCE",
+      "polarity": "POSITIVE",
+      "query": "Airflow로 조정하고 Spark로 계산하는 영상 데이터 파이프라인을 운영했어?",
+      "httpStatus": 200,
+      "latencyMs": 255.69919999999547,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 18,
+            "documentId": 4,
+            "documentVersionId": 5,
+            "documentTitle": "SYN2-U02-RESUME",
+            "versionNo": 1,
+            "content": "종료 조건을 기록했다.\n• Airflow task duration과 deferred duration 분리\n• Spark stage skew dashboard\n• quarantine aging 및 재전송 SLA 관측\nTechnical profile\nsynthetic skills\nPython · FastAPI · Pytest · Airflow · Spark SQL · Delta Lake를 중심으로 작업했다. 데이터 계약은 JSON Schema와\nproperty-based test로 검증했다.\n• DuckDB · GeoTIFF metadata · object storage\n• structured event log · OpenLineage concepts\n• backfill rehearsal · checkpoint recovery\nExplicit scope boundaries\n검토와 구현을 구분\nDask는 로컬 prototype 30건 비교에만 사용했고 production scheduler나 계산 엔진으로 채택하지 않았다. 외부 cloud mask\nmodel의 inference output은 소비했지만 객체 탐지 또는 cloud model을 직접 학습하지 않았다.\n• production orchestration: Airflow\n• production distributed compute: Spark",
+            "snippet": "Python · FastAPI · Pytest · Airflow · Spark SQL · Delta Lake를 중심으로 작업했다.\n데이터 계약은 JSON Schema와\nproperty-based test로 검증했다.",
+            "sourceType": "PAGE",
+            "sourceIndex": 2,
+            "sourceLabel": "2페이지",
+            "evidenceChunkId": 18,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "2페이지",
+            "distance": 0.4070034602274024,
+            "score": 0.5929965397725976
+          },
+          {
+            "chunkId": 20,
+            "documentId": 5,
+            "documentVersionId": 6,
+            "documentTitle": "SYN2-U02-PORTFOLIO",
+            "versionNo": 1,
+            "content": "6.4TB였다. 촬영 건수가 적은 극지방 orbit과 수천 장이 몰리는 중위도 orbit의 partition 크기가 크게 달랐다. acquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다. 작은 중간 파일은 모자이크 완료 시점에 병합했다. 동일한 40-node 조건에서 end-to-end 처리 시간은 138분에서 41분으로 줄었다.\n\n[실험 노트 D — 품질 격리]\n8,750개 delivery package를 받은 검증 주간에 checksum 또는 TIFF directory가 손상된 GeoTIFF 64개를 찾았다. 해당 scene은 quarantine table과 별도 object prefix로 이동했다. 오류가 있는 package 전체를 버리지는 않았지만, 격리된 scene은 모자이크 계산과 공개 catalog에 들어갈 수 없었다. 운영자는 원본 checksum, 발견 단계, 재전송 ticket을 함께 확인했다.\n\n[실험 노트 E — 과거 데이터 재적재]\nDelta Lake MERGE key는 scene_id와 revision의 조합이었다. 같은 장면의 보정판은 새 revision으로 유지하고 동일 revision의 재전송은 update 없이 종료했다. 9,600,000개 scene metadata를 backfill한 검증에서 최종 active row 중복은 0건이었다. backfill job은 처리한 날짜 범위를 checkpoint table에 기록해 중단 지점부터 재개했다.\n\n[실험 노",
+            "snippet": "운영 scheduler와 분산 계산 엔진은 Airflow와 Spark를 유지했다.\n외부 팀이 제공한 cloud mask model은 inference input으로 소비했지만, 객체 탐지나 cloud model을 직접 학습하지 않았다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 21,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.47780234415445844,
+            "score": 0.5221976558455416
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U02-NV01",
+      "userKey": "SYN2-U02",
+      "category": "NATURAL_VARIATION",
+      "polarity": "POSITIVE",
+      "query": "큰 영상 파일이 아직 도착하지 않았을 때 계산 worker를 계속 붙잡지 않도록 바꾼 적이 있어?",
+      "httpStatus": 200,
+      "latencyMs": 258.54009999999835,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 19,
+            "documentId": 5,
+            "documentVersionId": 6,
+            "documentTitle": "SYN2-U02-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U02\nOrbitMosaic: 위성 영상 배치의 대기, 품질 격리, 재처리\n\n본 문서는 검색 일반화 평가를 위해 만든 합성 데이터다. 실제 위성 사업자·기관·촬영 자료와 관련이 없다.\n\n[실험 노트 A — 입력 계약]\nOrbitMosaic는 촬영 궤도별 GeoTIFF를 받아 구름 마스크와 좌표계를 확인하고 일 단위 모자이크를 생성했다. 외부 제공자는 FastAPI endpoint에 manifest를 등록했다. API는 scene_id, revision, orbit, checksum, object URI를 검증하고 job key를 반환했다. 실제 영상 파일은 API 서버를 통과하지 않았고 object storage에서 직접 읽었다.\n\n[실험 노트 B — 기다리는 작업]\nmanifest가 먼저 도착하고 큰 영상 객체는 수분 뒤에 보이는 경우가 있었다. 초기 구현은 Airflow worker가 polling하면서 slot을 점유했다. 이를 deferrable operator로 바꿔 object-ready event가 올 때까지 triggerer가 기다리게 했다. 계산 worker는 파일이 준비된 작업에만 사용됐다. sequencer가 아니라 영상 제공자의 업로드 지연을 흡수하기 위한 설계였다.\n\n[실험 노트 C — Spark 병목]\n하루 입력은 최대 6.4TB였다. 촬영 건수가 적은 극지방 orbit과 수천 장이 몰리는 중위도 orbit의 partition 크기가 크게 달랐다. acquisition_date와 orbit을 1차 partition으로 두고 Spar",
+            "snippet": "계산 worker는 파일이 준비된 작업에만 사용됐다. sequencer가 아니라 영상 제공자의 업로드 지연을 흡수하기 위한 설계였다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 19,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.4615745590240251,
+            "score": 0.5384254409759749
+          },
+          {
+            "chunkId": 20,
+            "documentId": 5,
+            "documentVersionId": 6,
+            "documentTitle": "SYN2-U02-PORTFOLIO",
+            "versionNo": 1,
+            "content": "6.4TB였다. 촬영 건수가 적은 극지방 orbit과 수천 장이 몰리는 중위도 orbit의 partition 크기가 크게 달랐다. acquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다. 작은 중간 파일은 모자이크 완료 시점에 병합했다. 동일한 40-node 조건에서 end-to-end 처리 시간은 138분에서 41분으로 줄었다.\n\n[실험 노트 D — 품질 격리]\n8,750개 delivery package를 받은 검증 주간에 checksum 또는 TIFF directory가 손상된 GeoTIFF 64개를 찾았다. 해당 scene은 quarantine table과 별도 object prefix로 이동했다. 오류가 있는 package 전체를 버리지는 않았지만, 격리된 scene은 모자이크 계산과 공개 catalog에 들어갈 수 없었다. 운영자는 원본 checksum, 발견 단계, 재전송 ticket을 함께 확인했다.\n\n[실험 노트 E — 과거 데이터 재적재]\nDelta Lake MERGE key는 scene_id와 revision의 조합이었다. 같은 장면의 보정판은 새 revision으로 유지하고 동일 revision의 재전송은 update 없이 종료했다. 9,600,000개 scene metadata를 backfill한 검증에서 최종 active row 중복은 0건이었다. backfill job은 처리한 날짜 범위를 checkpoint table에 기록해 중단 지점부터 재개했다.\n\n[실험 노",
+            "snippet": "계산 worker는 파일이 준비된 작업에만 사용됐다. sequencer가 아니라 영상 제공자의 업로드 지연을 흡수하기 위한 설계였다.\n[실험 노트 C — Spark 병목]",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 19,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.48221526079912846,
+            "score": 0.5177847392008715
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U02-NV02",
+      "userKey": "SYN2-U02",
+      "category": "NATURAL_VARIATION",
+      "polarity": "POSITIVE",
+      "query": "같은 촬영 장면의 보정판과 단순 재전송을 구별해서 적재한 기준이 문서에 있나요?",
+      "httpStatus": 200,
+      "latencyMs": 282.8073000000004,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 16,
+            "documentId": 4,
+            "documentVersionId": 5,
+            "documentTitle": "SYN2-U02-RESUME",
+            "versionNo": 1,
+            "content": "손상된 GeoTIFF 64개를 quarantine table과 별도 object prefix로 옮겼다. 격리 scene은\n모자이크와 공개 catalog에 들어가지 못하며 재전송 ticket을 추적했다.\n• 오류 scene 단위 격리로 정상 package 내용은 보존\n• 원본 checksum과 발견 단계 기록\n• 재수신 뒤 revision·checksum을 다시 검증",
+            "snippet": "모자이크와 공개 catalog에 들어가지 못하며 재전송 ticket을 추적했다.",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 16,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.4800641274337457,
+            "score": 0.5199358725662543
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U02-IP01",
+      "userKey": "SYN2-U02",
+      "category": "INDIRECT_PROBLEM",
+      "polarity": "POSITIVE",
+      "query": "궤도별 데이터 쏠림 때문에 일부 Spark 작업만 오래 남는 병목을 줄인 사례를 알려줘.",
+      "httpStatus": 200,
+      "latencyMs": 278.9686999999976,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 21,
+            "documentId": 5,
+            "documentVersionId": 6,
+            "documentTitle": "SYN2-U02-PORTFOLIO",
+            "versionNo": 1,
+            "content": "ne metadata를 backfill한 검증에서 최종 active row 중복은 0건이었다. backfill job은 처리한 날짜 범위를 checkpoint table에 기록해 중단 지점부터 재개했다.\n\n[실험 노트 F — 선택하지 않은 것]\nDask는 로컬 prototype으로 동일 변환 30개를 비교하는 데만 사용했다. 운영 scheduler와 분산 계산 엔진은 Airflow와 Spark를 유지했다. 외부 팀이 제공한 cloud mask model은 inference input으로 소비했지만, 객체 탐지나 cloud model을 직접 학습하지 않았다.\n\n[실험 노트 G — 주변 업무]\nCloudCal 보정 도구에서는 분석가가 작은 표본을 노트북에서 확인할 수 있도록 DuckDB export를 제공했다. 이 기능은 대규모 OrbitMosaic Spark 성능 수치에 포함하지 않았다. on-call 문서에는 object 지연, checksum 오류, Spark executor 손실을 서로 다른 복구 절차로 나눴다.\n\n[결론]\n배치 시간을 줄인 것만으로는 성공이 아니었다. 준비되지 않은 객체는 계산 자원을 점유하지 않아야 했고, 손상 scene은 공개 결과에 섞이지 않아야 했으며, 수백만 건 재처리는 revision 의미를 보존해야 했다. 세 경계를 독립적으로 검증한 뒤에만 41분 결과를 성과로 기록했다.",
+            "snippet": "운영 scheduler와 분산 계산 엔진은 Airflow와 Spark를 유지했다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 21,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.4485583283290049,
+            "score": 0.5514416716709951
+          },
+          {
+            "chunkId": 20,
+            "documentId": 5,
+            "documentVersionId": 6,
+            "documentTitle": "SYN2-U02-PORTFOLIO",
+            "versionNo": 1,
+            "content": "6.4TB였다. 촬영 건수가 적은 극지방 orbit과 수천 장이 몰리는 중위도 orbit의 partition 크기가 크게 달랐다. acquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다. 작은 중간 파일은 모자이크 완료 시점에 병합했다. 동일한 40-node 조건에서 end-to-end 처리 시간은 138분에서 41분으로 줄었다.\n\n[실험 노트 D — 품질 격리]\n8,750개 delivery package를 받은 검증 주간에 checksum 또는 TIFF directory가 손상된 GeoTIFF 64개를 찾았다. 해당 scene은 quarantine table과 별도 object prefix로 이동했다. 오류가 있는 package 전체를 버리지는 않았지만, 격리된 scene은 모자이크 계산과 공개 catalog에 들어갈 수 없었다. 운영자는 원본 checksum, 발견 단계, 재전송 ticket을 함께 확인했다.\n\n[실험 노트 E — 과거 데이터 재적재]\nDelta Lake MERGE key는 scene_id와 revision의 조합이었다. 같은 장면의 보정판은 새 revision으로 유지하고 동일 revision의 재전송은 update 없이 종료했다. 9,600,000개 scene metadata를 backfill한 검증에서 최종 active row 중복은 0건이었다. backfill job은 처리한 날짜 범위를 checkpoint table에 기록해 중단 지점부터 재개했다.\n\n[실험 노",
+            "snippet": "촬영 건수가 적은 극지방 orbit과 수천 장이 몰리는 중위도 orbit의 partition 크기가 크게 달랐다. acquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다.\n작은 중간 파일은 모자이크 완료 시점에 병합했다.\n동일한 40-node 조건에서 end-to-end 처리 시간은 138분에서 41분으로 줄었다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 20,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.4489282734907062,
+            "score": 0.5510717265092938
+          },
+          {
+            "chunkId": 18,
+            "documentId": 4,
+            "documentVersionId": 5,
+            "documentTitle": "SYN2-U02-RESUME",
+            "versionNo": 1,
+            "content": "종료 조건을 기록했다.\n• Airflow task duration과 deferred duration 분리\n• Spark stage skew dashboard\n• quarantine aging 및 재전송 SLA 관측\nTechnical profile\nsynthetic skills\nPython · FastAPI · Pytest · Airflow · Spark SQL · Delta Lake를 중심으로 작업했다. 데이터 계약은 JSON Schema와\nproperty-based test로 검증했다.\n• DuckDB · GeoTIFF metadata · object storage\n• structured event log · OpenLineage concepts\n• backfill rehearsal · checkpoint recovery\nExplicit scope boundaries\n검토와 구현을 구분\nDask는 로컬 prototype 30건 비교에만 사용했고 production scheduler나 계산 엔진으로 채택하지 않았다. 외부 cloud mask\nmodel의 inference output은 소비했지만 객체 탐지 또는 cloud model을 직접 학습하지 않았다.\n• production orchestration: Airflow\n• production distributed compute: Spark",
+            "snippet": "• Spark stage skew dashboard",
+            "sourceType": "PAGE",
+            "sourceIndex": 2,
+            "sourceLabel": "2페이지",
+            "evidenceChunkId": 18,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "2페이지",
+            "distance": 0.4498440058061951,
+            "score": 0.5501559941938049
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U02-IP02",
+      "userKey": "SYN2-U02",
+      "category": "INDIRECT_PROBLEM",
+      "polarity": "POSITIVE",
+      "query": "깨진 위성 파일이 모자이크와 공개 목록에 섞이기 전에 차단한 경험이 있어?",
+      "httpStatus": 200,
+      "latencyMs": 264.1874000000025,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 19,
+            "documentId": 5,
+            "documentVersionId": 6,
+            "documentTitle": "SYN2-U02-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U02\nOrbitMosaic: 위성 영상 배치의 대기, 품질 격리, 재처리\n\n본 문서는 검색 일반화 평가를 위해 만든 합성 데이터다. 실제 위성 사업자·기관·촬영 자료와 관련이 없다.\n\n[실험 노트 A — 입력 계약]\nOrbitMosaic는 촬영 궤도별 GeoTIFF를 받아 구름 마스크와 좌표계를 확인하고 일 단위 모자이크를 생성했다. 외부 제공자는 FastAPI endpoint에 manifest를 등록했다. API는 scene_id, revision, orbit, checksum, object URI를 검증하고 job key를 반환했다. 실제 영상 파일은 API 서버를 통과하지 않았고 object storage에서 직접 읽었다.\n\n[실험 노트 B — 기다리는 작업]\nmanifest가 먼저 도착하고 큰 영상 객체는 수분 뒤에 보이는 경우가 있었다. 초기 구현은 Airflow worker가 polling하면서 slot을 점유했다. 이를 deferrable operator로 바꿔 object-ready event가 올 때까지 triggerer가 기다리게 했다. 계산 worker는 파일이 준비된 작업에만 사용됐다. sequencer가 아니라 영상 제공자의 업로드 지연을 흡수하기 위한 설계였다.\n\n[실험 노트 C — Spark 병목]\n하루 입력은 최대 6.4TB였다. 촬영 건수가 적은 극지방 orbit과 수천 장이 몰리는 중위도 orbit의 partition 크기가 크게 달랐다. acquisition_date와 orbit을 1차 partition으로 두고 Spar",
+            "snippet": "작은 중간 파일은 모자이크 완료 시점에 병합했다.\n동일한 40-node 조건에서 end-to-end 처리 시간은 138분에서 41분으로 줄었다.\n[실험 노트 D — 품질 격리]",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 20,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.43538904190061867,
+            "score": 0.5646109580993813
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U02-NI01",
+      "userKey": "SYN2-U02",
+      "category": "NUMERIC_IDENTIFIER",
+      "polarity": "POSITIVE",
+      "query": "하루 6.4TB 영상 처리를 138분에서 41분으로 단축했다는 근거가 있나요?",
+      "httpStatus": 200,
+      "latencyMs": 283.46390000000247,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 20,
+            "documentId": 5,
+            "documentVersionId": 6,
+            "documentTitle": "SYN2-U02-PORTFOLIO",
+            "versionNo": 1,
+            "content": "6.4TB였다. 촬영 건수가 적은 극지방 orbit과 수천 장이 몰리는 중위도 orbit의 partition 크기가 크게 달랐다. acquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다. 작은 중간 파일은 모자이크 완료 시점에 병합했다. 동일한 40-node 조건에서 end-to-end 처리 시간은 138분에서 41분으로 줄었다.\n\n[실험 노트 D — 품질 격리]\n8,750개 delivery package를 받은 검증 주간에 checksum 또는 TIFF directory가 손상된 GeoTIFF 64개를 찾았다. 해당 scene은 quarantine table과 별도 object prefix로 이동했다. 오류가 있는 package 전체를 버리지는 않았지만, 격리된 scene은 모자이크 계산과 공개 catalog에 들어갈 수 없었다. 운영자는 원본 checksum, 발견 단계, 재전송 ticket을 함께 확인했다.\n\n[실험 노트 E — 과거 데이터 재적재]\nDelta Lake MERGE key는 scene_id와 revision의 조합이었다. 같은 장면의 보정판은 새 revision으로 유지하고 동일 revision의 재전송은 update 없이 종료했다. 9,600,000개 scene metadata를 backfill한 검증에서 최종 active row 중복은 0건이었다. backfill job은 처리한 날짜 범위를 checkpoint table에 기록해 중단 지점부터 재개했다.\n\n[실험 노",
+            "snippet": "작은 중간 파일은 모자이크 완료 시점에 병합했다.\n동일한 40-node 조건에서 end-to-end 처리 시간은 138분에서 41분으로 줄었다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 20,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.4586442435595065,
+            "score": 0.5413557564404935
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U02-CN01",
+      "userKey": "SYN2-U02",
+      "category": "COMPLEX_NATURAL_LANGUAGE",
+      "polarity": "POSITIVE",
+      "query": "960만 건의 과거 scene을 다시 넣으면서 중단 지점부터 이어가고 동일 revision 중복도 막은 방법을 보여줘.",
+      "httpStatus": 200,
+      "latencyMs": 252.53010000000359,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 15,
+            "documentId": 4,
+            "documentVersionId": 5,
+            "documentTitle": "SYN2-U02-RESUME",
+            "versionNo": 1,
+            "content": "e revision 모델을 한 흐름으로 운영했다.\n• FastAPI manifest endpoint에서 scene_id, revision, orbit, checksum, object URI 검증\n• Airflow deferrable operator로 object-ready event 대기 중 worker slot 반환\n• acquisition_date·orbit partition과 Spark adaptive query execution으로 skew 완화\n• Delta MERGE의 scene_id + revision key로 동일 revision 재전송 중복 차단\nMeasured outcomes\n동일 40-node 조건\n최대 6.4TB 일일 입력의 end-to-end 시간을 138분에서 41분으로 줄였다. 9,600,000개 scene metadata backfill에서 active row\n중복은 0건이었으며 날짜 범위 checkpoint로 중단 지점부터 재개했다.\n• 작은 중간 파일을 모자이크 완료 시 병합\n• executor 손실·object 지연·품질 오류를 별도 retry 정책으로 분리\n• 성능 결과에 quarantine 재전송 시간은 포함하지 않음\nInput quality gate\n8,750 delivery package validation\nchecksum 또는 TIFF directory가 손상된 GeoTIFF 64개를 quarantine table과 별도 object prefix로 옮겼다. 격리 scene은\n모자이크와 공개 catalog에 들어가지 못하며 재전송 ticket을 추적했다.\n• 오류 sc",
+            "snippet": "• Delta MERGE의 scene_id + revision key로 동일 revision 재전송 중복 차단",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 15,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.392436978947189,
+            "score": 0.607563021052811
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U02-CN02",
+      "userKey": "SYN2-U02",
+      "category": "COMPLEX_NATURAL_LANGUAGE",
+      "polarity": "POSITIVE",
+      "query": "입력 무결성 확인을 통과하지 못한 영상은 계산 자원과 공개 catalog 양쪽에서 제외되도록 한 근거가 있어?",
+      "httpStatus": 200,
+      "latencyMs": 239.56730000000243,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "V2-U02-N01",
+      "userKey": "SYN2-U02",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "query": "Dask를 OrbitMosaic의 운영 분산 계산 엔진으로 채택했나요?",
+      "httpStatus": 200,
+      "latencyMs": 493.7989000000016,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "V2-U02-N02",
+      "userKey": "SYN2-U02",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "query": "위성 사진에서 객체를 찾는 딥러닝 모델을 직접 학습한 경력이 있어?",
+      "httpStatus": 200,
+      "latencyMs": 224.87860000000364,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "V2-U02-N03",
+      "userKey": "SYN2-U02",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "query": "손상된 GeoTIFF 60개를 격리했다는 결과가 문서에 있나요?",
+      "httpStatus": 200,
+      "latencyMs": 241.2806000000055,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "V2-U03-D01",
+      "userKey": "SYN2-U03",
+      "category": "DIRECT_EXPERIENCE",
+      "polarity": "POSITIVE",
+      "query": "Go와 ConnectRPC로 철도 운행 허가 시뮬레이터의 제어 API를 개발했어?",
+      "httpStatus": 200,
+      "latencyMs": 258.8634999999995,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 22,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U03\nRailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n\n평가 전용 합성 설계 기록. 실제 철도 시설, 노선, 안전 인증과 관계없다.\n\n[DECISION 01 — 명령 모델]\nRailPulse Lab은 실제 열차를 제어하지 않는 interlocking simulator다. Go control plane이 ConnectRPC로 route permit 요청을 받고, 각 요청을 NATS JetStream stream에 기록했다. permit에는 route_id, train_id, command_id와 controller가 발급한 permit_epoch가 포함됐다. simulator node는 자신이 마지막으로 수락한 epoch보다 작은 명령을 실행하지 않았다.\n\n[DECISION 02 — 재전달]\nJetStream pull consumer는 max ack pending을 제한해 느린 simulator가 전체 stream을 막지 않게 했다. ack wait가 지나면 메시지가 재전달될 수 있으므로 command ledger의 command_id unique key를 먼저 확인했다. 같은 명령의 두 번째 전달은 상태 전이를 만들지 않고 이전 결과를 돌려줬다. 메시지 ack 자체를 업무 완료의 유일한 근거로 사용하지 않았다.\n\n[DECISION 03 — 제어권 저장]\nACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다. SQLSTATE 40001 충돌은 decorrelated ji",
+            "snippet": "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n평가 전용 합성 설계 기록.\n실제 철도 시설, 노선, 안전 인증과 관계없다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 22,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.4406328372713355,
+            "score": 0.5593671627286645
+          },
+          {
+            "chunkId": 2,
+            "documentId": 1,
+            "documentVersionId": 2,
+            "documentTitle": "SYN2-U03 Resume",
+            "versionNo": 2,
+            "content": "PRIZM P7-A v2  |  SYNTHETIC RESUME  |  NOT A REAL PERSON PAGE 1 / 2\nLEE DO-HYUN / 합성 프로필\nDistributed Systems Engineer · Simulation Safety\nPRIZM P7-A v2 synthetic resume — 실제 인물·철도·안전 인증과 무관\n망 분할과 메시지 재전달이 있는 시뮬레이션 환경에서 오래된 제어권과 중복 명령을 차단하는 가상 분산 시스템 엔지니어.\n안전 주장과 시험 조건을 수치·ledger·event log로 함께 남긴다.\n12,800\nvirtual trains\n420\npartition scenarios\n9.6s → 2.7s\npermit failover P95\n0\nconflicting permits\nDISTRIBUTED CONTROL EXPERIENCE\nSynthetic Mobility Lab · Distributed Systems Engineer\n2022.11 - 2026.04 | RailPulse Lab\ninterlocking simulator의 route permit control plane을 Go로 개발했다. ConnectRPC 요청, NATS JetStream 전달, CockroachDB\ncommand ledger, simulator node 검증을 하나의 failure model로 문서화했다.\n• route_id·train_id·command_id·permit_epoch를 갖는 명령 contract 설계\n• JetStream pull consumer와 max ack pending으로 느린 zo",
+            "snippet": "망 분할과 메시지 재전달이 있는 시뮬레이션 환경에서 오래된 제어권과 중복 명령을 차단하는 가상 분산 시스템 엔지니어.",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 2,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.46865604813385797,
+            "score": 0.531343951866142
+          },
+          {
+            "chunkId": 6,
+            "documentId": 1,
+            "documentVersionId": 2,
+            "documentTitle": "SYN2-U03 Resume",
+            "versionNo": 2,
+            "content": "• CockroachDB · serializable transaction\n• fault injection · deterministic simulator\n• protocol review · incident rehearsal\nWriting & mentoring\n합성 활동\n신규 팀원을 위한 network-partition lab과 command-ledger walkthrough를 만들었다. 설계 review에서는 가정, invariant, 반례,\n관측 방법 순으로 문서를 작성했다.\n• 분기별 failure-mode workshop 진행\n• 운영자용 permit replay 판독 가이드 작성\nExplicit scope boundaries\nACTIVE와 과거 version 구분\netcd lease controller prototype은 철회된 resume v0에만 있고 ACTIVE v1 경력에는 없다. 현재 설계는 CockroachDB lease row를\n사용한다. 차량 CAN bus gateway firmware는 embedded team 범위였고 직접 구현하지 않았다.\n• YardLens Kotlin batch는 인접 검토 업무\n• RailPulse는 실제 열차 제어 제품이 아닌 simulator",
+            "snippet": "망 분할과 메시지 재전달이 있는 시뮬레이션 환경에서 오래된 제어권과 중복 명령을 차단하는 가상 분산 시스템 엔지니어.\n안전 주장과 시험 조건을 수치·ledger·event log로 함께 남긴다.",
+            "sourceType": "PAGE",
+            "sourceIndex": 2,
+            "sourceLabel": "2페이지",
+            "evidenceChunkId": 2,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.48346286814953066,
+            "score": 0.5165371318504693
+          },
+          {
+            "chunkId": 23,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "ISION 03 — 제어권 저장]\nACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다. SQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다. retry 한도를 넘으면 새 permit을 만들지 않고 호출자에게 재요청 가능한 오류를 반환했다. 무한 재시도로 지연을 숨기지 않았다.\n\n[DECISION 04 — 배포 무결성]\n운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다. node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다. 설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다.\n\n[VALIDATION — 규모와 장애]\n12,800개 virtual train을 16개 zone에 나눠 시험했다. leader process 중단 뒤 새 permit 발급 가능 시점까지의 P95는 9.6초에서 2.7초로 줄었다. 독립적으로 만든 420개 network-partition scenario에서 서로 충돌하는 route permit은 0건이었다. 이 수치는 simulator event log와 CockroachDB ledger를 대조해 확인했다.\n\n[HISTORICAL VERSION]\n초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다. 이후 operational review에서 해당 경력을 ACT",
+            "snippet": "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n평가 전용 합성 설계 기록.\n실제 철도 시설, 노선, 안전 인증과 관계없다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 22,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.48888820012382583,
+            "score": 0.5111117998761742
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U03-D02",
+      "userKey": "SYN2-U03",
+      "category": "DIRECT_EXPERIENCE",
+      "polarity": "POSITIVE",
+      "query": "느린 시뮬레이터 구역이 전체 명령 스트림을 막지 않게 pull 방식과 ack 상한을 둔 경력이 있나요?",
+      "httpStatus": 200,
+      "latencyMs": 244.6952999999994,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 3,
+            "documentId": 1,
+            "documentVersionId": 2,
+            "documentTitle": "SYN2-U03 Resume",
+            "versionNo": 2,
+            "content": "문서화했다.\n• route_id·train_id·command_id·permit_epoch를 갖는 명령 contract 설계\n• JetStream pull consumer와 max ack pending으로 느린 zone 격리\n• command_id unique ledger로 ack wait 이후 재전달 멱등 처리\n• simulator가 마지막 수락 epoch보다 오래된 permit을 거절하도록 구현\nController state and retry\nACTIVE v1 architecture\nCockroachDB lease row와 serializable transaction으로 controller state를 보존했다. SQLSTATE 40001은 decorrelated jitter로\n최대 4회만 재시도하고 한도 초과 시 permit 생성을 중단했다.\n• 재시도 동안 동일 command_id 유지\n• 무한 retry 대신 호출자에게 retryable error 반환\n• ledger와 simulator event를 correlation id로 연결\nSafety-oriented validation\n독립 scenario와 대조 검증\n12,800개 virtual train을 16개 zone에서 실행했다. leader 중단 뒤 permit 발급 P95는 9.6초에서 2.7초로 줄었고 420개\nnetwork-partition scenario의 conflicting route permit은 0건이었다.\n• event log와 DB ledger 결과 대조\n• clock skew·message redelivery·process",
+            "snippet": "• route_id·train_id·command_id·permit_epoch를 갖는 명령 contract 설계\n• JetStream pull consumer와 max ack pending으로 느린 zone 격리",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 3,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.406213290054794,
+            "score": 0.593786709945206
+          },
+          {
+            "chunkId": 23,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "ISION 03 — 제어권 저장]\nACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다. SQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다. retry 한도를 넘으면 새 permit을 만들지 않고 호출자에게 재요청 가능한 오류를 반환했다. 무한 재시도로 지연을 숨기지 않았다.\n\n[DECISION 04 — 배포 무결성]\n운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다. node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다. 설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다.\n\n[VALIDATION — 규모와 장애]\n12,800개 virtual train을 16개 zone에 나눠 시험했다. leader process 중단 뒤 새 permit 발급 가능 시점까지의 P95는 9.6초에서 2.7초로 줄었다. 독립적으로 만든 420개 network-partition scenario에서 서로 충돌하는 route permit은 0건이었다. 이 수치는 simulator event log와 CockroachDB ledger를 대조해 확인했다.\n\n[HISTORICAL VERSION]\n초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다. 이후 operational review에서 해당 경력을 ACT",
+            "snippet": "JetStream pull consumer는 max ack pending을 제한해 느린 simulator가 전체 stream을 막지 않게 했다. ack wait가 지나면 메시지가 재전달될 수 있으므로 command ledger의 command_id unique key를 먼저 확인했다.\n같은 명령의 두 번째 전달은 상태 전이를 만들지 않고 이전 결과를 돌려줬다.\n메시지 ack 자체를 업무 완료의 유일한 근거로 사용하지 않았다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 22,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.45509019226373293,
+            "score": 0.5449098077362671
+          },
+          {
+            "chunkId": 24,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "ICAL VERSION]\n초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다. 이후 operational review에서 해당 경력을 ACTIVE resume에서 제외했고, 현재 RailPulse 설계는 CockroachDB lease row를 사용한다. P7-B는 v0를 비활성 version으로만 등록해야 한다.\n\n[NOT MY SCOPE]\n차량의 CAN bus gateway firmware는 embedded team이 담당했다. control plane은 firmware가 노출한 simulator contract만 사용했다. 직접 작성한 경력으로 간주하지 않는다.\n\n[ADJACENT PROJECT]\nYardLens에서는 역사 내 혼잡도를 집계하는 Kotlin batch를 검토했지만 RailPulse 명령 경로에 포함하지 않았다. 이력서의 관측·문서화 활동은 안전 허가 명령 구현 성과와 구분한다.\n\n[RETROSPECTIVE]\n핵심은 leader 선출 자체가 아니라 오래된 leader의 명령을 소비자가 식별할 수 있게 한 점이었다. permit_epoch, command ledger, signed package가 서로 다른 실패를 담당했고 어느 하나도 다른 경계를 대신하지 않았다.",
+            "snippet": "핵심은 leader 선출 자체가 아니라 오래된 leader의 명령을 소비자가 식별할 수 있게 한 점이었다. permit_epoch, command ledger, signed package가 서로 다른 실패를 담당했고 어느 하나도 다른 경계를 대신하지 않았다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 24,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.4789968678943759,
+            "score": 0.5210031321056241
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U03-NV01",
+      "userKey": "SYN2-U03",
+      "category": "NATURAL_VARIATION",
+      "polarity": "POSITIVE",
+      "query": "이전 제어기가 늦게 보낸 운행 허가를 장비 쪽에서 알아보고 거절하게 했어?",
+      "httpStatus": 200,
+      "latencyMs": 307.52500000000146,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 4,
+            "documentId": 1,
+            "documentVersionId": 2,
+            "documentTitle": "SYN2-U03 Resume",
+            "versionNo": 2,
+            "content": "rtition scenario의 conflicting route permit은 0건이었다.\n• event log와 DB ledger 결과 대조\n• clock skew·message redelivery·process pause 조합\n• 실제 철도 안전 인증 수치로 사용하지 않음",
+            "snippet": "운행표와 simulator 설정을 Ed25519로 서명한 timetable package로 배포했다. node는 서명과 package sequence를 모두\n검증하고 변조 파일과 이전 sequence를 거절했다.\n• 승인자 key id와 package digest 기록",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 5,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "2페이지",
+            "distance": 0.4424845977155084,
+            "score": 0.5575154022844916
+          },
+          {
+            "chunkId": 24,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "ICAL VERSION]\n초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다. 이후 operational review에서 해당 경력을 ACTIVE resume에서 제외했고, 현재 RailPulse 설계는 CockroachDB lease row를 사용한다. P7-B는 v0를 비활성 version으로만 등록해야 한다.\n\n[NOT MY SCOPE]\n차량의 CAN bus gateway firmware는 embedded team이 담당했다. control plane은 firmware가 노출한 simulator contract만 사용했다. 직접 작성한 경력으로 간주하지 않는다.\n\n[ADJACENT PROJECT]\nYardLens에서는 역사 내 혼잡도를 집계하는 Kotlin batch를 검토했지만 RailPulse 명령 경로에 포함하지 않았다. 이력서의 관측·문서화 활동은 안전 허가 명령 구현 성과와 구분한다.\n\n[RETROSPECTIVE]\n핵심은 leader 선출 자체가 아니라 오래된 leader의 명령을 소비자가 식별할 수 있게 한 점이었다. permit_epoch, command ledger, signed package가 서로 다른 실패를 담당했고 어느 하나도 다른 경계를 대신하지 않았다.",
+            "snippet": "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n평가 전용 합성 설계 기록.\n실제 철도 시설, 노선, 안전 인증과 관계없다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 22,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.4640185194037427,
+            "score": 0.5359814805962573
+          },
+          {
+            "chunkId": 22,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U03\nRailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n\n평가 전용 합성 설계 기록. 실제 철도 시설, 노선, 안전 인증과 관계없다.\n\n[DECISION 01 — 명령 모델]\nRailPulse Lab은 실제 열차를 제어하지 않는 interlocking simulator다. Go control plane이 ConnectRPC로 route permit 요청을 받고, 각 요청을 NATS JetStream stream에 기록했다. permit에는 route_id, train_id, command_id와 controller가 발급한 permit_epoch가 포함됐다. simulator node는 자신이 마지막으로 수락한 epoch보다 작은 명령을 실행하지 않았다.\n\n[DECISION 02 — 재전달]\nJetStream pull consumer는 max ack pending을 제한해 느린 simulator가 전체 stream을 막지 않게 했다. ack wait가 지나면 메시지가 재전달될 수 있으므로 command ledger의 command_id unique key를 먼저 확인했다. 같은 명령의 두 번째 전달은 상태 전이를 만들지 않고 이전 결과를 돌려줬다. 메시지 ack 자체를 업무 완료의 유일한 근거로 사용하지 않았다.\n\n[DECISION 03 — 제어권 저장]\nACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다. SQLSTATE 40001 충돌은 decorrelated ji",
+            "snippet": "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n평가 전용 합성 설계 기록.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 22,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.46527411498843396,
+            "score": 0.534725885011566
+          },
+          {
+            "chunkId": 23,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "ISION 03 — 제어권 저장]\nACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다. SQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다. retry 한도를 넘으면 새 permit을 만들지 않고 호출자에게 재요청 가능한 오류를 반환했다. 무한 재시도로 지연을 숨기지 않았다.\n\n[DECISION 04 — 배포 무결성]\n운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다. node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다. 설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다.\n\n[VALIDATION — 규모와 장애]\n12,800개 virtual train을 16개 zone에 나눠 시험했다. leader process 중단 뒤 새 permit 발급 가능 시점까지의 P95는 9.6초에서 2.7초로 줄었다. 독립적으로 만든 420개 network-partition scenario에서 서로 충돌하는 route permit은 0건이었다. 이 수치는 simulator event log와 CockroachDB ledger를 대조해 확인했다.\n\n[HISTORICAL VERSION]\n초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다. 이후 operational review에서 해당 경력을 ACT",
+            "snippet": "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n평가 전용 합성 설계 기록.\n실제 철도 시설, 노선, 안전 인증과 관계없다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 22,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.4949444237384535,
+            "score": 0.5050555762615465
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U03-NV02",
+      "userKey": "SYN2-U03",
+      "category": "NATURAL_VARIATION",
+      "polarity": "POSITIVE",
+      "query": "분산 DB 직렬화 충돌을 무한히 숨기지 않고 정해진 횟수만 다시 시도한 근거가 있어?",
+      "httpStatus": 200,
+      "latencyMs": 256.0426000000007,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 23,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "ISION 03 — 제어권 저장]\nACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다. SQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다. retry 한도를 넘으면 새 permit을 만들지 않고 호출자에게 재요청 가능한 오류를 반환했다. 무한 재시도로 지연을 숨기지 않았다.\n\n[DECISION 04 — 배포 무결성]\n운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다. node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다. 설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다.\n\n[VALIDATION — 규모와 장애]\n12,800개 virtual train을 16개 zone에 나눠 시험했다. leader process 중단 뒤 새 permit 발급 가능 시점까지의 P95는 9.6초에서 2.7초로 줄었다. 독립적으로 만든 420개 network-partition scenario에서 서로 충돌하는 route permit은 0건이었다. 이 수치는 simulator event log와 CockroachDB ledger를 대조해 확인했다.\n\n[HISTORICAL VERSION]\n초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다. 이후 operational review에서 해당 경력을 ACT",
+            "snippet": "ACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다.\nSQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다. retry 한도를 넘으면 새 permit을 만들지 않고 호출자에게 재요청 가능한 오류를 반환했다.\n무한 재시도로 지연을 숨기지 않았다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 23,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.45584664623571225,
+            "score": 0.5441533537642878
+          },
+          {
+            "chunkId": 3,
+            "documentId": 1,
+            "documentVersionId": 2,
+            "documentTitle": "SYN2-U03 Resume",
+            "versionNo": 2,
+            "content": "문서화했다.\n• route_id·train_id·command_id·permit_epoch를 갖는 명령 contract 설계\n• JetStream pull consumer와 max ack pending으로 느린 zone 격리\n• command_id unique ledger로 ack wait 이후 재전달 멱등 처리\n• simulator가 마지막 수락 epoch보다 오래된 permit을 거절하도록 구현\nController state and retry\nACTIVE v1 architecture\nCockroachDB lease row와 serializable transaction으로 controller state를 보존했다. SQLSTATE 40001은 decorrelated jitter로\n최대 4회만 재시도하고 한도 초과 시 permit 생성을 중단했다.\n• 재시도 동안 동일 command_id 유지\n• 무한 retry 대신 호출자에게 retryable error 반환\n• ledger와 simulator event를 correlation id로 연결\nSafety-oriented validation\n독립 scenario와 대조 검증\n12,800개 virtual train을 16개 zone에서 실행했다. leader 중단 뒤 permit 발급 P95는 9.6초에서 2.7초로 줄었고 420개\nnetwork-partition scenario의 conflicting route permit은 0건이었다.\n• event log와 DB ledger 결과 대조\n• clock skew·message redelivery·process",
+            "snippet": "최대 4회만 재시도하고 한도 초과 시 permit 생성을 중단했다.\n• 재시도 동안 동일 command_id 유지",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 3,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.48391816695353707,
+            "score": 0.5160818330464629
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U03-IP01",
+      "userKey": "SYN2-U03",
+      "category": "INDIRECT_PROBLEM",
+      "polarity": "POSITIVE",
+      "query": "리더 프로세스가 멈춘 뒤 새 운행 허가를 낼 수 있을 때까지의 시간을 줄였나요?",
+      "httpStatus": 200,
+      "latencyMs": 245.87669999999343,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 3,
+            "documentId": 1,
+            "documentVersionId": 2,
+            "documentTitle": "SYN2-U03 Resume",
+            "versionNo": 2,
+            "content": "문서화했다.\n• route_id·train_id·command_id·permit_epoch를 갖는 명령 contract 설계\n• JetStream pull consumer와 max ack pending으로 느린 zone 격리\n• command_id unique ledger로 ack wait 이후 재전달 멱등 처리\n• simulator가 마지막 수락 epoch보다 오래된 permit을 거절하도록 구현\nController state and retry\nACTIVE v1 architecture\nCockroachDB lease row와 serializable transaction으로 controller state를 보존했다. SQLSTATE 40001은 decorrelated jitter로\n최대 4회만 재시도하고 한도 초과 시 permit 생성을 중단했다.\n• 재시도 동안 동일 command_id 유지\n• 무한 retry 대신 호출자에게 retryable error 반환\n• ledger와 simulator event를 correlation id로 연결\nSafety-oriented validation\n독립 scenario와 대조 검증\n12,800개 virtual train을 16개 zone에서 실행했다. leader 중단 뒤 permit 발급 P95는 9.6초에서 2.7초로 줄었고 420개\nnetwork-partition scenario의 conflicting route permit은 0건이었다.\n• event log와 DB ledger 결과 대조\n• clock skew·message redelivery·process",
+            "snippet": "운행표와 simulator 설정을 Ed25519로 서명한 timetable package로 배포했다. node는 서명과 package sequence를 모두\n검증하고 변조 파일과 이전 sequence를 거절했다.\n• 승인자 key id와 package digest 기록",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 5,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "2페이지",
+            "distance": 0.4108280959972169,
+            "score": 0.5891719040027831
+          },
+          {
+            "chunkId": 23,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "ISION 03 — 제어권 저장]\nACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다. SQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다. retry 한도를 넘으면 새 permit을 만들지 않고 호출자에게 재요청 가능한 오류를 반환했다. 무한 재시도로 지연을 숨기지 않았다.\n\n[DECISION 04 — 배포 무결성]\n운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다. node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다. 설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다.\n\n[VALIDATION — 규모와 장애]\n12,800개 virtual train을 16개 zone에 나눠 시험했다. leader process 중단 뒤 새 permit 발급 가능 시점까지의 P95는 9.6초에서 2.7초로 줄었다. 독립적으로 만든 420개 network-partition scenario에서 서로 충돌하는 route permit은 0건이었다. 이 수치는 simulator event log와 CockroachDB ledger를 대조해 확인했다.\n\n[HISTORICAL VERSION]\n초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다. 이후 operational review에서 해당 경력을 ACT",
+            "snippet": "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n평가 전용 합성 설계 기록.\n실제 철도 시설, 노선, 안전 인증과 관계없다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 22,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.4760112762451172,
+            "score": 0.5239887237548828
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U03-IP02",
+      "userKey": "SYN2-U03",
+      "category": "INDIRECT_PROBLEM",
+      "polarity": "POSITIVE",
+      "query": "네트워크가 여러 구간으로 갈라져도 충돌하는 진로 허가가 생기지 않는지 시험한 적 있어?",
+      "httpStatus": 200,
+      "latencyMs": 253.31840000000375,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 22,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U03\nRailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n\n평가 전용 합성 설계 기록. 실제 철도 시설, 노선, 안전 인증과 관계없다.\n\n[DECISION 01 — 명령 모델]\nRailPulse Lab은 실제 열차를 제어하지 않는 interlocking simulator다. Go control plane이 ConnectRPC로 route permit 요청을 받고, 각 요청을 NATS JetStream stream에 기록했다. permit에는 route_id, train_id, command_id와 controller가 발급한 permit_epoch가 포함됐다. simulator node는 자신이 마지막으로 수락한 epoch보다 작은 명령을 실행하지 않았다.\n\n[DECISION 02 — 재전달]\nJetStream pull consumer는 max ack pending을 제한해 느린 simulator가 전체 stream을 막지 않게 했다. ack wait가 지나면 메시지가 재전달될 수 있으므로 command ledger의 command_id unique key를 먼저 확인했다. 같은 명령의 두 번째 전달은 상태 전이를 만들지 않고 이전 결과를 돌려줬다. 메시지 ack 자체를 업무 완료의 유일한 근거로 사용하지 않았다.\n\n[DECISION 03 — 제어권 저장]\nACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다. SQLSTATE 40001 충돌은 decorrelated ji",
+            "snippet": "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n평가 전용 합성 설계 기록.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 22,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.4415307126088408,
+            "score": 0.5584692873911592
+          },
+          {
+            "chunkId": 23,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "ISION 03 — 제어권 저장]\nACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다. SQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다. retry 한도를 넘으면 새 permit을 만들지 않고 호출자에게 재요청 가능한 오류를 반환했다. 무한 재시도로 지연을 숨기지 않았다.\n\n[DECISION 04 — 배포 무결성]\n운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다. node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다. 설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다.\n\n[VALIDATION — 규모와 장애]\n12,800개 virtual train을 16개 zone에 나눠 시험했다. leader process 중단 뒤 새 permit 발급 가능 시점까지의 P95는 9.6초에서 2.7초로 줄었다. 독립적으로 만든 420개 network-partition scenario에서 서로 충돌하는 route permit은 0건이었다. 이 수치는 simulator event log와 CockroachDB ledger를 대조해 확인했다.\n\n[HISTORICAL VERSION]\n초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다. 이후 operational review에서 해당 경력을 ACT",
+            "snippet": "SQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다. retry 한도를 넘으면 새 permit을 만들지 않고 호출자에게 재요청 가능한 오류를 반환했다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 23,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.46117362828737507,
+            "score": 0.5388263717126249
+          },
+          {
+            "chunkId": 3,
+            "documentId": 1,
+            "documentVersionId": 2,
+            "documentTitle": "SYN2-U03 Resume",
+            "versionNo": 2,
+            "content": "문서화했다.\n• route_id·train_id·command_id·permit_epoch를 갖는 명령 contract 설계\n• JetStream pull consumer와 max ack pending으로 느린 zone 격리\n• command_id unique ledger로 ack wait 이후 재전달 멱등 처리\n• simulator가 마지막 수락 epoch보다 오래된 permit을 거절하도록 구현\nController state and retry\nACTIVE v1 architecture\nCockroachDB lease row와 serializable transaction으로 controller state를 보존했다. SQLSTATE 40001은 decorrelated jitter로\n최대 4회만 재시도하고 한도 초과 시 permit 생성을 중단했다.\n• 재시도 동안 동일 command_id 유지\n• 무한 retry 대신 호출자에게 retryable error 반환\n• ledger와 simulator event를 correlation id로 연결\nSafety-oriented validation\n독립 scenario와 대조 검증\n12,800개 virtual train을 16개 zone에서 실행했다. leader 중단 뒤 permit 발급 P95는 9.6초에서 2.7초로 줄었고 420개\nnetwork-partition scenario의 conflicting route permit은 0건이었다.\n• event log와 DB ledger 결과 대조\n• clock skew·message redelivery·process",
+            "snippet": "망 분할과 메시지 재전달이 있는 시뮬레이션 환경에서 오래된 제어권과 중복 명령을 차단하는 가상 분산 시스템 엔지니어.\n안전 주장과 시험 조건을 수치·ledger·event log로 함께 남긴다.\n12,800",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 2,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.4513147030218395,
+            "score": 0.5486852969781605
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U03-NI01",
+      "userKey": "SYN2-U03",
+      "category": "NUMERIC_IDENTIFIER",
+      "polarity": "POSITIVE",
+      "query": "12,800대의 가상 열차를 16개 구역에서 실행한 검증 기록이 있나요?",
+      "httpStatus": 200,
+      "latencyMs": 221.68069999999716,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 23,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "ISION 03 — 제어권 저장]\nACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다. SQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다. retry 한도를 넘으면 새 permit을 만들지 않고 호출자에게 재요청 가능한 오류를 반환했다. 무한 재시도로 지연을 숨기지 않았다.\n\n[DECISION 04 — 배포 무결성]\n운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다. node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다. 설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다.\n\n[VALIDATION — 규모와 장애]\n12,800개 virtual train을 16개 zone에 나눠 시험했다. leader process 중단 뒤 새 permit 발급 가능 시점까지의 P95는 9.6초에서 2.7초로 줄었다. 독립적으로 만든 420개 network-partition scenario에서 서로 충돌하는 route permit은 0건이었다. 이 수치는 simulator event log와 CockroachDB ledger를 대조해 확인했다.\n\n[HISTORICAL VERSION]\n초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다. 이후 operational review에서 해당 경력을 ACT",
+            "snippet": "12,800개 virtual train을 16개 zone에 나눠 시험했다. leader process 중단 뒤 새 permit 발급 가능 시점까지의 P95는 9.6초에서 2.7초로 줄었다.\n독립적으로 만든 420개 network-partition scenario에서 서로 충돌하는 route permit은 0건이었다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 23,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.4685676768856668,
+            "score": 0.5314323231143332
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U03-CN01",
+      "userKey": "SYN2-U03",
+      "category": "COMPLEX_NATURAL_LANGUAGE",
+      "polarity": "POSITIVE",
+      "query": "운행표 파일의 변조와 오래된 제어 명령을 서로 다른 버전 값으로 막은 설계를 설명해 줘.",
+      "httpStatus": 200,
+      "latencyMs": 257.32419999999547,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 24,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "ICAL VERSION]\n초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다. 이후 operational review에서 해당 경력을 ACTIVE resume에서 제외했고, 현재 RailPulse 설계는 CockroachDB lease row를 사용한다. P7-B는 v0를 비활성 version으로만 등록해야 한다.\n\n[NOT MY SCOPE]\n차량의 CAN bus gateway firmware는 embedded team이 담당했다. control plane은 firmware가 노출한 simulator contract만 사용했다. 직접 작성한 경력으로 간주하지 않는다.\n\n[ADJACENT PROJECT]\nYardLens에서는 역사 내 혼잡도를 집계하는 Kotlin batch를 검토했지만 RailPulse 명령 경로에 포함하지 않았다. 이력서의 관측·문서화 활동은 안전 허가 명령 구현 성과와 구분한다.\n\n[RETROSPECTIVE]\n핵심은 leader 선출 자체가 아니라 오래된 leader의 명령을 소비자가 식별할 수 있게 한 점이었다. permit_epoch, command ledger, signed package가 서로 다른 실패를 담당했고 어느 하나도 다른 경계를 대신하지 않았다.",
+            "snippet": "핵심은 leader 선출 자체가 아니라 오래된 leader의 명령을 소비자가 식별할 수 있게 한 점이었다. permit_epoch, command ledger, signed package가 서로 다른 실패를 담당했고 어느 하나도 다른 경계를 대신하지 않았다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 24,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.4552292554695375,
+            "score": 0.5447707445304625
+          },
+          {
+            "chunkId": 22,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U03\nRailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n\n평가 전용 합성 설계 기록. 실제 철도 시설, 노선, 안전 인증과 관계없다.\n\n[DECISION 01 — 명령 모델]\nRailPulse Lab은 실제 열차를 제어하지 않는 interlocking simulator다. Go control plane이 ConnectRPC로 route permit 요청을 받고, 각 요청을 NATS JetStream stream에 기록했다. permit에는 route_id, train_id, command_id와 controller가 발급한 permit_epoch가 포함됐다. simulator node는 자신이 마지막으로 수락한 epoch보다 작은 명령을 실행하지 않았다.\n\n[DECISION 02 — 재전달]\nJetStream pull consumer는 max ack pending을 제한해 느린 simulator가 전체 stream을 막지 않게 했다. ack wait가 지나면 메시지가 재전달될 수 있으므로 command ledger의 command_id unique key를 먼저 확인했다. 같은 명령의 두 번째 전달은 상태 전이를 만들지 않고 이전 결과를 돌려줬다. 메시지 ack 자체를 업무 완료의 유일한 근거로 사용하지 않았다.\n\n[DECISION 03 — 제어권 저장]\nACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다. SQLSTATE 40001 충돌은 decorrelated ji",
+            "snippet": "핵심은 leader 선출 자체가 아니라 오래된 leader의 명령을 소비자가 식별할 수 있게 한 점이었다. permit_epoch, command ledger, signed package가 서로 다른 실패를 담당했고 어느 하나도 다른 경계를 대신하지 않았다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 24,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.45237218694633674,
+            "score": 0.5476278130536633
+          },
+          {
+            "chunkId": 3,
+            "documentId": 1,
+            "documentVersionId": 2,
+            "documentTitle": "SYN2-U03 Resume",
+            "versionNo": 2,
+            "content": "문서화했다.\n• route_id·train_id·command_id·permit_epoch를 갖는 명령 contract 설계\n• JetStream pull consumer와 max ack pending으로 느린 zone 격리\n• command_id unique ledger로 ack wait 이후 재전달 멱등 처리\n• simulator가 마지막 수락 epoch보다 오래된 permit을 거절하도록 구현\nController state and retry\nACTIVE v1 architecture\nCockroachDB lease row와 serializable transaction으로 controller state를 보존했다. SQLSTATE 40001은 decorrelated jitter로\n최대 4회만 재시도하고 한도 초과 시 permit 생성을 중단했다.\n• 재시도 동안 동일 command_id 유지\n• 무한 retry 대신 호출자에게 retryable error 반환\n• ledger와 simulator event를 correlation id로 연결\nSafety-oriented validation\n독립 scenario와 대조 검증\n12,800개 virtual train을 16개 zone에서 실행했다. leader 중단 뒤 permit 발급 P95는 9.6초에서 2.7초로 줄었고 420개\nnetwork-partition scenario의 conflicting route permit은 0건이었다.\n• event log와 DB ledger 결과 대조\n• clock skew·message redelivery·process",
+            "snippet": "leader election, stale command fencing, redelivery idempotency, package integrity를 서로 다른 통제로 유지했다.\n한 지표의",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 5,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "2페이지",
+            "distance": 0.45830136040465264,
+            "score": 0.5416986395953474
+          },
+          {
+            "chunkId": 23,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "ISION 03 — 제어권 저장]\nACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다. SQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다. retry 한도를 넘으면 새 permit을 만들지 않고 호출자에게 재요청 가능한 오류를 반환했다. 무한 재시도로 지연을 숨기지 않았다.\n\n[DECISION 04 — 배포 무결성]\n운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다. node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다. 설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다.\n\n[VALIDATION — 규모와 장애]\n12,800개 virtual train을 16개 zone에 나눠 시험했다. leader process 중단 뒤 새 permit 발급 가능 시점까지의 P95는 9.6초에서 2.7초로 줄었다. 독립적으로 만든 420개 network-partition scenario에서 서로 충돌하는 route permit은 0건이었다. 이 수치는 simulator event log와 CockroachDB ledger를 대조해 확인했다.\n\n[HISTORICAL VERSION]\n초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다. 이후 operational review에서 해당 경력을 ACT",
+            "snippet": "운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다. node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다.\n설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다.\n[VALIDATION — 규모와 장애]",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 23,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.48492713137809407,
+            "score": 0.5150728686219059
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U03-CN02",
+      "userKey": "SYN2-U03",
+      "category": "COMPLEX_NATURAL_LANGUAGE",
+      "polarity": "POSITIVE",
+      "query": "메시지가 재전달되더라도 같은 허가를 두 번 실행하지 않고 이전 처리 결과를 돌려준 근거를 찾아줘.",
+      "httpStatus": 200,
+      "latencyMs": 239.96480000000156,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 22,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U03\nRailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n\n평가 전용 합성 설계 기록. 실제 철도 시설, 노선, 안전 인증과 관계없다.\n\n[DECISION 01 — 명령 모델]\nRailPulse Lab은 실제 열차를 제어하지 않는 interlocking simulator다. Go control plane이 ConnectRPC로 route permit 요청을 받고, 각 요청을 NATS JetStream stream에 기록했다. permit에는 route_id, train_id, command_id와 controller가 발급한 permit_epoch가 포함됐다. simulator node는 자신이 마지막으로 수락한 epoch보다 작은 명령을 실행하지 않았다.\n\n[DECISION 02 — 재전달]\nJetStream pull consumer는 max ack pending을 제한해 느린 simulator가 전체 stream을 막지 않게 했다. ack wait가 지나면 메시지가 재전달될 수 있으므로 command ledger의 command_id unique key를 먼저 확인했다. 같은 명령의 두 번째 전달은 상태 전이를 만들지 않고 이전 결과를 돌려줬다. 메시지 ack 자체를 업무 완료의 유일한 근거로 사용하지 않았다.\n\n[DECISION 03 — 제어권 저장]\nACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다. SQLSTATE 40001 충돌은 decorrelated ji",
+            "snippet": "JetStream pull consumer는 max ack pending을 제한해 느린 simulator가 전체 stream을 막지 않게 했다. ack wait가 지나면 메시지가 재전달될 수 있으므로 command ledger의 command_id unique key를 먼저 확인했다.\n같은 명령의 두 번째 전달은 상태 전이를 만들지 않고 이전 결과를 돌려줬다.\n메시지 ack 자체를 업무 완료의 유일한 근거로 사용하지 않았다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 22,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.47810580151987514,
+            "score": 0.5218941984801249
+          },
+          {
+            "chunkId": 3,
+            "documentId": 1,
+            "documentVersionId": 2,
+            "documentTitle": "SYN2-U03 Resume",
+            "versionNo": 2,
+            "content": "문서화했다.\n• route_id·train_id·command_id·permit_epoch를 갖는 명령 contract 설계\n• JetStream pull consumer와 max ack pending으로 느린 zone 격리\n• command_id unique ledger로 ack wait 이후 재전달 멱등 처리\n• simulator가 마지막 수락 epoch보다 오래된 permit을 거절하도록 구현\nController state and retry\nACTIVE v1 architecture\nCockroachDB lease row와 serializable transaction으로 controller state를 보존했다. SQLSTATE 40001은 decorrelated jitter로\n최대 4회만 재시도하고 한도 초과 시 permit 생성을 중단했다.\n• 재시도 동안 동일 command_id 유지\n• 무한 retry 대신 호출자에게 retryable error 반환\n• ledger와 simulator event를 correlation id로 연결\nSafety-oriented validation\n독립 scenario와 대조 검증\n12,800개 virtual train을 16개 zone에서 실행했다. leader 중단 뒤 permit 발급 P95는 9.6초에서 2.7초로 줄었고 420개\nnetwork-partition scenario의 conflicting route permit은 0건이었다.\n• event log와 DB ledger 결과 대조\n• clock skew·message redelivery·process",
+            "snippet": "• event log와 DB ledger 결과 대조",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 3,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.45977271254088836,
+            "score": 0.5402272874591116
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U03-N01",
+      "userKey": "SYN2-U03",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "query": "현재 ACTIVE 경력에서 etcd lease로 RailPulse 제어기 선출을 운영했나요?",
+      "httpStatus": 200,
+      "latencyMs": 219.0341000000044,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 23,
+            "documentId": 6,
+            "documentVersionId": 7,
+            "documentTitle": "SYN2-U03-PORTFOLIO",
+            "versionNo": 1,
+            "content": "ISION 03 — 제어권 저장]\nACTIVE 설계는 CockroachDB의 lease row와 serializable transaction을 사용했다. SQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다. retry 한도를 넘으면 새 permit을 만들지 않고 호출자에게 재요청 가능한 오류를 반환했다. 무한 재시도로 지연을 숨기지 않았다.\n\n[DECISION 04 — 배포 무결성]\n운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다. node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다. 설정 파일 암호화보다 누가 승인한 어느 버전인지를 검증하는 데 목적이 있었다.\n\n[VALIDATION — 규모와 장애]\n12,800개 virtual train을 16개 zone에 나눠 시험했다. leader process 중단 뒤 새 permit 발급 가능 시점까지의 P95는 9.6초에서 2.7초로 줄었다. 독립적으로 만든 420개 network-partition scenario에서 서로 충돌하는 route permit은 0건이었다. 이 수치는 simulator event log와 CockroachDB ledger를 대조해 확인했다.\n\n[HISTORICAL VERSION]\n초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다. 이후 operational review에서 해당 경력을 ACT",
+            "snippet": "초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 23,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.4238766865950695,
+            "score": 0.5761233134049305
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U03-N02",
+      "userKey": "SYN2-U03",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "query": "embedded 팀 영역의 차량 통신 소프트웨어도 본인이 납품했나요?",
+      "httpStatus": 200,
+      "latencyMs": 231.30229999999574,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "V2-U03-N03",
+      "userKey": "SYN2-U03",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "query": "6.4TB 위성 영상을 Spark로 모자이크 처리한 경력도 있나요?",
+      "httpStatus": 200,
+      "latencyMs": 421.9435000000012,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "V2-U04-D01",
+      "userKey": "SYN2-U04",
+      "category": "DIRECT_EXPERIENCE",
+      "polarity": "POSITIVE",
+      "query": "음악 저작권 자료를 받는 NestJS 수집 API를 개발한 적이 있어?",
+      "httpStatus": 200,
+      "latencyMs": 214.29079999999522,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 29,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U04\nScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다. 실제 창작자, 음원, 계약 또는 정산 정보는 없다.\n\n[2025-01 — 서로 다른 식별자]\nScoreRights Catalog는 출판사와 유통사에서 받은 work, recording, contract 자료를 연결했다. 같은 곡이 제목 표기만 달라 여러 번 들어오는 문제가 있었다. NestJS ingestion API는 ISWC와 ISRC를 형식별로 정규화하고 source organization을 함께 저장했다. 식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다.\n\n[2025-03 — 원본과 파생물]\n계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다. upload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다. 원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다. 비동기 작업은 Cloudflare Queues로 전달했으며 consumer는 extraction key를 기준으로 멱등 처리했다.\n\n[2025-05 — 검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다. 권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다. 새 sc",
+            "snippet": "ScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 29,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.4016219978397908,
+            "score": 0.5983780021602092
+          },
+          {
+            "chunkId": 28,
+            "documentId": 7,
+            "documentVersionId": 8,
+            "documentTitle": "SYN2-U04-RESUME",
+            "versionNo": 1,
+            "content": "able snapshot\n• export checksum과 전달 receipt 기록\n• 오류 statement만 분리 재생성\nTechnical profile\nsynthetic skills\nNode.js · TypeScript · NestJS · Meilisearch · Cloudflare R2 · Cloudflare Queues를 중심으로 작업했다. contract test와 schema\nmigration rehearsal을 배포 전에 수행했다.\n• Vitest · API contract test\n• content-addressed object workflow\n• index diff · replay benchmark\n• product decision record · support runbook\nExplicit scope boundaries\n평가와 production을 구분\nTypesense는 50,000개 sample record 비교에만 사용했고 production 검색 엔진으로 전환하지 않았다. 블록체인 기반 정산\n원장은 제품 범위에 없었고 설계하거나 구현하지 않았다. 현재 추천 표시는 규칙형 facet이다.\n• production search: Meilisearch\n• 권리 충돌 최종 판단: human review",
+            "snippet": "Node.js · TypeScript · NestJS · Meilisearch · Cloudflare R2 · Cloudflare Queues를 중심으로 작업했다. contract test와 schema",
+            "sourceType": "PAGE",
+            "sourceIndex": 2,
+            "sourceLabel": "2페이지",
+            "evidenceChunkId": 28,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "2페이지",
+            "distance": 0.4738593008014955,
+            "score": 0.5261406991985045
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U04-D02",
+      "userKey": "SYN2-U04",
+      "category": "DIRECT_EXPERIENCE",
+      "polarity": "POSITIVE",
+      "query": "음악 저작물 230만 건을 이름·권리자·지역 조건으로 조회할 색인을 만든 기록이 있어?",
+      "httpStatus": 200,
+      "latencyMs": 231.501400000001,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 29,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U04\nScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다. 실제 창작자, 음원, 계약 또는 정산 정보는 없다.\n\n[2025-01 — 서로 다른 식별자]\nScoreRights Catalog는 출판사와 유통사에서 받은 work, recording, contract 자료를 연결했다. 같은 곡이 제목 표기만 달라 여러 번 들어오는 문제가 있었다. NestJS ingestion API는 ISWC와 ISRC를 형식별로 정규화하고 source organization을 함께 저장했다. 식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다.\n\n[2025-03 — 원본과 파생물]\n계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다. upload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다. 원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다. 비동기 작업은 Cloudflare Queues로 전달했으며 consumer는 extraction key를 기준으로 멱등 처리했다.\n\n[2025-05 — 검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다. 권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다. 새 sc",
+            "snippet": "2,300,000개 work record를 Meilisearch에 색인했다.\n권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 29,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.46524370481686994,
+            "score": 0.5347562951831301
+          },
+          {
+            "chunkId": 30,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다. 권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다. 새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다. 색인 구축 중에도 기존 index가 요청을 처리했다.\n\n[2025-07 — 성능과 검증]\nfrequent-owner filter의 cardinality 문제를 줄이고 ranking rule 순서를 조정했다. 동일 20-query replay에서 검색 P95는 1.6초에서 240밀리초로 낮아졌다. alias 전환 14회 동안 빈 결과가 노출된 횟수는 0건이었다. 성능 수치는 warm replay 결과이며 첫 색인 build 시간과 섞지 않았다.\n\n[2025-09 — 권리 충돌]\n두 source가 같은 territory의 지분을 각각 100%로 주장하면 자동으로 한쪽을 선택하지 않았다. source priority, 계약 유효 기간, 수동 review 상태를 conflict record에 남겼다. 검색 결과는 미해결 충돌 배지를 보여줬지만 정산 비율을 임의로 계산하지 않았다.\n\n[2025-10 — 정산 주변 기능]\nSettleBoard export는 월별 18,600개 statement를 생성했다. 이 숫자는 검색 corpus 규모와 다른 업무 지표다. export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는",
+            "snippet": "2,300,000개 work record를 Meilisearch에 색인했다.\n권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다.\n새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 30,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.47141119667356035,
+            "score": 0.5285888033264396
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U04-NV01",
+      "userKey": "SYN2-U04",
+      "category": "NATURAL_VARIATION",
+      "polarity": "POSITIVE",
+      "query": "같은 계약 파일이 다시 올라오면 OCR 작업을 또 만들지 않도록 한 장치가 있어?",
+      "httpStatus": 200,
+      "latencyMs": 236.34990000000107,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 29,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U04\nScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다. 실제 창작자, 음원, 계약 또는 정산 정보는 없다.\n\n[2025-01 — 서로 다른 식별자]\nScoreRights Catalog는 출판사와 유통사에서 받은 work, recording, contract 자료를 연결했다. 같은 곡이 제목 표기만 달라 여러 번 들어오는 문제가 있었다. NestJS ingestion API는 ISWC와 ISRC를 형식별로 정규화하고 source organization을 함께 저장했다. 식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다.\n\n[2025-03 — 원본과 파생물]\n계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다. upload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다. 원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다. 비동기 작업은 Cloudflare Queues로 전달했으며 consumer는 extraction key를 기준으로 멱등 처리했다.\n\n[2025-05 — 검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다. 권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다. 새 sc",
+            "snippet": "계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다. upload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다.\n원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다.\n비동기 작업은 Cloudflare Queues로 전달했으며 consumer는 extraction key를 기준으로 멱등 처리했다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 29,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.44943117660227716,
+            "score": 0.5505688233977228
+          },
+          {
+            "chunkId": 26,
+            "documentId": 7,
+            "documentVersionId": 8,
+            "documentTitle": "SYN2-U04-RESUME",
+            "versionNo": 1,
+            "content": "정규화와 source별 원본 식별자 유지\n• content hash 중복이면 OCR·metadata extraction job 생성을 생략\n• 식별자 없는 legacy 자료는 자동 병합하지 않고 review queue로 격리\n• extraction key 기반 queue consumer 멱등 처리\nSearch index lifecycle\n2,300,000 work records\n권리자, 작품명, ISWC prefix, territory를 filterable attribute로 구성했다. 새 schema는 versioned index에서 만들고 sample query\n검증 뒤 alias를 원자적으로 교체했다.\n• index build 동안 기존 alias가 요청 처리\n• frequent-owner filter cardinality와 ranking rule 순서 조정\n• 14회 cutover에서 empty-result 노출 0건\nMeasured outcome\n동일 warm 20-query replay\n검색 P95를 1.6초에서 240밀리초로 낮췄다. 첫 index build와 cache cold start를 warm replay 성과에 포함하지 않았으며 corpus\nsnapshot id를 결과에 함께 기록했다.\n• query class별 latency 분리\n• alias 전후 result-count diff 확인\n• rollback은 이전 index alias 재지정으로 수행",
+            "snippet": "정규화와 source별 원본 식별자 유지\n• content hash 중복이면 OCR·metadata extraction job 생성을 생략",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 26,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.47924949290599705,
+            "score": 0.520750507094003
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U04-NV02",
+      "userKey": "SYN2-U04",
+      "category": "NATURAL_VARIATION",
+      "polarity": "POSITIVE",
+      "query": "새 검색 스키마를 준비하는 동안 기존 검색을 살려 두고 검증 후 교체했나요?",
+      "httpStatus": 200,
+      "latencyMs": 235.9707999999955,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 30,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다. 권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다. 새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다. 색인 구축 중에도 기존 index가 요청을 처리했다.\n\n[2025-07 — 성능과 검증]\nfrequent-owner filter의 cardinality 문제를 줄이고 ranking rule 순서를 조정했다. 동일 20-query replay에서 검색 P95는 1.6초에서 240밀리초로 낮아졌다. alias 전환 14회 동안 빈 결과가 노출된 횟수는 0건이었다. 성능 수치는 warm replay 결과이며 첫 색인 build 시간과 섞지 않았다.\n\n[2025-09 — 권리 충돌]\n두 source가 같은 territory의 지분을 각각 100%로 주장하면 자동으로 한쪽을 선택하지 않았다. source priority, 계약 유효 기간, 수동 review 상태를 conflict record에 남겼다. 검색 결과는 미해결 충돌 배지를 보여줬지만 정산 비율을 임의로 계산하지 않았다.\n\n[2025-10 — 정산 주변 기능]\nSettleBoard export는 월별 18,600개 statement를 생성했다. 이 숫자는 검색 corpus 규모와 다른 업무 지표다. export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는",
+            "snippet": "frequent-owner filter의 cardinality 문제를 줄이고 ranking rule 순서를 조정했다.\n동일 20-query replay에서 검색 P95는 1.6초에서 240밀리초로 낮아졌다. alias 전환 14회 동안 빈 결과가 노출된 횟수는 0건이었다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 30,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.46055020236071775,
+            "score": 0.5394497976392822
+          },
+          {
+            "chunkId": 26,
+            "documentId": 7,
+            "documentVersionId": 8,
+            "documentTitle": "SYN2-U04-RESUME",
+            "versionNo": 1,
+            "content": "정규화와 source별 원본 식별자 유지\n• content hash 중복이면 OCR·metadata extraction job 생성을 생략\n• 식별자 없는 legacy 자료는 자동 병합하지 않고 review queue로 격리\n• extraction key 기반 queue consumer 멱등 처리\nSearch index lifecycle\n2,300,000 work records\n권리자, 작품명, ISWC prefix, territory를 filterable attribute로 구성했다. 새 schema는 versioned index에서 만들고 sample query\n검증 뒤 alias를 원자적으로 교체했다.\n• index build 동안 기존 alias가 요청 처리\n• frequent-owner filter cardinality와 ranking rule 순서 조정\n• 14회 cutover에서 empty-result 노출 0건\nMeasured outcome\n동일 warm 20-query replay\n검색 P95를 1.6초에서 240밀리초로 낮췄다. 첫 index build와 cache cold start를 warm replay 성과에 포함하지 않았으며 corpus\nsnapshot id를 결과에 함께 기록했다.\n• query class별 latency 분리\n• alias 전후 result-count diff 확인\n• rollback은 이전 index alias 재지정으로 수행",
+            "snippet": "검증 뒤 alias를 원자적으로 교체했다.",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 26,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.4617453379521512,
+            "score": 0.5382546620478488
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U04-IP01",
+      "userKey": "SYN2-U04",
+      "category": "INDIRECT_PROBLEM",
+      "polarity": "POSITIVE",
+      "query": "두 공급자가 같은 지역 권리를 모두 자기 것이라고 주장할 때 자동으로 한쪽을 택하지 않게 만든 경험이 있어?",
+      "httpStatus": 200,
+      "latencyMs": 255.1504999999961,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "V2-U04-IP02",
+      "userKey": "SYN2-U04",
+      "category": "INDIRECT_PROBLEM",
+      "polarity": "POSITIVE",
+      "query": "표준 음악 식별자가 없는 오래된 자료가 잘못 합쳐지는 문제를 어떻게 막았어?",
+      "httpStatus": 200,
+      "latencyMs": 238.42050000000017,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 29,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U04\nScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다. 실제 창작자, 음원, 계약 또는 정산 정보는 없다.\n\n[2025-01 — 서로 다른 식별자]\nScoreRights Catalog는 출판사와 유통사에서 받은 work, recording, contract 자료를 연결했다. 같은 곡이 제목 표기만 달라 여러 번 들어오는 문제가 있었다. NestJS ingestion API는 ISWC와 ISRC를 형식별로 정규화하고 source organization을 함께 저장했다. 식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다.\n\n[2025-03 — 원본과 파생물]\n계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다. upload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다. 원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다. 비동기 작업은 Cloudflare Queues로 전달했으며 consumer는 extraction key를 기준으로 멱등 처리했다.\n\n[2025-05 — 검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다. 권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다. 새 sc",
+            "snippet": "같은 곡이 제목 표기만 달라 여러 번 들어오는 문제가 있었다.\nNestJS ingestion API는 ISWC와 ISRC를 형식별로 정규화하고 source organization을 함께 저장했다.\n식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 29,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.4631279735090452,
+            "score": 0.5368720264909548
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U04-NI01",
+      "userKey": "SYN2-U04",
+      "category": "NUMERIC_IDENTIFIER",
+      "polarity": "POSITIVE",
+      "query": "검색 P95를 1.6초에서 240밀리초로 낮춘 성과가 적혀 있나요?",
+      "httpStatus": 200,
+      "latencyMs": 245.6898000000001,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 30,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다. 권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다. 새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다. 색인 구축 중에도 기존 index가 요청을 처리했다.\n\n[2025-07 — 성능과 검증]\nfrequent-owner filter의 cardinality 문제를 줄이고 ranking rule 순서를 조정했다. 동일 20-query replay에서 검색 P95는 1.6초에서 240밀리초로 낮아졌다. alias 전환 14회 동안 빈 결과가 노출된 횟수는 0건이었다. 성능 수치는 warm replay 결과이며 첫 색인 build 시간과 섞지 않았다.\n\n[2025-09 — 권리 충돌]\n두 source가 같은 territory의 지분을 각각 100%로 주장하면 자동으로 한쪽을 선택하지 않았다. source priority, 계약 유효 기간, 수동 review 상태를 conflict record에 남겼다. 검색 결과는 미해결 충돌 배지를 보여줬지만 정산 비율을 임의로 계산하지 않았다.\n\n[2025-10 — 정산 주변 기능]\nSettleBoard export는 월별 18,600개 statement를 생성했다. 이 숫자는 검색 corpus 규모와 다른 업무 지표다. export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는",
+            "snippet": "frequent-owner filter의 cardinality 문제를 줄이고 ranking rule 순서를 조정했다.\n동일 20-query replay에서 검색 P95는 1.6초에서 240밀리초로 낮아졌다. alias 전환 14회 동안 빈 결과가 노출된 횟수는 0건이었다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 30,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.44065849761411524,
+            "score": 0.5593415023858848
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U04-CN01",
+      "userKey": "SYN2-U04",
+      "category": "COMPLEX_NATURAL_LANGUAGE",
+      "polarity": "POSITIVE",
+      "query": "계약 원본은 보존하면서 파싱 결과와 검색 인덱스를 각각 새 버전으로 교체한 흐름을 보여줘.",
+      "httpStatus": 200,
+      "latencyMs": 274.9207000000024,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 29,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U04\nScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다. 실제 창작자, 음원, 계약 또는 정산 정보는 없다.\n\n[2025-01 — 서로 다른 식별자]\nScoreRights Catalog는 출판사와 유통사에서 받은 work, recording, contract 자료를 연결했다. 같은 곡이 제목 표기만 달라 여러 번 들어오는 문제가 있었다. NestJS ingestion API는 ISWC와 ISRC를 형식별로 정규화하고 source organization을 함께 저장했다. 식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다.\n\n[2025-03 — 원본과 파생물]\n계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다. upload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다. 원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다. 비동기 작업은 Cloudflare Queues로 전달했으며 consumer는 extraction key를 기준으로 멱등 처리했다.\n\n[2025-05 — 검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다. 권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다. 새 sc",
+            "snippet": "[2025-03 — 원본과 파생물]\n계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다. upload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다.\n원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 29,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.45310305478246904,
+            "score": 0.546896945217531
+          },
+          {
+            "chunkId": 26,
+            "documentId": 7,
+            "documentVersionId": 8,
+            "documentTitle": "SYN2-U04-RESUME",
+            "versionNo": 1,
+            "content": "정규화와 source별 원본 식별자 유지\n• content hash 중복이면 OCR·metadata extraction job 생성을 생략\n• 식별자 없는 legacy 자료는 자동 병합하지 않고 review queue로 격리\n• extraction key 기반 queue consumer 멱등 처리\nSearch index lifecycle\n2,300,000 work records\n권리자, 작품명, ISWC prefix, territory를 filterable attribute로 구성했다. 새 schema는 versioned index에서 만들고 sample query\n검증 뒤 alias를 원자적으로 교체했다.\n• index build 동안 기존 alias가 요청 처리\n• frequent-owner filter cardinality와 ranking rule 순서 조정\n• 14회 cutover에서 empty-result 노출 0건\nMeasured outcome\n동일 warm 20-query replay\n검색 P95를 1.6초에서 240밀리초로 낮췄다. 첫 index build와 cache cold start를 warm replay 성과에 포함하지 않았으며 corpus\nsnapshot id를 결과에 함께 기록했다.\n• query class별 latency 분리\n• alias 전후 result-count diff 확인\n• rollback은 이전 index alias 재지정으로 수행",
+            "snippet": "서로 다른 음악 식별자와 계약 원본을 버전별로 보존하고, 검색 index를 중단 없이 교체하는 가상 제품 백엔드 엔지니어.\n자동화가 판단할 수 없는 권리 충돌은 사람의 review 경계에 남긴다.\n2.3M",
+            "sourceType": "PAGE",
+            "sourceIndex": 1,
+            "sourceLabel": "1페이지",
+            "evidenceChunkId": 25,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "1페이지",
+            "distance": 0.45556111236460073,
+            "score": 0.5444388876353993
+          },
+          {
+            "chunkId": 31,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "Board export는 월별 18,600개 statement를 생성했다. 이 숫자는 검색 corpus 규모와 다른 업무 지표다. export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는지 재현 가능하게 했다.\n\n[검토했지만 선택하지 않은 것]\nTypesense를 50,000개 sample record로 비교했지만 production 검색 엔진으로 전환하지 않았다. 블록체인 기반 정산 원장은 제품 범위에 없었고 설계하거나 구현하지 않았다. 현재 추천 표시는 장르와 territory에 대한 규칙형 facet뿐이다.\n\n[회고]\n검색 속도보다 먼저 원본, 파생 extraction, 검색 index, conflict 상태의 버전을 분리해야 했다. content hash는 중복 작업을 줄였고 alias 교체는 검색 연속성을 지켰지만, 권리 충돌의 진실을 자동으로 결정하는 도구는 아니었다.",
+            "snippet": "검색 속도보다 먼저 원본, 파생 extraction, 검색 index, conflict 상태의 버전을 분리해야 했다. content hash는 중복 작업을 줄였고 alias 교체는 검색 연속성을 지켰지만, 권리 충돌의 진실을 자동으로 결정하는 도구는 아니었다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 31,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.48726791143415904,
+            "score": 0.512732088565841
+          },
+          {
+            "chunkId": 30,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다. 권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다. 새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다. 색인 구축 중에도 기존 index가 요청을 처리했다.\n\n[2025-07 — 성능과 검증]\nfrequent-owner filter의 cardinality 문제를 줄이고 ranking rule 순서를 조정했다. 동일 20-query replay에서 검색 P95는 1.6초에서 240밀리초로 낮아졌다. alias 전환 14회 동안 빈 결과가 노출된 횟수는 0건이었다. 성능 수치는 warm replay 결과이며 첫 색인 build 시간과 섞지 않았다.\n\n[2025-09 — 권리 충돌]\n두 source가 같은 territory의 지분을 각각 100%로 주장하면 자동으로 한쪽을 선택하지 않았다. source priority, 계약 유효 기간, 수동 review 상태를 conflict record에 남겼다. 검색 결과는 미해결 충돌 배지를 보여줬지만 정산 비율을 임의로 계산하지 않았다.\n\n[2025-10 — 정산 주변 기능]\nSettleBoard export는 월별 18,600개 statement를 생성했다. 이 숫자는 검색 corpus 규모와 다른 업무 지표다. export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는",
+            "snippet": "[2025-03 — 원본과 파생물]\n계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다. upload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다.\n원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 29,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.4874789744665684,
+            "score": 0.5125210255334316
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U04-CN02",
+      "userKey": "SYN2-U04",
+      "category": "COMPLEX_NATURAL_LANGUAGE",
+      "polarity": "POSITIVE",
+      "query": "월별 정산 파일이 어느 시점의 권리 상태로 계산됐는지 나중에 재현할 수 있게 했나요?",
+      "httpStatus": 200,
+      "latencyMs": 283.53830000000016,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 30,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다. 권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다. 새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다. 색인 구축 중에도 기존 index가 요청을 처리했다.\n\n[2025-07 — 성능과 검증]\nfrequent-owner filter의 cardinality 문제를 줄이고 ranking rule 순서를 조정했다. 동일 20-query replay에서 검색 P95는 1.6초에서 240밀리초로 낮아졌다. alias 전환 14회 동안 빈 결과가 노출된 횟수는 0건이었다. 성능 수치는 warm replay 결과이며 첫 색인 build 시간과 섞지 않았다.\n\n[2025-09 — 권리 충돌]\n두 source가 같은 territory의 지분을 각각 100%로 주장하면 자동으로 한쪽을 선택하지 않았다. source priority, 계약 유효 기간, 수동 review 상태를 conflict record에 남겼다. 검색 결과는 미해결 충돌 배지를 보여줬지만 정산 비율을 임의로 계산하지 않았다.\n\n[2025-10 — 정산 주변 기능]\nSettleBoard export는 월별 18,600개 statement를 생성했다. 이 숫자는 검색 corpus 규모와 다른 업무 지표다. export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는",
+            "snippet": "[2025-10 — 정산 주변 기능]\nSettleBoard export는 월별 18,600개 statement를 생성했다.\n이 숫자는 검색 corpus 규모와 다른 업무 지표다. export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 30,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.4556175308113358,
+            "score": 0.5443824691886642
+          },
+          {
+            "chunkId": 31,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "Board export는 월별 18,600개 statement를 생성했다. 이 숫자는 검색 corpus 규모와 다른 업무 지표다. export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는지 재현 가능하게 했다.\n\n[검토했지만 선택하지 않은 것]\nTypesense를 50,000개 sample record로 비교했지만 production 검색 엔진으로 전환하지 않았다. 블록체인 기반 정산 원장은 제품 범위에 없었고 설계하거나 구현하지 않았다. 현재 추천 표시는 장르와 territory에 대한 규칙형 facet뿐이다.\n\n[회고]\n검색 속도보다 먼저 원본, 파생 extraction, 검색 index, conflict 상태의 버전을 분리해야 했다. content hash는 중복 작업을 줄였고 alias 교체는 검색 연속성을 지켰지만, 권리 충돌의 진실을 자동으로 결정하는 도구는 아니었다.",
+            "snippet": "Board export는 월별 18,600개 statement를 생성했다.\n이 숫자는 검색 corpus 규모와 다른 업무 지표다. export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는지 재현 가능하게 했다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 31,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.4602591735819743,
+            "score": 0.5397408264180257
+          },
+          {
+            "chunkId": 29,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U04\nScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다. 실제 창작자, 음원, 계약 또는 정산 정보는 없다.\n\n[2025-01 — 서로 다른 식별자]\nScoreRights Catalog는 출판사와 유통사에서 받은 work, recording, contract 자료를 연결했다. 같은 곡이 제목 표기만 달라 여러 번 들어오는 문제가 있었다. NestJS ingestion API는 ISWC와 ISRC를 형식별로 정규화하고 source organization을 함께 저장했다. 식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다.\n\n[2025-03 — 원본과 파생물]\n계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다. upload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다. 원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다. 비동기 작업은 Cloudflare Queues로 전달했으며 consumer는 extraction key를 기준으로 멱등 처리했다.\n\n[2025-05 — 검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다. 권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다. 새 sc",
+            "snippet": "[2025-10 — 정산 주변 기능]\nSettleBoard export는 월별 18,600개 statement를 생성했다.\n이 숫자는 검색 corpus 규모와 다른 업무 지표다. export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 30,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "텍스트 구간 2",
+            "distance": 0.46585115179737757,
+            "score": 0.5341488482026224
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U04-N01",
+      "userKey": "SYN2-U04",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "query": "ScoreRights의 production 검색을 Typesense로 운영했나요?",
+      "httpStatus": 200,
+      "latencyMs": 255.90610000000015,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 29,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U04\nScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다. 실제 창작자, 음원, 계약 또는 정산 정보는 없다.\n\n[2025-01 — 서로 다른 식별자]\nScoreRights Catalog는 출판사와 유통사에서 받은 work, recording, contract 자료를 연결했다. 같은 곡이 제목 표기만 달라 여러 번 들어오는 문제가 있었다. NestJS ingestion API는 ISWC와 ISRC를 형식별로 정규화하고 source organization을 함께 저장했다. 식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다.\n\n[2025-03 — 원본과 파생물]\n계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다. upload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다. 원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다. 비동기 작업은 Cloudflare Queues로 전달했으며 consumer는 extraction key를 기준으로 멱등 처리했다.\n\n[2025-05 — 검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다. 권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다. 새 sc",
+            "snippet": "Typesense를 50,000개 sample record로 비교했지만 production 검색 엔진으로 전환하지 않았다.\n블록체인 기반 정산 원장은 제품 범위에 없었고 설계하거나 구현하지 않았다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 31,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.4413367290085748,
+            "score": 0.5586632709914252
+          },
+          {
+            "chunkId": 30,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다. 권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다. 새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다. 색인 구축 중에도 기존 index가 요청을 처리했다.\n\n[2025-07 — 성능과 검증]\nfrequent-owner filter의 cardinality 문제를 줄이고 ranking rule 순서를 조정했다. 동일 20-query replay에서 검색 P95는 1.6초에서 240밀리초로 낮아졌다. alias 전환 14회 동안 빈 결과가 노출된 횟수는 0건이었다. 성능 수치는 warm replay 결과이며 첫 색인 build 시간과 섞지 않았다.\n\n[2025-09 — 권리 충돌]\n두 source가 같은 territory의 지분을 각각 100%로 주장하면 자동으로 한쪽을 선택하지 않았다. source priority, 계약 유효 기간, 수동 review 상태를 conflict record에 남겼다. 검색 결과는 미해결 충돌 배지를 보여줬지만 정산 비율을 임의로 계산하지 않았다.\n\n[2025-10 — 정산 주변 기능]\nSettleBoard export는 월별 18,600개 statement를 생성했다. 이 숫자는 검색 corpus 규모와 다른 업무 지표다. export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는",
+            "snippet": "Typesense를 50,000개 sample record로 비교했지만 production 검색 엔진으로 전환하지 않았다.\n블록체인 기반 정산 원장은 제품 범위에 없었고 설계하거나 구현하지 않았다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 31,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.43731755400547945,
+            "score": 0.5626824459945206
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U04-N02",
+      "userKey": "SYN2-U04",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "query": "저작권 정산 이력을 블록체인 원장에 기록하도록 구현했어?",
+      "httpStatus": 200,
+      "latencyMs": 265.3555000000051,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 28,
+            "documentId": 7,
+            "documentVersionId": 8,
+            "documentTitle": "SYN2-U04-RESUME",
+            "versionNo": 1,
+            "content": "able snapshot\n• export checksum과 전달 receipt 기록\n• 오류 statement만 분리 재생성\nTechnical profile\nsynthetic skills\nNode.js · TypeScript · NestJS · Meilisearch · Cloudflare R2 · Cloudflare Queues를 중심으로 작업했다. contract test와 schema\nmigration rehearsal을 배포 전에 수행했다.\n• Vitest · API contract test\n• content-addressed object workflow\n• index diff · replay benchmark\n• product decision record · support runbook\nExplicit scope boundaries\n평가와 production을 구분\nTypesense는 50,000개 sample record 비교에만 사용했고 production 검색 엔진으로 전환하지 않았다. 블록체인 기반 정산\n원장은 제품 범위에 없었고 설계하거나 구현하지 않았다. 현재 추천 표시는 규칙형 facet이다.\n• production search: Meilisearch\n• 권리 충돌 최종 판단: human review",
+            "snippet": "Typesense는 50,000개 sample record 비교에만 사용했고 production 검색 엔진으로 전환하지 않았다.\n블록체인 기반 정산\n원장은 제품 범위에 없었고 설계하거나 구현하지 않았다.",
+            "sourceType": "PAGE",
+            "sourceIndex": 2,
+            "sourceLabel": "2페이지",
+            "evidenceChunkId": 28,
+            "evidenceSourceType": "PAGE",
+            "evidenceSourceIndex": 2,
+            "evidenceSourceLabel": "2페이지",
+            "distance": 0.4760037220715253,
+            "score": 0.5239962779284747
+          },
+          {
+            "chunkId": 29,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U04\nScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다. 실제 창작자, 음원, 계약 또는 정산 정보는 없다.\n\n[2025-01 — 서로 다른 식별자]\nScoreRights Catalog는 출판사와 유통사에서 받은 work, recording, contract 자료를 연결했다. 같은 곡이 제목 표기만 달라 여러 번 들어오는 문제가 있었다. NestJS ingestion API는 ISWC와 ISRC를 형식별로 정규화하고 source organization을 함께 저장했다. 식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다.\n\n[2025-03 — 원본과 파생물]\n계약 PDF와 cue sheet 원본은 Cloudflare R2에 저장했다. upload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다. 원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다. 비동기 작업은 Cloudflare Queues로 전달했으며 consumer는 extraction key를 기준으로 멱등 처리했다.\n\n[2025-05 — 검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다. 권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다. 새 sc",
+            "snippet": "Typesense를 50,000개 sample record로 비교했지만 production 검색 엔진으로 전환하지 않았다.\n블록체인 기반 정산 원장은 제품 범위에 없었고 설계하거나 구현하지 않았다.\n현재 추천 표시는 장르와 territory에 대한 규칙형 facet뿐이다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 31,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.4387605096017796,
+            "score": 0.5612394903982204
+          },
+          {
+            "chunkId": 30,
+            "documentId": 8,
+            "documentVersionId": 9,
+            "documentTitle": "SYN2-U04-PORTFOLIO",
+            "versionNo": 1,
+            "content": "검색 구조]\n2,300,000개 work record를 Meilisearch에 색인했다. 권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다. 새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다. 색인 구축 중에도 기존 index가 요청을 처리했다.\n\n[2025-07 — 성능과 검증]\nfrequent-owner filter의 cardinality 문제를 줄이고 ranking rule 순서를 조정했다. 동일 20-query replay에서 검색 P95는 1.6초에서 240밀리초로 낮아졌다. alias 전환 14회 동안 빈 결과가 노출된 횟수는 0건이었다. 성능 수치는 warm replay 결과이며 첫 색인 build 시간과 섞지 않았다.\n\n[2025-09 — 권리 충돌]\n두 source가 같은 territory의 지분을 각각 100%로 주장하면 자동으로 한쪽을 선택하지 않았다. source priority, 계약 유효 기간, 수동 review 상태를 conflict record에 남겼다. 검색 결과는 미해결 충돌 배지를 보여줬지만 정산 비율을 임의로 계산하지 않았다.\n\n[2025-10 — 정산 주변 기능]\nSettleBoard export는 월별 18,600개 statement를 생성했다. 이 숫자는 검색 corpus 규모와 다른 업무 지표다. export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는",
+            "snippet": "Typesense를 50,000개 sample record로 비교했지만 production 검색 엔진으로 전환하지 않았다.\n블록체인 기반 정산 원장은 제품 범위에 없었고 설계하거나 구현하지 않았다.\n현재 추천 표시는 장르와 territory에 대한 규칙형 facet뿐이다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 31,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.48769808108852364,
+            "score": 0.5123019189114764
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2-U04-N03",
+      "userKey": "SYN2-U04",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "query": "음악 계약 수집 장애 때 계근 장비 callback 46,200건을 재생한 적이 있나요?",
+      "httpStatus": 200,
+      "latencyMs": 252.22899999999936,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    }
+  ]
+}

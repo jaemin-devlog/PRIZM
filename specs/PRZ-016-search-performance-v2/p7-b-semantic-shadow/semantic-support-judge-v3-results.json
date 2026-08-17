@@ -1,0 +1,3842 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-SEMANTIC-SUPPORT-JUDGE-SPIKE",
+  "runnerVersion": "PRZ-016-SEMANTIC-SUPPORT-JUDGE-SPIKE-v3",
+  "dataset": {
+    "path": "C:\\Users\\정재민\\Project\\PRIZM\\specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\nli-model-comparison-pairs.json",
+    "sha256": "8311af2ec5683b2b70c9de014570a4119c9804539f9a64f1afd8917472150eed"
+  },
+  "model": "qwen3:4b-instruct",
+  "endpoint": "http://localhost:11434/api/chat",
+  "requestContract": {
+    "stream": false,
+    "think": false,
+    "temperature": 0,
+    "schemaSha256": "9f53847abaea480eaceea96b598f78df44c185b92b6dac73fabbd136d9becb08",
+    "promptSha256": "83e121efc2d49dfe372fd566abad74e7632afa8172c7da795e7d1af406cd238f"
+  },
+  "checkpoint": "C:\\Users\\정재민\\Project\\PRIZM\\specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\semantic-support-judge-v3-checkpoint.jsonl",
+  "results": [
+    {
+      "id": "v1-Q01",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "2024년에 지역 기록보관소의 접수 번호를 검증하는 Ruby on Rails API를 직접 구현해 운영팀에 배포했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 4818.9843999862205,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:13:54.0301843Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 2711690900,
+        "loadDurationNs": 2263606700,
+        "promptEvalCount": 378,
+        "promptEvalDurationNs": 187455000,
+        "evalCount": 15,
+        "evalDurationNs": 241091000
+      }
+    },
+    {
+      "id": "v1-Q02",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "조력 발전 센서 대시보드에 Grafana Loki 로그 상관관계를 도입하고 야간 장애 대응 절차를 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2550.0217999942834,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:13:56.5845092Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 502783300,
+        "loadDurationNs": 173409300,
+        "promptEvalCount": 393,
+        "promptEvalDurationNs": 45839000,
+        "evalCount": 15,
+        "evalDurationNs": 263644000
+      }
+    },
+    {
+      "id": "v1-Q03",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1",
+          "S2"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "시청 제설 차량 배차 도구에 OSRM 기반 경로 계산 모듈을 구현했다."
+        },
+        {
+          "id": "S2",
+          "text": "현장 관리자가 폭설 당일 실제 운행 순서를 이 도구로 조정했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\",\"S2\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2472.8945000097156,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:13:59.0629746Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 450446400,
+        "loadDurationNs": 167249000,
+        "promptEvalCount": 385,
+        "promptEvalDurationNs": 38972000,
+        "evalCount": 18,
+        "evalDurationNs": 226994000
+      }
+    },
+    {
+      "id": "v1-Q04",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "대학 식물 표본 이미지 목록을 Solr에서 OpenSearch로 이전하고 사서용 검색 화면을 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2489.410100009991,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:01.5560614Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 443841800,
+        "loadDurationNs": 174811700,
+        "promptEvalCount": 377,
+        "promptEvalDurationNs": 37569000,
+        "evalCount": 15,
+        "evalDurationNs": 214529000
+      }
+    },
+    {
+      "id": "v1-Q05",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Electron 기반 출고 라벨 도구에 WebAssembly 바코드 판독 기능을 구현했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2501.868599996669,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:04.0602581Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 465978700,
+        "loadDurationNs": 178273800,
+        "promptEvalCount": 382,
+        "promptEvalDurationNs": 41932000,
+        "evalCount": 15,
+        "evalDurationNs": 226543000
+      }
+    },
+    {
+      "id": "v1-Q06",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "연구 지원금 심사 포털을 Django와 Celery로 구현해 심사위원에게 배포했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2484.7313999925973,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:06.5466098Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 462239100,
+        "loadDurationNs": 167136100,
+        "promptEvalCount": 377,
+        "promptEvalDurationNs": 40246000,
+        "evalCount": 15,
+        "evalDurationNs": 237506000
+      }
+    },
+    {
+      "id": "v1-Q07",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "자원봉사 일정 앱에 FIDO2 passkey 로그인을 구현하고 기존 비밀번호 로그인과 함께 실제 사용자에게 출시했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2505.8871999935945,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:09.0548297Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 450475200,
+        "loadDurationNs": 164315900,
+        "promptEvalCount": 360,
+        "promptEvalDurationNs": 37131000,
+        "evalCount": 15,
+        "evalDurationNs": 230770000
+      }
+    },
+    {
+      "id": "v1-Q08",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "하천 수질 관측 스트림에 Apache Flink checkpoint 복구를 구현하고 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2489.183799989405,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:11.5481524Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 434802900,
+        "loadDurationNs": 160704100,
+        "promptEvalCount": 371,
+        "promptEvalDurationNs": 39826000,
+        "evalCount": 15,
+        "evalDurationNs": 217359000
+      }
+    },
+    {
+      "id": "v1-Q09",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1",
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "얼굴 인식 출입 통제는 직접 구현하지 않았다."
+        },
+        {
+          "id": "S2",
+          "text": "보안 조직의 시연을 검토했을 뿐이며 현재 서비스에는 해당 기능이 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\",\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2557.194699998945,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:14.1065712Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 507100300,
+        "loadDurationNs": 168068000,
+        "promptEvalCount": 373,
+        "promptEvalDurationNs": 40040000,
+        "evalCount": 19,
+        "evalDurationNs": 282098000
+      }
+    },
+    {
+      "id": "v1-Q10",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1",
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Cassandra 운영 경험은 없다."
+        },
+        {
+          "id": "S2",
+          "text": "초기 설계 메모에 이름만 있었고 데이터 저장소로 설치하거나 관리하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\",\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2532.611300004646,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:16.6441762Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 503822300,
+        "loadDurationNs": 161478300,
+        "promptEvalCount": 355,
+        "promptEvalDurationNs": 37029000,
+        "evalCount": 19,
+        "evalDurationNs": 287673000
+      }
+    },
+    {
+      "id": "v1-Q11",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "iOS 앱을 작성한 적은 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2497.039499998209,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:19.1456074Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 470404800,
+        "loadDurationNs": 164327600,
+        "promptEvalCount": 360,
+        "promptEvalDurationNs": 36612000,
+        "evalCount": 16,
+        "evalDurationNs": 252036000
+      }
+    },
+    {
+      "id": "v1-Q12",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "드론 자율비행 모델을 만들거나 학습하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2565.2000999980373,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:21.7152297Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 535621000,
+        "loadDurationNs": 220889500,
+        "promptEvalCount": 370,
+        "promptEvalDurationNs": 39770000,
+        "evalCount": 16,
+        "evalDurationNs": 256387000
+      }
+    },
+    {
+      "id": "v1-Q13",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1",
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "YugabyteDB 전환 가능성을 검증했지만 MariaDB를 계속 사용했다."
+        },
+        {
+          "id": "S2",
+          "text": "성능 비교 보고서만 남기고 production migration은 진행하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\",\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2561.3998000044376,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:24.2784077Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 513724900,
+        "loadDurationNs": 169419000,
+        "promptEvalCount": 367,
+        "promptEvalDurationNs": 39251000,
+        "evalCount": 19,
+        "evalDurationNs": 286900000
+      }
+    },
+    {
+      "id": "v1-Q14",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1",
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Istio를 staging 환경에서 짧게 시험했지만 채택하지 않았다."
+        },
+        {
+          "id": "S2",
+          "text": "운영 서비스는 기존 reverse proxy 구성을 유지했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\",\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2562.5009999930626,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:26.8429238Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 525738900,
+        "loadDurationNs": 183149600,
+        "promptEvalCount": 363,
+        "promptEvalDurationNs": 36623000,
+        "evalCount": 19,
+        "evalDurationNs": 288752000
+      }
+    },
+    {
+      "id": "v1-Q15",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Hasura를 비교 대상으로 살펴봤으나 production에 넣지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2528.881399994134,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:29.3737724Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 498731400,
+        "loadDurationNs": 168632200,
+        "promptEvalCount": 356,
+        "promptEvalDurationNs": 36508000,
+        "evalCount": 16,
+        "evalDurationNs": 274712000
+      }
+    },
+    {
+      "id": "v1-Q16",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "아직 개발 일정도 확정되지 않았고 출시한 기능은 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2473.409800004447,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:31.8491242Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 450801100,
+        "loadDurationNs": 158335900,
+        "promptEvalCount": 367,
+        "promptEvalDurationNs": 37748000,
+        "evalCount": 16,
+        "evalDurationNs": 238153000
+      }
+    },
+    {
+      "id": "v1-Q17",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1",
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "문서 이미지의 AVIF 변환은 아키텍처 검토 안건일 뿐이다."
+        },
+        {
+          "id": "S2",
+          "text": "구현, 배포, 변환 작업은 시작하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\",\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2609.5868999982486,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:34.4636608Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 566513800,
+        "loadDurationNs": 189309500,
+        "promptEvalCount": 373,
+        "promptEvalDurationNs": 41341000,
+        "evalCount": 19,
+        "evalDurationNs": 317360000
+      }
+    },
+    {
+      "id": "v1-Q18",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "승인된 설계나 실행한 migration은 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2526.3673000008566,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:36.9920329Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 488061100,
+        "loadDurationNs": 174552200,
+        "promptEvalCount": 359,
+        "promptEvalDurationNs": 41305000,
+        "evalCount": 16,
+        "evalDurationNs": 254462000
+      }
+    },
+    {
+      "id": "v1-Q19",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "현재 경력의 운영 시스템에는 포함되지 않는다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2502.4246999964816,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:39.4987916Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 473226600,
+        "loadDurationNs": 158983100,
+        "promptEvalCount": 367,
+        "promptEvalDurationNs": 40667000,
+        "evalCount": 16,
+        "evalDurationNs": 255513000
+      }
+    },
+    {
+      "id": "v1-Q20",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "고객 서비스에 연결하지 않았고 이후 제품으로 전환하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2503.512600000249,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:42.0040631Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 473508400,
+        "loadDurationNs": 162465100,
+        "promptEvalCount": 365,
+        "promptEvalDurationNs": 36048000,
+        "evalCount": 16,
+        "evalDurationNs": 258156000
+      }
+    },
+    {
+      "id": "v1-Q21",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "예전 데모는 Mapbox GL로 지도를 렌더링했지만 현재 제품 출시 전에 제거했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2562.000200006878,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:44.5684398Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 522345400,
+        "loadDurationNs": 187835300,
+        "promptEvalCount": 371,
+        "promptEvalDurationNs": 46794000,
+        "evalCount": 16,
+        "evalDurationNs": 270844000
+      }
+    },
+    {
+      "id": "v1-Q22",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "자료 정합성 검사는 97.8%에서 통과했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2458.7061000056565,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:47.0292092Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 427031400,
+        "loadDurationNs": 165792100,
+        "promptEvalCount": 367,
+        "promptEvalDurationNs": 36556000,
+        "evalCount": 15,
+        "evalDurationNs": 207750000
+      }
+    },
+    {
+      "id": "v1-Q23",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "580밀리초 개선을 달성했다는 근거는 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2471.129400000791,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:49.5024406Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 442724400,
+        "loadDurationNs": 159582300,
+        "promptEvalCount": 373,
+        "promptEvalDurationNs": 36916000,
+        "evalCount": 16,
+        "evalDurationNs": 230144000
+      }
+    },
+    {
+      "id": "v1-Q24",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "현장 점검은 43개 경로를 대상으로 완료했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2469.5989999891026,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:51.9735823Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 444127300,
+        "loadDurationNs": 161075000,
+        "promptEvalCount": 366,
+        "promptEvalDurationNs": 37561000,
+        "evalCount": 15,
+        "evalDurationNs": 224024000
+      }
+    },
+    {
+      "id": "v2-U01",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "공공도서관의 반납 알림을 위해 Quarkus 서비스를 구현해 사서용 환경에 배포했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2527.656600010232,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:54.503369Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 488181800,
+        "loadDurationNs": 192191200,
+        "promptEvalCount": 367,
+        "promptEvalDurationNs": 38278000,
+        "evalCount": 15,
+        "evalDurationNs": 237281000
+      }
+    },
+    {
+      "id": "v2-U02",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "지역 축제 자원봉사 신청 화면을 SvelteKit으로 구현하고 시민에게 출시했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2511.483900001622,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:57.0169145Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 448866600,
+        "loadDurationNs": 173735400,
+        "promptEvalCount": 377,
+        "promptEvalDurationNs": 36988000,
+        "evalCount": 15,
+        "evalDurationNs": 221229000
+      }
+    },
+    {
+      "id": "v2-U03",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "농산물 공동구매의 주문 확인 작업에 RabbitMQ 큐를 도입하고 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2474.072900004103,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:14:59.4926655Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 450532700,
+        "loadDurationNs": 173065300,
+        "promptEvalCount": 369,
+        "promptEvalDurationNs": 36350000,
+        "evalCount": 15,
+        "evalDurationNs": 224199000
+      }
+    },
+    {
+      "id": "v2-U04",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "시민 체육관 예약의 중복 시간을 검사하는 Kotlin 모듈을 구현해 예약 서버에 배포했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2479.5881000027293,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:01.9769498Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 430957300,
+        "loadDurationNs": 161352400,
+        "promptEvalCount": 370,
+        "promptEvalDurationNs": 38201000,
+        "evalCount": 15,
+        "evalDurationNs": 214712000
+      }
+    },
+    {
+      "id": "v2-U05",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "양봉장 온도 센서에 Prometheus 알림 규칙을 도입하고 계절별 경보 절차를 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2457.0008000009693,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:04.4386325Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 439841600,
+        "loadDurationNs": 173079400,
+        "promptEvalCount": 370,
+        "promptEvalDurationNs": 36724000,
+        "evalCount": 15,
+        "evalDurationNs": 212472000
+      }
+    },
+    {
+      "id": "v2-U06",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "박물관 전시 안내판의 배포 절차에 Argo CD를 도입해 자동 배포를 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2507.255200005602,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:06.9476571Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 487849400,
+        "loadDurationNs": 174161300,
+        "promptEvalCount": 370,
+        "promptEvalDurationNs": 40711000,
+        "evalCount": 15,
+        "evalDurationNs": 251929000
+      }
+    },
+    {
+      "id": "v2-U07",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "농업 장비의 상태를 조회하는 gRPC 인터페이스를 구현하고 현장 관제 화면에서 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2507.250100010424,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:09.4600215Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 478813500,
+        "loadDurationNs": 175864500,
+        "promptEvalCount": 369,
+        "promptEvalDurationNs": 43351000,
+        "evalCount": 15,
+        "evalDurationNs": 241538000
+      }
+    },
+    {
+      "id": "v2-U08",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "산림 조사원이 저장한 기록을 SQLite 파일에서 가져오는 기능을 구현해 조사 도구에 배포했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2530.746000004001,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:11.9952922Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 484008600,
+        "loadDurationNs": 186949200,
+        "promptEvalCount": 378,
+        "promptEvalDurationNs": 43023000,
+        "evalCount": 15,
+        "evalDurationNs": 236762000
+      }
+    },
+    {
+      "id": "v2-U09",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Elasticsearch 클러스터는 직접 설치하거나 운영하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2515.045400010422,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:14.5125524Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 472833500,
+        "loadDurationNs": 171821600,
+        "promptEvalCount": 360,
+        "promptEvalDurationNs": 44361000,
+        "evalCount": 16,
+        "evalDurationNs": 238213000
+      }
+    },
+    {
+      "id": "v2-U10",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Flutter 앱을 작성한 경험은 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2482.561800003168,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:16.9988328Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 442043600,
+        "loadDurationNs": 169370900,
+        "promptEvalCount": 350,
+        "promptEvalDurationNs": 31490000,
+        "evalCount": 16,
+        "evalDurationNs": 224007000
+      }
+    },
+    {
+      "id": "v2-U11",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "PyTorch 모델을 만들거나 학습하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2488.1861000030767,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:19.4918971Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 444421200,
+        "loadDurationNs": 159256000,
+        "promptEvalCount": 360,
+        "promptEvalDurationNs": 33932000,
+        "evalCount": 16,
+        "evalDurationNs": 233407000
+      }
+    },
+    {
+      "id": "v2-U12",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "CockroachDB를 비교 환경에서 측정했지만 운영 데이터베이스로 채택하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2521.5394999977434,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:22.0179443Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 472607200,
+        "loadDurationNs": 170664200,
+        "promptEvalCount": 369,
+        "promptEvalDurationNs": 44001000,
+        "evalCount": 16,
+        "evalDurationNs": 240658000
+      }
+    },
+    {
+      "id": "v2-U13",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Temporal을 짧은 실험에서 비교했으나 도입하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2485.9668999997666,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:24.505816Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 450288100,
+        "loadDurationNs": 164775600,
+        "promptEvalCount": 356,
+        "promptEvalDurationNs": 33683000,
+        "evalCount": 16,
+        "evalDurationNs": 234448000
+      }
+    },
+    {
+      "id": "v2-U14",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Kubernetes의 운영 복잡도를 검토했지만 채택하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2498.7443999998504,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:27.00666Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 483140100,
+        "loadDurationNs": 180933000,
+        "promptEvalCount": 359,
+        "promptEvalDurationNs": 36888000,
+        "evalCount": 16,
+        "evalDurationNs": 248417000
+      }
+    },
+    {
+      "id": "v2-U15",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "개발 일정은 확정되지 않았고 출시한 기능은 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2510.9172999946168,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:29.5196472Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 450913100,
+        "loadDurationNs": 170367800,
+        "promptEvalCount": 356,
+        "promptEvalDurationNs": 34588000,
+        "evalCount": 16,
+        "evalDurationNs": 228502000
+      }
+    },
+    {
+      "id": "v2-U16",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "구현이나 배포 작업은 시작하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2487.5194000051124,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:32.0120757Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 436006800,
+        "loadDurationNs": 160517100,
+        "promptEvalCount": 357,
+        "promptEvalDurationNs": 33412999,
+        "evalCount": 16,
+        "evalDurationNs": 224547000
+      }
+    },
+    {
+      "id": "v2-U17",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "승인된 작업이나 실행한 이전은 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2505.9367999929236,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:34.5215828Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 457455000,
+        "loadDurationNs": 174378000,
+        "promptEvalCount": 354,
+        "promptEvalDurationNs": 34050000,
+        "evalCount": 16,
+        "evalDurationNs": 230979000
+      }
+    },
+    {
+      "id": "v2-U18",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "현재 서비스에는 포함되지 않는다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2489.728499989724,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:37.0166776Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 444660400,
+        "loadDurationNs": 164376400,
+        "promptEvalCount": 362,
+        "promptEvalDurationNs": 33578000,
+        "evalCount": 16,
+        "evalDurationNs": 228312000
+      }
+    },
+    {
+      "id": "v2-U19",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "현행 파이프라인에는 사용하지 않는다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2478.622800001176,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:39.4998862Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 445500500,
+        "loadDurationNs": 159909100,
+        "promptEvalCount": 357,
+        "promptEvalDurationNs": 34902000,
+        "evalCount": 16,
+        "evalDurationNs": 232474000
+      }
+    },
+    {
+      "id": "v2-U20",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1",
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "jQuery로 만든 예전 지도 데모는 실제 출시 전에 retired 처리했다."
+        },
+        {
+          "id": "S2",
+          "text": "현재 제품 화면에는 남아 있지 않다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\",\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2519.774399988819,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:42.0226925Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 477518700,
+        "loadDurationNs": 159357500,
+        "promptEvalCount": 359,
+        "promptEvalDurationNs": 33800000,
+        "evalCount": 19,
+        "evalDurationNs": 266244000
+      }
+    },
+    {
+      "id": "v2-U21",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "99.4%를 달성했다는 기록은 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2506.8720999988727,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:44.5317344Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 454542200,
+        "loadDurationNs": 170307300,
+        "promptEvalCount": 359,
+        "promptEvalDurationNs": 33662000,
+        "evalCount": 16,
+        "evalDurationNs": 234058000
+      }
+    },
+    {
+      "id": "v2-U22",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "720밀리초 개선을 달성했다는 근거는 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2457.792499990319,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:46.9919971Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 438413300,
+        "loadDurationNs": 162143500,
+        "promptEvalCount": 364,
+        "promptEvalDurationNs": 34465000,
+        "evalCount": 16,
+        "evalDurationNs": 224628000
+      }
+    },
+    {
+      "id": "v2-U23",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "QPS는 1,040건으로 측정됐다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2465.9848000010243,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:49.4599591Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 422484500,
+        "loadDurationNs": 155200300,
+        "promptEvalCount": 360,
+        "promptEvalDurationNs": 33564000,
+        "evalCount": 16,
+        "evalDurationNs": 217397000
+      }
+    },
+    {
+      "id": "v2-U24",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "12분 달성 수치는 검증 기록에 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2484.8806000081822,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:51.9489999Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 442997700,
+        "loadDurationNs": 165701300,
+        "promptEvalCount": 356,
+        "promptEvalDurationNs": 33302999,
+        "evalCount": 16,
+        "evalDurationNs": 228525000
+      }
+    },
+    {
+      "id": "adv-A01",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "운영 요구사항을 검토한 뒤 Cilium을 production 네트워크 정책에 도입해 현재 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2534.7106999979587,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:54.48822Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 501072600,
+        "loadDurationNs": 176401800,
+        "promptEvalCount": 356,
+        "promptEvalDurationNs": 38422000,
+        "evalCount": 15,
+        "evalDurationNs": 261815000
+      }
+    },
+    {
+      "id": "adv-A02",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Liquibase 변경 계획을 수립한 후 관람권 데이터베이스 migration을 완료하고 production에 배포했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2486.213399999542,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:56.9793957Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 430601800,
+        "loadDurationNs": 168949200,
+        "promptEvalCount": 350,
+        "promptEvalDurationNs": 30129000,
+        "evalCount": 15,
+        "evalDurationNs": 215162000
+      }
+    },
+    {
+      "id": "adv-A03",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Deno 기반 민원 알림 서비스를 단계적으로 production에 배포하고 현재 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2506.793500011554,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:15:59.4880392Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 480505200,
+        "loadDurationNs": 198507900,
+        "promptEvalCount": 343,
+        "promptEvalDurationNs": 34218000,
+        "evalCount": 15,
+        "evalDurationNs": 226175000
+      }
+    },
+    {
+      "id": "adv-A04",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "InfluxDB 수집기를 계절 관측 기간 내내 중단 없이 현재까지 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2570.0635999965016,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:02.062928Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 520390300,
+        "loadDurationNs": 189362900,
+        "promptEvalCount": 341,
+        "promptEvalDurationNs": 34640000,
+        "evalCount": 15,
+        "evalDurationNs": 275488000
+      }
+    },
+    {
+      "id": "adv-A05",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "OpenCV를 이용해 사진 접수 화면의 배경 제거 기능을 구현하고 production에서 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2471.6962999955285,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:04.5365858Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 443429900,
+        "loadDurationNs": 166827300,
+        "promptEvalCount": 347,
+        "promptEvalDurationNs": 34110000,
+        "evalCount": 15,
+        "evalDurationNs": 225798000
+      }
+    },
+    {
+      "id": "adv-A06",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "ChirpStack으로 폐기물 수거함 센서 상태를 수집하는 기능을 구현해 현재 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2532.725600001868,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:07.071039Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 498057000,
+        "loadDurationNs": 190169800,
+        "promptEvalCount": 353,
+        "promptEvalDurationNs": 37758000,
+        "evalCount": 15,
+        "evalDurationNs": 251972000
+      }
+    },
+    {
+      "id": "adv-A07",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Astro 사이트는 행사 prototype에서 시작했지만 이후 production으로 승격해 현재 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2474.057300001732,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:09.5466612Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 432331000,
+        "loadDurationNs": 167540000,
+        "promptEvalCount": 342,
+        "promptEvalDurationNs": 29077000,
+        "evalCount": 15,
+        "evalDurationNs": 219310000
+      }
+    },
+    {
+      "id": "adv-A08",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "deprecated된 Struts 화면을 교체하고 Ktor API를 구현해 현재 실제 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2475.9272999945097,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:12.0274927Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 428862600,
+        "loadDurationNs": 166593800,
+        "promptEvalCount": 337,
+        "promptEvalDurationNs": 28573000,
+        "evalCount": 15,
+        "evalDurationNs": 216202000
+      }
+    },
+    {
+      "id": "adv-A09",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Vitess를 다른 분산 저장소와 비교 시험한 뒤 production에 최종 도입하고 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2470.468300001812,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:14.500496Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 436237400,
+        "loadDurationNs": 168431800,
+        "promptEvalCount": 350,
+        "promptEvalDurationNs": 30447000,
+        "evalCount": 15,
+        "evalDurationNs": 221319000
+      }
+    },
+    {
+      "id": "adv-A10",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "초기 계획 단계에서 여러 경보 방식을 비교했으나 SLO를 96.6%로 실제 달성해 운영 보고서에 기록했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2472.8019000031054,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:16.9775793Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 438218000,
+        "loadDurationNs": 171327600,
+        "promptEvalCount": 362,
+        "promptEvalDurationNs": 35985000,
+        "evalCount": 15,
+        "evalDurationNs": 214949000
+      }
+    },
+    {
+      "id": "adv-A11",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "구현과 배포는 아직 시작하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2510.673400000087,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:19.4931836Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 461816600,
+        "loadDurationNs": 166063800,
+        "promptEvalCount": 355,
+        "promptEvalDurationNs": 36213000,
+        "evalCount": 16,
+        "evalDurationNs": 242226000
+      }
+    },
+    {
+      "id": "adv-A12",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Nginx Unit을 비교 시험했지만 운영 서비스에는 채택하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2498.577499995008,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:21.9965072Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 460949900,
+        "loadDurationNs": 165247000,
+        "promptEvalCount": 355,
+        "promptEvalDurationNs": 36623000,
+        "evalCount": 16,
+        "evalDurationNs": 242232000
+      }
+    },
+    {
+      "id": "adv-A13",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "현재 출시 제품에는 사용하지 않는다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2476.6462999978103,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:24.4781617Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 458900300,
+        "loadDurationNs": 165584400,
+        "promptEvalCount": 358,
+        "promptEvalDurationNs": 35041000,
+        "evalCount": 16,
+        "evalDurationNs": 239443000
+      }
+    },
+    {
+      "id": "adv-A14",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "ONNX 모델을 직접 변환하거나 운영하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2488.995599996997,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:26.9693543Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 462807100,
+        "loadDurationNs": 169872300,
+        "promptEvalCount": 351,
+        "promptEvalDurationNs": 34638000,
+        "evalCount": 16,
+        "evalDurationNs": 241097000
+      }
+    },
+    {
+      "id": "adv-A15",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1",
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "MTTR은 실제로 31분이었다."
+        },
+        {
+          "id": "S2",
+          "text": "27분 달성 수치는 운영 기록에 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\",\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2545.3309000004083,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:29.5163595Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 495321900,
+        "loadDurationNs": 164176800,
+        "promptEvalCount": 352,
+        "promptEvalDurationNs": 36708000,
+        "evalCount": 19,
+        "evalDurationNs": 276897000
+      }
+    },
+    {
+      "id": "adv-A16",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Three.js 전시 화면은 연구실 prototype으로만 만들었고 고객 서비스에는 연결하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2516.7893000034383,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:32.0350549Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 464275900,
+        "loadDurationNs": 161019800,
+        "promptEvalCount": 343,
+        "promptEvalDurationNs": 33027000,
+        "evalCount": 16,
+        "evalDurationNs": 251621000
+      }
+    },
+    {
+      "id": "unknown-01",
+      "group": "A",
+      "groundTruth": "UNKNOWN",
+      "expectedLabel": "INSUFFICIENT",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2463.105800008634,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:34.5027207Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 438114100,
+        "loadDurationNs": 162555300,
+        "promptEvalCount": 374,
+        "promptEvalDurationNs": 39860000,
+        "evalCount": 14,
+        "evalDurationNs": 218189000
+      }
+    },
+    {
+      "id": "unknown-02",
+      "group": "A",
+      "groundTruth": "UNKNOWN",
+      "expectedLabel": "INSUFFICIENT",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2467.523600003915,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:36.972327Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 449074600,
+        "loadDurationNs": 172408800,
+        "promptEvalCount": 378,
+        "promptEvalDurationNs": 40537000,
+        "evalCount": 14,
+        "evalDurationNs": 218257000
+      }
+    },
+    {
+      "id": "unknown-03",
+      "group": "A",
+      "groundTruth": "UNKNOWN",
+      "expectedLabel": "INSUFFICIENT",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2468.0977999960305,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:39.4443719Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 429252300,
+        "loadDurationNs": 165232400,
+        "promptEvalCount": 379,
+        "promptEvalDurationNs": 38972000,
+        "evalCount": 14,
+        "evalDurationNs": 208795000
+      }
+    },
+    {
+      "id": "unknown-04",
+      "group": "A",
+      "groundTruth": "UNKNOWN",
+      "expectedLabel": "INSUFFICIENT",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2466.74790000543,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:41.9149634Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 426872300,
+        "loadDurationNs": 166556700,
+        "promptEvalCount": 375,
+        "promptEvalDurationNs": 40796000,
+        "evalCount": 14,
+        "evalDurationNs": 202629000
+      }
+    },
+    {
+      "id": "unknown-05",
+      "group": "A",
+      "groundTruth": "UNKNOWN",
+      "expectedLabel": "INSUFFICIENT",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2478.941199995461,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:44.3954068Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 438479700,
+        "loadDurationNs": 165539600,
+        "promptEvalCount": 350,
+        "promptEvalDurationNs": 32130000,
+        "evalCount": 14,
+        "evalDurationNs": 222360000
+      }
+    },
+    {
+      "id": "unknown-06",
+      "group": "A",
+      "groundTruth": "UNKNOWN",
+      "expectedLabel": "INSUFFICIENT",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2499.815800008946,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:46.9017476Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 442757000,
+        "loadDurationNs": 166435700,
+        "promptEvalCount": 343,
+        "promptEvalDurationNs": 34053000,
+        "evalCount": 14,
+        "evalDurationNs": 225428000
+      }
+    },
+    {
+      "id": "unknown-07",
+      "group": "A",
+      "groundTruth": "UNKNOWN",
+      "expectedLabel": "INSUFFICIENT",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2465.7220000080997,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:49.3720247Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 425665300,
+        "loadDurationNs": 161225300,
+        "promptEvalCount": 349,
+        "promptEvalDurationNs": 33317000,
+        "evalCount": 14,
+        "evalDurationNs": 212813000
+      }
+    },
+    {
+      "id": "unknown-08",
+      "group": "A",
+      "groundTruth": "UNKNOWN",
+      "expectedLabel": "INSUFFICIENT",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2484.2745999922045,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:51.8607139Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 428350900,
+        "loadDurationNs": 167798700,
+        "promptEvalCount": 343,
+        "promptEvalDurationNs": 30979000,
+        "evalCount": 14,
+        "evalDurationNs": 213114000
+      }
+    },
+    {
+      "id": "F01",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "물류 창고의 재고 변경 흐름을 검토한 뒤 Debezium을 도입해 야간 적재를 실제 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2473.4231999900658,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:54.3380031Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 438786300,
+        "loadDurationNs": 163277500,
+        "promptEvalCount": 358,
+        "promptEvalDurationNs": 35354000,
+        "evalCount": 15,
+        "evalDurationNs": 224060000
+      }
+    },
+    {
+      "id": "F02",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "제조 설비 점검 화면은 Micronaut prototype으로 시작했지만 생산 라인에 배포해 현재 사용 중이다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2488.8212000078056,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:56.8307797Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 437056900,
+        "loadDurationNs": 163753000,
+        "promptEvalCount": 356,
+        "promptEvalDurationNs": 36127000,
+        "evalCount": 15,
+        "evalDurationNs": 220427000
+      }
+    },
+    {
+      "id": "F03",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "금융 정산 지연을 줄이기 위해 여러 메시지 시스템을 비교했고, Pulsar를 최종 채택하여 결제 알림을 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2485.677599994233,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:16:59.3207611Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 419527200,
+        "loadDurationNs": 158850500,
+        "promptEvalCount": 366,
+        "promptEvalDurationNs": 35708000,
+        "evalCount": 15,
+        "evalDurationNs": 209010000
+      }
+    },
+    {
+      "id": "F04",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "의료 예약 교환 규격을 계획한 뒤 HAPI FHIR 연동을 완료하고 병원 접수 시스템에 배포했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2471.3228999899,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:01.7931456Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 437602500,
+        "loadDurationNs": 160731600,
+        "promptEvalCount": 368,
+        "promptEvalDurationNs": 37068000,
+        "evalCount": 15,
+        "evalDurationNs": 222433000
+      }
+    },
+    {
+      "id": "F05",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "교육 수강 신청의 오래된 템플릿을 교체하고 Nuxt 기반 화면을 출시해 학기마다 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2466.1460000061197,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:04.2617596Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 430224800,
+        "loadDurationNs": 160758000,
+        "promptEvalCount": 361,
+        "promptEvalDurationNs": 35279000,
+        "evalCount": 15,
+        "evalDurationNs": 217010000
+      }
+    },
+    {
+      "id": "F06",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "게임 이벤트 서버에 Godot 상태 동기화 모듈을 구현해 정식 시즌 동안 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2481.438100003288,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:06.7478554Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 434364900,
+        "loadDurationNs": 156659700,
+        "promptEvalCount": 351,
+        "promptEvalDurationNs": 34524000,
+        "evalCount": 15,
+        "evalDurationNs": 226872000
+      }
+    },
+    {
+      "id": "F07",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "태양광 인버터의 전력 정보를 MQTT로 수집하도록 구현했고 관제실에서 매일 사용했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2499.2305999912787,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:09.2495131Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 451166300,
+        "loadDurationNs": 174430200,
+        "promptEvalCount": 352,
+        "promptEvalDurationNs": 34470000,
+        "evalCount": 15,
+        "evalDurationNs": 226246000
+      }
+    },
+    {
+      "id": "F08",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1",
+          "S2"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "공공 민원 처리 순서를 정리하는 계획을 세운 후 Prefect 작업 흐름을 완료해 배포했다."
+        },
+        {
+          "id": "S2",
+          "text": "담당 부서는 현재 이 흐름을 사용한다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\",\"S2\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2552.577200011001,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:11.8037907Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 491964500,
+        "loadDurationNs": 159344800,
+        "promptEvalCount": 380,
+        "promptEvalDurationNs": 40697000,
+        "evalCount": 18,
+        "evalDurationNs": 275610000
+      }
+    },
+    {
+      "id": "F09",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "현장 조사 파일을 DuckDB로 집계하는 기능을 구현해 조사관에게 배포했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2469.5979000098305,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:14.2755406Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 437940700,
+        "loadDurationNs": 161550100,
+        "promptEvalCount": 354,
+        "promptEvalDurationNs": 36399000,
+        "evalCount": 15,
+        "evalDurationNs": 223056000
+      }
+    },
+    {
+      "id": "F10",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "기상 관측 API의 배포 단계를 비교한 뒤 Helm 차트를 채택하여 운영 환경에 적용했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2502.387100001215,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:16.7826841Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 464469400,
+        "loadDurationNs": 172987200,
+        "promptEvalCount": 356,
+        "promptEvalDurationNs": 34902000,
+        "evalCount": 15,
+        "evalDurationNs": 236294000
+      }
+    },
+    {
+      "id": "F11",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "도서 대여 웹사이트의 회귀 검사를 Playwright로 작성하고 매주 배포 전 실행했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2485.4880000057165,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:19.2724268Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 440244700,
+        "loadDurationNs": 161025800,
+        "promptEvalCount": 344,
+        "promptEvalDurationNs": 31052000,
+        "evalCount": 15,
+        "evalDurationNs": 230265000
+      }
+    },
+    {
+      "id": "F12",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "상수도 누수 신고를 처리하는 Rust 서비스는 시범 운영 뒤 정식 전환되어 현재 접수 업무를 맡고 있다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2510.540500006755,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:21.7866746Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 462823700,
+        "loadDurationNs": 171831200,
+        "promptEvalCount": 362,
+        "promptEvalDurationNs": 36906000,
+        "evalCount": 15,
+        "evalDurationNs": 236857000
+      }
+    },
+    {
+      "id": "F13",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "지역 보건소의 예약 통계를 Superset 대시보드로 이전해 직원이 매일 확인하도록 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2476.1795999947935,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:24.2667936Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 436292400,
+        "loadDurationNs": 162218500,
+        "promptEvalCount": 354,
+        "promptEvalDurationNs": 36491000,
+        "evalCount": 15,
+        "evalDurationNs": 222119000
+      }
+    },
+    {
+      "id": "F14",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "배터리 충전소의 장애 알림을 Qdrant 검색으로 정리해 처리 시간을 47초로 낮췄고 운영 보고서에 기록했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2508.7461000075564,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:26.7775814Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 459179600,
+        "loadDurationNs": 169393300,
+        "promptEvalCount": 371,
+        "promptEvalDurationNs": 38387000,
+        "evalCount": 15,
+        "evalDurationNs": 232745000
+      }
+    },
+    {
+      "id": "F15",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Neo4j는 직접 설치하거나 운영한 적이 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2472.3283000057563,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:29.2517357Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 449751400,
+        "loadDurationNs": 165933100,
+        "promptEvalCount": 348,
+        "promptEvalDurationNs": 31375000,
+        "evalCount": 16,
+        "evalDurationNs": 235682000
+      }
+    },
+    {
+      "id": "F16",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Xamarin 앱 개발 경험은 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2483.4998000005726,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:31.7395513Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 446554800,
+        "loadDurationNs": 166931600,
+        "promptEvalCount": 353,
+        "promptEvalDurationNs": 36285000,
+        "evalCount": 16,
+        "evalDurationNs": 225854000
+      }
+    },
+    {
+      "id": "F17",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Envoy를 비교 환경에서 검토했지만 운영 프록시로 채택하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2507.5416000036057,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:34.2516711Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 450428800,
+        "loadDurationNs": 171085200,
+        "promptEvalCount": 346,
+        "promptEvalDurationNs": 31484000,
+        "evalCount": 16,
+        "evalDurationNs": 232312000
+      }
+    },
+    {
+      "id": "F18",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Bazel 빌드 전환은 다음 연도 계획에만 있고 구현 작업은 아직 시작하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2473.6960000009276,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:36.7270927Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 441908000,
+        "loadDurationNs": 168187700,
+        "promptEvalCount": 347,
+        "promptEvalDurationNs": 30336000,
+        "evalCount": 16,
+        "evalDurationNs": 224685000
+      }
+    },
+    {
+      "id": "F19",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Unity 전시 시뮬레이션은 연구 prototype으로만 만들었고 방문객 서비스에는 연결하지 않았다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2487.061399995582,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:39.218894Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 471310800,
+        "loadDurationNs": 171311800,
+        "promptEvalCount": 344,
+        "promptEvalDurationNs": 31476000,
+        "evalCount": 16,
+        "evalDurationNs": 249529000
+      }
+    },
+    {
+      "id": "F20",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "AngularJS로 만든 예전 관리자 화면은 개편 전에 폐기했고 현재 시스템에는 포함되지 않는다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2511.6828000027454,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:41.7322138Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 478692700,
+        "loadDurationNs": 178637500,
+        "promptEvalCount": 354,
+        "promptEvalDurationNs": 36286000,
+        "evalCount": 16,
+        "evalDurationNs": 246757000
+      }
+    },
+    {
+      "id": "F21",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Keras 모델 학습은 데이터 과학자가 담당했고 나는 결과 파일 전달만 지원했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2482.4623000022257,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:44.2175915Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 431990600,
+        "loadDurationNs": 164597800,
+        "promptEvalCount": 343,
+        "promptEvalDurationNs": 30979000,
+        "evalCount": 15,
+        "evalDurationNs": 220523000
+      }
+    },
+    {
+      "id": "F22",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Tableau는 보고서 비교 대상으로만 검토했으며 실제 대시보드는 다른 도구로 운영했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2481.316400007927,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:46.7010082Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 450902000,
+        "loadDurationNs": 163151100,
+        "promptEvalCount": 346,
+        "promptEvalDurationNs": 31255000,
+        "evalCount": 16,
+        "evalDurationNs": 239464000
+      }
+    },
+    {
+      "id": "F23",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1",
+          "S2"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "SLI의 실제 가용성은 88.6%였다."
+        },
+        {
+          "id": "S2",
+          "text": "91.6%를 달성했다는 기록은 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\",\"S2\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2547.5012000097195,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:49.2527067Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 498095000,
+        "loadDurationNs": 168567500,
+        "promptEvalCount": 362,
+        "promptEvalDurationNs": 35323000,
+        "evalCount": 19,
+        "evalDurationNs": 277535000
+      }
+    },
+    {
+      "id": "F24",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "TPS는 실제로 640건이었다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2507.9464000009466,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:51.7657014Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 454735900,
+        "loadDurationNs": 164892600,
+        "promptEvalCount": 349,
+        "promptEvalDurationNs": 31609000,
+        "evalCount": 16,
+        "evalDurationNs": 241377000
+      }
+    },
+    {
+      "id": "F25",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Airflow 파이프라인은 실험 노트에만 있었고 승인된 배포나 실행 이력은 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2499.315499997465,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:54.2692571Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 450999000,
+        "loadDurationNs": 167197800,
+        "promptEvalCount": 349,
+        "promptEvalDurationNs": 33479999,
+        "evalCount": 16,
+        "evalDurationNs": 234442000
+      }
+    },
+    {
+      "id": "F26",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "Ember 기반 안내 페이지는 과거 데모 후 제거했으며 현행 민원 사이트에는 없다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2508.4356000006665,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:56.7800536Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 463977500,
+        "loadDurationNs": 167686500,
+        "promptEvalCount": 351,
+        "promptEvalDurationNs": 34589000,
+        "evalCount": 16,
+        "evalDurationNs": 244507000
+      }
+    },
+    {
+      "id": "F27",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "NiFi 대신 Beam을 시험했지만 Beam은 채택하지 않았고 기존 처리기를 유지했다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2485.462299999199,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:17:59.269809Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 446218700,
+        "loadDurationNs": 172638200,
+        "promptEvalCount": 343,
+        "promptEvalDurationNs": 30677000,
+        "evalCount": 16,
+        "evalDurationNs": 226630000
+      }
+    },
+    {
+      "id": "F28",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "expectedLabel": "REFUTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "REFUTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "MATLAB 분석은 다른 연구원이 수행했고 나는 결과 표를 문서에 옮겼다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"REFUTED\"}",
+      "latencyMs": 2498.5072999988915,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:18:01.7730238Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 455248500,
+        "loadDurationNs": 165467700,
+        "promptEvalCount": 337,
+        "promptEvalDurationNs": 30364000,
+        "evalCount": 16,
+        "evalDurationNs": 241674000
+      }
+    },
+    {
+      "id": "FU01",
+      "group": "B",
+      "groundTruth": "UNKNOWN",
+      "expectedLabel": "INSUFFICIENT",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2464.386599996942,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:18:04.241251Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 417901700,
+        "loadDurationNs": 164635200,
+        "promptEvalCount": 363,
+        "promptEvalDurationNs": 35595000,
+        "evalCount": 14,
+        "evalDurationNs": 200430000
+      }
+    },
+    {
+      "id": "FU02",
+      "group": "B",
+      "groundTruth": "UNKNOWN",
+      "expectedLabel": "INSUFFICIENT",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2472.36429998884,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:18:06.7180844Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 426456000,
+        "loadDurationNs": 163895600,
+        "promptEvalCount": 355,
+        "promptEvalDurationNs": 35090000,
+        "evalCount": 14,
+        "evalDurationNs": 210463000
+      }
+    },
+    {
+      "id": "FU03",
+      "group": "B",
+      "groundTruth": "UNKNOWN",
+      "expectedLabel": "INSUFFICIENT",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2482.075000007171,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:18:09.2045809Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 445411000,
+        "loadDurationNs": 169816200,
+        "promptEvalCount": 357,
+        "promptEvalDurationNs": 36999000,
+        "evalCount": 14,
+        "evalDurationNs": 219903000
+      }
+    },
+    {
+      "id": "FU04",
+      "group": "B",
+      "groundTruth": "UNKNOWN",
+      "expectedLabel": "INSUFFICIENT",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2509.564000007231,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:18:11.7159483Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 460592300,
+        "loadDurationNs": 189481400,
+        "promptEvalCount": 347,
+        "promptEvalDurationNs": 33093000,
+        "evalCount": 14,
+        "evalDurationNs": 221804000
+      }
+    },
+    {
+      "id": "FU05",
+      "group": "B",
+      "groundTruth": "UNKNOWN",
+      "expectedLabel": "INSUFFICIENT",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2497.69329999981,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:18:14.2178978Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 438274200,
+        "loadDurationNs": 164191100,
+        "promptEvalCount": 360,
+        "promptEvalDurationNs": 36988000,
+        "evalCount": 14,
+        "evalDurationNs": 221350000
+      }
+    },
+    {
+      "id": "FU06",
+      "group": "B",
+      "groundTruth": "UNKNOWN",
+      "expectedLabel": "INSUFFICIENT",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2486.7333000001963,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:18:16.7065728Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 446073700,
+        "loadDurationNs": 177531400,
+        "promptEvalCount": 349,
+        "promptEvalDurationNs": 32712000,
+        "evalCount": 14,
+        "evalDurationNs": 218830000
+      }
+    },
+    {
+      "id": "FU07",
+      "group": "B",
+      "groundTruth": "UNKNOWN",
+      "expectedLabel": "INSUFFICIENT",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2503.9362000097753,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:18:19.2124834Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 450292100,
+        "loadDurationNs": 174656600,
+        "promptEvalCount": 359,
+        "promptEvalDurationNs": 36014000,
+        "evalCount": 14,
+        "evalDurationNs": 220759000
+      }
+    },
+    {
+      "id": "FU08",
+      "group": "B",
+      "groundTruth": "UNKNOWN",
+      "expectedLabel": "INSUFFICIENT",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2495.634399994742,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:18:21.7100097Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 432363700,
+        "loadDurationNs": 162972700,
+        "promptEvalCount": 362,
+        "promptEvalDurationNs": 36854000,
+        "evalCount": 14,
+        "evalDurationNs": 216238000
+      }
+    },
+    {
+      "id": "V2-U01-IP01#r1#w3",
+      "group": "C",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "계근 제어기가 응답하지 않을 때 매 요청이 timeout까지 기다리면 API thread가 고갈됐다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2501.118600004702,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:18:24.2155484Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 480733100,
+        "loadDurationNs": 179726600,
+        "promptEvalCount": 413,
+        "promptEvalDurationNs": 56621000,
+        "evalCount": 15,
+        "evalDurationNs": 220407000
+      }
+    },
+    {
+      "id": "V2-U02-D01#r2#w1",
+      "group": "C",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S1"
+        ],
+        "label": "INSUFFICIENT"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S1",
+          "text": "• FastAPI manifest endpoint에서 scene_id, revision, orbit, checksum, object URI 검증"
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S1\"],\"label\":\"INSUFFICIENT\"}",
+      "latencyMs": 2469.7470999963116,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:18:26.6867027Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 439100000,
+        "loadDurationNs": 158189300,
+        "promptEvalCount": 345,
+        "promptEvalDurationNs": 30116000,
+        "evalCount": 16,
+        "evalDurationNs": 233001000
+      }
+    },
+    {
+      "id": "V2-U02-NV01#r1#w2",
+      "group": "C",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "계산 worker는 파일이 준비된 작업에만 사용됐다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2499.0462999994634,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:18:29.1889482Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 437777500,
+        "loadDurationNs": 156685200,
+        "promptEvalCount": 416,
+        "promptEvalDurationNs": 53147000,
+        "evalCount": 15,
+        "evalDurationNs": 211120000
+      }
+    },
+    {
+      "id": "V2-U02-IP01#r2#w2",
+      "group": "C",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S2"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S2",
+          "text": "acquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S2\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2487.41990000417,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:18:31.6796835Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 459079300,
+        "loadDurationNs": 169346800,
+        "promptEvalCount": 397,
+        "promptEvalDurationNs": 44535000,
+        "evalCount": 15,
+        "evalDurationNs": 228233000
+      }
+    },
+    {
+      "id": "V2-U04-IP02#r1#w1",
+      "group": "C",
+      "groundTruth": "SUPPORT",
+      "expectedLabel": "SUPPORTED",
+      "status": "VALID",
+      "decision": {
+        "evidenceSentenceIds": [
+          "S3"
+        ],
+        "label": "SUPPORTED"
+      },
+      "groundedEvidence": [
+        {
+          "id": "S3",
+          "text": "식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다."
+        }
+      ],
+      "validationErrors": [],
+      "rawMessageContent": "{\"evidenceSentenceIds\":[\"S3\"],\"label\":\"SUPPORTED\"}",
+      "latencyMs": 2533.7704999983544,
+      "ollama": {
+        "model": "qwen3:4b-instruct",
+        "createdAt": "2026-08-16T19:18:34.2157706Z",
+        "done": true,
+        "doneReason": "stop",
+        "totalDurationNs": 495358800,
+        "loadDurationNs": 180795000,
+        "promptEvalCount": 419,
+        "promptEvalDurationNs": 57957000,
+        "evalCount": 15,
+        "evalDurationNs": 238388000
+      }
+    }
+  ],
+  "summary": {
+    "complete": true,
+    "completedPairCount": 113,
+    "modelOutputInvalid": 0,
+    "labelDistribution": {
+      "SUPPORTED": 47,
+      "REFUTED": 49,
+      "INSUFFICIENT": 17
+    },
+    "latencyMs": {
+      "average": 2518.9220752217807,
+      "p95": 2562.000200006878,
+      "total": 284638.1945000612
+    },
+    "gate": {
+      "checks": {
+        "groupCSupportedAtLeastFourOfFive": {
+          "passed": true,
+          "actual": "4/5"
+        },
+        "groupABSupportAtLeastThirtyNineOfForty": {
+          "passed": true,
+          "actual": "40/40"
+        },
+        "groupABContradictFalseSupportAtMostOne": {
+          "passed": false,
+          "actual": "3/52"
+        },
+        "groupABUnknownFalseSupportAtMostOne": {
+          "passed": true,
+          "actual": "0/16"
+        },
+        "modelOutputInvalidZero": {
+          "passed": true,
+          "actual": 0
+        }
+      },
+      "allPassed": false,
+      "final": "SEMANTIC_SUPPORT_JUDGE_NO_GO"
+    }
+  }
+}

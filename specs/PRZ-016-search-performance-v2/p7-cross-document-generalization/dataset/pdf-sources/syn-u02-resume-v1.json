@@ -1,0 +1,32 @@
+{
+  "title": "SYN-U02 · DATA PIPELINE RESUME",
+  "subtitle": "PRIZM P7 synthetic profile — 실제 인물·기관·검체와 무관",
+  "metrics": [
+    ["1.8 TB", "daily sequencing batch"],
+    ["94 → 26 min", "end-to-end validation"],
+    ["317 / 12,600", "checksum quarantine / manifests"],
+    ["2.4 M", "exact-once backfill records"]
+  ],
+  "sections": [
+    {
+      "heading": "GeneTrail QC",
+      "paragraphs": [
+        "Python과 FastAPI로 sample manifest 접수 API를 만들고, Airflow가 검증 단계를 조정하도록 구성했다.",
+        "Spark partition 재구성과 작은 파일 병합으로 1.8TB 일일 batch의 처리 시간을 94분에서 26분으로 줄였다."
+      ]
+    },
+    {
+      "heading": "Data correctness",
+      "paragraphs": [
+        "Delta Lake MERGE는 lab-batch와 sample-id를 복합 키로 사용했다. 2,400,000개 record를 다시 적재해도 중복 결과가 생기지 않았다.",
+        "manifest checksum 오류 317건은 격리 영역으로 이동시켜 분석 테이블과 섞이지 않게 했다."
+      ]
+    },
+    {
+      "heading": "Operational boundary",
+      "paragraphs": [
+        "sequencer gateway 보호를 위해 Airflow pool 동시 실행을 12개 task로 제한했다. Apache Iceberg는 비교 검토만 했으며 운영 포맷으로 채택하지 않았다."
+      ]
+    }
+  ]
+}

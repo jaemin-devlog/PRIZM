@@ -1,0 +1,32 @@
+{
+  "phase": "PRZ-016-P7-A",
+  "recordedAt": "2026-08-16T18:00:00+09:00",
+  "branch": "PRZ-016-search-performance-v2",
+  "head": "4a5c5b6bbd3cfd06f1313dee09e6695fdd68179e",
+  "originMain": "af6145a975031770f807ef4466a78f084e8223a2",
+  "originMainContainedInHead": true,
+  "productionSearch": {
+    "fileCount": 30,
+    "aggregateSha256": "32d8e31d7f5eeb3bf64033ce2b9db7c58347cbfe3d6f540b792e44c04951df31"
+  },
+  "phaseStatus": {
+    "P0": "DONE",
+    "P1": "DONE",
+    "P2": "DONE",
+    "P3": "DONE",
+    "P4": "DONE",
+    "P5": "DONE_FAIL",
+    "P6": "DONE_NO_GO",
+    "GPT_J1": "DONE_NO_GO"
+  },
+  "existingEvaluation": {
+    "p0QueryCount": 72,
+    "p0DatasetSha256": "51414093346646a47c1fb65c934111706e43dc123fc0355344545c4769dea9d6",
+    "p5QueryCount": 48,
+    "p5DatasetSha256": "4e28c0fb2b99b31f15640eb39776e04a533938b63db02e1ba0bfec22168532aa",
+    "p5GroundTruthSha256": "da915300974c27967e859c0586ec1f76347c314c62f0ca57f77b5b64c3e0180d"
+  },
+  "productionChangesAuthorized": 0,
+  "searchAuthorized": false,
+  "gptJudgeAuthorized": false
+}

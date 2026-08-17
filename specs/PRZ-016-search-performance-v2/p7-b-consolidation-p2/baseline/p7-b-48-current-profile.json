@@ -1,0 +1,408 @@
+{
+  "schemaVersion" : 1,
+  "phase" : "PRZ-016-CONSOLIDATION-P2-BASELINE-RECHECK",
+  "executedAt" : "2026-08-17T00:44:43.142318500Z",
+  "sourceQuestionsSha256" : "85c2e41bba5c293ca5172b48f77f41587d49be996252479ce5a71ed17763b868",
+  "sourceGroundTruthSha256" : "fd7525da3a00df4d7eccf42022b54a63cb2571be9f20111d2d6de740aa5f9680",
+  "sourceOriginalRawSha256" : "defc5e35dbf26f48a640f3df673e2247c14437b0cb65e8c8c05a0bd3b6e2cb2e",
+  "execution" : "CURRENT_PRODUCTION_SEARCH_SERVICE_ON_EXISTING_P7_B_ISOLATED_CORPUS",
+  "summary" : {
+    "total" : 48,
+    "positive" : 36,
+    "negative" : 12,
+    "pass" : 19,
+    "fail" : 29,
+    "top1" : 0.3333333333333333,
+    "recallAt3" : 0.5833333333333334,
+    "recallAt5" : 0.5833333333333334,
+    "mrrAt5" : 0.4490740740740741,
+    "negativeFpr" : 0.4166666666666667
+  },
+  "evaluations" : [ {
+    "id" : "V2-U01-D01",
+    "userKey" : "SYN2-U01",
+    "polarity" : "POSITIVE",
+    "state" : "NO_RELEVANT_RESULTS",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U01-D02",
+    "userKey" : "SYN2-U01",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 1,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U01-NV01",
+    "userKey" : "SYN2-U01",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 1,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U01-NV02",
+    "userKey" : "SYN2-U01",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U01-IP01",
+    "userKey" : "SYN2-U01",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 1,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U01-IP02",
+    "userKey" : "SYN2-U01",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 2,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U01-NI01",
+    "userKey" : "SYN2-U01",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 1,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U01-CN01",
+    "userKey" : "SYN2-U01",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 3,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U01-CN02",
+    "userKey" : "SYN2-U01",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 2,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U01-N01",
+    "userKey" : "SYN2-U01",
+    "polarity" : "NEGATIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : true,
+    "passed" : false
+  }, {
+    "id" : "V2-U01-N02",
+    "userKey" : "SYN2-U01",
+    "polarity" : "NEGATIVE",
+    "state" : "NO_RELEVANT_RESULTS",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U01-N03",
+    "userKey" : "SYN2-U01",
+    "polarity" : "NEGATIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : true,
+    "passed" : false
+  }, {
+    "id" : "V2-U02-D01",
+    "userKey" : "SYN2-U02",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 2,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U02-D02",
+    "userKey" : "SYN2-U02",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U02-NV01",
+    "userKey" : "SYN2-U02",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 1,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U02-NV02",
+    "userKey" : "SYN2-U02",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U02-IP01",
+    "userKey" : "SYN2-U02",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 2,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U02-IP02",
+    "userKey" : "SYN2-U02",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U02-NI01",
+    "userKey" : "SYN2-U02",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U02-CN01",
+    "userKey" : "SYN2-U02",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U02-CN02",
+    "userKey" : "SYN2-U02",
+    "polarity" : "POSITIVE",
+    "state" : "NO_RELEVANT_RESULTS",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U02-N01",
+    "userKey" : "SYN2-U02",
+    "polarity" : "NEGATIVE",
+    "state" : "NO_RELEVANT_RESULTS",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U02-N02",
+    "userKey" : "SYN2-U02",
+    "polarity" : "NEGATIVE",
+    "state" : "NO_RELEVANT_RESULTS",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U02-N03",
+    "userKey" : "SYN2-U02",
+    "polarity" : "NEGATIVE",
+    "state" : "NO_RELEVANT_RESULTS",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U03-D01",
+    "userKey" : "SYN2-U03",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 2,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U03-D02",
+    "userKey" : "SYN2-U03",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 1,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U03-NV01",
+    "userKey" : "SYN2-U03",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 3,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U03-NV02",
+    "userKey" : "SYN2-U03",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 1,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U03-IP01",
+    "userKey" : "SYN2-U03",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U03-IP02",
+    "userKey" : "SYN2-U03",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 2,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U03-NI01",
+    "userKey" : "SYN2-U03",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U03-CN01",
+    "userKey" : "SYN2-U03",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 2,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U03-CN02",
+    "userKey" : "SYN2-U03",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 1,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U03-N01",
+    "userKey" : "SYN2-U03",
+    "polarity" : "NEGATIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : true,
+    "passed" : false
+  }, {
+    "id" : "V2-U03-N02",
+    "userKey" : "SYN2-U03",
+    "polarity" : "NEGATIVE",
+    "state" : "NO_RELEVANT_RESULTS",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U03-N03",
+    "userKey" : "SYN2-U03",
+    "polarity" : "NEGATIVE",
+    "state" : "NO_RELEVANT_RESULTS",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U04-D01",
+    "userKey" : "SYN2-U04",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U04-D02",
+    "userKey" : "SYN2-U04",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U04-NV01",
+    "userKey" : "SYN2-U04",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 1,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U04-NV02",
+    "userKey" : "SYN2-U04",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 1,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U04-IP01",
+    "userKey" : "SYN2-U04",
+    "polarity" : "POSITIVE",
+    "state" : "NO_RELEVANT_RESULTS",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U04-IP02",
+    "userKey" : "SYN2-U04",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 1,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U04-NI01",
+    "userKey" : "SYN2-U04",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U04-CN01",
+    "userKey" : "SYN2-U04",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : 1,
+    "falsePositive" : false,
+    "passed" : true
+  }, {
+    "id" : "V2-U04-CN02",
+    "userKey" : "SYN2-U04",
+    "polarity" : "POSITIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : false
+  }, {
+    "id" : "V2-U04-N01",
+    "userKey" : "SYN2-U04",
+    "polarity" : "NEGATIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : true,
+    "passed" : false
+  }, {
+    "id" : "V2-U04-N02",
+    "userKey" : "SYN2-U04",
+    "polarity" : "NEGATIVE",
+    "state" : "EVIDENCE_FOUND",
+    "correctRank" : null,
+    "falsePositive" : true,
+    "passed" : false
+  }, {
+    "id" : "V2-U04-N03",
+    "userKey" : "SYN2-U04",
+    "polarity" : "NEGATIVE",
+    "state" : "NO_RELEVANT_RESULTS",
+    "correctRank" : null,
+    "falsePositive" : false,
+    "passed" : true
+  } ],
+  "productionChangesByEvaluation" : 0,
+  "datasetChanges" : 0
+}

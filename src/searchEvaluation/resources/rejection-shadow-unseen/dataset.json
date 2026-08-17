@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-unseen-rejection-shadow-validation",
+  "syntheticOnly": true,
+  "cases": [
+    {"id":"U01","category":"ACTUAL_ADOPTION","query":"Quarkus로 도서 대출 알림 서비스를 구현해 배포한 경험이 있나요?","candidate":"공공도서관의 반납 알림을 위해 Quarkus 서비스를 구현해 사서용 환경에 배포했다. 매일 연체 안내 작업을 운영했다."},
+    {"id":"U02","category":"ACTUAL_ADOPTION","query":"SvelteKit으로 지역 축제 신청 화면을 실제 출시했나요?","candidate":"지역 축제 자원봉사 신청 화면을 SvelteKit으로 구현하고 시민에게 출시했다. 접수 기간 동안 운영 담당자가 신청 현황을 확인했다."},
+    {"id":"U03","category":"ACTUAL_ADOPTION","query":"RabbitMQ를 도입해 주문 확인 작업을 운영했나요?","candidate":"농산물 공동구매의 주문 확인 작업에 RabbitMQ 큐를 도입하고 운영했다. 중복 접수는 소비자에게 전송되기 전에 분리했다."},
+    {"id":"U04","category":"ACTUAL_ADOPTION","query":"Kotlin으로 체육관 예약 검증 기능을 구현해 배포했나요?","candidate":"시민 체육관 예약의 중복 시간을 검사하는 Kotlin 모듈을 구현해 예약 서버에 배포했다. 안내 데스크가 이를 사용했다."},
+    {"id":"U05","category":"ACTUAL_ADOPTION","query":"Prometheus로 양봉장 센서 알림을 운영한 경험이 있나요?","candidate":"양봉장 온도 센서에 Prometheus 알림 규칙을 도입하고 계절별 경보 절차를 운영했다. 관리자는 임계치 초과를 바로 확인했다."},
+    {"id":"U06","category":"ACTUAL_ADOPTION","query":"Argo CD로 박물관 전시 안내 배포를 자동화했나요?","candidate":"박물관 전시 안내판의 배포 절차에 Argo CD를 도입해 자동 배포를 운영했다. 전시 교체일에 운영자가 승인했다."},
+    {"id":"U07","category":"ACTUAL_ADOPTION","query":"gRPC로 농업 장비 상태 조회를 구현해 운영했나요?","candidate":"농업 장비의 상태를 조회하는 gRPC 인터페이스를 구현하고 현장 관제 화면에서 운영했다. 장비 점검원이 응답을 확인했다."},
+    {"id":"U08","category":"ACTUAL_ADOPTION","query":"SQLite로 현장 조사 기록 가져오기를 구현했나요?","candidate":"산림 조사원이 저장한 기록을 SQLite 파일에서 가져오는 기능을 구현해 조사 도구에 배포했다. 오프라인 작업 뒤에도 기록이 보존됐다."},
+    {"id":"U09","category":"EXPLICIT_DENIAL","query":"Elasticsearch 클러스터를 직접 설치하고 운영했나요?","candidate":"Elasticsearch 클러스터는 직접 설치하거나 운영하지 않았다. 검색팀의 월간 보고서만 검토했다."},
+    {"id":"U10","category":"EXPLICIT_DENIAL","query":"Flutter로 모바일 앱을 작성한 경험이 있나요?","candidate":"Flutter 앱을 작성한 경험은 없다. 현장 안내는 종이 지도와 웹 안내문으로만 제공했다."},
+    {"id":"U11","category":"EXPLICIT_DENIAL","query":"PyTorch 모델을 직접 학습했나요?","candidate":"PyTorch 모델을 만들거나 학습하지 않았다. 외부 연구소의 분류 결과만 받아 품질을 점검했다."},
+    {"id":"U12","category":"COMPARISON_NOT_ADOPTED","query":"CockroachDB를 운영 데이터베이스로 채택했나요?","candidate":"CockroachDB를 비교 환경에서 측정했지만 운영 데이터베이스로 채택하지 않았다. 기존 저장소를 계속 사용했다."},
+    {"id":"U13","category":"COMPARISON_NOT_ADOPTED","query":"Temporal을 운영 작업에 도입했나요?","candidate":"Temporal을 짧은 실험에서 비교했으나 도입하지 않았다. 정기 작업은 기존 스케줄러에 남겼다."},
+    {"id":"U14","category":"COMPARISON_NOT_ADOPTED","query":"Kubernetes를 서비스 운영에 채택했나요?","candidate":"Kubernetes의 운영 복잡도를 검토했지만 채택하지 않았다. 배포 방식은 바꾸지 않았다."},
+    {"id":"U15","category":"PLAN_ONLY","query":"GraphQL 조회 기능을 이미 출시했나요?","candidate":"GraphQL 조회 기능은 다음 분기 검토 항목이다. 개발 일정은 확정되지 않았고 출시한 기능은 없다."},
+    {"id":"U16","category":"PLAN_ONLY","query":"WebRTC 상담 화면을 구현하고 배포했나요?","candidate":"WebRTC 상담 화면은 제안서에만 적혀 있다. 구현이나 배포 작업은 시작하지 않았다."},
+    {"id":"U17","category":"PLAN_ONLY","query":"Redpanda로 스트림 이전을 실제 실행했나요?","candidate":"Redpanda 스트림 이전은 예산 검토 단계다. 승인된 작업이나 실행한 이전은 없다."},
+    {"id":"U18","category":"PAST_PROTOTYPE_RETIRED","query":"Backbone.js를 현재 출시 서비스에 사용했나요?","candidate":"Backbone.js는 오래전 행사 안내 prototype에서 잠시 사용했지만 출시 전에 폐기했다. 현재 서비스에는 포함되지 않는다."},
+    {"id":"U19","category":"PAST_PROTOTYPE_RETIRED","query":"Hadoop을 현재 운영 파이프라인에 사용했나요?","candidate":"Hadoop으로 만든 교육용 prototype은 있었지만 운영 전 제거했다. 현행 파이프라인에는 사용하지 않는다."},
+    {"id":"U20","category":"PAST_PROTOTYPE_RETIRED","query":"jQuery 지도를 현재 제품에 구현했나요?","candidate":"jQuery로 만든 예전 지도 데모는 실제 출시 전에 retired 처리했다. 현재 제품 화면에는 남아 있지 않다."},
+    {"id":"U21","category":"NUMERIC_CONTRADICTION","query":"SLA를 99.4%로 달성했다는 근거가 있나요?","candidate":"SLA 측정은 98.4%였다. 99.4%를 달성했다는 기록은 없다."},
+    {"id":"U22","category":"NUMERIC_CONTRADICTION","query":"LCP를 720밀리초로 낮춘 경험이 있나요?","candidate":"LCP의 실제 값은 820밀리초였다. 720밀리초 개선을 달성했다는 근거는 없다."},
+    {"id":"U23","category":"NUMERIC_CONTRADICTION","query":"QPS를 1,400건으로 처리했나요?","candidate":"QPS는 1,040건으로 측정됐다. 1,400건 처리 결과는 보고서에 없다."},
+    {"id":"U24","category":"NUMERIC_CONTRADICTION","query":"RTO를 12분으로 달성했나요?","candidate":"RTO 복구 시간은 15분이었다. 12분 달성 수치는 검증 기록에 없다."}
+  ]
+}

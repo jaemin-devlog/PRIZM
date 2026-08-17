@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-B-CLAIM-AWARE-CONTENT-LOCALIZER-FREEZE",
+  "frozenAt": "2026-08-16T16:06:06.331597+00:00",
+  "groundTruthUsedBeforeFreeze": false,
+  "implementation": {
+    "path": "scripts/evaluation/build_claim_aware_localizer_shadow.py",
+    "sha256": "aa854d2e349ec258612c327efa6a48e8c6ddc24fbbce8f28a26d56ed053df09c",
+    "productionDependency": false
+  },
+  "source": {
+    "rawResults": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-b-independent-generalization/raw-results.json",
+      "sha256": "defc5e35dbf26f48a640f3df673e2247c14437b0cb65e8c8c05a0bd3b6e2cb2e"
+    },
+    "frozenPairs": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-b-semantic-shadow/pairs.json",
+      "sha256": "e48fb53e26c2c88960d054d8fcea2a0df33f38774c235258e06dafbe5f4ee758"
+    },
+    "c0Numeric": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-b-semantic-shadow/numeric-shadow-results.json",
+      "sha256": "fa72410888fd8c80aaeb8302a0fb1be1a29d80a19bac08d5d22086fef82b70be"
+    }
+  },
+  "candidates": {
+    "path": "specs/PRZ-016-search-performance-v2/p7-b-semantic-shadow/claim-localizer-candidates.json",
+    "sha256": "5ad9fd999e67f236c8480339786de1b6f0d8ef4bd6cb478da815f945c20dbacb",
+    "originalPairCount": 86,
+    "fallbackEligible": 64,
+    "c0AlreadySupport": 22,
+    "totalPreselectedWindows": 430,
+    "fallbackRunnerWindows": 320,
+    "averageCandidatesPerFallback": 5.0,
+    "maxCandidatesPerFallback": 5,
+    "maxSentenceCount": 3
+  },
+  "runner": {
+    "path": "specs/PRZ-016-search-performance-v2/p7-b-semantic-shadow/claim-localizer-runner-pairs.json",
+    "sha256": "9b7f3d30d6876f62d87824dc851d6e42a23db02cc67ab298f1e50c059bd966c9",
+    "pairCount": 320
+  },
+  "integrity": {
+    "queryIdRankOneToOne": true,
+    "hypothesisChanged": 0,
+    "resultContentChanged": 0,
+    "crossResultContamination": 0,
+    "crossDocumentContamination": 0,
+    "duplicateInvalidWindowCount": 0,
+    "candidateCountWithinLimit": true,
+    "windowSentenceCountWithinLimit": true,
+    "parse": "PASS",
+    "freeze": "PASS"
+  },
+  "nliInference": "NOT_RUN",
+  "numericVerification": "NOT_RUN",
+  "groundTruthScoring": "NOT_RUN"
+}

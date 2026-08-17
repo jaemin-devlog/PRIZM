@@ -155,6 +155,25 @@ tasks.register('p6FreezeIdentifierStressSet', Test) {
                     .getOrElse('specs/PRZ-016-search-performance-v2/p6-retrieval-shadow')
 }
 
+tasks.register('gptEvidenceJudgeShadow', Test) {
+    description = 'Runs the PRZ-016 GPT-J1 P5 evidence-judge shadow comparison.'
+    group = 'verification'
+    testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
+    classpath = sourceSets.searchEvaluation.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching 'com.prizm.search.evaluation.GptEvidenceJudgeShadowBenchmarkTest'
+    }
+    outputs.upToDateWhen { false }
+    systemProperty 'prizm.gpt-evidence-judge.output',
+            providers.gradleProperty('gptJudgeOutput')
+                    .getOrElse('local/gpt-evidence-judge/results.json')
+
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
 tasks.named('check') {
     dependsOn tasks.named('integrationTest')
 }

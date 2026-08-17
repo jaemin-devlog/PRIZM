@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-B-SEARCH-STAGE-CEILING-AUDIT",
+  "auditedAt": "2026-08-16T20:57:47.8129070Z",
+  "scope": "POSITIVE_STAGE_DIAGNOSIS_ONLY",
+  "sources": {
+    "rawResults": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-b-independent-generalization/raw-results.json",
+      "sha256": "defc5e35dbf26f48a640f3df673e2247c14437b0cb65e8c8c05a0bd3b6e2cb2e"
+    },
+    "baselineEvaluation": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-b-independent-generalization/evaluated-results.json",
+      "sha256": "a1b85aafcf516c2370724e7a7c311619da4692269e2b0971f54da88b9de696b8"
+    },
+    "groundTruth": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization-v2/dataset/ground-truth.json",
+      "sha256": "fd7525da3a00df4d7eccf42022b54a63cb2571be9f20111d2d6de740aa5f9680"
+    },
+    "freezeManifest": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization-v2/freeze-manifest.json",
+      "sha256": "539ebae29e4f111257a453893abb0eda78bcf922b525fa3d3c8a79ae0d8cca5f"
+    },
+    "claimAwareCandidates": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-b-semantic-shadow/claim-localizer-candidates.json",
+      "sha256": "5ad9fd999e67f236c8480339786de1b6f0d8ef4bd6cb478da815f945c20dbacb"
+    }
+  },
+  "integrity": {
+    "activeCorpusAggregateSha256": "fef6cb0b38fea658b03dfd06a43212acb84b57922acec764c49a5032fd795498",
+    "activeDocumentHashChecks": "8/8 PASS",
+    "activeDocuments": 8,
+    "activeVersionsCompleted": "8/8",
+    "completedSearchableChunks": 30,
+    "inactiveV0ExcludedByActiveVersionPointer": true,
+    "corpusDocumentVersionIntegrity": "PASS",
+    "searchBehaviorChanged": false,
+    "searchRerun": "NOT_RUN",
+    "modelInference": "NOT_RUN"
+  },
+  "traceAvailability": {
+    "frozenFinalResults": true,
+    "frozenResultContent": true,
+    "frozenClaimAwareTop5Windows": true,
+    "frozenPreFilterCandidateIds": false,
+    "frozenPostFilterCandidateIds": false,
+    "originalDockerProjectPresent": false,
+    "originalDockerVolumePresent": false,
+    "status": "UNKNOWN_STAGE_TRACE_REQUIRED_FOR_S2_S3"
+  },
+  "stageCeiling": {
+    "S0_CORPUS_ORACLE": {
+      "found": 36,
+      "missing": 0,
+      "evidence": "Freeze validation verified all 67 acceptable Positive anchors in the frozen active corpus."
+    },
+    "S1_CHUNK_ORACLE": {
+      "found": 36,
+      "lostAtThisStage": 0,
+      "evidence": "Thirty-four query anchors were observed in actual frozen result.content chunks. V2-U04-D01 and V2-U04-CN02 were verified in the first 800/120 chunk of their frozen PDF page; the owner snapshot records all four U04 resume chunks completed."
+    },
+    "S2_PRE_FILTER_CANDIDATE": {
+      "foundMinimum": 22,
+      "lostAtThisStageProven": 0,
+      "unknown": 14,
+      "evidence": "Every S4 result necessarily passed S2. Candidate IDs for the other queries were not frozen."
+    },
+    "S3_POST_FILTER": {
+      "foundMinimum": 22,
+      "lostAtThisStageProven": 0,
+      "unknown": 14,
+      "evidence": "Every S4 result necessarily passed S3. Post-filter IDs for the other queries were not frozen."
+    },
+    "S4_FINAL_TOP5": {
+      "found": 22,
+      "absent": 14,
+      "lostAtThisStageProven": 0,
+      "note": "The 14 absent results cannot be assigned to ranking because S2/S3 are unknown."
+    },
+    "S5_RESULT_CONTENT": {
+      "found": 22,
+      "lostAtThisStage": 0,
+      "note": "All 22 correct final result chunks contain at least one acceptable GT anchor."
+    },
+    "S6_LOCALIZATION": {
+      "found": 19,
+      "lostAtThisStage": 3,
+      "lostIds": ["V2-U03-NV01", "V2-U03-IP01", "V2-U03-CN01"],
+      "criterion": "At least one of the frozen five claim-aware windows for the correct original result contains an acceptable GT anchor."
+    }
+  },
+  "firstFailureTaxonomy": {
+    "CORPUS_MISSING": 0,
+    "CHUNKING": 0,
+    "CANDIDATE_RECALL": 0,
+    "FILTERING": 0,
+    "RANKING": 0,
+    "RESULT_CONTENT": 0,
+    "LOCALIZATION": 3,
+    "UNKNOWN": 14,
+    "PASSED_ALL_OBSERVED_STAGES": 19,
+    "note": "Zero counts for S2-S4 causes mean no loss was proven at that exact stage, not that those stages are exonerated."
+  },
+  "failedPositiveQueries": [
+    {
+      "id": "V2-U01-D01",
+      "firstFailedStage": "UNKNOWN_STAGE_TRACE_REQUIRED",
+      "expectedEvidence": ["골재·아스콘 주문을 출하 거점에 배정하고 계근 완료 중량을 운송 전표로 확정하는 서비스"],
+      "actualStageEvidence": "S1 chunk 7 contains the evidence; no correct final Top5 result; S2/S3 IDs unavailable.",
+      "reason": "Cannot distinguish candidate recall, filtering, or ranking."
+    },
+    {
+      "id": "V2-U01-NV02",
+      "firstFailedStage": "UNKNOWN_STAGE_TRACE_REQUIRED",
+      "expectedEvidence": ["subscription filter는 depot code와 material class를 기준으로 구성했다.", "자신이 담당하는 거점·자재 메시지만 받았고"],
+      "actualStageEvidence": "S1 chunk 11 contains the evidence; no correct final Top5 result; S2/S3 IDs unavailable.",
+      "reason": "Cannot distinguish candidate recall, filtering, or ranking."
+    },
+    {
+      "id": "V2-U02-D02",
+      "firstFailedStage": "UNKNOWN_STAGE_TRACE_REQUIRED",
+      "expectedEvidence": ["Airflow scheduling, Spark transform", "Airflow deferrable operator", "Spark adaptive query execution"],
+      "actualStageEvidence": "S1 chunk 15 contains acceptable evidence; no correct final Top5 result; S2/S3 IDs unavailable.",
+      "reason": "Cannot distinguish candidate recall, filtering, or ranking."
+    },
+    {
+      "id": "V2-U02-NV02",
+      "firstFailedStage": "UNKNOWN_STAGE_TRACE_REQUIRED",
+      "expectedEvidence": ["scene_id와 revision의 조합", "보정판은 새 revision으로 유지하고 동일 revision의 재전송은 update 없이 종료"],
+      "actualStageEvidence": "S1 chunk 20 contains the evidence; no correct final Top5 result; S2/S3 IDs unavailable.",
+      "reason": "Cannot distinguish candidate recall, filtering, or ranking."
+    },
+    {
+      "id": "V2-U02-IP02",
+      "firstFailedStage": "UNKNOWN_STAGE_TRACE_REQUIRED",
+      "expectedEvidence": ["손상된 GeoTIFF 64개를 찾았다.", "모자이크 계산과 공개 catalog에 들어갈 수 없었다."],
+      "actualStageEvidence": "S1 chunk 20 contains the evidence; no correct final Top5 result; S2/S3 IDs unavailable.",
+      "reason": "Cannot distinguish candidate recall, filtering, or ranking."
+    },
+    {
+      "id": "V2-U02-NI01",
+      "firstFailedStage": "UNKNOWN_STAGE_TRACE_REQUIRED",
+      "expectedEvidence": ["최대 6.4TB 일일 입력의 end-to-end 시간을 138분에서 41분으로 줄였다."],
+      "actualStageEvidence": "S1 chunk 15 contains the evidence; no correct final Top5 result; S2/S3 IDs unavailable.",
+      "reason": "Cannot distinguish candidate recall, filtering, or ranking."
+    },
+    {
+      "id": "V2-U02-CN01",
+      "firstFailedStage": "UNKNOWN_STAGE_TRACE_REQUIRED",
+      "expectedEvidence": ["9,600,000개 scene metadata를 backfill", "active row 중복은 0건", "checkpoint table에 기록해 중단 지점부터 재개"],
+      "actualStageEvidence": "S1 chunks 20 and 21 contain acceptable evidence; no correct final Top5 result; S2/S3 IDs unavailable.",
+      "reason": "Cannot distinguish candidate recall, filtering, or ranking."
+    },
+    {
+      "id": "V2-U02-CN02",
+      "firstFailedStage": "UNKNOWN_STAGE_TRACE_REQUIRED",
+      "expectedEvidence": ["checksum 또는 TIFF directory가 손상된 GeoTIFF 64개", "모자이크 계산과 공개 catalog에 들어갈 수 없었다."],
+      "actualStageEvidence": "S1 chunk 20 contains the evidence; no correct final Top5 result; S2/S3 IDs unavailable.",
+      "reason": "Cannot distinguish candidate recall, filtering, or ranking."
+    },
+    {
+      "id": "V2-U03-NV01",
+      "firstFailedStage": "LOCALIZATION",
+      "expectedEvidence": ["permit_epoch가 포함됐다.", "마지막으로 수락한 epoch보다 작은 명령을 실행하지 않았다."],
+      "actualStageEvidence": "S4/S5 found correct chunk 22 at rank 3; none of its five frozen claim-aware windows contains an acceptable anchor.",
+      "reason": "Correct result content survived, but deterministic localization did not select the supporting unit."
+    },
+    {
+      "id": "V2-U03-IP01",
+      "firstFailedStage": "LOCALIZATION",
+      "expectedEvidence": ["leader 중단 뒤 permit 발급 P95는 9.6초에서 2.7초로 줄었고"],
+      "actualStageEvidence": "S4/S5 found correct chunk 3 at rank 1; none of its five frozen claim-aware windows contains the acceptable anchor.",
+      "reason": "Correct result content survived, but deterministic localization did not select the supporting unit."
+    },
+    {
+      "id": "V2-U03-NI01",
+      "firstFailedStage": "UNKNOWN_STAGE_TRACE_REQUIRED",
+      "expectedEvidence": ["12,800개 virtual train을 16개 zone에서 실행했다."],
+      "actualStageEvidence": "S1 chunk 3 contains the evidence; no correct final Top5 result; S2/S3 IDs unavailable.",
+      "reason": "Cannot distinguish candidate recall, filtering, or ranking."
+    },
+    {
+      "id": "V2-U03-CN01",
+      "firstFailedStage": "LOCALIZATION",
+      "expectedEvidence": ["permit_epoch가 포함됐다.", "Ed25519로 서명한 timetable package"],
+      "actualStageEvidence": "S4/S5 found correct chunk 22 at rank 2; none of its five frozen claim-aware windows contains an acceptable anchor.",
+      "reason": "Correct result content survived, but deterministic localization did not select the supporting unit."
+    },
+    {
+      "id": "V2-U04-D01",
+      "firstFailedStage": "UNKNOWN_STAGE_TRACE_REQUIRED",
+      "expectedEvidence": ["catalog ingestion과 검색 API를 담당했다.", "NestJS"],
+      "actualStageEvidence": "S1 active PDF chunk 25 contains the evidence; no correct final Top5 result; S2/S3 IDs unavailable.",
+      "reason": "Cannot distinguish candidate recall, filtering, or ranking."
+    },
+    {
+      "id": "V2-U04-D02",
+      "firstFailedStage": "UNKNOWN_STAGE_TRACE_REQUIRED",
+      "expectedEvidence": ["2,300,000 work records", "Meilisearch"],
+      "actualStageEvidence": "S1 chunk 26 contains the evidence; no correct final Top5 result; S2/S3 IDs unavailable.",
+      "reason": "Cannot distinguish candidate recall, filtering, or ranking."
+    },
+    {
+      "id": "V2-U04-IP01",
+      "firstFailedStage": "UNKNOWN_STAGE_TRACE_REQUIRED",
+      "expectedEvidence": ["같은 territory의 지분을 각각 100%로 주장하면 자동으로 한쪽을 선택하지 않았다.", "conflict record에 남겼다."],
+      "actualStageEvidence": "S1 chunk 30 contains the evidence; no correct final Top5 result; S2/S3 IDs unavailable.",
+      "reason": "Cannot distinguish candidate recall, filtering, or ranking."
+    },
+    {
+      "id": "V2-U04-NI01",
+      "firstFailedStage": "UNKNOWN_STAGE_TRACE_REQUIRED",
+      "expectedEvidence": ["검색 P95를 1.6초에서 240밀리초로 낮췄다."],
+      "actualStageEvidence": "S1 chunk 26 contains the evidence; no correct final Top5 result; S2/S3 IDs unavailable.",
+      "reason": "Cannot distinguish candidate recall, filtering, or ranking."
+    },
+    {
+      "id": "V2-U04-CN02",
+      "firstFailedStage": "UNKNOWN_STAGE_TRACE_REQUIRED",
+      "expectedEvidence": ["catalog snapshot id로 계산 기준을 재현했다.", "재실행 가능한 immutable snapshot"],
+      "actualStageEvidence": "S1 active PDF chunk 27 contains the evidence; no correct final Top5 result; S2/S3 IDs unavailable.",
+      "reason": "Cannot distinguish candidate recall, filtering, or ranking."
+    }
+  ],
+  "primaryBottleneck": "UNKNOWN_STAGE_TRACE_REQUIRED",
+  "largestResolvedLossStage": "LOCALIZATION",
+  "next": "INSUFFICIENT_TRACE_DATA",
+  "productionChanges": 0,
+  "searchChanges": 0,
+  "judgeChanges": 0,
+  "numericChanges": 0,
+  "datasetChanges": 0
+}

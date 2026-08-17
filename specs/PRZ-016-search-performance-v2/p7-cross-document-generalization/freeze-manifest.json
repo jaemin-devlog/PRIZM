@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-A",
+  "status": "DATASET_FROZEN_READY_FOR_INDEPENDENT_RUN",
+  "frozenAt": "2026-08-16T18:43:06.9489602+09:00",
+  "searchExecutedAtFreeze": false,
+  "benchmarkExecutedAtFreeze": false,
+  "gptJudgeExecutedAtFreeze": false,
+  "p7bStatus": "NOT_STARTED",
+  "baseline": {
+    "branch": "PRZ-016-search-performance-v2",
+    "head": "4a5c5b6bbd3cfd06f1313dee09e6695fdd68179e",
+    "originMain": "af6145a975031770f807ef4466a78f084e8223a2",
+    "originMainContainedInHead": true,
+    "productionSearchFileCount": 30,
+    "productionSearchSourceAggregateSha256": "32d8e31d7f5eeb3bf64033ce2b9db7c58347cbfe3d6f540b792e44c04951df31"
+  },
+  "counts": {
+    "syntheticUsers": 4,
+    "activeDocuments": 8,
+    "txtDocuments": 4,
+    "pdfDocuments": 4,
+    "inactiveVersionFixtures": 1,
+    "questions": 48,
+    "positive": 36,
+    "negative": 12,
+    "groundTruthEntries": 48
+  },
+  "categories": {
+    "DIRECT_EXPERIENCE": 8,
+    "NATURAL_VARIATION": 8,
+    "INDIRECT_PROBLEM": 8,
+    "NUMERIC_IDENTIFIER": 4,
+    "COMPLEX_NATURAL_LANGUAGE": 8,
+    "NEGATIVE": 12
+  },
+  "validation": {
+    "status": "PASS",
+    "positiveAnchorsVerified": 58,
+    "negativeActiveCorpusAbsenceVerified": 12,
+    "p0QueriesCompared": 72,
+    "p5QueriesCompared": 48,
+    "exactDuplicates": 0,
+    "normalizedDuplicates": 0,
+    "nearDuplicateReviewCandidates": 0,
+    "manualNearDuplicates": 0,
+    "verbatimDocumentQueryCopies": 0,
+    "legacyProjectFactReuse": 0,
+    "pdfPagesExtracted": 4,
+    "pdfPagesRenderedAndVisuallyInspected": 4,
+    "pdfVisualDefects": 0,
+    "sensitiveDataFindings": 0,
+    "productionChanges": 0,
+    "gitDiffCheck": "PASS"
+  },
+  "hashing": {
+    "algorithm": "SHA-256",
+    "individualFileInput": "raw file bytes",
+    "activeCorpusAggregateInput": "For active documents sorted by manifest path: UTF-8 path + NUL + raw bytes + NUL"
+  },
+  "requiredHashes": {
+    "activeCorpusAggregate": "4ad8a564bee353c877a9c0938d6cf1f866d6d824750b01c5bf5f976b71a25ae1",
+    "questions": "7e1055db772034e0d7257de781944c9d5ba368888b5d1757baea7f864fcab957",
+    "groundTruth": "cbb78a66f3563ab82d86702220c409a3674ce2a6f5db1ad366795d085e6186f9"
+  },
+  "activeDocumentHashes": [
+    {"documentKey":"SYN-U01-PORTFOLIO","path":"dataset/documents/syn-u01-portfolio-v1.pdf","bytes":73665,"sha256":"cc58aa5f3050d57b2cf908e5585f38ef26b6b748900d2c0dfcff9b88c932186c"},
+    {"documentKey":"SYN-U01-RESUME","path":"dataset/documents/syn-u01-resume-v1.txt","bytes":1092,"sha256":"05edc5d8856c42fca7b93e423d3505f4310385d309a44638e80ae62627893137"},
+    {"documentKey":"SYN-U02-PORTFOLIO","path":"dataset/documents/syn-u02-portfolio-v1.txt","bytes":1025,"sha256":"5d40b14d16bc6bc2c61eadf00dfb508ee2142fc73ca3a9f70b75adb7eb4f4cdf"},
+    {"documentKey":"SYN-U02-RESUME","path":"dataset/documents/syn-u02-resume-v1.pdf","bytes":56318,"sha256":"e76501faeed05c1477d94d671afb04b636cca4cc6ed5e2e6610ee01faa7aea8e"},
+    {"documentKey":"SYN-U03-PORTFOLIO","path":"dataset/documents/syn-u03-portfolio-v1.pdf","bytes":64635,"sha256":"94107a86899e5925e73cb65b2e9c77d88a8ba81d6ebec36dad0ae6b90e3cb4a4"},
+    {"documentKey":"SYN-U03-RESUME","path":"dataset/documents/syn-u03-resume-v1.txt","bytes":893,"sha256":"1119f1327feb1e836666c4aeea2f5ab91aacce8b5171cdb315fb2e80d03bb00f"},
+    {"documentKey":"SYN-U04-PORTFOLIO","path":"dataset/documents/syn-u04-portfolio-v1.txt","bytes":1164,"sha256":"a3bdc65d501354e8466ac4004ecd1c231ec73641ee9062f3b5a818772af854a7"},
+    {"documentKey":"SYN-U04-RESUME","path":"dataset/documents/syn-u04-resume-v1.pdf","bytes":57948,"sha256":"de382a9047401e7c04ddfdfec0bae69237c5bcdb6a18228449303a4bb857b4ed"}
+  ],
+  "otherFrozenAssetHashes": [
+    {"path":"baseline.json","bytes":1050,"sha256":"58f0d2630e319eae9420a6e01bef97abdc655005ed24d710178b71a249bb0195"},
+    {"path":"dataset/corpus-manifest.json","bytes":2889,"sha256":"79b49f078728b6ec9e11c63d56c11ca40080a0376b9ce4b7abbff726b7bb4695"},
+    {"path":"dataset/ground-truth.json","bytes":21047,"sha256":"cbb78a66f3563ab82d86702220c409a3674ce2a6f5db1ad366795d085e6186f9"},
+    {"path":"dataset/inactive-versions/syn-u03-resume-v0.txt","bytes":378,"sha256":"11b8013cd5df91c864433eff361e5550a472f0e4e117001e188a884da3ed10d7"},
+    {"path":"dataset/pdf-sources/syn-u01-portfolio-v1.json","bytes":1747,"sha256":"d0479d3f7a502f750cf3cf36376711a8be957700ccc45ee7600d544afb92e092"},
+    {"path":"dataset/pdf-sources/syn-u02-resume-v1.json","bytes":1361,"sha256":"7add52f431a10d308e75fa45ac4d08e8c03fd583a40c18988aee4426178d4281"},
+    {"path":"dataset/pdf-sources/syn-u03-portfolio-v1.json","bytes":1528,"sha256":"ea73f5620c96e438064b1ee0f0be998cb43277eee82dd32631c69d4d5a98bab0"},
+    {"path":"dataset/pdf-sources/syn-u04-resume-v1.json","bytes":1330,"sha256":"f98e37ced7dd9e26cc2ba3a0b3c6f98ac5eafa1d31c4a101ddda350dc648a344"},
+    {"path":"dataset/questions.json","bytes":10272,"sha256":"7e1055db772034e0d7257de781944c9d5ba368888b5d1757baea7f864fcab957"},
+    {"path":"evidence.md","bytes":2835,"sha256":"940a3727693dbd3cb0c4600e9e4adf65125817e00b3425665fe248aa87dfd430"},
+    {"path":"plan.md","bytes":3614,"sha256":"a9f85eefd833c3a0b5dbd285f7cb5502942bc76262bae50c2707058d4ca8bd15"},
+    {"path":"rendered/syn-u01-portfolio-v1-1.png","bytes":163618,"sha256":"bea4cd4b096d005f09599cb017486ec10b07ab30e28c8cd3afcfe20ae86a015b"},
+    {"path":"rendered/syn-u02-resume-v1-1.png","bytes":135305,"sha256":"13cd22f5122f3db1c2baf432576d9e6aeff90ebcb27197875e19da815f4e5e79"},
+    {"path":"rendered/syn-u03-portfolio-v1-1.png","bytes":147200,"sha256":"e896ae6d17084f1df679ce753296423c14c4476d83e2dad2c3bd5971762b83f5"},
+    {"path":"rendered/syn-u04-resume-v1-1.png","bytes":126108,"sha256":"f5bc3a8af48557ca6a3c946ab74a66045a9893de31e659bd7d264b7b9fa8d2f3"},
+    {"path":"spec.md","bytes":5120,"sha256":"eeeb58932b2419a5f19fca921885e6411fdb7f1f081ac8086641215989c080e8"},
+    {"path":"tasks.md","bytes":941,"sha256":"1be75570fc8b195b646442f977257cfb3d4211706e4d833582e1e187a7651d16"},
+    {"path":"tools/generate-pdfs.py","bytes":5223,"sha256":"08476f5b46190b495474bb5234753a9fa0b533c53c1b0f04383b3ef3a623eeda"},
+    {"path":"tools/validate-p7.py","bytes":12661,"sha256":"cfaade25e044a27f1903278b3c3ee167c6e7c6d6794a4bb4a447bec7ce4d6f43"}
+  ],
+  "immutabilityRule": "P7-A files must not be modified after this manifest. P7-B must fail closed on any hash mismatch."
+}

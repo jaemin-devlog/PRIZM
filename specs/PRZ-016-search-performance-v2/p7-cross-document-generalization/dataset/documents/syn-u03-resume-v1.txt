@@ -1,0 +1,22 @@
+PRIZM P7 합성 이력서 — SYN-U03
+Synthetic profile / 실제 인물과 무관
+
+ROLE
+Maritime control backend engineer. 항만 장비 명령의 일관성과 장애 복구를 담당했다.
+
+HARBORMESH CONTROL
+• Go 기반 control plane과 ConnectRPC command API 개발
+• NATS JetStream durable consumer 및 ack wait 정책 운영
+• monotonic lease epoch를 명령에 넣어 오래된 controller의 실행을 차단
+• CockroachDB serializable 충돌(SQLSTATE 40001)에 bounded jitter retry 적용
+
+VERIFICATION NUMBERS
+• simulated nodes: 6,400
+• controller recovery: 11초 → 3.4초
+• network partition test: split-brain command 0건
+
+SECURITY / SCOPE
+• 장비 설정은 서명된 configuration bundle로 배포
+• LoRaWAN gateway firmware는 하드웨어 팀 범위였으며 직접 구현하지 않음
+• ACTIVE 이력에는 Firebase Remote Config 사용 경험이 없음
+

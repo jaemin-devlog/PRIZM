@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "dataset": "PRZ-016-P7-A-cross-document-generalization",
+  "syntheticOnly": true,
+  "activeCorpusRule": "Only documents listed in activeDocuments are eligible in P7-B.",
+  "users": [
+    {"userKey": "SYN-U01", "domain": "cold-chain dispatch", "style": "short operational bullets"},
+    {"userKey": "SYN-U02", "domain": "genomics batch quality", "style": "metric card plus incident log"},
+    {"userKey": "SYN-U03", "domain": "maritime equipment control", "style": "Korean-English mixed engineering case"},
+    {"userKey": "SYN-U04", "domain": "museum archive discovery", "style": "compact resume plus chronology"}
+  ],
+  "activeDocuments": [
+    {"documentKey": "SYN-U01-RESUME", "userKey": "SYN-U01", "documentType": "RESUME", "format": "TXT", "versionKey": "SYN-U01-RESUME-V1", "path": "dataset/documents/syn-u01-resume-v1.txt", "active": true},
+    {"documentKey": "SYN-U01-PORTFOLIO", "userKey": "SYN-U01", "documentType": "PORTFOLIO", "format": "PDF", "versionKey": "SYN-U01-PORTFOLIO-V1", "path": "dataset/documents/syn-u01-portfolio-v1.pdf", "active": true},
+    {"documentKey": "SYN-U02-RESUME", "userKey": "SYN-U02", "documentType": "RESUME", "format": "PDF", "versionKey": "SYN-U02-RESUME-V1", "path": "dataset/documents/syn-u02-resume-v1.pdf", "active": true},
+    {"documentKey": "SYN-U02-PORTFOLIO", "userKey": "SYN-U02", "documentType": "PORTFOLIO", "format": "TXT", "versionKey": "SYN-U02-PORTFOLIO-V1", "path": "dataset/documents/syn-u02-portfolio-v1.txt", "active": true},
+    {"documentKey": "SYN-U03-RESUME", "userKey": "SYN-U03", "documentType": "RESUME", "format": "TXT", "versionKey": "SYN-U03-RESUME-V1", "path": "dataset/documents/syn-u03-resume-v1.txt", "active": true},
+    {"documentKey": "SYN-U03-PORTFOLIO", "userKey": "SYN-U03", "documentType": "PORTFOLIO", "format": "PDF", "versionKey": "SYN-U03-PORTFOLIO-V1", "path": "dataset/documents/syn-u03-portfolio-v1.pdf", "active": true},
+    {"documentKey": "SYN-U04-RESUME", "userKey": "SYN-U04", "documentType": "RESUME", "format": "PDF", "versionKey": "SYN-U04-RESUME-V1", "path": "dataset/documents/syn-u04-resume-v1.pdf", "active": true},
+    {"documentKey": "SYN-U04-PORTFOLIO", "userKey": "SYN-U04", "documentType": "PORTFOLIO", "format": "TXT", "versionKey": "SYN-U04-PORTFOLIO-V1", "path": "dataset/documents/syn-u04-portfolio-v1.txt", "active": true}
+  ],
+  "inactiveVersionFixtures": [
+    {"documentKey": "SYN-U03-RESUME", "userKey": "SYN-U03", "documentType": "RESUME", "format": "TXT", "versionKey": "SYN-U03-RESUME-V0", "path": "dataset/inactive-versions/syn-u03-resume-v0.txt", "active": false, "purpose": "historical-version negative"}
+  ],
+  "pdfSources": [
+    "dataset/pdf-sources/syn-u01-portfolio-v1.json",
+    "dataset/pdf-sources/syn-u02-resume-v1.json",
+    "dataset/pdf-sources/syn-u03-portfolio-v1.json",
+    "dataset/pdf-sources/syn-u04-resume-v1.json"
+  ]
+}

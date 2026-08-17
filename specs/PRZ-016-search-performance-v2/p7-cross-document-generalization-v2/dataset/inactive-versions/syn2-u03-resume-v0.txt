@@ -1,0 +1,6 @@
+PRIZM P7-A v2 합성 이력서 — SYN2-U03 — INACTIVE V0
+
+[LEGACY PROTOTYPE — RETIRED]
+RailPulse 초기 prototype에서 etcd lease를 이용해 controller election을 구현했다.
+이 항목은 철회된 과거 version에만 존재하며 ACTIVE resume v1의 현재 경력 근거가 아니다.
+

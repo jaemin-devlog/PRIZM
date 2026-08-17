@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-KOREAN-NLI-MODEL-EVALUATION-PREP-FREEZE",
+  "frozenAt": "2026-08-17T01:55:01.6347674+09:00",
+  "datasetRole": "MODEL_SELECTION",
+  "pairFile": {
+    "path": "specs/PRZ-016-search-performance-v2/p7-b-semantic-shadow/nli-model-comparison-pairs.json",
+    "sha256": "8311af2ec5683b2b70c9de014570a4119c9804539f9a64f1afd8917472150eed",
+    "pairCount": 113,
+    "counts": {
+      "SUPPORT": 45,
+      "CONTRADICT": 52,
+      "UNKNOWN": 16
+    }
+  },
+  "groups": {
+    "A": {
+      "name": "EXISTING_SEMANTIC_CAPABILITY",
+      "source": "specs/PRZ-016-search-performance-v2/semantic-nli-capability/pairs.json",
+      "sourceSha256": "83078b2c794add9e23e5e43f5c70dd6046a4302962521ba81018952d20e53555",
+      "pairCount": 72,
+      "counts": { "SUPPORT": 26, "CONTRADICT": 38, "UNKNOWN": 8 }
+    },
+    "B": {
+      "name": "EXISTING_FRESH_SEMANTIC_VALIDATION",
+      "currentRole": "MODEL_SELECTION",
+      "source": "specs/PRZ-016-search-performance-v2/semantic-nli-fresh/pairs.json",
+      "sourceSha256": "5614b910c5a7747627d0033cc797d7f0970872d58692705ac3b6e46e6427e002",
+      "pairCount": 36,
+      "counts": { "SUPPORT": 14, "CONTRADICT": 14, "UNKNOWN": 8 }
+    },
+    "C": {
+      "name": "P7_DIAGNOSTIC_SUPPORT_MISSES",
+      "sourceRunnerPairs": "specs/PRZ-016-search-performance-v2/p7-b-semantic-shadow/claim-localizer-runner-pairs.json",
+      "sourceRunnerPairsSha256": "9b7f3d30d6876f62d87824dc851d6e42a23db02cc67ab298f1e50c059bd966c9",
+      "sourceCandidates": "specs/PRZ-016-search-performance-v2/p7-b-semantic-shadow/claim-localizer-candidates.json",
+      "sourceCandidatesSha256": "5ad9fd999e67f236c8480339786de1b6f0d8ef4bd6cb478da815f945c20dbacb",
+      "groundTruth": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization-v2/dataset/ground-truth.json",
+      "groundTruthSha256": "fd7525da3a00df4d7eccf42022b54a63cb2571be9f20111d2d6de740aa5f9680",
+      "pairCount": 5,
+      "counts": { "SUPPORT": 5, "CONTRADICT": 0, "UNKNOWN": 0 },
+      "pairIds": [
+        "V2-U01-IP01#r1#w3",
+        "V2-U02-D01#r2#w1",
+        "V2-U02-NV01#r1#w2",
+        "V2-U02-IP01#r2#w2",
+        "V2-U04-IP02#r1#w1"
+      ]
+    }
+  },
+  "integrity": {
+    "hypothesisChanged": 0,
+    "premiseChanged": 0,
+    "duplicatePairId": 0,
+    "duplicatePremiseHypothesisPair": 0,
+    "groundTruthInconsistency": 0,
+    "parse": "PASS"
+  },
+  "runner": {
+    "path": "scripts/evaluation/run_semantic_nli.py",
+    "sha256": "d512036b579c349da52a8a2470fa3f904a0d50383af3de30060dc8dc01746f09",
+    "sameRunnerForBothModels": true,
+    "threshold": "NONE",
+    "decision": "ARGMAX",
+    "labelMapping": {
+      "entailment": "SUPPORT",
+      "contradiction": "CONTRADICT",
+      "neutral": "UNKNOWN"
+    }
+  },
+  "models": {
+    "baseline": {
+      "id": "MoritzLaurer/mDeBERTa-v3-base-mnli-xnli",
+      "localPath": "C:/Users/정재민/.cache/prizm-nli/mdeberta",
+      "architecture": "DebertaV2ForSequenceClassification",
+      "configSha256": "4e4430c95100d613df80fa01276f231931e1b535557cf62fbb3cc50323e50cca",
+      "id2label": { "0": "entailment", "1": "neutral", "2": "contradiction" }
+    },
+    "candidate": {
+      "id": "Huffon/klue-roberta-base-nli",
+      "localTargetPath": "C:/Users/정재민/.cache/prizm-nli/klue-roberta-base-nli",
+      "configSource": "https://huggingface.co/Huffon/klue-roberta-base-nli/blob/main/config.json",
+      "repositoryRevision": "3778d23ecb30a63babb17f5efb37b1493b08d975",
+      "configRevisionObserved": "06ae079",
+      "architecture": "RobertaForSequenceClassification",
+      "modelType": "roberta",
+      "tokenizerClass": "BertTokenizer",
+      "id2label": { "0": "ENTAILMENT", "1": "NEUTRAL", "2": "CONTRADICTION" },
+      "autoTokenizerLocalLoad": "NOT_RUN",
+      "autoModelLocalLoad": "NOT_RUN",
+      "productionAdoptionStatus": "EVALUATION_ONLY"
+    }
+  },
+  "screenGateFrozenBeforeInference": {
+    "groupCSupportAtLeast": "3/5",
+    "groupABSupportFalseRejectIncreaseVsBaseline": 0,
+    "groupABContradictFalseSupportIncreaseVsBaseline": 0,
+    "groupABUnknownFalseSupportAtMost": 1,
+    "allMustPass": true,
+    "passLabel": "KOREAN_NLI_CANDIDATE_PROMISING",
+    "failLabel": "KOREAN_NLI_CANDIDATE_NO_GO",
+    "productionAdoptionGate": false
+  },
+  "modelDownload": "NOT_RUN",
+  "baselineInference": "NOT_RUN",
+  "candidateInference": "NOT_RUN",
+  "modelSelection": "NOT_PERFORMED"
+}

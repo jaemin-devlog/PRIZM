@@ -1,0 +1,2094 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-B-FULL-VERIFICATION-PIPELINE-FINAL-SCORING",
+  "evaluatedAt": "2026-08-16T20:09:09.864497+00:00",
+  "sources": {
+    "rawResults": {
+      "path": "C:\\Users\\정재민\\Project\\PRIZM\\specs\\PRZ-016-search-performance-v2\\p7-b-independent-generalization\\raw-results.json",
+      "sha256": "defc5e35dbf26f48a640f3df673e2247c14437b0cb65e8c8c05a0bd3b6e2cb2e"
+    },
+    "baselineEvaluation": {
+      "path": "C:\\Users\\정재민\\Project\\PRIZM\\specs\\PRZ-016-search-performance-v2\\p7-b-independent-generalization\\evaluated-results.json",
+      "sha256": "a1b85aafcf516c2370724e7a7c311619da4692269e2b0971f54da88b9de696b8"
+    },
+    "groundTruth": {
+      "path": "C:\\Users\\정재민\\Project\\PRIZM\\specs\\PRZ-016-search-performance-v2\\p7-cross-document-generalization-v2\\dataset\\ground-truth.json",
+      "sha256": "fd7525da3a00df4d7eccf42022b54a63cb2571be9f20111d2d6de740aa5f9680"
+    },
+    "claimAwareCandidates": {
+      "path": "C:\\Users\\정재민\\Project\\PRIZM\\specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\claim-localizer-candidates.json",
+      "sha256": "5ad9fd999e67f236c8480339786de1b6f0d8ef4bd6cb478da815f945c20dbacb"
+    },
+    "candidatePairs": {
+      "path": "C:\\Users\\정재민\\Project\\PRIZM\\specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\p7-full-judge-v3-candidate-pairs.json",
+      "sha256": "e2c7538a86411075c929c09651823e72c458126fac75921b03761b15b162c1c5"
+    },
+    "judgeResults": {
+      "path": "C:\\Users\\정재민\\Project\\PRIZM\\specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\p7-full-judge-v3-results.json",
+      "sha256": "777c24a3134f82ce47389b706ec8bd96186bc43cfbc78c02b4a1e434108acfaa"
+    },
+    "judgeCheckpoint": {
+      "path": "C:\\Users\\정재민\\Project\\PRIZM\\specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\p7-full-judge-v3-checkpoint.jsonl",
+      "sha256": "9c108802a8d52cd39e3455f30ddad7d77e2f0e4f730af11ed9c833e348aa023d"
+    },
+    "numericResults": {
+      "path": "C:\\Users\\정재민\\Project\\PRIZM\\specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\p7-full-judge-v3-numeric-results.json",
+      "sha256": "79de993f0f482aceffefb905679b88d57fadbfbf550978ac1d2b7e7b1e58b0e0"
+    }
+  },
+  "integrity": {
+    "phase0": "PASS",
+    "candidateCoverage": 430,
+    "originalResultCoverage": 86,
+    "queryCountWithResults": 38,
+    "modelOutputInvalid": 0,
+    "baselineMatchingReproduced": "48/48",
+    "groundTruthReadAfterPhase0": true
+  },
+  "policy": {
+    "candidateOrder": "FROZEN_1_TO_5",
+    "firstSupportedCandidate": "VERIFY_ORIGINAL_RESULT",
+    "nonSupportLabels": [
+      "REFUTED",
+      "INSUFFICIENT",
+      "NUMERIC_UNRESOLVED"
+    ],
+    "resultOrder": "PRESERVE_AND_RECOMPRESS",
+    "newEvidenceAllowed": false
+  },
+  "baseline": {
+    "top1": {
+      "correct": 12,
+      "total": 36,
+      "rate": 0.3333333333333333
+    },
+    "recallAt3": {
+      "correct": 21,
+      "total": 36,
+      "rate": 0.5833333333333334
+    },
+    "recallAt5": {
+      "correct": 21,
+      "total": 36,
+      "rate": 0.5833333333333334
+    },
+    "mrrAt5": 0.449074074074074,
+    "negativeFalsePositive": {
+      "count": 5,
+      "total": 12,
+      "rate": 0.4166666666666667
+    },
+    "pass": 28,
+    "fail": 20
+  },
+  "fullPipeline": {
+    "top1": {
+      "correct": 13,
+      "total": 36,
+      "rate": 0.3611111111111111
+    },
+    "recallAt3": {
+      "correct": 19,
+      "total": 36,
+      "rate": 0.5277777777777778
+    },
+    "recallAt5": {
+      "correct": 19,
+      "total": 36,
+      "rate": 0.5277777777777778
+    },
+    "mrrAt5": 0.4444444444444444,
+    "negativeFalsePositive": {
+      "count": 4,
+      "total": 12,
+      "rate": 0.3333333333333333
+    },
+    "pass": 27,
+    "fail": 21
+  },
+  "delta": {
+    "top1": 0.02777777777777779,
+    "recallAt3": -0.05555555555555558,
+    "recallAt5": -0.05555555555555558,
+    "mrrAt5": -0.004629629629629595,
+    "negativeFpr": -0.08333333333333337
+  },
+  "positive": {
+    "baselineCorrect": 21,
+    "retained": 19,
+    "retainedIds": [
+      "V2-U01-D02",
+      "V2-U01-NV01",
+      "V2-U01-IP01",
+      "V2-U01-IP02",
+      "V2-U01-NI01",
+      "V2-U01-CN02",
+      "V2-U02-D01",
+      "V2-U02-NV01",
+      "V2-U02-IP01",
+      "V2-U03-D01",
+      "V2-U03-D02",
+      "V2-U03-NV02",
+      "V2-U03-IP02",
+      "V2-U03-CN01",
+      "V2-U03-CN02",
+      "V2-U04-NV01",
+      "V2-U04-NV02",
+      "V2-U04-IP02",
+      "V2-U04-CN01"
+    ],
+    "regression": 2,
+    "regressionIds": [
+      "V2-U01-CN01",
+      "V2-U03-NV01"
+    ],
+    "rankImproved": 1,
+    "rankImprovedIds": [
+      "V2-U02-IP01"
+    ],
+    "newlyPassed": 0,
+    "newlyPassedIds": []
+  },
+  "negative": {
+    "baselineFalsePositive": 5,
+    "finalFalsePositive": 4,
+    "blocked": 1,
+    "remainingIds": [
+      "V2-U01-N01",
+      "V2-U03-N01",
+      "V2-U04-N01",
+      "V2-U04-N02"
+    ],
+    "details": [
+      {
+        "id": "V2-U01-N01",
+        "status": "REMAINING",
+        "finalSupportResults": 1
+      },
+      {
+        "id": "V2-U01-N03",
+        "status": "BLOCKED",
+        "finalSupportResults": 0
+      },
+      {
+        "id": "V2-U03-N01",
+        "status": "REMAINING",
+        "finalSupportResults": 1
+      },
+      {
+        "id": "V2-U04-N01",
+        "status": "REMAINING",
+        "finalSupportResults": 1
+      },
+      {
+        "id": "V2-U04-N02",
+        "status": "REMAINING",
+        "finalSupportResults": 1
+      }
+    ]
+  },
+  "unresolved": {
+    "candidateCount": 14,
+    "affectedOriginalResultCount": 3,
+    "affectedOriginalResults": [
+      {
+        "queryId": "V2-U01-N03",
+        "originalRank": 1
+      },
+      {
+        "queryId": "V2-U02-NI01",
+        "originalRank": 1
+      },
+      {
+        "queryId": "V2-U03-NI01",
+        "originalRank": 1
+      }
+    ],
+    "affectedQueryIds": [
+      "V2-U01-N03",
+      "V2-U02-NI01",
+      "V2-U03-NI01"
+    ],
+    "positiveCorrectEvidenceRemoved": [],
+    "positiveRegressionCausedCount": 0,
+    "positiveRegressionCausedIds": [],
+    "negativeFalsePositiveBlockedCount": 1,
+    "negativeFalsePositiveBlockedIds": [
+      "V2-U01-N03"
+    ]
+  },
+  "filter": {
+    "originalResults": 86,
+    "support": 59,
+    "nonSupport": 27,
+    "newEvidenceCreated": 0
+  },
+  "actorAttributionObservation": {
+    "knownComponentLimitation": "F21",
+    "remainingP7FalsePositiveEvidence": [
+      {
+        "queryId": "V2-U01-N01",
+        "candidateId": "V2-U01-N01#r1#w2",
+        "hypothesis": "Solace PubSub+를 QuarryFlow의 실제 메시지 인프라로 전환했다.",
+        "premise": "subscription filter는 depot code와 material class를 기준으로 구성했다.\n이 방식으로 각 worker는 자신이 담당하는 거점·자재 메시지만 받았고, 새로운 거점 추가 때 API 배포가 필요하지 않았다.\nSolace PubSub+도 후보로 비교했다.",
+        "groundedEvidence": [
+          {
+            "id": "S3",
+            "text": "Solace PubSub+도 후보로 비교했다."
+          }
+        ]
+      },
+      {
+        "queryId": "V2-U03-N01",
+        "candidateId": "V2-U03-N01#r1#w2",
+        "hypothesis": "현재 ACTIVE 경력에서 etcd lease로 RailPulse 제어기 선출을 운영했다.",
+        "premise": "[HISTORICAL VERSION]\n초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다.",
+        "groundedEvidence": [
+          {
+            "id": "S2",
+            "text": "초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다."
+          }
+        ]
+      },
+      {
+        "queryId": "V2-U04-N01",
+        "candidateId": "V2-U04-N01#r1#w4",
+        "hypothesis": "ScoreRights의 production 검색을 Typesense로 운영했다.",
+        "premise": "ScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체\n이 문서는 가상의 음악 권리 관리 제품을 설명하는 평가 자산이다.",
+        "groundedEvidence": [
+          {
+            "id": "S1",
+            "text": "ScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체"
+          }
+        ]
+      },
+      {
+        "queryId": "V2-U04-N02",
+        "candidateId": "V2-U04-N02#r1#w1",
+        "hypothesis": "저작권 정산 이력을 블록체인 원장에 기록하도록 구현했다.",
+        "premise": "블록체인 기반 정산\n원장은 제품 범위에 없었고 설계하거나 구현하지 않았다.",
+        "groundedEvidence": [
+          {
+            "id": "S1",
+            "text": "블록체인 기반 정산"
+          }
+        ]
+      }
+    ]
+  },
+  "evaluations": [
+    {
+      "id": "V2-U01-D01",
+      "userKey": "SYN2-U01",
+      "category": "DIRECT_EXPERIENCE",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 0,
+      "finalResultCount": 0,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": []
+    },
+    {
+      "id": "V2-U01-D02",
+      "userKey": "SYN2-U01",
+      "category": "DIRECT_EXPERIENCE",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 2,
+      "finalResultCount": 1,
+      "correctRank": 1,
+      "top1Correct": true,
+      "matchedAnchor": "SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 8,
+          "documentId": 2,
+          "documentVersionId": 3,
+          "score": 0.5477674432632881,
+          "distance": 0.4522325567367119,
+          "selectedCandidateId": "V2-U01-D02#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-NV01",
+      "userKey": "SYN2-U01",
+      "category": "NATURAL_VARIATION",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 4,
+      "finalResultCount": 4,
+      "correctRank": 1,
+      "top1Correct": true,
+      "matchedAnchor": "source_ticket_id가 있었다.",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 12,
+          "documentId": 3,
+          "documentVersionId": 4,
+          "score": 0.5910116921649388,
+          "distance": 0.40898830783506124,
+          "selectedCandidateId": "V2-U01-NV01#r1#w4",
+          "selectedCandidateRank": 4,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "transaction이 끝난 뒤 같은 callback이 다시 도착하면 이미 처리된 inbox row를 확인하고 성공 응답만 반환했다."
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 11,
+          "documentId": 3,
+          "documentVersionId": 4,
+          "score": 0.574446882340507,
+          "distance": 0.425553117659493,
+          "selectedCandidateId": "V2-U01-NV01#r2#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S3",
+              "text": "일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다."
+            }
+          ]
+        },
+        {
+          "finalRank": 3,
+          "originalRank": 3,
+          "chunkId": 13,
+          "documentId": 3,
+          "documentVersionId": 4,
+          "score": 0.5609108922151063,
+          "distance": 0.43908910778489374,
+          "selectedCandidateId": "V2-U01-NV01#r3#w3",
+          "selectedCandidateRank": 3,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "이 경험은 QuarryFlow의 계근 전표 정합성과는 다른 관측용 workload다."
+            }
+          ]
+        },
+        {
+          "finalRank": 4,
+          "originalRank": 4,
+          "chunkId": 7,
+          "documentId": 2,
+          "documentVersionId": 3,
+          "score": 0.5304461085264591,
+          "distance": 0.4695538914735409,
+          "selectedCandidateId": "V2-U01-NV01#r4#w2",
+          "selectedCandidateRank": 2,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "골재·아스콘 주문을 출하 거점에 배정하고 계근 완료 중량을 운송 전표로 확정하는 서비스의 API와 비동기 처리 경로를 담당했다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-NV02",
+      "userKey": "SYN2-U01",
+      "category": "NATURAL_VARIATION",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 2,
+      "finalResultCount": 2,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 13,
+          "documentId": 3,
+          "documentVersionId": 4,
+          "score": 0.5466070660097481,
+          "distance": 0.45339293399025193,
+          "selectedCandidateId": "V2-U01-NV02#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "topic filter는 격리와 확장에 도움을 줬지만, 중복 방지의 근거는 source_ticket_id와 owner 거점이 결합된 DB 제약이었다."
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 8,
+          "documentId": 2,
+          "documentVersionId": 3,
+          "score": 0.547112117422556,
+          "distance": 0.45288788257744395,
+          "selectedCandidateId": "V2-U01-NV02#r2#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "• depot code와 material class subscription filter로 거점·자재별 worker 격리"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-IP01",
+      "userKey": "SYN2-U01",
+      "category": "INDIRECT_PROBLEM",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 4,
+      "finalResultCount": 2,
+      "correctRank": 1,
+      "top1Correct": true,
+      "matchedAnchor": "장비별 circuit breaker와 짧은 timeout을 적용",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 12,
+          "documentId": 3,
+          "documentVersionId": 4,
+          "score": 0.5905039526233729,
+          "distance": 0.40949604737662715,
+          "selectedCandidateId": "V2-U01-IP01#r1#w2",
+          "selectedCandidateRank": 2,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "계근 제어기가 응답하지 않을 때 매 요청이 timeout까지 기다리면 API thread가 고갈됐다."
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 11,
+          "documentId": 3,
+          "documentVersionId": 4,
+          "score": 0.5274820707685051,
+          "distance": 0.47251792923149494,
+          "selectedCandidateId": "V2-U01-IP01#r2#w2",
+          "selectedCandidateRank": 2,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-IP02",
+      "userKey": "SYN2-U01",
+      "category": "INDIRECT_PROBLEM",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 4,
+      "finalResultCount": 3,
+      "correctRank": 2,
+      "top1Correct": false,
+      "matchedAnchor": "72시간 통신 단절을 모사해 46,200개 callback을 순서를 섞어 재생했다.",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 8,
+          "documentId": 2,
+          "documentVersionId": 3,
+          "score": 0.6213877814351347,
+          "distance": 0.37861221856486527,
+          "selectedCandidateId": "V2-U01-IP02#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "duplicate shipment가 0건이었고 운영 DB row를 수동 수정하지 않았다."
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 13,
+          "documentId": 3,
+          "documentVersionId": 4,
+          "score": 0.5831078341281919,
+          "distance": 0.4168921658718081,
+          "selectedCandidateId": "V2-U01-IP02#r2#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "72시간 통신 단절을 모사해 46,200개 callback을 순서를 섞어 재생했다."
+            },
+            {
+              "id": "S3",
+              "text": "운영자는 DB row를 수동 수정하지 않았고 replay dashboard에서 거점별 처리량과 거절 사유만 확인했다."
+            }
+          ]
+        },
+        {
+          "finalRank": 3,
+          "originalRank": 4,
+          "chunkId": 11,
+          "documentId": 3,
+          "documentVersionId": 4,
+          "score": 0.5098749095276134,
+          "distance": 0.4901250904723866,
+          "selectedCandidateId": "V2-U01-IP02#r4#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "일부 계근 제어기는 통신이 끊기면 완료 callback을 로컬에 저장했다가 연결이 회복된 뒤 여러 번 전송했다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-NI01",
+      "userKey": "SYN2-U01",
+      "category": "NUMERIC_IDENTIFIER",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 1,
+      "finalResultCount": 1,
+      "correctRank": 1,
+      "top1Correct": true,
+      "matchedAnchor": "견적 API P95를 1.4초에서 380밀리초로 낮췄다.",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 8,
+          "documentId": 2,
+          "documentVersionId": 3,
+          "score": 0.6135086607306417,
+          "distance": 0.3864913392693583,
+          "selectedCandidateId": "V2-U01-NI01#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "동일 부하 replay에서 견적 API P95를 1.4초에서 380밀리초로 낮췄다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-CN01",
+      "userKey": "SYN2-U01",
+      "category": "COMPLEX_NATURAL_LANGUAGE",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 3,
+      "finalResultCount": 2,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 13,
+          "documentId": 3,
+          "documentVersionId": 4,
+          "score": 0.5540323990486873,
+          "distance": 0.4459676009513127,
+          "selectedCandidateId": "V2-U01-CN01#r1#w2",
+          "selectedCandidateRank": 2,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "topic filter는 격리와 확장에 도움을 줬지만, 중복 방지의 근거는 source_ticket_id와 owner 거점이 결합된 DB 제약이었다."
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 8,
+          "documentId": 2,
+          "documentVersionId": 3,
+          "score": 0.5406731173166823,
+          "distance": 0.45932688268331767,
+          "selectedCandidateId": "V2-U01-CN01#r2#w4",
+          "selectedCandidateRank": 4,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "• depot code와 material class subscription filter로 거점·자재별 worker 격리"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-CN02",
+      "userKey": "SYN2-U01",
+      "category": "COMPLEX_NATURAL_LANGUAGE",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 3,
+      "finalResultCount": 2,
+      "correctRank": 2,
+      "top1Correct": false,
+      "matchedAnchor": "특정 전표가 만들어진 시점의 규칙을 재구성",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 8,
+          "documentId": 2,
+          "documentVersionId": 3,
+          "score": 0.5279616894882063,
+          "distance": 0.4720383105117937,
+          "selectedCandidateId": "V2-U01-CN02#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "• SQL Server system-versioned table로 가격 규칙의 변경 전후와 적용 시점 보존"
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 12,
+          "documentId": 3,
+          "documentVersionId": 4,
+          "score": 0.5205328750292743,
+          "distance": 0.47946712497072574,
+          "selectedCandidateId": "V2-U01-CN02#r2#w2",
+          "selectedCandidateRank": 2,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "운임과 자재 단가는 적용 날짜, 고객 등급, 운송 거리로 결정됐다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-N01",
+      "userKey": "SYN2-U01",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "expectedLabel": "NONE",
+      "originalResultCount": 1,
+      "finalResultCount": 1,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": true,
+      "passed": false,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 11,
+          "documentId": 3,
+          "documentVersionId": 4,
+          "score": 0.5314504541695659,
+          "distance": 0.46854954583043407,
+          "selectedCandidateId": "V2-U01-N01#r1#w2",
+          "selectedCandidateRank": 2,
+          "verificationEvidence": [
+            {
+              "id": "S3",
+              "text": "Solace PubSub+도 후보로 비교했다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U01-N02",
+      "userKey": "SYN2-U01",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "expectedLabel": "NONE",
+      "originalResultCount": 0,
+      "finalResultCount": 0,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": []
+    },
+    {
+      "id": "V2-U01-N03",
+      "userKey": "SYN2-U01",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "expectedLabel": "NONE",
+      "originalResultCount": 1,
+      "finalResultCount": 0,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": []
+    },
+    {
+      "id": "V2-U02-D01",
+      "userKey": "SYN2-U02",
+      "category": "DIRECT_EXPERIENCE",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 2,
+      "finalResultCount": 2,
+      "correctRank": 2,
+      "top1Correct": false,
+      "matchedAnchor": "FastAPI manifest endpoint에서 scene_id, revision, orbit, checksum, object URI 검증",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 19,
+          "documentId": 5,
+          "documentVersionId": 6,
+          "score": 0.5813113104515579,
+          "distance": 0.4186886895484421,
+          "selectedCandidateId": "V2-U02-D01#r1#w4",
+          "selectedCandidateRank": 4,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "OrbitMosaic: 위성 영상 배치의 대기, 품질 격리, 재처리"
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 15,
+          "documentId": 4,
+          "documentVersionId": 5,
+          "score": 0.5717926366205605,
+          "distance": 0.42820736337943954,
+          "selectedCandidateId": "V2-U02-D01#r2#w2",
+          "selectedCandidateRank": 2,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "• FastAPI manifest endpoint에서 scene_id, revision, orbit, checksum, object URI 검증"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-D02",
+      "userKey": "SYN2-U02",
+      "category": "DIRECT_EXPERIENCE",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 2,
+      "finalResultCount": 2,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 18,
+          "documentId": 4,
+          "documentVersionId": 5,
+          "score": 0.5929965397725976,
+          "distance": 0.4070034602274024,
+          "selectedCandidateId": "V2-U02-D02#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "Python · FastAPI · Pytest · Airflow · Spark SQL · Delta Lake를 중심으로 작업했다."
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 20,
+          "documentId": 5,
+          "documentVersionId": 6,
+          "score": 0.5221976558455416,
+          "distance": 0.47780234415445844,
+          "selectedCandidateId": "V2-U02-D02#r2#w3",
+          "selectedCandidateRank": 3,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "acquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-NV01",
+      "userKey": "SYN2-U02",
+      "category": "NATURAL_VARIATION",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 2,
+      "finalResultCount": 1,
+      "correctRank": 1,
+      "top1Correct": true,
+      "matchedAnchor": "deferrable operator로 바꿔 object-ready event가 올 때까지 triggerer가 기다리게 했다.",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 19,
+          "documentId": 5,
+          "documentVersionId": 6,
+          "score": 0.5384254409759749,
+          "distance": 0.4615745590240251,
+          "selectedCandidateId": "V2-U02-NV01#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "계산 worker는 파일이 준비된 작업에만 사용됐다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-NV02",
+      "userKey": "SYN2-U02",
+      "category": "NATURAL_VARIATION",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 1,
+      "finalResultCount": 1,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 16,
+          "documentId": 4,
+          "documentVersionId": 5,
+          "score": 0.5199358725662543,
+          "distance": 0.4800641274337457,
+          "selectedCandidateId": "V2-U02-NV02#r1#w2",
+          "selectedCandidateRank": 2,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "모자이크와 공개 catalog에 들어가지 못하며 재전송 ticket을 추적했다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-IP01",
+      "userKey": "SYN2-U02",
+      "category": "INDIRECT_PROBLEM",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 3,
+      "finalResultCount": 1,
+      "correctRank": 1,
+      "top1Correct": true,
+      "matchedAnchor": "partition 크기가 크게 달랐다.",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 2,
+          "chunkId": 20,
+          "documentId": 5,
+          "documentVersionId": 6,
+          "score": 0.5510717265092938,
+          "distance": 0.4489282734907062,
+          "selectedCandidateId": "V2-U02-IP01#r2#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "acquisition_date와 orbit을 1차 partition으로 두고 Spark adaptive query execution으로 skew partition을 다시 나눴다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-IP02",
+      "userKey": "SYN2-U02",
+      "category": "INDIRECT_PROBLEM",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 1,
+      "finalResultCount": 0,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": []
+    },
+    {
+      "id": "V2-U02-NI01",
+      "userKey": "SYN2-U02",
+      "category": "NUMERIC_IDENTIFIER",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 1,
+      "finalResultCount": 0,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": []
+    },
+    {
+      "id": "V2-U02-CN01",
+      "userKey": "SYN2-U02",
+      "category": "COMPLEX_NATURAL_LANGUAGE",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 1,
+      "finalResultCount": 1,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 15,
+          "documentId": 4,
+          "documentVersionId": 5,
+          "score": 0.607563021052811,
+          "distance": 0.392436978947189,
+          "selectedCandidateId": "V2-U02-CN01#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "• Delta MERGE의 scene_id + revision key로 동일 revision 재전송 중복 차단"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U02-CN02",
+      "userKey": "SYN2-U02",
+      "category": "COMPLEX_NATURAL_LANGUAGE",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 0,
+      "finalResultCount": 0,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": []
+    },
+    {
+      "id": "V2-U02-N01",
+      "userKey": "SYN2-U02",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "expectedLabel": "NONE",
+      "originalResultCount": 0,
+      "finalResultCount": 0,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": []
+    },
+    {
+      "id": "V2-U02-N02",
+      "userKey": "SYN2-U02",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "expectedLabel": "NONE",
+      "originalResultCount": 0,
+      "finalResultCount": 0,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": []
+    },
+    {
+      "id": "V2-U02-N03",
+      "userKey": "SYN2-U02",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "expectedLabel": "NONE",
+      "originalResultCount": 0,
+      "finalResultCount": 0,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": []
+    },
+    {
+      "id": "V2-U03-D01",
+      "userKey": "SYN2-U03",
+      "category": "DIRECT_EXPERIENCE",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 4,
+      "finalResultCount": 2,
+      "correctRank": 2,
+      "top1Correct": false,
+      "matchedAnchor": "route permit control plane을 Go로 개발했다.",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 22,
+          "documentId": 6,
+          "documentVersionId": 7,
+          "score": 0.5593671627286645,
+          "distance": 0.4406328372713355,
+          "selectedCandidateId": "V2-U03-D01#r1#w2",
+          "selectedCandidateRank": 2,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "Go control plane이 ConnectRPC로 route permit 요청을 받고, 각 요청을 NATS JetStream stream에 기록했다."
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 2,
+          "documentId": 1,
+          "documentVersionId": 2,
+          "score": 0.531343951866142,
+          "distance": 0.46865604813385797,
+          "selectedCandidateId": "V2-U03-D01#r2#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "interlocking simulator의 route permit control plane을 Go로 개발했다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-D02",
+      "userKey": "SYN2-U03",
+      "category": "DIRECT_EXPERIENCE",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 3,
+      "finalResultCount": 2,
+      "correctRank": 1,
+      "top1Correct": true,
+      "matchedAnchor": "JetStream pull consumer와 max ack pending",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 3,
+          "documentId": 1,
+          "documentVersionId": 2,
+          "score": 0.593786709945206,
+          "distance": 0.406213290054794,
+          "selectedCandidateId": "V2-U03-D02#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "• JetStream pull consumer와 max ack pending으로 느린 zone 격리"
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 3,
+          "chunkId": 24,
+          "documentId": 6,
+          "documentVersionId": 7,
+          "score": 0.5210031321056241,
+          "distance": 0.4789968678943759,
+          "selectedCandidateId": "V2-U03-D02#r3#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "핵심은 leader 선출 자체가 아니라 오래된 leader의 명령을 소비자가 식별할 수 있게 한 점이었다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-NV01",
+      "userKey": "SYN2-U03",
+      "category": "NATURAL_VARIATION",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 4,
+      "finalResultCount": 1,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 4,
+          "chunkId": 23,
+          "documentId": 6,
+          "documentVersionId": 7,
+          "score": 0.5050555762615465,
+          "distance": 0.4949444237384535,
+          "selectedCandidateId": "V2-U03-NV01#r4#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-NV02",
+      "userKey": "SYN2-U03",
+      "category": "NATURAL_VARIATION",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 2,
+      "finalResultCount": 2,
+      "correctRank": 1,
+      "top1Correct": true,
+      "matchedAnchor": "SQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다.",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 23,
+          "documentId": 6,
+          "documentVersionId": 7,
+          "score": 0.5441533537642878,
+          "distance": 0.45584664623571225,
+          "selectedCandidateId": "V2-U03-NV02#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "SQLSTATE 40001 충돌은 decorrelated jitter를 적용해 최대 4회만 재시도했다."
+            },
+            {
+              "id": "S2",
+              "text": "retry 한도를 넘으면 새 permit을 만들지 않고 호출자에게 재요청 가능한 오류를 반환했다."
+            },
+            {
+              "id": "S3",
+              "text": "무한 재시도로 지연을 숨기지 않았다."
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 3,
+          "documentId": 1,
+          "documentVersionId": 2,
+          "score": 0.5160818330464629,
+          "distance": 0.48391816695353707,
+          "selectedCandidateId": "V2-U03-NV02#r2#w4",
+          "selectedCandidateRank": 4,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "network-partition scenario의 conflicting route permit은 0건이었다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-IP01",
+      "userKey": "SYN2-U03",
+      "category": "INDIRECT_PROBLEM",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 2,
+      "finalResultCount": 0,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": []
+    },
+    {
+      "id": "V2-U03-IP02",
+      "userKey": "SYN2-U03",
+      "category": "INDIRECT_PROBLEM",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 3,
+      "finalResultCount": 2,
+      "correctRank": 2,
+      "top1Correct": false,
+      "matchedAnchor": "420개 network-partition scenario",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 22,
+          "documentId": 6,
+          "documentVersionId": 7,
+          "score": 0.5584692873911592,
+          "distance": 0.4415307126088408,
+          "selectedCandidateId": "V2-U03-IP02#r1#w4",
+          "selectedCandidateRank": 4,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험"
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 23,
+          "documentId": 6,
+          "documentVersionId": 7,
+          "score": 0.5388263717126249,
+          "distance": 0.46117362828737507,
+          "selectedCandidateId": "V2-U03-IP02#r2#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S3",
+              "text": "독립적으로 만든 420개 network-partition scenario에서 서로 충돌하는 route permit은 0건이었다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-NI01",
+      "userKey": "SYN2-U03",
+      "category": "NUMERIC_IDENTIFIER",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 1,
+      "finalResultCount": 0,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": []
+    },
+    {
+      "id": "V2-U03-CN01",
+      "userKey": "SYN2-U03",
+      "category": "COMPLEX_NATURAL_LANGUAGE",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 4,
+      "finalResultCount": 4,
+      "correctRank": 2,
+      "top1Correct": false,
+      "matchedAnchor": "permit_epoch가 포함됐다.",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 24,
+          "documentId": 6,
+          "documentVersionId": 7,
+          "score": 0.5447707445304625,
+          "distance": 0.4552292554695375,
+          "selectedCandidateId": "V2-U03-CN01#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "핵심은 leader 선출 자체가 아니라 오래된 leader의 명령을 소비자가 식별할 수 있게 한 점이었다."
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 22,
+          "documentId": 6,
+          "documentVersionId": 7,
+          "score": 0.5476278130536633,
+          "distance": 0.45237218694633674,
+          "selectedCandidateId": "V2-U03-CN01#r2#w4",
+          "selectedCandidateRank": 4,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "같은 명령의 두 번째 전달은 상태 전이를 만들지 않고 이전 결과를 돌려줬다."
+            }
+          ]
+        },
+        {
+          "finalRank": 3,
+          "originalRank": 3,
+          "chunkId": 3,
+          "documentId": 1,
+          "documentVersionId": 2,
+          "score": 0.5416986395953474,
+          "distance": 0.45830136040465264,
+          "selectedCandidateId": "V2-U03-CN01#r3#w2",
+          "selectedCandidateRank": 2,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "• simulator가 마지막 수락 epoch보다 오래된 permit을 거절하도록 구현"
+            }
+          ]
+        },
+        {
+          "finalRank": 4,
+          "originalRank": 4,
+          "chunkId": 23,
+          "documentId": 6,
+          "documentVersionId": 7,
+          "score": 0.5150728686219059,
+          "distance": 0.48492713137809407,
+          "selectedCandidateId": "V2-U03-CN01#r4#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "운행표와 simulator 설정은 Ed25519로 서명한 timetable package로 배포했다."
+            },
+            {
+              "id": "S2",
+              "text": "node는 서명과 package sequence를 모두 확인하고, 이전 sequence이거나 서명이 틀린 파일을 거절했다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-CN02",
+      "userKey": "SYN2-U03",
+      "category": "COMPLEX_NATURAL_LANGUAGE",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 2,
+      "finalResultCount": 2,
+      "correctRank": 1,
+      "top1Correct": true,
+      "matchedAnchor": "command_id unique key를 먼저 확인했다.",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 22,
+          "documentId": 6,
+          "documentVersionId": 7,
+          "score": 0.5218941984801249,
+          "distance": 0.47810580151987514,
+          "selectedCandidateId": "V2-U03-CN02#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "같은 명령의 두 번째 전달은 상태 전이를 만들지 않고 이전 결과를 돌려줬다."
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 3,
+          "documentId": 1,
+          "documentVersionId": 2,
+          "score": 0.5402272874591116,
+          "distance": 0.45977271254088836,
+          "selectedCandidateId": "V2-U03-CN02#r2#w3",
+          "selectedCandidateRank": 3,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "• command_id unique ledger로 ack wait 이후 재전달 멱등 처리"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-N01",
+      "userKey": "SYN2-U03",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "expectedLabel": "NONE",
+      "originalResultCount": 1,
+      "finalResultCount": 1,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": true,
+      "passed": false,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 23,
+          "documentId": 6,
+          "documentVersionId": 7,
+          "score": 0.5761233134049305,
+          "distance": 0.4238766865950695,
+          "selectedCandidateId": "V2-U03-N01#r1#w2",
+          "selectedCandidateRank": 2,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "초기 resume v0에는 controller election을 etcd lease로 구현한 prototype이 기록돼 있었다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U03-N02",
+      "userKey": "SYN2-U03",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "expectedLabel": "NONE",
+      "originalResultCount": 0,
+      "finalResultCount": 0,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": []
+    },
+    {
+      "id": "V2-U03-N03",
+      "userKey": "SYN2-U03",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "expectedLabel": "NONE",
+      "originalResultCount": 0,
+      "finalResultCount": 0,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": []
+    },
+    {
+      "id": "V2-U04-D01",
+      "userKey": "SYN2-U04",
+      "category": "DIRECT_EXPERIENCE",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 2,
+      "finalResultCount": 2,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 29,
+          "documentId": 8,
+          "documentVersionId": 9,
+          "score": 0.5983780021602092,
+          "distance": 0.4016219978397908,
+          "selectedCandidateId": "V2-U04-D01#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "ScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체"
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 28,
+          "documentId": 7,
+          "documentVersionId": 8,
+          "score": 0.5261406991985045,
+          "distance": 0.4738593008014955,
+          "selectedCandidateId": "V2-U04-D01#r2#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "Node.js · TypeScript · NestJS · Meilisearch · Cloudflare R2 · Cloudflare Queues를 중심으로 작업했다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-D02",
+      "userKey": "SYN2-U04",
+      "category": "DIRECT_EXPERIENCE",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 2,
+      "finalResultCount": 2,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 29,
+          "documentId": 8,
+          "documentVersionId": 9,
+          "score": 0.5347562951831301,
+          "distance": 0.46524370481686994,
+          "selectedCandidateId": "V2-U04-D02#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "2,300,000개 work record를 Meilisearch에 색인했다."
+            },
+            {
+              "id": "S2",
+              "text": "권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다."
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 30,
+          "documentId": 8,
+          "documentVersionId": 9,
+          "score": 0.5285888033264396,
+          "distance": 0.47141119667356035,
+          "selectedCandidateId": "V2-U04-D02#r2#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "2,300,000개 work record를 Meilisearch에 색인했다."
+            },
+            {
+              "id": "S2",
+              "text": "권리자 이름, 작품명, ISWC prefix, territory를 filterable attribute로 구분했다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-NV01",
+      "userKey": "SYN2-U04",
+      "category": "NATURAL_VARIATION",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 2,
+      "finalResultCount": 2,
+      "correctRank": 1,
+      "top1Correct": true,
+      "matchedAnchor": "upload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다.",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 29,
+          "documentId": 8,
+          "documentVersionId": 9,
+          "score": 0.5505688233977228,
+          "distance": 0.44943117660227716,
+          "selectedCandidateId": "V2-U04-NV01#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "upload content hash가 이미 존재하면 OCR과 metadata extraction job을 새로 만들지 않았다."
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 26,
+          "documentId": 7,
+          "documentVersionId": 8,
+          "score": 0.520750507094003,
+          "distance": 0.47924949290599705,
+          "selectedCandidateId": "V2-U04-NV01#r2#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "• content hash 중복이면 OCR·metadata extraction job 생성을 생략"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-NV02",
+      "userKey": "SYN2-U04",
+      "category": "NATURAL_VARIATION",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 2,
+      "finalResultCount": 2,
+      "correctRank": 1,
+      "top1Correct": true,
+      "matchedAnchor": "별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다.",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 30,
+          "documentId": 8,
+          "documentVersionId": 9,
+          "score": 0.5394497976392822,
+          "distance": 0.46055020236071775,
+          "selectedCandidateId": "V2-U04-NV02#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "새 schema는 `rights-2025-05`, `rights-2025-08`처럼 별도 index로 만들고 sample query 검증 뒤 alias를 원자적으로 교체했다."
+            },
+            {
+              "id": "S2",
+              "text": "색인 구축 중에도 기존 index가 요청을 처리했다."
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 26,
+          "documentId": 7,
+          "documentVersionId": 8,
+          "score": 0.5382546620478488,
+          "distance": 0.4617453379521512,
+          "selectedCandidateId": "V2-U04-NV02#r2#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "• index build 동안 기존 alias가 요청 처리"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-IP01",
+      "userKey": "SYN2-U04",
+      "category": "INDIRECT_PROBLEM",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 0,
+      "finalResultCount": 0,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": []
+    },
+    {
+      "id": "V2-U04-IP02",
+      "userKey": "SYN2-U04",
+      "category": "INDIRECT_PROBLEM",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 1,
+      "finalResultCount": 1,
+      "correctRank": 1,
+      "top1Correct": true,
+      "matchedAnchor": "식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다.",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 29,
+          "documentId": 8,
+          "documentVersionId": 9,
+          "score": 0.5368720264909548,
+          "distance": 0.4631279735090452,
+          "selectedCandidateId": "V2-U04-IP02#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S3",
+              "text": "식별자가 없는 오래된 자료는 자동 병합하지 않고 review queue로 보냈다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-NI01",
+      "userKey": "SYN2-U04",
+      "category": "NUMERIC_IDENTIFIER",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 1,
+      "finalResultCount": 1,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 30,
+          "documentId": 8,
+          "documentVersionId": 9,
+          "score": 0.5593415023858848,
+          "distance": 0.44065849761411524,
+          "selectedCandidateId": "V2-U04-NI01#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "동일 20-query replay에서 검색 P95는 1.6초에서 240밀리초로 낮아졌다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-CN01",
+      "userKey": "SYN2-U04",
+      "category": "COMPLEX_NATURAL_LANGUAGE",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 4,
+      "finalResultCount": 3,
+      "correctRank": 1,
+      "top1Correct": true,
+      "matchedAnchor": "원본 object는 삭제하지 않았고",
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 29,
+          "documentId": 8,
+          "documentVersionId": 9,
+          "score": 0.546896945217531,
+          "distance": 0.45310305478246904,
+          "selectedCandidateId": "V2-U04-CN01#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S3",
+              "text": "원본 object는 삭제하지 않았고, 파싱 규칙이 바뀌면 같은 원본에서 새 extraction version을 만들었다."
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 26,
+          "documentId": 7,
+          "documentVersionId": 8,
+          "score": 0.5444388876353993,
+          "distance": 0.45556111236460073,
+          "selectedCandidateId": "V2-U04-CN01#r2#w2",
+          "selectedCandidateRank": 2,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "검증 뒤 alias를 원자적으로 교체했다."
+            }
+          ]
+        },
+        {
+          "finalRank": 3,
+          "originalRank": 3,
+          "chunkId": 31,
+          "documentId": 8,
+          "documentVersionId": 9,
+          "score": 0.512732088565841,
+          "distance": 0.48726791143415904,
+          "selectedCandidateId": "V2-U04-CN01#r3#w2",
+          "selectedCandidateRank": 2,
+          "verificationEvidence": [
+            {
+              "id": "S2",
+              "text": "검색 속도보다 먼저 원본, 파생 extraction, 검색 index, conflict 상태의 버전을 분리해야 했다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-CN02",
+      "userKey": "SYN2-U04",
+      "category": "COMPLEX_NATURAL_LANGUAGE",
+      "polarity": "POSITIVE",
+      "expectedLabel": "EVIDENCE",
+      "originalResultCount": 3,
+      "finalResultCount": 2,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": false,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 30,
+          "documentId": 8,
+          "documentVersionId": 9,
+          "score": 0.5443824691886642,
+          "distance": 0.4556175308113358,
+          "selectedCandidateId": "V2-U04-CN02#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S3",
+              "text": "export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는"
+            }
+          ]
+        },
+        {
+          "finalRank": 2,
+          "originalRank": 2,
+          "chunkId": 31,
+          "documentId": 8,
+          "documentVersionId": 9,
+          "score": 0.5397408264180257,
+          "distance": 0.4602591735819743,
+          "selectedCandidateId": "V2-U04-CN02#r2#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S3",
+              "text": "export는 catalog snapshot id를 기록해 어느 권리 상태로 계산했는지 재현 가능하게 했다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-N01",
+      "userKey": "SYN2-U04",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "expectedLabel": "NONE",
+      "originalResultCount": 2,
+      "finalResultCount": 1,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": true,
+      "passed": false,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 29,
+          "documentId": 8,
+          "documentVersionId": 9,
+          "score": 0.5586632709914252,
+          "distance": 0.4413367290085748,
+          "selectedCandidateId": "V2-U04-N01#r1#w4",
+          "selectedCandidateRank": 4,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "ScoreRights Catalog: 저작권 자료 수집과 검색 인덱스 교체"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-N02",
+      "userKey": "SYN2-U04",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "expectedLabel": "NONE",
+      "originalResultCount": 3,
+      "finalResultCount": 1,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": true,
+      "passed": false,
+      "retainedOriginalResults": [
+        {
+          "finalRank": 1,
+          "originalRank": 1,
+          "chunkId": 28,
+          "documentId": 7,
+          "documentVersionId": 8,
+          "score": 0.5239962779284747,
+          "distance": 0.4760037220715253,
+          "selectedCandidateId": "V2-U04-N02#r1#w1",
+          "selectedCandidateRank": 1,
+          "verificationEvidence": [
+            {
+              "id": "S1",
+              "text": "블록체인 기반 정산"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V2-U04-N03",
+      "userKey": "SYN2-U04",
+      "category": "NEGATIVE",
+      "polarity": "NEGATIVE",
+      "expectedLabel": "NONE",
+      "originalResultCount": 0,
+      "finalResultCount": 0,
+      "correctRank": null,
+      "top1Correct": false,
+      "matchedAnchor": null,
+      "falsePositive": false,
+      "passed": true,
+      "retainedOriginalResults": []
+    }
+  ],
+  "gate": {
+    "checks": {
+      "negativeFprAtMostOneOfTwelve": {
+        "passed": false,
+        "actual": "4/12"
+      },
+      "top1AtLeastBaseline": {
+        "passed": true,
+        "actual": 0.3611111111111111,
+        "required": 0.3333333333333333
+      },
+      "recallAt5AtLeastBaseline": {
+        "passed": false,
+        "actual": 0.5277777777777778,
+        "required": 0.5833333333333334
+      },
+      "positiveRegressionAtMostOne": {
+        "passed": false,
+        "actual": 2
+      },
+      "newEvidenceZero": {
+        "passed": true,
+        "actual": 0
+      }
+    },
+    "allPassed": false
+  },
+  "final": "P7_FULL_VERIFICATION_SHADOW_FAIL",
+  "next": "STOP_AND_REASSESS"
+}

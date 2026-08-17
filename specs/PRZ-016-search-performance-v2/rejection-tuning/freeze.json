@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-rejection-tuning",
+  "status": "FROZEN_PRE_SEARCH",
+  "datasetSha256": "342c5355f7256fc56430805dd91571bfc8be0fedcd6dcad90c563e6efcca2114",
+  "snippetCount": 24,
+  "questionCount": 24,
+  "positiveCount": 8,
+  "negativeCount": 16,
+  "negativeTypes": {
+    "EXPLICIT_DENIAL": 4,
+    "COMPARISON_NOT_ADOPTED": 3,
+    "PLAN_ONLY": 3,
+    "PAST_PROTOTYPE": 3,
+    "NUMERIC_NEAR_MISS": 3
+  },
+  "p7bNormalizedQuestionDuplicates": 0,
+  "productionSearch": {
+    "fileCount": 30,
+    "aggregateSha256": "32d8e31d7f5eeb3bf64033ce2b9db7c58347cbfe3d6f540b792e44c04951df31"
+  },
+  "immutabilityRule": "Do not modify the dataset, questions, answer anchors, or production search source after this freeze. Execute the baseline once only."
+}

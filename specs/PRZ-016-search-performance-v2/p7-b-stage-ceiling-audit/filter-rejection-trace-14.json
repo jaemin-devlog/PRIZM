@@ -1,0 +1,848 @@
+{
+  "schemaVersion" : 1,
+  "phase" : "PRZ-016-P7-B-FILTER-REJECTION-REASON-TRACE",
+  "executedAt" : "2026-08-16T22:12:25.775873600Z",
+  "sourceHead" : "4a5c5b6bbd3cfd06f1313dee09e6695fdd68179e",
+  "sourceStageTraceSha256" : "e334a88d54678ded5233a87021de262f0ee823a8f18b60b8256cbeb5f0d64dba",
+  "total" : 14,
+  "traced" : 14,
+  "unknown" : 0,
+  "productionOrder" : [ "STRONG_IDENTIFIER_EVIDENCE_GUARD", "SOURCE_LOCATION_CONSOLIDATION", "COMPOSITE_PROFILE_REJECTION_REASONS", "QUERY_EVIDENCE_CONSOLIDATION", "GENERAL_RANKING_TOP5", "DIRECT_ANCHOR_FILTER", "CONTEXTUAL_NUMERIC_FILTER", "EXACT_PRESENTATION_CONTENT_DEDUPLICATION" ],
+  "primaryRejectionCount" : {
+    "DENSE_SCORE_BELOW_TUNING_FLOOR" : 7,
+    "NEGATED_CLAIM" : 2,
+    "SOURCE_LOCATION_CONSOLIDATION" : 1,
+    "QUERY_EVIDENCE_CONSOLIDATION" : 4
+  },
+  "dominantFilter" : "DENSE_SCORE_BELOW_TUNING_FLOOR",
+  "safety" : {
+    "knownNegativeFailure" : "NOT_CONFIRMED",
+    "evidence" : "P0 F06 GraphQL false positive scored 0.5312 and already passed the 0.50 floor; it is not evidence that the floor blocked that failure.",
+    "simpleRemovalSafety" : "UNKNOWN"
+  },
+  "queries" : [ {
+    "id" : "V2-U01-D01",
+    "query" : "여러 출하 거점의 건설 자재 배차와 계근 전표를 처리하는 서비스를 맡아 본 이력이 있어?",
+    "acceptableCorrectChunkIds" : [ 7 ],
+    "tracedCorrectChunkId" : 7,
+    "preFilterRank" : 2,
+    "score" : 0.4767159410553239,
+    "distance" : 0.5232840589446761,
+    "filters" : [ {
+      "name" : "STRONG_IDENTIFIER_EVIDENCE_GUARD",
+      "input" : {
+        "guardedIdentifiers" : [ ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "NO_GUARDED_IDENTIFIERS"
+    }, {
+      "name" : "SOURCE_LOCATION_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 7,
+        "memberChunkIds" : [ 7, 8 ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "RETAINED_AS_SOURCE_LOCATION_REPRESENTATIVE"
+    }, {
+      "name" : "COMPOSITE_PROFILE_REJECTION_REASONS",
+      "input" : {
+        "score" : 0.4767159410553239,
+        "intent" : "GENERAL"
+      },
+      "decision" : "FAIL",
+      "actualReason" : "DENSE_SCORE_BELOW_TUNING_FLOOR"
+    }, {
+      "name" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "GENERAL_RANKING_TOP5",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "DIRECT_ANCHOR_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "CONTEXTUAL_NUMERIC_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "EXACT_PRESENTATION_CONTENT_DEDUPLICATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    } ],
+    "firstRejection" : "DENSE_SCORE_BELOW_TUNING_FLOOR"
+  }, {
+    "id" : "V2-U01-NV02",
+    "query" : "거점과 자재 종류에 따라 필요한 작업자만 배차 메시지를 받도록 나눈 경험이 있나요?",
+    "acceptableCorrectChunkIds" : [ 11 ],
+    "tracedCorrectChunkId" : 11,
+    "preFilterRank" : 1,
+    "score" : 0.5523216724395791,
+    "distance" : 0.4476783275604209,
+    "filters" : [ {
+      "name" : "STRONG_IDENTIFIER_EVIDENCE_GUARD",
+      "input" : {
+        "guardedIdentifiers" : [ ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "NO_GUARDED_IDENTIFIERS"
+    }, {
+      "name" : "SOURCE_LOCATION_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 11,
+        "memberChunkIds" : [ 11 ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "RETAINED_AS_SOURCE_LOCATION_REPRESENTATIVE"
+    }, {
+      "name" : "COMPOSITE_PROFILE_REJECTION_REASONS",
+      "input" : {
+        "score" : 0.5523216724395791,
+        "intent" : "GENERAL"
+      },
+      "decision" : "FAIL",
+      "actualReason" : "NEGATED_CLAIM"
+    }, {
+      "name" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "GENERAL_RANKING_TOP5",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "DIRECT_ANCHOR_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "CONTEXTUAL_NUMERIC_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "EXACT_PRESENTATION_CONTENT_DEDUPLICATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    } ],
+    "firstRejection" : "NEGATED_CLAIM"
+  }, {
+    "id" : "V2-U02-D02",
+    "query" : "Airflow로 조정하고 Spark로 계산하는 영상 데이터 파이프라인을 운영했어?",
+    "acceptableCorrectChunkIds" : [ 15 ],
+    "tracedCorrectChunkId" : 15,
+    "preFilterRank" : 3,
+    "score" : 0.5265159889152066,
+    "distance" : 0.47348401108479343,
+    "filters" : [ {
+      "name" : "STRONG_IDENTIFIER_EVIDENCE_GUARD",
+      "input" : {
+        "guardedIdentifiers" : [ "airflow", "spark" ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "ALL_ACTIVE_IDENTIFIERS_PRESENT"
+    }, {
+      "name" : "SOURCE_LOCATION_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 14,
+        "memberChunkIds" : [ 14, 15, 16 ]
+      },
+      "decision" : "FAIL",
+      "actualReason" : "REPLACED_BY_PREFERRED_REPRESENTATIVE:14"
+    }, {
+      "name" : "COMPOSITE_PROFILE_REJECTION_REASONS",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "GENERAL_RANKING_TOP5",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "DIRECT_ANCHOR_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "CONTEXTUAL_NUMERIC_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "EXACT_PRESENTATION_CONTENT_DEDUPLICATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    } ],
+    "firstRejection" : "SOURCE_LOCATION_CONSOLIDATION"
+  }, {
+    "id" : "V2-U02-NV02",
+    "query" : "같은 촬영 장면의 보정판과 단순 재전송을 구별해서 적재한 기준이 문서에 있나요?",
+    "acceptableCorrectChunkIds" : [ 20 ],
+    "tracedCorrectChunkId" : 20,
+    "preFilterRank" : 3,
+    "score" : 0.47164042156199715,
+    "distance" : 0.5283595784380029,
+    "filters" : [ {
+      "name" : "STRONG_IDENTIFIER_EVIDENCE_GUARD",
+      "input" : {
+        "guardedIdentifiers" : [ ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "NO_GUARDED_IDENTIFIERS"
+    }, {
+      "name" : "SOURCE_LOCATION_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 20,
+        "memberChunkIds" : [ 20 ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "RETAINED_AS_SOURCE_LOCATION_REPRESENTATIVE"
+    }, {
+      "name" : "COMPOSITE_PROFILE_REJECTION_REASONS",
+      "input" : {
+        "score" : 0.47164042156199715,
+        "intent" : "GENERAL"
+      },
+      "decision" : "FAIL",
+      "actualReason" : "DENSE_SCORE_BELOW_TUNING_FLOOR"
+    }, {
+      "name" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "GENERAL_RANKING_TOP5",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "DIRECT_ANCHOR_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "CONTEXTUAL_NUMERIC_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "EXACT_PRESENTATION_CONTENT_DEDUPLICATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    } ],
+    "firstRejection" : "DENSE_SCORE_BELOW_TUNING_FLOOR"
+  }, {
+    "id" : "V2-U02-IP02",
+    "query" : "깨진 위성 파일이 모자이크와 공개 목록에 섞이기 전에 차단한 경험이 있어?",
+    "acceptableCorrectChunkIds" : [ 20 ],
+    "tracedCorrectChunkId" : 20,
+    "preFilterRank" : 2,
+    "score" : 0.5559116203943462,
+    "distance" : 0.44408837960565384,
+    "filters" : [ {
+      "name" : "STRONG_IDENTIFIER_EVIDENCE_GUARD",
+      "input" : {
+        "guardedIdentifiers" : [ ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "NO_GUARDED_IDENTIFIERS"
+    }, {
+      "name" : "SOURCE_LOCATION_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 20,
+        "memberChunkIds" : [ 20 ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "RETAINED_AS_SOURCE_LOCATION_REPRESENTATIVE"
+    }, {
+      "name" : "COMPOSITE_PROFILE_REJECTION_REASONS",
+      "input" : {
+        "score" : 0.5559116203943462,
+        "intent" : "GENERAL"
+      },
+      "decision" : "FAIL",
+      "actualReason" : "NEGATED_CLAIM"
+    }, {
+      "name" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "GENERAL_RANKING_TOP5",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "DIRECT_ANCHOR_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "CONTEXTUAL_NUMERIC_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "EXACT_PRESENTATION_CONTENT_DEDUPLICATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    } ],
+    "firstRejection" : "NEGATED_CLAIM"
+  }, {
+    "id" : "V2-U02-NI01",
+    "query" : "하루 6.4TB 영상 처리를 138분에서 41분으로 단축했다는 근거가 있나요?",
+    "acceptableCorrectChunkIds" : [ 15 ],
+    "tracedCorrectChunkId" : 15,
+    "preFilterRank" : 2,
+    "score" : 0.5080286283561442,
+    "distance" : 0.49197137164385585,
+    "filters" : [ {
+      "name" : "STRONG_IDENTIFIER_EVIDENCE_GUARD",
+      "input" : {
+        "guardedIdentifiers" : [ ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "NO_GUARDED_IDENTIFIERS"
+    }, {
+      "name" : "SOURCE_LOCATION_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 15,
+        "memberChunkIds" : [ 15, 14, 16 ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "RETAINED_AS_SOURCE_LOCATION_REPRESENTATIVE"
+    }, {
+      "name" : "COMPOSITE_PROFILE_REJECTION_REASONS",
+      "input" : {
+        "score" : 0.5080286283561442,
+        "intent" : "GENERAL"
+      },
+      "decision" : "PASS",
+      "actualReason" : "NO_REJECTION_REASONS"
+    }, {
+      "name" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 20,
+        "memberChunkIds" : [ 20, 15 ]
+      },
+      "decision" : "FAIL",
+      "actualReason" : "REPLACED_BY_PREFERRED_REPRESENTATIVE:20"
+    }, {
+      "name" : "GENERAL_RANKING_TOP5",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "DIRECT_ANCHOR_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "CONTEXTUAL_NUMERIC_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "EXACT_PRESENTATION_CONTENT_DEDUPLICATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    } ],
+    "firstRejection" : "QUERY_EVIDENCE_CONSOLIDATION"
+  }, {
+    "id" : "V2-U02-CN01",
+    "query" : "960만 건의 과거 scene을 다시 넣으면서 중단 지점부터 이어가고 동일 revision 중복도 막은 방법을 보여줘.",
+    "acceptableCorrectChunkIds" : [ 20, 21 ],
+    "tracedCorrectChunkId" : 20,
+    "preFilterRank" : 3,
+    "score" : 0.5545884370804818,
+    "distance" : 0.4454115629195182,
+    "filters" : [ {
+      "name" : "STRONG_IDENTIFIER_EVIDENCE_GUARD",
+      "input" : {
+        "guardedIdentifiers" : [ ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "NO_GUARDED_IDENTIFIERS"
+    }, {
+      "name" : "SOURCE_LOCATION_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 20,
+        "memberChunkIds" : [ 20 ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "RETAINED_AS_SOURCE_LOCATION_REPRESENTATIVE"
+    }, {
+      "name" : "COMPOSITE_PROFILE_REJECTION_REASONS",
+      "input" : {
+        "score" : 0.5545884370804818,
+        "intent" : "GENERAL"
+      },
+      "decision" : "PASS",
+      "actualReason" : "NO_REJECTION_REASONS"
+    }, {
+      "name" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 15,
+        "memberChunkIds" : [ 15, 20, 21 ]
+      },
+      "decision" : "FAIL",
+      "actualReason" : "REPLACED_BY_PREFERRED_REPRESENTATIVE:15"
+    }, {
+      "name" : "GENERAL_RANKING_TOP5",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "DIRECT_ANCHOR_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "CONTEXTUAL_NUMERIC_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "EXACT_PRESENTATION_CONTENT_DEDUPLICATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    } ],
+    "firstRejection" : "QUERY_EVIDENCE_CONSOLIDATION"
+  }, {
+    "id" : "V2-U02-CN02",
+    "query" : "입력 무결성 확인을 통과하지 못한 영상은 계산 자원과 공개 catalog 양쪽에서 제외되도록 한 근거가 있어?",
+    "acceptableCorrectChunkIds" : [ 20 ],
+    "tracedCorrectChunkId" : 20,
+    "preFilterRank" : 5,
+    "score" : 0.43664814720613365,
+    "distance" : 0.5633518527938663,
+    "filters" : [ {
+      "name" : "STRONG_IDENTIFIER_EVIDENCE_GUARD",
+      "input" : {
+        "guardedIdentifiers" : [ "catalog" ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "ALL_ACTIVE_IDENTIFIERS_PRESENT"
+    }, {
+      "name" : "SOURCE_LOCATION_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 20,
+        "memberChunkIds" : [ 20 ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "RETAINED_AS_SOURCE_LOCATION_REPRESENTATIVE"
+    }, {
+      "name" : "COMPOSITE_PROFILE_REJECTION_REASONS",
+      "input" : {
+        "score" : 0.43664814720613365,
+        "intent" : "GENERAL"
+      },
+      "decision" : "FAIL",
+      "actualReason" : "DENSE_SCORE_BELOW_TUNING_FLOOR;NEGATED_CLAIM"
+    }, {
+      "name" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "GENERAL_RANKING_TOP5",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "DIRECT_ANCHOR_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "CONTEXTUAL_NUMERIC_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "EXACT_PRESENTATION_CONTENT_DEDUPLICATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    } ],
+    "firstRejection" : "DENSE_SCORE_BELOW_TUNING_FLOOR"
+  }, {
+    "id" : "V2-U03-NI01",
+    "query" : "12,800대의 가상 열차를 16개 구역에서 실행한 검증 기록이 있나요?",
+    "acceptableCorrectChunkIds" : [ 3 ],
+    "tracedCorrectChunkId" : 3,
+    "preFilterRank" : 2,
+    "score" : 0.5243296721486129,
+    "distance" : 0.4756703278513871,
+    "filters" : [ {
+      "name" : "STRONG_IDENTIFIER_EVIDENCE_GUARD",
+      "input" : {
+        "guardedIdentifiers" : [ ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "NO_GUARDED_IDENTIFIERS"
+    }, {
+      "name" : "SOURCE_LOCATION_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 3,
+        "memberChunkIds" : [ 3, 2, 4 ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "RETAINED_AS_SOURCE_LOCATION_REPRESENTATIVE"
+    }, {
+      "name" : "COMPOSITE_PROFILE_REJECTION_REASONS",
+      "input" : {
+        "score" : 0.5243296721486129,
+        "intent" : "GENERAL"
+      },
+      "decision" : "PASS",
+      "actualReason" : "NO_REJECTION_REASONS"
+    }, {
+      "name" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 23,
+        "memberChunkIds" : [ 23, 3 ]
+      },
+      "decision" : "FAIL",
+      "actualReason" : "REPLACED_BY_PREFERRED_REPRESENTATIVE:23"
+    }, {
+      "name" : "GENERAL_RANKING_TOP5",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "DIRECT_ANCHOR_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "CONTEXTUAL_NUMERIC_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "EXACT_PRESENTATION_CONTENT_DEDUPLICATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    } ],
+    "firstRejection" : "QUERY_EVIDENCE_CONSOLIDATION"
+  }, {
+    "id" : "V2-U04-D01",
+    "query" : "음악 저작권 자료를 받는 NestJS 수집 API를 개발한 적이 있어?",
+    "acceptableCorrectChunkIds" : [ 25 ],
+    "tracedCorrectChunkId" : 25,
+    "preFilterRank" : 3,
+    "score" : 0.48079870584013396,
+    "distance" : 0.519201294159866,
+    "filters" : [ {
+      "name" : "STRONG_IDENTIFIER_EVIDENCE_GUARD",
+      "input" : {
+        "guardedIdentifiers" : [ ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "NO_GUARDED_IDENTIFIERS"
+    }, {
+      "name" : "SOURCE_LOCATION_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 25,
+        "memberChunkIds" : [ 25, 26 ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "RETAINED_AS_SOURCE_LOCATION_REPRESENTATIVE"
+    }, {
+      "name" : "COMPOSITE_PROFILE_REJECTION_REASONS",
+      "input" : {
+        "score" : 0.48079870584013396,
+        "intent" : "GENERAL"
+      },
+      "decision" : "FAIL",
+      "actualReason" : "DENSE_SCORE_BELOW_TUNING_FLOOR"
+    }, {
+      "name" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "GENERAL_RANKING_TOP5",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "DIRECT_ANCHOR_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "CONTEXTUAL_NUMERIC_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "EXACT_PRESENTATION_CONTENT_DEDUPLICATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    } ],
+    "firstRejection" : "DENSE_SCORE_BELOW_TUNING_FLOOR"
+  }, {
+    "id" : "V2-U04-D02",
+    "query" : "음악 저작물 230만 건을 이름·권리자·지역 조건으로 조회할 색인을 만든 기록이 있어?",
+    "acceptableCorrectChunkIds" : [ 26 ],
+    "tracedCorrectChunkId" : 26,
+    "preFilterRank" : 4,
+    "score" : 0.44912519570075127,
+    "distance" : 0.5508748042992487,
+    "filters" : [ {
+      "name" : "STRONG_IDENTIFIER_EVIDENCE_GUARD",
+      "input" : {
+        "guardedIdentifiers" : [ ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "NO_GUARDED_IDENTIFIERS"
+    }, {
+      "name" : "SOURCE_LOCATION_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 26,
+        "memberChunkIds" : [ 26, 25 ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "RETAINED_AS_SOURCE_LOCATION_REPRESENTATIVE"
+    }, {
+      "name" : "COMPOSITE_PROFILE_REJECTION_REASONS",
+      "input" : {
+        "score" : 0.44912519570075127,
+        "intent" : "GENERAL"
+      },
+      "decision" : "FAIL",
+      "actualReason" : "DENSE_SCORE_BELOW_TUNING_FLOOR"
+    }, {
+      "name" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "GENERAL_RANKING_TOP5",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "DIRECT_ANCHOR_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "CONTEXTUAL_NUMERIC_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "EXACT_PRESENTATION_CONTENT_DEDUPLICATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    } ],
+    "firstRejection" : "DENSE_SCORE_BELOW_TUNING_FLOOR"
+  }, {
+    "id" : "V2-U04-IP01",
+    "query" : "두 공급자가 같은 지역 권리를 모두 자기 것이라고 주장할 때 자동으로 한쪽을 택하지 않게 만든 경험이 있어?",
+    "acceptableCorrectChunkIds" : [ 30 ],
+    "tracedCorrectChunkId" : 30,
+    "preFilterRank" : 3,
+    "score" : 0.4382376630506799,
+    "distance" : 0.5617623369493201,
+    "filters" : [ {
+      "name" : "STRONG_IDENTIFIER_EVIDENCE_GUARD",
+      "input" : {
+        "guardedIdentifiers" : [ ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "NO_GUARDED_IDENTIFIERS"
+    }, {
+      "name" : "SOURCE_LOCATION_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 30,
+        "memberChunkIds" : [ 30 ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "RETAINED_AS_SOURCE_LOCATION_REPRESENTATIVE"
+    }, {
+      "name" : "COMPOSITE_PROFILE_REJECTION_REASONS",
+      "input" : {
+        "score" : 0.4382376630506799,
+        "intent" : "GENERAL"
+      },
+      "decision" : "FAIL",
+      "actualReason" : "DENSE_SCORE_BELOW_TUNING_FLOOR;NEGATED_CLAIM"
+    }, {
+      "name" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "GENERAL_RANKING_TOP5",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "DIRECT_ANCHOR_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "CONTEXTUAL_NUMERIC_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "EXACT_PRESENTATION_CONTENT_DEDUPLICATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    } ],
+    "firstRejection" : "DENSE_SCORE_BELOW_TUNING_FLOOR"
+  }, {
+    "id" : "V2-U04-NI01",
+    "query" : "검색 P95를 1.6초에서 240밀리초로 낮춘 성과가 적혀 있나요?",
+    "acceptableCorrectChunkIds" : [ 26 ],
+    "tracedCorrectChunkId" : 26,
+    "preFilterRank" : 2,
+    "score" : 0.5248615302104608,
+    "distance" : 0.4751384697895392,
+    "filters" : [ {
+      "name" : "STRONG_IDENTIFIER_EVIDENCE_GUARD",
+      "input" : {
+        "guardedIdentifiers" : [ ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "NO_GUARDED_IDENTIFIERS"
+    }, {
+      "name" : "SOURCE_LOCATION_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 26,
+        "memberChunkIds" : [ 26, 25 ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "RETAINED_AS_SOURCE_LOCATION_REPRESENTATIVE"
+    }, {
+      "name" : "COMPOSITE_PROFILE_REJECTION_REASONS",
+      "input" : {
+        "score" : 0.5248615302104608,
+        "intent" : "GENERAL"
+      },
+      "decision" : "PASS",
+      "actualReason" : "NO_REJECTION_REASONS"
+    }, {
+      "name" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 30,
+        "memberChunkIds" : [ 30, 26 ]
+      },
+      "decision" : "FAIL",
+      "actualReason" : "REPLACED_BY_PREFERRED_REPRESENTATIVE:30"
+    }, {
+      "name" : "GENERAL_RANKING_TOP5",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "DIRECT_ANCHOR_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "CONTEXTUAL_NUMERIC_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "EXACT_PRESENTATION_CONTENT_DEDUPLICATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    } ],
+    "firstRejection" : "QUERY_EVIDENCE_CONSOLIDATION"
+  }, {
+    "id" : "V2-U04-CN02",
+    "query" : "월별 정산 파일이 어느 시점의 권리 상태로 계산됐는지 나중에 재현할 수 있게 했나요?",
+    "acceptableCorrectChunkIds" : [ 27 ],
+    "tracedCorrectChunkId" : 27,
+    "preFilterRank" : 4,
+    "score" : 0.4957628978764337,
+    "distance" : 0.5042371021235663,
+    "filters" : [ {
+      "name" : "STRONG_IDENTIFIER_EVIDENCE_GUARD",
+      "input" : {
+        "guardedIdentifiers" : [ ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "NO_GUARDED_IDENTIFIERS"
+    }, {
+      "name" : "SOURCE_LOCATION_CONSOLIDATION",
+      "input" : {
+        "selectedRepresentativeChunkId" : 27,
+        "memberChunkIds" : [ 27, 28 ]
+      },
+      "decision" : "PASS",
+      "actualReason" : "RETAINED_AS_SOURCE_LOCATION_REPRESENTATIVE"
+    }, {
+      "name" : "COMPOSITE_PROFILE_REJECTION_REASONS",
+      "input" : {
+        "score" : 0.4957628978764337,
+        "intent" : "GENERAL"
+      },
+      "decision" : "FAIL",
+      "actualReason" : "DENSE_SCORE_BELOW_TUNING_FLOOR"
+    }, {
+      "name" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "GENERAL_RANKING_TOP5",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "DIRECT_ANCHOR_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "CONTEXTUAL_NUMERIC_FILTER",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    }, {
+      "name" : "EXACT_PRESENTATION_CONTENT_DEDUPLICATION",
+      "input" : { },
+      "decision" : "NOT_REACHED",
+      "actualReason" : "EARLIER_FILTER_REMOVED_CANDIDATE"
+    } ],
+    "firstRejection" : "DENSE_SCORE_BELOW_TUNING_FLOOR"
+  } ],
+  "productionChanges" : 0,
+  "searchBehaviorChanges" : 0,
+  "datasetChanges" : 0
+}

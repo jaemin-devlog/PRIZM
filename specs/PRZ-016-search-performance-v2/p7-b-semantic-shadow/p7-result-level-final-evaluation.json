@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-B-RESULT-LEVEL-EVIDENCE-SET-JUDGE-FINAL-SCORING",
+  "evaluatedAt": "2026-08-16T20:43:54.4545670Z",
+  "sources": {
+    "rawResults": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-b-independent-generalization/raw-results.json",
+      "sha256": "defc5e35dbf26f48a640f3df673e2247c14437b0cb65e8c8c05a0bd3b6e2cb2e"
+    },
+    "baselineEvaluation": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-b-independent-generalization/evaluated-results.json",
+      "sha256": "a1b85aafcf516c2370724e7a7c311619da4692269e2b0971f54da88b9de696b8"
+    },
+    "groundTruth": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization-v2/dataset/ground-truth.json",
+      "sha256": "fd7525da3a00df4d7eccf42022b54a63cb2571be9f20111d2d6de740aa5f9680"
+    },
+    "resultLevelDataset": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-b-semantic-shadow/p7-result-level-evidence-set-pairs.json",
+      "sha256": "b0156ec5ac2ec243f6b23976ffbb433939c487af142c1142de2e25e0f16cd160"
+    },
+    "freeze": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-b-semantic-shadow/p7-result-level-evidence-set-freeze.json",
+      "sha256": "2e9f4cc1155bbc822577f027884845b54b62265e01079bad7e13ebb739aa0634"
+    },
+    "judgeResults": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-b-semantic-shadow/p7-result-level-evidence-set-judge-results.json",
+      "sha256": "5f638f413895198de82e9108e680e6b0832c031c9da053cc1f2c2d18bcc19244"
+    },
+    "judgeCheckpoint": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-b-semantic-shadow/p7-result-level-evidence-set-judge-checkpoint.jsonl",
+      "sha256": "b0feb229a96b150e608b46e4daf41409d6392742fdaee2a0b4bf74082a4482b4"
+    },
+    "numericResults": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-b-semantic-shadow/p7-result-level-evidence-set-judge-numeric-results.json",
+      "sha256": "d8b1b8e5733ad2fb18433da842ffc8fe205c6f2c4f05bfe80b49aec74ae38c47"
+    },
+    "candidateLevelEvaluation": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-b-semantic-shadow/p7-full-final-evaluation.json",
+      "sha256": "6613a8a4fe6b5aa886440dd27cfe18291dcb3b1d25e7e319595b2e7ced6cd1c6"
+    },
+    "candidateLevelNumericResults": {
+      "path": "specs/PRZ-016-search-performance-v2/p7-b-semantic-shadow/p7-full-judge-v3-numeric-results.json",
+      "sha256": "79de993f0f482aceffefb905679b88d57fadbfbf550978ac1d2b7e7b1e58b0e0"
+    }
+  },
+  "integrity": {
+    "frozenShaChecks": "PASS",
+    "resultCoverage": "86/86",
+    "windowCoverage": "430/430",
+    "queryCountWithResults": 38,
+    "modelOutputInvalid": 0,
+    "resultIdentityMismatch": 0,
+    "baselineMatchingReproduced": "48/48",
+    "newEvidenceCreated": 0,
+    "status": "PASS"
+  },
+  "policy": {
+    "supported": "KEEP_ORIGINAL_RESULT",
+    "refuted": "REMOVE",
+    "insufficient": "REMOVE",
+    "numericUnresolved": "FAIL_CLOSED_REMOVE",
+    "resultOrder": "PRESERVE_ORIGINAL_RANK_AND_RECOMPRESS",
+    "correctnessMatching": "P7_B_BASELINE_DOCUMENT_VERSION_LOCALIZED_SOURCE_ACCEPTABLE_ANCHOR"
+  },
+  "baseline": {
+    "top1": {"correct": 12, "total": 36, "rate": 0.3333333333333333},
+    "recallAt3": {"correct": 21, "total": 36, "rate": 0.5833333333333334},
+    "recallAt5": {"correct": 21, "total": 36, "rate": 0.5833333333333334},
+    "mrrAt5": 0.449074074074074,
+    "negativeFalsePositive": {"count": 5, "total": 12, "rate": 0.4166666666666667},
+    "pass": 28,
+    "fail": 20
+  },
+  "candidateLevelFull": {
+    "top1": {"correct": 13, "total": 36, "rate": 0.3611111111111111},
+    "recallAt3": {"correct": 19, "total": 36, "rate": 0.5277777777777778},
+    "recallAt5": {"correct": 19, "total": 36, "rate": 0.5277777777777778},
+    "mrrAt5": 0.4444444444444444,
+    "negativeFalsePositive": {"count": 4, "total": 12, "rate": 0.3333333333333333},
+    "positiveRegression": {"count": 2, "total": 21},
+    "pass": 27,
+    "fail": 21
+  },
+  "resultLevelFull": {
+    "top1": {"correct": 14, "total": 36, "rate": 0.3888888888888889},
+    "recallAt3": {"correct": 20, "total": 36, "rate": 0.5555555555555556},
+    "recallAt5": {"correct": 20, "total": 36, "rate": 0.5555555555555556},
+    "mrrAt5": 0.46759259259259256,
+    "negativeFalsePositive": {"count": 3, "total": 12, "rate": 0.25},
+    "pass": 29,
+    "fail": 19,
+    "supportOriginalResults": 58
+  },
+  "deltaVsBaseline": {
+    "top1": 0.05555555555555558,
+    "recallAt3": -0.02777777777777779,
+    "recallAt5": -0.02777777777777779,
+    "mrrAt5": 0.018518518518518545,
+    "negativeFpr": -0.16666666666666669
+  },
+  "deltaVsCandidateLevel": {
+    "top1": 0.02777777777777779,
+    "recallAt3": 0.02777777777777779,
+    "recallAt5": 0.02777777777777779,
+    "mrrAt5": 0.02314814814814814,
+    "negativeFpr": -0.08333333333333331
+  },
+  "positive": {
+    "baselineCorrect": 21,
+    "retained": 20,
+    "regression": 1,
+    "regressionIds": ["V2-U03-NV01"],
+    "rankImproved": 2,
+    "rankImprovedIds": ["V2-U02-D01", "V2-U03-CN01"],
+    "newlyPassed": 0,
+    "newlyPassedIds": [],
+    "candidateLevelRegressionRecovery": {
+      "V2-U01-CN01": "RECOVERED",
+      "V2-U03-NV01": "NOT_RECOVERED"
+    }
+  },
+  "negative": {
+    "baselineFalsePositive": 5,
+    "candidateLevelFalsePositive": 4,
+    "resultLevelFalsePositive": 3,
+    "blockedVsBaselineIds": ["V2-U01-N01", "V2-U01-N03"],
+    "blockedVsCandidateLevelIds": ["V2-U01-N01"],
+    "remainingIds": ["V2-U03-N01", "V2-U04-N01", "V2-U04-N02"],
+    "newlyIntroducedQueryFalsePositiveIds": [],
+    "candidateLevelRemainingStatus": {
+      "V2-U01-N01": "BLOCKED",
+      "V2-U03-N01": "REMAINING",
+      "V2-U04-N01": "REMAINING",
+      "V2-U04-N02": "REMAINING"
+    }
+  },
+  "numericUnresolved": {
+    "count": 2,
+    "results": [
+      {
+        "id": "V2-U02-NI01#r1",
+        "queryId": "V2-U02-NI01",
+        "polarity": "POSITIVE",
+        "reason": "PREMISE_METRIC_MISSING",
+        "correctEvidenceRemoved": false,
+        "positiveRegressionCaused": false,
+        "negativeFalsePositiveBlocked": false
+      },
+      {
+        "id": "V2-U03-NI01#r1",
+        "queryId": "V2-U03-NI01",
+        "polarity": "POSITIVE",
+        "reason": "HYPOTHESIS_METRIC_MISSING",
+        "correctEvidenceRemoved": false,
+        "positiveRegressionCaused": false,
+        "negativeFalsePositiveBlocked": false
+      }
+    ],
+    "positiveImpact": "NO_METRIC_CHANGE",
+    "negativeImpact": "NO_FALSE_POSITIVE_BLOCK"
+  },
+  "resultSetChange": {
+    "candidateSupportCount": 59,
+    "resultLevelSupportCount": 58,
+    "candidateSupportToResultLevelNonSupport": [
+      "V2-U01-N01#r1",
+      "V2-U01-NV01#r4",
+      "V2-U01-NV02#r1",
+      "V2-U02-D01#r1",
+      "V2-U02-NV02#r1",
+      "V2-U03-CN01#r1",
+      "V2-U03-D02#r3",
+      "V2-U03-NV01#r4",
+      "V2-U04-CN01#r3",
+      "V2-U04-D01#r1",
+      "V2-U04-D01#r2",
+      "V2-U04-N02#r1"
+    ],
+    "resultLevelNewSupport": [
+      "V2-U01-CN01#r3",
+      "V2-U01-CN02#r3",
+      "V2-U01-IP02#r3",
+      "V2-U02-IP01#r1",
+      "V2-U02-IP01#r3",
+      "V2-U02-NV01#r2",
+      "V2-U03-IP02#r3",
+      "V2-U03-NV01#r1",
+      "V2-U03-NV01#r2",
+      "V2-U04-CN02#r3",
+      "V2-U04-N02#r3"
+    ],
+    "effects": {
+      "positiveRecovery": ["V2-U01-CN01#r3"],
+      "positiveRankImprovement": ["V2-U02-D01#r1", "V2-U03-CN01#r1"],
+      "positiveRankRegression": ["V2-U02-IP01#r1"],
+      "positiveNewFailure": [],
+      "negativeFalsePositiveBlock": ["V2-U01-N01#r1", "V2-U04-N02#r1"],
+      "negativeFalsePositiveIntroduction": ["V2-U04-N02#r3"],
+      "queryLevelNegativeFalsePositiveNetBlock": ["V2-U01-N01"],
+      "queryLevelNegativeFalsePositiveNew": [],
+      "positiveNonCorrectResultChurn": 19
+    }
+  },
+  "gate": {
+    "checks": {
+      "negativeFprAtMostOneOfTwelve": {"passed": false, "actual": "3/12", "required": "<=1/12"},
+      "top1AtLeastBaseline": {"passed": true, "actual": "14/36", "required": ">=12/36"},
+      "recallAt5AtLeastBaseline": {"passed": false, "actual": "20/36", "required": ">=21/36"},
+      "baselineCorrectRegressionAtMostOne": {"passed": true, "actual": "1/21", "required": "<=1/21"},
+      "newEvidenceZero": {"passed": true, "actual": 0, "required": 0}
+    },
+    "allPassed": false
+  },
+  "final": "RESULT_LEVEL_EVIDENCE_SET_JUDGE_FAIL",
+  "next": "STOP_QWEN4B_VERIFIER_AND_REASSESS"
+}

@@ -1,0 +1,36 @@
+{
+  "title": "SYN-U04 / ARCHIVE SYSTEMS",
+  "subtitle": "PRIZM P7 synthetic resume — compact project card",
+  "metrics": [
+    ["860,000", "artifact records"],
+    ["1.9 s → 310 ms", "search P95"],
+    ["0", "empty-result cutovers"]
+  ],
+  "sections": [
+    {
+      "heading": "ArchiveLens",
+      "paragraphs": [
+        "Node.js와 NestJS로 박물관 디지털 자료 수집 API를 개발했다. 원본 이미지와 OCR 산출물은 Cloudflare R2에 저장하고 작업 이벤트는 Cloudflare Queues로 전달했다."
+      ]
+    },
+    {
+      "heading": "Discovery",
+      "paragraphs": [
+        "860,000개 유물 record를 Meilisearch에 색인했다. 새 index를 버전별로 만든 뒤 검증된 alias만 원자적으로 교체했다.",
+        "검색 P95는 1.9초에서 310밀리초로 줄었고, 전환 중 빈 결과가 노출된 횟수는 0건이었다."
+      ]
+    },
+    {
+      "heading": "Ingestion discipline",
+      "paragraphs": [
+        "원본 content hash가 이미 존재하면 OCR 작업을 생성하지 않아 동일 이미지의 중복 변환을 막았다."
+      ]
+    },
+    {
+      "heading": "Scope",
+      "paragraphs": [
+        "추천은 시대·재질·소장처 facet rule로만 제공했다. 신경망 기반 개인화 추천 엔진은 구현하지 않았다."
+      ]
+    }
+  ]
+}

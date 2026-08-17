@@ -1,0 +1,2015 @@
+{
+  "schemaVersion": 1,
+  "mode": "SEMANTIC_SUPPORT_JUDGE_V3_PLUS_NUMERIC_SHADOW",
+  "runnerVersion": "PRZ-016-SEMANTIC-NUMERIC-JUDGE-SHADOW-v1",
+  "sources": {
+    "pairs": {
+      "path": "specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\nli-model-comparison-pairs.json",
+      "sha256": "8311af2ec5683b2b70c9de014570a4119c9804539f9a64f1afd8917472150eed"
+    },
+    "judgeResults": {
+      "path": "specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\semantic-support-judge-v3-results.json",
+      "sha256": "697c8f33714c23d6e94ab8447ea0833701ca50db0e25a111c8929014f718c39d"
+    },
+    "judgeCheckpoint": {
+      "path": "specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\semantic-support-judge-v3-checkpoint.jsonl",
+      "sha256": "9fb6eae6e8da1652bc84748869e3811108f1d9cb07446f1c5c48014c6238bb22"
+    },
+    "numericVerifier": {
+      "path": "C:\\Users\\정재민\\Project\\PRIZM\\scripts\\evaluation\\run_semantic_nli_numeric_shadow.py",
+      "sha256": "c7aa71b249ca16d77f9c6bac18cee6dd6de76f4debcd334159834191c6187118"
+    }
+  },
+  "results": [
+    {
+      "id": "v1-Q01",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Ruby on Rails API를 운영팀에 배포했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "v1-Q02",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Grafana Loki 로그 상관관계를 도입해 야간 장애 대응을 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "v1-Q03",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "OSRM 경로 계산 모듈로 제설 차량 운행 순서를 조정했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "v1-Q04",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "OpenSearch로 식물 표본 검색을 이전해 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "v1-Q05",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "WebAssembly 바코드 판독 기능을 구현했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "v1-Q06",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Django와 Celery로 심사 포털을 배포했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "v1-Q07",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "FIDO2 passkey 로그인을 실제 출시했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "v1-Q08",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Apache Flink checkpoint 복구를 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "v1-Q09",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "얼굴 인식 출입 통제를 직접 구현해 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v1-Q10",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Cassandra 클러스터를 설치하고 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v1-Q11",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "iOS 앱을 직접 작성했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v1-Q12",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "드론 자율비행 모델을 직접 학습하고 만들었다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v1-Q13",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "YugabyteDB를 production 데이터베이스로 전환해 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v1-Q14",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Istio를 운영 서비스에 채택했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v1-Q15",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Hasura를 production API에 도입했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v1-Q16",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "hardware security key 로그인을 이미 출시했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v1-Q17",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "문서 이미지를 AVIF로 변환하는 기능을 구현해 배포했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v1-Q18",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "서버리스 이전 migration을 실제 실행했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v1-Q19",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Apache Storm을 현재 운영 서비스에 사용했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v1-Q20",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Prolog 규칙 엔진을 고객 서비스 제품으로 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v1-Q21",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Mapbox GL 지도를 현재 출시 제품에 구현했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v1-Q22",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "자료 정합성 99.8%를 달성했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": true,
+      "numeric": {
+        "status": "NUMERIC_UNRESOLVED",
+        "reason": "HYPOTHESIS_METRIC_MISSING",
+        "expectedValues": [
+          {
+            "value": "99.8",
+            "unit": "%"
+          }
+        ],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "NUMERIC_UNRESOLVED"
+    },
+    {
+      "id": "v1-Q23",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "야간 집계 P95를 580밀리초로 낮췄다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": true,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v1-Q24",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "현장 점검을 34개 경로에서 완료했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": true,
+      "numeric": {
+        "status": "NUMERIC_UNRESOLVED",
+        "reason": "HYPOTHESIS_METRIC_MISSING",
+        "expectedValues": [
+          {
+            "value": "34",
+            "unit": "개"
+          }
+        ],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "NUMERIC_UNRESOLVED"
+    },
+    {
+      "id": "v2-U01",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Quarkus 서비스를 구현해 배포했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "v2-U02",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "SvelteKit 신청 화면을 실제 출시했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "v2-U03",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "RabbitMQ를 도입해 주문 확인 작업을 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "v2-U04",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Kotlin 예약 검증 기능을 구현해 배포했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "v2-U05",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Prometheus 알림 규칙을 도입해 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "v2-U06",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Argo CD로 배포를 자동화해 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "v2-U07",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "gRPC 상태 조회를 구현해 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "v2-U08",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "SQLite 기록 가져오기 기능을 구현해 배포했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "v2-U09",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Elasticsearch 클러스터를 직접 설치하고 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v2-U10",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Flutter 앱을 작성했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v2-U11",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "PyTorch 모델을 직접 학습했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v2-U12",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "CockroachDB를 운영 데이터베이스로 채택했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v2-U13",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Temporal을 운영 작업에 도입했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v2-U14",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Kubernetes를 서비스 운영에 채택했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v2-U15",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "GraphQL 조회 기능을 이미 출시했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v2-U16",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "WebRTC 상담 화면을 구현해 배포했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v2-U17",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Redpanda 스트림 이전을 실제 실행했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v2-U18",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Backbone.js를 현재 출시 서비스에 사용했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v2-U19",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Hadoop을 현재 운영 파이프라인에 사용했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v2-U20",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "jQuery 지도를 현재 제품에 구현했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v2-U21",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "SLA를 99.4%로 달성했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": true,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v2-U22",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "LCP를 720밀리초로 낮췄다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": true,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v2-U23",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "QPS를 1,400건으로 처리했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": true,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "v2-U24",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "RTO를 12분으로 달성했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": true,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "adv-A01",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Cilium을 production 네트워크 정책에 도입해 현재 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "adv-A02",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Liquibase migration을 완료해 production에 배포했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "adv-A03",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Deno 서비스를 단계적으로 production에 배포해 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "adv-A04",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "InfluxDB 수집기를 중단 없이 현재까지 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "adv-A05",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "OpenCV로 배경 제거 기능을 production에서 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "adv-A06",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "ChirpStack으로 폐기물 수거 센서를 현재 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "adv-A07",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Astro 사이트를 production으로 승격해 현재 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "adv-A08",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Ktor API를 현재 실제 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "adv-A09",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Vitess를 비교 시험 뒤 production에 최종 도입했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "adv-A10",
+      "group": "A",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "SLO를 96.6%로 실제 달성했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": true,
+      "numeric": {
+        "status": "CONSISTENT",
+        "reason": "EXACT_VALUE_UNIT_METRIC_MATCH",
+        "expectedValues": [
+          {
+            "value": "96.6",
+            "unit": "%"
+          }
+        ],
+        "metricTokens": [
+          "SLO"
+        ],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "adv-A11",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Bun 기반 변환기를 이미 배포했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "adv-A12",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Nginx Unit을 운영 서비스에 채택했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "adv-A13",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Cordova를 현재 출시 제품에 사용했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "adv-A14",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "ONNX 모델을 직접 변환하고 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "adv-A15",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "MTTR을 27분으로 달성했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": true,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "adv-A16",
+      "group": "A",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Three.js 전시 화면을 현재 서비스에서 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "unknown-01",
+      "group": "A",
+      "groundTruth": "UNKNOWN",
+      "hypothesis": "Ruby on Rails API를 운영팀에 배포했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "unknown-02",
+      "group": "A",
+      "groundTruth": "UNKNOWN",
+      "hypothesis": "Grafana Loki 로그 상관관계를 도입해 야간 장애 대응을 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "unknown-03",
+      "group": "A",
+      "groundTruth": "UNKNOWN",
+      "hypothesis": "OSRM 경로 계산 모듈로 제설 차량 운행 순서를 조정했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "unknown-04",
+      "group": "A",
+      "groundTruth": "UNKNOWN",
+      "hypothesis": "OpenSearch로 식물 표본 검색을 이전해 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "unknown-05",
+      "group": "A",
+      "groundTruth": "UNKNOWN",
+      "hypothesis": "WebAssembly 바코드 판독 기능을 구현했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "unknown-06",
+      "group": "A",
+      "groundTruth": "UNKNOWN",
+      "hypothesis": "Django와 Celery로 심사 포털을 배포했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "unknown-07",
+      "group": "A",
+      "groundTruth": "UNKNOWN",
+      "hypothesis": "FIDO2 passkey 로그인을 실제 출시했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "unknown-08",
+      "group": "A",
+      "groundTruth": "UNKNOWN",
+      "hypothesis": "Apache Flink checkpoint 복구를 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "F01",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Debezium을 도입해 재고 변경 적재를 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "F02",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Micronaut 점검 화면을 생산 라인에서 현재 사용한다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "F03",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Pulsar를 최종 채택해 결제 알림을 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "F04",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "HAPI FHIR 연동을 완료해 병원 접수 시스템에 배포했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "F05",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Nuxt 기반 수강 신청 화면을 출시해 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "F06",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Godot 상태 동기화 모듈을 정식 시즌에 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "F07",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "MQTT로 태양광 인버터 전력 정보를 수집해 사용했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "F08",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Prefect 작업 흐름을 완료해 배포하고 현재 사용한다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "F09",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "DuckDB로 현장 조사 파일을 집계하는 기능을 구현해 배포했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "F10",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Helm 차트를 채택해 운영 환경에 적용했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "F11",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Playwright로 회귀 검사를 작성해 매주 실행했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "F12",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Rust 서비스가 현재 상수도 누수 신고 접수 업무를 처리한다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "F13",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Superset 대시보드로 예약 통계를 이전해 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "F14",
+      "group": "B",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "Qdrant 검색으로 장애 알림 처리 시간을 47초로 낮췄다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": true,
+      "numeric": {
+        "status": "NUMERIC_UNRESOLVED",
+        "reason": "HYPOTHESIS_METRIC_MISSING",
+        "expectedValues": [
+          {
+            "value": "47",
+            "unit": "초"
+          }
+        ],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "NUMERIC_UNRESOLVED"
+    },
+    {
+      "id": "F15",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Neo4j를 직접 설치하고 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "F16",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Xamarin 앱을 개발했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "F17",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Envoy를 운영 프록시로 채택했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "F18",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Bazel 빌드 전환을 구현해 사용했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "F19",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Unity 전시 시뮬레이션을 방문객 서비스에서 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "F20",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "AngularJS 관리자 화면을 현재 시스템에서 사용한다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "F21",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Keras 모델을 직접 학습했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "F22",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Tableau 대시보드를 실제 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "F23",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "SLI 가용성을 91.6%로 달성했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": true,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "F24",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "TPS를 760건으로 처리했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": true,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "F25",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Airflow 파이프라인을 배포해 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "F26",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Ember 안내 페이지를 현행 민원 사이트에서 운영한다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "F27",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "Beam을 운영 처리기로 채택했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "F28",
+      "group": "B",
+      "groundTruth": "CONTRADICT",
+      "hypothesis": "MATLAB 분석을 직접 수행했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "REFUTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "REFUTED"
+    },
+    {
+      "id": "FU01",
+      "group": "B",
+      "groundTruth": "UNKNOWN",
+      "hypothesis": "Debezium을 도입해 재고 변경 적재를 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "FU02",
+      "group": "B",
+      "groundTruth": "UNKNOWN",
+      "hypothesis": "Micronaut 점검 화면을 생산 라인에서 현재 사용한다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "FU03",
+      "group": "B",
+      "groundTruth": "UNKNOWN",
+      "hypothesis": "HAPI FHIR 연동을 완료해 병원 접수 시스템에 배포했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "FU04",
+      "group": "B",
+      "groundTruth": "UNKNOWN",
+      "hypothesis": "Godot 상태 동기화 모듈을 정식 시즌에 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "FU05",
+      "group": "B",
+      "groundTruth": "UNKNOWN",
+      "hypothesis": "MQTT로 태양광 인버터 전력 정보를 수집해 사용했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "FU06",
+      "group": "B",
+      "groundTruth": "UNKNOWN",
+      "hypothesis": "Superset 대시보드로 예약 통계를 이전해 운영했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "FU07",
+      "group": "B",
+      "groundTruth": "UNKNOWN",
+      "hypothesis": "Rust 서비스가 현재 상수도 누수 신고 접수 업무를 처리한다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "FU08",
+      "group": "B",
+      "groundTruth": "UNKNOWN",
+      "hypothesis": "Playwright로 회귀 검사를 작성해 매주 실행했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "V2-U01-IP01#r1#w3",
+      "group": "C",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "계근 제어기가 응답하지 않을 때 요청 스레드가 모두 묶이는 상황을 피했다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "V2-U02-D01#r2#w1",
+      "group": "C",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "위성 영상 처리 작업을 접수하는 FastAPI 인터페이스를 만들었다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "INSUFFICIENT",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_EVALUATED",
+        "reason": "JUDGE_NON_SUPPORT_OR_INVALID",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "INSUFFICIENT"
+    },
+    {
+      "id": "V2-U02-NV01#r1#w2",
+      "group": "C",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "큰 영상 파일이 아직 도착하지 않았을 때 계산 worker를 계속 붙잡지 않도록 바꿨다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "V2-U02-IP01#r2#w2",
+      "group": "C",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "궤도별 데이터 쏠림 때문에 일부 Spark 작업만 오래 남는 병목을 줄였다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    },
+    {
+      "id": "V2-U04-IP02#r1#w1",
+      "group": "C",
+      "groundTruth": "SUPPORT",
+      "hypothesis": "표준 음악 식별자가 없는 오래된 자료가 잘못 합쳐지는 문제를 막았다.",
+      "judgeStatus": "VALID",
+      "judgeLabel": "SUPPORTED",
+      "numericClaim": false,
+      "numeric": {
+        "status": "NOT_APPLICABLE",
+        "reason": "NO_NUMERIC_CLAIM",
+        "expectedValues": [],
+        "metricTokens": [],
+        "numericVeto": null
+      },
+      "combinedLabel": "SUPPORTED"
+    }
+  ],
+  "summary": {
+    "judgeV3": {
+      "groupCSupported": "4/5",
+      "groupABSupportSupported": "40/40",
+      "groupABContradictFalseSupport": "3/52",
+      "groupABUnknownFalseSupport": "0/16",
+      "modelOutputInvalid": 0
+    },
+    "combined": {
+      "groupCSupported": "4/5",
+      "groupABSupportSupported": "39/40",
+      "groupABContradictFalseSupport": "1/52",
+      "groupABUnknownFalseSupport": "0/16",
+      "modelOutputInvalid": 0,
+      "numericUnresolved": 3,
+      "numericBlockedIds": [],
+      "remainingFalseSupportIds": [
+        "F21"
+      ],
+      "gate": {
+        "checks": {
+          "groupCSupportedAtLeastFourOfFive": {
+            "passed": true,
+            "actual": "4/5"
+          },
+          "groupABSupportAtLeastThirtyNineOfForty": {
+            "passed": true,
+            "actual": "39/40"
+          },
+          "groupABContradictFalseSupportAtMostOne": {
+            "passed": true,
+            "actual": "1/52"
+          },
+          "groupABUnknownFalseSupportAtMostOne": {
+            "passed": true,
+            "actual": "0/16"
+          },
+          "modelOutputInvalidZero": {
+            "passed": true,
+            "actual": 0
+          }
+        },
+        "allPassed": true,
+        "final": "SEMANTIC_NUMERIC_JUDGE_PROMISING"
+      }
+    }
+  }
+}

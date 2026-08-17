@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-B-FULL-CLAIM-AWARE-JUDGE-V3-FREEZE",
+  "frozenAt": "2026-08-16T19:37:58.992176+00:00",
+  "groundTruthUsedBeforeFreeze": false,
+  "sources": {
+    "rawResults": {
+      "path": "specs\\PRZ-016-search-performance-v2\\p7-b-independent-generalization\\raw-results.json",
+      "sha256": "defc5e35dbf26f48a640f3df673e2247c14437b0cb65e8c8c05a0bd3b6e2cb2e"
+    },
+    "semanticPairs": {
+      "path": "specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\pairs.json",
+      "sha256": "e48fb53e26c2c88960d054d8fcea2a0df33f38774c235258e06dafbe5f4ee758"
+    },
+    "claimAwareCandidates": {
+      "path": "specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\claim-localizer-candidates.json",
+      "sha256": "5ad9fd999e67f236c8480339786de1b6f0d8ef4bd6cb478da815f945c20dbacb"
+    }
+  },
+  "runnerPairs": {
+    "path": "specs\\PRZ-016-search-performance-v2\\p7-b-semantic-shadow\\p7-full-judge-v3-candidate-pairs.json",
+    "sha256": "e2c7538a86411075c929c09651823e72c458126fac75921b03761b15b162c1c5",
+    "pairCount": 430,
+    "queryCountWithResults": 38,
+    "originalResultCount": 86,
+    "candidatesPerResult": {
+      "min": 5,
+      "max": 5
+    }
+  },
+  "judge": {
+    "version": "PRZ-016-SEMANTIC-SUPPORT-JUDGE-SPIKE-v3",
+    "model": "qwen3:4b-instruct",
+    "schemaSha256": "9f53847abaea480eaceea96b598f78df44c185b92b6dac73fabbd136d9becb08",
+    "promptSha256": "83e121efc2d49dfe372fd566abad74e7632afa8172c7da795e7d1af406cd238f",
+    "adapter": {
+      "path": "C:\\Users\\정재민\\Project\\PRIZM\\scripts\\evaluation\\run_p7_full_claim_aware_judge.py",
+      "sha256": "44b83e56560a9aa18b8010a054ced889006187b96e73346399ee3b3ced9c091c"
+    }
+  },
+  "numeric": {
+    "adapter": {
+      "path": "C:\\Users\\정재민\\Project\\PRIZM\\scripts\\evaluation\\run_p7_full_claim_aware_judge_numeric_shadow.py",
+      "sha256": "52b215af6022f68c9db22c848df598001842e8006bc9a7c2cab505431190face"
+    },
+    "verifier": {
+      "path": "C:\\Users\\정재민\\Project\\PRIZM\\scripts\\evaluation\\run_semantic_nli_numeric_shadow.py",
+      "sha256": "c7aa71b249ca16d77f9c6bac18cee6dd6de76f4debcd334159834191c6187118"
+    },
+    "unresolvedPolicy": "FAIL_CLOSED_NON_SUPPORT"
+  },
+  "builder": {
+    "version": "PRZ-016-P7-FULL-JUDGE-COVERAGE-BUILDER-v1",
+    "path": "C:\\Users\\정재민\\Project\\PRIZM\\scripts\\evaluation\\build_p7_full_claim_aware_judge_pairs.py",
+    "sha256": "6c26de72c98853a7fd44d9cf3cbfde0de9948d596bffdd521472b54e6f60838e"
+  },
+  "integrity": {
+    "rawSemanticCandidateResultKeysMatch": true,
+    "resultIdentityPreserved": true,
+    "resultContentSha256Match": true,
+    "hypothesisChanged": 0,
+    "premiseMismatch": 0,
+    "duplicateCandidateIds": 0,
+    "missingOriginalResults": 0
+  },
+  "inference": "NOT_RUN",
+  "groundTruthScoring": "NOT_RUN"
+}

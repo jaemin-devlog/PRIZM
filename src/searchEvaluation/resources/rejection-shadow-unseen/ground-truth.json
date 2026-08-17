@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-unseen-rejection-shadow-validation",
+  "expectations": [
+    {"id":"U01","expected":"ACCEPT"},{"id":"U02","expected":"ACCEPT"},{"id":"U03","expected":"ACCEPT"},{"id":"U04","expected":"ACCEPT"},
+    {"id":"U05","expected":"ACCEPT"},{"id":"U06","expected":"ACCEPT"},{"id":"U07","expected":"ACCEPT"},{"id":"U08","expected":"ACCEPT"},
+    {"id":"U09","expected":"REJECT"},{"id":"U10","expected":"REJECT"},{"id":"U11","expected":"REJECT"},
+    {"id":"U12","expected":"REJECT"},{"id":"U13","expected":"REJECT"},{"id":"U14","expected":"REJECT"},
+    {"id":"U15","expected":"REJECT"},{"id":"U16","expected":"REJECT"},{"id":"U17","expected":"REJECT"},
+    {"id":"U18","expected":"REJECT"},{"id":"U19","expected":"REJECT"},{"id":"U20","expected":"REJECT"},
+    {"id":"U21","expected":"REJECT"},{"id":"U22","expected":"REJECT"},{"id":"U23","expected":"REJECT"},{"id":"U24","expected":"REJECT"}
+  ]
+}

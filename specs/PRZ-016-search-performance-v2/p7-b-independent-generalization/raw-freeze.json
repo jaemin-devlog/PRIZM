@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-B",
+  "frozenAt": "2026-08-16T10:18:04.660Z",
+  "rawResultsPath": "raw-results.json",
+  "rawResultsBytes": 225850,
+  "rawResultsSha256": "defc5e35dbf26f48a640f3df673e2247c14437b0cb65e8c8c05a0bd3b6e2cb2e",
+  "queryCount": 48,
+  "groundTruthReadBeforeRawFreeze": false,
+  "orchestrationScriptPath": "C:\\Users\\정재민\\AppData\\Local\\Temp\\prizm-p7b-20260816\\orchestrate-p7b.mjs",
+  "orchestrationScriptSha256": "db774737912f22e1ed322bc2a26942831ab10fb3887a99a543777a23551b22fd",
+  "command": "node C:\\Users\\정재민\\AppData\\Local\\Temp\\prizm-p7b-20260816\\orchestrate-p7b.mjs C:\\Users\\정재민\\Project\\PRIZM http://127.0.0.1:28081 4a5c5b6bbd3cfd06f1313dee09e6695fdd68179e"
+}

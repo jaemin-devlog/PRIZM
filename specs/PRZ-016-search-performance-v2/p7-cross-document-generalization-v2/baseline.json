@@ -1,0 +1,21 @@
+{
+  "phase": "PRZ-016-P7-A-v2",
+  "branch": "PRZ-016-search-performance-v2",
+  "head": "4a5c5b6bbd3cfd06f1313dee09e6695fdd68179e",
+  "originMain": "af6145a975031770f807ef4466a78f084e8223a2",
+  "originMainContainedInHead": true,
+  "v1": {
+    "path": "specs/PRZ-016-search-performance-v2/p7-cross-document-generalization",
+    "freezeManifestSha256": "0b46f12562050c58c6d7ccefe940378a5c42550192d0f35dffc7e2599eae3b79",
+    "frozenAssetCount": 27,
+    "hashMismatchesAtV2Start": 0,
+    "status": "PRESERVED_SUPERSEDED_BEFORE_RUN"
+  },
+  "productionSearch": {
+    "fileCount": 30,
+    "aggregateSha256": "32d8e31d7f5eeb3bf64033ce2b9db7c58347cbfe3d6f540b792e44c04951df31"
+  },
+  "searchAuthorized": false,
+  "productionChangesAuthorized": 0,
+  "commitPushPrAuthorized": false
+}

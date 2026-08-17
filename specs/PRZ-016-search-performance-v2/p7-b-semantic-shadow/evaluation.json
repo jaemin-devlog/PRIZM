@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-P7-B-SEMANTIC-NUMERIC-SHADOW-PHASE-B",
+  "evaluatedAt": "2026-08-17T00:24:10.2933462+09:00",
+  "productionImpact": "NONE",
+  "inputIntegrity": {
+    "allRequiredHashesMatchedBeforeGroundTruthRead": true,
+    "groundTruthUsedBeforeHashCheck": false,
+    "rawResults": {
+      "path": "../p7-b-independent-generalization/raw-results.json",
+      "sha256": "defc5e35dbf26f48a640f3df673e2247c14437b0cb65e8c8c05a0bd3b6e2cb2e"
+    },
+    "pairs": {
+      "path": "pairs.json",
+      "sha256": "e48fb53e26c2c88960d054d8fcea2a0df33f38774c235258e06dafbe5f4ee758"
+    },
+    "nliResults": {
+      "path": "nli-results.json",
+      "sha256": "1d1e42f7f9d42bde7a67fe3c574e7848334f6d9970ed7ee021465a6f18060f78"
+    },
+    "numericShadowResults": {
+      "path": "numeric-shadow-results.json",
+      "sha256": "fa72410888fd8c80aaeb8302a0fb1be1a29d80a19bac08d5d22086fef82b70be"
+    }
+  },
+  "scoring": {
+    "shadowPolicy": {
+      "SUPPORT": "RETAIN",
+      "CONTRADICT": "FILTER",
+      "UNKNOWN": "FILTER",
+      "rankPolicy": "Preserve original Production order and recompress retained ranks from 1",
+      "newEvidenceAllowed": false
+    },
+    "groundTruth": {
+      "path": "../p7-cross-document-generalization-v2/dataset/ground-truth.json",
+      "sha256": "fd7525da3a00df4d7eccf42022b54a63cb2571be9f20111d2d6de740aa5f9680"
+    },
+    "matchingContract": "Existing P7-B document, evidence source, and acceptable-anchor matching contract",
+    "baselineCorrectRankReproduction": "36/36 positive queries matched evaluated-results.json"
+  },
+  "baseline": {
+    "totalQueries": 48,
+    "positiveQueries": 36,
+    "negativeQueries": 12,
+    "top1": { "correct": 12, "total": 36, "rate": 0.3333333333333333 },
+    "recallAt3": { "correct": 21, "total": 36, "rate": 0.5833333333333334 },
+    "recallAt5": { "correct": 21, "total": 36, "rate": 0.5833333333333334 },
+    "mrrAt5": 0.44907407407407407,
+    "negativeFalsePositive": { "count": 5, "total": 12, "rate": 0.4166666666666667 },
+    "pass": 28,
+    "fail": 20
+  },
+  "shadow": {
+    "top1": { "correct": 5, "total": 36, "rate": 0.1388888888888889 },
+    "recallAt3": { "correct": 7, "total": 36, "rate": 0.19444444444444445 },
+    "recallAt5": { "correct": 7, "total": 36, "rate": 0.19444444444444445 },
+    "mrrAt5": 0.16666666666666666,
+    "negativeFalsePositive": { "count": 1, "total": 12, "rate": 0.08333333333333333 },
+    "pass": 18,
+    "fail": 30
+  },
+  "negativeFalsePositiveAnalysis": {
+    "baselineFalsePositiveIds": [
+      "V2-U01-N01",
+      "V2-U01-N03",
+      "V2-U03-N01",
+      "V2-U04-N01",
+      "V2-U04-N02"
+    ],
+    "blocked": {
+      "count": 4,
+      "of": 5,
+      "ids": [
+        "V2-U01-N01",
+        "V2-U03-N01",
+        "V2-U04-N01",
+        "V2-U04-N02"
+      ]
+    },
+    "remaining": {
+      "count": 1,
+      "of": 5,
+      "ids": ["V2-U01-N03"]
+    }
+  },
+  "positivePreservation": {
+    "baselineCorrect": 21,
+    "retained": {
+      "count": 7,
+      "of": 21,
+      "ids": [
+        "V2-U01-NI01",
+        "V2-U01-CN02",
+        "V2-U03-D02",
+        "V2-U03-NV02",
+        "V2-U03-CN01",
+        "V2-U03-CN02",
+        "V2-U04-NV01"
+      ]
+    },
+    "regression": {
+      "count": 14,
+      "of": 21,
+      "ids": [
+        "V2-U01-D02",
+        "V2-U01-NV01",
+        "V2-U01-IP01",
+        "V2-U01-IP02",
+        "V2-U01-CN01",
+        "V2-U02-D01",
+        "V2-U02-NV01",
+        "V2-U02-IP01",
+        "V2-U03-D01",
+        "V2-U03-NV01",
+        "V2-U03-IP02",
+        "V2-U04-NV02",
+        "V2-U04-IP02",
+        "V2-U04-CN01"
+      ]
+    },
+    "rankImproved": {
+      "count": 0,
+      "ids": []
+    }
+  },
+  "filtering": {
+    "totalPairs": 86,
+    "retainedSupportPairs": 22,
+    "filteredNonSupportPairs": 64,
+    "combinedLabelDistribution": {
+      "SUPPORT": 22,
+      "CONTRADICT": 20,
+      "UNKNOWN": 44
+    },
+    "numericVetoCount": 0,
+    "newEvidenceCreated": false
+  },
+  "latency": {
+    "scope": "NLI inference recorded in frozen nli-results.json; numeric verifier latency was not separately recorded",
+    "pairCount": 86,
+    "totalMs": 93242.14529995515,
+    "averageMs": 1084.2109918599438,
+    "p95Ms": 1628.6285999958636
+  },
+  "gate": {
+    "negativeFprAtMostOneOfTwelve": { "passed": true, "actual": "1/12" },
+    "positiveRegressionZero": { "passed": false, "actual": 14 },
+    "recallAt5AtLeast58_33Percent": { "passed": false, "actual": "7/36 (19.44%)" },
+    "top1AtLeast33_33Percent": { "passed": false, "actual": "5/36 (13.89%)" },
+    "noNewEvidence": { "passed": true, "actual": true },
+    "allPassed": false
+  },
+  "final": "P7_B_SEMANTIC_SHADOW_FAIL"
+}

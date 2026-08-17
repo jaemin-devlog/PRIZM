@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-semantic-nli-fresh-validation",
+  "counts": {"SUPPORT": 14, "CONTRADICT": 14, "UNKNOWN": 8},
+  "gate": {"supportMin": 13, "contradictFalseSupportMax": 1, "unknownFalseSupportMax": 1, "supportContradictMax": 1}
+}

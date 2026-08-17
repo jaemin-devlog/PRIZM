@@ -1,0 +1,730 @@
+{
+  "schemaVersion": 1,
+  "mode": "NLI_PLUS_NUMERIC_SHADOW",
+  "results": [
+    {
+      "id": "V2-U01-D02#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U01-D02#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U01-NV01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U01-NV01#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U01-NV01#r3",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U01-NV01#r4",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U01-NV02#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U01-NV02#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U01-IP01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U01-IP01#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U01-IP01#r3",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U01-IP01#r4",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U01-IP02#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U01-IP02#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U01-IP02#r3",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U01-IP02#r4",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U01-NI01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U01-CN01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U01-CN01#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U01-CN01#r3",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U01-CN02#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U01-CN02#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U01-CN02#r3",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U01-N01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U01-N03#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U02-D01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U02-D01#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U02-D02#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U02-D02#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U02-NV01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U02-NV01#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U02-NV02#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U02-IP01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U02-IP01#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U02-IP01#r3",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U02-IP02#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U02-NI01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U02-CN01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U03-D01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U03-D01#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U03-D01#r3",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U03-D01#r4",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U03-D02#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U03-D02#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U03-D02#r3",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U03-NV01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U03-NV01#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U03-NV01#r3",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U03-NV01#r4",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U03-NV02#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U03-NV02#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U03-IP01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U03-IP01#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U03-IP02#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U03-IP02#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U03-IP02#r3",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U03-NI01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U03-CN01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U03-CN01#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U03-CN01#r3",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U03-CN01#r4",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U03-CN02#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U03-CN02#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U03-N01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U04-D01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U04-D01#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U04-D02#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U04-D02#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U04-NV01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U04-NV01#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U04-NV02#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U04-NV02#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U04-IP02#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U04-NI01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U04-CN01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U04-CN01#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U04-CN01#r3",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U04-CN01#r4",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U04-CN02#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U04-CN02#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U04-CN02#r3",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "UNKNOWN",
+      "combinedLabel": "UNKNOWN",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "V2-U04-N01#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U04-N01#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U04-N02#r1",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U04-N02#r2",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "V2-U04-N02#r3",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    }
+  ],
+  "summary": {
+    "nliOnly": {
+      "SUPPORT": {
+        "SUPPORT": 0,
+        "CONTRADICT": 0,
+        "UNKNOWN": 0
+      },
+      "CONTRADICT": {
+        "SUPPORT": 0,
+        "CONTRADICT": 0,
+        "UNKNOWN": 0
+      },
+      "UNKNOWN": {
+        "SUPPORT": 24,
+        "CONTRADICT": 20,
+        "UNKNOWN": 42
+      }
+    },
+    "combined": {
+      "SUPPORT": {
+        "SUPPORT": 0,
+        "CONTRADICT": 0,
+        "UNKNOWN": 0
+      },
+      "CONTRADICT": {
+        "SUPPORT": 0,
+        "CONTRADICT": 0,
+        "UNKNOWN": 0
+      },
+      "UNKNOWN": {
+        "SUPPORT": 24,
+        "CONTRADICT": 20,
+        "UNKNOWN": 42
+      }
+    }
+  }
+}

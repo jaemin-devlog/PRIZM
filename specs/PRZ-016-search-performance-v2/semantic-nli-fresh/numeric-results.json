@@ -1,0 +1,330 @@
+{
+  "schemaVersion": 1,
+  "mode": "NLI_PLUS_NUMERIC_SHADOW",
+  "results": [
+    {
+      "id": "F01",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F02",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F03",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F04",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F05",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F06",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F07",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F08",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F09",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F10",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F11",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F12",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F13",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F14",
+      "groundTruth": "SUPPORT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F15",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F16",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F17",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F18",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "SUPPORT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "F19",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F20",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F21",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F22",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F23",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": "SAME_METRIC_DIFFERENT_VALUE",
+      "correct": true
+    },
+    {
+      "id": "F24",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "SUPPORT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": "SAME_METRIC_DIFFERENT_VALUE",
+      "correct": true
+    },
+    {
+      "id": "F25",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F26",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F27",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "F28",
+      "groundTruth": "CONTRADICT",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": true
+    },
+    {
+      "id": "FU01",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "FU02",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "FU03",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "FU04",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "FU05",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "FU06",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "FU07",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    },
+    {
+      "id": "FU08",
+      "groundTruth": "UNKNOWN",
+      "nliLabel": "CONTRADICT",
+      "combinedLabel": "CONTRADICT",
+      "numericVeto": null,
+      "correct": false
+    }
+  ],
+  "summary": {
+    "nliOnly": {
+      "SUPPORT": {
+        "SUPPORT": 14,
+        "CONTRADICT": 0,
+        "UNKNOWN": 0
+      },
+      "CONTRADICT": {
+        "SUPPORT": 2,
+        "CONTRADICT": 12,
+        "UNKNOWN": 0
+      },
+      "UNKNOWN": {
+        "SUPPORT": 0,
+        "CONTRADICT": 8,
+        "UNKNOWN": 0
+      }
+    },
+    "combined": {
+      "SUPPORT": {
+        "SUPPORT": 14,
+        "CONTRADICT": 0,
+        "UNKNOWN": 0
+      },
+      "CONTRADICT": {
+        "SUPPORT": 1,
+        "CONTRADICT": 13,
+        "UNKNOWN": 0
+      },
+      "UNKNOWN": {
+        "SUPPORT": 0,
+        "CONTRADICT": 8,
+        "UNKNOWN": 0
+      }
+    }
+  }
+}

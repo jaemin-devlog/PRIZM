@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "runType": "single-production-baseline",
+  "datasetCount": 24,
+  "positivePass": 3,
+  "positiveTotal": 8,
+  "negativeFalsePositive": 5,
+  "negativeTotal": 16,
+  "byCategory": [
+    {
+      "category": "EXPLICIT_DENIAL",
+      "falsePositive": 0,
+      "total": 4,
+      "ids": []
+    },
+    {
+      "category": "COMPARISON_NOT_ADOPTED",
+      "falsePositive": 1,
+      "total": 3,
+      "ids": [
+        "Q15"
+      ]
+    },
+    {
+      "category": "PLAN_ONLY",
+      "falsePositive": 0,
+      "total": 3,
+      "ids": []
+    },
+    {
+      "category": "PAST_PROTOTYPE",
+      "falsePositive": 2,
+      "total": 3,
+      "ids": [
+        "Q19",
+        "Q21"
+      ]
+    },
+    {
+      "category": "NUMERIC_NEAR_MISS",
+      "falsePositive": 2,
+      "total": 3,
+      "ids": [
+        "Q22",
+        "Q23"
+      ]
+    }
+  ],
+  "falsePositives": [
+    {
+      "id": "Q15",
+      "snippetId": "NEG-C03",
+      "polarity": "NEGATIVE",
+      "category": "COMPARISON_NOT_ADOPTED",
+      "query": "Hasura를 production API에 도입했나요?",
+      "answerAnchor": null,
+      "evidenceFound": true,
+      "positiveCorrect": false,
+      "falsePositive": true,
+      "resultCount": 1,
+      "returned": [
+        {
+          "snippet": "[POS-01] 2024년에 지역 기록보관소의 접수 번호를 검증하는 Ruby on Rails API를 직접 구현해 운영팀에 배포했다.",
+          "content": "[POS-01] 2024년에 지역 기록보관소의 접수 번호를 검증하는 Ruby on Rails API를 직접 구현해 운영팀에 배포했다. 담당자는 매일 이 서비스로 기증 기록을 등록했다.\n\n[POS-02] 조력 발전 센서 대시보드에 Grafana Loki 로그 상관관계를 도입하고 야간 장애 대응 절차를 운영했다. 알람 담당자가 trace ID로 수집기 오류를 추적했다.\n\n[POS-03] 시청 제설 차량 배차 도구에 OSRM 기반 경로 계산 모듈을 구현했다. 현장 관리자가 폭설 당일 실제 운행 순서를 이 도구로 조정했다.\n\n[POS-04] 대학 식물 표본 이미지 목록을 Solr에서 OpenSearch로 이전하고 사서용 검색 화면을 운영했다. 학명과 채집 지역 필터를 직접 구성했다.\n\n[POS-05] Electron 기반 출고 라벨 도구에 WebAssembly 바코드 판독 기능을 구현했다. 창고 직원은 외부 스캐너 없이 노트북 카메라로 라벨을 확인했다.\n\n[POS-06] 연구 지원금 심사 포털을 Django와 Celery로 구현해 심사위원에게 배포했다. 마감 시점의 대량 첨부 파일 검증 작업을 비동기로 처리했다.\n\n[POS-07] 자원봉사 일정 앱에 FIDO2 passkey 로그인을 구현하고 기존 비밀번호 로그인과 함께 실제 사용자에게 출시했다.\n\n[POS-08] 하천 수질 관측 스트림에 Apache Flink checkpoint 복구를 구현하고 운영했다. 작업 재시작 뒤에도 마지막 확정 수위 측정값부터 처리했다.\n\n[NEG-D01] 얼굴 인식 출입 통제는 직접 구현하지 않았다. 보안 조직의 시연을 검토했을 뿐이며",
+          "score": 0.5026805114009211
+        }
+      ]
+    },
+    {
+      "id": "Q19",
+      "snippetId": "NEG-H01",
+      "polarity": "NEGATIVE",
+      "category": "PAST_PROTOTYPE",
+      "query": "Apache Storm을 현재 운영 서비스에 사용했나요?",
+      "answerAnchor": null,
+      "evidenceFound": true,
+      "positiveCorrect": false,
+      "falsePositive": true,
+      "resultCount": 1,
+      "returned": [
+        {
+          "snippet": "[NEG-H01] 2018년 hackweek prototype에서 Apache Storm을 잠시 사용했지만 조직 서비스가 시작되기 전에 폐기했다.\n현재 경력의 운영 시스템에는 포함되지 않는다.",
+          "content": "개발 일정도 확정되지 않았고 출시한 기능은 없다.\n\n[NEG-P02] 문서 이미지의 AVIF 변환은 아키텍처 검토 안건일 뿐이다. 구현, 배포, 변환 작업은 시작하지 않았다.\n\n[NEG-P03] 서버리스 이전은 분기 계획 회의에서 논의만 했다. 승인된 설계나 실행한 migration은 없다.\n\n[NEG-H01] 2018년 hackweek prototype에서 Apache Storm을 잠시 사용했지만 조직 서비스가 시작되기 전에 폐기했다. 현재 경력의 운영 시스템에는 포함되지 않는다.\n\n[NEG-H02] 대학 연구실에서 Prolog 규칙 엔진을 만든 실험은 있었다. 고객 서비스에 연결하지 않았고 이후 제품으로 전환하지 않았다.\n\n[NEG-H03] 예전 데모는 Mapbox GL로 지도를 렌더링했지만 현재 제품 출시 전에 제거했다. 현행 화면에는 그 코드가 없다.\n\n[NEG-M01] 자료 정합성 검사는 97.8%에서 통과했다. 99.8%라는 수치는 기록이나 운영 보고서에 없다.\n\n[NEG-M02] 야간 집계의 실제 P95는 680밀리초였다. 580밀리초 개선을 달성했다는 근거는 없다.\n\n[NEG-M03] 현장 점검은 43개 경로를 대상으로 완료했다. 34개 경로라는 숫자는 사용하지 않았다.",
+          "score": 0.5808851565513553
+        }
+      ]
+    },
+    {
+      "id": "Q21",
+      "snippetId": "NEG-H03",
+      "polarity": "NEGATIVE",
+      "category": "PAST_PROTOTYPE",
+      "query": "Mapbox GL 지도를 현재 출시 제품에 구현했나요?",
+      "answerAnchor": null,
+      "evidenceFound": true,
+      "positiveCorrect": false,
+      "falsePositive": true,
+      "resultCount": 1,
+      "returned": [
+        {
+          "snippet": "고객 서비스에 연결하지 않았고 이후 제품으로 전환하지 않았다.\n[NEG-H03] 예전 데모는 Mapbox GL로 지도를 렌더링했지만 현재 제품 출시 전에 제거했다.",
+          "content": "개발 일정도 확정되지 않았고 출시한 기능은 없다.\n\n[NEG-P02] 문서 이미지의 AVIF 변환은 아키텍처 검토 안건일 뿐이다. 구현, 배포, 변환 작업은 시작하지 않았다.\n\n[NEG-P03] 서버리스 이전은 분기 계획 회의에서 논의만 했다. 승인된 설계나 실행한 migration은 없다.\n\n[NEG-H01] 2018년 hackweek prototype에서 Apache Storm을 잠시 사용했지만 조직 서비스가 시작되기 전에 폐기했다. 현재 경력의 운영 시스템에는 포함되지 않는다.\n\n[NEG-H02] 대학 연구실에서 Prolog 규칙 엔진을 만든 실험은 있었다. 고객 서비스에 연결하지 않았고 이후 제품으로 전환하지 않았다.\n\n[NEG-H03] 예전 데모는 Mapbox GL로 지도를 렌더링했지만 현재 제품 출시 전에 제거했다. 현행 화면에는 그 코드가 없다.\n\n[NEG-M01] 자료 정합성 검사는 97.8%에서 통과했다. 99.8%라는 수치는 기록이나 운영 보고서에 없다.\n\n[NEG-M02] 야간 집계의 실제 P95는 680밀리초였다. 580밀리초 개선을 달성했다는 근거는 없다.\n\n[NEG-M03] 현장 점검은 43개 경로를 대상으로 완료했다. 34개 경로라는 숫자는 사용하지 않았다.",
+          "score": 0.5715837563324793
+        }
+      ]
+    },
+    {
+      "id": "Q22",
+      "snippetId": "NEG-M01",
+      "polarity": "NEGATIVE",
+      "category": "NUMERIC_NEAR_MISS",
+      "query": "자료 정합성 99.8%를 달성했다는 근거가 있나요?",
+      "answerAnchor": null,
+      "evidenceFound": true,
+      "positiveCorrect": false,
+      "falsePositive": true,
+      "resultCount": 1,
+      "returned": [
+        {
+          "snippet": "[NEG-M01] 자료 정합성 검사는 97.8%에서 통과했다. 99.8%라는 수치는 기록이나 운영 보고서에 없다.\n[NEG-M02] 야간 집계의 실제 P95는 680밀리초였다. 580밀리초 개선을 달성했다는 근거는 없다.",
+          "content": "개발 일정도 확정되지 않았고 출시한 기능은 없다.\n\n[NEG-P02] 문서 이미지의 AVIF 변환은 아키텍처 검토 안건일 뿐이다. 구현, 배포, 변환 작업은 시작하지 않았다.\n\n[NEG-P03] 서버리스 이전은 분기 계획 회의에서 논의만 했다. 승인된 설계나 실행한 migration은 없다.\n\n[NEG-H01] 2018년 hackweek prototype에서 Apache Storm을 잠시 사용했지만 조직 서비스가 시작되기 전에 폐기했다. 현재 경력의 운영 시스템에는 포함되지 않는다.\n\n[NEG-H02] 대학 연구실에서 Prolog 규칙 엔진을 만든 실험은 있었다. 고객 서비스에 연결하지 않았고 이후 제품으로 전환하지 않았다.\n\n[NEG-H03] 예전 데모는 Mapbox GL로 지도를 렌더링했지만 현재 제품 출시 전에 제거했다. 현행 화면에는 그 코드가 없다.\n\n[NEG-M01] 자료 정합성 검사는 97.8%에서 통과했다. 99.8%라는 수치는 기록이나 운영 보고서에 없다.\n\n[NEG-M02] 야간 집계의 실제 P95는 680밀리초였다. 580밀리초 개선을 달성했다는 근거는 없다.\n\n[NEG-M03] 현장 점검은 43개 경로를 대상으로 완료했다. 34개 경로라는 숫자는 사용하지 않았다.",
+          "score": 0.4534556702809286
+        }
+      ]
+    },
+    {
+      "id": "Q23",
+      "snippetId": "NEG-M02",
+      "polarity": "NEGATIVE",
+      "category": "NUMERIC_NEAR_MISS",
+      "query": "야간 집계 P95를 580밀리초로 낮춘 경험이 있나요?",
+      "answerAnchor": null,
+      "evidenceFound": true,
+      "positiveCorrect": false,
+      "falsePositive": true,
+      "resultCount": 1,
+      "returned": [
+        {
+          "snippet": "[NEG-M02] 야간 집계의 실제 P95는 680밀리초였다. 580밀리초 개선을 달성했다는 근거는 없다.",
+          "content": "개발 일정도 확정되지 않았고 출시한 기능은 없다.\n\n[NEG-P02] 문서 이미지의 AVIF 변환은 아키텍처 검토 안건일 뿐이다. 구현, 배포, 변환 작업은 시작하지 않았다.\n\n[NEG-P03] 서버리스 이전은 분기 계획 회의에서 논의만 했다. 승인된 설계나 실행한 migration은 없다.\n\n[NEG-H01] 2018년 hackweek prototype에서 Apache Storm을 잠시 사용했지만 조직 서비스가 시작되기 전에 폐기했다. 현재 경력의 운영 시스템에는 포함되지 않는다.\n\n[NEG-H02] 대학 연구실에서 Prolog 규칙 엔진을 만든 실험은 있었다. 고객 서비스에 연결하지 않았고 이후 제품으로 전환하지 않았다.\n\n[NEG-H03] 예전 데모는 Mapbox GL로 지도를 렌더링했지만 현재 제품 출시 전에 제거했다. 현행 화면에는 그 코드가 없다.\n\n[NEG-M01] 자료 정합성 검사는 97.8%에서 통과했다. 99.8%라는 수치는 기록이나 운영 보고서에 없다.\n\n[NEG-M02] 야간 집계의 실제 P95는 680밀리초였다. 580밀리초 개선을 달성했다는 근거는 없다.\n\n[NEG-M03] 현장 점검은 43개 경로를 대상으로 완료했다. 34개 경로라는 숫자는 사용하지 않았다.",
+          "score": 0.5357165900732365
+        }
+      ]
+    }
+  ],
+  "rawResultsSha256": "0eff78c5906af9babec8d38ec1138425dd625a7eeac26df3a19219f68254b607"
+}

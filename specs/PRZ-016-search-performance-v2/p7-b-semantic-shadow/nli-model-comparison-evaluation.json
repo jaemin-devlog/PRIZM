@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "phase": "PRZ-016-NLI-MODEL-COMPARISON-FINAL-EVALUATION",
+  "evaluatedAt": "2026-08-17T02:46:06.0361653+09:00",
+  "productionImpact": "NONE",
+  "integrity": {
+    "status": "PASS",
+    "allRequiredHashesMatchedBeforeResultRead": true,
+    "pairs": {
+      "path": "nli-model-comparison-pairs.json",
+      "sha256": "8311af2ec5683b2b70c9de014570a4119c9804539f9a64f1afd8917472150eed"
+    },
+    "mdebertaResults": {
+      "path": "nli-model-comparison-results-mdeberta.json",
+      "sha256": "e83ccc879d62d6b36a817660f04d3b00839785484dcfd48b0a6a9965d8914a48"
+    },
+    "klueResults": {
+      "path": "nli-model-comparison-results-klue-roberta.json",
+      "sha256": "d3343b5393ce9d6a6611f04e738647ed49d7238c5e647195f6c04ff787cd0743"
+    },
+    "pairCount": 113,
+    "mdebertaResultCount": 113,
+    "klueResultCount": 113,
+    "missingIds": 0,
+    "extraIds": 0,
+    "groundTruthMismatch": 0
+  },
+  "groupAB": {
+    "counts": { "SUPPORT": 40, "CONTRADICT": 52, "UNKNOWN": 16 },
+    "mdeberta": {
+      "confusion": {
+        "SUPPORT": { "SUPPORT": 40, "UNKNOWN": 0, "CONTRADICT": 0 },
+        "CONTRADICT": { "SUPPORT": 4, "UNKNOWN": 0, "CONTRADICT": 48 },
+        "UNKNOWN": { "SUPPORT": 0, "UNKNOWN": 3, "CONTRADICT": 13 }
+      },
+      "positiveFalseReject": { "count": 0, "supportToContradict": 0, "ids": [] },
+      "negativeFalseSupport": { "count": 4, "ids": ["v2-U22", "adv-A15", "F18", "F24"] },
+      "unknownFalseSupport": { "count": 0, "ids": [] }
+    },
+    "klue": {
+      "confusion": {
+        "SUPPORT": { "SUPPORT": 39, "UNKNOWN": 0, "CONTRADICT": 1 },
+        "CONTRADICT": { "SUPPORT": 3, "UNKNOWN": 5, "CONTRADICT": 44 },
+        "UNKNOWN": { "SUPPORT": 0, "UNKNOWN": 16, "CONTRADICT": 0 }
+      },
+      "positiveFalseReject": { "count": 1, "supportToContradict": 1, "ids": ["v2-U02"] },
+      "negativeFalseSupport": { "count": 3, "ids": ["v1-Q22", "v2-U23", "F24"] },
+      "unknownFalseSupport": { "count": 0, "ids": [] }
+    }
+  },
+  "groupC": {
+    "groundTruth": "SUPPORT",
+    "mdeberta": { "SUPPORT": 0, "UNKNOWN": 4, "CONTRADICT": 1 },
+    "klue": { "SUPPORT": 0, "UNKNOWN": 5, "CONTRADICT": 0 },
+    "recoveredIds": [],
+    "failedIds": [
+      "V2-U01-IP01",
+      "V2-U02-D01",
+      "V2-U02-NV01",
+      "V2-U02-IP01",
+      "V2-U04-IP02"
+    ],
+    "cases": [
+      {
+        "queryId": "V2-U01-IP01",
+        "pairId": "V2-U01-IP01#r1#w3",
+        "mdeberta": { "label": "CONTRADICT", "support": 0.0021915435791015625, "unknown": 0.001407623291015625, "contradict": 0.99658203125 },
+        "klue": { "label": "UNKNOWN", "support": 0.0004471890861168504, "unknown": 0.9989811778068542, "contradict": 0.0005716417799703777 },
+        "recovered": false
+      },
+      {
+        "queryId": "V2-U02-D01",
+        "pairId": "V2-U02-D01#r2#w1",
+        "mdeberta": { "label": "UNKNOWN", "support": 0.0731201171875, "unknown": 0.92578125, "contradict": 0.0009131431579589844 },
+        "klue": { "label": "UNKNOWN", "support": 0.0005722095374949276, "unknown": 0.9990806579589844, "contradict": 0.00034718363895080984 },
+        "recovered": false
+      },
+      {
+        "queryId": "V2-U02-NV01",
+        "pairId": "V2-U02-NV01#r1#w2",
+        "mdeberta": { "label": "UNKNOWN", "support": 0.0013761520385742188, "unknown": 0.99853515625, "contradict": 0.0002455711364746094 },
+        "klue": { "label": "UNKNOWN", "support": 0.0004356741555966437, "unknown": 0.9982068538665771, "contradict": 0.0013574982294812799 },
+        "recovered": false
+      },
+      {
+        "queryId": "V2-U02-IP01",
+        "pairId": "V2-U02-IP01#r2#w2",
+        "mdeberta": { "label": "UNKNOWN", "support": 0.0005536079406738281, "unknown": 0.9990234375, "contradict": 0.0006613731384277344 },
+        "klue": { "label": "UNKNOWN", "support": 0.0004014349542558193, "unknown": 0.9991106390953064, "contradict": 0.0004879453917965293 },
+        "recovered": false
+      },
+      {
+        "queryId": "V2-U04-IP02",
+        "pairId": "V2-U04-IP02#r1#w1",
+        "mdeberta": { "label": "UNKNOWN", "support": 0.386474609375, "unknown": 0.61083984375, "contradict": 0.0027828216552734375 },
+        "klue": { "label": "UNKNOWN", "support": 0.00041081494418904185, "unknown": 0.9990166425704956, "contradict": 0.000572457502130419 },
+        "recovered": false
+      }
+    ]
+  },
+  "accuracy": {
+    "mdeberta": {
+      "groupA": { "correct": 65, "total": 72, "rate": 0.9027777777777778 },
+      "groupB": { "correct": 26, "total": 36, "rate": 0.7222222222222222 },
+      "groupC": { "correct": 0, "total": 5, "rate": 0.0 },
+      "overall": { "correct": 91, "total": 113, "rate": 0.8053097345132744 }
+    },
+    "klue": {
+      "groupA": { "correct": 66, "total": 72, "rate": 0.9166666666666666 },
+      "groupB": { "correct": 33, "total": 36, "rate": 0.9166666666666666 },
+      "groupC": { "correct": 0, "total": 5, "rate": 0.0 },
+      "overall": { "correct": 99, "total": 113, "rate": 0.8761061946902655 }
+    }
+  },
+  "labelDistribution": {
+    "mdeberta": { "SUPPORT": 44, "UNKNOWN": 7, "CONTRADICT": 62 },
+    "klue": { "SUPPORT": 42, "UNKNOWN": 26, "CONTRADICT": 45 }
+  },
+  "latencyMs": {
+    "mdeberta": { "average": 891.6094743356158, "p95": 1146.978399992804, "total": 100751.87059992459 },
+    "klue": { "average": 62.92912035467581, "p95": 81.19869999063667, "total": 7110.990600078367 },
+    "includedInGate": false
+  },
+  "gate": {
+    "groupCSupportAtLeastThreeOfFive": { "passed": false, "actual": "0/5" },
+    "groupABSupportFalseRejectNotIncreased": { "passed": false, "baseline": 0, "candidate": 1 },
+    "groupABContradictFalseSupportNotIncreased": { "passed": true, "baseline": 4, "candidate": 3 },
+    "groupABUnknownFalseSupportAtMostOne": { "passed": true, "actual": "0/16" },
+    "allPassed": false
+  },
+  "final": "KOREAN_NLI_CANDIDATE_NO_GO",
+  "next": "NLI_MODEL_LIMITATION"
+}

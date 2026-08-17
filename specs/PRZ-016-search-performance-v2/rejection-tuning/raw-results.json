@@ -1,0 +1,451 @@
+{
+  "phase": "PRZ-016-rejection-tuning",
+  "executedAt": "2026-08-16T10:47:10.889Z",
+  "datasetSha256": "342c5355f7256fc56430805dd91571bfc8be0fedcd6dcad90c563e6efcca2114",
+  "user": {
+    "id": 1,
+    "role": "USER"
+  },
+  "document": {
+    "id": 1,
+    "activeVersionId": 1,
+    "status": "ACTIVE"
+  },
+  "queryCount": 24,
+  "queries": [
+    {
+      "id": "Q01",
+      "polarity": "POSITIVE",
+      "negativeType": null,
+      "query": "기록보관소 접수 번호를 검증하는 Rails 서비스를 실제 운영팀에 배포한 경험이 있나요?",
+      "latencyMs": 277.8798999999999,
+      "response": {
+        "state": "NO_EVIDENCE",
+        "results": []
+      }
+    },
+    {
+      "id": "Q02",
+      "polarity": "POSITIVE",
+      "negativeType": null,
+      "query": "조력 발전 센서 장애를 Loki 로그 상관관계로 운영한 경험이 있나요?",
+      "latencyMs": 256.6260000000002,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 1,
+            "documentId": 1,
+            "documentVersionId": 1,
+            "documentTitle": "Synthetic Rejection Tuning Record",
+            "versionNo": 1,
+            "content": "[POS-01] 2024년에 지역 기록보관소의 접수 번호를 검증하는 Ruby on Rails API를 직접 구현해 운영팀에 배포했다. 담당자는 매일 이 서비스로 기증 기록을 등록했다.\n\n[POS-02] 조력 발전 센서 대시보드에 Grafana Loki 로그 상관관계를 도입하고 야간 장애 대응 절차를 운영했다. 알람 담당자가 trace ID로 수집기 오류를 추적했다.\n\n[POS-03] 시청 제설 차량 배차 도구에 OSRM 기반 경로 계산 모듈을 구현했다. 현장 관리자가 폭설 당일 실제 운행 순서를 이 도구로 조정했다.\n\n[POS-04] 대학 식물 표본 이미지 목록을 Solr에서 OpenSearch로 이전하고 사서용 검색 화면을 운영했다. 학명과 채집 지역 필터를 직접 구성했다.\n\n[POS-05] Electron 기반 출고 라벨 도구에 WebAssembly 바코드 판독 기능을 구현했다. 창고 직원은 외부 스캐너 없이 노트북 카메라로 라벨을 확인했다.\n\n[POS-06] 연구 지원금 심사 포털을 Django와 Celery로 구현해 심사위원에게 배포했다. 마감 시점의 대량 첨부 파일 검증 작업을 비동기로 처리했다.\n\n[POS-07] 자원봉사 일정 앱에 FIDO2 passkey 로그인을 구현하고 기존 비밀번호 로그인과 함께 실제 사용자에게 출시했다.\n\n[POS-08] 하천 수질 관측 스트림에 Apache Flink checkpoint 복구를 구현하고 운영했다. 작업 재시작 뒤에도 마지막 확정 수위 측정값부터 처리했다.\n\n[NEG-D01] 얼굴 인식 출입 통제는 직접 구현하지 않았다. 보안 조직의 시연을 검토했을 뿐이며",
+            "snippet": "[POS-02] 조력 발전 센서 대시보드에 Grafana Loki 로그 상관관계를 도입하고 야간 장애 대응 절차를 운영했다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 1,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.4277656760494729,
+            "score": 0.5722343239505271
+          }
+        ]
+      }
+    },
+    {
+      "id": "Q03",
+      "polarity": "POSITIVE",
+      "negativeType": null,
+      "query": "제설 차량의 실제 운행 순서를 OSRM 경로 계산으로 조정한 경험이 있나요?",
+      "latencyMs": 243.61110000000008,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 1,
+            "documentId": 1,
+            "documentVersionId": 1,
+            "documentTitle": "Synthetic Rejection Tuning Record",
+            "versionNo": 1,
+            "content": "[POS-01] 2024년에 지역 기록보관소의 접수 번호를 검증하는 Ruby on Rails API를 직접 구현해 운영팀에 배포했다. 담당자는 매일 이 서비스로 기증 기록을 등록했다.\n\n[POS-02] 조력 발전 센서 대시보드에 Grafana Loki 로그 상관관계를 도입하고 야간 장애 대응 절차를 운영했다. 알람 담당자가 trace ID로 수집기 오류를 추적했다.\n\n[POS-03] 시청 제설 차량 배차 도구에 OSRM 기반 경로 계산 모듈을 구현했다. 현장 관리자가 폭설 당일 실제 운행 순서를 이 도구로 조정했다.\n\n[POS-04] 대학 식물 표본 이미지 목록을 Solr에서 OpenSearch로 이전하고 사서용 검색 화면을 운영했다. 학명과 채집 지역 필터를 직접 구성했다.\n\n[POS-05] Electron 기반 출고 라벨 도구에 WebAssembly 바코드 판독 기능을 구현했다. 창고 직원은 외부 스캐너 없이 노트북 카메라로 라벨을 확인했다.\n\n[POS-06] 연구 지원금 심사 포털을 Django와 Celery로 구현해 심사위원에게 배포했다. 마감 시점의 대량 첨부 파일 검증 작업을 비동기로 처리했다.\n\n[POS-07] 자원봉사 일정 앱에 FIDO2 passkey 로그인을 구현하고 기존 비밀번호 로그인과 함께 실제 사용자에게 출시했다.\n\n[POS-08] 하천 수질 관측 스트림에 Apache Flink checkpoint 복구를 구현하고 운영했다. 작업 재시작 뒤에도 마지막 확정 수위 측정값부터 처리했다.\n\n[NEG-D01] 얼굴 인식 출입 통제는 직접 구현하지 않았다. 보안 조직의 시연을 검토했을 뿐이며",
+            "snippet": "[POS-03] 시청 제설 차량 배차 도구에 OSRM 기반 경로 계산 모듈을 구현했다.\n현장 관리자가 폭설 당일 실제 운행 순서를 이 도구로 조정했다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 1,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.4961136269908023,
+            "score": 0.5038863730091977
+          }
+        ]
+      }
+    },
+    {
+      "id": "Q04",
+      "polarity": "POSITIVE",
+      "negativeType": null,
+      "query": "식물 표본 검색을 OpenSearch로 이전해 사서가 쓰도록 운영한 적이 있나요?",
+      "latencyMs": 486.42449999999917,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "Q05",
+      "polarity": "POSITIVE",
+      "negativeType": null,
+      "query": "Electron 출고 라벨 도구에 WebAssembly 바코드 판독을 구현했나요?",
+      "latencyMs": 227.59850000000006,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "Q06",
+      "polarity": "POSITIVE",
+      "negativeType": null,
+      "query": "Django와 Celery로 지원금 심사 포털의 첨부 파일 검증을 비동기 처리했나요?",
+      "latencyMs": 262.83799999999974,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 1,
+            "documentId": 1,
+            "documentVersionId": 1,
+            "documentTitle": "Synthetic Rejection Tuning Record",
+            "versionNo": 1,
+            "content": "[POS-01] 2024년에 지역 기록보관소의 접수 번호를 검증하는 Ruby on Rails API를 직접 구현해 운영팀에 배포했다. 담당자는 매일 이 서비스로 기증 기록을 등록했다.\n\n[POS-02] 조력 발전 센서 대시보드에 Grafana Loki 로그 상관관계를 도입하고 야간 장애 대응 절차를 운영했다. 알람 담당자가 trace ID로 수집기 오류를 추적했다.\n\n[POS-03] 시청 제설 차량 배차 도구에 OSRM 기반 경로 계산 모듈을 구현했다. 현장 관리자가 폭설 당일 실제 운행 순서를 이 도구로 조정했다.\n\n[POS-04] 대학 식물 표본 이미지 목록을 Solr에서 OpenSearch로 이전하고 사서용 검색 화면을 운영했다. 학명과 채집 지역 필터를 직접 구성했다.\n\n[POS-05] Electron 기반 출고 라벨 도구에 WebAssembly 바코드 판독 기능을 구현했다. 창고 직원은 외부 스캐너 없이 노트북 카메라로 라벨을 확인했다.\n\n[POS-06] 연구 지원금 심사 포털을 Django와 Celery로 구현해 심사위원에게 배포했다. 마감 시점의 대량 첨부 파일 검증 작업을 비동기로 처리했다.\n\n[POS-07] 자원봉사 일정 앱에 FIDO2 passkey 로그인을 구현하고 기존 비밀번호 로그인과 함께 실제 사용자에게 출시했다.\n\n[POS-08] 하천 수질 관측 스트림에 Apache Flink checkpoint 복구를 구현하고 운영했다. 작업 재시작 뒤에도 마지막 확정 수위 측정값부터 처리했다.\n\n[NEG-D01] 얼굴 인식 출입 통제는 직접 구현하지 않았다. 보안 조직의 시연을 검토했을 뿐이며",
+            "snippet": "[POS-06] 연구 지원금 심사 포털을 Django와 Celery로 구현해 심사위원에게 배포했다.\n마감 시점의 대량 첨부 파일 검증 작업을 비동기로 처리했다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 1,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.4593669240346092,
+            "score": 0.5406330759653908
+          },
+          {
+            "chunkId": 2,
+            "documentId": 1,
+            "documentVersionId": 1,
+            "documentTitle": "Synthetic Rejection Tuning Record",
+            "versionNo": 1,
+            "content": "ink checkpoint 복구를 구현하고 운영했다. 작업 재시작 뒤에도 마지막 확정 수위 측정값부터 처리했다.\n\n[NEG-D01] 얼굴 인식 출입 통제는 직접 구현하지 않았다. 보안 조직의 시연을 검토했을 뿐이며 현재 서비스에는 해당 기능이 없다.\n\n[NEG-D02] Cassandra 운영 경험은 없다. 초기 설계 메모에 이름만 있었고 데이터 저장소로 설치하거나 관리하지 않았다.\n\n[NEG-D03] iOS 앱을 작성한 적은 없다. 모바일 팀이 담당했고 나는 브라우저용 관리자 화면만 유지했다.\n\n[NEG-D04] 드론 자율비행 모델을 만들거나 학습하지 않았다. 외부 업체의 비행 영상 품질 보고서만 읽었다.\n\n[NEG-C01] YugabyteDB 전환 가능성을 검증했지만 MariaDB를 계속 사용했다. 성능 비교 보고서만 남기고 production migration은 진행하지 않았다.\n\n[NEG-C02] Istio를 staging 환경에서 짧게 시험했지만 채택하지 않았다. 운영 서비스는 기존 reverse proxy 구성을 유지했다.\n\n[NEG-C03] Hasura를 비교 대상으로 살펴봤으나 production에 넣지 않았다. 공개 API는 기존 REST endpoint로 계속 제공했다.\n\n[NEG-P01] 다음 회계연도 계획에는 hardware security key 지원 검토가 적혀 있다. 아직 개발 일정도 확정되지 않았고 출시한 기능은 없다.\n\n[NEG-P02] 문서 이미지의 AVIF 변환은 아키텍처 검토 안건일 뿐이다. 구현, 배포, 변환 작업은 시작하지 않았다.\n\n[NEG-P03] 서버리스 이전은 분기",
+            "snippet": "[POS-06] 연구 지원금 심사 포털을 Django와 Celery로 구현해 심사위원에게 배포했다.\n마감 시점의 대량 첨부 파일 검증 작업을 비동기로 처리했다.\n[POS-07] 자원봉사 일정 앱에 FIDO2 passkey 로그인을 구현하고 기존 비밀번호 로그인과 함께 실제 사용자에게 출시했다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 2,
+            "sourceLabel": "텍스트 구간 2",
+            "evidenceChunkId": 1,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.49872173357502025,
+            "score": 0.5012782664249797
+          }
+        ]
+      }
+    },
+    {
+      "id": "Q07",
+      "polarity": "POSITIVE",
+      "negativeType": null,
+      "query": "자원봉사 일정 앱에 passkey 로그인을 실제 출시한 경험이 있나요?",
+      "latencyMs": 240.6301999999996,
+      "response": {
+        "state": "NO_EVIDENCE",
+        "results": []
+      }
+    },
+    {
+      "id": "Q08",
+      "polarity": "POSITIVE",
+      "negativeType": null,
+      "query": "하천 수질 스트림에서 Flink checkpoint 복구를 운영했나요?",
+      "latencyMs": 232.53039999999964,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "Q09",
+      "polarity": "NEGATIVE",
+      "negativeType": "EXPLICIT_DENIAL",
+      "query": "얼굴 인식 출입 통제를 직접 구현해 운영했나요?",
+      "latencyMs": 232.14369999999872,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "Q10",
+      "polarity": "NEGATIVE",
+      "negativeType": "EXPLICIT_DENIAL",
+      "query": "Cassandra 클러스터를 설치하고 운영한 경험이 있나요?",
+      "latencyMs": 221.0694999999996,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "Q11",
+      "polarity": "NEGATIVE",
+      "negativeType": "EXPLICIT_DENIAL",
+      "query": "iOS 앱을 직접 작성한 경험이 있나요?",
+      "latencyMs": 232.6884000000009,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "Q12",
+      "polarity": "NEGATIVE",
+      "negativeType": "EXPLICIT_DENIAL",
+      "query": "드론 자율비행 모델을 직접 학습하고 만들었나요?",
+      "latencyMs": 282.1279000000013,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "Q13",
+      "polarity": "NEGATIVE",
+      "negativeType": "COMPARISON_NOT_ADOPTED",
+      "query": "YugabyteDB를 production 데이터베이스로 전환해 운영했나요?",
+      "latencyMs": 455.53080000000045,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "Q14",
+      "polarity": "NEGATIVE",
+      "negativeType": "COMPARISON_NOT_ADOPTED",
+      "query": "Istio를 운영 서비스에 채택했나요?",
+      "latencyMs": 464.40390000000116,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "Q15",
+      "polarity": "NEGATIVE",
+      "negativeType": "COMPARISON_NOT_ADOPTED",
+      "query": "Hasura를 production API에 도입했나요?",
+      "latencyMs": 243.47849999999926,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 1,
+            "documentId": 1,
+            "documentVersionId": 1,
+            "documentTitle": "Synthetic Rejection Tuning Record",
+            "versionNo": 1,
+            "content": "[POS-01] 2024년에 지역 기록보관소의 접수 번호를 검증하는 Ruby on Rails API를 직접 구현해 운영팀에 배포했다. 담당자는 매일 이 서비스로 기증 기록을 등록했다.\n\n[POS-02] 조력 발전 센서 대시보드에 Grafana Loki 로그 상관관계를 도입하고 야간 장애 대응 절차를 운영했다. 알람 담당자가 trace ID로 수집기 오류를 추적했다.\n\n[POS-03] 시청 제설 차량 배차 도구에 OSRM 기반 경로 계산 모듈을 구현했다. 현장 관리자가 폭설 당일 실제 운행 순서를 이 도구로 조정했다.\n\n[POS-04] 대학 식물 표본 이미지 목록을 Solr에서 OpenSearch로 이전하고 사서용 검색 화면을 운영했다. 학명과 채집 지역 필터를 직접 구성했다.\n\n[POS-05] Electron 기반 출고 라벨 도구에 WebAssembly 바코드 판독 기능을 구현했다. 창고 직원은 외부 스캐너 없이 노트북 카메라로 라벨을 확인했다.\n\n[POS-06] 연구 지원금 심사 포털을 Django와 Celery로 구현해 심사위원에게 배포했다. 마감 시점의 대량 첨부 파일 검증 작업을 비동기로 처리했다.\n\n[POS-07] 자원봉사 일정 앱에 FIDO2 passkey 로그인을 구현하고 기존 비밀번호 로그인과 함께 실제 사용자에게 출시했다.\n\n[POS-08] 하천 수질 관측 스트림에 Apache Flink checkpoint 복구를 구현하고 운영했다. 작업 재시작 뒤에도 마지막 확정 수위 측정값부터 처리했다.\n\n[NEG-D01] 얼굴 인식 출입 통제는 직접 구현하지 않았다. 보안 조직의 시연을 검토했을 뿐이며",
+            "snippet": "[POS-01] 2024년에 지역 기록보관소의 접수 번호를 검증하는 Ruby on Rails API를 직접 구현해 운영팀에 배포했다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 1,
+            "sourceLabel": "텍스트 구간 1",
+            "evidenceChunkId": 1,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 1,
+            "evidenceSourceLabel": "텍스트 구간 1",
+            "distance": 0.49731948859907893,
+            "score": 0.5026805114009211
+          }
+        ]
+      }
+    },
+    {
+      "id": "Q16",
+      "polarity": "NEGATIVE",
+      "negativeType": "PLAN_ONLY",
+      "query": "hardware security key 로그인을 이미 출시했나요?",
+      "latencyMs": 237.61399999999958,
+      "response": {
+        "state": "NO_EVIDENCE",
+        "results": []
+      }
+    },
+    {
+      "id": "Q17",
+      "polarity": "NEGATIVE",
+      "negativeType": "PLAN_ONLY",
+      "query": "문서 이미지를 AVIF로 변환하는 기능을 구현하고 배포했나요?",
+      "latencyMs": 442.52330000000075,
+      "response": {
+        "state": "NO_EVIDENCE",
+        "results": []
+      }
+    },
+    {
+      "id": "Q18",
+      "polarity": "NEGATIVE",
+      "negativeType": "PLAN_ONLY",
+      "query": "서버리스 이전 migration을 실제로 실행했나요?",
+      "latencyMs": 449.3299999999999,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "Q19",
+      "polarity": "NEGATIVE",
+      "negativeType": "PAST_PROTOTYPE",
+      "query": "Apache Storm을 현재 운영 서비스에 사용했나요?",
+      "latencyMs": 255.10939999999937,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 3,
+            "documentId": 1,
+            "documentVersionId": 1,
+            "documentTitle": "Synthetic Rejection Tuning Record",
+            "versionNo": 1,
+            "content": "개발 일정도 확정되지 않았고 출시한 기능은 없다.\n\n[NEG-P02] 문서 이미지의 AVIF 변환은 아키텍처 검토 안건일 뿐이다. 구현, 배포, 변환 작업은 시작하지 않았다.\n\n[NEG-P03] 서버리스 이전은 분기 계획 회의에서 논의만 했다. 승인된 설계나 실행한 migration은 없다.\n\n[NEG-H01] 2018년 hackweek prototype에서 Apache Storm을 잠시 사용했지만 조직 서비스가 시작되기 전에 폐기했다. 현재 경력의 운영 시스템에는 포함되지 않는다.\n\n[NEG-H02] 대학 연구실에서 Prolog 규칙 엔진을 만든 실험은 있었다. 고객 서비스에 연결하지 않았고 이후 제품으로 전환하지 않았다.\n\n[NEG-H03] 예전 데모는 Mapbox GL로 지도를 렌더링했지만 현재 제품 출시 전에 제거했다. 현행 화면에는 그 코드가 없다.\n\n[NEG-M01] 자료 정합성 검사는 97.8%에서 통과했다. 99.8%라는 수치는 기록이나 운영 보고서에 없다.\n\n[NEG-M02] 야간 집계의 실제 P95는 680밀리초였다. 580밀리초 개선을 달성했다는 근거는 없다.\n\n[NEG-M03] 현장 점검은 43개 경로를 대상으로 완료했다. 34개 경로라는 숫자는 사용하지 않았다.",
+            "snippet": "[NEG-H01] 2018년 hackweek prototype에서 Apache Storm을 잠시 사용했지만 조직 서비스가 시작되기 전에 폐기했다.\n현재 경력의 운영 시스템에는 포함되지 않는다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 3,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.4191148434486447,
+            "score": 0.5808851565513553
+          }
+        ]
+      }
+    },
+    {
+      "id": "Q20",
+      "polarity": "NEGATIVE",
+      "negativeType": "PAST_PROTOTYPE",
+      "query": "Prolog 규칙 엔진을 고객 서비스 제품으로 운영했나요?",
+      "latencyMs": 220.0596999999998,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    },
+    {
+      "id": "Q21",
+      "polarity": "NEGATIVE",
+      "negativeType": "PAST_PROTOTYPE",
+      "query": "Mapbox GL 지도를 현재 출시 제품에 구현했나요?",
+      "latencyMs": 243.1999999999989,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 3,
+            "documentId": 1,
+            "documentVersionId": 1,
+            "documentTitle": "Synthetic Rejection Tuning Record",
+            "versionNo": 1,
+            "content": "개발 일정도 확정되지 않았고 출시한 기능은 없다.\n\n[NEG-P02] 문서 이미지의 AVIF 변환은 아키텍처 검토 안건일 뿐이다. 구현, 배포, 변환 작업은 시작하지 않았다.\n\n[NEG-P03] 서버리스 이전은 분기 계획 회의에서 논의만 했다. 승인된 설계나 실행한 migration은 없다.\n\n[NEG-H01] 2018년 hackweek prototype에서 Apache Storm을 잠시 사용했지만 조직 서비스가 시작되기 전에 폐기했다. 현재 경력의 운영 시스템에는 포함되지 않는다.\n\n[NEG-H02] 대학 연구실에서 Prolog 규칙 엔진을 만든 실험은 있었다. 고객 서비스에 연결하지 않았고 이후 제품으로 전환하지 않았다.\n\n[NEG-H03] 예전 데모는 Mapbox GL로 지도를 렌더링했지만 현재 제품 출시 전에 제거했다. 현행 화면에는 그 코드가 없다.\n\n[NEG-M01] 자료 정합성 검사는 97.8%에서 통과했다. 99.8%라는 수치는 기록이나 운영 보고서에 없다.\n\n[NEG-M02] 야간 집계의 실제 P95는 680밀리초였다. 580밀리초 개선을 달성했다는 근거는 없다.\n\n[NEG-M03] 현장 점검은 43개 경로를 대상으로 완료했다. 34개 경로라는 숫자는 사용하지 않았다.",
+            "snippet": "고객 서비스에 연결하지 않았고 이후 제품으로 전환하지 않았다.\n[NEG-H03] 예전 데모는 Mapbox GL로 지도를 렌더링했지만 현재 제품 출시 전에 제거했다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 3,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.42841624366752074,
+            "score": 0.5715837563324793
+          }
+        ]
+      }
+    },
+    {
+      "id": "Q22",
+      "polarity": "NEGATIVE",
+      "negativeType": "NUMERIC_NEAR_MISS",
+      "query": "자료 정합성 99.8%를 달성했다는 근거가 있나요?",
+      "latencyMs": 228.51250000000073,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 3,
+            "documentId": 1,
+            "documentVersionId": 1,
+            "documentTitle": "Synthetic Rejection Tuning Record",
+            "versionNo": 1,
+            "content": "개발 일정도 확정되지 않았고 출시한 기능은 없다.\n\n[NEG-P02] 문서 이미지의 AVIF 변환은 아키텍처 검토 안건일 뿐이다. 구현, 배포, 변환 작업은 시작하지 않았다.\n\n[NEG-P03] 서버리스 이전은 분기 계획 회의에서 논의만 했다. 승인된 설계나 실행한 migration은 없다.\n\n[NEG-H01] 2018년 hackweek prototype에서 Apache Storm을 잠시 사용했지만 조직 서비스가 시작되기 전에 폐기했다. 현재 경력의 운영 시스템에는 포함되지 않는다.\n\n[NEG-H02] 대학 연구실에서 Prolog 규칙 엔진을 만든 실험은 있었다. 고객 서비스에 연결하지 않았고 이후 제품으로 전환하지 않았다.\n\n[NEG-H03] 예전 데모는 Mapbox GL로 지도를 렌더링했지만 현재 제품 출시 전에 제거했다. 현행 화면에는 그 코드가 없다.\n\n[NEG-M01] 자료 정합성 검사는 97.8%에서 통과했다. 99.8%라는 수치는 기록이나 운영 보고서에 없다.\n\n[NEG-M02] 야간 집계의 실제 P95는 680밀리초였다. 580밀리초 개선을 달성했다는 근거는 없다.\n\n[NEG-M03] 현장 점검은 43개 경로를 대상으로 완료했다. 34개 경로라는 숫자는 사용하지 않았다.",
+            "snippet": "[NEG-M01] 자료 정합성 검사는 97.8%에서 통과했다. 99.8%라는 수치는 기록이나 운영 보고서에 없다.\n[NEG-M02] 야간 집계의 실제 P95는 680밀리초였다. 580밀리초 개선을 달성했다는 근거는 없다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 3,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.5465443297190714,
+            "score": 0.4534556702809286
+          }
+        ]
+      }
+    },
+    {
+      "id": "Q23",
+      "polarity": "NEGATIVE",
+      "negativeType": "NUMERIC_NEAR_MISS",
+      "query": "야간 집계 P95를 580밀리초로 낮춘 경험이 있나요?",
+      "latencyMs": 235.5537000000004,
+      "response": {
+        "state": "EVIDENCE_FOUND",
+        "results": [
+          {
+            "chunkId": 3,
+            "documentId": 1,
+            "documentVersionId": 1,
+            "documentTitle": "Synthetic Rejection Tuning Record",
+            "versionNo": 1,
+            "content": "개발 일정도 확정되지 않았고 출시한 기능은 없다.\n\n[NEG-P02] 문서 이미지의 AVIF 변환은 아키텍처 검토 안건일 뿐이다. 구현, 배포, 변환 작업은 시작하지 않았다.\n\n[NEG-P03] 서버리스 이전은 분기 계획 회의에서 논의만 했다. 승인된 설계나 실행한 migration은 없다.\n\n[NEG-H01] 2018년 hackweek prototype에서 Apache Storm을 잠시 사용했지만 조직 서비스가 시작되기 전에 폐기했다. 현재 경력의 운영 시스템에는 포함되지 않는다.\n\n[NEG-H02] 대학 연구실에서 Prolog 규칙 엔진을 만든 실험은 있었다. 고객 서비스에 연결하지 않았고 이후 제품으로 전환하지 않았다.\n\n[NEG-H03] 예전 데모는 Mapbox GL로 지도를 렌더링했지만 현재 제품 출시 전에 제거했다. 현행 화면에는 그 코드가 없다.\n\n[NEG-M01] 자료 정합성 검사는 97.8%에서 통과했다. 99.8%라는 수치는 기록이나 운영 보고서에 없다.\n\n[NEG-M02] 야간 집계의 실제 P95는 680밀리초였다. 580밀리초 개선을 달성했다는 근거는 없다.\n\n[NEG-M03] 현장 점검은 43개 경로를 대상으로 완료했다. 34개 경로라는 숫자는 사용하지 않았다.",
+            "snippet": "[NEG-M02] 야간 집계의 실제 P95는 680밀리초였다. 580밀리초 개선을 달성했다는 근거는 없다.",
+            "sourceType": "TEXT_CHUNK",
+            "sourceIndex": 3,
+            "sourceLabel": "텍스트 구간 3",
+            "evidenceChunkId": 3,
+            "evidenceSourceType": "TEXT_CHUNK",
+            "evidenceSourceIndex": 3,
+            "evidenceSourceLabel": "텍스트 구간 3",
+            "distance": 0.46428340992676354,
+            "score": 0.5357165900732365
+          }
+        ]
+      }
+    },
+    {
+      "id": "Q24",
+      "polarity": "NEGATIVE",
+      "negativeType": "NUMERIC_NEAR_MISS",
+      "query": "현장 점검을 34개 경로에서 완료했나요?",
+      "latencyMs": 242.92590000000018,
+      "response": {
+        "state": "NO_RELEVANT_RESULTS",
+        "results": []
+      }
+    }
+  ]
+}

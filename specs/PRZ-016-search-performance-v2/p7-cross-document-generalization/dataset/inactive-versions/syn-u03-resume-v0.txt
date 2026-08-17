@@ -1,0 +1,7 @@
+PRIZM P7 합성 이력서 — SYN-U03 — INACTIVE VERSION v0
+이 파일은 ACTIVE corpus에 포함되지 않는 과거 버전 검증용 fixture다.
+
+[LEGACY PROTOTYPE]
+HarborMesh 초기 알림 시제품에서 Firebase Remote Config로 경고 임계값을 배포했다.
+이 시제품 경력은 철회된 과거 버전에만 존재하며 ACTIVE v1에는 포함되지 않는다.
+

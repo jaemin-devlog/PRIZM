@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -22,6 +24,15 @@ class FreshGeneralizationV2DatasetTest {
     private static final Path ROOT = Path.of(
             "specs/PRZ-016-search-performance-v2/fresh-generalization-evaluation-v2/dataset");
     private final ObjectMapper mapper = new ObjectMapper();
+
+    @BeforeEach
+    void requireLocallyRetainedFrozenFixture() {
+        Assumptions.assumeTrue(
+                Files.isRegularFile(ROOT.resolve("corpus-manifest.json"))
+                        && Files.isRegularFile(ROOT.resolve("questions.json"))
+                        && Files.isRegularFile(ROOT.resolve("ground-truth.json")),
+                "Fresh Generalization V2 fixture is retained only for local evaluation.");
+    }
 
     @Test
     void frozenInputsHaveFourOwnersEightActiveDocumentsAndBalancedQueryContracts() throws Exception {

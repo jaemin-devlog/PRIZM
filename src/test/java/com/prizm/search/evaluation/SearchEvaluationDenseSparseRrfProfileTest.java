@@ -86,15 +86,19 @@ class SearchEvaluationDenseSparseRrfProfileTest {
     }
 
     @Test
-    void existingSamePageDedupAndMaximumFiveResultsRemainInForce() {
+    void overlappingSamePageDedupAndMaximumFiveResultsRemainInForce() {
         List<VectorSearchResult> dense = new ArrayList<>();
         List<SparseCandidate> sparse = new ArrayList<>();
+        String overlap = "같은 PDF 청크 경계에서 반복되는 Redis 합성 근거다. ".repeat(4);
         for (long id = 1L; id <= 7L; id++) {
             int page = id <= 2L ? 1 : (int) id;
+            String content = id == 1L
+                    ? "Redis 캐시 첫 근거. " + overlap
+                    : id == 2L ? overlap + "Redis 캐시 둘째 근거." : "Redis 캐시 근거 " + id;
             VectorSearchResult candidate = candidate(
                     id,
                     page,
-                    "Redis 캐시 근거 " + id,
+                    content,
                     0.90d - (id / 100.0d));
             dense.add(candidate);
             sparse.add(sparse(candidate, 1.0d / id));
@@ -145,7 +149,7 @@ class SearchEvaluationDenseSparseRrfProfileTest {
     }
 
     @Test
-    void completedReleaseEvidenceKeepsTheStrictDenseFloorOnTheSparseBranch() {
+    void directCompletedReleaseClaimCanPassBelowTheDenseFloorOnTheSparseBranch() {
         VectorSearchResult belowFloorDirectClaim = candidate(
                 1L,
                 1,
@@ -157,9 +161,8 @@ class SearchEvaluationDenseSparseRrfProfileTest {
                 List.of(belowFloorDirectClaim),
                 List.of(sparse(belowFloorDirectClaim, 0.10d)));
 
-        assertThat(outcome.decision().results()).isEmpty();
-        assertThat(outcome.decision().rejectionReasons())
-                .contains("DENSE_SCORE_BELOW_TUNING_FLOOR");
+        assertThat(outcome.decision().results()).containsExactly(belowFloorDirectClaim);
+        assertThat(outcome.decision().rejectionReasons()).isEmpty();
     }
 
     @Test

@@ -32,13 +32,14 @@ class SearchEvaluationCompositeProfileTest {
     }
 
     @Test
-    void keepsOneResultPerPdfPageAndChoosesTheBetterLexicalRepresentative() {
+    void consolidatesOverlappingPdfChunksAndChoosesTheBetterLexicalRepresentative() {
+        String overlap = "같은 PDF 경계에서 반복되는 합성 매칭 근거 문장이다. ".repeat(4);
         VectorSearchResult denseFirst = candidate(
                 1L, 1, 2, ChunkSourceType.PAGE,
-                "같은 팀 조합은 고유 제약으로 중복을 차단했다.", 0.64d);
+                "같은 팀 조합은 고유 제약으로 중복을 차단했다. " + overlap, 0.64d);
         VectorSearchResult direct = candidate(
                 2L, 2, 2, ChunkSourceType.PAGE,
-                "MatchLedger DB 행 잠금과 상태 재확인으로 매칭 중복 확정을 방지했다.", 0.62d);
+                overlap + "MatchLedger DB 행 잠금과 상태 재확인으로 매칭 중복 확정을 방지했다.", 0.62d);
 
         SearchEvaluationCompositeProfile.Decision decision = profile.apply(
                 "MatchLedger의 DB 잠금 근거를 같은 페이지 중복 없이 보여줘.",
@@ -964,6 +965,42 @@ class SearchEvaluationCompositeProfileTest {
         assertThat(profile.apply("합성 요청 2400건 처리 근거를 보여줘.", List.of(wrongNumber))
                         .rejected())
                 .isFalse();
+    }
+
+    @Test
+    void bypassesDenseFloorForAnExplicitlySupportedDirectClaimWithoutParsedActionOrNumber() {
+        VectorSearchResult directEvidence = candidate(
+                1L, 1, 1, ChunkSourceType.TEXT_CHUNK,
+                "FCM 전송 실패가 핵심 기능에 영향을 주지 않도록 Outbox로 전송을 분리했다.",
+                0.425d);
+
+        assertThat(profile.apply(
+                "FCM 전송 실패가 핵심 기능에 영향을 주지 않게 어떻게 설계했나요?",
+                List.of(directEvidence)).rejected()).isFalse();
+    }
+
+    @Test
+    void keepsDenseFloorForMereMentionWithoutDirectClaimSupport() {
+        VectorSearchResult mentionOnly = candidate(
+                1L, 1, 1, ChunkSourceType.TEXT_CHUNK,
+                "FCM은 외부 전송 서비스다.",
+                0.425d);
+
+        assertThat(profile.apply(
+                "FCM 전송 실패가 핵심 기능에 영향을 주지 않게 어떻게 설계했나요?",
+                List.of(mentionOnly)).rejected()).isTrue();
+    }
+
+    @Test
+    void keepsContradictedClaimBelowDenseFloorRejected() {
+        VectorSearchResult contradicted = candidate(
+                1L, 1, 1, ChunkSourceType.TEXT_CHUNK,
+                "FCM 전송 실패가 핵심 기능에 영향을 주지 않도록 설계하지 않았다.",
+                0.425d);
+
+        assertThat(profile.apply(
+                "FCM 전송 실패가 핵심 기능에 영향을 주지 않게 어떻게 설계했나요?",
+                List.of(contradicted)).rejected()).isTrue();
     }
 
     @Test

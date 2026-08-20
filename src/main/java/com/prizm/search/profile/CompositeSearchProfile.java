@@ -27,6 +27,10 @@ public class CompositeSearchProfile {
     private static final double MINIMUM_DENSE_SCORE = 0.50d;
     private static final int MINIMUM_TEXT_OVERLAP = 80;
     private static final double MINIMUM_TEXT_OVERLAP_RATIO = 0.30d;
+    private static final int MINIMUM_SAME_SOURCE_DUPLICATE_SPAN = 200;
+    private static final double MINIMUM_SAME_SOURCE_DUPLICATE_RATIO = 0.30d;
+    private static final int MINIMUM_CROSS_SOURCE_DUPLICATE_SPAN = 320;
+    private static final double MINIMUM_CROSS_SOURCE_DUPLICATE_RATIO = 0.40d;
     private static final int MINIMUM_CORE_TERM_MATCHES = 2;
     private static final int MAX_RESULTS = 5;
     private static final int MAX_IDENTIFIER_LENGTH = 64;
@@ -120,6 +124,27 @@ public class CompositeSearchProfile {
             "어떻게", "이유", "왜", "방지", "막았");
 
     private final EvidenceQualityReranker evidenceQualityReranker = new EvidenceQualityReranker();
+    private final StructuredClaimSupportEvaluator claimSupportEvaluator =
+            new StructuredClaimSupportEvaluator();
+
+    /** Structured requirements exposed for evaluation observability, not the API response. */
+    public QueryClaimRequirements queryClaimRequirements(String query) {
+        return claimSupportEvaluator.extract(query);
+    }
+
+    /** Candidate-local support decision used by eligibility and P9 evaluation tracing. */
+    public ClaimSupportDecision candidateClaimSupport(
+            String query,
+            VectorSearchResult candidate) {
+        return candidateClaimSupport(query, candidate.content());
+    }
+
+    /** Content overload for evaluation tracing without reconstructing a repository DTO. */
+    public ClaimSupportDecision candidateClaimSupport(
+            String query,
+            String candidateContent) {
+        return claimSupportEvaluator.evaluate(query, candidateContent);
+    }
 
     public SearchIntent resolveIntent(String query) {
         return resolveIntent(querySignals(query));
@@ -202,8 +227,53 @@ public class CompositeSearchProfile {
             SearchIntent intent,
             QuerySignals signals,
             VectorSearchResult top) {
+        List<String> completedReleaseReasons = intent == SearchIntent.COMPLETED_RELEASE_EVIDENCE
+                ? rejectionReasons(signals, top)
+                : List.of();
+        ClaimSupportDecision claimSupport = candidateClaimSupport(signals.originalQuery(), top);
+        if (claimSupport.status() == ClaimSupportDecision.Status.CONTRADICTED) {
+            if (!completedReleaseReasons.isEmpty()) {
+                return completedReleaseReasons;
+            }
+            List<String> reasons = new ArrayList<>(claimSupport.reasons().stream()
+                    .map(reason -> "CLAIM_SUPPORT_" + claimSupport.status() + ":" + reason)
+                    .sorted()
+                    .toList());
+            if (signals.positiveClaimQuestion() && containsNegatedClaim(top.content(), signals)) {
+                reasons.add("NEGATED_CLAIM");
+            }
+            return List.copyOf(reasons);
+        }
+        boolean structuredDirectSupport = claimSupport.directSupport()
+                && signals.claimRequirements().claimQuestion()
+                && (!signals.directAnchorRequired()
+                        || !signals.claimRequirements().actions().isEmpty()
+                        || !signals.claimRequirements().numericConstraints().isEmpty());
+        if (structuredDirectSupport) {
+            if (completedReleaseReasons.contains("UNSUPPORTED_COMPLETED_RELEASE_QUERY")
+                    && signals.claimRequirements().actions().size() <= 1) {
+                return completedReleaseReasons;
+            }
+            boolean legacyClaimBindingFailed = completedReleaseReasons.stream()
+                    .anyMatch(reason -> reason.startsWith("MISSING_ASSERTED_COMPLETED_RELEASE"));
+            if (legacyClaimBindingFailed
+                    && signals.claimRequirements().requiredState()
+                            != QueryClaimRequirements.State.PRODUCTION
+                    && signals.claimRequirements().numericConstraints().isEmpty()) {
+                return completedReleaseReasons;
+            }
+            return List.of();
+        }
         if (intent == SearchIntent.COMPLETED_RELEASE_EVIDENCE) {
-            return rejectionReasons(signals, top);
+            return completedReleaseReasons;
+        }
+        if (claimSupport.status() == ClaimSupportDecision.Status.UNSUPPORTED
+                && signals.claimRequirements().claimQuestion()
+                && top.score() >= MINIMUM_DENSE_SCORE) {
+            return claimSupport.reasons().stream()
+                    .map(reason -> "CLAIM_SUPPORT_" + claimSupport.status() + ":" + reason)
+                    .sorted()
+                    .toList();
         }
 
         List<String> reasons = new ArrayList<>();
@@ -250,8 +320,9 @@ public class CompositeSearchProfile {
         List<CandidateGroup> groups = new ArrayList<>();
         for (VectorSearchResult candidate : eligibleCandidates) {
             CandidateGroup duplicate = groups.stream()
-                    .filter(group -> group.members().stream()
-                            .anyMatch(member -> sameQueryEvidence(signals, member, candidate)))
+                    .filter(group -> sameRepeatedEvidence(group.representative(), candidate)
+                            || group.members().stream()
+                                    .anyMatch(member -> sameQueryAnchor(signals, member, candidate)))
                     .findFirst()
                     .orElse(null);
             if (duplicate == null) {
@@ -268,7 +339,7 @@ public class CompositeSearchProfile {
         return List.copyOf(groups);
     }
 
-    private boolean sameQueryEvidence(
+    private boolean sameQueryAnchor(
             QuerySignals signals,
             VectorSearchResult left,
             VectorSearchResult right) {
@@ -290,19 +361,63 @@ public class CompositeSearchProfile {
                 && (sharedIdentifierAnchor || sharedNumberAnchor);
     }
 
+    private boolean sameRepeatedEvidence(VectorSearchResult left, VectorSearchResult right) {
+        if (!left.documentVersionId().equals(right.documentVersionId())) {
+            return false;
+        }
+        if (left.sourceType() == right.sourceType() && left.sourceIndex() == right.sourceIndex()) {
+            return hasSharedContentSpan(
+                    left.content(),
+                    right.content(),
+                    MINIMUM_SAME_SOURCE_DUPLICATE_SPAN,
+                    MINIMUM_SAME_SOURCE_DUPLICATE_RATIO);
+        }
+        return hasSharedContentSpan(
+                left.content(),
+                right.content(),
+                MINIMUM_CROSS_SOURCE_DUPLICATE_SPAN,
+                MINIMUM_CROSS_SOURCE_DUPLICATE_RATIO);
+    }
+
+    private boolean hasSharedContentSpan(
+            String left,
+            String right,
+            int minimumSpan,
+            double minimumRatio) {
+        String normalizedLeft = normalized(left).replaceAll("\\s+", " ").strip();
+        String normalizedRight = normalized(right).replaceAll("\\s+", " ").strip();
+        String shorter = normalizedLeft.length() <= normalizedRight.length() ? normalizedLeft : normalizedRight;
+        String longer = shorter == normalizedLeft ? normalizedRight : normalizedLeft;
+        int requiredSpan = Math.max(minimumSpan, (int) Math.ceil(shorter.length() * minimumRatio));
+        if (shorter.length() < requiredSpan) {
+            return false;
+        }
+        for (int start = 0; start <= shorter.length() - requiredSpan; start++) {
+            if (longer.indexOf(shorter.substring(start, start + requiredSpan)) >= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean sameEvidenceLocation(VectorSearchResult left, VectorSearchResult right) {
         if (!left.documentVersionId().equals(right.documentVersionId())) {
             return false;
         }
         if (left.sourceType() == ChunkSourceType.PAGE && right.sourceType() == ChunkSourceType.PAGE) {
-            return left.sourceIndex() == right.sourceIndex();
+            return left.sourceIndex() == right.sourceIndex()
+                    && hasMeaningfulBoundaryOverlap(left.content(), right.content());
         }
         if (left.sourceType() != ChunkSourceType.TEXT_CHUNK
                 || right.sourceType() != ChunkSourceType.TEXT_CHUNK) {
             return false;
         }
-        int overlap = exactBoundaryOverlap(left.content(), right.content());
-        int shorterLength = Math.min(left.content().length(), right.content().length());
+        return hasMeaningfulBoundaryOverlap(left.content(), right.content());
+    }
+
+    private boolean hasMeaningfulBoundaryOverlap(String left, String right) {
+        int overlap = exactBoundaryOverlap(left, right);
+        int shorterLength = Math.min(left.length(), right.length());
         return overlap >= MINIMUM_TEXT_OVERLAP
                 && shorterLength > 0
                 && ((double) overlap / shorterLength) >= MINIMUM_TEXT_OVERLAP_RATIO;
@@ -587,7 +702,10 @@ public class CompositeSearchProfile {
                 completionQuery.targetTokens(),
                 positiveClaim,
                 isDirectImplementationEvidenceRequest(normalizedQuery),
-                isIdentifierEvidenceRequest(normalizedQuery));
+                isIdentifierEvidenceRequest(normalizedQuery),
+                NaturalLanguageQueryFallback.requiresDirectAnchor(query),
+                claimSupportEvaluator.extract(query),
+                query);
     }
 
     private static boolean isSupportedExactCompletedReleaseFactQuery(
@@ -1319,7 +1437,10 @@ public class CompositeSearchProfile {
             List<String> completionTargetTokens,
             boolean positiveClaimQuestion,
             boolean directImplementationEvidenceRequest,
-            boolean identifierEvidenceRequest) {
+            boolean identifierEvidenceRequest,
+            boolean directAnchorRequired,
+            QueryClaimRequirements claimRequirements,
+            String originalQuery) {
 
         private QuerySignals {
             completionTargetTokens = List.copyOf(completionTargetTokens);

@@ -342,17 +342,17 @@ class SearchServiceTest {
     void presentationRemovesExactCrossDocumentDuplicatesAfterEvidenceReranking() {
         SearchService optInService = defaultSearchService();
         float[] embedding = nonZeroEmbedding();
-        String repeatedContent = "정재민 Java / Spring Boot Backend";
+        String repeatedContent = "테스트 사용자 Java / Spring Boot Backend";
         VectorSearchResult first = careerEvidenceCandidate(
-                71L, 10L, 20L, "정재민 신입 백엔드", repeatedContent, 0.82d);
+                71L, 10L, 20L, "synthetic-backend-resume", repeatedContent, 0.82d);
         VectorSearchResult duplicate = careerEvidenceCandidate(
-                72L, 11L, 21L, "정재민 신입 백엔드 이력서", repeatedContent, 0.81d);
+                72L, 11L, 21L, "synthetic-backend-resume-copy", repeatedContent, 0.81d);
         VectorSearchResult distinct = careerEvidenceCandidate(
                 73L,
                 12L,
                 22L,
-                "정재민 백엔드 포트폴리오",
-                "Java / Spring Boot로 AirConnect 알림 시스템을 운영하고 개선했습니다.",
+                "synthetic-backend-portfolio",
+                "Java / Spring Boot로 Project Atlas 알림 시스템을 운영하고 개선했습니다.",
                 0.80d);
         when(embeddingService.embed("Springboot 활용 경험")).thenReturn(embedding);
         when(vectorSearchRepository.findCareerEvidenceCandidates(7L, embedding))
@@ -401,15 +401,15 @@ class SearchServiceTest {
         float[] originalEmbedding = nonZeroEmbedding();
         float[] fallbackEmbedding = nonZeroEmbedding();
         fallbackEmbedding[1] = 1.0f;
-        String query = "AirConnect에서 뭐했어?";
-        String fallbackQuery = "AirConnect 수행 경험";
+        String query = "Project Atlas에서 뭐했어?";
+        String fallbackQuery = "Project Atlas 수행 경험";
         VectorSearchResult belowFloor = careerEvidenceCandidate(
                 210L,
-                "AirConnect 프로젝트에서 Outbox 기반 알림 처리를 구현했습니다.",
+                "Project Atlas에서 Outbox 기반 알림 처리를 구현했습니다.",
                 0.48d);
         VectorSearchResult direct = careerEvidenceCandidate(
                 211L,
-                "AirConnect 프로젝트에서 Outbox 기반 알림 처리를 구현했습니다.",
+                "Project Atlas에서 Outbox 기반 알림 처리를 구현했습니다.",
                 0.72d);
         when(embeddingService.embed(query)).thenReturn(originalEmbedding);
         when(embeddingService.embed(fallbackQuery)).thenReturn(fallbackEmbedding);
@@ -599,7 +599,7 @@ class SearchServiceTest {
     }
 
     @Test
-    void defaultCompletedReleaseProfileNeverUsesShortExactTokenRescue() {
+    void defaultCompletedReleaseProfileAllowsDirectClaimSupportBelowDenseFloor() {
         SearchService optInService = defaultSearchService();
         float[] embedding = nonZeroEmbedding();
         String query = "PRIZM 서비스를 배포했나요?";
@@ -614,8 +614,10 @@ class SearchServiceTest {
         CareerEvidenceSearchV2Response result =
                 optInService.searchCareerEvidenceV2(7L, query);
 
-        assertThat(result.state()).isEqualTo(CareerEvidenceSearchState.NO_EVIDENCE);
-        assertThat(result.results()).isEmpty();
+        assertThat(result.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+        assertThat(result.results())
+                .extracting(CareerEvidenceSearchResponse::chunkId, CareerEvidenceSearchResponse::content)
+                .containsExactly(tuple(120L, "PRIZM 서비스를 배포했습니다."));
     }
 
     @Test

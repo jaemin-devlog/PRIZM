@@ -254,8 +254,14 @@ sequenceDiagram
 저장과 검색 전에는 차원 수, 모든 값의 유한성, 0이 아닌 norm을 검사합니다.
 PostgreSQL pgvector의 exact cosine distance 연산자 `<=>`로 후보를 정렬하며 ANN
 인덱스는 사용하지 않습니다. 기본 `source-dedup-evidence-signals-v1` profile은 상위
-20개 후보에서 같은 PDF page와 TXT overlap을 축약하고, dense score를 주 신호로
-최대 5건을 반환합니다. GENERAL 검색은 기본 `0.50` floor를 유지하되 기존 결과가
+20개 후보에서 TXT와 PDF의 meaningful exact boundary overlap을 축약합니다. PDF는
+같은 page라는 이유만으로 합치지 않고, 같은 page이면서 기존 최소 overlap 길이·비율을
+함께 만족할 때만 같은 source evidence로 간주합니다. 이 P11 변경은 실제 이력서
+retention을 개선했지만 frozen Stress duplicate Gate가 실패해 `PARTIAL_PASS`이며 아직
+검증 완료 상태가 아닙니다. P11.1은 source identity를 되돌리지 않고 같은 document
+version 안의 substantial repeated text span만 query-evidence representative 기준으로
+축약했다. 이후 dense score를 주 신호로 최대 5건을 반환합니다.
+GENERAL 검색은 기본 `0.50` floor를 유지하되 기존 결과가
 비어 있고 정규화된 질의가 단일 2–4자 token이며 본문 exact token이 일치할 때만
 `0.49 <= score < 0.50` 후보 한 건을 제한적으로 복구합니다. 부분 문자열은 인정하지
 않고 원래 score와 distance를 반환합니다. 완료 배포·출시 검색은 이 복구 경로를
@@ -267,12 +273,17 @@ PostgreSQL pgvector의 exact cosine distance 연산자 `<=>`로 후보를 정렬
 API는 배열 형식을 유지하고, v2 API는 `EVIDENCE_FOUND`, `NO_RELEVANT_RESULTS`,
 `NO_EVIDENCE`, `NO_SEARCHABLE_DOCUMENTS`와 결과 배열을 반환합니다. GENERAL 질의의
 관련 결과 부재는 `NO_RELEVANT_RESULTS`, 완료 배포·출시 근거 검증 실패는
-`NO_EVIDENCE`로 구분합니다. 최종 결과가 선택된 뒤 질문 핵심어의 포함 범위와
-구현·개선·통합 같은 수행 문맥, 문제·행동·결과 신호를 함께 사용해 기존
-`content`에서 연속된 원문 1–3문장을 `snippet`으로 선택합니다. ranking과 score는
-다시 계산하지 않습니다. 응답은 전체 `content`도 유지합니다. frontend는 핵심 근거,
-출처, 버전·관련도 순서로 표시하고 전체 원문을 펼치거나 접을 수 있습니다. TXT chunk는 `TEXT_CHUNK`와
-텍스트 구간 번호를, PDF chunk는 `PAGE`와 페이지 번호를 원문 위치로 반환합니다.
+`NO_EVIDENCE`로 구분합니다. 최종 결과가 선택된 뒤 PDF hard wrap을 임의의
+문장 경계로 보지 않고 원문 offset을 보존한 semantic sentence를 구성합니다.
+같은 source block의 연속 1–3문장 window 중 query 포함 범위와 numeric/metric,
+수행·문제·결과·상태 신호를 직접적으로 보여 주는 최소 extractive span을
+`snippet`으로 선택합니다. Selected chunk가 충분하면 evidence를 이동하지 않고,
+부족할 때만 기존 owner/document/ACTIVE-version 범위의 expansion을 사용합니다.
+ranking과 score는 다시 계산하지 않으며 응답은 전체 `content`도 유지합니다. frontend는 찾은 내용,
+문서·페이지, 주변 내용 순서로 표시하고 전체 문맥을 펼치거나 접을 수 있습니다. PDF `PAGE` 결과의
+`문서에서 보기`는 기존 owner-scoped original endpoint에서 받은 인증된 Blob PDF를 열고 해당 1-based
+페이지로 이동한다. TXT 결과에는 이 PDF 동작을 노출하지 않는다. TXT chunk는 `TEXT_CHUNK`와 텍스트
+구간 번호를, PDF chunk는 `PAGE`와 페이지 번호를 원문 위치로 반환합니다.
 PostgreSQL FTS·BGE-M3 Sparse·BGE reranker 실험은 평가 전용이며 Production 경로에
 포함되지 않습니다.
 

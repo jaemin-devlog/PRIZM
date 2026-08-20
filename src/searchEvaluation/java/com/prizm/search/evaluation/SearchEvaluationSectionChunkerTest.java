@@ -16,7 +16,7 @@ class SearchEvaluationSectionChunkerTest {
                 + "Spring Security를 공통 진입점으로 두고 OAuth2와 JWT 상태를 같은 규칙으로 검증했습니다. ";
         String deployment = "배포 환경은 GCP Ubuntu에서 Docker Compose로 구성했습니다. "
                 + "Nginx 리버스 프록시와 HTTPS를 적용하고 업로드 파일 서빙을 분리했습니다. ";
-        String text = "MoneyWay 프로젝트\n"
+        String text = "LedgerLab 프로젝트\n"
                 + "02 인증 흐름 통합 및 계정 상태 검증\n"
                 + authentication.repeat(2) + "\n"
                 + "03 GCP 기반 Docker 배포 환경 구축\n"
@@ -30,7 +30,7 @@ class SearchEvaluationSectionChunkerTest {
 
     @Test
     void preservesEveryNonBlankLineWithoutExceedingTheExperimentalMaximum() {
-        String text = "AirConnect 프로젝트\n"
+        String text = "AtlasBoard 프로젝트\n"
                 + "01 매칭 중복 확정 방지\n"
                 + "DB row lock으로 상태를 다시 확인했습니다. ".repeat(12) + "\n"
                 + "02 알림 저장과 FCM 발송 실패 격리\n"
@@ -51,13 +51,13 @@ class SearchEvaluationSectionChunkerTest {
     @Test
     void carriesShortProjectTitleIntoTheFollowingSection() {
         String text = "Project Portfolio 01\n"
-                + "AirConnect — 매칭 정합성 개선\n"
+                + "AtlasBoard — 매칭 정합성 개선\n"
                 + "01 문제 원인\n"
                 + "같은 팀이 중복 확정될 수 있었습니다.";
 
         assertThat(chunker.split(text))
                 .singleElement()
                 .satisfies(chunk -> assertThat(chunk.content())
-                        .contains("AirConnect — 매칭 정합성 개선", "같은 팀이 중복 확정"));
+                        .contains("AtlasBoard — 매칭 정합성 개선", "같은 팀이 중복 확정"));
     }
 }

@@ -50,7 +50,7 @@
 |---|---|
 | 현재 제품 | Spring Boot와 React Career Vault로 구현한 자동화된 AI 문서 관리 플랫폼 |
 | 구현됨 | 자체 호스팅 회원가입, 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, ChangeLog 기반 비동기 색인·복구, Ollama 자동 임베딩, pgvector 근거 검색, Career Vault 문서 관리, 읽기 전용 MCP Career Evidence 검색 |
-| 현재 단계 | 소스 전용 공개 준비, clean-clone, 실제 OpenSQL direct 기준선과 PRZ-013 OpenProxy 단일 Primary SQL Gate 검증 완료. PRZ-010 변경 로그 동기화, PRZ-011 문서 처리 상태 UX와 PRZ-015 MCP 검색은 `VERIFIED`; PRZ-008 검색 개선은 `IN_PROGRESS`; PRZ-009 경력 키워드 맵과 PRZ-012 검색 근거 표현 품질은 `IMPLEMENTED_UNVERIFIED` |
+| 현재 단계 | 소스 전용 공개 준비, clean-clone, 실제 OpenSQL direct 기준선과 PRZ-013 OpenProxy 단일 Primary SQL Gate 검증 완료. PRZ-010 변경 로그 동기화, PRZ-011 문서 처리 상태 UX와 PRZ-015 MCP 검색은 `VERIFIED`; PRZ-016은 작업 branch의 P10 localization Gate까지 `VERIFIED`이고 P11 source consolidation은 duplicate Gate 실패로 `PARTIAL_PASS / IMPLEMENTED_UNVERIFIED`; PRZ-008 검색 개선은 `IN_PROGRESS`; PRZ-009 경력 키워드 맵과 PRZ-012 검색 근거 표현 품질은 `IMPLEMENTED_UNVERIFIED` |
 | 계획된 미구현 | CareerFact, 근거 기반 portfolio, `/api/v1`, 독립 Engine 패키지 |
 | 명시적 범위 제외 | 다중 OpenSQL DB node, DB 장애전환, OpenProxy 이중화·VIP와 서비스 연속성 보장 |
 
@@ -111,7 +111,8 @@ PRZ-005에서는 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 직�
 - PostgreSQL pgvector 기반 원문 근거 검색
 - TXT 텍스트 구간과 PDF 페이지 위치 반환
 - 단일 검색 결과와 최대 5개의 Career Evidence 결과 제공. Career Evidence는 전체
-  원문을 보존하면서 질문 관련 원문 1–3문장을 핵심 근거로 먼저 표시하고 출처,
+  원문을 보존하면서 hard-wrap-aware, claim-complete 연속 원문 1–3문장을
+  핵심 근거로 먼저 표시하고 출처,
   버전·관련도와 전체 원문 펼치기를 제공
 - GENERAL Career Evidence는 기본 dense `0.50`을 유지하고, 결과가 비어 있는 단일
   2–4자 exact-token 질의에만 `0.49` 이상 후보 한 건을 제한적으로 복구. 완료
@@ -180,6 +181,13 @@ PRZ-011은 문서 처리의 파일 읽기·텍스트 추출·청크 생성·실�
 | PRZ-010 변경 로그 동기화 | `VERIFIED` | 2026-08-12 source `26c546b`: PostgreSQL ChangeLog integration, 실제 OpenSQL direct `5432` V14 SQL Gate, 실제 OpenSQL+Ollama `bge-m3` V1→V2 E2E와 실패 시 V1 보존, 전체 integration `104 completed / 7 skipped / 0 failures`, backend test, frontend lint/build, Compose와 diff 감사 통과 |
 | PRZ-011 문서 처리 상태 UX | `VERIFIED` | 2026-08-13 source `fbb3481`: backend unit 464개 중 449 pass·15 skip, integration 112개 중 105 pass·7 skip, frontend unit 5개·lint·build, Compose V15 적용, PostgreSQL+pgvector·Ollama `bge-m3` 문서 처리/검색과 browser polling·retry 표시 통과. AUDIT blocking 2건 수정 뒤 재-AUDIT PASS, PR #41로 `main` 통합 |
 | PRZ-012 검색 근거 표현 품질 | `IMPLEMENTED_UNVERIFIED` | 질문 관련 원문 1–3문장 선택과 근거 중심 UI, PRZ-008 평가 15개 결과 불변, backend unit·integration과 frontend 검증 통과. 실제 개인 문서 대표 7개 Before/After는 owner·authentication 경계 안에서 실행하지 못해 `NOT_RUN`, VERIFY Gate `FAIL` |
+| PRZ-016 P10 Evidence Localization | `VERIFIED` — branch Gate | frozen P8.1 Judge displayed/localization 68.75% → 87.5%, Stress 65/60% → 100/100%; Dense/selection/FPR 회귀 0, owner/ACTIVE isolation PASS. Commit/push/PR은 `NOT_RUN`이며 PRZ-016 전체는 미통합 `IN_PROGRESS` |
+| PRZ-016 P11 Source Consolidation | `PARTIAL_PASS` — branch Gate | 실제 이력서 same-page distinct evidence retention은 개선되고 frozen 품질·FPR·localization·isolation은 유지됐으나 Stress 1건에서 final 3→5와 duplicate snippet +2가 발생. P11은 `VERIFIED`가 아님 |
+| PRZ-016 P11.1 Duplicate Evidence Consolidation | `PASS` — branch Gate | P11 source identity를 유지한 QEV repeated-evidence 축약으로 Stress final 5→3, duplicate extras 5→3 및 P10 exact final result를 복구. 실제 이력서 retention 4/4/3/3, P8.1/P9/P10 metric·FPR·localization·isolation 유지 |
+| PRZ-016 P12 Simple Tech Usage Eligibility | `PASS` — branch Gate | P9 simple `USE` query가 같은 candidate의 project-scoped technology declaration 또는 직접 usage를 근거로 인정하도록 최소 보완. PostgreSQL eligibility/final 0/0→2/2, OAuth2 0/0→1/1; P8.1/P9/P10/P11.1 metric·FPR·localization·duplicate·owner/ACTIVE isolation 유지. Commit/push/PR은 `NOT_RUN` |
+| PRZ-016 P12.1 Direct-Support Floor Bypass Contract | `PASS` — branch Gate | evaluator가 `SUPPORTED` 및 `directSupport=true`로 판정한 claim 질문은 action/numeric requirement 공백만으로 dense floor에서 제거되지 않도록 최소 보완. FCM chunk 108이 eligibility/final로 복구됐고 P10 frozen metric·FPR·localization·owner/ACTIVE isolation 및 기존 direct-anchor fallback 계약은 유지. Commit/push/PR은 `NOT_RUN` |
+| PRZ-016 P13 Evidence Expansion Safety | `PASS` — branch Gate | selected chunk의 직접 ASCII query anchor를 local evidence 우선 조건으로 보존하고 cross-chunk expansion 후보도 이를 유지하도록 제한. FCM `108→106` anchor loss는 `108→108`으로 복구됐으며 P10 frozen metric·FPR·localization·owner/ACTIVE isolation은 유지. Commit/push/PR은 `NOT_RUN` |
+| PRZ-016 P14 Claim-Complete Snippet | `PASS` — branch Gate | 해결 질문의 extractive scorer가 action/problem-result complete contiguous 1–3문장 window를 우선하도록 보완. Q9 result/evidence chunk 106과 P13 safety는 유지되고 frozen P10 metric·FPR·localization·owner/ACTIVE isolation은 유지. Commit/push/PR은 `NOT_RUN` |
 
 세부 실행 환경과 명령은 [PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md),
 [PRZ-002 Evidence](../specs/PRZ-002-open-source-readiness/evidence.md),

@@ -59,6 +59,20 @@ frontend/dist/
 frontend/.vite/
 *.tsbuildinfo
 
+### Local evaluation and developer caches ###
+/.gradle-prizm-pdf-ux/
+/.pnpm-store/
+/.venv-nli/
+/_workspace/
+
+### Private resume-audit outputs (never publish) ###
+/specs/PRZ-016-search-performance-v2/**/real-resume-*.json
+/src/searchEvaluation/java/com/prizm/search/evaluation/P11RealResumeSourceConsolidationAuditTest.java
+/src/searchEvaluation/java/com/prizm/search/evaluation/P121DirectSupportFloorBypassAuditTest.java
+/src/searchEvaluation/java/com/prizm/search/evaluation/P12RealResumeSimpleTechnologyUsageAuditTest.java
+/src/searchEvaluation/java/com/prizm/search/evaluation/P13EvidenceExpansionSafetyAuditTest.java
+/src/searchEvaluation/java/com/prizm/search/evaluation/P14ClaimCompleteSnippetAuditTest.java
+
 ### OS generated files ###
 .DS_Store
 Thumbs.db

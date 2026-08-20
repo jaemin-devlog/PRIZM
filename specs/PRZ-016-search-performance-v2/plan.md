@@ -91,3 +91,47 @@ v1 PDF의 문서 밀도 부족은 frozen v1을 수정하지 않고
 - focused SearchService test와 실패했던 PostgreSQL integration test를 먼저 실행한 뒤,
   전체 unit·integration과 `git diff --check`를 수행한다.
 - P7-B 결과에 맞춘 검색 tuning, 새 benchmark, 모델 inference는 수행하지 않는다.
+
+## P15 PDF Document Confirmation UX
+
+### 변경 경계
+
+- `frontend/src/App.tsx`의 EvidencePage에 PDF page evidence용 viewer state와
+  `문서에서 보기` 버튼을 추가한다.
+- 현재 `getDocumentPdf` API, JWT Authorization header, Blob URL, `pdf-viewer-*` modal
+  styles를 재사용한다.
+- 필요한 경우 frontend presentation test와 style만 갱신한다.
+- `src/main`, SearchService, search DTO/API, Flyway, ingestion, embedding, dependency는
+  수정하지 않는다.
+
+### 데이터 흐름
+
+1. 검색 결과의 evidence source가 `PAGE`인지 확인한다.
+2. 카드 버튼은 document ID, version ID, evidence page index와 document title을 viewer에
+   전달한다.
+3. viewer는 기존 authenticated original API에서 PDF Blob을 가져온다.
+4. `blob:` URL에 `#page=N&zoom=page-width`를 붙여 iframe에 표시한다.
+5. 원본 요청이 실패해도 검색 카드와 결과 state는 바꾸지 않는다.
+
+### 보안·실패·rollback
+
+- URL에는 서버 저장 경로나 access token을 넣지 않는다. API 호출은 기존 Bearer token과
+  backend의 owner-scoped `findByIdAndOwnerUserIdAndDocumentId` 경계를 그대로 쓴다.
+- PDF.js가 없어 snippet highlight는 구현하지 않는다. page fragment가 브라우저에서 지원되지
+  않아도 PDF 자체는 열려야 한다.
+- 401/403은 기존 `onSessionExpired`를 호출하고, 일반 오류는 viewer 안에서만 안내한다.
+- rollback은 P15 frontend 변경만 되돌리는 것이다. 검색 결과 API 및 backend source는
+  변경하지 않는다.
+
+### 검증
+
+```powershell
+npm --prefix frontend run test:unit
+npm --prefix frontend run lint
+npm --prefix frontend run build
+.\gradlew.bat test --tests com.prizm.document.controller.DocumentThumbnailControllerTest --no-daemon
+git diff --check
+```
+
+Docker가 준비된 경우 실제 PDF 검색 결과의 page fragment와 카드 결과 불변성을 브라우저에서
+확인한다. PDF.js가 없는 현재 dependency 상태에서는 highlight를 `NOT_IMPLEMENTED`로 기록한다.

@@ -44,8 +44,8 @@ class CareerKeywordExtractorTest {
                 "처리 발송 알림 중복 매칭 실패 저장 기준 상태 호출 DB 대기 동기화 API Redis 상세 "
                         + "백엔드 병렬 선점 최종 흐름 FCM 통합 관광지 요청 Outbox 문제 소개 후보 "
                         + "Spring Boot TourAPI 같은 시간 외부 테스트 확정 Worker 분리 작업자 Java21 "
-                        + "MySQL 데이터 조건 조회 확인 id 구조 동시 제외 팀방 AirConnect 검증 그룹 "
-                        + "순차 이벤트 읽음 정재민 정합성 조합 차단 OAuth2 JWT Docker Nginx GCP Apache POI");
+                        + "MySQL 데이터 조건 조회 확인 id 구조 동시 제외 팀방 SampleProject 검증 그룹 "
+                        + "순차 이벤트 읽음 테스트사용자 정합성 조합 차단 OAuth2 JWT Docker Nginx GCP Apache POI");
 
         assertThat(keywords.values()).extracting(ExtractedKeyword::keyword)
                 .contains(
@@ -54,7 +54,7 @@ class CareerKeywordExtractorTest {
                         "이벤트", "정합성", "OAuth2", "JWT", "Docker", "Nginx", "GCP", "Apache POI")
                 .doesNotContain(
                         "처리", "발송", "알림", "중복", "매칭", "실패", "저장", "기준", "상태",
-                        "TourAPI", "AirConnect", "정재민", "데이터", "확인", "구조");
+                        "TourAPI", "SampleProject", "테스트사용자", "데이터", "확인", "구조");
     }
 
     @Test

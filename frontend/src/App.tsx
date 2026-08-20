@@ -45,7 +45,12 @@ import {
   searchCareerEvidence,
   type CareerEvidenceSearchResult,
 } from './api/searchApi'
-import { getEvidenceContext, getEvidenceSourceLabel } from './searchEvidencePresentation'
+import {
+  getEvidenceContext,
+  getEvidenceHighlight,
+  getEvidencePdfPage,
+  getEvidenceSourceLabel,
+} from './searchEvidencePresentation'
 import {
   clearSession,
   getAccessToken,
@@ -142,7 +147,7 @@ const NAVIGATION_ITEMS: ReadonlyArray<{
 }> = [
   { path: DOCUMENTS_PATH, label: '문서 보관함', marker: '문' },
   { path: KEYWORDS_PATH, label: '경력 키워드', marker: '키' },
-  { path: EVIDENCE_PATH, label: '경력 근거 검색', marker: '근' },
+  { path: EVIDENCE_PATH, label: '내 경험 찾기', marker: '경' },
   { path: UPLOAD_PATH, label: '문서 업로드', marker: '+' },
 ]
 
@@ -160,6 +165,28 @@ type PdfViewerTarget = {
   versionId: number
   versionNo: number
   originalFileName: string
+}
+
+type EvidencePdfViewerTarget = {
+  documentId: number
+  documentVersionId: number
+  documentTitle: string
+  pageNumber: number
+}
+
+function getEvidencePdfViewerTarget(
+  result: CareerEvidenceSearchResult,
+): EvidencePdfViewerTarget | null {
+  const pageNumber = getEvidencePdfPage(result)
+  if (pageNumber === null) {
+    return null
+  }
+  return {
+    documentId: result.documentId,
+    documentVersionId: result.documentVersionId,
+    documentTitle: result.documentTitle,
+    pageNumber,
+  }
 }
 
 type KeywordRankingMode = 'frequency' | 'documents' | 'balanced'
@@ -2332,6 +2359,99 @@ function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<CareerEvidenceSearchResult[]>([])
   const [searchState, setSearchState] = useState<SearchState>('idle')
+  const [pdfViewerTarget, setPdfViewerTarget] = useState<EvidencePdfViewerTarget | null>(null)
+  const [pdfViewerUrl, setPdfViewerUrl] = useState<string | null>(null)
+  const [pdfViewerErrorMessage, setPdfViewerErrorMessage] = useState<string | null>(null)
+  const [isPdfViewerLoading, setIsPdfViewerLoading] = useState(false)
+  const pdfViewerRequestId = useRef(0)
+  const pdfViewerAbortController = useRef<AbortController | null>(null)
+  const pdfViewerObjectUrl = useRef<string | null>(null)
+
+  const closePdfViewer = useCallback(() => {
+    pdfViewerRequestId.current += 1
+    pdfViewerAbortController.current?.abort()
+    pdfViewerAbortController.current = null
+    if (pdfViewerObjectUrl.current !== null) {
+      URL.revokeObjectURL(pdfViewerObjectUrl.current)
+      pdfViewerObjectUrl.current = null
+    }
+    setPdfViewerTarget(null)
+    setPdfViewerUrl(null)
+    setPdfViewerErrorMessage(null)
+    setIsPdfViewerLoading(false)
+  }, [])
+
+  useEffect(() => () => {
+    pdfViewerAbortController.current?.abort()
+    if (pdfViewerObjectUrl.current !== null) {
+      URL.revokeObjectURL(pdfViewerObjectUrl.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (pdfViewerTarget === null) {
+      return
+    }
+    const previousOverflow = document.body.style.overflow
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closePdfViewer()
+      }
+    }
+    document.body.style.overflow = 'hidden'
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [closePdfViewer, pdfViewerTarget])
+
+  const handleOpenPdf = async (target: EvidencePdfViewerTarget) => {
+    closePdfViewer()
+    const requestId = pdfViewerRequestId.current + 1
+    pdfViewerRequestId.current = requestId
+    const controller = new AbortController()
+    pdfViewerAbortController.current = controller
+    setPdfViewerTarget(target)
+    setPdfViewerErrorMessage(null)
+    setIsPdfViewerLoading(true)
+
+    try {
+      const pdf = await getDocumentPdf(target.documentId, target.documentVersionId, controller.signal)
+      if (pdfViewerRequestId.current !== requestId) {
+        return
+      }
+      const objectUrl = URL.createObjectURL(pdf)
+      if (pdfViewerRequestId.current !== requestId) {
+        URL.revokeObjectURL(objectUrl)
+        return
+      }
+      pdfViewerObjectUrl.current = objectUrl
+      setPdfViewerUrl(`${objectUrl}#page=${target.pageNumber}&zoom=page-width`)
+    } catch (error) {
+      if (pdfViewerRequestId.current !== requestId) {
+        return
+      }
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        return
+      }
+      if (error instanceof DocumentApiError && (error.status === 401 || error.status === 403)) {
+        closePdfViewer()
+        onSessionExpired()
+        return
+      }
+      if (error instanceof DocumentApiError && error.code === 'ORIGINAL_FILE_NOT_FOUND') {
+        setPdfViewerErrorMessage('첨부한 PDF 파일을 찾지 못했습니다.')
+      } else {
+        setPdfViewerErrorMessage('문서를 열지 못했습니다. 잠시 후 다시 시도해 주세요.')
+      }
+    } finally {
+      if (pdfViewerRequestId.current === requestId) {
+        pdfViewerAbortController.current = null
+        setIsPdfViewerLoading(false)
+      }
+    }
+  }
 
   const handleSearchQueryChange = (value: string) => {
     setSearchQuery(value)
@@ -2366,9 +2486,9 @@ function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
   return (
     <section className="vault-page evidence-page" aria-labelledby="evidence-title">
       <header className="page-heading">
-        <p className="eyebrow">CAREER EVIDENCE</p>
-        <h1 id="evidence-title">경력 근거 검색</h1>
-        <p>질문을 입력하면 등록된 문서에서 관련 원문을 최대 5개까지 찾습니다.</p>
+        <p className="eyebrow">MY EXPERIENCE</p>
+        <h1 id="evidence-title">내 경험 찾기</h1>
+        <p>질문을 입력하면 등록된 문서에서 관련 내용을 최대 5개까지 찾습니다.</p>
       </header>
 
       <div className="evidence-search-panel">
@@ -2379,7 +2499,7 @@ function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
           aria-busy={searchState === 'loading'}
         >
           <label className="visually-hidden" htmlFor="document-search-query">
-            경력 근거 검색어
+            검색어
           </label>
           <div className="document-search-controls">
             <input
@@ -2387,7 +2507,7 @@ function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
               name="query"
               type="text"
               maxLength={500}
-              placeholder="예: Spring Boot와 Redis를 사용한 경험"
+              placeholder="예: Spring Boot를 사용한 프로젝트가 있나요?"
               value={searchQuery}
               onChange={(event) => handleSearchQueryChange(event.target.value)}
               disabled={searchState === 'loading'}
@@ -2399,14 +2519,22 @@ function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
               aria-busy={searchState === 'loading'}
             >
               {searchState === 'loading' && <span className="button-spinner" aria-hidden="true" />}
-              {searchState === 'loading' ? '검색 중' : '원문 찾기'}
+              {searchState === 'loading' ? '검색 중' : '찾기'}
             </button>
           </div>
+          {isShortSearchInput(searchQuery) && (
+            <div className="search-query-guidance" role="status">
+              <p>문장으로 질문하면 더 정확하게 찾을 수 있어요.</p>
+              <small>
+                예: Spring Boot를 사용한 경험이 있나요? · 동시성 문제를 어떻게 해결했나요?
+              </small>
+            </div>
+          )}
         </form>
 
         <p className="search-processing-note">
           <span aria-hidden="true">i</span>
-          처리 중인 문서는 검색 결과에 포함되지 않을 수 있습니다.
+          아직 처리 중인 문서는 검색되지 않을 수 있어요.
         </p>
       </div>
 
@@ -2419,17 +2547,17 @@ function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
         {searchState === 'loading' && (
           <p className="state-message search-state">
             <span className="state-spinner" aria-hidden="true" />
-            관련 원문을 찾는 중입니다.
+            관련 내용을 찾는 중입니다.
           </p>
         )}
         {searchState === 'empty' && (
           <p className="state-message search-empty-state">
-            현재 PRIZM에 등록된 문서에서 관련 근거를 찾지 못했습니다.
+            현재 PRIZM에 등록된 문서에서 관련 내용을 찾지 못했습니다.
           </p>
         )}
         {searchState === 'error' && (
           <p className="form-error feedback-message" role="alert">
-            경력 근거 검색 중 문제가 발생했습니다.
+            내 경험 찾기 중 문제가 발생했습니다.
           </p>
         )}
         {searchState === 'result' && searchResults.length > 0 && (
@@ -2437,58 +2565,141 @@ function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
             <header className="search-result-heading">
               <div>
                 <p className="search-result-kicker">검색 결과</p>
-                <h2>질문과 관련된 원문 근거</h2>
+                <h2>질문과 관련된 내용</h2>
               </div>
               <span className="search-result-count">{searchResults.length}개</span>
             </header>
             <ol className="search-result-list">
-              {searchResults.map((result, index) => (
-                <li key={result.chunkId}>
-                  <article className="search-result-card">
-                    <header className="search-result-card-heading">
-                      <span className="result-index">
-                        결과 {String(index + 1).padStart(2, '0')}
-                      </span>
-                    </header>
-                    <section className="search-result-evidence" aria-label="핵심 근거">
-                      <p className="search-result-section-label">핵심 근거</p>
-                      <blockquote className="search-result-snippet">{result.snippet}</blockquote>
-                    </section>
-                    <footer className="search-result-source" aria-label="출처">
-                      <div>
-                        <p className="search-result-source-label">출처 문서</p>
-                        <h3>{result.documentTitle}</h3>
-                      </div>
-                      <div className="search-result-meta" aria-label="근거 위치와 버전">
-                        <span className="search-result-source-badge">
-                          {getEvidenceSourceLabel(result)}
+              {searchResults.map((result, index) => {
+                const displayedEvidence = getEvidenceHighlight(searchQuery, result)
+                const viewerTarget = getEvidencePdfViewerTarget(result)
+                return (
+                  <li key={result.chunkId}>
+                    <article className="search-result-card">
+                      <header className="search-result-card-heading">
+                        <span className="result-index">
+                          결과 {String(index + 1).padStart(2, '0')}
                         </span>
-                        <span>버전 {result.versionNo}</span>
-                      </div>
-                    </footer>
-                    <details className="search-result-full-content">
-                      <summary>
-                        <span className="full-content-open-label">원문 문맥 보기</span>
-                        <span className="full-content-close-label">접기</span>
-                      </summary>
-                      <EvidenceContextReader
-                        content={result.content}
-                        snippet={result.snippet}
-                      />
-                    </details>
-                  </article>
-                </li>
-              ))}
+                      </header>
+                      <section className="search-result-evidence" aria-label="찾은 내용">
+                        <p className="search-result-section-label">찾은 내용</p>
+                        <blockquote className="search-result-snippet">
+                          {displayedEvidence}
+                        </blockquote>
+                      </section>
+                      <footer className="search-result-source" aria-label="문서">
+                        <div>
+                          <p className="search-result-source-label">문서</p>
+                          <h3>{result.documentTitle} · {getEvidenceSourceLabel(result)}</h3>
+                        </div>
+                        {viewerTarget !== null && (
+                          <button
+                            type="button"
+                            className="search-result-document-button"
+                            onClick={() => void handleOpenPdf(viewerTarget)}
+                            aria-label={`${result.documentTitle} ${viewerTarget.pageNumber}페이지에서 보기`}
+                          >
+                            문서에서 보기
+                          </button>
+                        )}
+                      </footer>
+                      <details className="search-result-full-content">
+                        <summary>
+                          <span className="full-content-open-label">주변 내용 보기</span>
+                          <span className="full-content-close-label">주변 내용 닫기</span>
+                        </summary>
+                        <EvidenceContextReader
+                          query={searchQuery}
+                          content={result.content}
+                          snippet={result.snippet}
+                        />
+                      </details>
+                    </article>
+                  </li>
+                )
+              })}
             </ol>
           </section>
         )}
       </div>
+      {pdfViewerTarget !== null && (
+        <>
+          <button
+            type="button"
+            className="pdf-viewer-backdrop"
+            aria-label="문서 확인 닫기"
+            onClick={closePdfViewer}
+          />
+          <section
+            className="pdf-viewer-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="evidence-pdf-viewer-title"
+            aria-busy={isPdfViewerLoading}
+          >
+            <header className="pdf-viewer-heading">
+              <div>
+                <p className="section-kicker">문서 · {pdfViewerTarget.pageNumber}페이지</p>
+                <h2 id="evidence-pdf-viewer-title">{pdfViewerTarget.documentTitle}</h2>
+              </div>
+              <button
+                type="button"
+                className="icon-button"
+                aria-label="문서 확인 닫기"
+                onClick={closePdfViewer}
+              >
+                ×
+              </button>
+            </header>
+            <div className="pdf-viewer-content">
+              {isPdfViewerLoading && (
+                <p className="state-message search-state">
+                  <span className="state-spinner" aria-hidden="true" />
+                  문서를 여는 중입니다.
+                </p>
+              )}
+              {pdfViewerErrorMessage !== null && (
+                <div className="pdf-viewer-error" role="alert">
+                  <p>{pdfViewerErrorMessage}</p>
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={() => void handleOpenPdf(pdfViewerTarget)}
+                  >
+                    다시 시도
+                  </button>
+                </div>
+              )}
+              {pdfViewerUrl !== null && pdfViewerErrorMessage === null && (
+                <iframe
+                  className="pdf-viewer-frame"
+                  src={pdfViewerUrl}
+                  title={`${pdfViewerTarget.documentTitle} ${pdfViewerTarget.pageNumber}페이지`}
+                />
+              )}
+            </div>
+          </section>
+        </>
+      )}
     </section>
   )
 }
 
-function EvidenceContextReader({ content, snippet }: { content: string; snippet: string }) {
-  const context = getEvidenceContext(content, snippet)
+function isShortSearchInput(value: string): boolean {
+  const words = value.trim().split(/\s+/).filter(Boolean)
+  return words.length > 0 && words.length <= 2
+}
+
+function EvidenceContextReader({
+  query,
+  content,
+  snippet,
+}: {
+  query: string
+  content: string
+  snippet: string
+}) {
+  const context = getEvidenceContext(query, content, snippet)
   return (
     <div className="search-result-document-reader" role="document">
       {context}

@@ -101,4 +101,13 @@ public class DocumentController {
         documentManagementService.delete(currentUserProvider.userId(), documentId);
         return ResponseEntity.noContent().build();
     }
+
+    /** Removes one terminal historical version for the current owner without touching the active version. */
+    @DeleteMapping("/{documentId}/versions/{versionId}")
+    public ResponseEntity<Void> deleteVersion(
+            @PathVariable Long documentId,
+            @PathVariable Long versionId) {
+        documentManagementService.deleteVersion(currentUserProvider.userId(), documentId, versionId);
+        return ResponseEntity.noContent().build();
+    }
 }

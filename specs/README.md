@@ -173,8 +173,8 @@ flowchart TD
 - **Spec ID:** [PRZ-009](PRZ-009-career-keyword-map/spec.md)
   - 이름: 경력 키워드 맵
   - 상태: `IMPLEMENTED_UNVERIFIED`
-  - Source commit: `d52c6d0`
-  - Last verified: 2026-08-10
+  - Source commit: core `d52c6d0`; UI·문서 관리 확장 `3af28492` (origin branch push)
+  - Last verified: 2026-08-21
 - **Spec ID:** [PRZ-010](PRZ-010-change-log-sync/spec.md)
   - 이름: 변경 로그 동기화
   - 상태: `VERIFIED`

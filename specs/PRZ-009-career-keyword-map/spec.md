@@ -3,26 +3,27 @@
 > **상태:** `IMPLEMENTED_UNVERIFIED`
 > **유형:** Feature
 > **선행 문서:** [PRZ-000](../PRZ-000-platform-baseline/spec.md)
-> **기준 소스:** `d52c6d01a3bef916e80a3c983a43c7b1fad1139b`
-> **통합:** merge `5a8ea8d2b85e7d87342e11e96d1d58d1181ab6b8`
-> **최종 확인:** 2026-08-10
+> **핵심 기능 소스:** `d52c6d01a3bef916e80a3c983a43c7b1fad1139b`
+> **UI·문서 관리 확장 소스:** `3af28492` (`PRZ-009-keyword-tags-ui`, origin push 완료)
+> **통합:** 핵심 기능 merge `5a8ea8d2b85e7d87342e11e96d1d58d1181ab6b8`; 확장 소스 PR·merge `NOT_RUN`
+> **최종 확인:** 2026-08-21
 
 ## 상태
 
-`IMPLEMENTED_UNVERIFIED` — 구현·전체 PostgreSQL integration·최종 감사 완료, OpenSQL opt-in `NOT_RUN`
+`IMPLEMENTED_UNVERIFIED` — 구현·전체 PostgreSQL integration·최종 감사와 확장 브랜치 commit/push 완료,
+OpenSQL opt-in `NOT_RUN`
 
 시작 기준 source는 `83631f13c21eab54ac0f32ebb0f893b6c5acea0f`이다.
 
 ## 목적과 사용자 흐름
 
-사용자가 등록한 이력서와 포트폴리오의 현재 검색 가능 원문에서 반복되는 기술명과
-핵심 단어를 문장이 아닌 키워드로 모아 본다. 키워드 크기는 원문 출현 빈도를
-반영하며, 키워드를 선택하면 오른쪽 근거 목록에서 해당 원문과 원본 파일을 다시
-확인할 수 있어야 한다.
+사용자가 등록한 이력서와 포트폴리오의 현재 검색 가능 원문에서 확인된 기술명과
+공학 개념을 태그로 둘러본다. 이 화면은 숙련도·점수·중요도를 판단하는 분석
+도구가 아니라, 이미 확인된 키워드에서 실제 문서 근거로 이어지는 Browse 기능이다.
 
 ```text
-로그인 → 경력 키워드 → 빈도 기반 키워드 맵 → 키워드 선택
-→ 문서·버전·페이지/텍스트 근거 확인 → TXT/PDF 원본 열람
+로그인 → 경력 키워드 태그 목록 → category 선택 또는 키워드 선택
+→ 해당 키워드의 문서·페이지/텍스트 근거 확인 → TXT/PDF 원본 열람
 ```
 
 이 결과는 CareerFact나 검증된 역량 판정이 아니다. 원문에서 직접 산출한 탐색용
@@ -33,7 +34,7 @@
 - owner의 ACTIVE 이력서·포트폴리오 chunk를 원문 단위로 조립한다.
 - overlap을 제거한 원문에서 등록된 기술명·공학 개념을 canonical keyword로 집계한다.
 - API는 keyword, 빈도, 문서 수와 실제 source 근거를 함께 반환한다.
-- UI는 category·정렬·선택 상태를 적용하고 TXT/PDF owner-scoped viewer로 연결한다.
+- UI는 category·고정 순서·URL 선택 상태를 적용하고 TXT/PDF owner-scoped viewer로 연결한다.
 
 ## 원문과 키워드 계약
 
@@ -89,18 +90,31 @@
 ## 화면 계약
 
 - `/career-vault/keywords`와 사이드바 `경력 키워드` 메뉴를 추가한다.
-- 가운데 맵은 빈도 상위 15개 기술 키워드만 연한 보라색 구름 모양 버튼으로
-  표시하고, 빈도가 높을수록 글자가 커진다. 순위 밖 기술 키워드는 아래의 작은 버튼
-  목록으로 분리한다.
-- 사용자는 전체 또는 현재 문서에 존재하는 기술 category 하나를 선택해 맵과 하위 목록을
-  필터링할 수 있다.
-- 사용자는 `언급 수`, `등장 문서 수`, `균형 점수` 중 하나를 선택할 수 있고 선택한 값이
-  상위 15개 순서, 구름 크기, 하위 목록 값에 동일하게 적용된다. 균형 점수는
-  `log1p(frequency) * (1 + log1p(documentCount))`로 계산해 한 문서의 단순 반복 영향을 줄인다.
-- 키보드 focus, 선택 상태와 빈도에 대한 접근 가능한 이름을 제공한다.
-- 오른쪽 패널은 선택 전 안내, loading, 빈 결과, 오류, 근거 목록 상태를 구분한다.
-  근거 카드에는 파일 형식과 페이지/텍스트 위치를 강조하고 키워드 주변의 짧은
-  문맥만 표시하며 선택 키워드를 강조한다.
+- 목록은 모든 keyword를 같은 크기의 pill/tag로 표시한다. 글자 크기·색·위치는
+  빈도, 문서 수 또는 계산한 점수에 따라 바꾸지 않는다. `frequency`는 작은 숫자로만
+  표시하며, 접근 가능한 이름에서는 `문서에서 확인된 언급 N회`로 설명한다.
+- 기본 순서는 기존 API 계약과 같은 빈도 내림차순, 같은 빈도면 keyword 이름의 안정
+  오름차순이다. ranking selector, 균형 점수, 상위 15개와 순위 밖 목록은 제공하지 않는다.
+- 사용자는 전체 또는 backend enum의 모든 기술 category 하나를 선택할 수 있다. 선택한
+  category에 keyword가 없으면 해당 category의 empty state를 표시한다.
+- 키보드 focus와 category의 `aria-pressed`를 제공하며, 색상만으로 선택 상태를 표현하지 않는다.
+- keyword 선택은 `/career-vault/keywords?keyword={canonical keyword}`로 이동한다. browser
+  back/forward는 목록과 상세를 자연스럽게 전환한다.
+- 상세는 키워드, 실제 문서 발췌, 문서 제목·유형·페이지/텍스트 위치, 추가 근거와
+  owner-scoped TXT/PDF 원본 열람만 표시한다. version number와 분석 score는 기본 화면에 표시하지 않는다.
+- keyword detail의 concise preview는 이메일, 전화번호, URL, GitHub URL 및 연락처·프로필
+  metadata 행을 표시하지 않는다. 이는 화면 presentation만의 제외이며, source 원본·DB content·
+  keyword extraction은 변경하지 않고 `문서에서 보기`는 원본을 그대로 연다.
+- 상세 상단은 evidence 배열의 위치 수와 `totalFrequency`를 `관련 기록 N개 · 총 M회 언급`으로
+  한 번만 표시한다. category chip의 수는 해당 category keyword 개수로 `키워드 N개`로 표시한다.
+- 상세 breadcrumb의 `경력 키워드`만 목록 복귀 action으로 제공한다. source row와 큰 원본 버튼을
+  중복 표시하지 않고, 각 concise evidence card는 `주변 내용 보기`와 `문서에서 보기` action을 최대 하나씩 제공한다.
+- concise preview는 안전한 의미 단위가 남아 있으면 이를 먼저 표시하고, 개인정보·프로필 metadata를
+  제외한 뒤 표시할 문장이 전혀 없을 때만 generic fallback을 사용한다. `주변 내용 보기`는 concise preview와
+  중복되지 않는 추가 안전 문맥이 있을 때만 제공한다.
+- 761px 이상 desktop viewport는 공통 shell·page·card·filter/tag spacing을 100% browser zoom 기준의
+  compact density로 표시한다. 1366×768·1440×900·1920×1080에서 같은 visual rhythm을 유지하되,
+  mobile/tablet breakpoint 계약과 text/button의 읽기·조작 크기는 줄이지 않는다.
 - 같은 문서/version의 여러 페이지 또는 문맥은 하나의 문서 카드로 묶고 대표 근거 하나만
   먼저 표시한다. 나머지는 사용자가 `근거 N개 더 보기`로 펼치거나 다시 접을 수 있다.
 - 근거 카드에서 PDF 또는 UTF-8 TXT 원본을 인증된 요청으로 불러와 별도 viewer에서
@@ -161,15 +175,46 @@ PDF와 TXT 원본을 기존 보안 header와 소유권 경계 안에서 열람�
 
 ### `PRZ-009-R8` — 요구사항
 
-category 필터와 세 정렬 기준이 같은 keyword 집합에 결정적으로 적용된다.
+category 필터는 backend category 계약을 그대로 사용하며, 목록은 빈도 내림차순과
+이름 안정 정렬의 단일 Browse 순서를 사용한다.
 
 ### `PRZ-009-R9` — 요구사항
 
-같은 document/version의 근거는 문서 카드 하나로 묶이고 추가 근거는 접기·펼치기로 확인한다.
+각 source evidence는 compact card 하나로 표시하며, 처음 세 개 뒤의 source evidence는
+`관련 기록 N개 더 보기`와 `추가 기록 접기`로 확인한다.
 
 ### `PRZ-009-R10` — 요구사항
 
 PDF는 해당 페이지, TXT는 첫 일치 표기로 owner-scoped 원본 viewer가 이동한다.
+
+### `PRZ-009-R11` — 요구사항
+
+keyword evidence의 preview는 개인정보를 최소화하면서 keyword가 발견된 이유를 이해할 수 있는 안전한
+문구를 우선 표시하고, 노트북 100% viewport에서도 공통 Career Vault 화면의 정보 밀도를 유지한다.
+
+### `PRZ-009-R12` — 요구사항
+
+문서 보관함 root는 existing document summary를 frontend에서 DocumentType별로 묶은 folder card만 표시한다.
+비어 있는 type은 숨기며, folder 선택은 `?type=` URL state·breadcrumb·browser back/forward로 유지한다.
+제목 검색은 모든 type을 대상으로 하고, folder 내부에서만 상태 filter와 기존 document card를 제공한다.
+
+### `PRZ-009-R13` — 요구사항
+
+Career Vault의 로그인·회원가입, sidebar, 문서 보관함과 폴더 내부, 경력 키워드 목록·상세,
+내 경험 찾기, 문서 업로드, modal·viewer 및 loading·empty·error state는 blue/black/gray palette와
+3D folder card의 `Soft Minimal + Friendly Productivity SaaS` 디자인 언어를 공유한다. 공통 surface는
+큰 radius·약한 border·soft shadow·정돈된 spacing을 사용하고, card·button·tag hover는 작은 elevation만
+제공하며 `prefers-reduced-motion`을 존중한다. 기능·API·result ID/order/count·PDF navigation은 변경하지 않는다.
+
+### `PRZ-009-R14` — 요구사항
+
+문서 상세의 각 과거 version은 owner-scoped 휴지통 action으로 개별 삭제할 수 있다. 삭제는 원본 파일 정리,
+change log·processing job·chunk 정리를 기존 문서 삭제와 같은 순서와 안전한 background cleanup으로 수행한다.
+현재 검색에 사용 중인 version과 처리 중인 version은 삭제할 수 없으며, 문서 전체 삭제 action은 그대로 유지한다.
+상태 문구는 내부 처리 용어 대신 사용자가 이해할 수 있는 문장으로 표시한다. 예를 들어 현재 검색 대상은
+`검색에 사용 중`, 새 파일의 진행 상태는 `문서를 읽고 검색할 수 있게 준비 중`, 완료된 비활성 version은
+`이전 버전 · 검색 제외`로 표시한다.
+이 변경은 활성화, 처리 상태, 검색 결과의 계약을 바꾸지 않는다.
 
 완료에는 backend 단위·controller·PostgreSQL integration test, frontend lint·build,
 Docker Compose 구성 확인과 최종 ownership·diff 감사가 필요하다. OpenSQL에서 새 SQL을

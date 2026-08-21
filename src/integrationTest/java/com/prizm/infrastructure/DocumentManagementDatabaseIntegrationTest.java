@@ -9,6 +9,7 @@ import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.entity.DocumentType;
 import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.exception.DocumentManagementException;
+import com.prizm.document.exception.DocumentManagementErrorCode;
 import com.prizm.document.exception.DocumentNotFoundException;
 import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
@@ -171,6 +172,54 @@ class DocumentManagementDatabaseIntegrationTest {
                 .anySatisfy(changeLog -> assertThat(changeLog.getDocumentVersionId()).isEqualTo(response.versionId()));
         assertThat(Files.exists(STORAGE_ROOT.resolve("storage").resolve(
                 "documents/%d/%d/guide-v2.txt".formatted(fixture.documentId(), response.versionId())))).isTrue();
+    }
+
+    @Test
+    void removesOnlyATerminalHistoricalVersionAndKeepsTheActiveVersionSearchable() {
+        UserAccount owner = createUser("version-removal-owner@prizm.local");
+        UserAccount otherUser = createUser("version-removal-other@prizm.local");
+        DocumentFixture first = createDocument(owner.getId(), "guide-v1.txt");
+        jdbcTemplate.update("UPDATE document_versions SET status = 'ACTIVE' WHERE id = ?", first.versionId());
+        jdbcTemplate.update(
+                "UPDATE processing_jobs SET status = 'COMPLETED', completed_at = now() WHERE id = ?",
+                first.processingJobId());
+
+        Document document = documentRepository.findById(first.documentId()).orElseThrow();
+        DocumentVersion secondVersion = DocumentVersion.quarantined(
+                owner.getId(), document.getId(), 2, "guide-v2.txt", DocumentFileType.TXT, "b".repeat(64));
+        secondVersion.updateStoredFilePath("documents/%d/guide-v2.txt".formatted(document.getId()));
+        secondVersion = documentVersionRepository.saveAndFlush(secondVersion);
+        Long secondVersionId = secondVersion.getId();
+        document.activateVersion(secondVersionId);
+        documentRepository.saveAndFlush(document);
+        ProcessingJob secondJob = processingJobRepository.saveAndFlush(
+                ProcessingJob.pendingIndexing(owner.getId(), secondVersionId));
+        jdbcTemplate.update("UPDATE document_versions SET status = 'ACTIVE' WHERE id = ?", secondVersionId);
+        jdbcTemplate.update(
+                "UPDATE processing_jobs SET status = 'COMPLETED', completed_at = now() WHERE id = ?",
+                secondJob.getId());
+
+        assertThat(documentManagementService.deleteVersion(otherUser.getId(), first.documentId(), first.versionId()))
+                .isFalse();
+        assertThat(documentManagementService.deleteVersion(owner.getId(), first.documentId(), first.versionId()))
+                .isTrue();
+
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM document_versions WHERE id = ?", Long.class, first.versionId())).isZero();
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM processing_jobs WHERE id = ?", Long.class, first.processingJobId())).isZero();
+        assertThat(documentRepository.findById(first.documentId()).orElseThrow().getActiveVersionId())
+                .isEqualTo(secondVersionId);
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM document_versions WHERE id = ?", Long.class, secondVersionId)).isEqualTo(1L);
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT status FROM file_cleanup_jobs WHERE storage_key = ?", String.class, first.storageKey()))
+                .isEqualTo("PENDING");
+        assertThatThrownBy(() -> documentManagementService.deleteVersion(
+                        owner.getId(), first.documentId(), secondVersionId))
+                .isInstanceOf(DocumentManagementException.class)
+                .extracting(exception -> ((DocumentManagementException) exception).code())
+                .isEqualTo(DocumentManagementErrorCode.DOCUMENT_VERSION_ACTIVE);
     }
 
     @Test

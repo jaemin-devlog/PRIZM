@@ -52,11 +52,13 @@ OpenSQL/OpenProxy와 Ollama `bge-m3`에서 전체 흐름을 검증했습니다. 
      별도 PR로 진행합니다.
 2. **경력 키워드 맵**
    - 현재 사용자의 `ACTIVE` 이력서·포트폴리오 원문에서 실제로 확인한 기술을 정규화하고,
-     category와 세 순위 기준으로 표시하며 문서별 근거와 TXT/PDF 원본 위치에 연결합니다.
+     category와 단일 Browse 순서로 표시하며 문서별 근거와 TXT/PDF 원본 위치에 연결합니다.
    - [PRZ-009](../specs/PRZ-009-career-keyword-map/spec.md)는 소스 구현, 단위·정적 검증,
      전체 PostgreSQL integration, synthetic browser와 최종 감사를 마쳤습니다. OpenSQL
      opt-in target이 `NOT_RUN`이므로 상태는 `IMPLEMENTED_UNVERIFIED`이며, 결과를
      CareerFact나 검증된 숙련도 판정으로 사용하지 않습니다.
+   - 2026-08-21 UI·문서 관리 확장 source `3af28492`는 origin branch에 push했으며,
+     PR·`main` merge는 별도 통합 Gate로 남습니다.
 
 다중 OpenSQL DB node, DB 장애전환, OpenProxy 이중화·VIP와 서비스 연속성 보장은
 로드맵에 포함하지 않습니다.

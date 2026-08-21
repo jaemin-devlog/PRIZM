@@ -19,6 +19,19 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
             Long documentId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+            select version
+            from DocumentVersion version
+            where version.id = :id
+              and version.ownerUserId = :ownerUserId
+              and version.documentId = :documentId
+            """)
+    Optional<DocumentVersion> findByIdAndOwnerUserIdAndDocumentIdForUpdate(
+            @Param("id") Long id,
+            @Param("ownerUserId") Long ownerUserId,
+            @Param("documentId") Long documentId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select version from DocumentVersion version where version.id = :id")
     Optional<DocumentVersion> findByIdForUpdate(@Param("id") Long id);
 

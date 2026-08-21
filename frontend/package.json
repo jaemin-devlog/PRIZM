@@ -12,7 +12,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "test:unit": "node --experimental-strip-types --test test/document-processing-presentation.test.ts test/search-evidence-presentation.test.ts",
+    "test:unit": "node --experimental-strip-types --test test/document-processing-presentation.test.ts test/search-evidence-presentation.test.ts test/career-keyword-presentation.test.ts test/document-folder-presentation.test.ts",
     "typecheck": "tsc -b --pretty false",
     "preview": "vite preview",
     "sbom": "node ../scripts/generate-frontend-sbom.mjs"

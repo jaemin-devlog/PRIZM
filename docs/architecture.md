@@ -9,7 +9,7 @@
 > 최종 Windows·Linux 경로 교정·CI source commit:
 > `aff3e87a9a912e44fcf217291a45328cf451cfc9`
 >
-> 문서 검토 기준일: `2026-08-15`
+> 문서 검토 기준일: `2026-08-21`
 >
 > PRZ-010 상태: `VERIFIED` — source
 > `26c546b16eb9ea42d98460dd6e5aa0bf0752212a`, `main` 통합 merge
@@ -23,7 +23,8 @@
 >
 > PRZ-009 상태: `IMPLEMENTED_UNVERIFIED` — source
 > `d52c6d01a3bef916e80a3c983a43c7b1fad1139b`은 `main`에 통합됐고 전체 PostgreSQL
-> integration, browser와 최종 감사는 통과했으나 OpenSQL opt-in 검증은 `NOT_RUN`
+> integration, browser와 최종 감사는 통과했다. UI·문서 관리 확장 source `3af28492`는
+> `origin/PRZ-009-keyword-tags-ui`에 push됐으며 PR·merge와 OpenSQL opt-in 검증은 `NOT_RUN`
 >
 > 범위: 현재 Spring Boot 애플리케이션과 React Career Vault Reference App
 

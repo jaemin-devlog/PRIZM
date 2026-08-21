@@ -38,7 +38,8 @@
 - [x] 모든 backend category enum chip과 category empty state를 제공했다.
 - [x] `?keyword=` 상세 URL과 back/forward 동작을 추가하고, 기존 TXT/PDF owner-scoped original viewer를 재사용했다.
 - [x] focused frontend·Search presentation·backend regression·lint/build과 diff 감사를 실행했다.
-- [ ] 로그인한 synthetic browser에서 tag 선택, TXT/PDF original navigation을 다시 관찰하고 결과를 기록한다.
+- 검증 제외: 로그인한 synthetic browser 재관찰은 fixture를 만들지 않았으므로 `NOT_RUN`이다.
+  2026-08-10의 이전 UI browser 결과를 현재 presentation의 증거로 재사용하지 않는다.
 
 ## P3.2. Evidence presentation refinement
 
@@ -53,7 +54,7 @@
 - [x] synthetic metadata가 섞인 profile line에서도 안전한 기술 문구를 보존하고 generic fallback 조건을 test로 고정한다.
 - [x] concise preview와 중복되지 않는 추가 context가 있을 때만 toggle을 표시한다.
 - [x] 761–1599px 공통 Career Vault shell·page·card·filter/tag spacing을 compact density로 조정한다.
-- [ ] 요청한 keyword screen의 authenticated 100% viewport 확인은 synthetic session을 준비하지 못해 `NOT_RUN`으로 남긴다.
+- 검증 제외: authenticated keyword screen의 100% viewport는 synthetic session을 준비하지 않아 `NOT_RUN`이다.
 - [x] 로그인 전 공통 breakpoint/mobile smoke, focused regression·lint/build·Docker·diff 감사를 실행하고 기록한다.
 
 ## P3.4. Document type folder browse
@@ -69,7 +70,7 @@
 - [x] 공통 palette를 reference의 blue/black/gray scale로 전환하고 red·green을 의미 상태에만 사용한다.
 - [x] 키워드 browse 목록에서 내 문서의 키워드를 주 콘텐츠 영역으로 확장하고, 기술 분류는 데스크톱 우측의 세로 스크롤 rail로 이동한다. 키워드 상세 route는 유지한다.
 - [x] 문서 상세·관리 modal의 version history를 compact row로 정리하고 새 버전 upload form을 토글 방식으로 제공한다.
-- [ ] 100% zoom의 authenticated 1366×768·1920×1080 내부 화면은 사용자 후속 지시에 따라 `NOT_RUN`으로 남긴다.
+- 검증 제외: authenticated 1366×768·1920×1080 내부 화면은 사용자 지시에 따라 `NOT_RUN`이다.
 - [x] 1440×900 login/signup smoke와 frontend tests·lint·build·Docker health·`git diff --check`,
   backend/Search production source 무변경을 확인한다.
 
@@ -80,6 +81,13 @@
 - [x] 문서 processing 상태와 업로드 안내를 일반 사용자 언어로 정리한다.
 - [x] backend/frontend regression, Docker, cleanup/owner/ACTIVE diff audit을 실행하고 evidence에 기록한다.
 
-## 후속 또는 제외 범위
+## 외부 검증 Gate
 
-- [ ] OpenSQL opt-in 검증이 남아 있어 상태를 `VERIFIED`로 올리지 않는다.
+- OpenSQL opt-in 검증은 전용 target이 없어 `NOT_RUN`이다. 구현 작업은 완료했지만 이 Gate 때문에
+  전체 상태를 `VERIFIED`로 올리지 않는다.
+
+## 문서 마감
+
+- [x] 확장 source `3af28492`의 commit·origin push 상태를 spec·plan·evidence와 상태 문서에 반영했다.
+- [x] 현재 단일 Browse UI, folder 보관함, 공통 visual language와 version별 삭제 계약을 문서 간 일치시켰다.
+- [x] 변경 Markdown의 로컬 링크·code fence·후행 공백과 `git diff --check`를 검증했다.

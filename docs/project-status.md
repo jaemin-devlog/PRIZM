@@ -136,9 +136,12 @@ PRZ-005에서는 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 직�
 - 같은 크기의 태그 Browse 목록, `frequency` 기반 고정 순서와 `?keyword=` 근거 상세
 - 개인정보를 제외한 compact 페이지·텍스트 발췌 근거와 처음 세 기록 이후 펼치기·접기
 - owner-scoped UTF-8 TXT 첫 일치 강조와 PDF page/search 위치 원본 열람
+- DocumentType folder 보관함과 우측 세로 기술 분류 rail, 공통 Soft Minimal Career Vault UI
+- active·처리 중 version을 보호하는 과거 version별 삭제와 사용자 중심 처리 상태 문구
 
 PRZ-009의 전체 backend unit test와 전체 PostgreSQL integration, frontend lint·build,
-Docker build/runtime, synthetic browser 흐름과 최종 diff 감사는 통과했다. OpenSQL
+Docker build/runtime, synthetic browser 흐름과 최종 diff 감사는 통과했다. 확장 source
+`3af28492`는 `origin/PRZ-009-keyword-tags-ui`에 push했지만 PR·merge는 `NOT_RUN`이다. OpenSQL
 opt-in integration은 전용 target을 활성화하지 않아 `NOT_RUN`이므로 현재 상태는 계속
 `IMPLEMENTED_UNVERIFIED`다. 상세 범위는
 [PRZ-009 Evidence](../specs/PRZ-009-career-keyword-map/evidence.md)를 따른다.
@@ -177,7 +180,7 @@ PRZ-011은 문서 처리의 파일 읽기·텍스트 추출·청크 생성·실�
 | 대회 OpenSQL 구성 | `SINGLE_ONLY` | 공식 안내에 따라 단일 서버 설치만 사용. PRZ-014 다중 노드 구성은 `REJECTED` |
 | PRZ-004 demo `USER` clean-clone | `VERIFIED` | `25d09e9`에서 자동 검증 `339 PASS / 18 SKIP / 0 FAIL`과 두 독립 clone 통과. `aff3e87` 경로 교정 뒤 Windows·Linux Node test와 GitHub CI 6건 통과, PR #25 merge `1f9a5ad`. 두 번째 빈 목록 UI 직접 관찰은 `NOT_RUN` |
 | PRZ-008 검색 근거 신뢰성 | `IN_PROGRESS` | 2026-08-13 source `2190d47`, PR #40 merge `9b24808`: 기본 profile, v2 상태, 제한적 exact-token rescue와 OpenSQL direct `5432` API·UI Gate를 통합. 의미 단위 청킹·batch embedding·PDF 중복 최적화의 제품 적용 Gate는 남음 |
-| PRZ-009 경력 키워드 맵 | `IMPLEMENTED_UNVERIFIED` | 2026-08-10 source `d52c6d0`, merge `5a8ea8d`: backend unit 323개 중 308 pass·15 skip·실패 0, 전체 integration 71개 중 68 pass·조건부 3 skip·실패 0, frontend lint·build, Docker build/runtime, synthetic browser와 diff 감사 pass. OpenSQL opt-in은 `NOT_RUN` |
+| PRZ-009 경력 키워드 맵 | `IMPLEMENTED_UNVERIFIED` | 핵심 source `d52c6d0`, merge `5a8ea8d`; 2026-08-21 UI·문서 관리 확장 source `3af28492` origin push 완료, PR·merge `NOT_RUN`. 최신 backend test 576 pass, integration 114 pass·8 conditional skip, frontend unit 27·lint·typecheck·build, Docker runtime·diff 감사 pass. OpenSQL opt-in과 후속 authenticated browser 재관찰은 `NOT_RUN` |
 | PRZ-010 변경 로그 동기화 | `VERIFIED` | 2026-08-12 source `26c546b`: PostgreSQL ChangeLog integration, 실제 OpenSQL direct `5432` V14 SQL Gate, 실제 OpenSQL+Ollama `bge-m3` V1→V2 E2E와 실패 시 V1 보존, 전체 integration `104 completed / 7 skipped / 0 failures`, backend test, frontend lint/build, Compose와 diff 감사 통과 |
 | PRZ-011 문서 처리 상태 UX | `VERIFIED` | 2026-08-13 source `fbb3481`: backend unit 464개 중 449 pass·15 skip, integration 112개 중 105 pass·7 skip, frontend unit 5개·lint·build, Compose V15 적용, PostgreSQL+pgvector·Ollama `bge-m3` 문서 처리/검색과 browser polling·retry 표시 통과. AUDIT blocking 2건 수정 뒤 재-AUDIT PASS, PR #41로 `main` 통합 |
 | PRZ-012 검색 근거 표현 품질 | `IMPLEMENTED_UNVERIFIED` | 질문 관련 원문 1–3문장 선택과 근거 중심 UI, PRZ-008 평가 15개 결과 불변, backend unit·integration과 frontend 검증 통과. 실제 개인 문서 대표 7개 Before/After는 owner·authentication 경계 안에서 실행하지 못해 `NOT_RUN`, VERIFY Gate `FAIL` |
@@ -221,10 +224,11 @@ PRZ-011의 검증·통합 결과는
 - 기본값 `source-dedup-evidence-signals-v1`은 의미상 근거 없음과 검색 문서 없음을
   구분하고 동일 출처 위치·본문 중복을 축약합니다. `legacy-dense-v1`은 명시적
   `PRIZM_SEARCH_PROFILE` rollback override로 유지합니다.
-- 이력서·포트폴리오의 정규화·category·세 순위 기준 키워드 맵과 문서별 근거·원본 위치
-  연결은 [PRZ-009](../specs/PRZ-009-career-keyword-map/spec.md) source `d52c6d0`에 구현돼
-  merge `5a8ea8d`로 `main`에 통합됐고
-  전체 PostgreSQL integration·browser·최종 diff 감사를 통과했습니다. 다만 OpenSQL
+- 이력서·포트폴리오의 정규화·category·단일 Browse 순서 키워드 목록과 문서별 근거·원본 위치
+  연결은 [PRZ-009](../specs/PRZ-009-career-keyword-map/spec.md) 핵심 source `d52c6d0`에 구현돼
+  merge `5a8ea8d`로 `main`에 통합됐다. 폴더 보관함·공통 UI·버전별 삭제 확장은 source `3af28492`로 push됐고,
+  최신 backend·PostgreSQL integration·frontend·Docker·diff 감사를 통과했습니다. 확장 UI의 authenticated
+  browser 재관찰은 사용자 지시에 따라 `NOT_RUN`이다. OpenSQL
   opt-in target 검증이 `NOT_RUN`이어서 OpenSQL 범위까지 검증 완료한 기능은 아닙니다.
 - 프런트엔드 자동 UI 테스트가 없습니다.
 - V13의 일부 제약과 기존 데이터 보정 전용 회귀 테스트가 없습니다.

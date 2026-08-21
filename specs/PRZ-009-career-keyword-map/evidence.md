@@ -5,15 +5,16 @@
 `IMPLEMENTED_UNVERIFIED`
 
 - 시작 기준 source: `83631f13c21eab54ac0f32ebb0f893b6c5acea0f`
-- 구현 source: `d52c6d01a3bef916e80a3c983a43c7b1fad1139b`
-- `main` 통합 merge: `5a8ea8d2b85e7d87342e11e96d1d58d1181ab6b8`
-- 검증일: `2026-08-10`
+- 핵심 기능 source: `d52c6d01a3bef916e80a3c983a43c7b1fad1139b`
+- UI·문서 관리 확장 source: `3af28492` (`origin/PRZ-009-keyword-tags-ui` push 완료)
+- `main` 통합 merge: 핵심 기능 `5a8ea8d2b85e7d87342e11e96d1d58d1181ab6b8`; 확장 source PR·merge `NOT_RUN`
+- 최종 검증일: `2026-08-21`
 - 환경: Windows PowerShell, Java 17, Gradle 9.5.1, Node/npm,
   Docker Desktop, PostgreSQL+pgvector Testcontainers, Codex In-app Browser
 
 ## 2026-08-21 Presentation update — 태그 Browse UX
 
-이 항목은 `PRZ-009-keyword-tags-ui`의 `origin/main` 기준 uncommitted worktree 변경이다.
+이 항목은 `PRZ-009-keyword-tags-ui`에서 구현해 확장 source `3af28492`에 포함했다.
 PRZ-009의 backend source, API DTO·endpoint, migration, keyword normalization, category,
 owner/ACTIVE isolation과 Search production source는 변경하지 않았다.
 
@@ -39,7 +40,7 @@ owner/ACTIVE isolation과 Search production source는 변경하지 않았다.
 
 ## 2026-08-21 Evidence presentation refinement
 
-이 항목도 `PRZ-009-keyword-tags-ui`의 uncommitted worktree 변경이다. backend/API, database,
+이 항목도 확장 source `3af28492`에 포함했다. backend/API, database,
 Flyway, keyword normalization·classification, owner/ACTIVE isolation, SearchService와 PRZ-016
 search presentation source는 변경하지 않았다.
 
@@ -68,7 +69,7 @@ search presentation source는 변경하지 않았다.
 
 ## 2026-08-21 Evidence fallback 및 laptop density polish
 
-이 항목은 동일한 `PRZ-009-keyword-tags-ui` uncommitted worktree의 presentation-only 변경이다.
+이 항목은 동일한 확장 source `3af28492`의 presentation-only 변경이다.
 CareerKeyword backend/API, keyword extraction·normalization·occurrence, owner/ACTIVE isolation, SearchService와
 PRZ-016 production search source, DB/Flyway는 변경하지 않았다.
 
@@ -133,7 +134,7 @@ production source는 변경하지 않았다.
     authenticated browser 증거로 확대하지 않는다.
 
 브라우저 확인을 위해 사용자 계정과 분리된 local-only synthetic account 2개를 만들었으나 문서 업로드,
-사용자 계정 접근 또는 기존 data 변경은 수행하지 않았다. commit·push·PR·merge도 수행하지 않았다.
+사용자 계정 접근 또는 기존 data 변경은 수행하지 않았다. 확장 source는 commit·push했으며 PR·merge는 `NOT_RUN`이다.
 
 ## 2026-08-21 Reference palette alignment
 
@@ -153,6 +154,10 @@ route와 기능은 바꾸지 않았고 3D folder asset도 기존 blue 자산을 
 surface로 사용하고, 기술 분류는 desktop에서 우측 세로 rail 안에 표시한다. rail은 viewport 높이를 넘으면 내부에서
 스크롤한다. 1120px 이하에서는 rail을 주 콘텐츠 아래로 배치하고, mobile에서는 가로 스크롤 pill row로 전환한다.
 키워드 선택 뒤의 detail route와 근거 UI는 변경하지 않았다.
+
+최종 polish에서 rail의 불필요한 두 번째 grid 열을 제거해 분류 button이 가용 폭을 채우도록 했고,
+제목·항목을 가운데 정렬했다. 키워드가 많을 때는 desktop 주 콘텐츠 목록만 제한 높이 안에서 독립 스크롤하며,
+1120px 이하에서는 문서 흐름에 맞게 전체 높이로 펼친다.
 
 - **검증:** frontend unit tests 27, TypeScript, ESLint, Vite production build, `git diff --check` 모두 `PASS`.
   기본 `dist`는 실행 중 컨테이너가 점유하고 있어 build는 별도 verification output에 생성했다. backend/Search
@@ -271,8 +276,8 @@ active chunk에서 계산하며 별도 영구 keyword table이나 생성형 모�
 - **요구사항:** `R7` canonical 별칭과 source 표기 보존
   - 근거: extractor/service/integration test
   - 현재 판정: `PASS`
-- **요구사항:** `R8` category와 세 순위 기준
-  - 근거: React source, browser
+- **요구사항:** `R8` category와 빈도·이름 기반 단일 Browse 순서
+  - 근거: React source, frontend presentation test
   - 현재 판정: `PASS`
 - **요구사항:** `R9` document/version 근거 묶기
   - 근거: React source, browser 3개 근거 접기·펼치기
@@ -294,8 +299,8 @@ active chunk에서 계산하며 별도 영구 keyword table이나 생성형 모�
   이전 version은 기존 안전한 file-cleanup 등록 흐름을 거친 뒤 해당 version의 change log, processing
   job, chunk, metadata만 제거한다. document와 active version pointer는 변경하지 않는다.
 - **UI:** version history의 삭제 가능한 행에만 확인 절차가 있는 휴지통 icon을 제공한다. 문서 전체
-  삭제는 기존대로 모든 version을 함께 삭제한다. `처리 완료` 같은 내부 표현은 `검색 준비 완료`,
-  `검색 준비 중`, `문서를 읽고 검색할 수 있게 준비 중`, `검색에 사용 중`,
+  삭제는 기존대로 모든 version을 함께 삭제한다. 내부 처리 표현은 `검색 준비 중`,
+  `문서를 읽고 검색할 수 있게 준비 중`, `검색에 사용 중`,
   `이전 버전 · 검색 제외`로 바꿨다.
 - **명령·검증:** focused `DocumentManagementServiceTest`와 `DocumentControllerTest`
   - 결과: `PASS`
@@ -311,3 +316,14 @@ active chunk에서 계산하며 별도 영구 keyword table이나 생성형 모�
   - 결과: `PASS`
 - **명령·검증:** browser authenticated interaction
   - 결과: `NOT_RUN` (사용자 지시에 따라 직접 브라우저 확인을 수행하지 않음)
+
+## 2026-08-21 문서 마감 감사
+
+- 확장 source의 실제 원격 SHA `3af284920943ba03c6cd109366698c32dc25d3fc`와
+  `origin/PRZ-009-keyword-tags-ui` push 결과를 spec·plan·status·roadmap·registry에 반영했다.
+- 구현 완료 task와 실행하지 않은 browser/OpenSQL Gate를 분리했다. 후자는 `NOT_RUN`이며
+  전체 상태를 `VERIFIED`로 올리지 않는 근거다.
+- 변경한 Markdown 8개에서 159개 로컬 링크, code fence·후행 공백·Markdown 기본 형식을 검사했다.
+  결과는 `PASS`다.
+- `git diff --check` 결과는 `PASS`이며, 이 문서 마감에서는 production source·test·migration·dependency를
+  변경하지 않았다.

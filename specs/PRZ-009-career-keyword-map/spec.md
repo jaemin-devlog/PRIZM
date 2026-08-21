@@ -3,13 +3,15 @@
 > **상태:** `IMPLEMENTED_UNVERIFIED`
 > **유형:** Feature
 > **선행 문서:** [PRZ-000](../PRZ-000-platform-baseline/spec.md)
-> **기준 소스:** `d52c6d01a3bef916e80a3c983a43c7b1fad1139b`
-> **통합:** merge `5a8ea8d2b85e7d87342e11e96d1d58d1181ab6b8`
-> **최종 확인:** 2026-08-10
+> **핵심 기능 소스:** `d52c6d01a3bef916e80a3c983a43c7b1fad1139b`
+> **UI·문서 관리 확장 소스:** `3af28492` (`PRZ-009-keyword-tags-ui`, origin push 완료)
+> **통합:** 핵심 기능 merge `5a8ea8d2b85e7d87342e11e96d1d58d1181ab6b8`; 확장 소스 PR·merge `NOT_RUN`
+> **최종 확인:** 2026-08-21
 
 ## 상태
 
-`IMPLEMENTED_UNVERIFIED` — 구현·전체 PostgreSQL integration·최종 감사 완료, OpenSQL opt-in `NOT_RUN`
+`IMPLEMENTED_UNVERIFIED` — 구현·전체 PostgreSQL integration·최종 감사와 확장 브랜치 commit/push 완료,
+OpenSQL opt-in `NOT_RUN`
 
 시작 기준 source는 `83631f13c21eab54ac0f32ebb0f893b6c5acea0f`이다.
 

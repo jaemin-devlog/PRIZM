@@ -139,5 +139,5 @@ replay 결과를 unseen 성능으로 다시 부르지 않는다.
 
 - [전체 실험과 판단 기록](PRZ-016-SEARCH-RND-HISTORY.md)
 - [현재 Production pipeline](SEARCH-FINAL-ARCHITECTURE.md)
-- [Claim Verification Architecture Audit](claim-verification-architecture-audit/evidence.md)
-- [실패한 V2 Production 통합](final-production-claim-verifier-v2-integration/evidence.md)
+- Claim Verification Architecture Audit과 실패한 V2 Production 통합의 query-level
+  evidence는 local-only 연구 artifact로 보존하며 공개 저장소에는 포함하지 않는다.

@@ -61,9 +61,8 @@ P7-B 14개 positive failure의 최초 소실 분포(dense floor 7, negation 2, s
 
 Fresh baseline은 Candidate Recall@20 100%, Top1/Recall@5 87.5%, Negative FPR 50%,
 localization correctness 79.17%, owner/ACTIVE isolation PASS였다. 이 수치에 맞추기 위한
-검색 수정은 하지 않았다. 상세 구조, hash, query별 trace와 다음 phase 판단은
-[`fresh-generalization-evaluation-v2/evidence.md`](fresh-generalization-evaluation-v2/evidence.md)에
-있다.
+검색 수정은 하지 않았다. 상세 구조, hash, query별 trace와 frozen 입력은 local-only
+evaluation artifact로 보존하며 공개 저장소에는 aggregate 결과만 남긴다.
 
 ## P9 Structured Claim-Support Eligibility
 
@@ -77,8 +76,7 @@ Negative FPR은 15%에서 0%로 바뀌었다. Stress는 Top1/Recall@5/selected c
 75%에서 100%로, Negative FPR은 75%에서 0%로 바뀌었다. Dense Recall@1/5/10/20,
 owner isolation, ACTIVE isolation은 회귀 없이 PASS다. Displayed/localization은 각각
 Judge 68.75%, Stress 65%/60%로 남아 다음 Phase 대상이다. 상세 판정과 query별 trace는
-[`p9-structured-claim-support-eligibility/evidence.md`](p9-structured-claim-support-eligibility/evidence.md)를
-따른다.
+local-only evaluation artifact로 보존하며 공개 저장소에는 aggregate 결과만 남긴다.
 
 ## P10 Evidence Localization
 
@@ -95,8 +93,8 @@ Top1/Recall@5/selected correctness 100%와 FPR 0%는 불변이고,
 displayed/localization은 65/60% → 100/100%다. P9 localization PASS → P10 FAIL
 회귀는 0건이며 owner/ACTIVE isolation과 trace/Production parity는 PASS다.
 Frozen dataset/original runner mismatch는 0이다. 상세 구조, 예시, expansion
-전수 조사, complexity warning과 명령 결과는
-[`p10-evidence-localization/evidence.md`](p10-evidence-localization/evidence.md)를 따른다.
+전수 조사, complexity warning과 명령 결과는 local-only evaluation artifact로 보존하며
+공개 저장소에는 aggregate 결과만 남긴다.
 
 ## P11 Source Consolidation Redesign
 
@@ -109,8 +107,8 @@ Frozen Judge/Stress의 Dense, Top1, Recall@5, selected correctness, Negative FPR
 localization, owner/ACTIVE isolation과 parity metric은 유지됐다. 그러나 Stress 1건의
 final 결과가 3→5로 늘면서 normalized duplicate snippet도 2개 증가해 원본 P10
 runner의 exact-result assertion과 P11 duplicate Gate가 실패했다. 따라서 P11은
-`PARTIAL_PASS / IMPLEMENTED_UNVERIFIED`이며, 상세 결과는
-[`p11-source-consolidation-redesign/evidence.md`](p11-source-consolidation-redesign/evidence.md)를 따른다.
+`PARTIAL_PASS / IMPLEMENTED_UNVERIFIED`이며, 상세 query-level 결과는 local-only
+evaluation artifact로 보존한다.
 
 ## P11.1 Duplicate Evidence Consolidation
 
@@ -118,8 +116,8 @@ P11 source identity를 유지한 상태에서 same-version repeated text span만
 query-evidence consolidation의 representative 기준으로 축약했다. Stress RS-S02-P02는
 final 5→3, duplicate extras 5→3과 exact final result가 P10 수준으로 복구됐고 실제
 이력서 source retention 4/4/3/3과 P8.1/P9/P10 metric·FPR·localization·owner/ACTIVE
-  isolation은 유지됐다. P11.1 판정은 `PASS`다. 상세는
-  [`p11-1-duplicate-evidence-consolidation/evidence.md`](p11-1-duplicate-evidence-consolidation/evidence.md)를 따른다.
+isolation은 유지됐다. P11.1 판정은 `PASS`다. 상세 query-level 결과는 local-only
+evaluation artifact로 보존한다.
 
 ## P12 Simple Tech Usage Eligibility
 
@@ -131,8 +129,8 @@ other-actor, review/comparison, numeric/metric, prototype/production state gate�
 `0/0 → 2/2`, OAuth2는 `0/0 → 1/1`로 복구됐고 production-response parity는
 유지됐다. Judge는 Candidate Recall@20 `1.0`, Top1/Recall@5/localization `0.875`,
 FPR `0`; Stress는 모두 `1.0`, FPR `0`; owner/ACTIVE isolation과 P10 exact
-result assertion은 PASS다. 상세는
-[`p12-simple-tech-usage-eligibility/evidence.md`](p12-simple-tech-usage-eligibility/evidence.md)를 따른다.
+result assertion은 PASS다. 상세 query-level 결과는 local-only evaluation artifact로
+보존한다.
 
 ## Spec ID 충돌 해소
 
@@ -217,8 +215,8 @@ P12.1은 threshold 자체를 변경하지 않았다. 기존의 `directSupport &&
 claim 질문의 direct support만 추가했다. FCM chunk 108 (dense score `0.425492`)은
 `SUPPORTED/directSupport`로 eligibility와 final result를 통과했다. P10 Judge는
 Top1/Recall@5/localization `0.875`, FPR `0`; Stress는 각각 `1.0`, FPR `0`; owner와
-ACTIVE isolation은 모두 `PASS`다. 상세는
-[`p12-1-direct-support-floor-bypass/evidence.md`](p12-1-direct-support-floor-bypass/evidence.md)를 따른다.
+ACTIVE isolation은 모두 `PASS`다. 상세 query-level 결과는 local-only evaluation
+artifact로 보존한다.
 
 ## P15 PDF Document Confirmation UX
 

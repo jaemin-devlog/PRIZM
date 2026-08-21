@@ -359,5 +359,5 @@ Trace는 Production API schema나 검색 결과를 바꾸지 않는다. P7-B `48
 
 - [전체 R&D 흐름](PRZ-016-SEARCH-RND-HISTORY.md)
 - [5분 요약](SEARCH-FINAL-SUMMARY.md)
-- [실패한 V2 Production 통합](final-production-claim-verifier-v2-integration/evidence.md)
-- [Claim Verification Architecture Audit](claim-verification-architecture-audit/evidence.md)
+- 실패한 V2 Production 통합과 Claim Verification Architecture Audit의 query-level
+  evidence는 local-only 연구 artifact로 보존하며 공개 저장소에는 포함하지 않는다.

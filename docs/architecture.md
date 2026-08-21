@@ -309,13 +309,14 @@ overlap을 한 번만 남겨 전체 원문으로 조립하고 PDF chunk는 페�
 조립한 원문에 실제 등장한 token과 명시적으로 지원하는 복합 기술어만 정규화해
 빈도와 문서 수를 계산한다. 등록된 한영 별칭과 Java 버전 표기는 canonical keyword에
 합치되 source의 실제 표기는 variants와 matched terms로 보존한다. 각 keyword에는
-언어·프레임워크·DB·인프라 등 고정 category가 붙고 React 화면은 언급 수·문서 수·
-`log1p(frequency) * (1 + log1p(documentCount))` 균형 점수로 같은 목록을 재정렬한다.
+언어·프레임워크·DB·인프라 등 고정 category가 붙고 React 화면은 모든 keyword를 같은
+크기의 태그로 표시한다. 목록은 API의 빈도 내림차순·이름 안정 정렬을 사용하며,
+`frequency`는 문서에서 확인된 언급 횟수일 뿐 점수·숙련도·중요도가 아니다.
 
 이 값은 원문 탐색용 인덱스이며 CareerFact, 숙련도나 경력 진위 판정이 아니다. 화면에서
-키워드를 선택하면 같은 active source의 발췌문을 document/version별로 묶어 대표 근거를
-먼저 보여준다. owner-scoped original endpoint로 UTF-8 TXT의 첫 일치 표기를 강조하거나
-PDF built-in viewer를 page/search fragment 위치로 연다.
+키워드를 선택하면 `?keyword=` 상세에서 같은 active source의 발췌문과 문서·위치를
+보여준다. owner-scoped original endpoint로 UTF-8 TXT의 첫 일치 표기를 강조하거나 PDF
+built-in viewer를 page/search fragment 위치로 연다.
 
 현재 소스 구현과 단위·controller test, frontend lint·build, 전체 PostgreSQL integration,
 synthetic browser 흐름과 최종 diff 감사는 완료됐다. OpenSQL opt-in integration은 전용
@@ -545,8 +546,10 @@ Ollama 연결, model 미설치, GPU/model 실행, 일반 처리 실패의 allowl
   상대 경로만 저장합니다.
 - **rollback 보상:** 원본 저장 뒤 DB transaction이 rollback되면 즉시 보상
   삭제를 시도합니다. 실패하면 `FileCleanupJob`을 등록합니다.
-- **문서 삭제:** owner-scoped 문서가 terminal 상태일 때 같은 DB transaction에서
-  각 버전의 정리 작업을 먼저 등록하고 문서 데이터를 삭제합니다.
+- **문서·이전 버전 삭제:** owner-scoped 문서가 terminal 상태일 때 같은 DB transaction에서
+  각 버전의 정리 작업을 먼저 등록하고 문서 데이터를 삭제합니다. 과거 version 하나를 삭제할 때도
+  같은 순서로 해당 version의 정리 작업·ChangeLog·processing job·chunk·metadata만 제거합니다.
+  현재 `active_version_id`가 가리키는 version과 처리 중 version은 이 경로에서 삭제하지 않습니다.
 - **Cleanup Worker:** 정리 작업을 짧게 선점하고 DB transaction 밖에서 파일을
   지웁니다. 파일 삭제 중에는 heartbeat를 보내지 않으며, 실패나 5분 lease 만료는
   색인과 같은 backoff 정책으로 복구합니다.

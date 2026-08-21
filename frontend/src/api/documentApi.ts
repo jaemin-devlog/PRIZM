@@ -165,6 +165,10 @@ export async function deleteDocument(documentId: number): Promise<void> {
   await documentRequest(`/api/documents/${documentId}`, { method: 'DELETE' })
 }
 
+export async function deleteDocumentVersion(documentId: number, versionId: number): Promise<void> {
+  await documentRequest(`/api/documents/${documentId}/versions/${versionId}`, { method: 'DELETE' })
+}
+
 export async function uploadDocument(
   title: string,
   documentType: DocumentType,

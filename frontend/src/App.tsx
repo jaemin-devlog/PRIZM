@@ -19,13 +19,13 @@ import {
   CareerKeywordApiError,
   getCareerKeywordEvidence,
   getCareerKeywordMap,
-  type CareerKeywordCategory,
   type CareerKeywordEvidenceItem,
   type CareerKeywordSummary,
 } from './api/careerKeywordApi'
 import {
   DocumentApiError,
   deleteDocument,
+  deleteDocumentVersion,
   getDocument,
   getDocumentOriginal,
   getDocumentPdf,
@@ -52,6 +52,19 @@ import {
   getEvidenceSourceLabel,
 } from './searchEvidencePresentation'
 import {
+  categoryKeywordCountLabel,
+  getConciseKeywordEvidence,
+  getKeywordEvidenceContext,
+  getVisibleKeywords,
+  KEYWORD_CATEGORY_LABELS,
+  KEYWORD_CATEGORY_ORDER,
+  keywordDetailPath,
+  keywordEvidenceCountLabel,
+  keywordMentionLabel,
+  selectedKeywordFromSearch,
+  type KeywordCategoryFilter,
+} from './careerKeywordPresentation'
+import {
   clearSession,
   getAccessToken,
   getStoredCurrentUser,
@@ -59,6 +72,11 @@ import {
   saveCurrentUser,
 } from './auth/tokenStorage'
 import { progressSummary } from './documentProcessingPresentation'
+import {
+  documentFolderPath,
+  groupDocumentsByType,
+  selectedDocumentFolderFromSearch,
+} from './documentFolderPresentation'
 
 const LOGIN_PATH = '/login'
 const CAREER_VAULT_PATH = '/career-vault'
@@ -67,23 +85,7 @@ const KEYWORDS_PATH = '/career-vault/keywords'
 const EVIDENCE_PATH = '/career-vault/evidence'
 const UPLOAD_PATH = '/career-vault/upload'
 const MAX_UPLOAD_FILE_SIZE_BYTES = 10 * 1024 * 1024
-const TOP_KEYWORD_LIMIT = 15
 const DOCUMENT_STATUS_POLL_INTERVAL_MS = 2_000
-
-const KEYWORD_CATEGORY_LABELS: Record<CareerKeywordCategory, string> = {
-  LANGUAGE: '언어',
-  FRAMEWORK: '프레임워크',
-  DATABASE: '데이터베이스',
-  INFRASTRUCTURE: '인프라',
-  MESSAGING: '메시징',
-  SECURITY: '보안',
-  TESTING: '테스트',
-  WEB: '웹·애플리케이션',
-  TOOLING: '개발 도구',
-  ENGINEERING_CONCEPT: '공학 개념',
-}
-
-const KEYWORD_CATEGORY_ORDER = Object.keys(KEYWORD_CATEGORY_LABELS) as CareerKeywordCategory[]
 
 const DOCUMENT_TYPE_OPTIONS: ReadonlyArray<{ value: DocumentType | undefined; label: string }> = [
   { value: undefined, label: '전체' },
@@ -108,13 +110,13 @@ const DOCUMENT_TYPE_LABELS: Readonly<Record<DocumentType, string>> = Object.from
 ) as Record<DocumentType, string>
 
 const DOCUMENT_STATUS_LABELS: Readonly<Record<string, string>> = {
-  PENDING: '처리 대기',
-  QUARANTINED: '처리 대기',
-  PROCESSING: '처리 중',
-  RETRY_WAIT: '재시도 대기',
-  COMPLETED: '처리 완료',
-  ACTIVE: '검색 가능',
-  FAILED: '처리 실패',
+  PENDING: '준비 중',
+  QUARANTINED: '준비 중',
+  PROCESSING: '검색 준비 중',
+  RETRY_WAIT: '잠시 후 다시 준비',
+  COMPLETED: '검색 준비 완료',
+  ACTIVE: '검색에 사용 중',
+  FAILED: '준비에 실패함',
 }
 
 const PROCESSING_ERROR_MESSAGES: Readonly<Record<string, string>> = {
@@ -123,18 +125,6 @@ const PROCESSING_ERROR_MESSAGES: Readonly<Record<string, string>> = {
   OLLAMA_RUNTIME_FAILURE: 'Ollama가 GPU 또는 embedding model을 실행하지 못했습니다.',
   DOCUMENT_PROCESSING_FAILED: '문서를 처리하지 못했습니다. 파일 형식과 내용을 확인해 주세요.',
 }
-
-const PROCESSING_STATUS_OPTIONS: ReadonlyArray<{
-  value: ProcessingJobStatus | undefined
-  label: string
-}> = [
-  { value: undefined, label: '전체 상태' },
-  { value: 'PENDING', label: '처리 대기' },
-  { value: 'PROCESSING', label: '처리 중' },
-  { value: 'RETRY_WAIT', label: '재시도 대기' },
-  { value: 'COMPLETED', label: '처리 완료' },
-  { value: 'FAILED', label: '처리 실패' },
-]
 
 const UPLOAD_DOCUMENT_TYPE_OPTIONS = DOCUMENT_TYPE_OPTIONS.filter(
   (option): option is { value: DocumentType; label: string } => option.value !== undefined,
@@ -189,9 +179,6 @@ function getEvidencePdfViewerTarget(
   }
 }
 
-type KeywordRankingMode = 'frequency' | 'documents' | 'balanced'
-type KeywordCategoryFilter = CareerKeywordCategory | 'ALL'
-
 type OriginalViewerTarget = Pick<
   CareerKeywordEvidenceItem,
   | 'documentId'
@@ -204,19 +191,6 @@ type OriginalViewerTarget = Pick<
   | 'sourceLabel'
   | 'matchedTerms'
 > & { keyword: string }
-
-type CareerKeywordEvidenceGroup = {
-  key: string
-  documentId: number
-  documentVersionId: number
-  documentTitle: string
-  documentType: DocumentType
-  versionNo: number
-  originalFileName: string
-  fileType: CareerKeywordEvidenceItem['fileType']
-  occurrenceCount: number
-  sources: CareerKeywordEvidenceItem[]
-}
 
 function isVaultPath(pathname: string): pathname is VaultPath {
   return pathname === DOCUMENTS_PATH
@@ -636,7 +610,9 @@ function CareerVaultShell({
 }
 
 function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
-  const [selectedDocumentType, setSelectedDocumentType] = useState<DocumentType | undefined>()
+  const [selectedDocumentType, setSelectedDocumentType] = useState<DocumentType | undefined>(() =>
+    selectedDocumentFolderFromSearch(window.location.search),
+  )
   const [selectedProcessingStatus, setSelectedProcessingStatus] = useState<
     ProcessingJobStatus | undefined
   >()
@@ -654,6 +630,9 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleteConfirming, setIsDeleteConfirming] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [versionDeleteTarget, setVersionDeleteTarget] = useState<DocumentVersion | null>(null)
+  const [isVersionDeleting, setIsVersionDeleting] = useState(false)
+  const [isVersionUploadFormOpen, setIsVersionUploadFormOpen] = useState(false)
   const [versionUploadFile, setVersionUploadFile] = useState<File | null>(null)
   const [versionUploadInputKey, setVersionUploadInputKey] = useState(0)
   const [isVersionUploading, setIsVersionUploading] = useState(false)
@@ -667,6 +646,21 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
   const pdfRequestId = useRef(0)
   const pdfAbortController = useRef<AbortController | null>(null)
   const pdfObjectUrl = useRef<string | null>(null)
+
+  useEffect(() => {
+    const syncFolder = () => setSelectedDocumentType(selectedDocumentFolderFromSearch(window.location.search))
+    window.addEventListener('popstate', syncFolder)
+    return () => window.removeEventListener('popstate', syncFolder)
+  }, [])
+
+  const selectDocumentFolder = useCallback((documentType: DocumentType | undefined) => {
+    const nextPath = documentFolderPath(documentType)
+    if (`${window.location.pathname}${window.location.search}` !== nextPath) {
+      window.history.pushState(null, '', nextPath)
+    }
+    setSelectedDocumentType(documentType)
+    setSelectedProcessingStatus(undefined)
+  }, [])
 
   useEffect(() => {
     let isCurrentRequest = true
@@ -792,6 +786,9 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
       setReloadKey((value) => value + 1)
       return
     }
+    if (normalizedTitle !== '') {
+      selectDocumentFolder(undefined)
+    }
     setAppliedTitleQuery(normalizedTitle)
   }
 
@@ -823,6 +820,9 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
     setDetailErrorMessage(null)
     setIsDetailLoading(false)
     setIsDeleteConfirming(false)
+    setVersionDeleteTarget(null)
+    setIsVersionDeleting(false)
+    setIsVersionUploadFormOpen(false)
     setVersionUploadFile(null)
     setVersionUploadInputKey((value) => value + 1)
     setIsVersionUploading(false)
@@ -863,6 +863,9 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
     setDetailErrorMessage(null)
     setActionMessage(null)
     setIsDeleteConfirming(false)
+    setVersionDeleteTarget(null)
+    setIsVersionDeleting(false)
+    setIsVersionUploadFormOpen(false)
     setVersionUploadFile(null)
     setVersionUploadInputKey((value) => value + 1)
     try {
@@ -941,12 +944,55 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
         return
       }
       if (error instanceof DocumentApiError && error.code === 'DOCUMENT_PROCESSING') {
-        setDetailErrorMessage('문서 처리 중에는 삭제할 수 없습니다. 처리 완료 또는 실패 후 다시 시도해 주세요.')
+        setDetailErrorMessage('문서를 읽고 검색할 수 있게 준비 중에는 삭제할 수 없습니다. 준비가 끝난 뒤 다시 시도해 주세요.')
       } else {
         setDetailErrorMessage('문서를 삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.')
       }
     } finally {
       setIsDeleting(false)
+    }
+  }
+
+  const handleVersionDelete = async () => {
+    if (selectedDocument === null || versionDeleteTarget === null || isVersionDeleting) {
+      return
+    }
+
+    const documentId = selectedDocument.documentId
+    const versionId = versionDeleteTarget.versionId
+    const versionNo = versionDeleteTarget.versionNo
+    const requestId = detailRequestId.current
+    setIsVersionDeleting(true)
+    setDetailErrorMessage(null)
+    try {
+      await deleteDocumentVersion(documentId, versionId)
+      const updated = await getDocument(documentId)
+      if (detailRequestId.current !== requestId) {
+        return
+      }
+      setSelectedDocument(updated)
+      setVersionDeleteTarget(null)
+      setActionMessage(`v${versionNo} 이전 버전을 삭제했어요. 원본 파일은 안전하게 정리됩니다.`)
+      setReloadKey((value) => value + 1)
+    } catch (error) {
+      if (detailRequestId.current !== requestId) {
+        return
+      }
+      if (error instanceof DocumentApiError && (error.status === 401 || error.status === 403)) {
+        onSessionExpired()
+        return
+      }
+      if (error instanceof DocumentApiError && error.code === 'DOCUMENT_VERSION_ACTIVE') {
+        setDetailErrorMessage('검색에 사용 중인 버전은 지울 수 없어요. 새 버전이 검색에 사용되기 시작한 뒤 정리해 주세요.')
+      } else if (error instanceof DocumentApiError && error.code === 'DOCUMENT_PROCESSING') {
+        setDetailErrorMessage('아직 문서를 읽고 검색할 수 있게 준비 중인 버전은 지울 수 없어요.')
+      } else {
+        setDetailErrorMessage('이전 버전을 삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.')
+      }
+    } finally {
+      if (detailRequestId.current === requestId) {
+        setIsVersionDeleting(false)
+      }
     }
   }
 
@@ -988,10 +1034,11 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
       }
       const uploadedVersion = updated.versions.find((version) => version.versionId === uploaded.versionId)
       setSelectedDocument(updated)
+      setIsVersionUploadFormOpen(false)
       setVersionUploadFile(null)
       setVersionUploadInputKey((value) => value + 1)
       setActionMessage(
-        `버전 ${uploadedVersion?.versionNo ?? updated.versions.length}의 원본을 등록했습니다. 처리가 끝나면 자동으로 ACTIVE 버전이 됩니다.`,
+        `버전 ${uploadedVersion?.versionNo ?? updated.versions.length}을 등록했어요. 문서를 읽고 검색할 수 있게 준비가 끝나면 검색에 사용되는 버전으로 바뀝니다.`,
       )
       setReloadKey((value) => value + 1)
     } catch (error) {
@@ -1003,7 +1050,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
         return
       }
       if (error instanceof DocumentApiError && error.code === 'DOCUMENT_PROCESSING') {
-        setDetailErrorMessage('현재 버전 처리가 끝난 뒤 새 버전을 등록할 수 있습니다.')
+        setDetailErrorMessage('현재 버전을 읽고 검색할 수 있게 준비하는 중이에요. 준비가 끝난 뒤 새 버전을 등록할 수 있습니다.')
       } else {
         setDetailErrorMessage('새 버전을 등록하지 못했습니다. 파일을 확인한 뒤 다시 시도해 주세요.')
       }
@@ -1075,6 +1122,11 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
   const activeVersion = selectedDocument?.versions.find(
     (version) => version.versionId === selectedDocument.activeVersionId,
   ) ?? null
+  const hasMetadataChanges = selectedDocument !== null && (
+    editTitle.trim() !== selectedDocument.title || editDocumentType !== selectedDocument.documentType
+  )
+  const documentFolders = groupDocumentsByType(documents)
+  const isSearchingDocuments = appliedTitleQuery !== ''
 
   return (
     <section className="vault-page documents-page" aria-labelledby="documents-title">
@@ -1103,22 +1155,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
               </button>
             </div>
           </form>
-          <label className="document-filter" htmlFor="document-type">
-            <span>문서 유형</span>
-            <select
-              id="document-type"
-              value={selectedDocumentType ?? ''}
-              onChange={(event) => setSelectedDocumentType(toDocumentType(event.target.value))}
-              disabled={isLoading}
-            >
-              {DOCUMENT_TYPE_OPTIONS.map((option) => (
-                <option key={option.label} value={option.value ?? ''}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="document-filter" htmlFor="processing-status">
+          {selectedDocumentType !== undefined && !isSearchingDocuments && <label className="document-filter" htmlFor="processing-status">
             <span>처리 상태</span>
             <select
               id="processing-status"
@@ -1130,13 +1167,18 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
               }
               disabled={isLoading}
             >
-              {PROCESSING_STATUS_OPTIONS.map((option) => (
+              {[
+                { value: undefined, label: '전체' },
+                { value: 'COMPLETED' as ProcessingJobStatus, label: '검색 가능' },
+                { value: 'PROCESSING' as ProcessingJobStatus, label: '검색 준비 중' },
+                { value: 'FAILED' as ProcessingJobStatus, label: '실패' },
+              ].map((option) => (
                 <option key={option.label} value={option.value ?? ''}>
                   {option.label}
                 </option>
               ))}
             </select>
-          </label>
+          </label>}
         </div>
       </header>
 
@@ -1164,7 +1206,39 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
               : '선택한 조건의 문서가 없습니다.'}
           </p>
         )}
-        {!isLoading && errorMessage === null && documents.length > 0 && (
+        {!isLoading && errorMessage === null && selectedDocumentType === undefined && !isSearchingDocuments && documents.length > 0 && (
+          <div className="document-folder-section">
+            <div className="document-folder-heading">
+              <div>
+                <p className="section-kicker">BROWSE BY TYPE</p>
+                <h2>문서 유형</h2>
+              </div>
+              <span>등록된 유형 {documentFolders.length}개</span>
+            </div>
+            <ul className="document-folder-grid">
+              {documentFolders.map((folder) => (
+                <li key={folder.documentType}>
+                  <button type="button" className="document-folder-card" onClick={() => selectDocumentFolder(folder.documentType)}>
+                    <img src="/assets/prizm-document-folder.png" alt="" aria-hidden="true" />
+                    <span className="document-folder-copy">
+                      <strong>{documentTypeLabel(folder.documentType)}</strong>
+                      <small>{folder.documents.length}개</small>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {!isLoading && errorMessage === null && (selectedDocumentType !== undefined || isSearchingDocuments) && documents.length > 0 && (
+          <>
+            <div className="document-folder-breadcrumb" aria-label="문서 보관함 위치">
+              <button type="button" onClick={() => selectDocumentFolder(undefined)}>문서 보관함</button>
+              {selectedDocumentType !== undefined && <><span>›</span><span aria-current="page">{documentTypeLabel(selectedDocumentType)}</span></>}
+              {isSearchingDocuments && <><span>›</span><span aria-current="page">검색 결과</span></>}
+              <span className="document-folder-count">등록된 문서 {documents.length}개</span>
+            </div>
+            {isSearchingDocuments && <button type="button" className="document-folder-reset" onClick={() => { setTitleQuery(''); setAppliedTitleQuery('') }}>폴더로 돌아가기</button>}
           <ul className="document-grid">
             {documents.map((document) => (
               <li key={document.documentId}>
@@ -1231,6 +1305,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
               </li>
             ))}
           </ul>
+          </>
         )}
       </div>
 
@@ -1290,7 +1365,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
                 <dl className="document-detail-summary">
                   <div>
                     <dt>현재 버전</dt>
-                    <dd>{activeVersion === null ? '처리 중' : `v${activeVersion.versionNo}`}</dd>
+                    <dd>{activeVersion === null ? '준비 중' : `v${activeVersion.versionNo}`}</dd>
                   </div>
                   <div>
                     <dt>전체 버전</dt>
@@ -1309,7 +1384,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
                 </p>
               )}
 
-              <section className="document-detail-card" aria-labelledby="metadata-heading">
+              <section className="document-detail-section" aria-labelledby="metadata-heading">
                 <div className="document-detail-section-heading">
                   <div>
                     <p className="section-kicker">BASIC INFORMATION</p>
@@ -1347,54 +1422,72 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
                   <button
                     type="submit"
                     className="primary-button button-large metadata-save-button"
-                    disabled={isSaving || isDeleting || isVersionUploading}
+                    disabled={!hasMetadataChanges || isSaving || isDeleting || isVersionUploading}
                   >
                     {isSaving ? '저장 중' : '정보 저장'}
                   </button>
                 </form>
               </section>
 
-              <section className="document-detail-card document-version-section" aria-labelledby="versions-heading">
-                <div className="document-detail-section-heading">
+              <section className="document-detail-section document-version-section" aria-labelledby="versions-heading">
+                <div className="document-version-heading">
                   <div>
                     <p className="section-kicker">VERSION HISTORY</p>
-                    <h3 id="versions-heading">버전 및 처리 상태</h3>
+                    <h3 id="versions-heading">버전 관리</h3>
                   </div>
-                  <p>새 수정본은 기존 ACTIVE 버전을 유지한 채 별도로 처리됩니다.</p>
+                  <button
+                    type="button"
+                    className="secondary-button version-upload-toggle"
+                    aria-expanded={isVersionUploadFormOpen}
+                    aria-controls="version-upload-form"
+                    onClick={() => {
+                      const nextIsOpen = !isVersionUploadFormOpen
+                      setIsVersionUploadFormOpen(nextIsOpen)
+                      if (!nextIsOpen) {
+                        setVersionUploadFile(null)
+                        setVersionUploadInputKey((value) => value + 1)
+                      }
+                    }}
+                    disabled={isDeleting || isVersionUploading}
+                  >
+                    {isVersionUploadFormOpen ? '닫기' : '+ 새 버전 추가'}
+                  </button>
                 </div>
 
-                <form className="version-upload-form" onSubmit={handleVersionUpload}>
-                  <div>
-                    <strong>새 버전 추가</strong>
-                    <span>TXT 또는 텍스트 레이어가 있는 PDF · 최대 10MB</span>
-                  </div>
-                  <label className="version-file-picker" htmlFor="document-version-file">
-                    <input
-                      key={versionUploadInputKey}
-                      id="document-version-file"
-                      type="file"
-                      accept=".txt,.pdf,text/plain,application/pdf"
-                      onChange={handleVersionFileChange}
-                      disabled={hasInFlightVersion || isVersionUploading || isDeleting}
-                    />
-                    <span>{versionUploadFile?.name ?? '수정본 파일 선택'}</span>
-                  </label>
-                  <button
-                    type="submit"
-                    className="primary-button button-large version-upload-button"
-                    disabled={
-                      hasInFlightVersion ||
-                      versionUploadFile === null ||
-                      isVersionUploading ||
-                      isDeleting
-                    }
-                  >
-                    {isVersionUploading ? '등록 중' : '새 버전 등록'}
-                  </button>
-                  {hasInFlightVersion && (
-                    <p>현재 버전 처리가 끝나면 새 수정본을 등록할 수 있습니다.</p>
-                  )}
-                </form>
+                {isVersionUploadFormOpen && (
+                  <form id="version-upload-form" className="version-upload-form" onSubmit={handleVersionUpload}>
+                    <div>
+                      <strong>새 수정본 추가</strong>
+                      <span>TXT 또는 텍스트 레이어가 있는 PDF · 최대 10MB</span>
+                    </div>
+                    <label className="version-file-picker" htmlFor="document-version-file">
+                      <input
+                        key={versionUploadInputKey}
+                        id="document-version-file"
+                        type="file"
+                        accept=".txt,.pdf,text/plain,application/pdf"
+                        onChange={handleVersionFileChange}
+                        disabled={hasInFlightVersion || isVersionUploading || isDeleting}
+                      />
+                      <span>{versionUploadFile?.name ?? '수정본 파일 선택'}</span>
+                    </label>
+                    <button
+                      type="submit"
+                      className="primary-button version-upload-button"
+                      disabled={
+                        hasInFlightVersion ||
+                        versionUploadFile === null ||
+                        isVersionUploading ||
+                        isDeleting
+                      }
+                    >
+                      {isVersionUploading ? '등록 중' : '등록'}
+                    </button>
+                    {hasInFlightVersion && (
+                      <p>현재 버전을 검색할 수 있게 준비한 뒤 새 수정본을 등록할 수 있어요.</p>
+                    )}
+                  </form>
+                )}
 
                 <ul className="document-version-list">
                   {selectedDocument.versions.map((version) => (
@@ -1406,18 +1499,20 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
                           <span>{version.fileType} · {formatCreatedAt(version.createdAt)}</span>
                         </div>
                         {version.versionId === selectedDocument.activeVersionId && (
-                          <span className="active-version-label">ACTIVE</span>
+                          <span className="active-version-label">검색에 사용 중</span>
                         )}
                       </div>
                       <div className="version-row-actions">
-                        <span
-                          className={
-                            'status-badge ' +
-                            documentStatusClassName(version.processingStatus ?? version.status)
-                          }
-                        >
-                          {documentStatusLabel(version.processingStatus ?? version.status)}
-                        </span>
+                        {version.versionId !== selectedDocument.activeVersionId && (
+                          <span
+                            className={
+                              'status-badge ' +
+                              versionHistoryStatusClassName(version)
+                            }
+                          >
+                            {versionHistoryStatusLabel(version)}
+                          </span>
+                        )}
                         {version.fileType === 'PDF' && (
                           <button
                             type="button"
@@ -1435,13 +1530,48 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
                             PDF 열기
                           </button>
                         )}
+                        {version.versionId !== selectedDocument.activeVersionId && !isDocumentVersionInFlight(version) && (
+                          <button
+                            type="button"
+                            className="version-delete-button"
+                            aria-label={`${version.originalFileName} v${version.versionNo} 삭제`}
+                            title="이전 버전 삭제"
+                            onClick={() => setVersionDeleteTarget(version)}
+                            disabled={isDeleting || isVersionDeleting || isVersionUploading}
+                          >
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5" />
+                            </svg>
+                          </button>
+                        )}
                       </div>
+                      {versionDeleteTarget?.versionId === version.versionId && (
+                        <div className="version-delete-confirmation" role="alert">
+                          <p>v{version.versionNo} 이전 버전을 삭제할까요? 이 버전의 원본과 검색용 내용이 정리되며 되돌릴 수 없어요.</p>
+                          <button
+                            type="button"
+                            className="danger-button"
+                            onClick={() => void handleVersionDelete()}
+                            disabled={isVersionDeleting}
+                          >
+                            {isVersionDeleting ? '삭제 중' : '삭제'}
+                          </button>
+                          <button
+                            type="button"
+                            className="secondary-button"
+                            onClick={() => setVersionDeleteTarget(null)}
+                            disabled={isVersionDeleting}
+                          >
+                            취소
+                          </button>
+                        </div>
+                      )}
                       {version.processingErrorCode !== null && (
                         <p className="processing-safe-message">
                           {processingErrorMessage(version.processingErrorCode)}
                         </p>
                       )}
-                      {version.processingStatus !== null && (
+                      {version.processingStatus !== null && isDocumentVersionInFlight(version) && (
                         <div className="processing-progress" role="status">
                           <p>
                             {version.progressPercent === null &&
@@ -1482,10 +1612,10 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
 
               <section className="document-delete-section">
                 <div>
-                  <p className="section-kicker">DANGER ZONE</p>
-                  <h3>문서 삭제</h3>
+                  <p className="section-kicker">DOCUMENT MANAGEMENT</p>
+                  <h3>문서 관리</h3>
                 </div>
-                <p>처리 중인 문서는 삭제할 수 없습니다. 원본 파일은 안전한 백그라운드 정리 작업으로 제거됩니다.</p>
+                <p>이 문서를 더 이상 보관하지 않으려면 모든 버전을 함께 삭제할 수 있어요. 검색 준비 중인 문서는 삭제할 수 없습니다.</p>
                 {!isDeleteConfirming ? (
                   <button
                     type="button"
@@ -1497,7 +1627,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
                   </button>
                 ) : (
                   <div className="delete-confirmation" role="alert">
-                    <p>이 문서의 모든 버전과 검색용 데이터가 삭제됩니다. 계속할까요?</p>
+                    <p>삭제하면 모든 버전과 검색용 데이터가 사라지며 되돌릴 수 없습니다. 계속할까요?</p>
                     <button
                       type="button"
                       className="danger-button"
@@ -1709,8 +1839,9 @@ function CareerKeywordsPage({ onSessionExpired }: { onSessionExpired: () => void
   const [keywordState, setKeywordState] = useState<SearchState>('loading')
   const [keywordReloadKey, setKeywordReloadKey] = useState(0)
   const [categoryFilter, setCategoryFilter] = useState<KeywordCategoryFilter>('ALL')
-  const [rankingMode, setRankingMode] = useState<KeywordRankingMode>('frequency')
-  const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null)
+  const [selectedKeyword, setSelectedKeyword] = useState<string | null>(() =>
+    selectedKeywordFromSearch(window.location.search),
+  )
   const [evidence, setEvidence] = useState<CareerKeywordEvidenceItem[]>([])
   const [evidenceFrequency, setEvidenceFrequency] = useState(0)
   const [evidenceState, setEvidenceState] = useState<SearchState>('idle')
@@ -1719,7 +1850,7 @@ function CareerKeywordsPage({ onSessionExpired }: { onSessionExpired: () => void
   const [originalViewerText, setOriginalViewerText] = useState<string | null>(null)
   const [originalViewerErrorMessage, setOriginalViewerErrorMessage] = useState<string | null>(null)
   const [isOriginalViewerLoading, setIsOriginalViewerLoading] = useState(false)
-  const [expandedEvidenceGroups, setExpandedEvidenceGroups] = useState<Set<string>>(() => new Set())
+  const [isEvidenceListExpanded, setIsEvidenceListExpanded] = useState(false)
   const evidenceRequestId = useRef(0)
   const originalRequestId = useRef(0)
   const originalAbortController = useRef<AbortController | null>(null)
@@ -1753,10 +1884,11 @@ function CareerKeywordsPage({ onSessionExpired }: { onSessionExpired: () => void
     evidenceRequestId.current += 1
     setKeywords([])
     setKeywordState('loading')
+    window.history.replaceState(null, '', keywordDetailPath(null))
     setSelectedKeyword(null)
     setEvidence([])
     setEvidenceState('idle')
-    setExpandedEvidenceGroups(new Set())
+    setIsEvidenceListExpanded(false)
     setKeywordReloadKey((value) => value + 1)
   }
 
@@ -1812,14 +1944,14 @@ function CareerKeywordsPage({ onSessionExpired }: { onSessionExpired: () => void
     return () => window.cancelAnimationFrame(animationFrame)
   }, [isOriginalViewerLoading, originalViewerText])
 
-  const handleKeywordSelect = async (keyword: string) => {
+  const loadKeywordEvidence = useCallback(async (keyword: string) => {
     const requestId = evidenceRequestId.current + 1
     evidenceRequestId.current = requestId
     setSelectedKeyword(keyword)
     setEvidence([])
     setEvidenceFrequency(0)
     setEvidenceState('loading')
-    setExpandedEvidenceGroups(new Set())
+    setIsEvidenceListExpanded(false)
 
     try {
       const response = await getCareerKeywordEvidence(keyword)
@@ -1839,6 +1971,45 @@ function CareerKeywordsPage({ onSessionExpired }: { onSessionExpired: () => void
       }
       setEvidenceState('error')
     }
+  }, [onSessionExpired])
+
+  useEffect(() => {
+    if (selectedKeyword === null) {
+      return
+    }
+    const timeoutId = window.setTimeout(() => {
+      void loadKeywordEvidence(selectedKeyword)
+    }, 0)
+    return () => window.clearTimeout(timeoutId)
+  }, [loadKeywordEvidence, selectedKeyword])
+
+  useEffect(() => {
+    const syncSelectedKeyword = () => {
+      setSelectedKeyword(selectedKeywordFromSearch(window.location.search))
+    }
+    window.addEventListener('popstate', syncSelectedKeyword)
+    return () => window.removeEventListener('popstate', syncSelectedKeyword)
+  }, [])
+
+  const handleKeywordSelect = (keyword: string) => {
+    const nextPath = keywordDetailPath(keyword)
+    if (`${window.location.pathname}${window.location.search}` !== nextPath) {
+      window.history.pushState(null, '', nextPath)
+    }
+    setSelectedKeyword(keyword)
+  }
+
+  const handleKeywordBack = () => {
+    const nextPath = keywordDetailPath(null)
+    if (`${window.location.pathname}${window.location.search}` !== nextPath) {
+      window.history.pushState(null, '', nextPath)
+    }
+    evidenceRequestId.current += 1
+    setEvidence([])
+    setEvidenceFrequency(0)
+    setEvidenceState('idle')
+    setIsEvidenceListExpanded(false)
+    setSelectedKeyword(null)
   }
 
   const handleOpenOriginal = async (target: OriginalViewerTarget) => {
@@ -1893,267 +2064,196 @@ function CareerKeywordsPage({ onSessionExpired }: { onSessionExpired: () => void
     }
   }
 
-  const availableCategories = KEYWORD_CATEGORY_ORDER.filter((category) =>
-    keywords.some((keyword) => keyword.category === category))
-  const rankedKeywords = keywords
-    .filter((keyword) => categoryFilter === 'ALL' || keyword.category === categoryFilter)
-    .sort((left, right) => compareRankedKeywords(left, right, rankingMode))
-  const topKeywords = rankedKeywords.slice(0, TOP_KEYWORD_LIMIT)
-  const otherKeywords = rankedKeywords.slice(TOP_KEYWORD_LIMIT)
-  const maxRankValue = topKeywords[0] === undefined ? 1 : keywordRankValue(topKeywords[0], rankingMode)
+  const visibleKeywords = getVisibleKeywords(keywords, categoryFilter)
   const selectedSummary = keywords.find((keyword) => keyword.keyword === selectedKeyword)
-  const evidenceGroups = groupKeywordEvidence(evidence)
+  const visibleEvidence = isEvidenceListExpanded ? evidence : evidence.slice(0, 3)
 
   const handleCategorySelect = (category: KeywordCategoryFilter) => {
     setCategoryFilter(category)
     if (category !== 'ALL' && selectedSummary?.category !== category) {
-      evidenceRequestId.current += 1
-      setSelectedKeyword(null)
-      setEvidence([])
-      setEvidenceState('idle')
-      setExpandedEvidenceGroups(new Set())
+      handleKeywordBack()
     }
-  }
-
-  const toggleEvidenceGroup = (groupKey: string) => {
-    setExpandedEvidenceGroups((current) => {
-      const next = new Set(current)
-      if (next.has(groupKey)) {
-        next.delete(groupKey)
-      } else {
-        next.add(groupKey)
-      }
-      return next
-    })
   }
 
   return (
     <section className="vault-page keyword-page" aria-labelledby="keyword-title">
       <header className="page-heading keyword-page-heading">
-        <p className="eyebrow">CAREER KEYWORD MAP</p>
+        <p className="eyebrow">{selectedKeyword === null ? 'MY KEYWORDS' : 'CAREER KEYWORDS'}</p>
         <h1 id="keyword-title">경력 키워드</h1>
-        <p>활성 이력서와 포트폴리오에서 반복해서 확인된 핵심 키워드를 모았습니다.</p>
+        {selectedKeyword === null ? (
+          <p>등록한 문서에서 확인된 기술과 경험을 둘러보세요.</p>
+        ) : (
+          <nav className="keyword-breadcrumb" aria-label="경력 키워드 위치">
+            <button type="button" onClick={handleKeywordBack}>경력 키워드</button>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">{selectedKeyword}</span>
+          </nav>
+        )}
       </header>
 
-      {keywordState === 'result' && (
-        <div className="keyword-controls" aria-label="키워드 표시 기준">
-          <fieldset className="keyword-ranking-control">
-            <legend>순위 기준</legend>
-            <div>
-              {([
-                ['frequency', '언급 수'],
-                ['documents', '등장 문서 수'],
-                ['balanced', '균형 점수'],
-              ] as const).map(([value, label]) => (
-                <button
-                  key={value}
-                  type="button"
-                  aria-pressed={rankingMode === value}
-                  title={value === 'balanced' ? '반복 언급은 낮추고 여러 문서에서 확인된 기술을 높입니다.' : undefined}
-                  onClick={() => setRankingMode(value)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </fieldset>
-
-          <fieldset className="keyword-category-control">
-            <legend>기술 분류</legend>
-            <div>
-              <button
-                type="button"
-                aria-pressed={categoryFilter === 'ALL'}
-                onClick={() => handleCategorySelect('ALL')}
-              >
-                전체 <small>{keywords.length}</small>
-              </button>
-              {availableCategories.map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  aria-pressed={categoryFilter === category}
-                  onClick={() => handleCategorySelect(category)}
-                >
-                  {KEYWORD_CATEGORY_LABELS[category]}
-                  <small>{keywords.filter((keyword) => keyword.category === category).length}</small>
-                </button>
-              ))}
-            </div>
-          </fieldset>
-        </div>
-      )}
-
-      <div className="keyword-workspace">
-        <section className="keyword-cloud-panel" aria-labelledby="keyword-cloud-title">
-          <header className="keyword-panel-heading">
-            <div>
-              <p className="section-kicker">KEYWORD CLOUD</p>
-              <h2 id="keyword-cloud-title">내 문서의 핵심 키워드</h2>
-            </div>
-            <span>상위 {topKeywords.length}개 · {documentCount}개 문서 · {keywordRankingLabel(rankingMode)}</span>
-          </header>
-
-          <div className="keyword-cloud" aria-live="polite" aria-busy={keywordState === 'loading'}>
-            {keywordState === 'loading' && (
-              <p className="keyword-state"><span className="state-spinner" aria-hidden="true" />키워드를 모으는 중입니다.</p>
-            )}
-            {keywordState === 'empty' && (
-              <p className="keyword-state">검색 가능한 이력서 또는 포트폴리오에서 키워드를 찾지 못했습니다.</p>
-            )}
-            {keywordState === 'error' && (
-              <div className="keyword-state" role="alert">
-                <p>키워드를 불러오지 못했습니다.</p>
-                <button type="button" className="secondary-button" onClick={handleKeywordReload}>
-                  다시 시도
-                </button>
-              </div>
-            )}
-            {keywordState === 'result' && topKeywords.map((keyword) => (
-              <button
-                key={keyword.keyword}
-                type="button"
-                className="keyword-cloud-item"
-                style={{
-                  fontSize: keywordFontSize(keywordRankValue(keyword, rankingMode), maxRankValue),
-                }}
-                aria-pressed={selectedKeyword === keyword.keyword}
-                aria-label={`${keyword.keyword}, ${keyword.frequency}회, ${keyword.documentCount}개 문서, ${KEYWORD_CATEGORY_LABELS[keyword.category]}`}
-                title={keywordSummaryTitle(keyword)}
-                onClick={() => void handleKeywordSelect(keyword.keyword)}
-              >
-                <span>{keyword.keyword}</span>
-              </button>
-            ))}
-          </div>
-
-          {keywordState === 'result' && otherKeywords.length > 0 && (
-            <section className="keyword-other-section" aria-labelledby="keyword-other-title">
-              <header>
+      <div className={'keyword-workspace' + (selectedKeyword === null ? '' : ' is-detail')}>
+        {selectedKeyword === null && (
+          <>
+            <section className="keyword-cloud-panel" aria-labelledby="keyword-cloud-title">
+              <header className="keyword-panel-heading">
                 <div>
-                  <p className="section-kicker">MORE TECHNOLOGIES</p>
-                  <h3 id="keyword-other-title">그 외 기술 키워드</h3>
+                  <p className="section-kicker">BROWSE KEYWORDS</p>
+                  <h2 id="keyword-cloud-title">내 문서의 키워드</h2>
                 </div>
-                <span>{otherKeywords.length}개</span>
+                <span>{documentCount}개 문서</span>
               </header>
-              <div className="keyword-other-list">
-                {otherKeywords.map((keyword) => (
+
+              <div className="keyword-cloud" aria-live="polite" aria-busy={keywordState === 'loading'}>
+                {keywordState === 'loading' && (
+                  <p className="keyword-state"><span className="state-spinner" aria-hidden="true" />키워드를 모으는 중입니다.</p>
+                )}
+                {keywordState === 'empty' && (
+                  <p className="keyword-state">아직 확인된 경력 키워드가 없어요. 이력서, 포트폴리오, 프로젝트 문서를 등록하면 문서에서 확인된 키워드를 보여드려요.</p>
+                )}
+                {keywordState === 'error' && (
+                  <div className="keyword-state" role="alert">
+                    <p>키워드를 불러오지 못했습니다.</p>
+                    <button type="button" className="secondary-button" onClick={handleKeywordReload}>
+                      다시 시도
+                    </button>
+                  </div>
+                )}
+                {keywordState === 'result' && visibleKeywords.length === 0 && (
+                  <p className="keyword-state">이 분류에서 확인된 키워드가 없어요.</p>
+                )}
+                {keywordState === 'result' && visibleKeywords.map((keyword) => (
                   <button
                     key={keyword.keyword}
                     type="button"
-                    className="keyword-other-item"
-                    aria-pressed={selectedKeyword === keyword.keyword}
-                    aria-label={`${keyword.keyword}, ${keyword.frequency}회, ${keyword.documentCount}개 문서`}
-                    onClick={() => void handleKeywordSelect(keyword.keyword)}
+                    className="keyword-cloud-item"
+                    aria-label={`${keyword.keyword}, ${keywordMentionLabel(keyword.frequency)}, ${KEYWORD_CATEGORY_LABELS[keyword.category]}`}
+                    onClick={() => handleKeywordSelect(keyword.keyword)}
                   >
                     <span>{keyword.keyword}</span>
-                    <small>{keywordRankDisplay(keyword, rankingMode)}</small>
+                    <small aria-hidden="true">{keyword.frequency}</small>
                   </button>
                 ))}
               </div>
             </section>
-          )}
-        </section>
 
-        <aside className="keyword-evidence-panel" aria-labelledby="keyword-evidence-title">
+            {keywordState === 'result' && (
+              <aside className="keyword-controls" aria-label="키워드 분류">
+                <fieldset className="keyword-category-control">
+                  <legend>기술 분류</legend>
+                  <div>
+                    <button
+                      type="button"
+                      aria-pressed={categoryFilter === 'ALL'}
+                      onClick={() => handleCategorySelect('ALL')}
+                    >
+                      전체 <small>{categoryKeywordCountLabel(keywords.length)}</small>
+                    </button>
+                    {KEYWORD_CATEGORY_ORDER.map((category) => (
+                      <button
+                        key={category}
+                        type="button"
+                        aria-pressed={categoryFilter === category}
+                        onClick={() => handleCategorySelect(category)}
+                      >
+                        {KEYWORD_CATEGORY_LABELS[category]}
+                        <small>{categoryKeywordCountLabel(keywords.filter((keyword) => keyword.category === category).length)}</small>
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
+              </aside>
+            )}
+          </>
+        )}
+
+        {selectedKeyword !== null && (
+        <section className="keyword-evidence-panel" aria-labelledby="keyword-evidence-title">
           <header className="keyword-panel-heading">
             <div>
-              <p className="section-kicker">SOURCE EVIDENCE</p>
-              <h2 id="keyword-evidence-title">{selectedKeyword ?? '키워드 근거'}</h2>
+              <h2 id="keyword-evidence-title">{selectedKeyword}</h2>
+              {evidenceState === 'result' && (
+                <p className="keyword-evidence-count">
+                  {keywordEvidenceCountLabel(evidence.length, evidenceFrequency)}
+                </p>
+              )}
             </div>
-            {evidenceState === 'result' && <span>{evidenceFrequency}회</span>}
           </header>
 
           <div className="keyword-evidence-content" aria-live="polite" aria-busy={evidenceState === 'loading'}>
-            {evidenceState === 'idle' && <p className="keyword-state">가운데 키워드를 선택하면 관련 문서 내용이 표시됩니다.</p>}
             {evidenceState === 'loading' && <p className="keyword-state"><span className="state-spinner" aria-hidden="true" />근거를 찾는 중입니다.</p>}
             {evidenceState === 'empty' && <p className="keyword-state">현재 활성 문서에서 해당 근거를 찾지 못했습니다.</p>}
             {evidenceState === 'error' && <p className="keyword-state" role="alert">키워드 근거를 불러오지 못했습니다.</p>}
             {evidenceState === 'result' && (
               <div className="keyword-evidence-results">
-                {selectedSummary !== undefined && (
-                  <p className="keyword-normalization-note">
-                    <strong>{KEYWORD_CATEGORY_LABELS[selectedSummary.category]}</strong>
-                    <span>
-                      확인 표기 {selectedSummary.variants.join(' · ')}
-                    </span>
-                  </p>
-                )}
                 <ol className="keyword-evidence-list">
-                  {evidenceGroups.map((group) => {
-                    const expanded = expandedEvidenceGroups.has(group.key)
-                    const visibleSources = expanded ? group.sources : group.sources.slice(0, 1)
+                  {visibleEvidence.map((item, index) => {
+                    const viewerTarget: OriginalViewerTarget = {
+                      ...item,
+                      keyword: selectedKeyword,
+                    }
+                    const conciseEvidence = getConciseKeywordEvidence(item.excerpt)
+                    const evidenceContext = getKeywordEvidenceContext(item.excerpt)
                     return (
-                      <li key={group.key}>
+                      <li key={`${item.documentId}-${item.documentVersionId}-${item.sourceType}-${item.sourceIndex}`}>
                         <article className="keyword-evidence-card">
-                          <header>
-                            <div>
-                              <span>{DOCUMENT_TYPE_LABELS[group.documentType]}</span>
-                              <h3>{group.documentTitle}</h3>
-                              <small>버전 {group.versionNo} · 근거 {group.sources.length}개</small>
-                            </div>
-                            <strong>{group.occurrenceCount}회</strong>
-                          </header>
-
-                          <div className="keyword-evidence-sources">
-                            {visibleSources.map((item) => {
-                              const viewerTarget: OriginalViewerTarget = {
-                                ...item,
-                                keyword: selectedKeyword ?? '',
-                              }
-                              return (
-                                <section
-                                  key={`${item.sourceType}-${item.sourceIndex}`}
-                                  className="keyword-evidence-source"
-                                >
-                                  <button
-                                    type="button"
-                                    className="keyword-source-location"
-                                    onClick={() => void handleOpenOriginal(viewerTarget)}
-                                  >
-                                    <strong>{sourceLocationLabel(item)}</strong>
-                                    <span>이 위치 열기 →</span>
-                                  </button>
-                                  <p className="keyword-context-label">
-                                    <strong>{selectedKeyword}</strong> 주변 문맥
-                                  </p>
-                                  <blockquote>
-                                    <HighlightedKeywordExcerpt
-                                      excerpt={item.excerpt}
-                                      terms={[selectedKeyword ?? '', ...item.matchedTerms]}
-                                    />
-                                  </blockquote>
-                                  <button
-                                    type="button"
-                                    className="keyword-original-button"
-                                    onClick={() => void handleOpenOriginal(viewerTarget)}
-                                  >
-                                    원본에서 {item.sourceLabel} 열기
-                                  </button>
-                                </section>
-                              )
-                            })}
-                          </div>
-
-                          {group.sources.length > 1 && (
+                          <span className="keyword-evidence-index">{String(index + 1).padStart(2, '0')}</span>
+                          <p className="keyword-context-label">찾은 내용</p>
+                          <blockquote>
+                            <HighlightedKeywordExcerpt
+                              excerpt={conciseEvidence || '관련 내용은 문서에서 확인할 수 있어요.'}
+                              terms={[selectedKeyword, ...item.matchedTerms]}
+                            />
+                          </blockquote>
+                          <p className="keyword-document-reference">
+                            <strong>문서</strong>
+                            <span>{item.documentTitle} · {item.sourceLabel}</span>
+                          </p>
+                          <div className="keyword-evidence-actions">
+                            {evidenceContext !== '' && evidenceContext !== conciseEvidence && (
+                              <details className="keyword-context-details">
+                                <summary>
+                                  <span className="keyword-context-open-label">주변 내용 보기</span>
+                                  <span className="keyword-context-close-label">주변 내용 닫기</span>
+                                </summary>
+                                <p>{evidenceContext}</p>
+                              </details>
+                            )}
                             <button
                               type="button"
-                              className="keyword-evidence-toggle"
-                              aria-expanded={expanded}
-                              onClick={() => toggleEvidenceGroup(group.key)}
+                              className="keyword-document-button"
+                              onClick={() => void handleOpenOriginal(viewerTarget)}
                             >
-                              {expanded ? '추가 근거 접기' : `근거 ${group.sources.length - 1}개 더 보기`}
+                              문서에서 보기
                             </button>
-                          )}
+                          </div>
                         </article>
                       </li>
                     )
                   })}
                 </ol>
+                {evidence.length > visibleEvidence.length && (
+                  <button
+                    type="button"
+                    className="keyword-evidence-toggle"
+                    onClick={() => setIsEvidenceListExpanded(true)}
+                  >
+                    관련 기록 {evidence.length - visibleEvidence.length}개 더 보기
+                  </button>
+                )}
+                {isEvidenceListExpanded && evidence.length > 3 && (
+                  <button
+                    type="button"
+                    className="keyword-evidence-toggle"
+                    onClick={() => setIsEvidenceListExpanded(false)}
+                  >
+                    추가 기록 접기
+                  </button>
+                )}
               </div>
             )}
           </div>
-        </aside>
+        </section>
+        )}
       </div>
 
       {originalViewerTarget !== null && (
@@ -2209,94 +2309,10 @@ function CareerKeywordsPage({ onSessionExpired }: { onSessionExpired: () => void
   )
 }
 
-function keywordFontSize(value: number, maxValue: number): string {
-  const ratio = maxValue <= 1 ? 0 : Math.log1p(value) / Math.log1p(maxValue)
-  return `${0.92 + ratio * 0.72}rem`
-}
-
-function keywordRankValue(keyword: CareerKeywordSummary, mode: KeywordRankingMode): number {
-  if (mode === 'documents') {
-    return keyword.documentCount
-  }
-  if (mode === 'balanced') {
-    return Math.log1p(keyword.frequency) * (1 + Math.log1p(keyword.documentCount))
-  }
-  return keyword.frequency
-}
-
-function keywordRankDisplay(keyword: CareerKeywordSummary, mode: KeywordRankingMode): string {
-  if (mode === 'documents') {
-    return `${keyword.documentCount}문서`
-  }
-  if (mode === 'balanced') {
-    return `${keywordRankValue(keyword, mode).toFixed(1)}점`
-  }
-  return `${keyword.frequency}회`
-}
-
-function keywordRankingLabel(mode: KeywordRankingMode): string {
-  if (mode === 'documents') {
-    return '등장 문서 수'
-  }
-  if (mode === 'balanced') {
-    return '균형 점수'
-  }
-  return '언급 수'
-}
-
-function compareRankedKeywords(
-  left: CareerKeywordSummary,
-  right: CareerKeywordSummary,
-  mode: KeywordRankingMode,
-): number {
-  return keywordRankValue(right, mode) - keywordRankValue(left, mode)
-    || right.documentCount - left.documentCount
-    || right.frequency - left.frequency
-    || left.keyword.localeCompare(right.keyword)
-}
-
-function keywordSummaryTitle(keyword: CareerKeywordSummary): string {
-  const variants = keyword.variants.length > 1 ? ` · 통합 표기 ${keyword.variants.join(', ')}` : ''
-  return `${KEYWORD_CATEGORY_LABELS[keyword.category]} · ${keyword.frequency}회 · ${keyword.documentCount}개 문서${variants}`
-}
-
 function sourceLocationLabel(
   item: Pick<CareerKeywordEvidenceItem, 'fileType' | 'sourceLabel'>,
 ): string {
   return `${item.fileType} · ${item.sourceLabel}`
-}
-
-function groupKeywordEvidence(evidence: CareerKeywordEvidenceItem[]): CareerKeywordEvidenceGroup[] {
-  const groups = new Map<string, CareerKeywordEvidenceGroup>()
-  evidence.forEach((item) => {
-    const key = `${item.documentId}-${item.documentVersionId}`
-    const group = groups.get(key)
-    if (group === undefined) {
-      groups.set(key, {
-        key,
-        documentId: item.documentId,
-        documentVersionId: item.documentVersionId,
-        documentTitle: item.documentTitle,
-        documentType: item.documentType,
-        versionNo: item.versionNo,
-        originalFileName: item.originalFileName,
-        fileType: item.fileType,
-        occurrenceCount: item.occurrenceCount,
-        sources: [item],
-      })
-      return
-    }
-    group.occurrenceCount += item.occurrenceCount
-    group.sources.push(item)
-  })
-  return [...groups.values()]
-    .map((group) => ({
-      ...group,
-      sources: group.sources.sort((left, right) =>
-        right.occurrenceCount - left.occurrenceCount || left.sourceIndex - right.sourceIndex),
-    }))
-    .sort((left, right) =>
-      right.occurrenceCount - left.occurrenceCount || left.documentTitle.localeCompare(right.documentTitle))
 }
 
 function originalViewerLocationUrl(objectUrl: string, target: OriginalViewerTarget): string {
@@ -2904,10 +2920,6 @@ function UploadPage({
   )
 }
 
-function toDocumentType(value: string): DocumentType | undefined {
-  return value === '' ? undefined : (value as DocumentType)
-}
-
 function titleFromFileName(fileName: string): string {
   return fileName.replace(/\.(txt|pdf)$/i, '').trim() || fileName
 }
@@ -2962,6 +2974,22 @@ function isDocumentVersionInFlight(version: DocumentVersion): boolean {
     version.processingStatus === 'PENDING' ||
     version.processingStatus === 'PROCESSING' ||
     version.processingStatus === 'RETRY_WAIT'
+}
+
+function versionHistoryStatusLabel(version: DocumentVersion): string {
+  const status = version.processingStatus ?? version.status
+  if (isDocumentVersionInFlight(version) || status === 'FAILED') {
+    return documentStatusLabel(status)
+  }
+  return '이전 버전 · 검색 제외'
+}
+
+function versionHistoryStatusClassName(version: DocumentVersion): string {
+  const status = version.processingStatus ?? version.status
+  if (isDocumentVersionInFlight(version) || status === 'FAILED') {
+    return documentStatusClassName(status)
+  }
+  return 'status-archived'
 }
 
 function retrySummary(

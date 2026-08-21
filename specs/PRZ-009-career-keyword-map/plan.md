@@ -40,10 +40,78 @@
 - Rollback: 필수 검증 실패 시 `IMPLEMENTED_UNVERIFIED`보다 높이지 않는다.
 - 중단 조건: OpenSQL `NOT_RUN`을 `PASS`로 기록하거나 기존 검색이 회귀하면 중단한다.
 
+## P3.1. 태그 Browse UX 단순화
+
+- 목표: 기존 keyword map을 동일 위계의 태그 목록과 근거 상세 Browse 흐름으로 교체한다.
+- 변경 범위: frontend route query state, keyword presentation helper·test, `App.tsx`, `styles.css`와
+  현행 UX 문서만 변경한다. CareerKeyword API·service·repository·extractor와 Search production source는 변경하지 않는다.
+- 검증: fixed frequency/name order, 모든 category chip과 category empty, URL detail/back-forward,
+  tag count의 `frequency` 의미, 기존 TXT/PDF original navigation, Search presentation 회귀를 확인한다.
+- Rollback: presentation helper와 frontend UI·style만 이전 UI로 되돌린다. API·migration·data rollback은 없다.
+- 중단 조건: DTO 또는 existing original endpoint가 부족해 backend contract 확장이 필요하면 구현 전에 중단하고 보고한다.
+
+## P3.2. Evidence presentation refinement
+
+- 목표: Tags Browse 방향을 유지하면서 개인정보 없는 concise preview와 compact evidence scan을 제공한다.
+- 변경 범위: keyword frontend presentation helper·test, `App.tsx`, `styles.css`와 PRZ-009 문서만 수정한다.
+  CareerKeyword backend/API, SearchService와 PRZ-016 frontend/search presentation source는 변경하지 않는다.
+- 검증: synthetic email·phone·URL·GitHub metadata가 preview/context에 보이지 않는지, evidence/source count와
+  total frequency의 의미가 분리되는지, 문서 action 중복이 없는지, URL breadcrumb 복귀·TXT/PDF navigation이 보존되는지 확인한다.
+- Rollback: frontend presentation helper와 card markup/style만 되돌린다. 원본·DB·API rollback은 없다.
+- 중단 조건: preview 제외에 backend content mutation, API 변경 또는 원본 viewer 변화가 필요하면 중단하고 보고한다.
+
+## P3.3. Evidence fallback 및 laptop density polish
+
+- 목표: 개인정보를 제외해도 남는 안전한 evidence 문구를 generic fallback보다 우선하고, 100% zoom의
+  1366–1599px Career Vault를 spacing 중심으로 compact하게 만든다.
+- 변경 범위: `careerKeywordPresentation.ts`와 해당 presentation test, `App.tsx`, `styles.css`, PRZ-009 문서다.
+  backend/API/DB/Flyway, keyword extraction·normalization·occurrence, SearchService와 PRZ-016 production
+  search source는 변경하지 않는다.
+- 검증: synthetic contact/profile line에서 의미 있는 기술 문구 보존, no-safe-content fallback, concise와
+  중복되지 않는 optional context, 1366×768·1440×900·1920×1080 100% 및 mobile smoke, frontend/backend focused
+  regression, lint/build, Docker health와 diff audit을 실행한다.
+- Rollback: frontend helper/UI/CSS와 documentation만 되돌린다. 원본·DB·API rollback은 없다.
+- 중단 조건: safety를 위해 원본 content·backend evidence localization·API contract를 바꿔야 하면 중단한다.
+
+## P3.4. Document type folder browse
+
+- 목표: 문서 보관함 root를 type별 folder grid로 바꾸고 기존 card/detail을 folder 내부에서 재사용한다.
+- 변경 범위: frontend presentation helper/test, `App.tsx`, `styles.css`, supplied PNG static asset와 PRZ-009 문서만 변경한다.
+  DocumentType/API/service/repository, upload/version, owner isolation, Search·CareerKeyword backend와 DB/Flyway는 변경하지 않는다.
+- 검증: grouping·빈 folder 제외·`?type=`/breadcrumb/back-forward·검색 전체 범위·folder status filter·detail 재사용,
+  responsive grid, lint/build/backend focused regression/diff를 확인한다.
+
+## P3.5. Career Vault visual language polish
+
+- 목표: 문서 보관함의 3D folder card 감성을 로그인·회원가입과 전체 Career Vault surface에 확장해
+  `Soft Minimal + Friendly Productivity SaaS` visual language로 통일한다.
+- 변경 범위: 기존 markup 구조를 유지한 `App.tsx`의 최소 presentation 구분과 `styles.css`의 공통
+  surface·card·button·input·sidebar·state·modal/viewer 스타일만 수정한다. 새 framework나 dependency는 추가하지 않는다.
+- 검증: 문서 root/folder/detail, keyword 목록/detail, search, upload, login/signup을 100% zoom의
+  1366×768·1440×900·1920×1080에서 확인하고 frontend tests·lint·build·Docker·`git diff --check`를 실행한다.
+- Rollback: P3.5에서 추가한 presentation class와 CSS override만 제거한다. API·backend·DB rollback은 없다.
+- 중단 조건: 요구한 시각 계층을 위해 Search/Keyword/Document API, result 계약, PDF navigation 또는
+  owner/ACTIVE isolation을 바꿔야 하면 구현을 중단한다.
+
+## P3.6. Version-specific removal and plain-language processing status
+
+- 목표: 문서 전체 삭제와 과거 version 삭제를 명확히 구분하고, 처리 상태를 일반 사용자 언어로 설명한다.
+- 변경 범위: owner-scoped `DELETE /api/documents/{documentId}/versions/{versionId}` controller/service/repository 경로,
+  기존 document API client·detail modal·status presentation·tests와 PRZ-009 문서다. Flyway, schema, upload,
+  ACTIVE activation, SearchService와 result 계약은 변경하지 않는다.
+- 안전: document와 version을 owner scope로 잠그고, active version·in-flight version·non-terminal job은 거부한다.
+  허용된 version은 기존 전체 삭제와 동일하게 cleanup job 등록 후 change log, job, chunk, version metadata 순으로
+  제거한다. 원본 파일은 transaction 밖 cleanup worker가 정리한다.
+- 검증: service/controller owner isolation·active/in-flight 거부·terminal historical version cleanup 순서,
+  frontend trash confirmation/status copy, 기존 upload/active/search regression, lint/build/Docker/diff audit을 실행한다.
+- Rollback: 새 DELETE route 및 version delete UI만 제거한다. 이미 요청된 cleanup job은 기존 cleanup contract로
+  완료되며 schema migration은 없다.
+- 중단 조건: active pointer를 추측해 재지정하거나 worker fencing/owner isolation을 약화해야 하면 중단한다.
+
 ## 공통 위험과 대응
 
 - overlap은 동일 suffix·prefix를 한 번만 조립한다.
-- 등록한 alias만 합치고 균형 점수 수식을 source와 UI에서 같게 유지한다.
+- 등록한 alias만 합치며 UI는 API의 frequency/name 순서만 사용한다.
 - repository SQL에서 세 owner column과 active pointer·status·문서 유형을 제한한다.
 - object URL은 교체·닫기·unmount 때 정리한다.
 

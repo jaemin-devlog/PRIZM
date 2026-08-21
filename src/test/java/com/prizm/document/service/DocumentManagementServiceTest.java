@@ -189,4 +189,66 @@ class DocumentManagementServiceTest {
         verify(documentVersionRepository, never())
                 .findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(org.mockito.ArgumentMatchers.anyLong(), org.mockito.ArgumentMatchers.anyLong());
     }
+
+    @Test
+    void deletesOnlyAnOwnersTerminalHistoricalVersionAndQueuesItsOriginalForCleanup() {
+        when(documentRepository.findByIdAndOwnerUserIdForUpdate(11L, 7L)).thenReturn(Optional.of(document));
+        when(documentVersionRepository.findByIdAndOwnerUserIdAndDocumentIdForUpdate(21L, 7L, 11L))
+                .thenReturn(Optional.of(version));
+        when(document.getActiveVersionId()).thenReturn(22L);
+        when(version.getStatus()).thenReturn(com.prizm.document.entity.DocumentVersionStatus.ACTIVE);
+        when(version.getStoredFilePath()).thenReturn("documents/7/21/guide-v1.pdf");
+        when(processingJobRepository.findByOwnerUserIdAndDocumentVersionId(7L, 21L))
+                .thenReturn(Optional.of(processingJob));
+        when(processingJob.getStatus()).thenReturn(ProcessingJobStatus.COMPLETED);
+
+        assertThat(service.deleteVersion(7L, 11L, 21L)).isTrue();
+
+        verify(fileCleanupJobService).registerPendingCleanupInCurrentTransaction("documents/7/21/guide-v1.pdf");
+        verify(documentChangeLogRepository).deleteByOwnerUserIdAndDocumentVersionIdIn(7L, List.of(21L));
+        verify(documentChangeLogRepository).flush();
+        verify(processingJobRepository).delete(processingJob);
+        verify(processingJobRepository).flush();
+        verify(documentChunkRepository).deleteByOwnerUserIdAndDocumentVersionId(7L, 21L);
+        verify(documentVersionRepository).delete(version);
+        verify(documentVersionRepository).flush();
+        verify(document, never()).clearActiveVersion();
+        verify(documentRepository, never()).delete(document);
+    }
+
+    @Test
+    void refusesToDeleteTheCurrentActiveVersion() {
+        when(documentRepository.findByIdAndOwnerUserIdForUpdate(11L, 7L)).thenReturn(Optional.of(document));
+        when(documentVersionRepository.findByIdAndOwnerUserIdAndDocumentIdForUpdate(21L, 7L, 11L))
+                .thenReturn(Optional.of(version));
+        when(document.getActiveVersionId()).thenReturn(21L);
+
+        assertThatThrownBy(() -> service.deleteVersion(7L, 11L, 21L))
+                .isInstanceOf(DocumentManagementException.class)
+                .extracting(exception -> ((DocumentManagementException) exception).code())
+                .isEqualTo(DocumentManagementErrorCode.DOCUMENT_VERSION_ACTIVE);
+
+        verify(fileCleanupJobService, never()).registerPendingCleanupInCurrentTransaction(org.mockito.ArgumentMatchers.anyString());
+        verify(documentVersionRepository, never()).delete(version);
+    }
+
+    @Test
+    void refusesToDeleteAVersionWhoseProcessingJobIsNotTerminal() {
+        when(documentRepository.findByIdAndOwnerUserIdForUpdate(11L, 7L)).thenReturn(Optional.of(document));
+        when(documentVersionRepository.findByIdAndOwnerUserIdAndDocumentIdForUpdate(21L, 7L, 11L))
+                .thenReturn(Optional.of(version));
+        when(document.getActiveVersionId()).thenReturn(22L);
+        when(version.getStatus()).thenReturn(com.prizm.document.entity.DocumentVersionStatus.ACTIVE);
+        when(processingJobRepository.findByOwnerUserIdAndDocumentVersionId(7L, 21L))
+                .thenReturn(Optional.of(processingJob));
+        when(processingJob.getStatus()).thenReturn(ProcessingJobStatus.PROCESSING);
+
+        assertThatThrownBy(() -> service.deleteVersion(7L, 11L, 21L))
+                .isInstanceOf(DocumentManagementException.class)
+                .extracting(exception -> ((DocumentManagementException) exception).code())
+                .isEqualTo(DocumentManagementErrorCode.DOCUMENT_PROCESSING);
+
+        verify(fileCleanupJobService, never()).registerPendingCleanupInCurrentTransaction(org.mockito.ArgumentMatchers.anyString());
+        verify(documentVersionRepository, never()).delete(version);
+    }
 }

@@ -107,6 +107,55 @@ public class DocumentManagementService {
         return true;
     }
 
+    /**
+     * Removes one historical terminal version without changing the document's active search pointer.
+     * Original-file removal is delegated to the existing cleanup worker after the transaction commits.
+     */
+    @Transactional
+    public boolean deleteVersion(Long ownerUserId, Long documentId, Long versionId) {
+        Optional<Document> foundDocument = documentRepository.findByIdAndOwnerUserIdForUpdate(documentId, ownerUserId);
+        if (foundDocument.isEmpty()) {
+            return false;
+        }
+
+        Document document = foundDocument.orElseThrow();
+        Optional<DocumentVersion> foundVersion = documentVersionRepository
+                .findByIdAndOwnerUserIdAndDocumentIdForUpdate(versionId, ownerUserId, documentId);
+        if (foundVersion.isEmpty()) {
+            return false;
+        }
+
+        DocumentVersion version = foundVersion.orElseThrow();
+        if (versionId.equals(document.getActiveVersionId())) {
+            throw new DocumentManagementException(
+                    DocumentManagementErrorCode.DOCUMENT_VERSION_ACTIVE,
+                    "The active document version cannot be deleted.");
+        }
+        if (isInFlight(version.getStatus())) {
+            throw new DocumentManagementException(
+                    DocumentManagementErrorCode.DOCUMENT_PROCESSING,
+                    "Document processing must finish before deletion.");
+        }
+
+        Optional<ProcessingJob> foundJob = processingJobRepository
+                .findByOwnerUserIdAndDocumentVersionId(ownerUserId, versionId);
+        if (foundJob.isPresent() && isNonTerminal(foundJob.orElseThrow().getStatus())) {
+            throw new DocumentManagementException(
+                    DocumentManagementErrorCode.DOCUMENT_PROCESSING,
+                    "Document processing must finish before deletion.");
+        }
+
+        fileCleanupJobService.registerPendingCleanupInCurrentTransaction(version.getStoredFilePath());
+        documentChangeLogRepository.deleteByOwnerUserIdAndDocumentVersionIdIn(ownerUserId, List.of(versionId));
+        documentChangeLogRepository.flush();
+        foundJob.ifPresent(processingJobRepository::delete);
+        processingJobRepository.flush();
+        documentChunkRepository.deleteByOwnerUserIdAndDocumentVersionId(ownerUserId, versionId);
+        documentVersionRepository.delete(version);
+        documentVersionRepository.flush();
+        return true;
+    }
+
     private boolean isNonTerminal(ProcessingJobStatus status) {
         return status == ProcessingJobStatus.PENDING
                 || status == ProcessingJobStatus.RETRY_WAIT

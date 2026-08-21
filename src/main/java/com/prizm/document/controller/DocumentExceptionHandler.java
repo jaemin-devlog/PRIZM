@@ -56,7 +56,7 @@ public class DocumentExceptionHandler {
     @ExceptionHandler(DocumentManagementException.class)
     public ResponseEntity<ErrorResponse> handleManagement(DocumentManagementException exception) {
         HttpStatus status = switch (exception.code()) {
-            case DOCUMENT_PROCESSING -> HttpStatus.CONFLICT;
+            case DOCUMENT_PROCESSING, DOCUMENT_VERSION_ACTIVE -> HttpStatus.CONFLICT;
             case INVALID_TITLE, INVALID_DOCUMENT_TYPE -> HttpStatus.BAD_REQUEST;
         };
         return ResponseEntity.status(status)

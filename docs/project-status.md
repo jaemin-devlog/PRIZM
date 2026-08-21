@@ -101,7 +101,7 @@ PRZ-005에서는 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 직�
 ### 문서와 버전 관리
 
 - UTF-8 TXT와 비암호화 텍스트 PDF 업로드
-- 문서 목록·필터·상세·수정·삭제와 PDF 열람
+- 문서 목록·필터·상세·수정·전체 삭제·과거 버전 삭제와 PDF 열람
 - 원본 파일, SHA-256 해시와 변경 불가능한 버전(immutable version) 보존
 - 새 버전 등록과 처리 완료 뒤 검색 대상 버전(active version) 전환
 
@@ -133,8 +133,8 @@ PRZ-005에서는 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 직�
 
 - 현재 사용자의 active 이력서·포트폴리오 원문에서 계산하는 경력 키워드 맵
 - 한영 별칭·Java 버전 표기 통합과 언어·프레임워크·DB·인프라 등 기술 category 필터
-- 언급 수·등장 문서 수·균형 점수 기준의 상위 15개 구름과 순위 밖 기술 목록
-- document/version별로 묶은 페이지·텍스트 발췌 근거와 추가 근거 접기·펼치기
+- 같은 크기의 태그 Browse 목록, `frequency` 기반 고정 순서와 `?keyword=` 근거 상세
+- 개인정보를 제외한 compact 페이지·텍스트 발췌 근거와 처음 세 기록 이후 펼치기·접기
 - owner-scoped UTF-8 TXT 첫 일치 강조와 PDF page/search 위치 원본 열람
 
 PRZ-009의 전체 backend unit test와 전체 PostgreSQL integration, frontend lint·build,

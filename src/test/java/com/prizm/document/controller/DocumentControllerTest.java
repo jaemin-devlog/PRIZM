@@ -4,6 +4,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -19,6 +20,8 @@ import com.prizm.document.dto.response.DocumentVersionResponse;
 import com.prizm.document.entity.DocumentFileType;
 import com.prizm.document.entity.DocumentType;
 import com.prizm.document.entity.DocumentVersionStatus;
+import com.prizm.document.exception.DocumentManagementErrorCode;
+import com.prizm.document.exception.DocumentManagementException;
 import com.prizm.document.service.DocumentQueryService;
 import com.prizm.document.service.DocumentManagementService;
 import com.prizm.document.service.DocumentUploadService;
@@ -227,5 +230,25 @@ class DocumentControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(documentManagementService).delete(7L, 1L);
+    }
+
+    @Test
+    void deletesOneHistoricalVersionForTheCurrentUser() throws Exception {
+        mockMvc.perform(delete("/api/documents/1/versions/2"))
+                .andExpect(status().isNoContent());
+
+        verify(documentManagementService).deleteVersion(7L, 1L, 2L);
+    }
+
+    @Test
+    void reportsAConflictWhenDeletingTheCurrentVersion() throws Exception {
+        doThrow(new DocumentManagementException(
+                DocumentManagementErrorCode.DOCUMENT_VERSION_ACTIVE,
+                "The active document version cannot be deleted."))
+                .when(documentManagementService).deleteVersion(7L, 1L, 2L);
+
+        mockMvc.perform(delete("/api/documents/1/versions/2"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("DOCUMENT_VERSION_ACTIVE"));
     }
 }

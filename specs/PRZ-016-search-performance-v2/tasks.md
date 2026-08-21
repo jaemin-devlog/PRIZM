@@ -73,3 +73,103 @@
 - [x] frozen 31개 자산·v1 manifest hash 재검증 PASS
 - [x] Markdown link와 `git diff --check` PASS
 - [x] 최종 AUDIT blocking finding 0
+
+## P8 Evaluation Observability + Fresh Generalization V2
+
+- [x] ORIENT/SPEC/PLAN Gate 완료
+- [x] 구조화 production decision trace와 parity 검증 구현
+- [x] P7-B trace validation 실행
+- [x] fresh corpus/questions/Ground Truth V2 작성·동결
+- [x] fresh baseline, 전체 검증과 AUDIT 완료
+
+## P9 Structured Claim-Support Eligibility
+
+- [x] Query claim requirements와 candidate support decision 구현
+- [x] `CompositeSearchProfile` eligibility에만 통합
+- [x] frozen P8.1 Judge/Stress after-run과 structured trace 생성
+- [x] Judge Recall@5/selected 87.5%, FPR 0% 달성
+- [x] Stress Recall@5/selected 100%, FPR 0% 달성
+- [x] Dense regression 0, owner/ACTIVE isolation, full unit/integration PASS
+- [x] Localization은 변경하지 않고 다음 Phase 판단으로 분리
+
+## P10 Evidence Localization
+
+- [x] 실제 snippet/expansion 호출 흐름과 P9 localization 실패 11건 재확인
+- [x] P9·P8.1 freeze, localization-only 범위, 성공/중단 조건 고정
+- [x] hard-wrap-aware sentence/window extraction과 claim-complete scoring 구현
+- [x] selected-chunk-first, owner/document/ACTIVE-version-scoped expansion 유지
+- [x] Frozen Judge/Stress before-after, selection parity, isolation, regression 검증
+- [x] focused 31개, backend unit 554개, integration 113개 실행
+- [x] complexity/scope/security 감사 — `ACCEPTABLE_BUT_COMPLEX`, blocking finding 0
+- [x] commit/push/PR `NOT_RUN` — 사용자 금지 지시
+- [x] sentence extraction, window scoring, orchestration, expansion 책임과 LOC 계획 작성
+- [ ] selected-chunk-first extractive localization 구현 및 focused test
+- [ ] frozen Judge/Stress before-after, regression/isolation/parity 검증
+- [ ] complexity·scope·hardcoding 감사와 evidence 완료
+
+## P11 Source Consolidation Redesign
+
+- [x] 같은 PAGE/sourceIndex 전체를 합치던 실제 Production 경로 재확인
+- [x] 기존 meaningful exact-boundary-overlap 기준을 PDF evidence identity에 적용
+- [x] same-page distinct, duplicate/overlap, different-page, TXT synthetic 회귀 추가
+- [x] 실제 이력서 4개 질의 source retention read-only Before/After 확인
+- [x] backend unit 560개, integration 113개 PASS
+- [x] frozen Judge/Stress 품질·FPR·localization·isolation·parity metric 유지
+- [x] frozen Stress 1건 exact-result drift와 duplicate snippet +2 확인
+- [x] 최종 판정 `PARTIAL_PASS`; commit/push/PR `NOT_RUN`
+
+## P11.1 Duplicate Evidence Consolidation
+
+- [x] repeated same-version evidence를 QEV representative 기준으로만 축약
+- [x] same-technology different-project synthetic 회귀와 repeated-span 회귀 추가
+- [x] Stress 5→3, actual-resume source retention 4/4/3/3 유지 확인
+- [x] unit 562개, integration 113개, metric/isolation, diff check PASS
+- [x] frozen P10 exact chunk-ID assertion과 metric/isolation gate PASS
+- [x] commit/push/PR `NOT_RUN`
+
+## P12 Simple Tech Usage Eligibility
+
+- [x] Reproduce P9 simple-technology `ACTION_NOT_SUPPORTED` / entity-binding
+  decisions from the P11.1 state.
+- [x] Add only the bounded project-scoped technology declaration/direct-use
+  support rule to the existing evaluator.
+- [x] Add synthetic positive and safety regressions without resume text or
+  technology-specific production branches.
+- [x] Run read-only real-resume trace, frozen P8.1/P9/P10/P11.1, full backend
+  unit and integration suites, and diff audit.
+- [x] Record branch-local `PASS`; commit/push/PR remain `NOT_RUN` by request.
+
+## P13 Evidence Expansion Safety
+
+- [x] Reproduce selected-result to expanded-evidence direct-anchor loss.
+- [x] Add selected-anchor retention and cross-chunk preservation guards.
+- [x] Add synthetic regression and read-only real-resume anchor audit.
+- [x] Run frozen P10 and backend verification.
+- [x] Commit/push/PR remain `NOT_RUN` by request.
+
+## P12.1 Direct-Support Floor Bypass Contract
+
+- [x] Reproduce the FCM direct-support candidate's below-floor rejection.
+- [x] Extend only the existing dense-floor bypass with direct claim support while
+  retaining the pre-existing direct-anchor fallback contract.
+- [x] Add below-floor direct-support, mere-mention, and contradicted synthetic
+  regressions.
+- [x] Run read-only FCM/P12 real-resume audits, frozen P10, backend unit and
+  integration suites, and diff audit.
+- [x] Record branch-local `PASS`; commit/push/PR remain `NOT_RUN` by request.
+
+## P15 PDF Document Confirmation UX
+
+- [x] ORIENT: 기존 original API, Blob iframe viewer, search evidence document/version/page
+  metadata와 owner-scoped backend lookup을 확인
+- [x] SPEC/PLAN: page-only viewer, 검색 불변성, highlight 비범위, authorization과 rollback
+  계약을 고정
+- [x] IMPLEMENT: PDF `PAGE` evidence 카드에 `문서에서 보기`와 existing authenticated viewer
+  재사용 연결
+- [x] IMPLEMENT: `#page=N&zoom=page-width` page navigation과 viewer-local error handling
+- [x] VERIFY: 결과 ID/order/count/snippet/context 불변 frontend regression
+- [x] VERIFY: frontend unit/lint/build, Docker image build와 unauthenticated browser rendering
+- [ ] VERIFY: authenticated PDF page navigation — local bootstrap user is disabled and no user session or
+  document fixture was available; `NOT_VERIFIED`
+- [x] AUDIT: 검색 source/API/DB 변경 0, owner boundary와 highlight `NOT_IMPLEMENTED` 확인
+- [ ] commit/push/PR `NOT_RUN` — 사용자 금지 지시

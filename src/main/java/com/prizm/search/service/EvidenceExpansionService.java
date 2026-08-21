@@ -60,7 +60,7 @@ public class EvidenceExpansionService {
         try {
             SnippetSelection localSelection = searchSnippetGenerator.selectForLocalization(query, result.content());
             EvidencePresentation localPresentation = presentation(
-                    usableSnippet(localSelection.snippet(), fallbackContent),
+                    localSnippetPreservingDirectAnchors(query, localSelection, fallbackContent),
                     result.chunkId(),
                     result.sourceType(),
                     result.sourceIndex(),
@@ -75,7 +75,8 @@ public class EvidenceExpansionService {
                             result.sourceLabel(),
                             fallbackContent),
                     localSelection);
-            if (isSufficientLocalEvidence(query, localCandidate)) {
+            if (hasRequiredDirectAnchor(query, localCandidate)
+                    || isSufficientLocalEvidence(query, localCandidate)) {
                 return localPresentation;
             }
             return evidenceExpansionRepository.findActiveVersionChunks(
@@ -87,6 +88,7 @@ public class EvidenceExpansionService {
                             query,
                             chunk,
                             searchSnippetGenerator.selectForLocalization(query, chunk.content())))
+                    .filter(candidate -> preservesRequiredDirectAnchors(query, localCandidate, candidate))
                     .filter(EvidenceExpansionService::isEligibleExpansionEvidence)
                     .filter(candidate -> isMeaningfullyMoreDirect(candidate, localCandidate))
                     .max(DIRECTNESS_ORDER)
@@ -115,6 +117,36 @@ public class EvidenceExpansionService {
         return snippet == null || snippet.isBlank() ? fallbackContent : snippet;
     }
 
+    private static String localSnippetPreservingDirectAnchors(
+            String query,
+            SnippetSelection selection,
+            String fallbackContent) {
+        String snippet = usableSnippet(selection.snippet(), fallbackContent);
+        Set<String> anchors = asciiAnchors(query);
+        if (anchors.isEmpty() || anchors.stream().allMatch(asciiAnchors(snippet)::contains)) {
+            return snippet;
+        }
+        return fallbackContent;
+    }
+
+    private static boolean hasRequiredDirectAnchor(String query, ExpansionCandidate candidate) {
+        return !requiredDirectAnchors(query, candidate.chunk().content()).isEmpty();
+    }
+
+    private static boolean preservesRequiredDirectAnchors(
+            String query,
+            ExpansionCandidate local,
+            ExpansionCandidate candidate) {
+        Set<String> required = requiredDirectAnchors(query, local.chunk().content());
+        return required.isEmpty() || asciiAnchors(candidate.chunk().content()).containsAll(required);
+    }
+
+    private static Set<String> requiredDirectAnchors(String query, String content) {
+        Set<String> anchors = new LinkedHashSet<>(asciiAnchors(query));
+        anchors.retainAll(asciiAnchors(content));
+        return Set.copyOf(anchors);
+    }
+
     private static boolean isSufficientLocalEvidence(String query, ExpansionCandidate local) {
         SnippetSelection selection = local.selection();
         if (local.summary()) {
@@ -128,7 +160,7 @@ public class EvidenceExpansionService {
                 && !selection.technicalList()) {
             return true;
         }
-        return selection.queryCoverage() >= 2
+        return selection.queryCoverage() >= 3
                 && (selection.narrative() || hasAsciiAnchor(query, selection.snippet()))
                 && !selection.technicalList()
                 && !selection.metadata();
@@ -196,6 +228,11 @@ public class EvidenceExpansionService {
                 && candidate.selection().queryCoverage() >= 2
                 && candidate.structuredDetail()
                 && !local.structuredDetail()
+                && !candidate.summary()) {
+            return true;
+        }
+        if (coverageGain >= 0
+                && candidate.selection().anchorScore() >= local.selection().anchorScore() + 1_000
                 && !candidate.summary()) {
             return true;
         }
@@ -280,8 +317,7 @@ public class EvidenceExpansionService {
     }
 
     private String expandedSnippet(ExpansionCandidate candidate) {
-        String selected = usableSnippet(candidate.selection().snippet(), candidate.chunk().content());
-        return searchSnippetGenerator.addFollowingSourceSentence(candidate.chunk().content(), selected);
+        return usableSnippet(candidate.selection().snippet(), candidate.chunk().content());
     }
 
     private static EvidencePresentation presentation(

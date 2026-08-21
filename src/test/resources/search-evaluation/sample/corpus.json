@@ -2,8 +2,8 @@
   "datasetId": "prizm-synthetic-dense-pilot-v2",
   "documents": [
     {
-      "fixtureId": "airconnect-report",
-      "title": "합성 AirConnect 프로젝트 보고서",
+      "fixtureId": "atlas-report",
+      "title": "합성 Atlas 프로젝트 보고서",
       "documentType": "PROJECT_REPORT",
       "fileType": "PDF",
       "pages": [
@@ -13,10 +13,10 @@
         }
       ],
       "evidenceAnchors": [
-        {"fixtureEvidenceId": "airconnect-stack", "anchorText": "Spring Boot와 Redis를 사용해 요청 상태를 관리했다"},
-        {"fixtureEvidenceId": "airconnect-duplicate-prevention", "anchorText": "동일 요청 키에 대한 중복 처리를 방지했다"},
-        {"fixtureEvidenceId": "airconnect-notification-retry", "anchorText": "지연이 긴 호출은 제한된 횟수만 재시도했다"},
-        {"fixtureEvidenceId": "airconnect-exact-load-value", "anchorText": "1,000개의 가상 요청을 생성했고"}
+        {"fixtureEvidenceId": "atlas-stack", "anchorText": "Spring Boot와 Redis를 사용해 요청 상태를 관리했다"},
+        {"fixtureEvidenceId": "atlas-duplicate-prevention", "anchorText": "동일 요청 키에 대한 중복 처리를 방지했다"},
+        {"fixtureEvidenceId": "atlas-notification-retry", "anchorText": "지연이 긴 호출은 제한된 횟수만 재시도했다"},
+        {"fixtureEvidenceId": "atlas-exact-load-value", "anchorText": "1,000개의 가상 요청을 생성했고"}
       ]
     },
     {

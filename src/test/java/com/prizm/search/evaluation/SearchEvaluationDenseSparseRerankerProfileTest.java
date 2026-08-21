@@ -102,11 +102,15 @@ class SearchEvaluationDenseSparseRerankerProfileTest {
     }
 
     @Test
-    void samePageDedupAndMaximumFiveRemainAfterReranking() {
+    void overlappingSamePageDedupAndMaximumFiveRemainAfterReranking() {
         List<VectorSearchResult> dense = new ArrayList<>();
+        String overlap = "같은 PDF 청크 경계에서 반복되는 Redis 합성 근거다. ".repeat(4);
         for (long id = 1L; id <= 7L; id++) {
             int page = id <= 2L ? 1 : (int) id;
-            dense.add(candidate(id, page, "Redis evidence " + id, 0.90d - (id / 100.0d)));
+            String content = id == 1L
+                    ? "Redis evidence first. " + overlap
+                    : id == 2L ? overlap + "Redis evidence second." : "Redis evidence " + id;
+            dense.add(candidate(id, page, content, 0.90d - (id / 100.0d)));
         }
         List<FusedCandidate> p14Eligible = eligible(dense, List.of());
 

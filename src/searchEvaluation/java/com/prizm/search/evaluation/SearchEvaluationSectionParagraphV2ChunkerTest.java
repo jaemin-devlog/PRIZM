@@ -16,10 +16,10 @@ class SearchEvaluationSectionParagraphV2ChunkerTest {
         String parentContext = "04 대표 문제 해결 사례\n3개 대표 사례를 간단히 요약했습니다.";
         String text = parentContext + "\n"
                 + "Case 01\n"
-                + "AirConnect - 그룹 매칭 동시성 정합성 개선\n"
+                + "AtlasBoard - 그룹 매칭 동시성 정합성 개선\n"
                 + "DB row lock과 unique constraint로 중복 확정을 방지했습니다.\n"
                 + "Case 02\n"
-                + "AirConnect - Outbox 기반 알림 처리\n"
+                + "AtlasBoard - Outbox 기반 알림 처리\n"
                 + "알림 저장과 FCM 발송을 분리했습니다.";
 
         assertThat(chunker.split(text))
@@ -27,10 +27,10 @@ class SearchEvaluationSectionParagraphV2ChunkerTest {
                 .allSatisfy(chunk -> assertThat(chunk.content())
                         .startsWith(parentContext + "\nCase"));
         assertThat(chunker.split(text).get(0).content())
-                .contains("Case 01\nAirConnect - 그룹 매칭 동시성 정합성 개선")
+                .contains("Case 01\nAtlasBoard - 그룹 매칭 동시성 정합성 개선")
                 .doesNotContain("Case 02");
         assertThat(chunker.split(text).get(1).content())
-                .contains("Case 02\nAirConnect - Outbox 기반 알림 처리")
+                .contains("Case 02\nAtlasBoard - Outbox 기반 알림 처리")
                 .doesNotContain("Case 01");
     }
 
@@ -40,7 +40,7 @@ class SearchEvaluationSectionParagraphV2ChunkerTest {
                 + "Nginx와 HTTPS를 적용했습니다.\n"
                 + "04 대표 문제 해결 사례\n"
                 + "Case 01\n"
-                + "AirConnect - 그룹 매칭 동시성 정합성 개선\n"
+                + "AtlasBoard - 그룹 매칭 동시성 정합성 개선\n"
                 + "DB row lock으로 중복 확정을 방지했습니다.\n"
                 + "05 수상\n"
                 + "관광데이터 활용 공모전 우수상을 수상했습니다.";
@@ -57,10 +57,10 @@ class SearchEvaluationSectionParagraphV2ChunkerTest {
     void preservesAllLinesAndTheExistingSixHundredCharacterMaximum() {
         String text = "04 대표 문제 해결 사례\n3개 대표 사례를 간단히 요약했습니다.\n"
                 + "Case 01\n"
-                + "AirConnect - 그룹 매칭 동시성 정합성 개선\n"
+                + "AtlasBoard - 그룹 매칭 동시성 정합성 개선\n"
                 + "DB row lock으로 상태를 확인했습니다. ".repeat(6) + "\n"
                 + "Case 02\n"
-                + "MoneyWay - TourAPI 동기화 병목 개선\n"
+                + "LedgerLab - TourAPI 동기화 병목 개선\n"
                 + "관광지별 호출을 병렬 처리했습니다. ".repeat(6);
 
         List<TextChunk> chunks = chunker.split(text);

@@ -46,6 +46,21 @@ class EvidenceExpansionServiceTest {
     }
 
     @Test
+    void keepsDirectTechnicalEvidenceInTheSelectedChunkInsteadOfExpandingAwayItsAnchor() {
+        VectorSearchResult result = result(
+                52L,
+                "Project Delta의 기술 스택은 MessageBridge와 RelationalDB입니다.",
+                4,
+                "4페이지");
+
+        EvidencePresentation presentation = service.select(7L, "MessageBridge를 사용한 경험이 있나요?", result);
+
+        assertThat(presentation.evidenceChunkId()).isEqualTo(52L);
+        assertThat(presentation.snippet()).contains("MessageBridge");
+        verify(repository, never()).findActiveVersionChunks(7L, 10L, 20L);
+    }
+
+    @Test
     void expandsOnlyWithinTheSelectedOwnersDocumentAndActiveVersion() {
         VectorSearchResult result = result(
                 58L,

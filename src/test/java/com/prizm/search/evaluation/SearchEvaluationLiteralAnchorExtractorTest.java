@@ -16,8 +16,8 @@ class SearchEvaluationLiteralAnchorExtractorTest {
                 .containsExactly("tourapi", "680건", "6.8초");
         assertThat(normalized("Spring Boot와 Docker Compose를 사용했나?"))
                 .containsExactly("spring boot", "docker compose");
-        assertThat(normalized("GCP에서 AirConnect와 JWT를 사용했나?"))
-                .containsExactly("gcp", "airconnect", "jwt");
+        assertThat(normalized("GCP에서 AtlasBoard와 JWT를 사용했나?"))
+                .containsExactly("gcp", "atlasboard", "jwt");
         assertThat(normalized("FOR UPDATE SKIP LOCKED로 선점했나?"))
                 .containsExactly("for update skip locked");
     }

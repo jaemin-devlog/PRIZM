@@ -97,19 +97,19 @@ class SearchSnippetGeneratorTest {
     void experienceQueryPrefersTheIdentifierWindowWithConcreteProjectEvidence() {
         String content = String.join(
                 "\n",
-                "정재민",
+                "테스트 사용자",
                 "Java / Spring Boot",
                 "Backend",
                 "신입 백엔드 개발자 | Java / Spring Boot",
-                "교내 매칭 서비스를 운영하며 알림 시스템을 개선했습니다.",
+                "지역 커뮤니티 서비스를 운영하며 알림 시스템을 개선했습니다.",
                 "동시성과 외부 서비스 실패 상황에서도 사용자 흐름이 유지되도록 설계했습니다.");
 
         String snippet = generator.generate("Springboot 활용 경험", content);
 
         assertThat(snippet)
-                .startsWith("교내 매칭 서비스를 운영하며 알림 시스템을 개선했습니다.")
+                .startsWith("지역 커뮤니티 서비스를 운영하며 알림 시스템을 개선했습니다.")
                 .doesNotContain("Java / Spring Boot")
-                .doesNotContain("정재민");
+                .doesNotContain("테스트 사용자");
     }
 
     @Test

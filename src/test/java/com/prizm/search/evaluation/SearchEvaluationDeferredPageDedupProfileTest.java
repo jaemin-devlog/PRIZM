@@ -15,7 +15,7 @@ class SearchEvaluationDeferredPageDedupProfileTest {
             new SearchEvaluationDeferredPageDedupProfile();
 
     @Test
-    void deferredPageDedupKeepsGeneralCandidateThatPassesAfterPreferredCandidateIsRejected() {
+    void productionPreservesDistinctSamePageEvidenceBeforeEligibility() {
         VectorSearchResult rejectedRepresentative = pageCandidate(
                 1L,
                 1,
@@ -30,8 +30,8 @@ class SearchEvaluationDeferredPageDedupProfileTest {
 
         assertThat(productionProfile.apply(
                         query, List.of(rejectedRepresentative, eligibleEvidence))
-                .rejected())
-                .isTrue();
+                .results())
+                .containsExactly(eligibleEvidence);
         assertThat(deferredProfile.apply(
                         query, List.of(rejectedRepresentative, eligibleEvidence))
                 .results())
@@ -39,7 +39,7 @@ class SearchEvaluationDeferredPageDedupProfileTest {
     }
 
     @Test
-    void deferredPageDedupSelectsOneHighestRankedEligibleCandidatePerPage() {
+    void productionAndDeferredProfilesPreserveDistinctEligibleSamePageEvidence() {
         VectorSearchResult denseOnly = pageCandidate(
                 1L,
                 1,
@@ -51,10 +51,12 @@ class SearchEvaluationDeferredPageDedupProfileTest {
                 "Redis 캐싱을 운영 환경에 적용했다.",
                 0.60d);
 
-        assertThat(deferredProfile.apply(
-                        "Redis 캐싱 경험", List.of(denseOnly, identifierMatch))
-                .results())
-                .containsExactly(identifierMatch);
+        String query = "Redis 캐싱 경험";
+
+        assertThat(productionProfile.apply(query, List.of(denseOnly, identifierMatch)).results())
+                .containsExactly(identifierMatch, denseOnly);
+        assertThat(deferredProfile.apply(query, List.of(denseOnly, identifierMatch)).results())
+                .containsExactly(identifierMatch, denseOnly);
     }
 
     @Test

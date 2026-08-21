@@ -59,6 +59,42 @@ frontend/dist/
 frontend/.vite/
 *.tsbuildinfo
 
+### Local evaluation and developer caches ###
+/.gradle-prizm-pdf-ux/
+/.pnpm-store/
+/.venv-nli/
+/_workspace/
+
+### Private resume-audit outputs (never publish) ###
+/specs/PRZ-016-search-performance-v2/**/real-resume-*.json
+/src/searchEvaluation/java/com/prizm/search/evaluation/P11RealResumeSourceConsolidationAuditTest.java
+/src/searchEvaluation/java/com/prizm/search/evaluation/P121DirectSupportFloorBypassAuditTest.java
+/src/searchEvaluation/java/com/prizm/search/evaluation/P12RealResumeSimpleTechnologyUsageAuditTest.java
+/src/searchEvaluation/java/com/prizm/search/evaluation/P13EvidenceExpansionSafetyAuditTest.java
+/src/searchEvaluation/java/com/prizm/search/evaluation/P14ClaimCompleteSnippetAuditTest.java
+
+### Local PRZ-016 evaluation runs and generated artifacts (never publish) ###
+/src/searchEvaluation/java/com/prizm/search/evaluation/P81JudgeRealisticRetrievalStressBenchmarkTest.java
+/specs/PRZ-016-search-performance-v2/claim-verification-architecture-audit/
+/specs/PRZ-016-search-performance-v2/final-fix-claim-scope-actor-binding/
+/specs/PRZ-016-search-performance-v2/final-positive-eligibility-generalization/
+/specs/PRZ-016-search-performance-v2/final-production-claim-verifier-v2-integration/
+/specs/PRZ-016-search-performance-v2/final-unseen-judge-b/
+/specs/PRZ-016-search-performance-v2/final-unseen-judge-c/
+/specs/PRZ-016-search-performance-v2/final-unseen-judge-e2e/
+/specs/PRZ-016-search-performance-v2/fresh-generalization-evaluation-v2/
+/specs/PRZ-016-search-performance-v2/local-window-preselection-contract/
+/specs/PRZ-016-search-performance-v2/p10-evidence-localization/
+/specs/PRZ-016-search-performance-v2/p11-1-duplicate-evidence-consolidation/
+/specs/PRZ-016-search-performance-v2/p11-source-consolidation-redesign/
+/specs/PRZ-016-search-performance-v2/p12-1-direct-support-floor-bypass/
+/specs/PRZ-016-search-performance-v2/p12-simple-tech-usage-eligibility/
+/specs/PRZ-016-search-performance-v2/p13-evidence-expansion-safety/
+/specs/PRZ-016-search-performance-v2/p14-claim-complete-snippet/
+/specs/PRZ-016-search-performance-v2/p8-1-judge-realistic-retrieval-stress/
+/specs/PRZ-016-search-performance-v2/p9-structured-claim-support-eligibility/
+/specs/PRZ-016-search-performance-v2/safety-first-claim-verifier-v2/
+
 ### OS generated files ###
 .DS_Store
 Thumbs.db

@@ -913,6 +913,34 @@ select:disabled {
   line-height: 21px;
 }
 
+.search-query-guidance {
+  margin: var(--prizm-space-md) 0 0;
+  padding: 12px 14px;
+  border: 1px solid var(--prizm-color-primary-border);
+  border-radius: var(--prizm-radius-control);
+  color: var(--prizm-color-primary-text);
+  background: var(--prizm-color-primary-soft);
+}
+
+.search-query-guidance p,
+.search-query-guidance small {
+  display: block;
+  margin: 0;
+}
+
+.search-query-guidance p {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 21px;
+}
+
+.search-query-guidance small {
+  margin-top: 4px;
+  color: var(--prizm-color-body);
+  font-size: 12px;
+  line-height: 18px;
+}
+
 .search-processing-note > span {
   width: 16px;
   height: 16px;
@@ -1010,19 +1038,6 @@ select:disabled {
   letter-spacing: 0.05em;
 }
 
-.search-result-source-badge,
-.search-result-meta > span {
-  min-height: 28px;
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 10px;
-  border-radius: var(--prizm-radius-pill);
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 20px;
-  white-space: nowrap;
-}
-
 .search-result-evidence {
   margin-top: var(--prizm-space-lg);
   padding: 22px 24px 23px;
@@ -1069,24 +1084,26 @@ select:disabled {
   letter-spacing: 0.04em;
 }
 
-.search-result-meta {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: var(--prizm-space-sm);
-  margin: 0;
-}
-
-.search-result-meta > span {
+.search-result-document-button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
   border: 1px solid var(--prizm-color-border);
-  color: var(--prizm-color-body);
-  background: var(--prizm-color-surface-soft);
+  border-radius: var(--prizm-radius-control);
+  color: var(--prizm-color-primary-text);
+  background: var(--prizm-color-surface);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+  cursor: pointer;
 }
 
-.search-result-meta > .search-result-source-badge {
-  border-color: var(--prizm-color-primary-border);
-  color: var(--prizm-color-primary-text);
-  background: var(--prizm-color-primary-soft);
+.search-result-document-button:hover {
+  border-color: var(--prizm-color-primary);
+  background: var(--prizm-color-primary-soft-hover);
 }
 
 .search-result-document-reader {
@@ -2722,10 +2739,6 @@ select:disabled {
   .search-result-source {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .search-result-meta {
-    justify-content: flex-start;
   }
 
   .upload-success-panel .secondary-button {

@@ -12,7 +12,7 @@ class NaturalLanguageQueryFallbackTest {
     @Test
     void buildsConservativeVariantsWithoutReducingQueriesToOneKeyword() {
         assertThat(Map.of(
-                        "AirConnect에서 뭐했어?", "AirConnect 수행 경험",
+                        "AtlasBoard에서 뭐했어?", "AtlasBoard 수행 경험",
                         "Springboot", "Spring Boot 경험",
                         "springboot", "Spring Boot 경험",
                         "Spring Boot", "Spring Boot 경험",
@@ -34,8 +34,8 @@ class NaturalLanguageQueryFallbackTest {
     void extractsCanonicalAnchorsAcrossFormattingAndKoreanParticles() {
         assertThat(NaturalLanguageQueryFallback.anchorTerms("SpringBoot를 활용한 경험"))
                 .containsExactly("springboot");
-        assertThat(NaturalLanguageQueryFallback.anchorTerms("AirConnect에서 뭐했어?"))
-                .containsExactly("airconnect");
+        assertThat(NaturalLanguageQueryFallback.anchorTerms("AtlasBoard에서 뭐했어?"))
+                .containsExactly("atlasboard");
         assertThat(NaturalLanguageQueryFallback.anchorTerms("Redis는 왜 사용했어?"))
                 .containsExactly("redis");
     }

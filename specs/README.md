@@ -173,7 +173,7 @@ flowchart TD
 - **Spec ID:** [PRZ-009](PRZ-009-career-keyword-map/spec.md)
   - 이름: 경력 키워드 맵
   - 상태: `IMPLEMENTED_UNVERIFIED`
-  - Source commit: core `d52c6d0`; UI·문서 관리 확장 `3af28492` (origin branch push)
+  - Source commit: core `d52c6d0`; UI·문서 관리 확장 `3af28492` (PR #49 merge `550c9d4`)
   - Last verified: 2026-08-21
 - **Spec ID:** [PRZ-010](PRZ-010-change-log-sync/spec.md)
   - 이름: 변경 로그 동기화
@@ -213,11 +213,10 @@ flowchart TD
   - GitHub: [PR #46](https://github.com/jaemin-devlog/PRIZM/pull/46), merge commit `23166e7`
 - **Spec ID:** [PRZ-016](PRZ-016-search-performance-v2/spec.md)
   - 이름: Search Performance V2
-  - 상태: `IN_PROGRESS` (`P10 EVIDENCE_LOCALIZATION VERIFIED`; `P11 SOURCE_CONSOLIDATION PARTIAL_PASS`, `P11.1 DUPLICATE_EVIDENCE_CONSOLIDATION PASS`, `P12 SIMPLE_TECH_USAGE_ELIGIBILITY PASS`, `P12.1 DIRECT_SUPPORT_FLOOR_BYPASS PASS`, `P13 EVIDENCE_EXPANSION_SAFETY PASS`, `P14 CLAIM_COMPLETE_SNIPPET PASS`)
-  - Source commit: —
-  - Last verified: 2026-08-19 (P10 localization-only; frozen P8.1 Judge
-    selected/displayed/localization 87.5%, FPR 0%; Stress 100/100/100%, FPR 0%;
-    Dense/selection regression 0, owner/ACTIVE isolation `PASS`)
+  - 상태: `IN_PROGRESS` (`P10 VERIFIED`, `P11 PARTIAL_PASS`, `P11.1`~`P14 PASS`; `P15` 인증된 PDF 페이지 이동 `NOT_VERIFIED`)
+  - Source commit: P9~P15 구현 `930eced`~`404606d`; [PR #48](https://github.com/jaemin-devlog/PRIZM/pull/48) merge `154b9c8`
+  - Last verified: 2026-08-21 (P10 localization, P11.1~P14 Gate와 owner/ACTIVE isolation 통과;
+    P15의 인증된 PDF 페이지 이동은 `NOT_VERIFIED`)
 
 ## 환경별 판정 주의
 

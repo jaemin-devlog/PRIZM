@@ -88,6 +88,6 @@
 
 ## 문서 마감
 
-- [x] 확장 source `3af28492`의 commit·origin push 상태를 spec·plan·evidence와 상태 문서에 반영했다.
+- [x] 확장 source `3af28492`와 PR #49 merge `550c9d4`를 spec·plan·evidence와 상태 문서에 반영했다.
 - [x] 현재 단일 Browse UI, folder 보관함, 공통 visual language와 version별 삭제 계약을 문서 간 일치시켰다.
 - [x] 변경 Markdown의 로컬 링크·code fence·후행 공백과 `git diff --check`를 검증했다.

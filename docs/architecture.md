@@ -24,7 +24,8 @@
 > PRZ-009 상태: `IMPLEMENTED_UNVERIFIED` — source
 > `d52c6d01a3bef916e80a3c983a43c7b1fad1139b`은 `main`에 통합됐고 전체 PostgreSQL
 > integration, browser와 최종 감사는 통과했다. UI·문서 관리 확장 source `3af28492`는
-> `origin/PRZ-009-keyword-tags-ui`에 push됐으며 PR·merge와 OpenSQL opt-in 검증은 `NOT_RUN`
+> [PR #49](https://github.com/jaemin-devlog/PRIZM/pull/49) merge `550c9d4`로 통합됐으며,
+> OpenSQL opt-in과 authenticated browser 재관찰은 `NOT_RUN`
 >
 > 범위: 현재 Spring Boot 애플리케이션과 React Career Vault Reference App
 

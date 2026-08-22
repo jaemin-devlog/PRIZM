@@ -237,3 +237,10 @@ artifact로 보존한다.
 - backend source 변경 0이므로 별도 backend 변경 test는 없다. 기존 original endpoint의
   `DocumentThumbnailService.resolveOwnedVersion` owner-scoped lookup과 controller test를 source로
   재확인했다.
+
+## GitHub 통합
+
+- P9~P15 구현 source는 [PR #48](https://github.com/jaemin-devlog/PRIZM/pull/48) merge
+  `154b9c8fa99f0d4391bbdece7cfd0d9fb468dd55`로 `main`에 통합됐다.
+- 이 통합은 P15 인증된 PDF 페이지 이동을 검증한 결과가 아니다. 해당 Gate는 실제 로그인
+  세션과 PDF fixture가 없어 계속 `NOT_VERIFIED`이며, 전체 상태는 `IN_PROGRESS`를 유지한다.

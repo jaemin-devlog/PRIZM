@@ -1,6 +1,9 @@
 # PRZ-016: Search Performance V2
 
 - 상태: `IN_PROGRESS`
+- 통합: [PR #48](https://github.com/jaemin-devlog/PRIZM/pull/48) merge `154b9c8fa99f0d4391bbdece7cfd0d9fb468dd55`
+- 현재 제한: P15 인증된 PDF 페이지 이동은 `NOT_VERIFIED`이며, 이 문서는 이를 `VERIFIED`로
+  표현하지 않는다.
 - 목표: PRIZM 커리어 근거 검색의 retrieval, ranking, query understanding과 evidence
   localization을 같은 평가 기준으로 측정하고 단계적으로 개선한다.
 

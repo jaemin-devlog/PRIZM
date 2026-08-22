@@ -122,8 +122,7 @@
 ## Branch와 통합 경계
 
 - PRZ-008 검색 판정·응답·평가 source는 수정하지 않는다.
-- UI·문서 관리 확장은 `3af28492`로 commit하고 `origin/PRZ-009-keyword-tags-ui`에 push했다.
-- PR 생성과 `main` merge는 이 문서 마감 범위에서 `NOT_RUN`이다.
+- UI·문서 관리 확장은 `3af28492`로 commit하고 [PR #49](https://github.com/jaemin-devlog/PRIZM/pull/49) merge `550c9d4`로 `main`에 통합했다.
 
 ## 계획 대비 주요 변경
 

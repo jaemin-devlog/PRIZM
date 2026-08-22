@@ -6,8 +6,8 @@
 
 - 시작 기준 source: `83631f13c21eab54ac0f32ebb0f893b6c5acea0f`
 - 핵심 기능 source: `d52c6d01a3bef916e80a3c983a43c7b1fad1139b`
-- UI·문서 관리 확장 source: `3af28492` (`origin/PRZ-009-keyword-tags-ui` push 완료)
-- `main` 통합 merge: 핵심 기능 `5a8ea8d2b85e7d87342e11e96d1d58d1181ab6b8`; 확장 source PR·merge `NOT_RUN`
+- UI·문서 관리 확장 source: `3af28492` ([PR #49](https://github.com/jaemin-devlog/PRIZM/pull/49) merge `550c9d4`)
+- `main` 통합 merge: 핵심 기능 `5a8ea8d2b85e7d87342e11e96d1d58d1181ab6b8`; 확장 source `550c9d4c5b1852f13335be061d1624d22ddec382`
 - 최종 검증일: `2026-08-21`
 - 환경: Windows PowerShell, Java 17, Gradle 9.5.1, Node/npm,
   Docker Desktop, PostgreSQL+pgvector Testcontainers, Codex In-app Browser
@@ -134,7 +134,7 @@ production source는 변경하지 않았다.
     authenticated browser 증거로 확대하지 않는다.
 
 브라우저 확인을 위해 사용자 계정과 분리된 local-only synthetic account 2개를 만들었으나 문서 업로드,
-사용자 계정 접근 또는 기존 data 변경은 수행하지 않았다. 확장 source는 commit·push했으며 PR·merge는 `NOT_RUN`이다.
+사용자 계정 접근 또는 기존 data 변경은 수행하지 않았다. 확장 source는 이후 PR #49 merge `550c9d4`로 `main`에 통합됐다.
 
 ## 2026-08-21 Reference palette alignment
 
@@ -319,8 +319,8 @@ active chunk에서 계산하며 별도 영구 keyword table이나 생성형 모�
 
 ## 2026-08-21 문서 마감 감사
 
-- 확장 source의 실제 원격 SHA `3af284920943ba03c6cd109366698c32dc25d3fc`와
-  `origin/PRZ-009-keyword-tags-ui` push 결과를 spec·plan·status·roadmap·registry에 반영했다.
+- 확장 source의 실제 SHA `3af284920943ba03c6cd109366698c32dc25d3fc`와
+  PR #49 merge `550c9d4c5b1852f13335be061d1624d22ddec382`를 spec·plan·status·roadmap·registry에 반영했다.
 - 구현 완료 task와 실행하지 않은 browser/OpenSQL Gate를 분리했다. 후자는 `NOT_RUN`이며
   전체 상태를 `VERIFIED`로 올리지 않는 근거다.
 - 변경한 Markdown 8개에서 159개 로컬 링크, code fence·후행 공백·Markdown 기본 형식을 검사했다.

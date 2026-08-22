@@ -1,6 +1,6 @@
 # PRIZM 현재 구현 현황
 
-> 현재 상태 기준일: 2026-08-15
+> 현재 상태 기준일: 2026-08-21
 >
 > PRZ-011 검증 source commit: `fbb3481626a3cba6f36f070845ffae502511569e`
 >
@@ -50,7 +50,7 @@
 |---|---|
 | 현재 제품 | Spring Boot와 React Career Vault로 구현한 자동화된 AI 문서 관리 플랫폼 |
 | 구현됨 | 자체 호스팅 회원가입, 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, ChangeLog 기반 비동기 색인·복구, Ollama 자동 임베딩, pgvector 근거 검색, Career Vault 문서 관리, 읽기 전용 MCP Career Evidence 검색 |
-| 현재 단계 | 소스 전용 공개 준비, clean-clone, 실제 OpenSQL direct 기준선과 PRZ-013 OpenProxy 단일 Primary SQL Gate 검증 완료. PRZ-010 변경 로그 동기화, PRZ-011 문서 처리 상태 UX와 PRZ-015 MCP 검색은 `VERIFIED`; PRZ-016은 작업 branch의 P10 localization Gate까지 `VERIFIED`이고 P11 source consolidation은 duplicate Gate 실패로 `PARTIAL_PASS / IMPLEMENTED_UNVERIFIED`; PRZ-008 검색 개선은 `IN_PROGRESS`; PRZ-009 경력 키워드 맵과 PRZ-012 검색 근거 표현 품질은 `IMPLEMENTED_UNVERIFIED` |
+| 현재 단계 | 소스 전용 공개 준비, clean-clone, 실제 OpenSQL direct 기준선과 PRZ-013 OpenProxy 단일 Primary SQL Gate 검증 완료. PRZ-010 변경 로그 동기화, PRZ-011 문서 처리 상태 UX와 PRZ-015 MCP 검색은 `VERIFIED`; PRZ-016은 PR #48로 `main`에 통합됐고 P10은 `VERIFIED`, P11은 `PARTIAL_PASS`, P11.1~P14는 `PASS`이나 P15의 인증된 PDF 페이지 이동이 `NOT_VERIFIED`여서 `IN_PROGRESS`; PRZ-008 검색 개선은 `IN_PROGRESS`; PRZ-009 경력 키워드 맵과 PRZ-012 검색 근거 표현 품질은 `IMPLEMENTED_UNVERIFIED` |
 | 계획된 미구현 | CareerFact, 근거 기반 portfolio, `/api/v1`, 독립 Engine 패키지 |
 | 명시적 범위 제외 | 다중 OpenSQL DB node, DB 장애전환, OpenProxy 이중화·VIP와 서비스 연속성 보장 |
 
@@ -141,7 +141,8 @@ PRZ-005에서는 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 직�
 
 PRZ-009의 전체 backend unit test와 전체 PostgreSQL integration, frontend lint·build,
 Docker build/runtime, synthetic browser 흐름과 최종 diff 감사는 통과했다. 확장 source
-`3af28492`는 `origin/PRZ-009-keyword-tags-ui`에 push했지만 PR·merge는 `NOT_RUN`이다. OpenSQL
+`3af28492`는 [PR #49](https://github.com/jaemin-devlog/PRIZM/pull/49)로 `main`에 병합됐다
+(merge `550c9d4`). OpenSQL
 opt-in integration은 전용 target을 활성화하지 않아 `NOT_RUN`이므로 현재 상태는 계속
 `IMPLEMENTED_UNVERIFIED`다. 상세 범위는
 [PRZ-009 Evidence](../specs/PRZ-009-career-keyword-map/evidence.md)를 따른다.
@@ -180,17 +181,18 @@ PRZ-011은 문서 처리의 파일 읽기·텍스트 추출·청크 생성·실�
 | 대회 OpenSQL 구성 | `SINGLE_ONLY` | 공식 안내에 따라 단일 서버 설치만 사용. PRZ-014 다중 노드 구성은 `REJECTED` |
 | PRZ-004 demo `USER` clean-clone | `VERIFIED` | `25d09e9`에서 자동 검증 `339 PASS / 18 SKIP / 0 FAIL`과 두 독립 clone 통과. `aff3e87` 경로 교정 뒤 Windows·Linux Node test와 GitHub CI 6건 통과, PR #25 merge `1f9a5ad`. 두 번째 빈 목록 UI 직접 관찰은 `NOT_RUN` |
 | PRZ-008 검색 근거 신뢰성 | `IN_PROGRESS` | 2026-08-13 source `2190d47`, PR #40 merge `9b24808`: 기본 profile, v2 상태, 제한적 exact-token rescue와 OpenSQL direct `5432` API·UI Gate를 통합. 의미 단위 청킹·batch embedding·PDF 중복 최적화의 제품 적용 Gate는 남음 |
-| PRZ-009 경력 키워드 맵 | `IMPLEMENTED_UNVERIFIED` | 핵심 source `d52c6d0`, merge `5a8ea8d`; 2026-08-21 UI·문서 관리 확장 source `3af28492` origin push 완료, PR·merge `NOT_RUN`. 최신 backend test 576 pass, integration 114 pass·8 conditional skip, frontend unit 27·lint·typecheck·build, Docker runtime·diff 감사 pass. OpenSQL opt-in과 후속 authenticated browser 재관찰은 `NOT_RUN` |
+| PRZ-009 경력 키워드 맵 | `IMPLEMENTED_UNVERIFIED` | 핵심 source `d52c6d0`, merge `5a8ea8d`; UI·문서 관리 확장 source `3af28492`는 PR #49 merge `550c9d4`로 통합. 최신 backend test 576 pass, integration 114 pass·8 conditional skip, frontend unit 27·lint·typecheck·build, Docker runtime·diff 감사 pass. OpenSQL opt-in과 후속 authenticated browser 재관찰은 `NOT_RUN` |
 | PRZ-010 변경 로그 동기화 | `VERIFIED` | 2026-08-12 source `26c546b`: PostgreSQL ChangeLog integration, 실제 OpenSQL direct `5432` V14 SQL Gate, 실제 OpenSQL+Ollama `bge-m3` V1→V2 E2E와 실패 시 V1 보존, 전체 integration `104 completed / 7 skipped / 0 failures`, backend test, frontend lint/build, Compose와 diff 감사 통과 |
 | PRZ-011 문서 처리 상태 UX | `VERIFIED` | 2026-08-13 source `fbb3481`: backend unit 464개 중 449 pass·15 skip, integration 112개 중 105 pass·7 skip, frontend unit 5개·lint·build, Compose V15 적용, PostgreSQL+pgvector·Ollama `bge-m3` 문서 처리/검색과 browser polling·retry 표시 통과. AUDIT blocking 2건 수정 뒤 재-AUDIT PASS, PR #41로 `main` 통합 |
 | PRZ-012 검색 근거 표현 품질 | `IMPLEMENTED_UNVERIFIED` | 질문 관련 원문 1–3문장 선택과 근거 중심 UI, PRZ-008 평가 15개 결과 불변, backend unit·integration과 frontend 검증 통과. 실제 개인 문서 대표 7개 Before/After는 owner·authentication 경계 안에서 실행하지 못해 `NOT_RUN`, VERIFY Gate `FAIL` |
-| PRZ-016 P10 Evidence Localization | `VERIFIED` — branch Gate | frozen P8.1 Judge displayed/localization 68.75% → 87.5%, Stress 65/60% → 100/100%; Dense/selection/FPR 회귀 0, owner/ACTIVE isolation PASS. Commit/push/PR은 `NOT_RUN`이며 PRZ-016 전체는 미통합 `IN_PROGRESS` |
-| PRZ-016 P11 Source Consolidation | `PARTIAL_PASS` — branch Gate | 실제 이력서 same-page distinct evidence retention은 개선되고 frozen 품질·FPR·localization·isolation은 유지됐으나 Stress 1건에서 final 3→5와 duplicate snippet +2가 발생. P11은 `VERIFIED`가 아님 |
-| PRZ-016 P11.1 Duplicate Evidence Consolidation | `PASS` — branch Gate | P11 source identity를 유지한 QEV repeated-evidence 축약으로 Stress final 5→3, duplicate extras 5→3 및 P10 exact final result를 복구. 실제 이력서 retention 4/4/3/3, P8.1/P9/P10 metric·FPR·localization·isolation 유지 |
-| PRZ-016 P12 Simple Tech Usage Eligibility | `PASS` — branch Gate | P9 simple `USE` query가 같은 candidate의 project-scoped technology declaration 또는 직접 usage를 근거로 인정하도록 최소 보완. PostgreSQL eligibility/final 0/0→2/2, OAuth2 0/0→1/1; P8.1/P9/P10/P11.1 metric·FPR·localization·duplicate·owner/ACTIVE isolation 유지. Commit/push/PR은 `NOT_RUN` |
-| PRZ-016 P12.1 Direct-Support Floor Bypass Contract | `PASS` — branch Gate | evaluator가 `SUPPORTED` 및 `directSupport=true`로 판정한 claim 질문은 action/numeric requirement 공백만으로 dense floor에서 제거되지 않도록 최소 보완. FCM chunk 108이 eligibility/final로 복구됐고 P10 frozen metric·FPR·localization·owner/ACTIVE isolation 및 기존 direct-anchor fallback 계약은 유지. Commit/push/PR은 `NOT_RUN` |
-| PRZ-016 P13 Evidence Expansion Safety | `PASS` — branch Gate | selected chunk의 직접 ASCII query anchor를 local evidence 우선 조건으로 보존하고 cross-chunk expansion 후보도 이를 유지하도록 제한. FCM `108→106` anchor loss는 `108→108`으로 복구됐으며 P10 frozen metric·FPR·localization·owner/ACTIVE isolation은 유지. Commit/push/PR은 `NOT_RUN` |
-| PRZ-016 P14 Claim-Complete Snippet | `PASS` — branch Gate | 해결 질문의 extractive scorer가 action/problem-result complete contiguous 1–3문장 window를 우선하도록 보완. Q9 result/evidence chunk 106과 P13 safety는 유지되고 frozen P10 metric·FPR·localization·owner/ACTIVE isolation은 유지. Commit/push/PR은 `NOT_RUN` |
+| PRZ-016 P10 Evidence Localization | `VERIFIED` — 통합 Gate | frozen P8.1 Judge displayed/localization 68.75% → 87.5%, Stress 65/60% → 100/100%; Dense/selection/FPR 회귀 0, owner/ACTIVE isolation PASS. PR #48 merge `154b9c8`로 통합 |
+| PRZ-016 P11 Source Consolidation | `PARTIAL_PASS` — 통합 Gate | 실제 이력서 same-page distinct evidence retention은 개선되고 frozen 품질·FPR·localization·isolation은 유지됐으나 Stress 1건에서 final 3→5와 duplicate snippet +2가 발생. P11은 `VERIFIED`가 아님 |
+| PRZ-016 P11.1 Duplicate Evidence Consolidation | `PASS` — 통합 Gate | P11 source identity를 유지한 QEV repeated-evidence 축약으로 Stress final 5→3, duplicate extras 5→3 및 P10 exact final result를 복구. 실제 이력서 retention 4/4/3/3, P8.1/P9/P10 metric·FPR·localization·isolation 유지 |
+| PRZ-016 P12 Simple Tech Usage Eligibility | `PASS` — 통합 Gate | P9 simple `USE` query가 같은 candidate의 project-scoped technology declaration 또는 직접 usage를 근거로 인정하도록 최소 보완. PostgreSQL eligibility/final 0/0→2/2, OAuth2 0/0→1/1; P8.1/P9/P10/P11.1 metric·FPR·localization·duplicate·owner/ACTIVE isolation 유지 |
+| PRZ-016 P12.1 Direct-Support Floor Bypass Contract | `PASS` — 통합 Gate | evaluator가 `SUPPORTED` 및 `directSupport=true`로 판정한 claim 질문은 action/numeric requirement 공백만으로 dense floor에서 제거되지 않도록 최소 보완. FCM chunk 108이 eligibility/final로 복구됐고 P10 frozen metric·FPR·localization·owner/ACTIVE isolation 및 기존 direct-anchor fallback 계약은 유지 |
+| PRZ-016 P13 Evidence Expansion Safety | `PASS` — 통합 Gate | selected chunk의 직접 ASCII query anchor를 local evidence 우선 조건으로 보존하고 cross-chunk expansion 후보도 이를 유지하도록 제한. FCM `108→106` anchor loss는 `108→108`으로 복구됐으며 P10 frozen metric·FPR·localization·owner/ACTIVE isolation은 유지 |
+| PRZ-016 P14 Claim-Complete Snippet | `PASS` — 통합 Gate | 해결 질문의 extractive scorer가 action/problem-result complete contiguous 1–3문장 window를 우선하도록 보완. Q9 result/evidence chunk 106과 P13 safety는 유지되고 frozen P10 metric·FPR·localization·owner/ACTIVE isolation은 유지 |
+| PRZ-016 P15 PDF Document Confirmation UX | `IMPLEMENTED_UNVERIFIED` | PR #48 merge `154b9c8`로 통합. frontend unit·lint·build·Docker와 비인증 렌더링은 통과했으나, 실제 로그인 세션과 PDF fixture가 없어 인증된 PDF 페이지 이동은 `NOT_VERIFIED` |
 
 세부 실행 환경과 명령은 [PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md),
 [PRZ-002 Evidence](../specs/PRZ-002-open-source-readiness/evidence.md),
@@ -226,7 +228,8 @@ PRZ-011의 검증·통합 결과는
   `PRIZM_SEARCH_PROFILE` rollback override로 유지합니다.
 - 이력서·포트폴리오의 정규화·category·단일 Browse 순서 키워드 목록과 문서별 근거·원본 위치
   연결은 [PRZ-009](../specs/PRZ-009-career-keyword-map/spec.md) 핵심 source `d52c6d0`에 구현돼
-  merge `5a8ea8d`로 `main`에 통합됐다. 폴더 보관함·공통 UI·버전별 삭제 확장은 source `3af28492`로 push됐고,
+  merge `5a8ea8d`로 `main`에 통합됐다. 폴더 보관함·공통 UI·버전별 삭제 확장은 source `3af28492`와
+  PR #49 merge `550c9d4`로 `main`에 통합됐고,
   최신 backend·PostgreSQL integration·frontend·Docker·diff 감사를 통과했습니다. 확장 UI의 authenticated
   browser 재관찰은 사용자 지시에 따라 `NOT_RUN`이다. OpenSQL
   opt-in target 검증이 `NOT_RUN`이어서 OpenSQL 범위까지 검증 완료한 기능은 아닙니다.

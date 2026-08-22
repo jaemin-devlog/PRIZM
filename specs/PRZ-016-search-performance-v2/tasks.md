@@ -103,9 +103,6 @@
 - [x] complexity/scope/security 감사 — `ACCEPTABLE_BUT_COMPLEX`, blocking finding 0
 - [x] commit/push/PR `NOT_RUN` — 사용자 금지 지시
 - [x] sentence extraction, window scoring, orchestration, expansion 책임과 LOC 계획 작성
-- [ ] selected-chunk-first extractive localization 구현 및 focused test
-- [ ] frozen Judge/Stress before-after, regression/isolation/parity 검증
-- [ ] complexity·scope·hardcoding 감사와 evidence 완료
 
 ## P11 Source Consolidation Redesign
 
@@ -172,4 +169,4 @@
 - [ ] VERIFY: authenticated PDF page navigation — local bootstrap user is disabled and no user session or
   document fixture was available; `NOT_VERIFIED`
 - [x] AUDIT: 검색 source/API/DB 변경 0, owner boundary와 highlight `NOT_IMPLEMENTED` 확인
-- [ ] commit/push/PR `NOT_RUN` — 사용자 금지 지시
+- [x] [PR #48](https://github.com/jaemin-devlog/PRIZM/pull/48) merge `154b9c8`로 `main` 통합

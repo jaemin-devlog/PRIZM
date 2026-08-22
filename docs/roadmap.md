@@ -1,6 +1,6 @@
 # PRIZM 개발 로드맵
 
-> 기준일: 2026-08-15
+> 기준일: 2026-08-21
 
 이 문서는 제품이 발전하는 순서만 설명합니다. 현재 구현과 검증 결과는
 [현재 구현 현황](project-status.md), 기능별 근거는
@@ -57,8 +57,8 @@ OpenSQL/OpenProxy와 Ollama `bge-m3`에서 전체 흐름을 검증했습니다. 
      전체 PostgreSQL integration, synthetic browser와 최종 감사를 마쳤습니다. OpenSQL
      opt-in target이 `NOT_RUN`이므로 상태는 `IMPLEMENTED_UNVERIFIED`이며, 결과를
      CareerFact나 검증된 숙련도 판정으로 사용하지 않습니다.
-   - 2026-08-21 UI·문서 관리 확장 source `3af28492`는 origin branch에 push했으며,
-     PR·`main` merge는 별도 통합 Gate로 남습니다.
+   - 2026-08-21 UI·문서 관리 확장 source `3af28492`는 PR #49 merge `550c9d4`로 `main`에
+     통합됐습니다. OpenSQL opt-in과 authenticated browser 재관찰은 계속 `NOT_RUN`입니다.
 
 다중 OpenSQL DB node, DB 장애전환, OpenProxy 이중화·VIP와 서비스 연속성 보장은
 로드맵에 포함하지 않습니다.

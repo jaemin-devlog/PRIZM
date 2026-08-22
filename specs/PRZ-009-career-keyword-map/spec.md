@@ -4,8 +4,8 @@
 > **유형:** Feature
 > **선행 문서:** [PRZ-000](../PRZ-000-platform-baseline/spec.md)
 > **핵심 기능 소스:** `d52c6d01a3bef916e80a3c983a43c7b1fad1139b`
-> **UI·문서 관리 확장 소스:** `3af28492` (`PRZ-009-keyword-tags-ui`, origin push 완료)
-> **통합:** 핵심 기능 merge `5a8ea8d2b85e7d87342e11e96d1d58d1181ab6b8`; 확장 소스 PR·merge `NOT_RUN`
+> **UI·문서 관리 확장 소스:** `3af28492` (`PRZ-009-keyword-tags-ui`)
+> **통합:** 핵심 기능 merge `5a8ea8d2b85e7d87342e11e96d1d58d1181ab6b8`; 확장 소스는 [PR #49](https://github.com/jaemin-devlog/PRIZM/pull/49) merge `550c9d4c5b1852f13335be061d1624d22ddec382`
 > **최종 확인:** 2026-08-21
 
 ## 상태

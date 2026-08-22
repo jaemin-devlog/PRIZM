@@ -290,11 +290,11 @@ class SearchEvaluationCompositeProfileTest {
 
         assertThat(decision.rejected()).isTrue();
         assertThat(decision.rejectionReasons())
-                .contains("MISSING_ASSERTED_COMPLETED_RELEASE_CLAIM");
+                .contains("MISSING_IDENTIFIER:springboot");
     }
 
     @Test
-    void rejectsAnExplicitlyNegatedPositiveClaim() {
+    void keepsExplicitlyNegatedContentWhenItRemainsRelevantToTheQuery() {
         VectorSearchResult candidate = candidate(
                 1L, 1, 1, ChunkSourceType.TEXT_CHUNK,
                 "Kafka를 학습했지만 프로젝트에 적용하지 않았고 운영하지 않았다.", 0.70d);
@@ -303,8 +303,28 @@ class SearchEvaluationCompositeProfileTest {
                 "Kafka를 실제 프로젝트에 적용해 운영했나요?",
                 List.of(candidate));
 
-        assertThat(decision.rejected()).isTrue();
-        assertThat(decision.rejectionReasons()).contains("NEGATED_CLAIM");
+        assertThat(decision.rejected()).isFalse();
+        assertThat(decision.results()).containsExactly(candidate);
+        assertThat(decision.rejectionReasons()).isEmpty();
+    }
+
+    @Test
+    void keepsKafkaRelatedContentRegardlessOfActorAdoptionOrPolarity() {
+        List<VectorSearchResult> related = List.of(
+                candidate(11L, 11L, 21L, 1, 1, ChunkSourceType.TEXT_CHUNK,
+                        "Kafka를 사용해 메시징 시스템을 구현했다.", 0.84d),
+                candidate(12L, 12L, 22L, 1, 1, ChunkSourceType.TEXT_CHUNK,
+                        "Kafka를 사용하지 않았다.", 0.82d),
+                candidate(13L, 13L, 23L, 1, 1, ChunkSourceType.TEXT_CHUNK,
+                        "Kafka 도입을 검토했다.", 0.80d),
+                candidate(14L, 14L, 24L, 1, 1, ChunkSourceType.TEXT_CHUNK,
+                        "다른 팀이 Kafka를 사용했다.", 0.78d));
+
+        SearchEvaluationCompositeProfile.Decision decision = profile.apply("Kafka", related);
+
+        assertThat(decision.rejected()).isFalse();
+        assertThat(decision.results()).containsExactlyElementsOf(related);
+        assertThat(decision.rejectionReasons()).isEmpty();
     }
 
     @Test
@@ -455,53 +475,38 @@ class SearchEvaluationCompositeProfileTest {
     }
 
     @Test
-    void distinguishesCompletedReleaseAssertionsFromQuestionsReportsTagQuestionsAndRetractions() {
-        List<String> assertedClaims = List.of("주문 API를 배포했습니다.");
-        List<String> nonAssertedClaims = List.of(
+    void keepsReleaseAssertionsQuestionsReportsAndRetractionsWhenTheyRemainRelevant() {
+        List<String> relatedReleaseContent = List.of(
+                "주문 API를 배포했습니다.",
                 "주문 API를 배포했습니다?",
                 "주문 API를 배포했습니다, 맞나요?",
                 "“주문 API를 배포했습니다”라고 했나요?",
                 "주문 API 배포 여부를 확인했다.",
-                "배포했습니다, 그러나 실제로는 하지 않았습니다.",
-                "배포했습니다. 그러나 실제로는 하지 않았습니다.",
+                "주문 API를 배포했습니다, 그러나 실제로는 하지 않았습니다.",
+                "주문 API를 배포했습니다. 그러나 실제로는 하지 않았습니다.",
                 "담당자가 \"주문 API를 배포했습니다\"라고 전했다.",
                 "담당자가 \"주문 API를 배포했습니다\"라고 물었다.",
                 "주문 API를 배포했습니다. 맞나요?",
                 "주문 API를 배포했습니다. 아니, 아직 배포하지 않았습니다.");
 
-        for (int index = 0; index < assertedClaims.size(); index++) {
+        for (int index = 0; index < relatedReleaseContent.size(); index++) {
             VectorSearchResult candidate = candidate(
                     index + 1L,
                     index + 1,
                     index + 1,
                     ChunkSourceType.TEXT_CHUNK,
-                    assertedClaims.get(index),
+                    relatedReleaseContent.get(index),
                     0.90d);
 
             assertThat(profile.apply("주문 API를 출시한 이력이 있나요?", List.of(candidate))
                             .rejected())
-                    .as(assertedClaims.get(index))
+                    .as(relatedReleaseContent.get(index))
                     .isFalse();
-        }
-
-        for (int index = 0; index < nonAssertedClaims.size(); index++) {
-            VectorSearchResult candidate = candidate(
-                    index + 10L,
-                    index + 10,
-                    index + 10,
-                    ChunkSourceType.TEXT_CHUNK,
-                    nonAssertedClaims.get(index),
-                    0.90d);
-
-            assertThat(profile.apply("주문 API를 출시한 이력이 있나요?", List.of(candidate))
-                            .rejected())
-                    .as(nonAssertedClaims.get(index))
-                    .isTrue();
         }
     }
 
     @Test
-    void requiresAnchoredDirectCompletionAcrossClaimUnitTransformations() {
+    void keepsTargetBoundReleaseReferencesAcrossClaimUnitTransformations() {
         List<String> targets = List.of("주문 API", "주문 결제 API", "주문 취소 API");
         List<UnaryOperator<String>> assertiveTransformations = List.of(
                 target -> target + "를 배포했습니다.",
@@ -571,17 +576,19 @@ class SearchEvaluationCompositeProfileTest {
                         profile.apply(query, List.of(transformedCandidate));
 
                 assertThat(decision.rejected())
-                        .as("non-assertive transformation: %s", transformedClaim)
-                        .isTrue();
+                        .as("related transformation: %s", transformedClaim)
+                        .isFalse();
                 assertThat(decision.rejectionReasons())
-                        .as("required modality gate: %s", transformedClaim)
-                        .contains("MISSING_ASSERTED_COMPLETED_RELEASE_CLAIM");
+                        .as("truth reasons removed: %s", transformedClaim)
+                        .doesNotContain(
+                                "UNSUPPORTED_COMPLETED_RELEASE_QUERY",
+                                "MISSING_ASSERTED_COMPLETED_RELEASE_CLAIM");
             }
         }
     }
 
     @Test
-    void doesNotComposeCompletionAndTargetSignalsAcrossClaimUnits() {
+    void keepsReleaseReferencesWithoutComposingACompletedTruthClaimAcrossUnits() {
         List<SearchScenario> scenarios = List.of(
                 new SearchScenario(
                         "주문 결제 API를 출시한 이력이 있나요?",
@@ -615,10 +622,10 @@ class SearchEvaluationCompositeProfileTest {
             SearchEvaluationCompositeProfile.Decision decision =
                     profile.apply(scenario.query(), List.of(candidate));
 
-            assertThat(decision.rejected()).as(scenario.toString()).isTrue();
+            assertThat(decision.rejected()).as(scenario.toString()).isFalse();
             assertThat(decision.rejectionReasons())
                     .as(scenario.toString())
-                    .contains("MISSING_ASSERTED_COMPLETED_RELEASE_CLAIM");
+                    .doesNotContain("MISSING_ASSERTED_COMPLETED_RELEASE_CLAIM");
         }
 
         List<UnaryOperator<String>> opaqueTargetTransformations = List.of(
@@ -639,10 +646,10 @@ class SearchEvaluationCompositeProfileTest {
             SearchEvaluationCompositeProfile.Decision decision =
                     profile.apply(query, List.of(candidate));
 
-            assertThat(decision.rejected()).as(query).isTrue();
+            assertThat(decision.rejected()).as(query).isFalse();
             assertThat(decision.rejectionReasons())
                     .as("opaque target token: %s", query)
-                    .contains("MISSING_ASSERTED_COMPLETED_RELEASE_CLAIM");
+                    .doesNotContain("MISSING_ASSERTED_COMPLETED_RELEASE_CLAIM");
         }
 
         List<String> opaqueReservedTargetPhrases = List.of(
@@ -717,10 +724,10 @@ class SearchEvaluationCompositeProfileTest {
             SearchEvaluationCompositeProfile.Decision decision =
                     profile.apply(query, List.of(candidate));
 
-            assertThat(decision.rejected()).as(content).isTrue();
+            assertThat(decision.rejected()).as(content).isFalse();
             assertThat(decision.rejectionReasons())
                     .as("target token boundary: %s", content)
-                    .contains("MISSING_ASSERTED_COMPLETED_RELEASE_CLAIM");
+                    .doesNotContain("MISSING_ASSERTED_COMPLETED_RELEASE_CLAIM");
         }
 
         List<SearchScenario> acceptedIntentForms = List.of(
@@ -759,7 +766,7 @@ class SearchEvaluationCompositeProfileTest {
     }
 
     @Test
-    void failsClosedForUnsupportedCompletionQueryGrammarInsteadOfFallingBack() {
+    void unsupportedLegacyCompletionGrammarStillUsesReleaseRelevanceInsteadOfTruthRejection() {
         List<SearchScenario> unsupportedScenarios = List.of(
                 new SearchScenario(
                         "주문 API를 출시했습니까?",
@@ -805,10 +812,10 @@ class SearchEvaluationCompositeProfileTest {
             SearchEvaluationCompositeProfile.Decision decision =
                     profile.apply(scenario.query(), List.of(candidate));
 
-            assertThat(decision.rejected()).as(scenario.toString()).isTrue();
+            assertThat(decision.rejected()).as(scenario.toString()).isFalse();
             assertThat(decision.rejectionReasons())
                     .as(scenario.toString())
-                    .contains("UNSUPPORTED_COMPLETED_RELEASE_QUERY");
+                    .doesNotContain("UNSUPPORTED_COMPLETED_RELEASE_QUERY");
         }
     }
 
@@ -849,8 +856,8 @@ class SearchEvaluationCompositeProfileTest {
     }
 
     @Test
-    void doesNotTreatReleasePlansAutomationNegationOrLongerWordsAsCompletedEvidence() {
-        List<String> nonCompletedClaims = List.of(
+    void keepsReleasePlansAutomationNegationAndReleaseReferencesAsRelevantEvidence() {
+        List<String> relatedReleaseContent = List.of(
                 "주문 API 배포 계획만 세웠다.",
                 "주문 API 배포 자동화만 구현했다.",
                 "주문 API를 배포하지 않았다.",
@@ -862,23 +869,29 @@ class SearchEvaluationCompositeProfileTest {
                 "주문 API를 배포했다는 자동화 예제를 검토했다.",
                 "주문 API 출시일 문서를 작성했다.",
                 "주문 API 배포판을 검토했다.",
-                "주문 API 재배포 절차를 정리했다.",
-                "주문 completed-release-action 근거를 작성했다.");
+                "주문 API 재배포 절차를 정리했다.");
 
-        for (int index = 0; index < nonCompletedClaims.size(); index++) {
+        for (int index = 0; index < relatedReleaseContent.size(); index++) {
             VectorSearchResult candidate = candidate(
                     index + 1L,
                     index + 1,
                     index + 1,
                     ChunkSourceType.TEXT_CHUNK,
-                    nonCompletedClaims.get(index),
+                    relatedReleaseContent.get(index),
                     0.90d);
 
             assertThat(profile.apply("주문 API를 출시한 이력이 있나요?", List.of(candidate))
                             .rejected())
-                    .as(nonCompletedClaims.get(index))
-                    .isTrue();
+                    .as(relatedReleaseContent.get(index))
+                    .isFalse();
         }
+
+        VectorSearchResult unrelatedEnglishMarker = candidate(
+                99L, 99, 99, ChunkSourceType.TEXT_CHUNK,
+                "주문 completed-release-action 근거를 작성했다.", 0.90d);
+        assertThat(profile.apply("주문 API를 출시한 이력이 있나요?", List.of(unrelatedEnglishMarker))
+                        .rejected())
+                .isTrue();
     }
 
     @Test
@@ -921,7 +934,7 @@ class SearchEvaluationCompositeProfileTest {
     }
 
     @Test
-    void rejectsAnExactUnicodeAnchorWhenTheClaimIsNegated() {
+    void keepsAnExactUnicodeAnchorWhenTheRelatedContentIsNegated() {
         VectorSearchResult candidate = candidate(
                 1L, 1, 1, ChunkSourceType.TEXT_CHUNK,
                 "루미나 경험은 없다.", 0.90d);
@@ -929,8 +942,9 @@ class SearchEvaluationCompositeProfileTest {
         SearchEvaluationCompositeProfile.Decision decision = profile.apply(
                 "루미나 근거가 있어?", List.of(candidate));
 
-        assertThat(decision.rejected()).isTrue();
-        assertThat(decision.rejectionReasons()).contains("NEGATED_CLAIM");
+        assertThat(decision.rejected()).isFalse();
+        assertThat(decision.results()).containsExactly(candidate);
+        assertThat(decision.rejectionReasons()).isEmpty();
     }
 
     @Test
@@ -951,7 +965,7 @@ class SearchEvaluationCompositeProfileTest {
     }
 
     @Test
-    void keepsDenseScoreFloorWhileGeneralProfileIgnoresMissingNumericEvidence() {
+    void rescuesStrongNaturalLanguageOverlapWhileNumericBindingRemainsAServiceConcern() {
         VectorSearchResult lowScore = candidate(
                 1L, 1, 1, ChunkSourceType.TEXT_CHUNK,
                 "위성 관제 시스템 개발 근거", 0.49d);
@@ -960,57 +974,107 @@ class SearchEvaluationCompositeProfileTest {
                 "합성 요청 1200건 처리 근거", 0.70d);
 
         assertThat(profile.apply("위성 관제 시스템 개발 근거가 있어?", List.of(lowScore))
-                        .rejectionReasons())
-                .contains("DENSE_SCORE_BELOW_TUNING_FLOOR");
+                        .results())
+                .containsExactly(lowScore);
         assertThat(profile.apply("합성 요청 2400건 처리 근거를 보여줘.", List.of(wrongNumber))
                         .rejected())
                 .isFalse();
     }
 
     @Test
-    void bypassesDenseFloorForAnExplicitlySupportedDirectClaimWithoutParsedActionOrNumber() {
+    void rescuesOnlyTopFiveNaturalLanguageCandidatesWithSufficientExactCoreTerms() {
+        VectorSearchResult related = candidate(
+                10L, 10, 10, ChunkSourceType.TEXT_CHUNK,
+                "장애 상황에서 복구 절차를 문서화했다.", 0.42d);
+        VectorSearchResult oneTermOnly = candidate(
+                11L, 11, 11, ChunkSourceType.TEXT_CHUNK,
+                "장애 알림 기록", 0.42d);
+        String query = "장애 상황 복구 절차를 설명해줘.";
+
+        assertThat(profile.apply(query, List.of(related)).results())
+                .containsExactly(related);
+        assertThat(profile.apply(query, List.of(oneTermOnly)).rejectionReasons())
+                .contains("DENSE_SCORE_BELOW_TUNING_FLOOR");
+
+        List<VectorSearchResult> outsideTopFive = List.of(
+                candidate(21L, 21, 21, ChunkSourceType.TEXT_CHUNK, "무관한 회계 문서", 0.49d),
+                candidate(22L, 22, 22, ChunkSourceType.TEXT_CHUNK, "무관한 인사 문서", 0.48d),
+                candidate(23L, 23, 23, ChunkSourceType.TEXT_CHUNK, "무관한 계약 문서", 0.47d),
+                candidate(24L, 24, 24, ChunkSourceType.TEXT_CHUNK, "무관한 구매 문서", 0.46d),
+                candidate(25L, 25, 25, ChunkSourceType.TEXT_CHUNK, "무관한 정산 문서", 0.45d),
+                candidate(26L, 26, 26, ChunkSourceType.TEXT_CHUNK,
+                        "장애 상황에서 복구 절차를 문서화했다.", 0.44d));
+
+        assertThat(profile.apply(query, outsideTopFive).results()).isEmpty();
+    }
+
+    @Test
+    void rescuesBelowFloorEvidenceWithReliableExactIdentifiers() {
         VectorSearchResult directEvidence = candidate(
                 1L, 1, 1, ChunkSourceType.TEXT_CHUNK,
                 "FCM 전송 실패가 핵심 기능에 영향을 주지 않도록 Outbox로 전송을 분리했다.",
                 0.425d);
+        VectorSearchResult tauri = candidate(
+                2L, 2, 2, ChunkSourceType.TEXT_CHUNK,
+                "검토용 reference shell은 Tauri 기반으로 구성했다.",
+                0.337798d);
+        VectorSearchResult quartzHarborMesh = candidate(
+                3L, 3, 3, ChunkSourceType.TEXT_CHUNK,
+                "격리된 라우팅 fixture는 Quartz Harbor Mesh 기반으로 기록했다.",
+                0.442412d);
 
         assertThat(profile.apply(
                 "FCM 전송 실패가 핵심 기능에 영향을 주지 않게 어떻게 설계했나요?",
                 List.of(directEvidence)).rejected()).isFalse();
+        assertThat(profile.apply("Tauri", List.of(tauri)).results()).containsExactly(tauri);
+        assertThat(profile.apply("Quartz Harbor Mesh", List.of(quartzHarborMesh)).results())
+                .containsExactly(quartzHarborMesh);
     }
 
     @Test
-    void keepsDenseFloorForMereMentionWithoutDirectClaimSupport() {
-        VectorSearchResult mentionOnly = candidate(
+    void rescuesExactIdentifierMentionsRegardlessOfActorNegationOrReviewState() {
+        List<VectorSearchResult> related = List.of(
+                candidate(1L, 1, 1, ChunkSourceType.TEXT_CHUNK,
+                        "FCM은 외부 전송 서비스다.", 0.425d),
+                candidate(2L, 2, 2, ChunkSourceType.TEXT_CHUNK,
+                        "다른 팀이 FCM을 사용했다.", 0.425d),
+                candidate(3L, 3, 3, ChunkSourceType.TEXT_CHUNK,
+                        "FCM을 사용하지 않았다.", 0.425d),
+                candidate(4L, 4, 4, ChunkSourceType.TEXT_CHUNK,
+                        "FCM 도입을 검토했다.", 0.425d));
+
+        assertThat(profile.apply("FCM", related).results())
+                .containsExactlyInAnyOrderElementsOf(related);
+    }
+
+    @Test
+    void keepsDenseFloorWhenReliableExactIdentifierAnchorIsAbsentOrOnlyASubstring() {
+        VectorSearchResult absent = candidate(
                 1L, 1, 1, ChunkSourceType.TEXT_CHUNK,
-                "FCM은 외부 전송 서비스다.",
-                0.425d);
+                "Spring Boot 기반 API와 PostgreSQL을 사용했다.", 0.425d);
+        VectorSearchResult substring = candidate(
+                2L, 2, 2, ChunkSourceType.TEXT_CHUNK,
+                "FooEngineX를 플러그인 호스트 후보로 검토했다.", 0.425d);
+        VectorSearchResult partialMultiWord = candidate(
+                3L, 3, 3, ChunkSourceType.TEXT_CHUNK,
+                "Quartz Harbor 라우팅 구성을 검토했다.", 0.442412d);
 
-        assertThat(profile.apply(
-                "FCM 전송 실패가 핵심 기능에 영향을 주지 않게 어떻게 설계했나요?",
-                List.of(mentionOnly)).rejected()).isTrue();
+        assertThat(profile.apply("Kafka", List.of(absent)).rejectionReasons())
+                .contains("DENSE_SCORE_BELOW_TUNING_FLOOR");
+        assertThat(profile.apply("FooEngine", List.of(substring)).rejectionReasons())
+                .contains("DENSE_SCORE_BELOW_TUNING_FLOOR");
+        assertThat(profile.apply("Quartz Harbor Mesh", List.of(partialMultiWord)).rejectionReasons())
+                .contains("DENSE_SCORE_BELOW_TUNING_FLOOR");
     }
 
     @Test
-    void keepsContradictedClaimBelowDenseFloorRejected() {
-        VectorSearchResult contradicted = candidate(
-                1L, 1, 1, ChunkSourceType.TEXT_CHUNK,
-                "FCM 전송 실패가 핵심 기능에 영향을 주지 않도록 설계하지 않았다.",
-                0.425d);
-
-        assertThat(profile.apply(
-                "FCM 전송 실패가 핵심 기능에 영향을 주지 않게 어떻게 설계했나요?",
-                List.of(contradicted)).rejected()).isTrue();
-    }
-
-    @Test
-    void currentStrictProfileKeepsTheMinimumDenseScoreBoundaryAtPointFive() {
+    void currentStrictProfileKeepsPointFiveAsTheDefaultFloorWithoutAnExactAnchor() {
         VectorSearchResult atBoundary = candidate(
                 1L, 1, 1, ChunkSourceType.TEXT_CHUNK,
                 "Kafka를 운영 환경에서 사용한 근거", 0.50d);
         VectorSearchResult belowBoundary = candidate(
                 2L, 2, 2, ChunkSourceType.TEXT_CHUNK,
-                "Kafka를 운영 환경에서 사용한 근거", Math.nextDown(0.50d));
+                "Spring Boot 기반 API를 구현한 근거", Math.nextDown(0.50d));
 
         assertThat(profile.apply("Kafka 근거", List.of(atBoundary)).rejected()).isFalse();
         assertThat(profile.apply("Kafka 근거", List.of(belowBoundary)).rejectionReasons())
@@ -1086,7 +1150,7 @@ class SearchEvaluationCompositeProfileTest {
     }
 
     @Test
-    void generalRelaxationDoesNotChangeCompletedDirectEvidenceGates() {
+    void completedRetrievalKeepsRelevanceAnchorsWithoutTruthGates() {
         VectorSearchResult differentProject = candidate(
                 1L,
                 1,
@@ -1120,6 +1184,9 @@ class SearchEvaluationCompositeProfileTest {
         assertThat(profile.apply("Aurora API를 배포한 날짜가 2024년 11월 8일인지 확인해줘.",
                         List.of(quotedOrRetractedClaim)).rejected())
                 .isTrue();
+        assertThat(profile.apply("Aurora API를 배포한 날짜가 2024년 11월 8일인지 확인해줘.",
+                        List.of(quotedOrRetractedClaim)).rejectionReasons())
+                .contains("MISSING_NUMBER:2024", "MISSING_NUMBER:11");
         assertThat(profile.apply("Kafka 프로젝트에서 구현한 API 하나의 직접 근거를 보여줘.",
                         List.of(compoundIdentifier)).rejected())
                 .isFalse();

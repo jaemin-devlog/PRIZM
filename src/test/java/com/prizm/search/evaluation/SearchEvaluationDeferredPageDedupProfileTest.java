@@ -15,8 +15,8 @@ class SearchEvaluationDeferredPageDedupProfileTest {
             new SearchEvaluationDeferredPageDedupProfile();
 
     @Test
-    void productionPreservesDistinctSamePageEvidenceBeforeEligibility() {
-        VectorSearchResult rejectedRepresentative = pageCandidate(
+    void productionKeepsDistinctRelatedTruthVariantsOnTheSamePage() {
+        VectorSearchResult negatedEvidence = pageCandidate(
                 1L,
                 1,
                 "Redis 경험은 없다.",
@@ -29,13 +29,13 @@ class SearchEvaluationDeferredPageDedupProfileTest {
         String query = "Redis 경험 근거가 있어?";
 
         assertThat(productionProfile.apply(
-                        query, List.of(rejectedRepresentative, eligibleEvidence))
+                        query, List.of(negatedEvidence, eligibleEvidence))
                 .results())
-                .containsExactly(eligibleEvidence);
+                .containsExactly(negatedEvidence, eligibleEvidence);
         assertThat(deferredProfile.apply(
-                        query, List.of(rejectedRepresentative, eligibleEvidence))
+                        query, List.of(negatedEvidence, eligibleEvidence))
                 .results())
-                .containsExactly(eligibleEvidence);
+                .containsExactly(negatedEvidence, eligibleEvidence);
     }
 
     @Test
@@ -60,8 +60,8 @@ class SearchEvaluationDeferredPageDedupProfileTest {
     }
 
     @Test
-    void rejectedCompletedClaimCannotDisplaceValidatedClaimOnTheSamePage() {
-        VectorSearchResult unverifiedRepresentative = pageCandidate(
+    void distinctRelevantReleaseReferencesOnTheSamePageAreBothPreserved() {
+        VectorSearchResult planningReference = pageCandidate(
                 1L,
                 1,
                 "주문 API 출시 이력을 확인하기 위해 배포 여부를 검토했습니다.",
@@ -73,35 +73,35 @@ class SearchEvaluationDeferredPageDedupProfileTest {
                 0.60d);
         String query = "주문 API를 출시한 이력이 있나요?";
 
-        assertThat(productionProfile.apply(query, List.of(unverifiedRepresentative)).rejected())
-                .isTrue();
+        assertThat(productionProfile.apply(query, List.of(planningReference)).rejected())
+                .isFalse();
         assertThat(productionProfile.apply(query, List.of(validatedClaim)).rejected())
                 .isFalse();
         assertThat(deferredProfile.apply(
-                        query, List.of(unverifiedRepresentative, validatedClaim))
+                        query, List.of(planningReference, validatedClaim))
                 .results())
-                .containsExactly(validatedClaim);
+                .containsExactly(planningReference, validatedClaim);
     }
 
     @Test
-    void deferredPageDedupStillRejectsQuestionNegationAndRetractionClaims() {
-        List<String> rejectedContents = List.of(
+    void deferredPageDedupKeepsRelevantQuestionNegationAndRetractionContent() {
+        List<String> relatedContents = List.of(
                 "주문 API를 배포했나요?",
                 "주문 API를 배포하지 않았습니다.",
                 "주문 API를 배포했습니다. 이후 해당 내용을 정정했습니다.");
 
-        for (int index = 0; index < rejectedContents.size(); index++) {
+        for (int index = 0; index < relatedContents.size(); index++) {
             VectorSearchResult candidate = pageCandidate(
                     index + 1L,
                     1,
-                    rejectedContents.get(index),
+                    relatedContents.get(index),
                     0.90d);
 
             assertThat(deferredProfile.apply(
                             "주문 API를 출시한 이력이 있나요?", List.of(candidate))
                     .rejected())
-                    .as(rejectedContents.get(index))
-                    .isTrue();
+                    .as(relatedContents.get(index))
+                    .isFalse();
         }
     }
 

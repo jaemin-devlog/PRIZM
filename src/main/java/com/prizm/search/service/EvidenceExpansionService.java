@@ -211,28 +211,34 @@ public class EvidenceExpansionService {
         if (candidate.selection().numericMatches() > local.selection().numericMatches()) {
             return true;
         }
-        if (candidate.phraseMatches() > local.phraseMatches()) {
+        if (candidate.phraseMatches() > local.phraseMatches()
+                && (!hasCompleteLocalAnchor(local)
+                        || candidate.selection().queryCoverage()
+                        > local.selection().queryCoverage())) {
             return true;
         }
         int coverageGain = candidate.selection().queryCoverage()
                 - local.selection().queryCoverage();
-        if (coverageGain >= 2) {
+        if (coverageGain >= 2 && !hasCompleteLocalAnchor(local)) {
             return true;
         }
         if (local.selection().queryCoverage() == 0
                 && candidate.selection().queryCoverage() > 0
+                && !hasCompleteLocalAnchor(local)
                 && !candidate.summary()) {
             return true;
         }
         if (coverageGain == 0
                 && candidate.selection().queryCoverage() >= 2
                 && candidate.structuredDetail()
+                && !hasCompleteLocalAnchor(local)
                 && !local.structuredDetail()
                 && !candidate.summary()) {
             return true;
         }
         if (coverageGain >= 0
                 && candidate.selection().anchorScore() >= local.selection().anchorScore() + 1_000
+                && !hasCompleteLocalAnchor(local)
                 && !candidate.summary()) {
             return true;
         }
@@ -241,6 +247,15 @@ public class EvidenceExpansionService {
                 && candidate.selection().narrative()
                 && !local.selection().narrative()
                 && !candidate.summary();
+    }
+
+    private static boolean hasCompleteLocalAnchor(ExpansionCandidate local) {
+        SnippetSelection selection = local.selection();
+        return (selection.claimComplete()
+                        && selection.queryCoverage() > 0
+                        && selection.action()
+                        && selection.result())
+                || (selection.metric() && selection.narrative());
     }
 
     private static ExpansionCandidate candidate(

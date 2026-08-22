@@ -274,6 +274,32 @@ class EvidenceExpansionServiceTest {
         verify(repository, never()).findActiveVersionChunks(7L, 10L, 20L);
     }
 
+    @Test
+    void keepsTheSelectedEvidencePageWhenASiblingPageOnlyHasStrongerSurfaceOverlap() {
+        VectorSearchResult result = result(
+                107L,
+                "12,800개 virtual train을 16개 zone에서 실행했다. "
+                        + "leader 중단 뒤 permit 발급 P95는 9.6초에서 2.7초로 줄었고 420개\n"
+                        + "network-partition scenario의 conflicting route permit은 0건이었다.",
+                1,
+                "1페이지");
+        EvidenceChunk sibling = chunk(
+                108L,
+                2,
+                "2페이지",
+                "운행표와 simulator 설정을 배포했다. 이전 파일은 거절하고 운영 절차를 개선했다.");
+        when(repository.findActiveVersionChunks(7L, 10L, 20L)).thenReturn(List.of(sibling));
+
+        EvidencePresentation presentation = service.select(
+                7L,
+                "리더 프로세스가 멈춘 뒤 새 운행 허가를 낼 수 있을 때까지의 시간을 줄였나요?",
+                result);
+
+        assertThat(presentation.evidenceChunkId()).isEqualTo(107L);
+        assertThat(presentation.evidenceSourceLabel()).isEqualTo("1페이지");
+        assertThat(presentation.snippet()).contains("9.6초에서 2.7초로 줄었고");
+    }
+
     private static VectorSearchResult result(
             long chunkId,
             String content,

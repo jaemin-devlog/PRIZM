@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "prizm-p16-dense-floor-matrix-v1",
+  "frozenAt": "2026-08-22T23:49:50.0784549+09:00",
+  "frozenBeforeExecution": true,
+  "caseCount": 24,
+  "positiveCount": 12,
+  "negativeCount": 12,
+  "asset": {
+    "path": "specs/PRZ-016-search-performance-v2/p16-literal-candidate-phase-a/floor-matrix-v1.json",
+    "bytes": 10774,
+    "sha256": "2db0da24057a3aa6bdc4d9bc364bc576383ad7cf1ce9f8b5c5d2b8cdbacd4b42"
+  }
+}

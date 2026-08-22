@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "prizm-p16-unseen-direct-support-safety-gate-v1",
+  "frozenAt": "2026-08-23T00:38:45.0093490+09:00",
+  "frozenBeforeExecution": true,
+  "caseCount": 20,
+  "positiveCount": 10,
+  "negativeCount": 10,
+  "asset": {
+    "path": "specs/PRZ-016-search-performance-v2/p16-literal-candidate-phase-a/unseen-direct-support-gate-v1.json",
+    "bytes": 9408,
+    "sha256": "c9e800075ad257b60ddab7407abc2fdcad067e10206bb580553ba8755708c1c3"
+  }
+}

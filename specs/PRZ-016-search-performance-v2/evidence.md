@@ -17,6 +17,7 @@ truth, benchmark 결과, 실행 시점과 production 구현은 변경하지 않�
 | P5 | 48-query holdout: Top1 50.00%, Recall@3/5 61.11%, MRR@5 0.5509, Negative FPR 25%; `FAIL` |
 | P6 | PostgreSQL lexical+dense+RRF+literal gate shadow: H1 candidate recall 개선 0pp, H2 stress FPR 0%이나 72-query 회귀 5건; `NO_GO` |
 | GPT-J1 | GPT Evidence Judge shadow: Negative FPR 0%이나 완료 positive 회귀 2건·incomplete 4건; `NO_GO` |
+| P16 | Dense Top20 + exact-boundary literal Top20 evaluation path와 12/12 D0 parity·격리는 통과. positive 7개가 모두 Dense rank 1이라 literal-only 복구 0건; `NEEDS_ADJUSTMENT` |
 
 - P0 자산: [dataset](p0-benchmark/evaluation-dataset.json),
   [baseline](p0-benchmark/baseline-results.json),
@@ -29,6 +30,7 @@ truth, benchmark 결과, 실행 시점과 production 구현은 변경하지 않�
 - P6 shadow 평가: [56-item evidence](p6-retrieval-shadow/evidence.md),
   [authoritative raw result](p6-retrieval-shadow/p6-b-results.json)
 - GPT-J1 shadow 평가: [evidence](gpt-evidence-judge-shadow/evidence.md)
+- P16 Literal Candidate Phase A: [evidence](p16-literal-candidate-phase-a/evidence.md)
 
 ## 관리 구조 정리 당시 확인 결과
 

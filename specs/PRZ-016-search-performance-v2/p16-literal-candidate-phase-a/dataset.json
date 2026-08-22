@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "prizm-p16-literal-candidate-phase-a-v2",
+  "primaryOwner": "PRIMARY",
+  "primaryOwnerActiveChunkCount": 88,
+  "distractorGroups": [
+    {
+      "count": 10,
+      "template": "Synthetic cache reliability case {index}: concurrent requests shared session state, controlled duplicate writes, and measured retry behavior in a backend service."
+    },
+    {
+      "count": 10,
+      "template": "Synthetic Java service case {index}: dependency injection, transactional boundaries, HTTP request validation, and application startup checks were documented."
+    },
+    {
+      "count": 10,
+      "template": "Synthetic desktop delivery case {index}: a compact native shell packaged a web interface, file access, update checks, and cross-platform release artifacts."
+    },
+    {
+      "count": 10,
+      "template": "Synthetic JavaScript runtime case {index}: package installation, fast local scripts, test execution, bundling, and developer feedback loops were evaluated."
+    },
+    {
+      "count": 10,
+      "template": "Synthetic workflow graph case {index}: state transitions, conditional edges, tool calls, checkpoints, and recovery paths were exercised."
+    },
+    {
+      "count": 10,
+      "template": "Synthetic engine architecture case {index}: an internal processing engine coordinated plugins, queues, adapters, scheduling, and deterministic failure recovery."
+    },
+    {
+      "count": 10,
+      "template": "Synthetic career evidence case {index}: immutable versions, owner boundaries, source locations, search candidates, and audit traces were reviewed."
+    },
+    {
+      "count": 10,
+      "template": "Synthetic operations case {index}: telemetry, rollout controls, incident notes, capacity limits, and service restoration steps were recorded."
+    }
+  ],
+  "primaryActiveTargets": [
+    {
+      "key": "redis",
+      "content": "Synthetic project note: the team used REDIS for a bounded cache and verified expiration behavior without relying on personal production data."
+    },
+    {
+      "key": "spring-boot",
+      "content": "Synthetic project note: Spring Boot provided the application boundary, dependency injection, and test profile configuration."
+    },
+    {
+      "key": "tauri",
+      "content": "Synthetic project note: Tauri wrapped a small desktop reference interface and exposed only a constrained local command surface."
+    },
+    {
+      "key": "bun",
+      "content": "Synthetic project note: Bun executed a disposable build script while the benchmark recorded the exact tool name as evidence."
+    },
+    {
+      "key": "langgraph",
+      "content": "Synthetic project note: LangGraph represented a stateful evaluation workflow with explicit transitions and terminal states."
+    },
+    {
+      "key": "fooengine",
+      "content": "This long synthetic career note describes planning meetings, ownership reviews, immutable records, queue recovery, adapter boundaries, release documentation, test fixtures, failure classification, operational handoff, and reproducible audits. The note intentionally carries broad unrelated context so a literal identifier is only one small observation. At the end of the experiment the author recorded that FooEngine was used as the internal plugin host."
+    },
+    {
+      "key": "quartz-harbor-mesh",
+      "content": "This long synthetic portfolio entry covers document intake, version preservation, chunk metadata, source labels, search diagnostics, user isolation, deployment notes, rollback preparation, monitoring, and test evidence. It contains no real person or employer. One small implementation detail states that Quartz Harbor Mesh coordinated the disposable routing experiment."
+    }
+  ],
+  "primaryInactiveOnly": {
+    "key": "dormant-graph",
+    "content": "DormantGraph appeared only in the superseded synthetic version."
+  },
+  "primaryActiveReplacement": {
+    "key": "active-replacement",
+    "content": "The current synthetic version intentionally omits the superseded identifier."
+  },
+  "otherOwnerActive": [
+    {
+      "key": "foreign-only-stack",
+      "content": "ForeignOnlyStack exists only in the other synthetic owner's active document."
+    },
+    {
+      "key": "fooengine-x",
+      "content": "The other synthetic owner recorded FooEngineX as a near-miss identifier."
+    },
+    {
+      "key": "bundle",
+      "content": "The other synthetic owner evaluated Bundle tooling as a near-miss identifier."
+    }
+  ],
+  "queries": [
+    {"id": "P01", "owner": "PRIMARY", "query": "redis", "expectedKey": "redis", "caseVariant": true},
+    {"id": "P02", "owner": "PRIMARY", "query": "Spring Boot", "expectedKey": "spring-boot"},
+    {"id": "P03", "owner": "PRIMARY", "query": "Tauri", "expectedKey": "tauri"},
+    {"id": "P04", "owner": "PRIMARY", "query": "Bun", "expectedKey": "bun"},
+    {"id": "P05", "owner": "PRIMARY", "query": "LangGraph", "expectedKey": "langgraph"},
+    {"id": "P06", "owner": "PRIMARY", "query": "FooEngine", "expectedKey": "fooengine"},
+    {"id": "P07", "owner": "PRIMARY", "query": "Quartz Harbor Mesh", "expectedKey": "quartz-harbor-mesh"},
+    {"id": "N01", "owner": "PRIMARY", "query": "AbsentNimbus", "safety": "ABSENT"},
+    {"id": "N02", "owner": "PRIMARY", "query": "ForeignOnlyStack", "safety": "OTHER_OWNER_ONLY"},
+    {"id": "N03", "owner": "PRIMARY", "query": "DormantGraph", "safety": "INACTIVE_ONLY"},
+    {"id": "N04", "owner": "OTHER", "query": "FooEngine", "safety": "EXACT_BOUNDARY"},
+    {"id": "N05", "owner": "OTHER", "query": "Bun", "safety": "SHORT_BOUNDARY"}
+  ]
+}

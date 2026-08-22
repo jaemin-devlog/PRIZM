@@ -3,9 +3,14 @@ package com.prizm.search.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -266,6 +271,69 @@ class SearchServiceTest {
     }
 
     @Test
+    void defaultProfileReturnsTruthVariantsAndDropsUnrelatedContentByRelevanceAnchor() {
+        SearchService optInService = defaultSearchService();
+        float[] embedding = nonZeroEmbedding();
+        String query = "Kafka";
+        VectorSearchResult affirmative = new VectorSearchResult(
+                241L,
+                101L,
+                201L,
+                "Kafka 메시징 검토 기록",
+                1,
+                7,
+                7,
+                ChunkSourceType.PAGE,
+                7,
+                "7페이지",
+                "시스템의 메시징 구성을 검토했다. Kafka를 사용해 메시징 시스템을 구현했다.",
+                0.14d,
+                0.86d);
+        VectorSearchResult notUsed = careerEvidenceCandidate(
+                242L, 102L, 202L, "Kafka 미도입 기록", "Kafka를 사용하지 않았다.", 0.84d);
+        VectorSearchResult reviewed = careerEvidenceCandidate(
+                243L, 103L, 203L, "Kafka 검토 기록", "Kafka 도입을 검토했다.", 0.82d);
+        VectorSearchResult otherActor = careerEvidenceCandidate(
+                244L, 104L, 204L, "협업 기록", "다른 팀이 Kafka를 사용했다.", 0.80d);
+        VectorSearchResult unrelated = careerEvidenceCandidate(
+                245L,
+                105L,
+                205L,
+                "백엔드 최적화 기록",
+                "Spring Boot 기반 API를 구현했고 PostgreSQL 인덱스를 최적화했다.",
+                0.90d);
+        when(embeddingService.embed(query)).thenReturn(embedding);
+        when(vectorSearchRepository.findCareerEvidenceCandidates(7L, embedding))
+                .thenReturn(List.of(unrelated, affirmative, notUsed, reviewed, otherActor));
+
+        CareerEvidenceSearchV2Response result = optInService.searchCareerEvidenceV2(7L, query);
+
+        assertThat(result.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+        assertThat(result.results())
+                .extracting(CareerEvidenceSearchResponse::chunkId)
+                .containsExactlyInAnyOrder(241L, 242L, 243L, 244L);
+        assertThat(result.results())
+                .extracting(CareerEvidenceSearchResponse::chunkId)
+                .doesNotContain(245L);
+        CareerEvidenceSearchResponse pageResult = result.results().stream()
+                .filter(candidate -> candidate.chunkId().equals(241L))
+                .findFirst()
+                .orElseThrow();
+        assertThat(pageResult.documentId()).isEqualTo(101L);
+        assertThat(pageResult.documentVersionId()).isEqualTo(201L);
+        assertThat(pageResult.documentTitle()).isEqualTo("Kafka 메시징 검토 기록");
+        assertThat(pageResult.content()).contains("Kafka를 사용해 메시징 시스템을 구현했다.");
+        assertThat(pageResult.snippet()).contains("Kafka");
+        assertThat(pageResult.sourceType()).isEqualTo(ChunkSourceType.PAGE);
+        assertThat(pageResult.sourceIndex()).isEqualTo(7);
+        assertThat(pageResult.sourceLabel()).isEqualTo("7페이지");
+        assertThat(pageResult.evidenceSourceType()).isEqualTo(ChunkSourceType.PAGE);
+        assertThat(pageResult.evidenceSourceIndex()).isEqualTo(7);
+        assertThat(pageResult.evidenceSourceLabel()).isEqualTo("7페이지");
+        verify(vectorSearchRepository).findCareerEvidenceCandidates(7L, embedding);
+    }
+
+    @Test
     void strongIdentifierGuardRejectsAbsentTechnologyWithoutInspectingAnotherOwner() {
         SearchService optInService = defaultSearchService();
         float[] embedding = nonZeroEmbedding();
@@ -379,7 +447,7 @@ class SearchServiceTest {
     }
 
     @Test
-    void defaultGeneralProfileReportsNoRelevantResultsWhenActiveCandidatesFailEligibility() {
+    void defaultGeneralProfileRescuesAnExactIdentifierBelowTheDenseFloor() {
         SearchService optInService = defaultSearchService();
         float[] embedding = nonZeroEmbedding();
         VectorSearchResult belowDenseFloor = careerEvidenceCandidate(
@@ -391,8 +459,47 @@ class SearchServiceTest {
         CareerEvidenceSearchV2Response result =
                 optInService.searchCareerEvidenceV2(7L, "Redis experience");
 
-        assertThat(result.state()).isEqualTo(CareerEvidenceSearchState.NO_RELEVANT_RESULTS);
-        assertThat(result.results()).isEmpty();
+        assertThat(result.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+        assertThat(result.results())
+                .extracting(CareerEvidenceSearchResponse::chunkId)
+                .containsExactly(33L);
+    }
+
+    @Test
+    void defaultProfileRescuesFrozenV3ExactIdentifierAnchorsBelowTheDenseFloor() {
+        SearchService optInService = defaultSearchService();
+        List<ShortRescueCase> scenarios = List.of(
+                new ShortRescueCase(
+                        "Tauri",
+                        "검토용 reference shell은 Tauri 기반으로 구성했다.",
+                        0.337798d),
+                new ShortRescueCase(
+                        "Quartz Harbor Mesh",
+                        "격리된 라우팅 fixture는 Quartz Harbor Mesh 기반으로 기록했다.",
+                        0.442412d));
+
+        long chunkId = 340L;
+        int embeddingIndex = 1;
+        for (ShortRescueCase scenario : scenarios) {
+            float[] embedding = nonZeroEmbedding();
+            embedding[embeddingIndex++] = 1.0f;
+            VectorSearchResult candidate = careerEvidenceCandidate(
+                    chunkId, scenario.content(), scenario.score());
+            when(embeddingService.embed(scenario.query())).thenReturn(embedding);
+            when(vectorSearchRepository.findCareerEvidenceCandidates(7L, embedding))
+                    .thenReturn(List.of(candidate));
+
+            CareerEvidenceSearchV2Response result =
+                    optInService.searchCareerEvidenceV2(7L, scenario.query());
+
+            assertThat(result.state()).as(scenario.query())
+                    .isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+            assertThat(result.results()).as(scenario.query())
+                    .extracting(CareerEvidenceSearchResponse::chunkId)
+                    .containsExactly(chunkId);
+            verify(vectorSearchRepository).findCareerEvidenceCandidates(7L, embedding);
+            chunkId++;
+        }
     }
 
     @Test
@@ -405,7 +512,7 @@ class SearchServiceTest {
         String fallbackQuery = "Project Atlas 수행 경험";
         VectorSearchResult belowFloor = careerEvidenceCandidate(
                 210L,
-                "Project Atlas에서 Outbox 기반 알림 처리를 구현했습니다.",
+                "일반적인 Outbox 기반 알림 처리 초안을 기록했습니다.",
                 0.48d);
         VectorSearchResult direct = careerEvidenceCandidate(
                 211L,
@@ -424,6 +531,52 @@ class SearchServiceTest {
         assertThat(result.results())
                 .extracting(CareerEvidenceSearchResponse::chunkId)
                 .containsExactly(211L);
+        verify(vectorSearchRepository).findCareerEvidenceCandidates(7L, originalEmbedding);
+        verify(vectorSearchRepository).findCareerEvidenceCandidates(7L, fallbackEmbedding);
+    }
+
+    @Test
+    void bareIdentifierFallbackUsesTheVariantOnlyForRetrieval() {
+        CompositeSearchProfile profile = spy(new CompositeSearchProfile());
+        SearchSnippetGenerator snippetGenerator = mock(SearchSnippetGenerator.class);
+        SearchService optInService = new SearchService(
+                embeddingService,
+                new EmbeddingValidator(1024),
+                vectorSearchRepository,
+                new SearchProperties(SearchProperties.DEFAULT_PROFILE),
+                profile,
+                evidenceExpansionService(snippetGenerator));
+        float[] originalEmbedding = nonZeroEmbedding();
+        float[] fallbackEmbedding = nonZeroEmbedding();
+        fallbackEmbedding[1] = 1.0f;
+        String originalQuery = "Helidon";
+        String retrievalVariant = "Helidon 경험";
+        VectorSearchResult belowFloor = careerEvidenceCandidate(
+                214L, "일반적인 API 구현 기록", 0.48d);
+        VectorSearchResult retrieved = careerEvidenceCandidate(
+                215L, "Helidon 기반 API 구현 기록", 0.72d);
+        when(embeddingService.embed(originalQuery)).thenReturn(originalEmbedding);
+        when(embeddingService.embed(retrievalVariant)).thenReturn(fallbackEmbedding);
+        when(vectorSearchRepository.findCareerEvidenceCandidates(7L, originalEmbedding))
+                .thenReturn(List.of(belowFloor));
+        when(vectorSearchRepository.findCareerEvidenceCandidates(7L, fallbackEmbedding))
+                .thenReturn(List.of(retrieved));
+        when(snippetGenerator.selectForLocalization(originalQuery, retrieved.content()))
+                .thenReturn(directSelection(retrieved.content()));
+
+        CareerEvidenceSearchV2Response result =
+                optInService.searchCareerEvidenceV2(7L, originalQuery);
+
+        assertThat(result.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+        assertThat(result.results())
+                .extracting(CareerEvidenceSearchResponse::chunkId)
+                .containsExactly(215L);
+        verify(profile, atLeastOnce()).apply(eq(originalQuery), anyList());
+        verify(profile, never()).apply(eq(retrievalVariant), anyList());
+        verify(snippetGenerator).selectForLocalization(originalQuery, retrieved.content());
+        verify(snippetGenerator, never()).selectForLocalization(
+                eq(retrievalVariant),
+                eq(retrieved.content()));
         verify(vectorSearchRepository).findCareerEvidenceCandidates(7L, originalEmbedding);
         verify(vectorSearchRepository).findCareerEvidenceCandidates(7L, fallbackEmbedding);
     }
@@ -534,6 +687,42 @@ class SearchServiceTest {
     }
 
     @Test
+    void millisecondNearMissRejectsAnOtherwiseEligibleDenseCandidate() {
+        SearchService optInService = defaultSearchService();
+        float[] embedding = nonZeroEmbedding();
+        String query = "동일 견적 replay의 세 자릿수 지연 값이 340ms였다고 볼 자료가 있어?";
+        VectorSearchResult neighboringNumber = careerEvidenceCandidate(
+                243L, "동일 부하 조건에서 견적 API P95는 1.4초에서 380밀리초로 줄었다.", 0.534388d);
+        when(embeddingService.embed(anyString())).thenReturn(embedding);
+        when(vectorSearchRepository.findCareerEvidenceCandidates(7L, embedding))
+                .thenReturn(List.of(neighboringNumber));
+
+        CareerEvidenceSearchV2Response result = optInService.searchCareerEvidenceV2(7L, query);
+
+        assertThat(result.state()).isEqualTo(CareerEvidenceSearchState.NO_RELEVANT_RESULTS);
+        assertThat(result.results()).isEmpty();
+    }
+
+    @Test
+    void exactMillisecondEvidenceKeepsAnOtherwiseEligibleDenseCandidate() {
+        SearchService optInService = defaultSearchService();
+        float[] embedding = nonZeroEmbedding();
+        String query = "응답 시간이 340ms였다는 자료를 찾아줘.";
+        VectorSearchResult exactNumber = careerEvidenceCandidate(
+                244L, "장애 대응 후 응답 시간이 340 ms로 줄었다.", 0.534388d);
+        when(embeddingService.embed(query)).thenReturn(embedding);
+        when(vectorSearchRepository.findCareerEvidenceCandidates(7L, embedding))
+                .thenReturn(List.of(exactNumber));
+
+        CareerEvidenceSearchV2Response result = optInService.searchCareerEvidenceV2(7L, query);
+
+        assertThat(result.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+        assertThat(result.results())
+                .extracting(CareerEvidenceSearchResponse::chunkId)
+                .containsExactly(244L);
+    }
+
+    @Test
     void defaultGeneralProfileRescuesValidatedShortExactTokensAndKeepsOriginalScores() {
         SearchService optInService = defaultSearchService();
         float[] embedding = nonZeroEmbedding();
@@ -599,7 +788,7 @@ class SearchServiceTest {
     }
 
     @Test
-    void defaultCompletedReleaseProfileAllowsDirectClaimSupportBelowDenseFloor() {
+    void defaultCompletedReleaseProfileAllowsExactIdentifierAnchorBelowDenseFloor() {
         SearchService optInService = defaultSearchService();
         float[] embedding = nonZeroEmbedding();
         String query = "PRIZM 서비스를 배포했나요?";
@@ -621,7 +810,7 @@ class SearchServiceTest {
     }
 
     @Test
-    void defaultCompletedReleaseProfileReportsNoEvidenceWhenClaimGateRejectsActiveCandidate() {
+    void defaultCompletedReleaseProfileReturnsRelatedQuestionContentWithoutTruthJudgment() {
         SearchService optInService = defaultSearchService();
         float[] embedding = nonZeroEmbedding();
         VectorSearchResult questionOnly = careerEvidenceCandidate(
@@ -633,8 +822,10 @@ class SearchServiceTest {
         CareerEvidenceSearchV2Response result =
                 optInService.searchCareerEvidenceV2(7L, "주문 API를 출시했나요?");
 
-        assertThat(result.state()).isEqualTo(CareerEvidenceSearchState.NO_EVIDENCE);
-        assertThat(result.results()).isEmpty();
+        assertThat(result.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+        assertThat(result.results())
+                .extracting(CareerEvidenceSearchResponse::chunkId, CareerEvidenceSearchResponse::content)
+                .containsExactly(tuple(34L, "주문 API를 배포했나요?"));
     }
 
     @Test

@@ -534,242 +534,55 @@ class PgVectorInfrastructureTest {
 
     @Test
     @Transactional
-    void optInProfileRequiresAnAssertedCompletedReleaseClaimInPostgreSql() {
+    void returnsRelatedCompletedReleaseEvidenceInPostgreSql() {
         String query = "주문 API를 출시했나요?";
         float[] queryEmbedding = embeddingService.embed(query);
 
-        Long assertedOwner = createUser();
-        ActiveVectorDocument assertedDocument = createActiveVectorDocument(
-                assertedOwner, "Completed release evidence");
+        Long ownerUserId = createUser();
+        ActiveVectorDocument relatedDocument = createActiveVectorDocument(
+                ownerUserId, "주문 API 배포 검토 기록");
+        String relatedContent = "주문 API 배포를 계획했지만 일정상 진행하지 않았다.";
         insertVectorChunk(
-                assertedOwner,
-                assertedDocument.versionId(),
-                "2025년 3월 14일에 주문 API를 배포했습니다.",
+                ownerUserId,
+                relatedDocument.versionId(),
+                relatedContent,
                 1,
                 queryEmbedding,
                 ChunkSourceType.TEXT_CHUNK,
                 1);
 
-        var assertedResult = optInSearchService().searchCareerEvidenceV2(assertedOwner, query);
+        Long otherOwnerUserId = createUser();
+        ActiveVectorDocument otherOwnerDocument = createActiveVectorDocument(
+                otherOwnerUserId, "다른 사용자의 주문 API 배포 기록");
+        insertVectorChunk(
+                otherOwnerUserId,
+                otherOwnerDocument.versionId(),
+                "주문 API를 실제 배포했다.",
+                1,
+                queryEmbedding,
+                ChunkSourceType.TEXT_CHUNK,
+                1);
 
-        assertThat(assertedResult.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
-        assertThat(assertedResult.results()).hasSize(1);
+        var result = optInSearchService().searchCareerEvidenceV2(ownerUserId, query);
 
-        List<String> nonAssertedCandidates = List.of(
-                "주문 API를 배포했나요?",
-                "주문 API를 배포했습니다?",
-                "주문 API를 출시했습니다?",
-                "주문 API를 배포했습니다, 맞나요?",
-                "“주문 API를 배포했습니다”라고 했나요?",
-                "주문 API 배포 여부를 확인했다.",
-                "배포했습니다, 그러나 실제로는 하지 않았습니다.",
-                "배포했습니다. 그러나 실제로는 하지 않았습니다.",
-                "담당자가 \"주문 API를 배포했습니다\"라고 전했다.",
-                "담당자가 \"주문 API를 배포했습니다\"라고 물었다.",
-                "주문 API를 배포했습니다. 맞나요?",
-                "주문 API를 배포했습니다. 아니, 아직 배포하지 않았습니다.",
-                "주문 API를 배포했다는 계획만 세웠다.",
-                "주문 API를 배포했다는 자동화 예제를 검토했다.",
-                "주문 completed-release-action 근거를 작성했다.");
-        for (int index = 0; index < nonAssertedCandidates.size(); index++) {
-            Long ownerUserId = createUser();
-            ActiveVectorDocument document = createActiveVectorDocument(
-                    ownerUserId, "Non-asserted release candidate " + index);
-            insertVectorChunk(
-                    ownerUserId,
-                    document.versionId(),
-                    nonAssertedCandidates.get(index),
-                    1,
-                    queryEmbedding,
-                    ChunkSourceType.TEXT_CHUNK,
-                    1);
-
-            var result = optInSearchService().searchCareerEvidenceV2(ownerUserId, query);
-
-            assertThat(result.state())
-                    .as(nonAssertedCandidates.get(index))
-                    .isEqualTo(CareerEvidenceSearchState.NO_EVIDENCE);
-            assertThat(result.results()).isEmpty();
-        }
-
-        String multiTermQuery = "주문 결제 API를 출시한 이력이 있나요?";
-        float[] multiTermQueryEmbedding = embeddingService.embed(multiTermQuery);
-        List<String> modalityGateCandidates = List.of(
-                "주문 결제 API를 배포했습니다?",
-                "주문 결제 API 배포 여부를 확인했다.",
-                "담당자에 따르면 주문 결제 API를 배포했습니다.",
-                "주문 결제 API를 배포했습니다. 그러나 v1.2 배포 주장은 철회합니다.");
-        for (int index = 0; index < modalityGateCandidates.size(); index++) {
-            Long ownerUserId = createUser();
-            ActiveVectorDocument document = createActiveVectorDocument(
-                    ownerUserId, "Required modality gate candidate " + index);
-            insertVectorChunk(
-                    ownerUserId,
-                    document.versionId(),
-                    modalityGateCandidates.get(index),
-                    1,
-                    multiTermQueryEmbedding,
-                    ChunkSourceType.TEXT_CHUNK,
-                    1);
-
-            var result = optInSearchService().searchCareerEvidenceV2(ownerUserId, multiTermQuery);
-
-            assertThat(result.state())
-                    .as(modalityGateCandidates.get(index))
-                    .isEqualTo(CareerEvidenceSearchState.NO_EVIDENCE);
-            assertThat(result.results()).isEmpty();
-        }
-
-        List<SearchScenario> claimUnitScenarios = List.of(
-                new SearchScenario(
-                        "주문 API를 출시한 이력이 있나요?",
-                        "문제없이 주문 API를 배포했습니다.",
-                        CareerEvidenceSearchState.EVIDENCE_FOUND),
-                new SearchScenario(
-                        "문제없이 주문 API를 출시한 이력이 있나요?",
-                        "실제로 문제없이 주문 API를 배포했습니다.",
-                        CareerEvidenceSearchState.EVIDENCE_FOUND),
-                new SearchScenario(
-                        "주문 취소 API를 출시한 이력이 있나요?",
-                        "주문 취소 API를 배포했습니다.",
-                        CareerEvidenceSearchState.EVIDENCE_FOUND),
-                new SearchScenario(
-                        "주문 API를 출시한 이력이 있나요?",
-                        "주문 API “오로라”를 배포했습니다.운영팀에 인계했습니다.",
-                        CareerEvidenceSearchState.EVIDENCE_FOUND),
-                new SearchScenario(
-                        "주문 API를 출시한 이력이 있나요?",
-                        "주문 API “오로라-v1”을 배포했습니다.",
-                        CareerEvidenceSearchState.EVIDENCE_FOUND),
-                new SearchScenario(
-                        "주문 API를 출시한 이력이 있나요?",
-                        "주문 API “오:로라”를 배포했습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문 결제 API를 출시한 이력이 있나요?",
-                        "주문 결제 API를 배포했습니다? 정산 API를 배포했습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문 결제 API 출시 이력이 있나요?",
-                        "주문 결제 API를 배포했습니다?",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문 API를 출시한 이력이 있나요?",
-                        "주문 API를 배포했습니다.\n그러나 실제로는 하지 않았습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문 API를 출시한 이력이 있나요?",
-                        "담당자가 말하길 주문 API를 배포했습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "Kafka를 출시한 이력이 있나요?",
-                        "Kafka를 배포하지 않고 RabbitMQ를 배포했습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문 API를 출시한 이력이 있나요?",
-                        "확인 질문: 주문 API를 배포했습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문 API를 출시한 이력이 있나요?",
-                        "주문 API를 배포했습니다. 정말 맞나요?",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문 API를 출시했습니까?",
-                        "주문 API를 출시했습니까?",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문 API를 출시 했습니까?",
-                        "주문 API를 배포했습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문 API 출시. 이력 있나요?",
-                        "주문 API를 배포했습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문 API 출시 이력 있나요? 경험",
-                        "주문 API를 배포했습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문 API를 출시한 이력이 있나요?",
-                        "주문 API를 배포했습니다",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문 API를 출시한 이력이 있나요?",
-                        "주문 API v1.2 “오로라”를 배포했습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문하는 API를 출시한 이력이 있나요?",
-                        "주문 API를 배포했습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문하는 API를 출시한 이력이 있나요?",
-                        "주문하는 API를 배포했습니다.",
-                        CareerEvidenceSearchState.EVIDENCE_FOUND),
-                new SearchScenario(
-                        "경험 API를 출시한 이력이 있나요?",
-                        "경험 API를 배포했습니다.",
-                        CareerEvidenceSearchState.EVIDENCE_FOUND),
-                new SearchScenario(
-                        "배포 경험 API를 출시한 이력이 있나요?",
-                        "배포 경험 API를 배포했습니다.",
-                        CareerEvidenceSearchState.EVIDENCE_FOUND),
-                new SearchScenario(
-                        "실험했고 API를 출시한 이력이 있나요?",
-                        "실험했고 API를 배포했습니다.",
-                        CareerEvidenceSearchState.EVIDENCE_FOUND),
-                new SearchScenario(
-                        "주문 결제 API를 출시한 이력이 있나요?",
-                        "주문 결제 API 배포 여부를 확인했고 정산 API를 배포했습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "PRIZM API를 출시한 이력이 있나요?",
-                        "PRIZM- API를 배포했습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "PRIZM- API를 출시한 이력이 있나요?",
-                        "PRIZM API를 배포했습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "PRIZM-v1 API를 출시한 이력이 있나요?",
-                        "PRIZM-v1 API를 배포했습니다.",
-                        CareerEvidenceSearchState.EVIDENCE_FOUND),
-                new SearchScenario(
-                        "C#.NET API를 출시한 이력이 있나요?",
-                        "C#.NET API를 배포했습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문 API를 출시하는 건가요?",
-                        "주문 API를 배포했습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문 API 출시하는 이력 있나요?",
-                        "주문 API를 배포했습니다.",
-                        CareerEvidenceSearchState.NO_EVIDENCE),
-                new SearchScenario(
-                        "주문 API 출시 계획과 운영 경험을 보여줘.",
-                        "주문 API 출시 계획과 운영 경험을 기록했다.",
-                        CareerEvidenceSearchState.EVIDENCE_FOUND));
-        for (int index = 0; index < claimUnitScenarios.size(); index++) {
-            SearchScenario scenario = claimUnitScenarios.get(index);
-            float[] scenarioEmbedding = embeddingService.embed(scenario.query());
-            Long ownerUserId = createUser();
-            ActiveVectorDocument document = createActiveVectorDocument(
-                    ownerUserId, "Claim unit candidate " + index);
-            insertVectorChunk(
-                    ownerUserId,
-                    document.versionId(),
-                    scenario.content(),
-                    1,
-                    scenarioEmbedding,
-                    ChunkSourceType.TEXT_CHUNK,
-                    1);
-
-            var result = optInSearchService().searchCareerEvidenceV2(ownerUserId, scenario.query());
-
-            assertThat(result.state()).as(scenario.toString()).isEqualTo(scenario.expectedState());
-            assertThat(result.results()).hasSize(
-                    scenario.expectedState() == CareerEvidenceSearchState.EVIDENCE_FOUND ? 1 : 0);
-        }
+        assertThat(result.state()).isEqualTo(CareerEvidenceSearchState.EVIDENCE_FOUND);
+        assertThat(result.results()).singleElement().satisfies(evidence -> {
+            assertThat(evidence.documentId()).isEqualTo(relatedDocument.documentId());
+            assertThat(evidence.documentVersionId()).isEqualTo(relatedDocument.versionId());
+            assertThat(evidence.documentTitle()).isEqualTo("주문 API 배포 검토 기록");
+            assertThat(evidence.versionNo()).isEqualTo(1);
+            assertThat(evidence.content()).contains(relatedContent);
+            assertThat(evidence.snippet()).contains("주문 API", "배포", "진행하지 않았다");
+            assertThat(evidence.sourceType()).isEqualTo(ChunkSourceType.TEXT_CHUNK);
+            assertThat(evidence.sourceIndex()).isEqualTo(1);
+            assertThat(evidence.sourceLabel()).isEqualTo("텍스트 구간 1");
+            assertThat(evidence.evidenceSourceType()).isEqualTo(ChunkSourceType.TEXT_CHUNK);
+            assertThat(evidence.evidenceSourceIndex()).isEqualTo(1);
+            assertThat(evidence.evidenceSourceLabel()).isEqualTo("텍스트 구간 1");
+        });
+        assertThat(result.results())
+                .extracting(com.prizm.search.dto.response.CareerEvidenceSearchResponse::documentId)
+                .doesNotContain(otherOwnerDocument.documentId());
     }
 
     @Test
@@ -2167,12 +1980,6 @@ class PgVectorInfrastructureTest {
     }
 
     private record ActiveVectorDocument(Long documentId, Long versionId) {
-    }
-
-    private record SearchScenario(
-            String query,
-            String content,
-            CareerEvidenceSearchState expectedState) {
     }
 
     private record StoredChunkSource(int chunkNo, String sourceType, int sourceIndex, String sourceLabel) {

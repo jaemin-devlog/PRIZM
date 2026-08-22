@@ -268,6 +268,59 @@ class SearchSnippetGeneratorTest {
                 "조건에 맞는 675건만 선별해 갱신했다.");
     }
 
+    @Test
+    void localizesFrozenHardWrappedMetricAndSnapshotEvidence() {
+        assertRepresentativeSelection(
+                "리더 프로세스가 멈춘 뒤 새 운행 허가를 낼 수 있을 때까지의 시간을 줄였나요?",
+                "12,800개 virtual train을 16개 zone에서 실행했다. leader 중단 뒤 permit 발급 P95는 "
+                        + "9.6초에서 2.7초로 줄었고 420개\n"
+                        + "network-partition scenario의 conflicting route permit은 0건이었다.",
+                "leader 중단 뒤 permit 발급 P95는 9.6초에서 2.7초로 줄었고");
+        assertRepresentativeSelection(
+                "월별 정산 파일이 어느 시점의 권리 상태로 계산됐는지 나중에 재현할 수 있게 했나요?",
+                "월별 18,600개 statement export를 운영하고 catalog snapshot id로 계산 기준을 재현했다. "
+                        + "이 수치는 검색 record 수나 검색 latency와 별도 지표로 관리했다.\n"
+                        + "• 재실행 가능한 immutable snapshot",
+                "catalog snapshot id로 계산 기준을 재현했다.");
+    }
+
+    @Test
+    void prefersTheQuerySpecificProblemEvidenceOverUnrelatedStateOrMetricWindows() {
+        assertRepresentativeSelection(
+                "현장 계근기가 연결을 되찾은 뒤 완료 신호를 거듭 보내도 전표가 늘어나지 않게 한 방법이 궁금해.",
+                "[03. 중복 전표 방지]\n"
+                        + "계근 callback에는 장비가 생성한 source_ticket_id가 있었다. "
+                        + "consumer는 이 값을 owner 거점과 함께 inbox table의 unique key로 저장한 뒤에만 "
+                        + "shipment 상태를 바꿨다. "
+                        + "같은 callback이 다시 도착하면 이미 처리된 inbox row를 확인하고 성공 응답만 반환했다.\n\n"
+                        + "운영자는 특정 전표가 만들어진 시점의 규칙을 재구성할 수 있었고, "
+                        + "잘못 배포된 단가표는 과거 row를 복사해 새 유효 구간으로 되돌렸다.",
+                "source_ticket_id가 있었다.");
+        assertRepresentativeSelection(
+                "깨진 위성 파일이 모자이크와 공개 목록에 섞이기 전에 차단한 경험이 있어?",
+                "작은 중간 파일은 모자이크 완료 시점에 병합했다. "
+                        + "동일한 40-node 조건에서 end-to-end 처리 시간은 138분에서 41분으로 줄었다.\n\n"
+                        + "오류가 있는 package 전체를 버리지는 않았지만, "
+                        + "격리된 scene은 모자이크 계산과 공개 catalog에 들어갈 수 없었다.",
+                "격리된 scene은 모자이크 계산과 공개 catalog에 들어갈 수 없었다.");
+    }
+
+    @Test
+    void usesTheRelevantSectionBodyInsteadOfAQueryMatchingDocumentTitle() {
+        assertRepresentativeSelection(
+                "이전 제어기가 늦게 보낸 운행 허가를 장비 쪽에서 알아보고 거절하게 했어?",
+                "PRIZM P7-A v2 합성 포트폴리오 — SYN2-U03\n"
+                        + "RailPulse Lab: 운행 허가 명령의 세대 구분과 망 분할 시험\n\n"
+                        + "[DECISION 01 — 명령 모델]\n"
+                        + "RailPulse Lab은 실제 열차를 제어하지 않는 interlocking simulator다. "
+                        + "Go control plane이 route permit 요청을 기록했다. "
+                        + "permit에는 controller가 발급한 permit_epoch가 포함됐다. "
+                        + "simulator node는 마지막으로 수락한 epoch보다 작은 명령을 실행하지 않았다.\n\n"
+                        + "[DECISION 02 — 재전달]\n"
+                        + "같은 명령의 두 번째 전달은 이전 결과를 돌려줬다.",
+                "마지막으로 수락한 epoch보다 작은 명령을 실행하지 않았다.");
+    }
+
     private void assertRepresentativeSelection(String query, String content, String expectedSentence) {
         String snippet = generator.generate(query, content);
 

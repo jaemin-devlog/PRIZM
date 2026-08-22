@@ -15,9 +15,13 @@ import com.prizm.ingestion.service.TextChunker;
 import com.prizm.search.evaluation.trace.ProductionSearchDecisionTracer;
 import com.prizm.search.evaluation.trace.SearchDecisionTrace;
 import com.prizm.search.profile.CompositeSearchProfile;
+import com.prizm.search.profile.NaturalLanguageQueryFallback;
+import com.prizm.search.profile.NumericQueryAnchors;
 import com.prizm.search.repository.VectorSearchRepository;
 import com.prizm.search.service.EvidenceExpansionService;
 import com.prizm.search.service.SearchService;
+import com.prizm.search.service.SearchSnippetGenerator;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -63,6 +67,11 @@ class P7BDecisionTraceValidationTest {
             "V2-U02-IP02", "V2-U02-NI01", "V2-U02-CN01", "V2-U02-CN02",
             "V2-U03-NI01", "V2-U04-D01", "V2-U04-D02", "V2-U04-IP01",
             "V2-U04-NI01", "V2-U04-CN02");
+    private static final Set<String> NATURAL_LANGUAGE_FLOOR_LOSS_IDS = Set.of(
+            "V2-U01-N02", "V2-U02-N02", "V2-U04-IP01");
+    private static final Set<String> LOCALIZATION_FAILURE_IDS = Set.of(
+            "V2-U01-NV01", "V2-U01-CN01", "V2-U02-IP02",
+            "V2-U03-NV01", "V2-U03-IP01", "V2-U04-CN02");
     private static final DockerImageName PGVECTOR_IMAGE = DockerImageName
             .parse("pgvector/pgvector:0.8.2-pg16-bookworm")
             .asCompatibleSubstituteFor("postgres");
@@ -91,6 +100,7 @@ class P7BDecisionTraceValidationTest {
     @Autowired CompositeSearchProfile profile;
     @Autowired EvidenceExpansionService expansionService;
     @Autowired SearchService searchService;
+    @Autowired SearchSnippetGenerator snippetGenerator;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -118,6 +128,8 @@ class P7BDecisionTraceValidationTest {
         int finalReproduction = 0;
         int productionResponseParity = 0;
         int targetEvidenceRetrieved = 0;
+        int localizationFailuresRecovered = 0;
+        int expectedPdfPagesRecovered = 0;
 
         for (JsonNode question : questions.path("questions")) {
             String id = question.path("id").asText();
@@ -138,6 +150,24 @@ class P7BDecisionTraceValidationTest {
             node.put("productionResponseMatch", trace.productionResponseMatch());
             node.put("frozenFinalReproductionMatch", reproductionMatch);
             node.set("trace", mapper.valueToTree(trace));
+            if (NATURAL_LANGUAGE_FLOOR_LOSS_IDS.contains(id)) {
+                SearchDecisionTrace.CandidateTrace expected = floorLossCandidate(
+                        trace, truthById.get(id));
+                node.set("floorLossSignals", relevanceSignals(
+                        question.path("query").asText(), expected));
+            }
+            if (LOCALIZATION_FAILURE_IDS.contains(id)) {
+                node.set("localizationWindowSignals", localizationWindowSignals(
+                        question.path("query").asText(), trace));
+                JsonNode truth = truthById.get(id);
+                if (localizationMatches(trace, truth, false)) {
+                    localizationFailuresRecovered++;
+                }
+                if ("PAGE".equals(truth.path("source").path("kind").asText())
+                        && localizationMatches(trace, truth, true)) {
+                    expectedPdfPagesRecovered++;
+                }
+            }
             if (TARGET_IDS.contains(id)) {
                 JsonNode truth = truthById.get(id);
                 List<SearchDecisionTrace.CandidateTrace> acceptable = acceptableCandidates(trace, truth);
@@ -171,11 +201,15 @@ class P7BDecisionTraceValidationTest {
         report.put("targetPositiveFailureCount", 14);
         report.put("productionResponseParity", productionResponseParity + "/48");
         report.put("targetEvidenceRetrieved", targetEvidenceRetrieved + "/14");
+        report.put("localizationFailuresRecovered",
+                localizationFailuresRecovered + "/" + LOCALIZATION_FAILURE_IDS.size());
+        report.put("expectedPdfPagesRecovered", expectedPdfPagesRecovered + "/2");
         report.put("frozenFinalReproduction", finalReproduction + "/48");
         report.set("historicalPrimaryRejection", mapper.valueToTree(historicalCounts));
         report.set("observedPrimaryRejection", mapper.valueToTree(observed));
         report.put("historicalAuditMatch", observed.equals(historicalCounts));
         report.set("queries", outputQueries);
+        Files.createDirectories(OUTPUT);
         Files.writeString(
                 OUTPUT.resolve("p7-b-trace-validation.json"),
                 mapper.writerWithDefaultPrettyPrinter().writeValueAsString(report) + "\n",
@@ -186,7 +220,120 @@ class P7BDecisionTraceValidationTest {
         // observer reproduces the current production response and sees all targets.
         assertThat(productionResponseParity).isEqualTo(48);
         assertThat(targetEvidenceRetrieved).isEqualTo(14);
+        assertThat(localizationFailuresRecovered).isEqualTo(LOCALIZATION_FAILURE_IDS.size());
+        assertThat(expectedPdfPagesRecovered).isEqualTo(2);
         System.out.println("P8_P7B_TRACE_VALIDATION=" + OUTPUT.resolve("p7-b-trace-validation.json"));
+    }
+
+    private static boolean localizationMatches(
+            SearchDecisionTrace trace,
+            JsonNode truth,
+            boolean requireExpectedPage) {
+        List<String> anchors = new ArrayList<>();
+        truth.path("acceptableAnchors").forEach(anchor -> anchors.add(anchor.asText()));
+        Map<Long, SearchDecisionTrace.CandidateTrace> candidates = new HashMap<>();
+        trace.candidates().forEach(candidate -> candidates.putIfAbsent(candidate.chunkId(), candidate));
+        int expectedPage = truth.path("source").path("page").asInt(-1);
+        for (SearchDecisionTrace.FinalResultTrace result : trace.finalResults()) {
+            SearchDecisionTrace.CandidateTrace candidate = candidates.get(result.chunkId());
+            if (candidate == null || anchors.stream().noneMatch(candidate.content()::contains)) {
+                continue;
+            }
+            boolean matched = trace.localization().stream()
+                    .filter(evidence -> evidence.resultRank() == result.rank())
+                    .filter(evidence -> anchors.stream().anyMatch(evidence.snippet()::contains))
+                    .anyMatch(evidence -> !requireExpectedPage
+                            || (evidence.evidenceSourceType() == ChunkSourceType.PAGE
+                                    && evidence.evidenceSourceIndex() == expectedPage));
+            if (matched) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private ArrayNode localizationWindowSignals(String query, SearchDecisionTrace trace) {
+        Map<Long, SearchDecisionTrace.CandidateTrace> candidates = new HashMap<>();
+        trace.candidates().forEach(candidate -> candidates.putIfAbsent(candidate.chunkId(), candidate));
+        ArrayNode values = mapper.createArrayNode();
+        for (SearchDecisionTrace.FinalResultTrace result : trace.finalResults()) {
+            SearchDecisionTrace.CandidateTrace candidate = candidates.get(result.chunkId());
+            if (candidate == null) {
+                continue;
+            }
+            ObjectNode value = mapper.createObjectNode();
+            value.put("rank", result.rank());
+            value.put("chunkId", result.chunkId());
+            value.set("selection", mapper.valueToTree(
+                    snippetGenerator.select(query, candidate.content())));
+            values.add(value);
+        }
+        return values;
+    }
+
+    private SearchDecisionTrace.CandidateTrace floorLossCandidate(
+            SearchDecisionTrace trace,
+            JsonNode truth) {
+        List<String> anchors = new ArrayList<>();
+        truth.path("acceptableAnchors").forEach(anchor -> anchors.add(anchor.asText()));
+        if (truth.path("similarButReject").has("anchor")) {
+            anchors.add(truth.path("similarButReject").path("anchor").asText());
+        }
+        return trace.candidates().stream()
+                .filter(candidate -> anchors.stream().anyMatch(candidate.content()::contains))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                        "Expected floor-loss evidence was not retrieved: " + truth.path("id").asText()));
+    }
+
+    @SuppressWarnings("unchecked")
+    private ObjectNode relevanceSignals(
+            String query,
+            SearchDecisionTrace.CandidateTrace candidate) {
+        try {
+            Method querySignalsMethod = CompositeSearchProfile.class
+                    .getDeclaredMethod("querySignals", String.class);
+            querySignalsMethod.setAccessible(true);
+            Object querySignals = querySignalsMethod.invoke(profile, query);
+            Method candidateSignalsMethod = CompositeSearchProfile.class
+                    .getDeclaredMethod("candidateSignals", String.class);
+            candidateSignalsMethod.setAccessible(true);
+            Object candidateSignals = candidateSignalsMethod.invoke(null, candidate.content());
+            Set<String> identifiers = signalSet(querySignals, "requiredIdentifiers");
+            Set<String> numbers = signalSet(querySignals, "requiredNumbers");
+            Set<String> coreTerms = signalSet(querySignals, "coreTerms");
+            Set<String> candidateCoreTerms = signalSet(candidateSignals, "coreTerms");
+            Set<String> matchedCoreTerms = new LinkedHashSet<>(coreTerms);
+            matchedCoreTerms.retainAll(candidateCoreTerms);
+
+            ObjectNode signals = mapper.createObjectNode();
+            signals.put("chunkId", candidate.chunkId());
+            signals.set("requiredIdentifiers", mapper.valueToTree(identifiers));
+            signals.set("requiredNumbers", mapper.valueToTree(numbers));
+            signals.set("numericAnchors", mapper.valueToTree(NumericQueryAnchors.extract(query)));
+            signals.set("coreTerms", mapper.valueToTree(coreTerms));
+            signals.set("candidateCoreTerms", mapper.valueToTree(candidateCoreTerms));
+            signals.set("matchedCoreTerms", mapper.valueToTree(matchedCoreTerms));
+            signals.put("coreTermMatchCount", matchedCoreTerms.size());
+            signals.put("coreTermCoverage", coreTerms.isEmpty()
+                    ? 0.0d
+                    : (double) matchedCoreTerms.size() / coreTerms.size());
+            signals.put("directAnchor", NaturalLanguageQueryFallback.hasDirectAnchor(
+                    query, candidate.content()));
+            signals.put("firstFailureStage", candidate.firstFailureStage().name());
+            signals.put("firstFailureReason", candidate.firstFailureReason());
+            return signals;
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Composite relevance signals changed", exception);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Set<String> signalSet(Object signals, String accessor)
+            throws ReflectiveOperationException {
+        Method method = signals.getClass().getDeclaredMethod(accessor);
+        method.setAccessible(true);
+        return (Set<String>) method.invoke(signals);
     }
 
     private Seeded seed(JsonNode manifest) throws Exception {

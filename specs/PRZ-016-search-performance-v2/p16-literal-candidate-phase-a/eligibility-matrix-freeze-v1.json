@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "prizm-p16-structured-claim-eligibility-matrix-v1",
+  "frozenAt": "2026-08-22T22:49:30.1976325+09:00",
+  "frozenBeforeExecution": true,
+  "caseCount": 23,
+  "asset": {
+    "path": "specs/PRZ-016-search-performance-v2/p16-literal-candidate-phase-a/eligibility-matrix-v1.json",
+    "bytes": 6889,
+    "sha256": "1da06f10751a97b9ef4856249f2c15efee88d161ec151305efda647b369baa4b"
+  }
+}

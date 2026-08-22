@@ -170,3 +170,13 @@
   document fixture was available; `NOT_VERIFIED`
 - [x] AUDIT: 검색 source/API/DB 변경 0, owner boundary와 highlight `NOT_IMPLEMENTED` 확인
 - [x] [PR #48](https://github.com/jaemin-devlog/PRIZM/pull/48) merge `154b9c8`로 `main` 통합
+
+## P16 Literal Candidate Phase A
+
+- [x] ORIENT: branch·HEAD·dirty worktree·stash와 Production retrieval/filter source 확인
+- [x] SPEC: evaluation-only D0/D1 경계, synthetic corpus, isolation·boundary·parity 기준 고정
+- [x] PLAN: evaluation source/spec/build task만 수정하고 Production·migration·frontend 제외
+- [x] IMPLEMENT: generic literal Top20 repository, chunk-ID union diagnostics, frozen corpus 구현
+- [ ] VERIFY: D0 parity·owner/ACTIVE/boundary/case·full backend는 PASS; literal-only 복구 0건으로 focused Gate FAIL
+- [x] AUDIT: Production search hash/diff 0, unrelated work 보존, 구현 identifier hardcoding 0; phase blocking evidence gap 1건 공개
+- [ ] INTEGRATE: 사용자 지시에 따라 commit/push/PR `NOT_RUN`

@@ -85,7 +85,7 @@ class FinalUnseenJudgeBE2ETest {
             Long owner = corpus.owners().get(question.path("userKey").asText()); SearchDecisionTrace trace = tracer.trace(owner, query);
             parity &= trace.productionResponseMatch(); ownerIsolation &= ownerIsolated(owner, trace); activeIsolation &= activeIsolated(corpus, trace);
             ObjectNode row = results.addObject(); row.put("id", id); row.put("query", query); row.put("label", label); row.put("type", question.path("type").asText()); row.put("ownerUserId", owner);
-            row.put("responseState", trace.responseState()); row.put("productionResponseMatch", trace.productionResponseMatch()); row.set("finalResults", mapper.valueToTree(trace.finalResults())); row.set("displayedEvidence", mapper.valueToTree(trace.localization())); row.set("queryClaimRequirements", mapper.valueToTree(profile.queryClaimRequirements(query)));
+            row.put("responseState", trace.responseState()); row.put("productionResponseMatch", trace.productionResponseMatch()); row.set("finalResults", mapper.valueToTree(trace.finalResults())); row.set("displayedEvidence", mapper.valueToTree(trace.localization()));
             if ("POSITIVE".equals(label)) {
                 SearchDecisionTrace.GroundTruthOutcome outcome = evaluator.evaluatePositive(trace, truth.get(id), corpus.fixtureByDocument()); RawHit hit = expectedRank(owner, query, truth.get(id), corpus);
                 counters.positive(outcome, hit); row.put("expectedEvidenceRawDenseRank", hit.rank()); if (hit.rank() == null) row.putNull("expectedEvidenceRawDenseScore"); else row.put("expectedEvidenceRawDenseScore", hit.score());

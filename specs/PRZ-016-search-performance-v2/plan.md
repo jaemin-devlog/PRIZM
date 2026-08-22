@@ -135,3 +135,11 @@ git diff --check
 
 Docker가 준비된 경우 실제 PDF 검색 결과의 page fragment와 카드 결과 불변성을 브라우저에서
 확인한다. PDF.js가 없는 현재 dependency 상태에서는 highlight를 `NOT_IMPLEMENTED`로 기록한다.
+
+## P16 Literal Candidate Phase A
+
+Production 검색을 변경하지 않는 D0 parity와 literal candidate union 실험은
+[P16 Plan](p16-literal-candidate-phase-a/plan.md)에서 관리한다. P6의 FTS·RRF·literal gate를
+재사용하지 않고, BGE-M3 Dense Top20과 exact-boundary literal Top20을 chunk identity로만
+합친다. Phase B, production 적용, migration, frontend, PRZ-009·PRZ-017 변경과 Git 통합은
+수행하지 않는다.

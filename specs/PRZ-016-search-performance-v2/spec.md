@@ -38,6 +38,7 @@ PRZ는 독립적인 기능 또는 자체적으로 완료·폐기할 수 있는 �
 | P13 Evidence Expansion Safety | `PASS` | selected evidence의 직접 ASCII anchor를 보존하고 cross-chunk expansion이 이를 잃지 않게 제한 | [공개 요약](evidence.md) |
 | P14 Claim-Complete Snippet | `PASS` | 해결 질문은 contiguous problem/action/result window를 단문보다 우선 | [공개 요약](evidence.md) |
 | P15 PDF Document Confirmation UX | `IMPLEMENTED — PAGE_NAVIGATION_NOT_BROWSER_VERIFIED` | 검색 카드에서 기존 owner-scoped PDF original viewer를 열고 evidence page로 이동. 검색 정책·결과는 불변 | — |
+| P16 Literal Candidate Phase A | `NEEDS_ADJUSTMENT` | D0 parity·literal lookup·격리는 통과했으나 frozen corpus의 positive 7개가 모두 Dense rank 1이라 literal-only 복구 사례를 만들지 못함 | [P16 Evidence](p16-literal-candidate-phase-a/evidence.md) |
 
 P4는 focused 검증과 동일 72-query benchmark를 통과했다. P5와 P7-B는 서로 다른 unseen
 조건에서 모두 일반화 Gate를 통과하지 못했다. P7-B는 앞으로 `DIAGNOSTIC / HISTORICAL

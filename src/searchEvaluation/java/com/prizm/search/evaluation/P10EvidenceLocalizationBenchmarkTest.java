@@ -245,9 +245,6 @@ class P10EvidenceLocalizationBenchmarkTest {
             result.put("label", question.path("label").asText());
             result.put("type", question.path("type").asText());
             result.put("query", query);
-            result.set("queryClaimRequirements", mapper.valueToTree(
-                    searchProfile.queryClaimRequirements(query)));
-            result.set("candidateClaimSupport", candidateClaimSupportTrace(query, trace));
             result.put("ownerActiveChunkCount", corpus.activeChunksByOwner().get(owner));
             result.put("responseState", trace.responseState());
             result.put("productionResponseMatch", trace.productionResponseMatch());
@@ -284,9 +281,6 @@ class P10EvidenceLocalizationBenchmarkTest {
             queryResults.add(result);
             ObjectNode traceEnvelope = mapper.createObjectNode();
             traceEnvelope.put("id", id);
-            traceEnvelope.set("queryClaimRequirements", mapper.valueToTree(
-                    searchProfile.queryClaimRequirements(query)));
-            traceEnvelope.set("candidateClaimSupport", candidateClaimSupportTrace(query, trace));
             traceEnvelope.set("trace", mapper.valueToTree(trace));
             traceEnvelope.set("localizationDecision", localizationDecisionTrace(query, trace));
             traces.add(traceEnvelope);
@@ -334,18 +328,6 @@ class P10EvidenceLocalizationBenchmarkTest {
                 productionParity,
                 ownerIsolation,
                 activeIsolation);
-    }
-
-    private ArrayNode candidateClaimSupportTrace(String query, SearchDecisionTrace trace) {
-        ArrayNode values = mapper.createArrayNode();
-        for (SearchDecisionTrace.CandidateTrace candidate : trace.candidates()) {
-            ObjectNode value = mapper.createObjectNode();
-            value.put("chunkId", candidate.chunkId());
-            value.set("decision", mapper.valueToTree(
-                    searchProfile.candidateClaimSupport(query, candidate.content())));
-            values.add(value);
-        }
-        return values;
     }
 
     private ArrayNode localizationDecisionTrace(String query, SearchDecisionTrace trace) {

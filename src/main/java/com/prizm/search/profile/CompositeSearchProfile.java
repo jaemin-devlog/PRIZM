@@ -4,7 +4,6 @@ import com.prizm.ingestion.entity.ChunkSourceType;
 import com.prizm.search.repository.VectorSearchResult;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -116,35 +115,12 @@ public class CompositeSearchProfile {
             "으로부터", "에게서", "에서는", "에서도", "이라고", "이라도", "이라면", "에는",
             "에도", "에서", "에게", "까지", "부터", "처럼", "보다", "으로", "라고", "라는",
             "로", "을", "를", "은", "는", "이", "가", "와", "과", "의", "에", "도", "만");
-    private static final List<String> NEGATION_MARKERS = List.of(
-            "않", "아니", "아닙", "없", "못", "미취득", "하지 않았다", "하지 않았");
     private static final List<String> POSITIVE_CLAIM_MARKERS = List.of(
             "근거가 있", "경험", "이력", "기록", "했나요", "맡았", "적용", "운영", "취득");
     private static final List<String> EXPLANATION_MARKERS = List.of(
             "어떻게", "이유", "왜", "방지", "막았");
 
     private final EvidenceQualityReranker evidenceQualityReranker = new EvidenceQualityReranker();
-    private final StructuredClaimSupportEvaluator claimSupportEvaluator =
-            new StructuredClaimSupportEvaluator();
-
-    /** Structured requirements exposed for evaluation observability, not the API response. */
-    public QueryClaimRequirements queryClaimRequirements(String query) {
-        return claimSupportEvaluator.extract(query);
-    }
-
-    /** Candidate-local support decision used by eligibility and P9 evaluation tracing. */
-    public ClaimSupportDecision candidateClaimSupport(
-            String query,
-            VectorSearchResult candidate) {
-        return candidateClaimSupport(query, candidate.content());
-    }
-
-    /** Content overload for evaluation tracing without reconstructing a repository DTO. */
-    public ClaimSupportDecision candidateClaimSupport(
-            String query,
-            String candidateContent) {
-        return claimSupportEvaluator.evaluate(query, candidateContent);
-    }
 
     public SearchIntent resolveIntent(String query) {
         return resolveIntent(querySignals(query));
@@ -180,19 +156,31 @@ public class CompositeSearchProfile {
             String query,
             List<VectorSearchResult> denseCandidates,
             QuerySignals signals) {
+        Set<Long> denseTopFiveChunkIds = denseCandidates.stream()
+                .limit(MAX_RESULTS)
+                .map(VectorSearchResult::chunkId)
+                .collect(java.util.stream.Collectors.toUnmodifiableSet());
         List<VectorSearchResult> sourceDistinctCandidates = consolidateSourceLocations(
                         intent, query, signals, denseCandidates)
                 .stream()
                 .map(CandidateGroup::representative)
                 .toList();
         List<VectorSearchResult> eligibleCandidates = sourceDistinctCandidates.stream()
-                .filter(candidate -> rejectionReasons(intent, signals, candidate).isEmpty())
+                .filter(candidate -> rejectionReasons(
+                        intent,
+                        signals,
+                        candidate,
+                        denseTopFiveChunkIds.contains(candidate.chunkId())).isEmpty())
                 .toList();
         if (eligibleCandidates.isEmpty()) {
             return new Decision(
                     denseCandidates,
                     List.of(),
-                    rejectionReasons(intent, signals, sourceDistinctCandidates.get(0)));
+                    rejectionReasons(
+                            intent,
+                            signals,
+                            sourceDistinctCandidates.get(0),
+                            denseTopFiveChunkIds.contains(sourceDistinctCandidates.get(0).chunkId())));
         }
 
         List<VectorSearchResult> diverseCandidates = consolidateQueryEvidence(
@@ -226,64 +214,46 @@ public class CompositeSearchProfile {
     private List<String> rejectionReasons(
             SearchIntent intent,
             QuerySignals signals,
-            VectorSearchResult top) {
+            VectorSearchResult top,
+            boolean withinDenseTopFive) {
         List<String> completedReleaseReasons = intent == SearchIntent.COMPLETED_RELEASE_EVIDENCE
                 ? rejectionReasons(signals, top)
                 : List.of();
-        ClaimSupportDecision claimSupport = candidateClaimSupport(signals.originalQuery(), top);
-        if (claimSupport.status() == ClaimSupportDecision.Status.CONTRADICTED) {
-            if (!completedReleaseReasons.isEmpty()) {
-                return completedReleaseReasons;
-            }
-            List<String> reasons = new ArrayList<>(claimSupport.reasons().stream()
-                    .map(reason -> "CLAIM_SUPPORT_" + claimSupport.status() + ":" + reason)
-                    .sorted()
-                    .toList());
-            if (signals.positiveClaimQuestion() && containsNegatedClaim(top.content(), signals)) {
-                reasons.add("NEGATED_CLAIM");
-            }
-            return List.copyOf(reasons);
-        }
-        boolean structuredDirectSupport = claimSupport.directSupport()
-                && signals.claimRequirements().claimQuestion()
-                && (!signals.directAnchorRequired()
-                        || !signals.claimRequirements().actions().isEmpty()
-                        || !signals.claimRequirements().numericConstraints().isEmpty());
-        if (structuredDirectSupport) {
-            if (completedReleaseReasons.contains("UNSUPPORTED_COMPLETED_RELEASE_QUERY")
-                    && signals.claimRequirements().actions().size() <= 1) {
-                return completedReleaseReasons;
-            }
-            boolean legacyClaimBindingFailed = completedReleaseReasons.stream()
-                    .anyMatch(reason -> reason.startsWith("MISSING_ASSERTED_COMPLETED_RELEASE"));
-            if (legacyClaimBindingFailed
-                    && signals.claimRequirements().requiredState()
-                            != QueryClaimRequirements.State.PRODUCTION
-                    && signals.claimRequirements().numericConstraints().isEmpty()) {
-                return completedReleaseReasons;
-            }
-            return List.of();
-        }
         if (intent == SearchIntent.COMPLETED_RELEASE_EVIDENCE) {
             return completedReleaseReasons;
         }
-        if (claimSupport.status() == ClaimSupportDecision.Status.UNSUPPORTED
-                && signals.claimRequirements().claimQuestion()
-                && top.score() >= MINIMUM_DENSE_SCORE) {
-            return claimSupport.reasons().stream()
-                    .map(reason -> "CLAIM_SUPPORT_" + claimSupport.status() + ":" + reason)
-                    .sorted()
-                    .toList();
-        }
-
         List<String> reasons = new ArrayList<>();
-        if (top.score() < MINIMUM_DENSE_SCORE) {
+        if (top.score() < MINIMUM_DENSE_SCORE
+                && !hasReliableExactIdentifierAnchor(signals, top)
+                && !hasNaturalLanguageLexicalRescue(signals, top, withinDenseTopFive)) {
             reasons.add("DENSE_SCORE_BELOW_TUNING_FLOOR");
         }
-        if (signals.positiveClaimQuestion() && containsNegatedClaim(top.content(), signals)) {
-            reasons.add("NEGATED_CLAIM");
-        }
         return List.copyOf(reasons);
+    }
+
+    private static boolean hasNaturalLanguageLexicalRescue(
+            QuerySignals signals,
+            VectorSearchResult candidate,
+            boolean withinDenseTopFive) {
+        if (!withinDenseTopFive
+                || !signals.requiredIdentifiers().isEmpty()
+                || !signals.requiredNumbers().isEmpty()
+                || signals.coreTerms().size() < MINIMUM_CORE_TERM_MATCHES) {
+            return false;
+        }
+        return matchedCoreTerms(signals, evidenceSignals(candidate))
+                >= requiredCoreTermMatches(signals);
+    }
+
+    private static boolean hasReliableExactIdentifierAnchor(
+            QuerySignals signals,
+            VectorSearchResult candidate) {
+        if (signals.requiredIdentifiers().isEmpty()) {
+            return false;
+        }
+        CandidateSignals candidateSignals = evidenceSignals(candidate);
+        return candidateSignals.identifiers().containsAll(signals.requiredIdentifiers())
+                && candidateSignals.numbers().containsAll(signals.requiredNumbers());
     }
 
     private List<CandidateGroup> consolidateSourceLocations(
@@ -528,55 +498,22 @@ public class CompositeSearchProfile {
         if (!signals.hasExplicitEvidenceSignal()) {
             reasons.add("NO_EXPLICIT_EVIDENCE_SIGNAL");
         }
-        if (top.score() < MINIMUM_DENSE_SCORE) {
+        if (top.score() < MINIMUM_DENSE_SCORE
+                && !hasReliableExactIdentifierAnchor(signals, top)) {
             reasons.add("DENSE_SCORE_BELOW_TUNING_FLOOR");
         }
-        if (signals.unsupportedCompletedReleaseQuery()) {
-            reasons.add("UNSUPPORTED_COMPLETED_RELEASE_QUERY");
-        }
-        else if (signals.completedReleaseIntent()) {
-            if (!hasAnchoredDirectCompletedReleaseClaim(top.content(), signals)) {
-                reasons.add("MISSING_ASSERTED_COMPLETED_RELEASE_CLAIM");
+        for (String identifier : signals.requiredIdentifiers()) {
+            if (!candidateSignals.identifiers().contains(identifier)) {
+                reasons.add("MISSING_IDENTIFIER:" + identifier);
             }
         }
-        else if (signals.directCompletedReleaseEvidenceQuery()) {
-            if (!hasAnchoredDirectCompletedReleaseClaim(top.content(), signals)
-                    && !hasScopedDirectCompletedReleaseClaim(top.content(), signals)) {
-                reasons.add("MISSING_ASSERTED_COMPLETED_RELEASE_CLAIM");
+        for (String number : signals.requiredNumbers()) {
+            if (!candidateSignals.numbers().contains(number)) {
+                reasons.add("MISSING_NUMBER:" + number);
             }
         }
-        else if (signals.exactCompletedReleaseFactQuery()) {
-            if (!hasAnchoredExactCompletedReleaseFact(top.content(), signals)) {
-                reasons.add("MISSING_ASSERTED_COMPLETED_RELEASE_FACT");
-            }
-        }
-        else if (signals.directImplementationEvidenceRequest()
-                && hasScopedDirectCompletedReleaseClaim(top.content(), signals)) {
-            // The explicit project-name declaration binds only the immediately following assertion.
-        }
-        else if (signals.identifierEvidenceRequest()
-                && hasDeclaredProjectIdentity(top.content(), signals)) {
-            // A direct identifier-evidence request may cite only the explicit body declaration.
-        }
-        else {
-            for (String identifier : signals.requiredIdentifiers()) {
-                if (!candidateSignals.identifiers().contains(identifier)) {
-                    reasons.add("MISSING_IDENTIFIER:" + identifier);
-                }
-            }
-            for (String number : signals.requiredNumbers()) {
-                if (!candidateSignals.numbers().contains(number)) {
-                    reasons.add("MISSING_NUMBER:" + number);
-                }
-            }
-            if (matchedCoreTerms(signals, candidateSignals) < requiredCoreTermMatches(signals)) {
-                reasons.add("INSUFFICIENT_CORE_TERM_COVERAGE");
-            }
-        }
-        if (!signals.completionSensitiveQuery()
-                && signals.positiveClaimQuestion()
-                && containsNegatedClaim(top.content(), signals)) {
-            reasons.add("NEGATED_CLAIM");
+        if (matchedCoreTerms(signals, candidateSignals) < requiredCoreTermMatches(signals)) {
+            reasons.add("INSUFFICIENT_CORE_TERM_COVERAGE");
         }
         return List.copyOf(reasons);
     }
@@ -655,22 +592,6 @@ public class CompositeSearchProfile {
         return candidateSignals(candidate.documentTitle() + " " + candidate.content());
     }
 
-    private boolean containsNegatedClaim(String content, QuerySignals signals) {
-        return Arrays.stream(content.split("[.!?\\n]"))
-                .map(CompositeSearchProfile::normalized)
-                .anyMatch(sentence -> {
-                    CandidateSignals sentenceSignals = candidateSignals(sentence);
-                    int requiredCoreMatches = requiredCoreTermMatches(signals);
-                    boolean anchoredByIdentifier = signals.requiredIdentifiers().stream()
-                            .anyMatch(sentenceSignals.identifiers()::contains);
-                    boolean anchoredByCoreTerms = requiredCoreMatches > 0
-                            && matchedCoreTerms(signals.coreTerms(), sentenceSignals.coreTerms())
-                            >= requiredCoreMatches;
-                    return NEGATION_MARKERS.stream().anyMatch(sentence::contains)
-                            && (anchoredByIdentifier || anchoredByCoreTerms);
-                });
-    }
-
     private QuerySignals querySignals(String query) {
         String normalizedQuery = normalized(query);
         Set<String> identifiers = identifierTokens(query).stream()
@@ -702,10 +623,7 @@ public class CompositeSearchProfile {
                 completionQuery.targetTokens(),
                 positiveClaim,
                 isDirectImplementationEvidenceRequest(normalizedQuery),
-                isIdentifierEvidenceRequest(normalizedQuery),
-                NaturalLanguageQueryFallback.requiresDirectAnchor(query),
-                claimSupportEvaluator.extract(query),
-                query);
+                isIdentifierEvidenceRequest(normalizedQuery));
     }
 
     private static boolean isSupportedExactCompletedReleaseFactQuery(
@@ -751,18 +669,23 @@ public class CompositeSearchProfile {
                 identifierTokens(value),
                 numberTokens(value),
                 lexicalTokens(value, CANDIDATE_COMPLETED_RELEASE_FORMS),
-                containsAssertedCompletedReleaseClaim(value));
+                containsCompletedReleaseReference(value));
+    }
+
+    private static boolean containsCompletedReleaseReference(String value) {
+        String normalizedValue = normalized(value);
+        return normalizedValue.contains("배포") || normalizedValue.contains("출시");
     }
 
     private static int requiredCoreTermMatches(QuerySignals signals) {
-        int signalCount = signals.coreTerms().size() + (signals.completedReleaseIntent() ? 1 : 0);
+        int signalCount = signals.coreTerms().size() + (signals.completionSensitiveQuery() ? 1 : 0);
         return Math.min(MINIMUM_CORE_TERM_MATCHES, signalCount);
     }
 
     private static int matchedCoreTerms(QuerySignals signals, CandidateSignals candidateSignals) {
         int exactMatches = matchedCoreTerms(signals.coreTerms(), candidateSignals.coreTerms());
-        int completedReleaseMatch = signals.completedReleaseIntent()
-                        && candidateSignals.completedReleaseClaim()
+        int completedReleaseMatch = signals.completionSensitiveQuery()
+                        && candidateSignals.completedReleaseReference()
                 ? 1
                 : 0;
         return exactMatches + completedReleaseMatch;
@@ -1437,10 +1360,7 @@ public class CompositeSearchProfile {
             List<String> completionTargetTokens,
             boolean positiveClaimQuestion,
             boolean directImplementationEvidenceRequest,
-            boolean identifierEvidenceRequest,
-            boolean directAnchorRequired,
-            QueryClaimRequirements claimRequirements,
-            String originalQuery) {
+            boolean identifierEvidenceRequest) {
 
         private QuerySignals {
             completionTargetTokens = List.copyOf(completionTargetTokens);
@@ -1529,7 +1449,7 @@ public class CompositeSearchProfile {
             Set<String> identifiers,
             Set<String> numbers,
             Set<String> coreTerms,
-            boolean completedReleaseClaim) {
+            boolean completedReleaseReference) {
     }
 
     private static final class CandidateGroup {

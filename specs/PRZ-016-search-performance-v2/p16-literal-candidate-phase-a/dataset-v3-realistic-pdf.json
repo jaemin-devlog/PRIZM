@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 2,
+  "datasetId": "prizm-p16-literal-candidate-phase-a-v3-realistic-pdf",
+  "primaryOwner": "PRIMARY",
+  "primaryOwnerActiveChunkCount": 102,
+  "pdf": {
+    "path": "output/pdf/prizm-p16-realistic-long-synthetic-career-report.pdf",
+    "sourcePath": "specs/PRZ-016-search-performance-v2/p16-literal-candidate-phase-a/realistic-pdf/source.json",
+    "generatorPath": "specs/PRZ-016-search-performance-v2/p16-literal-candidate-phase-a/realistic-pdf/generate.py",
+    "pageCount": 27,
+    "extractedCharacterCount": 63470,
+    "chunkCount": 101,
+    "chunking": {"maxChunkLength": 800, "overlap": 120}
+  },
+  "targets": [
+    {"key": "redis", "expression": "Redis"},
+    {"key": "spring-boot", "expression": "Spring Boot"},
+    {"key": "tauri", "expression": "Tauri"},
+    {"key": "bun", "expression": "Bun"},
+    {"key": "langgraph", "expression": "LangGraph"},
+    {"key": "fooengine", "expression": "FooEngine"},
+    {"key": "quartz-harbor-mesh", "expression": "Quartz Harbor Mesh"}
+  ],
+  "primaryInactiveOnly": {
+    "key": "dormant-graph",
+    "content": "DormantGraph appeared only in the superseded synthetic version."
+  },
+  "primaryActiveReplacement": {
+    "key": "active-replacement",
+    "content": "The current synthetic version intentionally omits the superseded identifier."
+  },
+  "otherOwnerActive": [
+    {"key": "foreign-only-stack", "content": "ForeignOnlyStack exists only in this synthetic owner document."},
+    {"key": "fooengine-x", "content": "The isolated synthetic fixture contains FooEngineX."},
+    {"key": "bundle", "content": "The isolated synthetic fixture contains Bundle tooling."}
+  ],
+  "queries": [
+    {"id": "P01", "owner": "PRIMARY", "query": "redis", "expectedKey": "redis", "caseVariant": true},
+    {"id": "P02", "owner": "PRIMARY", "query": "Spring Boot", "expectedKey": "spring-boot"},
+    {"id": "P03", "owner": "PRIMARY", "query": "Tauri", "expectedKey": "tauri"},
+    {"id": "P04", "owner": "PRIMARY", "query": "Bun", "expectedKey": "bun"},
+    {"id": "P05", "owner": "PRIMARY", "query": "LangGraph", "expectedKey": "langgraph"},
+    {"id": "P06", "owner": "PRIMARY", "query": "FooEngine", "expectedKey": "fooengine"},
+    {"id": "P07", "owner": "PRIMARY", "query": "Quartz Harbor Mesh", "expectedKey": "quartz-harbor-mesh"},
+    {"id": "N01", "owner": "PRIMARY", "query": "AbsentNimbus", "safety": "ABSENT"},
+    {"id": "N02", "owner": "PRIMARY", "query": "ForeignOnlyStack", "safety": "OTHER_OWNER_ONLY"},
+    {"id": "N03", "owner": "PRIMARY", "query": "DormantGraph", "safety": "INACTIVE_ONLY"},
+    {"id": "N04", "owner": "OTHER", "query": "FooEngine", "safety": "EXACT_BOUNDARY"},
+    {"id": "N05", "owner": "OTHER", "query": "Bun", "safety": "SHORT_BOUNDARY"}
+  ]
+}

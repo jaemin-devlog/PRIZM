@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "prizm-p16-dense-floor-matrix-v1",
+  "frozenBeforeExecution": true,
+  "baseCorpus": "dataset-v3-realistic-pdf.json",
+  "cases": [
+    {
+      "id": "P01",
+      "type": "POSITIVE_DIRECT_SUPPORT",
+      "queryForm": "BARE_IDENTIFIER",
+      "query": "Redis",
+      "evidence": "분기별 운영 회고에서는 배포 일정과 장애 대응 절차, 관찰 지표의 변경 배경을 길게 정리했다. 세션 일관성이 필요한 구간에는 Redis 기반 캐시 계층을 직접 구성하고 만료 정책을 운영했으며, 변경 이후에도 데이터베이스 제약을 최종 방어선으로 유지했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "P02",
+      "type": "POSITIVE_DIRECT_SUPPORT",
+      "queryForm": "BARE_IDENTIFIER",
+      "query": "Tauri",
+      "evidence": "사용자 인터뷰와 배포 채널 검토, 자동 업데이트 실패 시 복구 절차를 포함해 데스크톱 제품의 운영 과정을 기록했다. 내부 관리 도구는 Tauri 기반으로 개발하고 파일 접근 권한과 프로세스 통신 경계를 직접 구현했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "P03",
+      "type": "POSITIVE_DIRECT_SUPPORT",
+      "queryForm": "BARE_IDENTIFIER",
+      "query": "FooEngine",
+      "evidence": "대량 작업의 처리 순서와 재시도 정책을 설계하면서 작업자 상태, 실패 복구, 중복 방지 기준을 함께 문서화했다. 실행 조정 계층에는 FooEngine을 적용해 동일 작업이 동시에 시작되지 않도록 임계 구역을 구현했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "P04",
+      "type": "POSITIVE_DIRECT_SUPPORT",
+      "queryForm": "BARE_IDENTIFIER",
+      "query": "VantaCore",
+      "evidence": "기존 시스템의 요청 흐름과 감사 로그 보존 기준을 분석하고 점진적인 전환 계획을 수립했다. 새 라우팅 모듈에는 VantaCore를 도입해 정책 검증과 실패 격리를 구현했으며 운영 전환 후 경보 기준도 함께 조정했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "P05",
+      "type": "POSITIVE_DIRECT_SUPPORT",
+      "queryForm": "MULTI_WORD_IDENTIFIER",
+      "query": "Quartz Harbor Mesh",
+      "evidence": "여러 서비스의 접근 경로를 통합하는 과정에서 요청 추적, 권한 재검증, 장애 격리 순서를 상세히 정리했다. 경계 라우터는 Quartz Harbor Mesh 기반으로 구현하고 실패한 연결만 선택적으로 차단하도록 운영 정책을 구성했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "P06",
+      "type": "POSITIVE_DIRECT_SUPPORT",
+      "queryForm": "EXPERIENCE",
+      "query": "Kafka 사용 경험",
+      "evidence": "주문 이벤트의 순서 보장과 재처리 범위를 검토한 뒤 Kafka를 사용해 이벤트 전달 파이프라인을 개발했다. 소비자 지연을 관찰할 수 있도록 파티션별 지표를 구성하고 장애 시 재동기화 절차도 운영했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "P07",
+      "type": "POSITIVE_DIRECT_SUPPORT",
+      "queryForm": "EXPERIENCE",
+      "query": "Docker 사용 경험",
+      "evidence": "개발 환경의 차이로 재현이 어려웠던 빌드 문제를 분석하고 Docker 기반 격리 환경을 구축했다. 이미지 계층과 캐시 정책을 정리해 반복 빌드 시간을 줄이고 배포 전 검증 절차를 자동화했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "P08",
+      "type": "POSITIVE_DIRECT_SUPPORT",
+      "queryForm": "EXPERIENCE",
+      "query": "Nebula Signal Fabric 사용 경험",
+      "evidence": "이벤트 전달 경로가 복잡해진 원인을 추적하고 관찰 지점과 실패 격리 단위를 다시 설계했다. Nebula Signal Fabric을 적용해 라우터 서비스를 구현했으며 재시도 폭주를 막는 제한 정책도 함께 운영했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "P09",
+      "type": "POSITIVE_DIRECT_SUPPORT",
+      "queryForm": "NATURAL_TECHNOLOGY",
+      "query": "Spring Boot 기반 서비스를 개발한 경험이 있나요?",
+      "evidence": "요청 검증과 데이터 접근 경계를 분리하기 위해 Spring Boot 기반 백엔드 서비스를 개발했다. 인증 실패와 외부 연동 오류를 구분하는 예외 처리 계층을 구현하고 운영 지표를 추가했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "P10",
+      "type": "POSITIVE_DIRECT_SUPPORT",
+      "queryForm": "NATURAL_TECHNOLOGY",
+      "query": "AsterQueue를 적용해 중복 작업을 해결한 경험이 있나요?",
+      "evidence": "동시에 들어온 요청이 같은 작업을 여러 번 생성하는 문제를 재현하고 처리 상태 전이를 분석했다. AsterQueue를 적용해 작업 생성 구간을 직렬화하고 중복 실행 문제를 해결했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "P11",
+      "type": "POSITIVE_DIRECT_SUPPORT",
+      "queryForm": "NATURAL_PROBLEM_SOLVING",
+      "query": "동시 요청으로 중복 데이터가 생기는 문제를 어떻게 해결했나요?",
+      "evidence": "같은 계정에서 동시에 제출된 요청이 중복 행을 만드는 상황을 테스트로 재현했다. 트랜잭션 안에서 고유 제약과 충돌 재시도를 적용해 생성 경로를 직렬화했고 중복 데이터가 남지 않도록 해결했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "P12",
+      "type": "POSITIVE_DIRECT_SUPPORT",
+      "queryForm": "NATURAL_PROBLEM_SOLVING",
+      "query": "배포 후 장애를 줄이기 위해 어떤 개선을 했나요?",
+      "evidence": "배포 직후 설정 누락으로 서비스가 반복 재시작된 원인을 로그와 변경 이력으로 확인했다. 설정 검증을 배포 전 단계로 이동하고 실패 시 자동 중단하도록 파이프라인을 개선해 같은 장애의 재발을 줄였다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "N01",
+      "type": "NEGATIVE_MERE_MENTION",
+      "queryForm": "EXPERIENCE",
+      "query": "Docker 사용 경험",
+      "evidence": "차기 개발 환경 후보를 비교하는 회의에서 Docker 도입 가능성과 예상 비용을 검토했다. 실제 환경 구성이나 이미지 작성, 서비스 배포는 수행하지 않았다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "N02",
+      "type": "NEGATIVE_MERE_MENTION",
+      "queryForm": "NATURAL_TECHNOLOGY",
+      "query": "FooEngine을 사용한 경험이 있나요?",
+      "evidence": "아키텍처 조사 과정에서 FooEngine 관련 운영 문서와 공개 예제를 읽었다. 적용 가능성을 정리했을 뿐 실제 프로젝트에 도입하거나 구현하지 않았다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "N03",
+      "type": "NEGATIVE_MERE_MENTION",
+      "queryForm": "BARE_IDENTIFIER",
+      "query": "VantaCore",
+      "evidence": "기술 후보 목록에 VantaCore라는 이름이 포함되어 있었고 비교표에서 라이선스 항목만 확인했다. 실제 사용 여부와 구현 결과는 기록되어 있지 않다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "N04",
+      "type": "NEGATIVE_OTHER_ACTOR",
+      "queryForm": "EXPERIENCE",
+      "query": "Tauri 사용 경험",
+      "evidence": "다른 팀이 Tauri를 사용해 사내 데스크톱 도구를 개발했고 그 결과를 공유 세션에서 발표했다. 나는 발표 자료를 열람했을 뿐 해당 구현이나 운영에는 참여하지 않았다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "N05",
+      "type": "NEGATIVE_OTHER_ACTOR",
+      "queryForm": "NATURAL_TECHNOLOGY",
+      "query": "Kafka를 사용해 서비스를 개발한 경험이 있나요?",
+      "evidence": "고객사가 Kafka를 사용해 이벤트 전달 서비스를 개발했고 운영 지표를 관리했다. 우리 쪽에서는 인터페이스 명세만 전달했으며 Kafka 구현에는 참여하지 않았다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "N06",
+      "type": "NEGATIVE_OTHER_ACTOR",
+      "queryForm": "MULTI_WORD_IDENTIFIER",
+      "query": "Zephyr Relay Mesh",
+      "evidence": "협력사가 Zephyr Relay Mesh 기반 라우터를 구현하고 장애 대응 절차를 운영했다. 나는 결과 보고서를 전달받았지만 해당 기술을 직접 적용하거나 개발하지 않았다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "N07",
+      "type": "NEGATIVE_NEGATION",
+      "queryForm": "EXPERIENCE",
+      "query": "Redis 사용 경험",
+      "evidence": "캐시 계층 도입을 검토했지만 Redis를 사용하지 않았다. 최종 구현은 데이터베이스 고유 제약과 애플리케이션 재시도만으로 구성했다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "N08",
+      "type": "NEGATIVE_NEGATION",
+      "queryForm": "BARE_IDENTIFIER",
+      "query": "Kafka",
+      "evidence": "이벤트 전달 방식은 Kafka가 아니라 PostgreSQL 알림 기능을 사용했다. Kafka 도입 경험은 없고 관련 운영도 수행하지 않았다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "N09",
+      "type": "NEGATIVE_NEGATION",
+      "queryForm": "NATURAL_TECHNOLOGY",
+      "query": "Nebula Signal Fabric을 적용한 경험이 있나요?",
+      "evidence": "Nebula Signal Fabric 적용을 검토했지만 프로젝트에는 도입하지 않았다. 기존 메시지 처리 경로를 그대로 유지했고 구현 경험도 없다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "N10",
+      "type": "NEGATIVE_ABSENT_IDENTIFIER",
+      "queryForm": "BARE_IDENTIFIER",
+      "query": "AbsentNimbus",
+      "evidence": "데이터베이스 연결 풀의 대기 시간을 관찰하고 제한 값을 조정했다. 요청 폭주 시 빠르게 실패하도록 설정했으며 별도의 메시지 기술은 사용하지 않았다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "N11",
+      "type": "NEGATIVE_ABSENT_IDENTIFIER",
+      "queryForm": "NATURAL_TECHNOLOGY",
+      "query": "Orchid Relay Mesh를 적용한 경험이 있나요?",
+      "evidence": "서비스 간 호출은 기존 HTTP 클라이언트와 데이터베이스 작업 큐로 처리했다. 새로운 라우팅 제품이나 별도 메시 계층을 도입한 기록은 없다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "N12",
+      "type": "NEGATIVE_MERE_MENTION",
+      "queryForm": "NATURAL_PROBLEM_SOLVING",
+      "query": "배포 장애를 해결한 경험이 있나요?",
+      "evidence": "배포 장애 사례를 다룬 외부 문서와 사내 가이드를 읽고 목차를 정리했다. 실제 장애를 담당하거나 수정 사항을 구현한 경험은 없다.",
+      "expected": "REJECT"
+    }
+  ]
+}

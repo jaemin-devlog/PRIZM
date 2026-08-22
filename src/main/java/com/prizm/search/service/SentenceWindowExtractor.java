@@ -11,7 +11,9 @@ final class SentenceWindowExtractor {
     private static final Pattern SECTION_HEADING = Pattern.compile(
             "^(?:[0-9]{1,2}(?:\\.[0-9]{1,2})+|[0-9]{1,2}[.)]?)\\s+.+$");
     private static final Pattern DOCUMENT_TITLE = Pattern.compile(
-            "(?i)^.{0,100}(?:이력서|포트폴리오|resume|portfolio)(?:\\s+\\d+\\s*/\\s*\\d+)?$");
+            "(?i)^.{0,160}(?:이력서|포트폴리오|resume|portfolio).{0,80}$");
+    private static final Pattern COLON_HEADING = Pattern.compile("^[^.!?。！？\\r\\n]{1,80}:\\s*[^.!?。！？\\r\\n]{1,100}$");
+    private static final Pattern LIST_SEPARATOR = Pattern.compile("[|/·]|(?<!\\d),(?!\\d)");
     private static final Pattern SHORT_HEADING = Pattern.compile(
             "(?i)^(?:검증 가능한 )?(?:핵심 )?(?:경험|개요|요약|목차|기술 스택|"
                     + "문제 해결 사례|테스트 결과|성능 측정 결과|검증 결과)$");
@@ -116,6 +118,7 @@ final class SentenceWindowExtractor {
                 || NAME_ONLY.matcher(line).matches()
                 || PROFILE_LABEL.matcher(line).matches()
                 || TECHNICAL_LIST.matcher(line).matches()
+                || COLON_HEADING.matcher(line).matches()
                 || looksLikeTechnicalList(line)) {
             return true;
         }
@@ -129,9 +132,7 @@ final class SentenceWindowExtractor {
         if (endsSentence(line) || EVIDENCE_LINE.matcher(line).matches()) {
             return false;
         }
-        long separators = line.codePoints()
-                .filter(value -> value == '|' || value == '/' || value == ',' || value == '·')
-                .count();
+        long separators = LIST_SEPARATOR.matcher(line).results().count();
         return separators > 0 && line.trim().split("\\s+").length >= 2;
     }
 

@@ -1,0 +1,653 @@
+{
+  "schemaVersion" : 1,
+  "phase" : "PRZ-016-P16-UNSEEN-FINAL-PASS-DIAGNOSTIC",
+  "executedAt" : "2026-08-22T15:51:08.480196600Z",
+  "sourceCommit" : "05044b11038eeebaebac650c67d0d90136ae10bc",
+  "datasetSha256" : "c9e800075ad257b60ddab7407abc2fdcad067e10206bb580553ba8755708c1c3",
+  "productionCodeChanges" : 0,
+  "cases" : [ {
+    "id" : "UP01",
+    "role" : "CONTROL_ACTUAL_USE_POSITIVE",
+    "query" : "HikariCP",
+    "queryForm" : "BARE_IDENTIFIER",
+    "bareIdentifier" : true,
+    "experienceQuery" : false,
+    "resolveIntent" : "GENERAL",
+    "querySignals" : {
+      "requiredIdentifiers" : [ "hikaricp" ],
+      "positiveClaimQuestion" : false,
+      "directImplementationEvidenceRequest" : false,
+      "identifierEvidenceRequest" : false,
+      "directAnchorRequired" : true
+    },
+    "queryClaimRequirements" : {
+      "claimQuestion" : false,
+      "actorRequired" : true,
+      "actions" : [ ],
+      "entities" : [ "hikaricp" ],
+      "subjectTerms" : [ ],
+      "requiredState" : "ANY"
+    },
+    "claimSupport" : {
+      "status" : "SUPPORTED",
+      "directSupport" : true,
+      "reasons" : [ "DIRECT_CLAIM_SUPPORT" ],
+      "matchedClaimWindow" : "연결 풀에는 hikaricp를 채택해 최대 연결 수와 대기 시간을 설정하고 피크 시간의 타임아웃을 줄였다"
+    },
+    "originalSingletonRejectionReasons" : [ ],
+    "originalDenseRank" : 1,
+    "originalDenseScore" : 0.5217023543602474,
+    "candidateRetrieval" : [ {
+      "variantId" : "ORIGINAL",
+      "denseRank" : 1,
+      "denseScore" : 0.5217023543602474,
+      "distance" : 0.47829764563975263
+    } ],
+    "candidateDecisions" : [ {
+      "variantId" : "ORIGINAL",
+      "stage" : "RETRIEVAL",
+      "decision" : "PASS",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    }, {
+      "variantId" : "ORIGINAL",
+      "stage" : "SOURCE_CONSOLIDATION",
+      "decision" : "SELECTED",
+      "reasons" : [ ],
+      "representativeChunkId" : 209
+    }, {
+      "variantId" : "ORIGINAL",
+      "stage" : "ELIGIBILITY",
+      "decision" : "PASS",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    }, {
+      "variantId" : "ORIGINAL",
+      "stage" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "decision" : "SELECTED",
+      "reasons" : [ ],
+      "representativeChunkId" : 209
+    }, {
+      "variantId" : "ORIGINAL",
+      "stage" : "RANKING",
+      "decision" : "SELECTED",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    }, {
+      "variantId" : "ORIGINAL",
+      "stage" : "POST_FILTER",
+      "decision" : "PASS",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    }, {
+      "variantId" : "FINAL",
+      "stage" : "FINAL",
+      "decision" : "SELECTED",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    } ],
+    "variants" : [ {
+      "variantId" : "ORIGINAL",
+      "variantType" : "ORIGINAL",
+      "query" : "HikariCP",
+      "resolveIntent" : "GENERAL",
+      "querySignals" : {
+        "requiredIdentifiers" : [ "hikaricp" ],
+        "positiveClaimQuestion" : false,
+        "directImplementationEvidenceRequest" : false,
+        "identifierEvidenceRequest" : false,
+        "directAnchorRequired" : true
+      },
+      "queryClaimRequirements" : {
+        "claimQuestion" : false,
+        "actorRequired" : true,
+        "actions" : [ ],
+        "entities" : [ "hikaricp" ],
+        "subjectTerms" : [ ],
+        "requiredState" : "ANY"
+      },
+      "claimSupport" : {
+        "status" : "SUPPORTED",
+        "directSupport" : true,
+        "reasons" : [ "DIRECT_CLAIM_SUPPORT" ],
+        "matchedClaimWindow" : "연결 풀에는 hikaricp를 채택해 최대 연결 수와 대기 시간을 설정하고 피크 시간의 타임아웃을 줄였다"
+      },
+      "eligibilityDecisions" : [ {
+        "variantId" : "ORIGINAL",
+        "stage" : "ELIGIBILITY",
+        "decision" : "PASS",
+        "reasons" : [ ],
+        "representativeChunkId" : null
+      } ],
+      "sourceRepresentative" : true,
+      "eligible" : true,
+      "queryRepresentative" : true,
+      "rankingPosition" : 1,
+      "topFive" : true,
+      "postFilter" : true
+    } ],
+    "firstFailureStage" : "NONE",
+    "firstFailureReason" : "NONE",
+    "searchServiceFinal" : true,
+    "finalRank" : 1,
+    "productionParity" : true
+  }, {
+    "id" : "UN01",
+    "role" : "CONTROL_OTHER_ACTOR_REJECT",
+    "query" : "Deno 사용 경험",
+    "queryForm" : "EXPERIENCE",
+    "bareIdentifier" : false,
+    "experienceQuery" : true,
+    "resolveIntent" : "GENERAL",
+    "querySignals" : {
+      "requiredIdentifiers" : [ "deno" ],
+      "positiveClaimQuestion" : true,
+      "directImplementationEvidenceRequest" : false,
+      "identifierEvidenceRequest" : false,
+      "directAnchorRequired" : true
+    },
+    "queryClaimRequirements" : {
+      "claimQuestion" : true,
+      "actorRequired" : true,
+      "actions" : [ "USE" ],
+      "entities" : [ "deno" ],
+      "subjectTerms" : [ ],
+      "requiredState" : "USED"
+    },
+    "claimSupport" : {
+      "status" : "CONTRADICTED",
+      "directSupport" : false,
+      "reasons" : [ "ACTOR_MISMATCH" ],
+      "matchedClaimWindow" : ""
+    },
+    "originalSingletonRejectionReasons" : [ "CLAIM_SUPPORT_CONTRADICTED:ACTOR_MISMATCH" ],
+    "originalDenseRank" : 1,
+    "originalDenseScore" : 0.6160970649487992,
+    "candidateRetrieval" : [ {
+      "variantId" : "ORIGINAL",
+      "denseRank" : 1,
+      "denseScore" : 0.6160970649487992,
+      "distance" : 0.38390293505120077
+    } ],
+    "candidateDecisions" : [ {
+      "variantId" : "ORIGINAL",
+      "stage" : "RETRIEVAL",
+      "decision" : "PASS",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    }, {
+      "variantId" : "ORIGINAL",
+      "stage" : "SOURCE_CONSOLIDATION",
+      "decision" : "SELECTED",
+      "reasons" : [ ],
+      "representativeChunkId" : 312
+    }, {
+      "variantId" : "ORIGINAL",
+      "stage" : "ELIGIBILITY",
+      "decision" : "REJECT",
+      "reasons" : [ "CLAIM_SUPPORT_CONTRADICTED:ACTOR_MISMATCH" ],
+      "representativeChunkId" : null
+    } ],
+    "variants" : [ {
+      "variantId" : "ORIGINAL",
+      "variantType" : "ORIGINAL",
+      "query" : "Deno 사용 경험",
+      "resolveIntent" : "GENERAL",
+      "querySignals" : {
+        "requiredIdentifiers" : [ "deno" ],
+        "positiveClaimQuestion" : true,
+        "directImplementationEvidenceRequest" : false,
+        "identifierEvidenceRequest" : false,
+        "directAnchorRequired" : true
+      },
+      "queryClaimRequirements" : {
+        "claimQuestion" : true,
+        "actorRequired" : true,
+        "actions" : [ "USE" ],
+        "entities" : [ "deno" ],
+        "subjectTerms" : [ ],
+        "requiredState" : "USED"
+      },
+      "claimSupport" : {
+        "status" : "CONTRADICTED",
+        "directSupport" : false,
+        "reasons" : [ "ACTOR_MISMATCH" ],
+        "matchedClaimWindow" : ""
+      },
+      "eligibilityDecisions" : [ {
+        "variantId" : "ORIGINAL",
+        "stage" : "ELIGIBILITY",
+        "decision" : "REJECT",
+        "reasons" : [ "CLAIM_SUPPORT_CONTRADICTED:ACTOR_MISMATCH" ],
+        "representativeChunkId" : null
+      } ],
+      "sourceRepresentative" : true,
+      "eligible" : false,
+      "queryRepresentative" : false,
+      "rankingPosition" : 0,
+      "topFive" : false,
+      "postFilter" : false
+    } ],
+    "firstFailureStage" : "ELIGIBILITY",
+    "firstFailureReason" : "CLAIM_SUPPORT_CONTRADICTED:ACTOR_MISMATCH",
+    "searchServiceFinal" : false,
+    "finalRank" : 0,
+    "productionParity" : true
+  }, {
+    "id" : "UN02",
+    "role" : "TARGET_OTHER_ACTOR_FALSE_POSITIVE",
+    "query" : "Helidon",
+    "queryForm" : "BARE_IDENTIFIER",
+    "bareIdentifier" : true,
+    "experienceQuery" : false,
+    "resolveIntent" : "GENERAL",
+    "querySignals" : {
+      "requiredIdentifiers" : [ "helidon" ],
+      "positiveClaimQuestion" : false,
+      "directImplementationEvidenceRequest" : false,
+      "identifierEvidenceRequest" : false,
+      "directAnchorRequired" : true
+    },
+    "queryClaimRequirements" : {
+      "claimQuestion" : false,
+      "actorRequired" : true,
+      "actions" : [ ],
+      "entities" : [ "helidon" ],
+      "subjectTerms" : [ ],
+      "requiredState" : "ANY"
+    },
+    "claimSupport" : {
+      "status" : "CONTRADICTED",
+      "directSupport" : false,
+      "reasons" : [ "ACTOR_MISMATCH" ],
+      "matchedClaimWindow" : ""
+    },
+    "originalSingletonRejectionReasons" : [ "CLAIM_SUPPORT_CONTRADICTED:ACTOR_MISMATCH" ],
+    "originalDenseRank" : 1,
+    "originalDenseScore" : 0.4898779368110806,
+    "candidateRetrieval" : [ {
+      "variantId" : "ORIGINAL",
+      "denseRank" : 1,
+      "denseScore" : 0.4898779368110806,
+      "distance" : 0.5101220631889194
+    }, {
+      "variantId" : "FALLBACK_1",
+      "denseRank" : 1,
+      "denseScore" : 0.57565273834351,
+      "distance" : 0.42434726165648995
+    } ],
+    "candidateDecisions" : [ {
+      "variantId" : "ORIGINAL",
+      "stage" : "RETRIEVAL",
+      "decision" : "PASS",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    }, {
+      "variantId" : "ORIGINAL",
+      "stage" : "SOURCE_CONSOLIDATION",
+      "decision" : "SELECTED",
+      "reasons" : [ ],
+      "representativeChunkId" : 415
+    }, {
+      "variantId" : "ORIGINAL",
+      "stage" : "ELIGIBILITY",
+      "decision" : "REJECT",
+      "reasons" : [ "CLAIM_SUPPORT_CONTRADICTED:ACTOR_MISMATCH" ],
+      "representativeChunkId" : null
+    }, {
+      "variantId" : "FALLBACK_1",
+      "stage" : "RETRIEVAL",
+      "decision" : "PASS",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    }, {
+      "variantId" : "FALLBACK_1",
+      "stage" : "SOURCE_CONSOLIDATION",
+      "decision" : "SELECTED",
+      "reasons" : [ ],
+      "representativeChunkId" : 415
+    }, {
+      "variantId" : "FALLBACK_1",
+      "stage" : "ELIGIBILITY",
+      "decision" : "PASS",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    }, {
+      "variantId" : "FALLBACK_1",
+      "stage" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "decision" : "SELECTED",
+      "reasons" : [ ],
+      "representativeChunkId" : 415
+    }, {
+      "variantId" : "FALLBACK_1",
+      "stage" : "RANKING",
+      "decision" : "SELECTED",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    }, {
+      "variantId" : "FALLBACK_1",
+      "stage" : "POST_FILTER",
+      "decision" : "PASS",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    }, {
+      "variantId" : "FINAL",
+      "stage" : "FINAL",
+      "decision" : "SELECTED",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    } ],
+    "variants" : [ {
+      "variantId" : "ORIGINAL",
+      "variantType" : "ORIGINAL",
+      "query" : "Helidon",
+      "resolveIntent" : "GENERAL",
+      "querySignals" : {
+        "requiredIdentifiers" : [ "helidon" ],
+        "positiveClaimQuestion" : false,
+        "directImplementationEvidenceRequest" : false,
+        "identifierEvidenceRequest" : false,
+        "directAnchorRequired" : true
+      },
+      "queryClaimRequirements" : {
+        "claimQuestion" : false,
+        "actorRequired" : true,
+        "actions" : [ ],
+        "entities" : [ "helidon" ],
+        "subjectTerms" : [ ],
+        "requiredState" : "ANY"
+      },
+      "claimSupport" : {
+        "status" : "CONTRADICTED",
+        "directSupport" : false,
+        "reasons" : [ "ACTOR_MISMATCH" ],
+        "matchedClaimWindow" : ""
+      },
+      "eligibilityDecisions" : [ {
+        "variantId" : "ORIGINAL",
+        "stage" : "ELIGIBILITY",
+        "decision" : "REJECT",
+        "reasons" : [ "CLAIM_SUPPORT_CONTRADICTED:ACTOR_MISMATCH" ],
+        "representativeChunkId" : null
+      } ],
+      "sourceRepresentative" : true,
+      "eligible" : false,
+      "queryRepresentative" : false,
+      "rankingPosition" : 0,
+      "topFive" : false,
+      "postFilter" : false
+    }, {
+      "variantId" : "FALLBACK_1",
+      "variantType" : "FALLBACK",
+      "query" : "Helidon 경험",
+      "resolveIntent" : "GENERAL",
+      "querySignals" : {
+        "requiredIdentifiers" : [ "helidon" ],
+        "positiveClaimQuestion" : true,
+        "directImplementationEvidenceRequest" : false,
+        "identifierEvidenceRequest" : false,
+        "directAnchorRequired" : true
+      },
+      "queryClaimRequirements" : {
+        "claimQuestion" : false,
+        "actorRequired" : false,
+        "actions" : [ ],
+        "entities" : [ "helidon" ],
+        "subjectTerms" : [ ],
+        "requiredState" : "ANY"
+      },
+      "claimSupport" : {
+        "status" : "SUPPORTED",
+        "directSupport" : false,
+        "reasons" : [ "NON_CLAIM_QUERY" ],
+        "matchedClaimWindow" : ""
+      },
+      "eligibilityDecisions" : [ {
+        "variantId" : "FALLBACK_1",
+        "stage" : "ELIGIBILITY",
+        "decision" : "PASS",
+        "reasons" : [ ],
+        "representativeChunkId" : null
+      } ],
+      "sourceRepresentative" : true,
+      "eligible" : true,
+      "queryRepresentative" : true,
+      "rankingPosition" : 1,
+      "topFive" : true,
+      "postFilter" : true
+    } ],
+    "firstFailureStage" : "NONE",
+    "firstFailureReason" : "NONE",
+    "searchServiceFinal" : true,
+    "finalRank" : 1,
+    "productionParity" : true
+  }, {
+    "id" : "UN04",
+    "role" : "CONTROL_MERE_MENTION_REJECT",
+    "query" : "Nomad 사용 경험",
+    "queryForm" : "EXPERIENCE",
+    "bareIdentifier" : false,
+    "experienceQuery" : true,
+    "resolveIntent" : "GENERAL",
+    "querySignals" : {
+      "requiredIdentifiers" : [ "nomad" ],
+      "positiveClaimQuestion" : true,
+      "directImplementationEvidenceRequest" : false,
+      "identifierEvidenceRequest" : false,
+      "directAnchorRequired" : true
+    },
+    "queryClaimRequirements" : {
+      "claimQuestion" : true,
+      "actorRequired" : true,
+      "actions" : [ "USE" ],
+      "entities" : [ "nomad" ],
+      "subjectTerms" : [ ],
+      "requiredState" : "USED"
+    },
+    "claimSupport" : {
+      "status" : "UNSUPPORTED",
+      "directSupport" : false,
+      "reasons" : [ "ENTITY_NOT_BOUND_TO_ACTION", "ACTION_NOT_SUPPORTED" ],
+      "matchedClaimWindow" : ""
+    },
+    "originalSingletonRejectionReasons" : [ "CLAIM_SUPPORT_UNSUPPORTED:ACTION_NOT_SUPPORTED", "CLAIM_SUPPORT_UNSUPPORTED:ENTITY_NOT_BOUND_TO_ACTION" ],
+    "originalDenseRank" : 1,
+    "originalDenseScore" : 0.6232526673826525,
+    "candidateRetrieval" : [ {
+      "variantId" : "ORIGINAL",
+      "denseRank" : 1,
+      "denseScore" : 0.6232526673826525,
+      "distance" : 0.3767473326173475
+    } ],
+    "candidateDecisions" : [ {
+      "variantId" : "ORIGINAL",
+      "stage" : "RETRIEVAL",
+      "decision" : "PASS",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    }, {
+      "variantId" : "ORIGINAL",
+      "stage" : "SOURCE_CONSOLIDATION",
+      "decision" : "SELECTED",
+      "reasons" : [ ],
+      "representativeChunkId" : 518
+    }, {
+      "variantId" : "ORIGINAL",
+      "stage" : "ELIGIBILITY",
+      "decision" : "REJECT",
+      "reasons" : [ "CLAIM_SUPPORT_UNSUPPORTED:ACTION_NOT_SUPPORTED", "CLAIM_SUPPORT_UNSUPPORTED:ENTITY_NOT_BOUND_TO_ACTION" ],
+      "representativeChunkId" : null
+    } ],
+    "variants" : [ {
+      "variantId" : "ORIGINAL",
+      "variantType" : "ORIGINAL",
+      "query" : "Nomad 사용 경험",
+      "resolveIntent" : "GENERAL",
+      "querySignals" : {
+        "requiredIdentifiers" : [ "nomad" ],
+        "positiveClaimQuestion" : true,
+        "directImplementationEvidenceRequest" : false,
+        "identifierEvidenceRequest" : false,
+        "directAnchorRequired" : true
+      },
+      "queryClaimRequirements" : {
+        "claimQuestion" : true,
+        "actorRequired" : true,
+        "actions" : [ "USE" ],
+        "entities" : [ "nomad" ],
+        "subjectTerms" : [ ],
+        "requiredState" : "USED"
+      },
+      "claimSupport" : {
+        "status" : "UNSUPPORTED",
+        "directSupport" : false,
+        "reasons" : [ "ENTITY_NOT_BOUND_TO_ACTION", "ACTION_NOT_SUPPORTED" ],
+        "matchedClaimWindow" : ""
+      },
+      "eligibilityDecisions" : [ {
+        "variantId" : "ORIGINAL",
+        "stage" : "ELIGIBILITY",
+        "decision" : "REJECT",
+        "reasons" : [ "CLAIM_SUPPORT_UNSUPPORTED:ACTION_NOT_SUPPORTED", "CLAIM_SUPPORT_UNSUPPORTED:ENTITY_NOT_BOUND_TO_ACTION" ],
+        "representativeChunkId" : null
+      } ],
+      "sourceRepresentative" : true,
+      "eligible" : false,
+      "queryRepresentative" : false,
+      "rankingPosition" : 0,
+      "topFive" : false,
+      "postFilter" : false
+    } ],
+    "firstFailureStage" : "ELIGIBILITY",
+    "firstFailureReason" : "CLAIM_SUPPORT_UNSUPPORTED:ACTION_NOT_SUPPORTED;CLAIM_SUPPORT_UNSUPPORTED:ENTITY_NOT_BOUND_TO_ACTION",
+    "searchServiceFinal" : false,
+    "finalRank" : 0,
+    "productionParity" : true
+  }, {
+    "id" : "UN05",
+    "role" : "TARGET_MERE_MENTION_FALSE_POSITIVE",
+    "query" : "Redwood Stream Core",
+    "queryForm" : "MULTI_WORD_IDENTIFIER",
+    "bareIdentifier" : true,
+    "experienceQuery" : false,
+    "resolveIntent" : "GENERAL",
+    "querySignals" : {
+      "requiredIdentifiers" : [ "core", "redwood", "stream" ],
+      "positiveClaimQuestion" : false,
+      "directImplementationEvidenceRequest" : false,
+      "identifierEvidenceRequest" : false,
+      "directAnchorRequired" : false
+    },
+    "queryClaimRequirements" : {
+      "claimQuestion" : false,
+      "actorRequired" : true,
+      "actions" : [ ],
+      "entities" : [ "core", "redwood", "stream" ],
+      "subjectTerms" : [ ],
+      "requiredState" : "ANY"
+    },
+    "claimSupport" : {
+      "status" : "UNSUPPORTED",
+      "directSupport" : false,
+      "reasons" : [ "ENTITY_NOT_BOUND_TO_ACTION", "ACTION_NOT_SUPPORTED" ],
+      "matchedClaimWindow" : ""
+    },
+    "originalSingletonRejectionReasons" : [ ],
+    "originalDenseRank" : 1,
+    "originalDenseScore" : 0.6305948302362352,
+    "candidateRetrieval" : [ {
+      "variantId" : "ORIGINAL",
+      "denseRank" : 1,
+      "denseScore" : 0.6305948302362352,
+      "distance" : 0.3694051697637648
+    } ],
+    "candidateDecisions" : [ {
+      "variantId" : "ORIGINAL",
+      "stage" : "RETRIEVAL",
+      "decision" : "PASS",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    }, {
+      "variantId" : "ORIGINAL",
+      "stage" : "SOURCE_CONSOLIDATION",
+      "decision" : "SELECTED",
+      "reasons" : [ ],
+      "representativeChunkId" : 621
+    }, {
+      "variantId" : "ORIGINAL",
+      "stage" : "ELIGIBILITY",
+      "decision" : "PASS",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    }, {
+      "variantId" : "ORIGINAL",
+      "stage" : "QUERY_EVIDENCE_CONSOLIDATION",
+      "decision" : "SELECTED",
+      "reasons" : [ ],
+      "representativeChunkId" : 621
+    }, {
+      "variantId" : "ORIGINAL",
+      "stage" : "RANKING",
+      "decision" : "SELECTED",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    }, {
+      "variantId" : "ORIGINAL",
+      "stage" : "POST_FILTER",
+      "decision" : "PASS",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    }, {
+      "variantId" : "FINAL",
+      "stage" : "FINAL",
+      "decision" : "SELECTED",
+      "reasons" : [ ],
+      "representativeChunkId" : null
+    } ],
+    "variants" : [ {
+      "variantId" : "ORIGINAL",
+      "variantType" : "ORIGINAL",
+      "query" : "Redwood Stream Core",
+      "resolveIntent" : "GENERAL",
+      "querySignals" : {
+        "requiredIdentifiers" : [ "core", "redwood", "stream" ],
+        "positiveClaimQuestion" : false,
+        "directImplementationEvidenceRequest" : false,
+        "identifierEvidenceRequest" : false,
+        "directAnchorRequired" : false
+      },
+      "queryClaimRequirements" : {
+        "claimQuestion" : false,
+        "actorRequired" : true,
+        "actions" : [ ],
+        "entities" : [ "core", "redwood", "stream" ],
+        "subjectTerms" : [ ],
+        "requiredState" : "ANY"
+      },
+      "claimSupport" : {
+        "status" : "UNSUPPORTED",
+        "directSupport" : false,
+        "reasons" : [ "ENTITY_NOT_BOUND_TO_ACTION", "ACTION_NOT_SUPPORTED" ],
+        "matchedClaimWindow" : ""
+      },
+      "eligibilityDecisions" : [ {
+        "variantId" : "ORIGINAL",
+        "stage" : "ELIGIBILITY",
+        "decision" : "PASS",
+        "reasons" : [ ],
+        "representativeChunkId" : null
+      } ],
+      "sourceRepresentative" : true,
+      "eligible" : true,
+      "queryRepresentative" : true,
+      "rankingPosition" : 1,
+      "topFive" : true,
+      "postFilter" : true
+    } ],
+    "firstFailureStage" : "NONE",
+    "firstFailureReason" : "NONE",
+    "searchServiceFinal" : true,
+    "finalRank" : 1,
+    "productionParity" : true
+  } ]
+}

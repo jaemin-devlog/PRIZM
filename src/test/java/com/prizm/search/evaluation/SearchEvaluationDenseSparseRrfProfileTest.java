@@ -114,7 +114,7 @@ class SearchEvaluationDenseSparseRrfProfileTest {
     }
 
     @Test
-    void completedReleaseClaimGateRemainsExactlyOnTheProductionDecisionPath() {
+    void completedReleaseRetrievalContractRemainsOnTheProductionDecisionPath() {
         VectorSearchResult direct = candidate(
                 1L,
                 1,
@@ -145,11 +145,11 @@ class SearchEvaluationDenseSparseRrfProfileTest {
                         sparse(retracted, 0.20d),
                         sparse(direct, 0.10d)));
 
-        assertThat(outcome.decision().results()).containsExactly(direct);
+        assertThat(outcome.decision().results()).containsExactly(question, negated, retracted, direct);
     }
 
     @Test
-    void directCompletedReleaseClaimCanPassBelowTheDenseFloorOnTheSparseBranch() {
+    void exactIdentifierCompletedReleaseEvidenceCanPassBelowTheDenseFloorOnTheSparseBranch() {
         VectorSearchResult belowFloorDirectClaim = candidate(
                 1L,
                 1,
@@ -166,7 +166,7 @@ class SearchEvaluationDenseSparseRrfProfileTest {
     }
 
     @Test
-    void unsupportedCompletedReleaseQueryCannotFallBackThroughTheSparseBranch() {
+    void legacyUnsupportedCompletionGrammarNoLongerTriggersATruthRejection() {
         VectorSearchResult candidate = candidate(
                 1L,
                 1,
@@ -178,9 +178,9 @@ class SearchEvaluationDenseSparseRrfProfileTest {
                 List.of(candidate),
                 List.of(sparse(candidate, 0.10d)));
 
-        assertThat(outcome.decision().results()).isEmpty();
+        assertThat(outcome.decision().results()).containsExactly(candidate);
         assertThat(outcome.decision().rejectionReasons())
-                .contains("UNSUPPORTED_COMPLETED_RELEASE_QUERY");
+                .doesNotContain("UNSUPPORTED_COMPLETED_RELEASE_QUERY");
     }
 
     @Test

@@ -1,0 +1,215 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "prizm-p16-structured-claim-eligibility-matrix-v1",
+  "frozenBeforeExecution": true,
+  "baseCorpus": "dataset-v3-realistic-pdf.json",
+  "cases": [
+    {
+      "id": "A01",
+      "type": "A_ACTUAL_USE",
+      "queryForm": "EXPERIENCE",
+      "identifier": "Redis",
+      "query": "Redis 사용 경험",
+      "evidence": "Redis를 사용해 세션 캐시 모듈을 개발했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "A02",
+      "type": "A_ACTUAL_USE",
+      "queryForm": "BARE",
+      "identifier": "Docker",
+      "query": "Docker",
+      "evidence": "Docker 기반으로 빌드 격리 서비스를 구현했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "A03",
+      "type": "A_ACTUAL_USE",
+      "queryForm": "NATURAL",
+      "identifier": "FooEngine",
+      "query": "FooEngine을 적용해 작업 중복 문제를 해결한 경험이 있나요?",
+      "evidence": "FooEngine을 적용해 작업 중복 문제를 해결했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "B01",
+      "type": "B_CONTRAST",
+      "queryForm": "EXPERIENCE",
+      "identifier": "Redis",
+      "query": "Redis 사용 경험",
+      "evidence": "Redis 기반 캐시를 사용했지만, 최종 중복 방지 근거는 캐시가 아니라 DB 제약이었다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "B02",
+      "type": "B_CONTRAST",
+      "queryForm": "NATURAL",
+      "identifier": "Docker",
+      "query": "Docker를 적용한 경험이 있나요?",
+      "evidence": "Docker를 적용했고, 최종 방어 수단은 Docker가 아니라 PostgreSQL 제약이었다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "B03",
+      "type": "B_CONTRAST",
+      "queryForm": "BARE",
+      "identifier": "Kafka",
+      "query": "Kafka",
+      "evidence": "Kafka를 사용했지만 장애 원인은 Kafka가 아니라 잘못된 재시도 정책이었다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "B04",
+      "type": "B_CONTRAST",
+      "queryForm": "NATURAL",
+      "identifier": "Nebula Harbor Mesh",
+      "query": "Nebula Harbor Mesh 기반 라우터를 구현한 경험이 있나요?",
+      "evidence": "Nebula Harbor Mesh 기반 라우터를 구현했지만, 최종 접근 통제 수단은 이 라우터가 아니라 권한 재검증이었다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "C01",
+      "type": "C_EXPLICIT_NEGATION",
+      "queryForm": "EXPERIENCE",
+      "identifier": "Redis",
+      "query": "Redis 사용 경험",
+      "evidence": "Redis를 사용하지 않았다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "C02",
+      "type": "C_EXPLICIT_NEGATION",
+      "queryForm": "BARE",
+      "identifier": "Kafka",
+      "query": "Kafka",
+      "evidence": "Kafka가 아니라 PostgreSQL을 사용했다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "C03",
+      "type": "C_EXPLICIT_NEGATION",
+      "queryForm": "NATURAL",
+      "identifier": "Docker",
+      "query": "Docker를 도입한 경험이 있나요?",
+      "evidence": "Docker 도입을 검토했지만 도입하지 않았다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "C04",
+      "type": "C_EXPLICIT_NEGATION",
+      "queryForm": "EXPERIENCE",
+      "identifier": "FooEngine",
+      "query": "FooEngine 사용 경험",
+      "evidence": "FooEngine 사용 경험이 없다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "D01",
+      "type": "D_OTHER_ACTOR",
+      "queryForm": "EXPERIENCE",
+      "identifier": "Tauri",
+      "query": "Tauri 사용 경험",
+      "evidence": "다른 팀이 Tauri를 사용해 데스크톱 도구를 개발했다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "D02",
+      "type": "D_OTHER_ACTOR",
+      "queryForm": "NATURAL",
+      "identifier": "Kafka",
+      "query": "Kafka를 사용한 경험이 있나요?",
+      "evidence": "고객사가 Kafka를 사용해 이벤트를 전달했다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "E01",
+      "type": "E_MERE_MENTION",
+      "queryForm": "EXPERIENCE",
+      "identifier": "Docker",
+      "query": "Docker 사용 경험",
+      "evidence": "Docker 도입 가능성을 검토했다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "E02",
+      "type": "E_MERE_MENTION",
+      "queryForm": "NATURAL",
+      "identifier": "FooEngine",
+      "query": "FooEngine을 사용한 경험이 있나요?",
+      "evidence": "FooEngine 관련 운영 문서를 읽었다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "F01",
+      "type": "F_TECH_DECLARATION",
+      "queryForm": "EXPERIENCE",
+      "identifier": "Spring Boot",
+      "query": "Spring Boot 사용 경험",
+      "evidence": "Spring Boot, PostgreSQL 기반 백엔드 개발",
+      "expected": "PASS"
+    },
+    {
+      "id": "F02",
+      "type": "F_TECH_DECLARATION",
+      "queryForm": "BARE",
+      "identifier": "Tauri",
+      "query": "Tauri",
+      "evidence": "Tauri 기반 데스크톱 앱 개발",
+      "expected": "PASS"
+    },
+    {
+      "id": "G01",
+      "type": "G_QUERY_FORM_POSITIVE",
+      "queryForm": "BARE",
+      "identifier": "Quartz Signal Fabric",
+      "query": "Quartz Signal Fabric",
+      "evidence": "Quartz Signal Fabric 기반으로 이벤트 라우터 서비스를 구현했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "G02",
+      "type": "G_QUERY_FORM_POSITIVE",
+      "queryForm": "EXPERIENCE",
+      "identifier": "Quartz Signal Fabric",
+      "query": "Quartz Signal Fabric 사용 경험",
+      "evidence": "Quartz Signal Fabric 기반으로 이벤트 라우터 서비스를 구현했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "G03",
+      "type": "G_QUERY_FORM_POSITIVE",
+      "queryForm": "NATURAL",
+      "identifier": "Quartz Signal Fabric",
+      "query": "Quartz Signal Fabric 기반 서비스를 구현한 경험이 있나요?",
+      "evidence": "Quartz Signal Fabric 기반으로 이벤트 라우터 서비스를 구현했다.",
+      "expected": "PASS"
+    },
+    {
+      "id": "G04",
+      "type": "G_QUERY_FORM_NEGATIVE",
+      "queryForm": "BARE",
+      "identifier": "Ember Harbor Mesh",
+      "query": "Ember Harbor Mesh",
+      "evidence": "고객사가 Ember Harbor Mesh를 사용했다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "G05",
+      "type": "G_QUERY_FORM_NEGATIVE",
+      "queryForm": "EXPERIENCE",
+      "identifier": "Ember Harbor Mesh",
+      "query": "Ember Harbor Mesh 사용 경험",
+      "evidence": "고객사가 Ember Harbor Mesh를 사용했다.",
+      "expected": "REJECT"
+    },
+    {
+      "id": "G06",
+      "type": "G_QUERY_FORM_NEGATIVE",
+      "queryForm": "NATURAL",
+      "identifier": "Ember Harbor Mesh",
+      "query": "Ember Harbor Mesh를 사용한 경험이 있나요?",
+      "evidence": "고객사가 Ember Harbor Mesh를 사용했다.",
+      "expected": "REJECT"
+    }
+  ]
+}

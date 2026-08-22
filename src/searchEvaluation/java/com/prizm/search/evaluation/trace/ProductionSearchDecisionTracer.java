@@ -241,7 +241,7 @@ public final class ProductionSearchDecisionTracer {
         if (numericRequired) {
             postFilter = postFilter.stream()
                     .filter(candidate -> {
-                        boolean pass = NumericQueryAnchors.hasContextualMatch(
+                        boolean pass = NumericQueryAnchors.hasAllContextualMatches(
                                 originalQuery, candidate.content());
                         if (!pass) {
                             postFilterReasons.computeIfAbsent(candidate.chunkId(), ignored -> new ArrayList<>())
@@ -349,12 +349,21 @@ public final class ProductionSearchDecisionTracer {
         List<GroupView> sourceGroups = groups(invoke(
                 profile, "consolidateSourceLocations", intent, query, signals, candidates));
         List<VectorSearchResult> sourceRepresentatives = representatives(sourceGroups);
+        Set<Long> denseTopFiveChunkIds = candidates.stream()
+                .limit(MAX_RESULTS)
+                .map(VectorSearchResult::chunkId)
+                .collect(Collectors.toSet());
 
         Map<Long, List<String>> eligibility = new LinkedHashMap<>();
         List<VectorSearchResult> eligible = new ArrayList<>();
         for (VectorSearchResult candidate : sourceRepresentatives) {
             List<String> reasons = (List<String>) invoke(
-                    profile, "rejectionReasons", intent, signals, candidate);
+                    profile,
+                    "rejectionReasons",
+                    intent,
+                    signals,
+                    candidate,
+                    denseTopFiveChunkIds.contains(candidate.chunkId()));
             eligibility.put(candidate.chunkId(), reasons);
             if (reasons.isEmpty()) {
                 eligible.add(candidate);

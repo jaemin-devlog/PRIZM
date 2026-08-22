@@ -155,6 +155,21 @@ tasks.register('p6FreezeIdentifierStressSet', Test) {
                     .getOrElse('specs/PRZ-016-search-performance-v2/p6-retrieval-shadow')
 }
 
+tasks.register('p16LiteralCandidatePhaseA', Test) {
+    description = 'Runs PRZ-016 P16 evaluation-only Dense plus literal candidate Phase A.'
+    group = 'verification'
+    testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
+    classpath = sourceSets.searchEvaluation.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching 'com.prizm.search.evaluation.PhaseALiteralCandidateEvaluationTest'
+    }
+    outputs.upToDateWhen { false }
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
 tasks.register('gptEvidenceJudgeShadow', Test) {
     description = 'Runs the PRZ-016 GPT-J1 P5 evidence-judge shadow comparison.'
     group = 'verification'

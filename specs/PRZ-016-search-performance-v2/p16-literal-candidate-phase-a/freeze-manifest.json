@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "prizm-p16-literal-candidate-phase-a-v2",
+  "frozenAt": "2026-08-22T21:27:34.2822962+09:00",
+  "frozenBeforeEvaluationRun": true,
+  "supersedesDatasetSha256": "492a568831d429fe08256de5a0ac040db970ac47913de96a10287fbf3e7674e3",
+  "supersessionReason": "The v1 near-miss fixture descriptions repeated the exact query tokens; v2 removes only those contradictory explanation words before the authoritative run.",
+  "datasetSha256": "55c7f2819462cf90d6645be40b7d3987c41f3153d6c6203fd20ae1feb2d5041d",
+  "datasetBytes": 5558,
+  "primaryOwnerActiveChunkCount": 88,
+  "queryCount": 12,
+  "positiveQueryCount": 7,
+  "safetyQueryCount": 5,
+  "productionSearchSourceCount": 35,
+  "productionSearchAggregateSha256": "743c767b4f893d112199b99888b34e9727771e1020259c0d3ae9465678510ee5"
+}

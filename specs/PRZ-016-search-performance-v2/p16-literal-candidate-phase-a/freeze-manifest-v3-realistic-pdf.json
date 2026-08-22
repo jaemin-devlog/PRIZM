@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "prizm-p16-literal-candidate-phase-a-v3-realistic-pdf",
+  "frozenAt": "2026-08-22T22:08:00.9277915+09:00",
+  "frozenBeforeDenseOrLiteralEvaluation": true,
+  "supersedesForNextRun": "prizm-p16-literal-candidate-phase-a-v2",
+  "supersessionReason": "v2 used short direct-seed chunks and all seven positive identifiers ranked first in Dense retrieval; v3 is an independently generated long-form PDF processed by the real PRIZM PDF extraction and chunking path.",
+  "assets": [
+    {
+      "path": "output/pdf/prizm-p16-realistic-long-synthetic-career-report.pdf",
+      "sha256": "a226f5497d66f9480645c52e1236736eef4e55d82e1de45667e5c276125b6843",
+      "bytes": 298432
+    },
+    {
+      "path": "specs/PRZ-016-search-performance-v2/p16-literal-candidate-phase-a/realistic-pdf/source.json",
+      "sha256": "77a3f37099b09969ce2b87f516a233ea3cd31302b09c83c226eb61e87cca88bb",
+      "bytes": 30030
+    },
+    {
+      "path": "specs/PRZ-016-search-performance-v2/p16-literal-candidate-phase-a/realistic-pdf/generate.py",
+      "sha256": "bf0ea34f3a5fbec364d8c83371bb3b1f50e09f0958fee3b2f5ae675018ce20ce",
+      "bytes": 11508
+    },
+    {
+      "path": "specs/PRZ-016-search-performance-v2/p16-literal-candidate-phase-a/dataset-v3-realistic-pdf.json",
+      "sha256": "3f48b56b7445fc19f745f7ae0ed9b3a2fe56ffaf6d256c8453227deab75109b6",
+      "bytes": 2740
+    }
+  ],
+  "pdfPageCount": 27,
+  "pdfExtractedCharacterCount": 63470,
+  "pdfChunkCount": 101,
+  "primaryOwnerActiveChunkCount": 102,
+  "queryCount": 12,
+  "positiveQueryCount": 7,
+  "safetyQueryCount": 5,
+  "productionSearchSourceCount": 35,
+  "productionSearchAggregateSha256": "743c767b4f893d112199b99888b34e9727771e1020259c0d3ae9465678510ee5"
+}

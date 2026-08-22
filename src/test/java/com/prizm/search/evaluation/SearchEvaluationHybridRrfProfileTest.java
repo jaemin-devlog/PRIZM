@@ -116,7 +116,7 @@ class SearchEvaluationHybridRrfProfileTest {
     }
 
     @Test
-    void completedReleaseClaimGateAcceptsOnlyTheDirectAffirmativeClaim() {
+    void completedReleaseRetrievalKeepsAllRelevantPolarityVariants() {
         VectorSearchResult direct = candidate(
                 1L,
                 1,
@@ -147,11 +147,11 @@ class SearchEvaluationHybridRrfProfileTest {
                         lexical(retracted, 0.20d),
                         lexical(direct, 0.10d)));
 
-        assertThat(outcome.decision().results()).containsExactly(direct);
+        assertThat(outcome.decision().results()).containsExactly(question, negated, retracted, direct);
     }
 
     @Test
-    void directCompletedReleaseClaimCanPassBelowTheDenseFloorOnTheLexicalBranch() {
+    void exactIdentifierCompletedReleaseEvidenceCanPassBelowTheDenseFloorOnTheLexicalBranch() {
         VectorSearchResult belowFloorDirectClaim = candidate(
                 1L,
                 1,
@@ -168,7 +168,7 @@ class SearchEvaluationHybridRrfProfileTest {
     }
 
     @Test
-    void unsupportedCompletedReleaseQueryCannotFallBackThroughTheLexicalBranch() {
+    void legacyUnsupportedCompletionGrammarNoLongerTriggersATruthRejection() {
         VectorSearchResult candidate = candidate(
                 1L,
                 1,
@@ -180,9 +180,9 @@ class SearchEvaluationHybridRrfProfileTest {
                 List.of(candidate),
                 List.of(lexical(candidate, 0.10d)));
 
-        assertThat(outcome.decision().results()).isEmpty();
+        assertThat(outcome.decision().results()).containsExactly(candidate);
         assertThat(outcome.decision().rejectionReasons())
-                .contains("UNSUPPORTED_COMPLETED_RELEASE_QUERY");
+                .doesNotContain("UNSUPPORTED_COMPLETED_RELEASE_QUERY");
     }
 
     @Test

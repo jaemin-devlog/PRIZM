@@ -113,7 +113,6 @@ class FinalUnseenJudgeE2ETest {
             row.put("responseState", trace.responseState()); row.put("productionResponseMatch", trace.productionResponseMatch());
             row.set("finalResults", mapper.valueToTree(trace.finalResults()));
             row.set("displayedEvidence", mapper.valueToTree(trace.localization()));
-            row.set("queryClaimRequirements", mapper.valueToTree(profile.queryClaimRequirements(query)));
             if ("POSITIVE".equals(question.path("label").asText())) {
                 JsonNode expected = truth.get(id);
                 SearchDecisionTrace.GroundTruthOutcome outcome = evaluator.evaluatePositive(trace, expected, corpus.fixtureByDocument());

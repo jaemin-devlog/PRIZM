@@ -56,6 +56,10 @@ public class SearchSnippetGenerator {
                 selected.queryCoverage(),
                 selected.numericMatches(),
                 selected.action() || selected.problem() || selected.result(),
+                selected.action(),
+                selected.problem(),
+                selected.result(),
+                selected.metric(),
                 selected.technicalList(),
                 selected.metadata(),
                 selected.score(),
@@ -76,6 +80,10 @@ public class SearchSnippetGenerator {
             int queryCoverage,
             int numericMatches,
             boolean narrative,
+            boolean action,
+            boolean problem,
+            boolean result,
+            boolean metric,
             boolean technicalList,
             boolean metadata,
             int anchorScore,
@@ -98,16 +106,19 @@ public class SearchSnippetGenerator {
                 boolean metadata,
                 int anchorScore) {
             this(snippet, exactPhrase, queryCoverage, numericMatches, narrative,
-                    technicalList, metadata, anchorScore, false, -1, -1, List.of());
+                    false, false, false, false, technicalList, metadata, anchorScore,
+                    false, -1, -1, List.of());
         }
 
         static SnippetSelection empty() {
-            return new SnippetSelection("", false, 0, 0, false, false, false, 0,
+            return new SnippetSelection("", false, 0, 0, false,
+                    false, false, false, false, false, false, 0,
                     false, -1, -1, List.of());
         }
 
         static SnippetSelection fallback(String content) {
-            return new SnippetSelection(content, false, 0, 0, false, false, false, 0,
+            return new SnippetSelection(content, false, 0, 0, false,
+                    false, false, false, false, false, false, 0,
                     false, -1, -1, List.of());
         }
     }

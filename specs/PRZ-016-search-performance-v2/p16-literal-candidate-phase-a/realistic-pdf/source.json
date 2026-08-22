@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "documentId": "prizm-p16-realistic-career-report-v3",
+  "title": "합성 프로젝트 수행 및 운영 회고 보고서",
+  "subtitle": "PRIZM P16 Literal Candidate Phase A · 현실형 장문 PDF corpus",
+  "classification": "SYNTHETIC EVALUATION DOCUMENT — 실제 인물·회사·경력 정보 없음",
+  "outputPath": "output/pdf/prizm-p16-realistic-long-synthetic-career-report.pdf",
+  "targetChunkRange": {"min": 95, "max": 105},
+  "targetExpressions": [
+    {"key": "redis", "expression": "Redis"},
+    {"key": "spring-boot", "expression": "Spring Boot"},
+    {"key": "tauri", "expression": "Tauri"},
+    {"key": "bun", "expression": "Bun"},
+    {"key": "langgraph", "expression": "LangGraph"},
+    {"key": "fooengine", "expression": "FooEngine"},
+    {"key": "quartz-harbor-mesh", "expression": "Quartz Harbor Mesh"}
+  ],
+  "sections": [
+    {
+      "title": "01. 문제 정의와 관찰 범위",
+      "situation": "여러 부서에서 전달된 변경 요청이 서로 다른 문서 형식과 시간 기준을 사용해 같은 사건을 다르게 설명했고, 담당자는 무엇을 먼저 확인해야 하는지 합의하기 어려웠다",
+      "pressure": "개발 일정은 짧았지만 과거 기록을 삭제하거나 새 결론으로 덮어쓰면 감사 가능성이 사라질 수 있었으므로 속도와 추적성을 동시에 지켜야 했다",
+      "decision": "요청 문장, 확인한 원문, 판단 시각, 담당 경계를 분리해 기록하고 불확실한 항목은 추정값으로 채우지 않은 채 별도 대기 상태로 남겼다",
+      "verification": "동일 입력을 반복 처리한 결과와 누락된 근거를 함께 검토하고, 문서에 없는 사실이 화면이나 보고서에 나타나지 않는지 표본과 전체 건수를 교차 점검했다",
+      "reflection": "초기의 모호한 요구를 작은 검증 질문으로 바꾼 덕분에 구현 논쟁보다 증거의 존재 여부를 먼저 확인할 수 있었고 이후 단계의 변경 범위도 좁아졌다"
+    },
+    {
+      "title": "02. 자료 수집과 기준선 고정",
+      "situation": "초기 자료에는 회의 메모, 장애 기록, 설계 초안, 테스트 결과가 뒤섞여 있었고 같은 이름의 파일도 저장 시점에 따라 내용이 달랐다",
+      "pressure": "나중에 더 좋아 보이는 결과만 선택하지 않으려면 검색이나 모델 실행 전에 입력과 기대 조건을 고정해야 했지만 문서 작성자는 계속 보완 의견을 보내고 있었다",
+      "decision": "원본을 수정하지 않고 버전별 해시와 수집 시각을 남겼으며, 평가에 사용할 질문과 허용 가능한 근거 위치를 별도 manifest로 분리했다",
+      "verification": "동결 전후 바이트 크기와 해시를 비교하고 문서 수, 페이지 수, 추출 문자 수가 예상 범위에 있는지 자동 검사와 수동 표본 검사를 함께 수행했다",
+      "reflection": "입력을 먼저 고정하니 실패한 결과도 해석 가능한 자료가 되었고, 결과를 본 뒤 문구를 고치는 방식의 과적합을 절차적으로 막을 수 있었다"
+    },
+    {
+      "title": "03. 동시 요청과 중복 기록 통제",
+      "situation": "같은 사용자가 짧은 시간에 동일 작업을 여러 번 요청하면 각 요청은 정상처럼 보이지만 저장 단계에서 중복 행과 상충하는 상태 전이가 만들어질 수 있었다",
+      "pressure": "단순히 버튼을 비활성화하는 방식은 네트워크 재전송과 여러 장치의 동시 실행을 막지 못했고, 실패 후 재시도까지 제한하면 정상 복구 경로가 사라졌다",
+      "decision": "업무 식별자와 소유자 경계를 묶은 멱등성 기준을 정하고 트랜잭션 안에서 선행 상태를 다시 읽은 뒤 이미 완료된 요청은 기존 결과를 반환하도록 했다",
+      "verification": "서로 다른 지연을 주입한 병렬 요청, 중간 실패 후 재시도, 같은 payload의 연속 제출을 반복해 최종 상태와 생성 건수가 항상 하나로 수렴하는지 확인했다",
+      "reflection": "중복 방지는 화면 동작이 아니라 저장 계약이어야 했고, 재시도 가능성과 단일 결과 보장을 함께 설계해야 운영 중 예외를 설명할 수 있었다",
+      "embeddedSentence": "이 과정에서 세션 밖의 짧은 상태를 공유해야 하는 구간에는 Redis 기반 캐시를 사용했지만, 최종 중복 방지의 근거는 캐시가 아니라 데이터베이스의 소유자별 원자적 제약과 재검증에 두었다."
+    },
+    {
+      "title": "04. 서버 경계와 요청 검증",
+      "situation": "입력 형식이 올바르더라도 현재 사용자에게 허용되지 않은 문서 식별자가 섞이면 내부 서비스가 잘못된 대상을 조회할 가능성이 있었다",
+      "pressure": "컨트롤러에서만 검증하면 비동기 작업이나 내부 호출이 같은 보호를 받지 못하고, 모든 계층이 독립적으로 복잡한 권한 판단을 하면 정책이 쉽게 어긋났다",
+      "decision": "인증 정보에서 사용자 식별자를 얻은 뒤 서비스와 저장소 조회에 소유자 조건을 반복하고, 요청 DTO의 형식 검증과 실제 데이터 소유권 검증을 분리했다",
+      "verification": "정상 사용자, 비활성 사용자, 다른 사용자 문서, 존재하지 않는 버전, 역할이 다른 계정을 조합해 각 경계에서 동일한 거부 결과가 유지되는지 확인했다",
+      "reflection": "권한은 한 번 통과하는 문이 아니라 데이터가 이동하는 모든 경로에 남아야 하는 조건이었고, 실패 응답이 내부 경로를 노출하지 않는지도 함께 봐야 했다",
+      "embeddedSentence": "애플리케이션 경계는 Spring Boot 환경의 의존성 주입과 트랜잭션 구성을 활용해 조립했으며, 프레임워크 이름 자체가 권한을 보장한다고 가정하지 않고 각 repository query의 owner 조건을 별도로 검증했다."
+    },
+    {
+      "title": "05. 원본 보존과 불변 버전",
+      "situation": "사용자가 같은 제목의 문서를 다시 올릴 때 기존 결과를 즉시 교체하면 새 파일의 추출이나 임베딩이 실패한 순간 검색 가능한 정상 버전까지 잃을 수 있었다",
+      "pressure": "저장 공간과 처리 시간을 아끼려는 요구가 있었지만 원본을 덮어쓰면 장애 원인을 재현할 수 없고 이전 답변이 어떤 파일에서 나왔는지도 설명하기 어려웠다",
+      "decision": "업로드마다 불변 버전을 만들고 원본 해시와 저장 descriptor를 보존하며, 새 버전의 모든 chunk가 준비된 뒤에만 active pointer를 원자적으로 전환했다",
+      "verification": "추출 실패, 임베딩 실패, 작업 lease 만료, 늦게 도착한 worker 완료를 주입해 이전 active version이 계속 검색 후보로 남고 실패 버전은 후보에 들어오지 않는지 확인했다",
+      "reflection": "버전 전환을 마지막 단일 상태 변경으로 모으니 복구 규칙이 단순해졌고, 사용자는 처리 중에도 마지막으로 검증된 문서를 계속 사용할 수 있었다"
+    },
+    {
+      "title": "06. 데스크톱 검토 도구의 최소 권한",
+      "situation": "운영자가 긴 문서와 추출 결과를 나란히 비교하려면 브라우저만으로는 반복적인 로컬 파일 확인이 번거로웠고 검토 중 임시 표시를 별도 창에서 유지할 필요가 있었다",
+      "pressure": "데스크톱 셸이 파일 시스템 전체나 임의 명령 실행 권한을 가지면 작은 편의 기능이 배포 위험으로 바뀔 수 있었고 플랫폼별 패키징 차이도 관리해야 했다",
+      "decision": "읽기 대상과 호출 명령을 좁은 allowlist로 제한하고 서버의 인증된 원본 조회를 우선 사용했으며, 로컬 경로는 화면이나 로그에 직접 노출하지 않았다",
+      "verification": "허용되지 않은 경로, 변조된 command payload, 세션 만료, 창 재시작을 반복해 검토 기능이 실패하더라도 원본과 검색 결과 상태가 바뀌지 않는지 확인했다",
+      "reflection": "편의 도구는 핵심 데이터 흐름과 분리할수록 안전했고, 로컬 기능을 추가하더라도 서버의 소유권 검증을 우회하는 새 통로를 만들지 않는 것이 중요했다",
+      "embeddedSentence": "검토용 reference shell은 Tauri 기반으로 구성해 제한된 command surface만 노출했으며, 이 선택은 평가 문서 확인을 돕기 위한 것이지 production 검색 후보나 순위를 바꾸는 요소로 사용하지 않았다."
+    },
+    {
+      "title": "07. 비동기 작업의 lease와 fencing",
+      "situation": "문서 처리 시간이 길어지면 작업을 가져간 worker가 종료되거나 네트워크 단절 뒤 뒤늦게 복귀해 새 worker의 결과를 덮어쓸 수 있었다",
+      "pressure": "단순 timeout은 느리지만 정상인 작업을 중복 실행할 수 있고, heartbeat만 신뢰하면 멈춘 프로세스가 소유권을 영구히 점유하는 문제가 생겼다",
+      "decision": "claim version과 만료 시각을 함께 저장하고 주기적으로 lease를 갱신하며, 모든 완료와 진행률 update가 현재 claim version을 만족할 때만 반영되게 했다",
+      "verification": "worker 강제 종료, clock 차이, lease 직전·직후 완료, stale worker의 늦은 activation을 재현해 오직 최신 claim만 상태를 바꾸는지 확인했다",
+      "reflection": "작업을 누가 시작했는지보다 현재 누가 변경 권한을 가졌는지가 중요했고, fencing 값은 복구 과정의 경쟁 상태를 관찰 가능한 실패로 바꾸었다"
+    },
+    {
+      "title": "08. 도구 실행 환경과 재현성",
+      "situation": "로컬 개발자는 서로 다른 운영체제와 패키지 캐시를 사용했고 같은 스크립트도 설치된 runtime과 lockfile 상태에 따라 실행 시간이 크게 달랐다",
+      "pressure": "평가 준비 시간을 줄이려다 dependency resolution을 느슨하게 만들면 clean clone에서 결과를 재현하기 어렵고, 빠른 로컬 성공이 배포 가능성을 증명하지 못했다",
+      "decision": "runtime 버전과 lockfile을 고정하고 생성 스크립트가 입력 파일과 출력 경로를 명시적으로 받도록 했으며, 생성물과 검증 로그를 분리했다",
+      "verification": "빈 캐시와 warm cache에서 동일 입력을 처리하고 생성물 해시, 테스트 수, 실패 메시지가 일치하는지 비교했으며 외부 네트워크 없이 가능한 단계도 구분했다",
+      "reflection": "속도는 유용하지만 재현 가능한 입력과 종료 코드가 먼저였고, 실행 도구를 바꾸더라도 산출물 계약과 검증 기준은 그대로 유지해야 했다",
+      "embeddedSentence": "일회성 문서 생성 보조 스크립트의 빠른 반복에는 Bun 실행기를 사용한 별도 실험도 기록했으나, 최종 평가 산출물은 고정된 Python 환경과 해시 manifest로 다시 생성해 도구 선택이 근거를 흔들지 않게 했다."
+    },
+    {
+      "title": "09. 텍스트 추출과 페이지 의미 보존",
+      "situation": "PDF는 화면에서 한 페이지로 보이지만 내부 text stream의 줄 순서와 공백이 작성 도구마다 달라 같은 문장이 여러 줄로 끊기거나 제목과 footer가 본문 사이에 섞였다",
+      "pressure": "추출 결과를 임의로 재배열하면 원문 확인 위치를 잃을 수 있고, 반대로 모든 줄바꿈을 보존하면 검색 문장이 지나치게 잘게 나뉘어 근거가 불완전해졌다",
+      "decision": "페이지 번호를 source metadata로 보존한 채 페이지별 text를 정규화하고, 고정 길이와 overlap으로 chunk를 만든 뒤 원문 content를 그대로 저장했다",
+      "verification": "여러 페이지에 걸친 긴 문단, 한글과 영문 혼합, footer 반복, 빈 페이지 가능성을 검사하고 각 chunk가 원래 페이지와 재연결되는지 확인했다",
+      "reflection": "검색 품질과 문서 확인 가능성은 따로 최적화할 수 없었고, page identity를 잃지 않는 범위에서만 text normalization을 적용해야 했다"
+    },
+    {
+      "title": "10. 상태 기반 평가 흐름",
+      "situation": "하나의 평가 요청은 준비, 후보 수집, 근거 판정, 결과 기록을 거치며 중간 실패가 발생하면 어떤 단계까지 완료됐는지 명확히 남겨야 했다",
+      "pressure": "조건문이 여러 파일에 흩어지면 재시도 때 이미 수행한 외부 호출을 반복하거나 실패 상태에서 성공 경로로 잘못 이동할 수 있었다",
+      "decision": "각 단계를 명시적인 state와 transition으로 표현하고 terminal state를 제한했으며, 외부 호출 전후에 재개 가능한 checkpoint를 남겼다",
+      "verification": "도구 timeout, 잘못된 응답 형식, 중간 저장 실패, 반복 resume를 주입해 허용되지 않은 edge가 실행되지 않고 최종 상태가 하나로 수렴하는지 확인했다",
+      "reflection": "workflow 표현은 복잡성을 없애기보다 어디에 있는지 보여 주었고, 관찰 가능한 state 덕분에 실패 원인과 재시도 범위를 분리할 수 있었다",
+      "embeddedSentence": "이 평가 orchestration의 실험형 그래프는 LangGraph 기반으로 상태 전이와 checkpoint를 표현했지만, 검색 후보의 적합성 판단은 기존 production evidence 계약이 담당하도록 경계를 유지했다."
+    },
+    {
+      "title": "11. 임베딩 입력과 수치 검증",
+      "situation": "문서와 질문을 벡터로 바꾸는 과정에서 응답 차원이 다르거나 NaN, 무한대, 영벡터가 들어오면 거리 계산은 실행되더라도 결과 의미가 사라질 수 있었다",
+      "pressure": "외부 모델 오류를 일시적인 빈 검색 결과로 취급하면 사용자는 근거가 없다고 오해하고, 잘못된 벡터를 저장하면 이후 모든 검색에 지속적인 영향을 준다",
+      "decision": "저장과 조회 직전에 차원, 유한값, non-zero norm을 검증하고 계약 위반은 재시도 가능 여부가 명확한 처리 실패로 분리했다",
+      "verification": "정상 벡터와 함께 차원 부족, 단일 NaN, 무한대, 영벡터 응답을 주입해 어떤 값도 데이터베이스에 기록되거나 검색 요청에 사용되지 않는지 확인했다",
+      "reflection": "수치 검증은 모델 품질 평가가 아니라 데이터 무결성의 최소 조건이었고, 실패를 조용한 빈 결과로 바꾸지 않아야 운영자가 원인을 찾을 수 있었다"
+    },
+    {
+      "title": "12. 플러그인 실행기 격리",
+      "situation": "여러 형식의 문서를 동일 파이프라인에서 처리하려면 parser와 adapter를 교체할 수 있어야 했지만 한 확장 모듈의 실패가 전체 작업 큐를 멈추면 안 됐다",
+      "pressure": "동적 확장을 쉽게 만들수록 임의 코드 실행과 dependency 충돌 위험이 커졌고, 실패 모듈이 부분 결과를 남기면 재실행 시 중복 처리될 수 있었다",
+      "decision": "확장 모듈의 입력·출력 계약과 timeout을 고정하고 임시 결과는 격리된 영역에 쓴 뒤 검증 완료 시점에만 본 처리 흐름으로 전달했다",
+      "verification": "느린 모듈, 잘못된 schema, 예외 종료, 같은 job의 반복 호출을 재현해 큐 진행과 기존 active 결과가 영향을 받지 않는지 확인했다",
+      "reflection": "확장성은 등록 가능한 모듈 수보다 실패 경계를 얼마나 분명히 정의했는지에 달려 있었고, core 상태 전환은 plugin 밖에 남겨야 했다",
+      "embeddedSentence": "합성 실험에서 내부 plugin host는 FooEngine 기반으로 구성했으며, 이 식별자는 긴 운영 회고 문장 속의 작은 구현 세부일 뿐 별도의 제품 기능이나 기술 whitelist를 뜻하지 않는다."
+    },
+    {
+      "title": "13. 검색 후보와 최종 근거의 분리",
+      "situation": "질문과 가까운 문장을 빠르게 찾는 단계와 그 문장이 실제 질문을 지지하는지 판단하는 단계가 섞이면 높은 유사도만으로 최종 답변이 만들어질 수 있었다",
+      "pressure": "후보 수를 과도하게 줄이면 정답이 검증 단계에 도달하지 못하고, 반대로 후보를 그대로 노출하면 단순 언급이나 반대 사례가 사용자에게 근거처럼 보였다",
+      "decision": "retrieval은 owner와 active 범위에서 제한된 후보를 만들고 structured claim support가 행동, 대상, 수치, 부정 표현을 확인한 뒤에만 결과로 선택하도록 역할을 분리했다",
+      "verification": "같은 기술을 사용한 사례, 사용하지 않았다는 문장, 계획만 한 문장, 다른 프로젝트의 문장을 섞어 후보 존재와 최종 선택을 각각 기록했다",
+      "reflection": "후보 recall과 최종 precision은 별도 관찰값이어야 했고, 새 후보 채널을 추가하더라도 기존 evidence 검증을 우회하지 않는 것이 핵심이었다"
+    },
+    {
+      "title": "14. 문자열 후보의 제한된 역할",
+      "situation": "짧은 제품명이나 새 식별자는 원문에 정확히 있어도 의미 기반 상위 후보에 들지 못할 수 있었고, 사용자는 문서에서 눈으로 찾을 수 있는 표현을 검색 결과에서 놓칠 수 있었다",
+      "pressure": "문자열 일치에 높은 점수를 주면 우연한 언급과 substring이 순위를 왜곡할 수 있고, 특정 이름 목록을 넣으면 처음 보는 식별자에 일반화되지 않았다",
+      "decision": "평가 경로에서만 질문 표현의 exact-boundary 원문 일치를 추가 후보로 수집하고 dense 후보와 chunk identity로 합치되 boost나 새 순위를 만들지 않았다",
+      "verification": "case 차이, 다른 사용자, inactive version, 긴 식별자 뒤의 접미사, 짧은 단어가 더 긴 단어 안에 있는 경우를 분리해 후보 단계의 포함 여부를 기록했다",
+      "reflection": "문자열 채널은 답을 결정하는 기능이 아니라 검증 단계에 도달할 기회를 보완하는 장치였고, 최종 결과는 기존 근거 판정을 그대로 통과해야 했다"
+    },
+    {
+      "title": "15. 합성 라우팅 실험 기록",
+      "situation": "새로운 연결 규칙을 시험할 때 운영 시스템의 실제 주소나 사용자 자료를 복제하지 않고도 여러 경로와 실패 조건을 설명할 수 있는 중립적인 fixture가 필요했다",
+      "pressure": "익숙한 공개 제품명만 사용하면 모델이 이미 학습한 의미 때문에 평가가 쉬워질 수 있었고, 무작위 한 단어는 실제 문서의 multi-word 식별자 형태를 충분히 대표하지 못했다",
+      "decision": "실존 제품을 가리키지 않는 새 multi-word 식별자를 source data에만 정의하고 긴 회고 문단의 한 문장에 넣어 일반적인 literal 처리 여부를 확인했다",
+      "verification": "generator와 검색 구현에서 이름별 상수나 분기가 없는지 검색하고 PDF text, chunk content, query data 사이의 exact 표현만 일치하는지 검사했다",
+      "reflection": "평가용 이름은 결과를 유도하는 규칙이 아니라 입력 데이터여야 하며, 새로운 이름으로 교체해도 같은 parser와 repository가 동작해야 일반화 근거가 된다",
+      "embeddedSentence": "격리된 라우팅 fixture는 Quartz Harbor Mesh 기반으로 기록했으며, 담당자는 이 표현을 설명 문단 중간에 한 번만 남겨 제목이나 목차가 검색 단서로 작동하지 않게 했다."
+    },
+    {
+      "title": "16. 결과 통합과 중복 근거",
+      "situation": "같은 문장이 overlap chunk와 반복된 문서 구간에 함께 나타나면 후보 단계에서 여러 ID로 보이고 최종 화면에도 거의 같은 근거가 반복될 수 있었다",
+      "pressure": "문서와 페이지가 같다는 이유만으로 합치면 같은 페이지의 서로 다른 성과를 잃고, 문자열이 조금 다르다는 이유로 모두 남기면 결과 수가 중복으로 채워졌다",
+      "decision": "source identity를 보존하면서 의미 있는 exact-boundary overlap과 같은 version의 반복 span만 축약하고 서로 다른 프로젝트의 독립 근거는 유지했다",
+      "verification": "같은 페이지의 다른 문장, 다른 페이지의 반복 문장, TXT overlap, 다른 문서의 같은 기술 표현을 조합해 남아야 할 결과와 제거할 결과를 구분했다",
+      "reflection": "중복 제거는 단순 ID dedup보다 늦은 단계의 evidence 관계 문제였고, source 위치를 잃지 않은 상태에서만 보수적으로 적용해야 했다"
+    },
+    {
+      "title": "17. 근거 문장 현지화",
+      "situation": "올바른 chunk가 선택돼도 화면에 첫 문장이나 가장 짧은 문장만 보이면 사용자가 문제, 행동, 결과를 한 번에 확인하지 못하고 원문을 다시 훑어야 했다",
+      "pressure": "너무 긴 snippet은 관련 없는 주변 설명을 포함하고, 문장 하나로 제한하면 줄바꿈이나 대명사 때문에 핵심 claim이 불완전해졌다",
+      "decision": "선택된 chunk를 우선해 hard-wrap을 복원하고 질문의 주체, 행동, 대상, 수치 anchor가 이어지는 1~3개 연속 문장 window를 추출했다",
+      "verification": "PDF 줄바꿈, 숫자와 단위 분리, 문제와 해결이 다른 문장에 있는 사례, 다음 chunk 확장을 조합해 anchor 손실과 과도한 문맥 포함을 점검했다",
+      "reflection": "localization은 ranking 뒤의 표현 문제가 아니라 evidence 완결성 계약이었고, 선택 근거를 바꾸지 않으면서 사용자가 확인할 범위를 정확히 줄여야 했다"
+    },
+    {
+      "title": "18. 실패 분류와 사용자 메시지",
+      "situation": "검색 결과가 비어 있는 이유는 문서에 근거가 없거나 후보가 threshold를 넘지 못했거나 외부 모델 호출이 실패한 경우처럼 서로 달랐다",
+      "pressure": "모든 경우를 동일한 빈 목록으로 반환하면 사용자는 경력 사실이 없다고 오해할 수 있고, 내부 오류를 그대로 노출하면 시스템 구조와 민감한 경로가 드러났다",
+      "decision": "근거 부재, 관련 결과 부재, 일시적 처리 실패를 내부 trace에서 분리하고 외부 메시지는 확인 가능한 범위만 설명하도록 제한했다",
+      "verification": "없는 identifier, 다른 owner에만 있는 표현, model timeout, invalid embedding, filter rejection을 각각 재현해 상태와 사용자 응답이 계약대로 구분되는지 확인했다",
+      "reflection": "정직한 실패 표현은 품질 지표만큼 중요했고, 문서에 없다는 결론과 시스템이 확인하지 못했다는 상태를 섞지 않아야 했다"
+    },
+    {
+      "title": "19. 관찰 가능성과 결정 trace",
+      "situation": "최종 결과만 보면 정답 chunk가 retrieval에서 누락됐는지 filter에서 제거됐는지 localization에서 잘못 잘렸는지 구분하기 어려웠다",
+      "pressure": "디버깅 정보를 production 응답에 모두 노출하면 내부 score와 문서 식별자가 불필요하게 공개되고, 로그만 남기면 평가별 비교가 재현되지 않았다",
+      "decision": "evaluation source set에만 query variant, candidate ID, eligibility reason, consolidation과 final selection을 구조화한 decision trace를 기록했다",
+      "verification": "실제 SearchService 응답의 state와 최종 chunk 순서를 trace와 비교하고, D0 후보 순서가 production repository 결과와 같은지 모든 frozen query에서 확인했다",
+      "reflection": "어느 단계에서 달라졌는지 보이면 개선 범위를 작게 유지할 수 있었고, 관찰 기능 자체가 검색 결과를 바꾸지 않는 parity test가 필수였다"
+    },
+    {
+      "title": "20. 소유자 격리 회귀",
+      "situation": "동일한 문자열이 여러 사용자의 문서에 존재할 수 있어 query text만으로 후보를 찾으면 다른 사용자의 chunk가 우연히 높은 점수나 literal match를 가질 수 있었다",
+      "pressure": "상위 서비스에서 owner를 확인해도 repository join 하나가 빠지면 version이나 chunk가 다른 사용자와 연결될 가능성이 있었고 관리 역할도 개인 데이터 우회를 허용하면 안 됐다",
+      "decision": "document, version, chunk 각 테이블의 owner를 join과 where 조건에서 반복 확인하고 현재 요청 사용자의 active 상태도 데이터베이스에서 재검증했다",
+      "verification": "같은 제목, 같은 표현, 같은 version 번호를 가진 두 사용자를 만들고 각 요청의 candidate와 final result ID가 오직 자기 소유 범위에 있는지 직접 조회했다",
+      "reflection": "격리는 결과 화면에서 한 번 확인하는 속성이 아니라 모든 read path의 구조적 조건이었고, evaluation 전용 SQL도 production과 같은 경계를 가져야 했다"
+    },
+    {
+      "title": "21. 활성 버전 격리 회귀",
+      "situation": "이전 문서 버전에만 있는 표현은 데이터베이스 chunk에 남아 있으므로 단순 owner 조건만으로 검색하면 이미 대체된 경력이 현재 근거처럼 나타날 수 있었다",
+      "pressure": "version status만 확인하면 document의 active pointer와 어긋난 비정상 상태를 놓칠 수 있고 pointer만 확인하면 실패 상태의 version을 후보로 허용할 수 있었다",
+      "decision": "document active_version_id와 version ACTIVE status를 동시에 만족하고 세 테이블 owner가 일치하는 chunk만 retrieval 대상으로 제한했다",
+      "verification": "inactive v1에만 식별자를 두고 active v2에는 다른 문장을 둔 뒤 dense와 literal 채널 모두에서 v1 chunk가 후보에 나타나지 않는지 확인했다",
+      "reflection": "현재성은 시간 순서가 아니라 명시적 활성화 계약으로 정의해야 했고, 실패하거나 superseded된 자료가 존재한다는 사실과 검색 가능하다는 사실을 분리해야 했다"
+    },
+    {
+      "title": "22. 경계 문자열과 근접 오인",
+      "situation": "짧은 검색어는 더 긴 식별자의 일부로 자주 나타나 단순 substring 검색이 실제 표현과 무관한 문서를 exact match처럼 취급할 수 있었다",
+      "pressure": "공백만 경계로 보면 하이픈, 슬래시, 점, 밑줄이 포함된 코드 식별자를 잘못 나누고 Unicode 문자와 대소문자 차이도 일관되게 처리하기 어려웠다",
+      "decision": "문자, 숫자와 제한된 identifier punctuation을 같은 token 내부로 보고 좌우가 그 집합 밖일 때만 exact boundary match로 인정했다",
+      "verification": "긴 이름 뒤 접미사, 짧은 단어가 긴 일반 단어 앞에 있는 경우, 대소문자 차이, multi-word 공백 변형을 독립 fixture로 만들어 포함과 제외를 확인했다",
+      "reflection": "경계 규칙은 기술명 사전 없이도 설명 가능해야 했고, false positive를 막기 위해 substring보다 보수적인 일관성을 선택했다"
+    },
+    {
+      "title": "23. 부하와 지연 관찰",
+      "situation": "후보 채널을 하나 더 조회하면 평균 지연이 작아 보여도 긴 tail latency가 사용자 경험과 worker 자원에 영향을 줄 수 있어 별도 관찰이 필요했다",
+      "pressure": "작은 synthetic corpus의 단일 실행은 cache warm-up과 네트워크 변동에 민감했고, 품질이 좋아 보여도 지연 비용을 기록하지 않으면 production 설계 판단에 사용할 수 없었다",
+      "decision": "이번 단계에서는 최종 성능 결론을 내리지 않고 채널별 후보 존재와 query 수를 우선 기록하며, latency 비교는 다음 승인 단계의 frozen run으로 분리했다",
+      "verification": "동일 환경 정보, database 종류, embedding model, 실행 시각을 결과에 남기고 현재 실행이 PostgreSQL 근거인지 OpenSQL 근거인지 명확히 구분했다",
+      "reflection": "측정하지 않은 성능을 개선됐다고 표현하지 않는 것이 중요했고, Phase A의 성공 조건은 후보 복구 가능성이라는 좁은 질문에만 한정했다"
+    },
+    {
+      "title": "24. 복구와 롤백 연습",
+      "situation": "실험 코드가 production source와 같은 저장소에 있어도 실행 경로가 분리되지 않으면 task 설정이나 profile 실수로 실제 서비스 동작에 연결될 위험이 있었다",
+      "pressure": "빠르게 비교하려고 공용 repository를 수정하면 rollback 범위가 커지고 기존 검색 회귀가 실험 결과와 섞여 원인을 판단하기 어려워졌다",
+      "decision": "별도 source set과 focused task에 evaluation repository와 runner를 두고 main source, migration, runtime configuration, frontend를 변경하지 않았다",
+      "verification": "production 검색 source 파일 수와 aggregate hash를 전후 비교하고 제한 경로의 diff가 0인지 확인했으며 focused task 외 일반 test도 다시 실행했다",
+      "reflection": "실험이 실패해도 새 평가 파일만 제거하면 되는 구조가 안전했고, 좋은 결과가 나와도 production 적용은 별도 설계와 승인 문제로 남겼다"
+    }
+  ]
+}

@@ -18,7 +18,6 @@ import com.prizm.search.profile.SearchIntent;
 import com.prizm.search.profile.ShortGeneralExactTokenRescueProfile;
 import com.prizm.search.repository.VectorSearchRepository;
 import com.prizm.search.repository.VectorSearchResult;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -135,12 +134,13 @@ public class SearchService {
         if (selectedProfile == SearchProfile.LEGACY_DENSE_V1) {
             selected = candidates;
         } else {
+            boolean requireDirectAnchor =
+                    NaturalLanguageQueryFallback.requiresDirectAnchor(query);
             selected = selectCompositeResults(
                     query,
-                    List.of(query),
                     candidates,
-                    NaturalLanguageQueryFallback.requiresDirectAnchor(query));
-            selected = keepExactContextualNumericEvidence(query, selected);
+                    requireDirectAnchor);
+            selected = keepRequiredNumericEvidence(query, selected);
             boolean fallbackAllowed = compositeSearchProfile.resolveIntent(query) == SearchIntent.GENERAL
                     || NaturalLanguageQueryFallback.isExperienceRequest(query);
             if (selected.isEmpty() && fallbackAllowed) {
@@ -149,25 +149,21 @@ public class SearchService {
                                 query, variant, guardedIdentifiers))
                         .toList();
                 List<VectorSearchResult> mergedCandidates = candidates;
-                List<String> anchorQueries = new ArrayList<>();
-                anchorQueries.add(query);
                 int executedVariants = 0;
-                for (String fallbackQuery : variants) {
-                    float[] fallbackEmbedding = embeddingService.embed(fallbackQuery);
+                for (String retrievalVariant : variants) {
+                    float[] fallbackEmbedding = embeddingService.embed(retrievalVariant);
                     embeddingValidator.validate(fallbackEmbedding);
                     List<VectorSearchResult> fallbackCandidates =
                             vectorSearchRepository.findCareerEvidenceCandidates(
                                     ownerUserId,
                                     fallbackEmbedding);
                     executedVariants++;
-                    anchorQueries.add(fallbackQuery);
                     mergedCandidates = mergeCandidates(mergedCandidates, fallbackCandidates);
                     selected = selectCompositeResults(
-                            fallbackQuery,
-                            anchorQueries,
+                            query,
                             mergedCandidates,
-                            true);
-                    selected = keepExactContextualNumericEvidence(query, selected);
+                            requireDirectAnchor);
+                    selected = keepRequiredNumericEvidence(query, selected);
                     if (!selected.isEmpty()) {
                         break;
                     }
@@ -202,7 +198,7 @@ public class SearchService {
                         .toList());
     }
 
-    private static List<VectorSearchResult> keepExactContextualNumericEvidence(
+    private static List<VectorSearchResult> keepRequiredNumericEvidence(
             String query,
             List<VectorSearchResult> selected) {
         boolean hasContextualNumericAnchor = NumericQueryAnchors.extract(query).stream()
@@ -211,25 +207,24 @@ public class SearchService {
             return selected;
         }
         return selected.stream()
-                .filter(candidate -> NumericQueryAnchors.hasContextualMatch(query, candidate.content()))
+                .filter(candidate -> NumericQueryAnchors.hasAllContextualMatches(
+                        query, candidate.content()))
                 .toList();
     }
 
     private List<VectorSearchResult> selectCompositeResults(
-            String searchQuery,
-            List<String> anchorQueries,
+            String originalQuery,
             List<VectorSearchResult> candidates,
             boolean requireDirectAnchor) {
         List<VectorSearchResult> selected =
-                shortGeneralExactTokenRescueProfile.apply(searchQuery, candidates).results();
+                shortGeneralExactTokenRescueProfile.apply(originalQuery, candidates).results();
         if (!requireDirectAnchor) {
             return selected;
         }
         return selected.stream()
-                .filter(candidate -> anchorQueries.stream().anyMatch(anchorQuery ->
-                        NaturalLanguageQueryFallback.hasDirectAnchor(
-                                anchorQuery,
-                                candidate.content())))
+                .filter(candidate -> NaturalLanguageQueryFallback.hasDirectAnchor(
+                        originalQuery,
+                        candidate.content()))
                 .toList();
     }
 

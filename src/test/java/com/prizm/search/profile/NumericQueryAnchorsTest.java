@@ -31,4 +31,20 @@ class NumericQueryAnchorsTest {
                         "675 갱신", "엑셀 업로드에서 675건을 갱신했다."))
                 .isFalse();
     }
+
+    @Test
+    void requiresEveryContextualQueryNumberAtAnExactBoundary() {
+        assertThat(NumericQueryAnchors.hasAllContextualMatches(
+                        "응답 시간이 340ms였나요?", "응답 시간이 340 ms였다."))
+                .isTrue();
+        assertThat(NumericQueryAnchors.hasAllContextualMatches(
+                        "P95가 1.4초에서 340ms로 줄었나요?", "P95는 1.4초에서 340밀리초로 줄었다."))
+                .isTrue();
+        assertThat(NumericQueryAnchors.hasAllContextualMatches(
+                        "응답 시간이 340ms였나요?", "응답 시간이 380밀리초였다."))
+                .isFalse();
+        assertThat(NumericQueryAnchors.hasAllContextualMatches(
+                        "응답 시간이 340ms였나요?", "응답 시간이 1,340ms였다."))
+                .isFalse();
+    }
 }

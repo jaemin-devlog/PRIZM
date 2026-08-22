@@ -26,19 +26,21 @@ final class EvidenceSentenceScorer {
     private static final Set<String> ACTION_TERMS = Set.of(
             "구현", "개선", "설계", "적용", "해결", "통합", "운영", "검증", "도입", "배포",
             "직접", "분리", "전환", "최적화", "처리", "구성", "갱신", "저장", "차단", "제어",
-            "직렬화", "수행", "만들", "결합", "제한");
+            "직렬화", "수행", "실행", "거절", "격리", "줄었", "막", "만들", "결합", "제한");
     private static final Set<String> PROBLEM_TERMS = Set.of(
             "문제", "장애", "실패", "병목", "충돌", "중복", "지연", "불일치", "누락", "위험",
-            "급증", "빠지는", "재실행", "덮어쓰");
+            "급증", "빠지는", "재실행", "덮어쓰", "오류", "손상", "격리", "깨진", "거듭",
+            "unique");
     private static final Set<String> RESULT_TERMS = Set.of(
             "감소", "단축", "향상", "개선", "방지", "유지", "성공", "완료", "절감",
             "안정", "해결", "전환", "갱신", "줄였", "낮췄", "높였", "제거", "완화", "차단",
-            "보냈", "반영", "들어가지", "복구", "0건", "적용됐", "배포했");
+            "보냈", "반영", "들어가지", "들어갈 수 없", "실행하지 않", "복구", "거절", "줄었", "막", "0건",
+            "적용됐", "배포했");
     private static final Set<String> STATE_TERMS = Set.of(
             "생산", "production", "운영", "배포", "출시", "실제", "적용됐", "사용되", "현재");
     private static final Set<String> DETAIL_TERMS = Set.of(
             "반영", "보정", "병합", "결합", "제한", "분리", "이동", "대기열", "checkpoint",
-            "체크포인트", "상한", "직렬화", "재시도", "보냈", "전환");
+            "체크포인트", "상한", "직렬화", "재시도", "보냈", "전환", "격리");
     private static final Set<String> ACTOR_TERMS = Set.of(
             "본인", "직접", "담당", "수행", "구현했", "만들었", "적용했", "배포했");
     private static final Set<String> METRIC_TERMS = Set.of(
@@ -99,7 +101,7 @@ final class EvidenceSentenceScorer {
         score += action && result ? 1_200 : 0;
         score += action && state ? 1_300 : 0;
         score += actor && action ? 1_200 : 0;
-        score += metric && result ? 700 : 0;
+        score += signals.metricRequested() && metric && result ? 700 : 0;
         score += claimComplete && (signals.actionRequested() || signals.problemRequested()) ? 4_000 : 0;
         score += claimComponents * 80;
         score -= (window.sentenceCount() - 1) * 1_000;
@@ -125,6 +127,12 @@ final class EvidenceSentenceScorer {
                 ordered.add(term);
             }
         }
+        if (normalizedQuery.contains("거절")) {
+            unique.add("실행하지 않");
+        }
+        if (normalizedQuery.contains("줄였")) {
+            unique.add("줄었");
+        }
         Set<String> numbers = numbers(Objects.requireNonNullElse(query, ""));
         boolean asksAction = containsAny(normalizedQuery, ACTION_TERMS)
                 || normalizedQuery.contains("했나") || normalizedQuery.contains("어떻게");
@@ -132,9 +140,10 @@ final class EvidenceSentenceScorer {
                 || containsAny(normalizedQuery, Set.of("문제", "장애", "해결", "대응"));
         boolean asksState = containsAny(normalizedQuery, Set.of(
                 "생산", "production", "운영", "배포", "출시", "적용", "사용"));
+        boolean asksMetric = containsAny(normalizedQuery, METRIC_TERMS);
         return new QuerySignals(
                 normalizedQuery, List.copyOf(ordered), Set.copyOf(unique), Set.copyOf(numbers),
-                asksAction, asksProblem, asksState);
+                asksAction, asksProblem, asksState, asksMetric);
     }
 
     private static int adjacentPhraseMatches(List<String> terms, String normalizedWindow) {
@@ -197,7 +206,8 @@ final class EvidenceSentenceScorer {
             Set<String> numbers,
             boolean actionRequested,
             boolean problemRequested,
-            boolean stateRequested) {
+            boolean stateRequested,
+            boolean metricRequested) {
     }
 
     record Selection(WindowScore selected, List<WindowScore> candidates) {

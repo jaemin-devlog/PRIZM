@@ -23,7 +23,11 @@ class SearchEvaluationDenseSparseRerankerProfileTest {
 
     @Test
     void rerankerRecoversTheDenseRankOneCandidateFromP14EligibleRankNine() {
-        VectorSearchResult answer = candidate(1L, 1, "FOR UPDATE SKIP LOCKED", 0.505d);
+        VectorSearchResult answer = candidate(
+                1L,
+                1,
+                "FOR UPDATE SKIP LOCKED를 적용해 동시 요청 처리를 구현했다.",
+                0.505d);
         List<VectorSearchResult> dense = new ArrayList<>();
         List<SparseCandidate> sparse = new ArrayList<>();
         dense.add(answer);
@@ -145,7 +149,7 @@ class SearchEvaluationDenseSparseRerankerProfileTest {
     }
 
     @Test
-    void completedClaimGateDecisionIsExactlyTheUnrerankedP14Decision() {
+    void completedRetrievalDecisionIsExactlyTheUnrerankedP14Decision() {
         VectorSearchResult question = candidate(1L, 1, "PRIZM 서비스를 배포했나요?", 0.90d);
         VectorSearchResult negated = candidate(2L, 2, "PRIZM 서비스를 배포하지 않았습니다.", 0.90d);
         VectorSearchResult retracted = candidate(
@@ -171,12 +175,12 @@ class SearchEvaluationDenseSparseRerankerProfileTest {
                         sparse);
 
         assertThat(outcome.decision()).isEqualTo(p14.decision());
-        assertThat(outcome.decision().results()).containsExactly(direct);
+        assertThat(outcome.decision().results()).containsExactly(question, negated, retracted, direct);
         assertThat(outcome.rerankedCandidates()).isEmpty();
     }
 
     @Test
-    void unsupportedCompletedQueryCannotEnterTheRerankerPath() {
+    void legacyUnsupportedCompletionGrammarNoLongerTriggersATruthRejection() {
         VectorSearchResult candidate = candidate(1L, 1, "주문 API를 배포했습니다.", 0.90d);
 
         RerankerOutcome outcome = profile.apply(
@@ -185,9 +189,9 @@ class SearchEvaluationDenseSparseRerankerProfileTest {
                 List.of(new SparseCandidate(candidate, 1.0d)),
                 List.of());
 
-        assertThat(outcome.decision().results()).isEmpty();
+        assertThat(outcome.decision().results()).containsExactly(candidate);
         assertThat(outcome.decision().rejectionReasons())
-                .contains("UNSUPPORTED_COMPLETED_RELEASE_QUERY");
+                .doesNotContain("UNSUPPORTED_COMPLETED_RELEASE_QUERY");
     }
 
     @Test

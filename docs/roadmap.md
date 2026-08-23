@@ -57,7 +57,7 @@ OpenSQL/OpenProxy와 Ollama `bge-m3`에서 전체 흐름을 검증했습니다. 
      연결된 tag와 문서 수를 집계합니다. 상세는 선택한 이름으로 기존 PRZ-016 Search를
      호출해 owner ACTIVE 전체 문서 evidence를 보여 주며 tag 연결 문서로 범위를 제한하지 않습니다.
     - [PRZ-009](../specs/PRZ-009-career-keyword-map/spec.md)는 현재 `VERIFIED`이고
-      AUDIT Gate는 `PASS`입니다. 구현 commit `1c1d8d2`와 PR #51을 생성했고 merge 전입니다.
+      AUDIT Gate는 `PASS`입니다. 구현 commit `1c1d8d2`를 PR #51 merge `d44f30e`로 통합했습니다.
      PostgreSQL integration·frontend 검증은 통과했고 인증된 브라우저 흐름은
      `USER_CONFIRMED`입니다. 독립 재감사 blocking finding은 0건입니다.
 

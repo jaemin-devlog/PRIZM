@@ -172,8 +172,8 @@ flowchart TD
   - Last verified: 2026-08-13 (통합된 제품 범위)
 - **Spec ID:** [PRZ-009](PRZ-009-career-keyword-map/spec.md)
   - 이름: 사용자 관리형 Document Tag
-  - 상태: `VERIFIED` (`AUDIT Gate: PASS`, [PR #51](https://github.com/jaemin-devlog/PRIZM/pull/51) merge 전)
-  - Source commit: 기존 keyword 구현 `d52c6d0`; P4 `1c1d8d2`
+  - 상태: `VERIFIED` (`AUDIT Gate: PASS`, [PR #51](https://github.com/jaemin-devlog/PRIZM/pull/51) merge `d44f30e`)
+  - Source commit: 기존 keyword 구현 `d52c6d0`; P4 `1c1d8d2`, merge `d44f30e`
   - Last verified: 2026-08-24 (backend·PostgreSQL·frontend·독립 감사 PASS, browser `USER_CONFIRMED`)
 - **Spec ID:** [PRZ-010](PRZ-010-change-log-sync/spec.md)
   - 이름: 변경 로그 동기화

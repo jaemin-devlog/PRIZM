@@ -21,7 +21,7 @@
 >
 > PRZ-004 상태: `VERIFIED` — 독립 감사, PR #25 CI와 GitHub `main` 통합 완료
 >
-> PRZ-009 상태: `VERIFIED` (`AUDIT Gate: PASS`, PR #51 merge 전) — 기존 자동 keyword 추출 계약을 사용자 관리형
+> PRZ-009 상태: `VERIFIED` (`AUDIT Gate: PASS`, PR #51 merge `d44f30e`) — 기존 자동 keyword 추출 계약을 사용자 관리형
 > Document Tag로 교체하는 P4 구현과 PostgreSQL·frontend 검증을 완료했다. 인증된 tag
 > 브라우저 흐름은 `USER_CONFIRMED`이며 독립 재감사 blocking finding은 0건이다.
 >

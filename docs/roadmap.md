@@ -1,6 +1,6 @@
 # PRIZM 개발 로드맵
 
-> 기준일: 2026-08-21
+> 기준일: 2026-08-24
 
 이 문서는 제품이 발전하는 순서만 설명합니다. 현재 구현과 검증 결과는
 [현재 구현 현황](project-status.md), 기능별 근거는
@@ -50,15 +50,16 @@ OpenSQL/OpenProxy와 Ollama `bge-m3`에서 전체 흐름을 검증했습니다. 
      고정 TEST와 실제 OpenSQL direct `5432` API·UI Gate를 통과한 결과입니다.
    - UI와 청킹·색인 최적화는 같은 변경에 섞지 않고, 평가 Gate를 통과한 단계만
      별도 PR로 진행합니다.
-2. **경력 키워드 맵**
-   - 현재 사용자의 `ACTIVE` 이력서·포트폴리오 원문에서 실제로 확인한 기술을 정규화하고,
-     category와 단일 Browse 순서로 표시하며 문서별 근거와 TXT/PDF 원본 위치에 연결합니다.
-   - [PRZ-009](../specs/PRZ-009-career-keyword-map/spec.md)는 소스 구현, 단위·정적 검증,
-     전체 PostgreSQL integration, synthetic browser와 최종 감사를 마쳤습니다. OpenSQL
-     opt-in target이 `NOT_RUN`이므로 상태는 `IMPLEMENTED_UNVERIFIED`이며, 결과를
-     CareerFact나 검증된 숙련도 판정으로 사용하지 않습니다.
-   - 2026-08-21 UI·문서 관리 확장 source `3af28492`는 PR #49 merge `550c9d4`로 `main`에
-     통합됐습니다. OpenSQL opt-in과 authenticated browser 재관찰은 계속 `NOT_RUN`입니다.
+2. **사용자 관리형 문서 태그**
+   - PRZ-009 P4는 하드코딩 기술 사전 기반 자동 추출을 제거하고 SYSTEM 추천 tag와
+     owner-scoped USER tag를 문서 metadata로 연결합니다.
+   - upload·document detail은 같은 Tag Modal을 사용하고, 경력 키워드 화면은 실제 문서에
+     연결된 tag와 문서 수를 집계합니다. 상세는 선택한 이름으로 기존 PRZ-016 Search를
+     호출해 owner ACTIVE 전체 문서 evidence를 보여 주며 tag 연결 문서로 범위를 제한하지 않습니다.
+    - [PRZ-009](../specs/PRZ-009-career-keyword-map/spec.md)는 현재 `VERIFIED`이고
+      AUDIT Gate는 `PASS`입니다. 구현 commit `1c1d8d2`와 PR #51을 생성했고 merge 전입니다.
+     PostgreSQL integration·frontend 검증은 통과했고 인증된 브라우저 흐름은
+     `USER_CONFIRMED`입니다. 독립 재감사 blocking finding은 0건입니다.
 
 다중 OpenSQL DB node, DB 장애전환, OpenProxy 이중화·VIP와 서비스 연속성 보장은
 로드맵에 포함하지 않습니다.

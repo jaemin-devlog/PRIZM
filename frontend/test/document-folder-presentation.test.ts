@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { documentFolderPath, groupDocumentsByType, selectedDocumentFolderFromSearch } from '../src/documentFolderPresentation.ts'
+import {
+  documentDetailPath,
+  documentFolderPath,
+  documentListPathAfterDetailClose,
+  groupDocumentsByType,
+  selectedDocumentFolderFromSearch,
+  selectedDocumentIdFromSearch,
+} from '../src/documentFolderPresentation.ts'
 import type { DocumentSummary } from '../src/api/documentApi.ts'
 
 const documents = [
@@ -19,4 +26,22 @@ test('folder URL round-trips for browser back and forward navigation', () => {
   assert.equal(documentFolderPath('RESUME'), '/career-vault/documents?type=RESUME')
   assert.equal(selectedDocumentFolderFromSearch('?type=RESUME'), 'RESUME')
   assert.equal(selectedDocumentFolderFromSearch(''), undefined)
+})
+
+test('document detail URL accepts only a positive integer identifier', () => {
+  assert.equal(documentDetailPath(42), '/career-vault/documents?documentId=42')
+  assert.equal(selectedDocumentIdFromSearch('?documentId=42'), 42)
+  assert.equal(selectedDocumentIdFromSearch('?documentId=0'), null)
+  assert.equal(selectedDocumentIdFromSearch('?documentId=resume'), null)
+})
+
+test('closing TXT document detail removes only the deep-link identifier', () => {
+  assert.equal(
+    documentListPathAfterDetailClose('?documentId=42'),
+    '/career-vault/documents',
+  )
+  assert.equal(
+    documentListPathAfterDetailClose('?type=RESUME&documentId=42'),
+    '/career-vault/documents?type=RESUME',
+  )
 })

@@ -15,6 +15,7 @@ import com.prizm.document.exception.DocumentUploadErrorCode;
 import com.prizm.document.exception.DocumentUploadException;
 import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
+import com.prizm.documenttag.service.DocumentTagService;
 import com.prizm.cleanup.service.FileCleanupJobService;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.infrastructure.storage.FileStorageException;
@@ -51,6 +52,7 @@ public class DocumentUploadService {
     private final FileStorage fileStorage;
     private final FileCleanupJobService fileCleanupJobService;
     private final DocumentTextExtractor documentTextExtractor;
+    private final DocumentTagService documentTagService;
     private final long maxFileSizeBytes;
 
     public DocumentUploadService(
@@ -61,6 +63,7 @@ public class DocumentUploadService {
             FileStorage fileStorage,
             FileCleanupJobService fileCleanupJobService,
             DocumentTextExtractor documentTextExtractor,
+            DocumentTagService documentTagService,
             @Value("${prizm.upload.max-file-size-bytes}") long maxFileSizeBytes) {
         this.documentRepository = documentRepository;
         this.documentVersionRepository = documentVersionRepository;
@@ -69,6 +72,7 @@ public class DocumentUploadService {
         this.fileStorage = fileStorage;
         this.fileCleanupJobService = fileCleanupJobService;
         this.documentTextExtractor = documentTextExtractor;
+        this.documentTagService = documentTagService;
         this.maxFileSizeBytes = maxFileSizeBytes;
     }
 
@@ -89,11 +93,23 @@ public class DocumentUploadService {
             String title,
             DocumentType documentType,
             MultipartFile file) {
+        return upload(ownerUserId, title, documentType, List.of(), file);
+    }
+
+    @Transactional
+    public DocumentUploadResponse upload(
+            Long ownerUserId,
+            String title,
+            DocumentType documentType,
+            List<Long> tagIds,
+            MultipartFile file) {
         String normalizedTitle = validateTitle(title);
+        List<Long> accessibleTagIds = documentTagService.requireAccessibleTagIds(ownerUserId, tagIds);
         UploadContent content = validateAndRead(file);
         DocumentType resolvedDocumentType = documentType == null ? DocumentType.OTHER : documentType;
 
         Document document = documentRepository.save(Document.create(ownerUserId, normalizedTitle, resolvedDocumentType));
+        documentTagService.attachToNewDocument(ownerUserId, document.getId(), accessibleTagIds);
         return persistVersion(ownerUserId, document, 1, content);
     }
 

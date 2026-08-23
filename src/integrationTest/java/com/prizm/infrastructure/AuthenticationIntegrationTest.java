@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -163,6 +164,7 @@ class AuthenticationIntegrationTest {
         jdbcTemplate.update("UPDATE documents SET active_version_id = NULL");
         jdbcTemplate.update("DELETE FROM document_versions");
         jdbcTemplate.update("DELETE FROM documents");
+        jdbcTemplate.update("DELETE FROM tags WHERE source = 'USER'");
         userAccountRepository.deleteAll();
     }
 
@@ -306,6 +308,105 @@ class AuthenticationIntegrationTest {
                         .content("{\"query\":\"career evidence\"}"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+    }
+
+    @Test
+    void permitsAllUserTagRoutesAndPreservesTheirAuthenticationBoundary() throws Exception {
+        UserAccount user = createUser("tag-user@prizm.local", UserRole.USER, true);
+        String userToken = login(user.getEmail());
+        UserAccount systemAdmin = createUser("tag-admin@prizm.local", UserRole.SYSTEM_ADMIN, true);
+        String systemAdminToken = login(systemAdmin.getEmail());
+        Long documentId = jdbcTemplate.queryForObject(
+                "INSERT INTO documents(owner_user_id, title, document_type) VALUES (?, ?, 'OTHER') RETURNING id",
+                Long.class,
+                user.getId(),
+                "Tag authentication boundary");
+
+        String systemTags = mockMvc.perform(get("/api/tags")
+                        .param("query", "Redis")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(userToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("Redis"))
+                .andReturn().getResponse().getContentAsString();
+        Number redisTagId = JsonPath.read(systemTags, "$[0].tagId");
+        String createdTag = mockMvc.perform(post("/api/tags")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(userToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Route Audit Tag\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Route Audit Tag"))
+                .andReturn().getResponse().getContentAsString();
+        Number userTagId = JsonPath.read(createdTag, "$.tagId");
+
+        mockMvc.perform(get("/api/documents/{documentId}/tags", documentId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(userToken)))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"));
+        mockMvc.perform(put("/api/documents/{documentId}/tags", documentId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(userToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"tagIds\":[" + redisTagId + "," + userTagId + "]}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("Redis"))
+                .andExpect(jsonPath("$[1].name").value("Route Audit Tag"));
+        mockMvc.perform(get("/api/tags/usage")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(userToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].documentCount").value(1))
+                .andExpect(jsonPath("$[1].documentCount").value(1));
+        mockMvc.perform(get("/api/tags/{tagId}/documents", redisTagId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(userToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tag.name").value("Redis"))
+                .andExpect(jsonPath("$.documents[0].documentId").value(documentId));
+        mockMvc.perform(delete("/api/documents/{documentId}/tags/{tagId}", documentId, userTagId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(userToken)))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/tags"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+        mockMvc.perform(post("/api/tags").contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Denied\"}"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/tags/usage"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/tags/{tagId}/documents", redisTagId))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/documents/{documentId}/tags", documentId))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(put("/api/documents/{documentId}/tags", documentId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"tagIds\":[]}"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(delete("/api/documents/{documentId}/tags/{tagId}", documentId, redisTagId))
+                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(get("/api/tags")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(systemAdminToken)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+        mockMvc.perform(post("/api/tags")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(systemAdminToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Denied\"}"))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/tags/usage")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(systemAdminToken)))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/tags/{tagId}/documents", redisTagId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(systemAdminToken)))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/documents/{documentId}/tags", documentId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(systemAdminToken)))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(put("/api/documents/{documentId}/tags", documentId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(systemAdminToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"tagIds\":[]}"))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(delete("/api/documents/{documentId}/tags/{tagId}", documentId, redisTagId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(systemAdminToken)))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -923,6 +1024,15 @@ class AuthenticationIntegrationTest {
                         .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET"))
                 .andExpect(status().isForbidden())
                 .andExpect(header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN));
+
+        mockMvc.perform(options("/api/documents/1/tags")
+                        .header(HttpHeaders.ORIGIN, "http://localhost:5173")
+                        .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "PUT")
+                        .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "authorization,content-type"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:5173"))
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS,
+                        org.hamcrest.Matchers.containsString("PUT")));
     }
 
     private String tokenFor(UserRole role) {

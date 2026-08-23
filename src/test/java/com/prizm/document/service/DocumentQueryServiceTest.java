@@ -8,6 +8,7 @@ import com.prizm.document.entity.Document;
 import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
+import com.prizm.documenttag.service.DocumentTagService;
 import com.prizm.ingestion.entity.ProcessingFailureCode;
 import com.prizm.ingestion.entity.ProcessingJob;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
@@ -32,13 +33,19 @@ class DocumentQueryServiceTest {
     DocumentVersionRepository documentVersionRepository;
     @Mock
     ProcessingJobRepository processingJobRepository;
+    @Mock
+    DocumentTagService documentTagService;
 
     DocumentQueryService service;
     DocumentVersion version;
 
     @BeforeEach
     void setUp() {
-        service = new DocumentQueryService(documentRepository, documentVersionRepository, processingJobRepository);
+        service = new DocumentQueryService(
+                documentRepository,
+                documentVersionRepository,
+                processingJobRepository,
+                documentTagService);
         Document document = Document.create(7L, "Guide");
         ReflectionTestUtils.setField(document, "id", 1L);
         version = DocumentVersion.quarantined(7L, 1L, "guide.txt", "a".repeat(64));

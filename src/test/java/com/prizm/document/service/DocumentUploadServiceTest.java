@@ -28,6 +28,7 @@ import com.prizm.document.exception.DocumentUploadErrorCode;
 import com.prizm.document.exception.DocumentUploadException;
 import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
+import com.prizm.documenttag.service.DocumentTagService;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.infrastructure.storage.FileStorageException;
 import com.prizm.ingestion.entity.ProcessingJob;
@@ -79,6 +80,9 @@ class DocumentUploadServiceTest {
     @Mock
     FileCleanupJobService fileCleanupJobService;
 
+    @Mock
+    DocumentTagService documentTagService;
+
     DocumentUploadService documentUploadService;
 
     @BeforeEach
@@ -92,6 +96,7 @@ class DocumentUploadServiceTest {
                 fileStorage,
                 fileCleanupJobService,
                 new DocumentTextExtractor(pdfProperties(300, 2_000_000)),
+                documentTagService,
                 1_000_000);
         lenient().when(documentRepository.save(any(Document.class))).thenAnswer(invocation -> {
             Document document = invocation.getArgument(0);
@@ -144,6 +149,36 @@ class DocumentUploadServiceTest {
                 .isEqualTo("DOCUMENT_VERSION_CREATED:22");
         assertThat(changeLogCaptor.getValue().getDispatchStatus()).isEqualTo(ChangeLogDispatchStatus.PENDING);
         verify(processingJobRepository, never()).save(any(ProcessingJob.class));
+    }
+
+    @Test
+    void validatesAndLinksSelectedTagsBeforeCreatingTheDocumentVersion() {
+        byte[] content = "tagged".getBytes(StandardCharsets.UTF_8);
+        MockMultipartFile file = new MockMultipartFile("file", "tagged.txt", "text/plain", content);
+        when(documentTagService.requireAccessibleTagIds(7L, List.of(3L, 4L)))
+                .thenReturn(List.of(3L, 4L));
+        when(fileStorage.store(11L, 22L, "tagged.txt", content))
+                .thenReturn("documents/11/22/tagged.txt");
+
+        documentUploadService.upload(7L, "Tagged", DocumentType.RESUME, List.of(3L, 4L), file);
+
+        verify(documentTagService).attachToNewDocument(7L, 11L, List.of(3L, 4L));
+    }
+
+    @Test
+    void rejectsAnInaccessibleTagBeforeCreatingDocumentOrFileState() {
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "tagged.txt", "text/plain", "tagged".getBytes(StandardCharsets.UTF_8));
+        org.mockito.Mockito.doThrow(new IllegalArgumentException("inaccessible tag"))
+                .when(documentTagService)
+                .requireAccessibleTagIds(7L, List.of(91L));
+
+        assertThatThrownBy(() -> documentUploadService.upload(
+                7L, "Tagged", DocumentType.RESUME, List.of(91L), file))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(documentVersionRepository, documentChangeLogRepository, processingJobRepository, fileStorage);
+        verify(documentRepository, never()).save(any(Document.class));
     }
 
     @Test
@@ -522,6 +557,7 @@ class DocumentUploadServiceTest {
                 fileStorage,
                 fileCleanupJobService,
                 new DocumentTextExtractor(pdfProperties(1, 100)),
+                documentTagService,
                 1_000_000);
         MockMultipartFile file = new MockMultipartFile(
                 "file", "large-pages.pdf", "application/pdf", textPdf(List.of("one", "two")));

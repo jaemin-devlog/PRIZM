@@ -1,6 +1,6 @@
 # PRIZM 현재 구현 현황
 
-> 현재 상태 기준일: 2026-08-21
+> 현재 상태 기준일: 2026-08-24
 >
 > PRZ-011 검증 source commit: `fbb3481626a3cba6f36f070845ffae502511569e`
 >
@@ -50,7 +50,7 @@
 |---|---|
 | 현재 제품 | Spring Boot와 React Career Vault로 구현한 자동화된 AI 문서 관리 플랫폼 |
 | 구현됨 | 자체 호스팅 회원가입, 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, ChangeLog 기반 비동기 색인·복구, Ollama 자동 임베딩, pgvector 근거 검색, Career Vault 문서 관리, 읽기 전용 MCP Career Evidence 검색 |
-| 현재 단계 | 소스 전용 공개 준비, clean-clone, 실제 OpenSQL direct 기준선과 PRZ-013 OpenProxy 단일 Primary SQL Gate 검증 완료. PRZ-010 변경 로그 동기화, PRZ-011 문서 처리 상태 UX와 PRZ-015 MCP 검색은 `VERIFIED`; PRZ-016은 PR #48로 `main`에 통합됐고 P10은 `VERIFIED`, P11은 `PARTIAL_PASS`, P11.1~P14는 `PASS`이나 P15의 인증된 PDF 페이지 이동이 `NOT_VERIFIED`여서 `IN_PROGRESS`; PRZ-008 검색 개선은 `IN_PROGRESS`; PRZ-009 경력 키워드 맵과 PRZ-012 검색 근거 표현 품질은 `IMPLEMENTED_UNVERIFIED` |
+| 현재 단계 | 소스 전용 공개 준비, clean-clone, 실제 OpenSQL direct 기준선과 PRZ-013 OpenProxy 단일 Primary SQL Gate 검증 완료. PRZ-010 변경 로그 동기화, PRZ-011 문서 처리 상태 UX와 PRZ-015 MCP 검색은 `VERIFIED`; PRZ-016은 PR #48로 `main`에 통합됐고 P10은 `VERIFIED`, P11은 `PARTIAL_PASS`, P11.1~P14는 `PASS`이나 P15의 인증된 PDF 페이지 이동이 `NOT_VERIFIED`여서 `IN_PROGRESS`; PRZ-008 검색 개선은 `IN_PROGRESS`; PRZ-009 사용자 관리형 Document Tag는 `VERIFIED` (`AUDIT Gate: PASS`, PR #51 merge 전); PRZ-012 검색 근거 표현 품질은 `IMPLEMENTED_UNVERIFIED` |
 | 계획된 미구현 | CareerFact, 근거 기반 portfolio, `/api/v1`, 독립 Engine 패키지 |
 | 명시적 범위 제외 | 다중 OpenSQL DB node, DB 장애전환, OpenProxy 이중화·VIP와 서비스 연속성 보장 |
 
@@ -73,7 +73,7 @@ Ollama가 자동 임베딩한 뒤 안전하게 `ACTIVE`로 전환해 사용자�
 → Worker가 텍스트 추출·분할·임베딩 수행
 → 처리가 끝난 버전을 검색 대상으로 전환
 → 내 문서에서 원문 위치와 함께 검색 결과 확인
-→ 활성 이력서·포트폴리오의 빈도 기반 키워드와 연결 원본 확인(PRZ-009 검증 대기)
+→ 문서에 연결한 태그 집계와 태그 이름으로 찾은 ACTIVE 원문 evidence 확인(PRZ-009 P4)
 ```
 
 새 버전 처리가 실패하면 이전 검색 대상 버전을 유지합니다. 다른 사용자의 문서와
@@ -129,22 +129,22 @@ PRZ-005에서는 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 직�
 - 기존 Career Evidence Search를 재사용해 사용자별 데이터 격리(owner isolation)와
   현재 `ACTIVE` 버전만 검색하는 규칙(ACTIVE isolation) 유지
 
-### 구현됐으나 필수 환경 검증이 남은 기능
+### 구현됐으나 최종 Gate가 남은 기능
 
-- 현재 사용자의 active 이력서·포트폴리오 원문에서 계산하는 경력 키워드 맵
-- 한영 별칭·Java 버전 표기 통합과 언어·프레임워크·DB·인프라 등 기술 category 필터
-- 같은 크기의 태그 Browse 목록, `frequency` 기반 고정 순서와 `?keyword=` 근거 상세
-- 개인정보를 제외한 compact 페이지·텍스트 발췌 근거와 처음 세 기록 이후 펼치기·접기
-- owner-scoped UTF-8 TXT 첫 일치 강조와 PDF page/search 위치 원본 열람
+- SYSTEM 추천 tag와 owner-scoped USER tag 생성·검색
+- 최초 document upload와 document detail의 tag 연결·추가·제거
+- 실제 document-tag 연결만 집계하는 경력 키워드 목록과 기존 Career Evidence Search를
+  재사용하는 tag 상세
+- 정규화 이름 기반 owner별 중복 방지와 다른 owner USER tag 미노출
 - DocumentType folder 보관함과 우측 세로 기술 분류 rail, 공통 Soft Minimal Career Vault UI
 - active·처리 중 version을 보호하는 과거 version별 삭제와 사용자 중심 처리 상태 문구
 
-PRZ-009의 전체 backend unit test와 전체 PostgreSQL integration, frontend lint·build,
-Docker build/runtime, synthetic browser 흐름과 최종 diff 감사는 통과했다. 확장 source
-`3af28492`는 [PR #49](https://github.com/jaemin-devlog/PRIZM/pull/49)로 `main`에 병합됐다
-(merge `550c9d4`). OpenSQL
-opt-in integration은 전용 target을 활성화하지 않아 `NOT_RUN`이므로 현재 상태는 계속
-`IMPLEMENTED_UNVERIFIED`다. 상세 범위는
+PRZ-009 P4 source `1c1d8d2`는 backend unit 578건 중 558건이 통과했고
+기존 skip 20건, 실패·오류 0이다. frontend unit 45개와 lint·typecheck·build도 통과했다.
+PostgreSQL integration은 116건 중 108건이 통과했고 실패·오류
+0, 기존 skip 8건이다. 인증된 upload/detail/경력 키워드 tag 흐름은 사용자가 정상 동작을
+확인했다(`USER_CONFIRMED`). 독립 재감사는 blocking finding 0건으로 통과해 상태는
+`VERIFIED`, AUDIT Gate `PASS`이며 PR #51 merge 전이다. OpenSQL opt-in은 `NOT_RUN`이다. 상세 범위는
 [PRZ-009 Evidence](../specs/PRZ-009-career-keyword-map/evidence.md)를 따른다.
 
 ### 비동기 처리와 파일 정리
@@ -181,7 +181,7 @@ PRZ-011은 문서 처리의 파일 읽기·텍스트 추출·청크 생성·실�
 | 대회 OpenSQL 구성 | `SINGLE_ONLY` | 공식 안내에 따라 단일 서버 설치만 사용. PRZ-014 다중 노드 구성은 `REJECTED` |
 | PRZ-004 demo `USER` clean-clone | `VERIFIED` | `25d09e9`에서 자동 검증 `339 PASS / 18 SKIP / 0 FAIL`과 두 독립 clone 통과. `aff3e87` 경로 교정 뒤 Windows·Linux Node test와 GitHub CI 6건 통과, PR #25 merge `1f9a5ad`. 두 번째 빈 목록 UI 직접 관찰은 `NOT_RUN` |
 | PRZ-008 검색 근거 신뢰성 | `IN_PROGRESS` | 2026-08-13 source `2190d47`, PR #40 merge `9b24808`: 기본 profile, v2 상태, 제한적 exact-token rescue와 OpenSQL direct `5432` API·UI Gate를 통합. 의미 단위 청킹·batch embedding·PDF 중복 최적화의 제품 적용 Gate는 남음 |
-| PRZ-009 경력 키워드 맵 | `IMPLEMENTED_UNVERIFIED` | 핵심 source `d52c6d0`, merge `5a8ea8d`; UI·문서 관리 확장 source `3af28492`는 PR #49 merge `550c9d4`로 통합. 최신 backend test 576 pass, integration 114 pass·8 conditional skip, frontend unit 27·lint·typecheck·build, Docker runtime·diff 감사 pass. OpenSQL opt-in과 후속 authenticated browser 재관찰은 `NOT_RUN` |
+| PRZ-009 사용자 관리형 Document Tag | `VERIFIED` (`AUDIT Gate: PASS`, PR #51 merge 전) | 기존 자동 keyword 구현을 P4 source `1c1d8d2`에서 V16 `tags`/`document_tags`, owner-scoped API와 upload/detail Tag Modal로 교체. 목록 count는 tag metadata, 상세는 기존 Career Evidence Search로 owner ACTIVE 전체 문서 evidence를 조회한다. backend unit 578 total·558 pass·20 skip·0 fail/error, frontend unit 45·lint·typecheck·build pass, PostgreSQL integration 108 pass·8 skip·0 fail/error, Search Production diff 0. 인증 브라우저는 `USER_CONFIRMED`, OpenSQL은 `NOT_RUN`; 독립 재감사 blocking finding 0 |
 | PRZ-010 변경 로그 동기화 | `VERIFIED` | 2026-08-12 source `26c546b`: PostgreSQL ChangeLog integration, 실제 OpenSQL direct `5432` V14 SQL Gate, 실제 OpenSQL+Ollama `bge-m3` V1→V2 E2E와 실패 시 V1 보존, 전체 integration `104 completed / 7 skipped / 0 failures`, backend test, frontend lint/build, Compose와 diff 감사 통과 |
 | PRZ-011 문서 처리 상태 UX | `VERIFIED` | 2026-08-13 source `fbb3481`: backend unit 464개 중 449 pass·15 skip, integration 112개 중 105 pass·7 skip, frontend unit 5개·lint·build, Compose V15 적용, PostgreSQL+pgvector·Ollama `bge-m3` 문서 처리/검색과 browser polling·retry 표시 통과. AUDIT blocking 2건 수정 뒤 재-AUDIT PASS, PR #41로 `main` 통합 |
 | PRZ-012 검색 근거 표현 품질 | `IMPLEMENTED_UNVERIFIED` | 질문 관련 원문 1–3문장 선택과 근거 중심 UI, PRZ-008 평가 15개 결과 불변, backend unit·integration과 frontend 검증 통과. 실제 개인 문서 대표 7개 Before/After는 owner·authentication 경계 안에서 실행하지 못해 `NOT_RUN`, VERIFY Gate `FAIL` |
@@ -226,14 +226,15 @@ PRZ-011의 검증·통합 결과는
 - 기본값 `source-dedup-evidence-signals-v1`은 의미상 근거 없음과 검색 문서 없음을
   구분하고 동일 출처 위치·본문 중복을 축약합니다. `legacy-dense-v1`은 명시적
   `PRIZM_SEARCH_PROFILE` rollback override로 유지합니다.
-- 이력서·포트폴리오의 정규화·category·단일 Browse 순서 키워드 목록과 문서별 근거·원본 위치
-  연결은 [PRZ-009](../specs/PRZ-009-career-keyword-map/spec.md) 핵심 source `d52c6d0`에 구현돼
-  merge `5a8ea8d`로 `main`에 통합됐다. 폴더 보관함·공통 UI·버전별 삭제 확장은 source `3af28492`와
-  PR #49 merge `550c9d4`로 `main`에 통합됐고,
-  최신 backend·PostgreSQL integration·frontend·Docker·diff 감사를 통과했습니다. 확장 UI의 authenticated
-  browser 재관찰은 사용자 지시에 따라 `NOT_RUN`이다. OpenSQL
-  opt-in target 검증이 `NOT_RUN`이어서 OpenSQL 범위까지 검증 완료한 기능은 아닙니다.
-- 프런트엔드 자동 UI 테스트가 없습니다.
+- 과거 자동 keyword·category Browse 구현과 확장 UI는 source `d52c6d0`, `3af28492`로
+  `main`에 통합됐지만, 현재 P4 source `1c1d8d2`에서는 사용자 관리형 Document Tag로
+  대체했습니다. 현재 목록 count는 tag metadata이고 상세는 tag 이름으로 기존 Career Evidence
+  Search를 호출합니다. PostgreSQL·frontend 검증은 통과했고 인증 브라우저는
+  `USER_CONFIRMED`이고 독립 재감사는 통과했으나 GitHub 통합은 남아 있습니다. OpenSQL opt-in은
+  `NOT_RUN`이므로 OpenSQL 검증 근거로 확대하지 않습니다.
+- 프런트엔드 회귀 테스트는 presentation과 component 표시·상태·navigation 계약을
+  검증하지만 실제 브라우저 E2E 자동화는 없습니다. PRZ-009 인증 흐름은 사용자가 직접
+  확인한 `USER_CONFIRMED` 근거로 구분합니다.
 - V13의 일부 제약과 기존 데이터 보정 전용 회귀 테스트가 없습니다.
 - 일부 JavaDoc이 TXT/PDF 공통 동작을 TXT 전용으로 설명합니다.
 - 일부 파일시스템에서는 안전 조건을 충족하지 못해 자동 파일 정리를 중단합니다.
@@ -245,10 +246,10 @@ PRZ-011의 검증·통합 결과는
 
 제품 개발 순서는 [개발 로드맵](roadmap.md)을 따릅니다. 현재
 [PRZ-008 검색 근거 신뢰성](../specs/PRZ-008-search-evidence-reliability/spec.md)은
-통합된 제품 범위 이후 남은 최적화 Gate를, [PRZ-009 경력 키워드 맵](../specs/PRZ-009-career-keyword-map/spec.md)은
-OpenSQL Gate를 분리해 관리합니다. [PRZ-012 검색 근거 표현 품질](../specs/PRZ-012-search-evidence-presentation/spec.md)은
-실제 개인 문서 대표 질의 검증을 남겨 두었습니다. PRZ-009와 PRZ-012는
-`IMPLEMENTED_UNVERIFIED`이며 검증된 기능이 아닙니다. OpenProxy 단일 Primary SQL
+통합된 제품 범위 이후 남은 최적화 Gate를, [PRZ-009 사용자 관리형 Document Tag](../specs/PRZ-009-career-keyword-map/spec.md)는
+독립 재감사를 통과했고 PR #51 merge를 기다립니다. [PRZ-012 검색 근거 표현 품질](../specs/PRZ-012-search-evidence-presentation/spec.md)은
+실제 개인 문서 대표 질의 검증을 남겨 두었습니다. PRZ-009는 `VERIFIED`
+(`AUDIT Gate: PASS`, PR #51 merge 전), PRZ-012는 `IMPLEMENTED_UNVERIFIED`입니다. OpenProxy 단일 Primary SQL
 routing은 PRZ-013에서 검증했습니다. 대회 제공 OpenSQL의 Single-only 지침에 따라
 다중 노드 구성과 장애 전환은 다음 작업이나 후속 검증 대상이 아닙니다. PRZ-015의
 읽기 전용 MCP Career Evidence 검색은 실제 OpenSQL/OpenProxy 환경의 P2 전체

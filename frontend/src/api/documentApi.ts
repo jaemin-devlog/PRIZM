@@ -1,4 +1,5 @@
 import { getAccessToken } from '../auth/tokenStorage'
+import type { Tag } from './tagApi'
 
 export type DocumentType =
   | 'RESUME'
@@ -82,6 +83,7 @@ export type DocumentDetail = {
   activeVersionId: number | null
   createdAt: string
   updatedAt: string
+  tags: Tag[]
   versions: DocumentVersion[]
 }
 
@@ -173,6 +175,7 @@ export async function uploadDocument(
   title: string,
   documentType: DocumentType,
   file: File,
+  tagIds: number[] = [],
 ): Promise<DocumentUploadResponse> {
   const accessToken = getAccessToken()
 
@@ -184,6 +187,7 @@ export async function uploadDocument(
   formData.set('title', title)
   formData.set('documentType', documentType)
   formData.set('file', file)
+  tagIds.forEach((tagId) => formData.append('tagIds', String(tagId)))
 
   const response = await fetch('/api/documents', {
     method: 'POST',

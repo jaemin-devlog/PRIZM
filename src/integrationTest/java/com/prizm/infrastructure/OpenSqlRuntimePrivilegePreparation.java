@@ -20,11 +20,11 @@ final class OpenSqlRuntimePrivilegePreparation {
     private static final String RUNTIME = configured("PRIZM_OPENSQL_EXPECTED_RUNTIME_USER", "prizm_app");
     private static final List<String> DOMAIN_TABLES = List.of(
             "users", "documents", "document_versions", "document_chunks",
-            "processing_jobs", "file_cleanup_jobs", "document_change_logs");
+            "processing_jobs", "file_cleanup_jobs", "document_change_logs", "tags", "document_tags");
     private static final List<String> DOMAIN_SEQUENCES = List.of(
             "users_id_seq", "documents_id_seq", "document_versions_id_seq",
             "document_chunks_id_seq", "processing_jobs_id_seq", "file_cleanup_jobs_id_seq",
-            "document_change_logs_id_seq");
+            "document_change_logs_id_seq", "tags_id_seq");
     private static final Map<String, Set<String>> EXPECTED_TABLE_PRIVILEGES = Map.of(
             "users", Set.of("SELECT", "INSERT"),
             "documents", Set.of("SELECT", "INSERT", "UPDATE", "DELETE"),
@@ -32,7 +32,9 @@ final class OpenSqlRuntimePrivilegePreparation {
             "document_chunks", Set.of("SELECT", "INSERT", "DELETE"),
             "processing_jobs", Set.of("SELECT", "INSERT", "UPDATE", "DELETE"),
             "file_cleanup_jobs", Set.of("SELECT", "INSERT", "UPDATE"),
-            "document_change_logs", Set.of("SELECT", "INSERT", "UPDATE", "DELETE"));
+            "document_change_logs", Set.of("SELECT", "INSERT", "UPDATE", "DELETE"),
+            "tags", Set.of("SELECT", "INSERT"),
+            "document_tags", Set.of("SELECT", "INSERT", "DELETE"));
 
     private OpenSqlRuntimePrivilegePreparation() {
     }
@@ -80,7 +82,7 @@ final class OpenSqlRuntimePrivilegePreparation {
                 .outOfOrder(false)
                 .load();
         assertThat(flyway.info().current()).isNotNull();
-        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("15");
+        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("16");
         assertThat(flyway.info().pending()).isEmpty();
 
         List<String> versions = jdbc.queryForList(
@@ -88,7 +90,7 @@ final class OpenSqlRuntimePrivilegePreparation {
                         + "WHERE success AND version IS NOT NULL ORDER BY installed_rank",
                 String.class);
         assertThat(versions).containsExactly(
-                "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15");
+                "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16");
         assertThat(jdbc.queryForObject(
                 "SELECT COUNT(*) FROM flyway_schema_history WHERE NOT success", Long.class)).isZero();
 
@@ -98,7 +100,8 @@ final class OpenSqlRuntimePrivilegePreparation {
                 String.class);
         assertThat(tables).containsExactlyInAnyOrderElementsOf(List.of(
                 "users", "documents", "document_versions", "document_chunks",
-                "processing_jobs", "file_cleanup_jobs", "document_change_logs", "flyway_schema_history"));
+                "processing_jobs", "file_cleanup_jobs", "document_change_logs", "tags", "document_tags",
+                "flyway_schema_history"));
         List<String> sequences = jdbc.queryForList(
                 "SELECT sequence_name FROM information_schema.sequences "
                         + "WHERE sequence_schema='public' ORDER BY sequence_name",
@@ -107,7 +110,8 @@ final class OpenSqlRuntimePrivilegePreparation {
 
         assertThat(badOwnerCount(jdbc, "r", List.of(
                 "users", "documents", "document_versions", "document_chunks",
-                "processing_jobs", "file_cleanup_jobs", "document_change_logs", "flyway_schema_history"), OWNER)).isZero();
+                "processing_jobs", "file_cleanup_jobs", "document_change_logs", "tags", "document_tags",
+                "flyway_schema_history"), OWNER)).isZero();
         assertThat(badOwnerCount(jdbc, "S", DOMAIN_SEQUENCES, OWNER)).isZero();
         assertThat(jdbc.queryForObject(
                 "SELECT e.extversion || '|' || r.rolname FROM pg_catalog.pg_extension e "
@@ -146,9 +150,11 @@ final class OpenSqlRuntimePrivilegePreparation {
         jdbc.execute("GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE processing_jobs TO " + runtimeRole);
         jdbc.execute("GRANT SELECT, INSERT, UPDATE ON TABLE file_cleanup_jobs TO " + runtimeRole);
         jdbc.execute("GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE document_change_logs TO " + runtimeRole);
+        jdbc.execute("GRANT SELECT, INSERT ON TABLE tags TO " + runtimeRole);
+        jdbc.execute("GRANT SELECT, INSERT, DELETE ON TABLE document_tags TO " + runtimeRole);
         jdbc.execute("GRANT USAGE ON SEQUENCE users_id_seq, documents_id_seq, "
                 + "document_versions_id_seq, document_chunks_id_seq, processing_jobs_id_seq, "
-                + "file_cleanup_jobs_id_seq, document_change_logs_id_seq TO " + runtimeRole);
+                + "file_cleanup_jobs_id_seq, document_change_logs_id_seq, tags_id_seq TO " + runtimeRole);
     }
 
     private static void verifyRuntimePrivileges(JdbcTemplate jdbc) {

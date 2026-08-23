@@ -4,7 +4,7 @@
 > **AUDIT Gate:** `PASS`
 > **유형:** Feature
 > **선행 문서:** [PRZ-000](../PRZ-000-platform-baseline/spec.md)
-> **현재 P4 소스:** 이 branch의 uncommitted worktree — commit·PR·merge 전
+> **현재 P4 소스:** `1c1d8d22065832da48c604e1b8278699a485c2da`, [PR #51](https://github.com/jaemin-devlog/PRIZM/pull/51) — merge 전
 > **역사적 P1–P3 자동 추출 소스:** `d52c6d01a3bef916e80a3c983a43c7b1fad1139b`, merge `5a8ea8d2b85e7d87342e11e96d1d58d1181ab6b8`
 > **역사적 UI·문서 관리 확장:** `3af28492` (`PRZ-009-keyword-tags-ui`), [PR #49](https://github.com/jaemin-devlog/PRIZM/pull/49) merge `550c9d4c5b1852f13335be061d1624d22ddec382`
 > **최종 확인:** 2026-08-24
@@ -13,7 +13,7 @@
 
 `VERIFIED` — 기존 원문 사전 추출형 Keyword Map을 사용자 관리형 Document Tag로
 대체했고, backend·PostgreSQL·frontend 검증과 수정에 참여하지 않은 세 관점의 독립
-재감사를 통과했다. GitHub commit·PR·merge는 아직 수행하지 않았다. 이전 구현 근거는
+재감사를 통과했다. 구현 commit과 PR #51은 생성됐고 merge는 아직 수행하지 않았다. 이전 구현 근거는
 이 문서 아래와 [Evidence](evidence.md)에 역사로 보존한다.
 
 시작 기준 source는 `83631f13c21eab54ac0f32ebb0f893b6c5acea0f`이다.

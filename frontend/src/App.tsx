@@ -1,6 +1,7 @@
 import {
   type ChangeEvent,
   type FormEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   useCallback,
   useEffect,
@@ -16,18 +17,19 @@ import {
   type LoginResponse,
 } from './api/authApi'
 import {
-  CareerKeywordApiError,
-  getCareerKeywordEvidence,
-  getCareerKeywordMap,
-  type CareerKeywordEvidenceItem,
-  type CareerKeywordSummary,
-} from './api/careerKeywordApi'
+  getTagUsage,
+  removeDocumentTag,
+  replaceDocumentTags,
+  TagApiError,
+  type Tag,
+  type TagUsage,
+} from './api/tagApi'
+import { TagModal } from './TagModal'
 import {
   DocumentApiError,
   deleteDocument,
   deleteDocumentVersion,
   getDocument,
-  getDocumentOriginal,
   getDocumentPdf,
   getDocuments,
   getDocumentThumbnail,
@@ -48,22 +50,22 @@ import {
 import {
   getEvidenceContext,
   getEvidenceHighlight,
-  getEvidencePdfPage,
   getEvidenceSourceLabel,
 } from './searchEvidencePresentation'
+import { loadKeywordEvidence } from './keywordEvidence'
 import {
-  categoryKeywordCountLabel,
-  getConciseKeywordEvidence,
-  getKeywordEvidenceContext,
-  getVisibleKeywords,
-  KEYWORD_CATEGORY_LABELS,
-  KEYWORD_CATEGORY_ORDER,
-  keywordDetailPath,
-  keywordEvidenceCountLabel,
-  keywordMentionLabel,
-  selectedKeywordFromSearch,
-  type KeywordCategoryFilter,
-} from './careerKeywordPresentation'
+  getEvidencePdfViewerTarget,
+  KeywordEvidencePanel,
+  type EvidencePdfViewerTarget,
+} from './keywordEvidencePanel'
+import {
+  keywordEvidenceRetryTarget,
+  resolveSelectedTag,
+  selectedTagIdFromSearch,
+  sortTagUsage,
+  tagDetailPath,
+} from './tagSelection'
+import { DocumentTagEditor } from './tagComponents'
 import {
   clearSession,
   getAccessToken,
@@ -71,10 +73,15 @@ import {
   saveAccessToken,
   saveCurrentUser,
 } from './auth/tokenStorage'
+import { expireSessionIfUnauthorized } from './auth/sessionPolicy'
+import { focusModalEntry, keepFocusWithinModal, restoreModalTrigger } from './modalFocus'
 import { progressSummary } from './documentProcessingPresentation'
 import {
+  documentDetailPath,
   documentFolderPath,
+  documentListPathAfterDetailClose,
   groupDocumentsByType,
+  selectedDocumentIdFromSearch,
   selectedDocumentFolderFromSearch,
 } from './documentFolderPresentation'
 
@@ -156,41 +163,6 @@ type PdfViewerTarget = {
   versionNo: number
   originalFileName: string
 }
-
-type EvidencePdfViewerTarget = {
-  documentId: number
-  documentVersionId: number
-  documentTitle: string
-  pageNumber: number
-}
-
-function getEvidencePdfViewerTarget(
-  result: CareerEvidenceSearchResult,
-): EvidencePdfViewerTarget | null {
-  const pageNumber = getEvidencePdfPage(result)
-  if (pageNumber === null) {
-    return null
-  }
-  return {
-    documentId: result.documentId,
-    documentVersionId: result.documentVersionId,
-    documentTitle: result.documentTitle,
-    pageNumber,
-  }
-}
-
-type OriginalViewerTarget = Pick<
-  CareerKeywordEvidenceItem,
-  | 'documentId'
-  | 'documentVersionId'
-  | 'versionNo'
-  | 'originalFileName'
-  | 'fileType'
-  | 'sourceType'
-  | 'sourceIndex'
-  | 'sourceLabel'
-  | 'matchedTerms'
-> & { keyword: string }
 
 function isVaultPath(pathname: string): pathname is VaultPath {
   return pathname === DOCUMENTS_PATH
@@ -595,7 +567,15 @@ function CareerVaultShell({
       <main className="vault-content">
         <div className="vault-page-container">
           {path === DOCUMENTS_PATH && <DocumentsPage onSessionExpired={onSessionExpired} />}
-          {path === KEYWORDS_PATH && <CareerKeywordsPage onSessionExpired={onSessionExpired} />}
+          {path === KEYWORDS_PATH && (
+            <CareerKeywordsPage
+              onSessionExpired={onSessionExpired}
+              onNavigateToDocument={(documentId) => {
+                window.history.pushState(null, '', documentDetailPath(documentId))
+                onNavigate(DOCUMENTS_PATH)
+              }}
+            />
+          )}
           {path === EVIDENCE_PATH && <EvidencePage onSessionExpired={onSessionExpired} />}
           {path === UPLOAD_PATH && (
             <UploadPage
@@ -636,6 +616,8 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
   const [versionUploadFile, setVersionUploadFile] = useState<File | null>(null)
   const [versionUploadInputKey, setVersionUploadInputKey] = useState(0)
   const [isVersionUploading, setIsVersionUploading] = useState(false)
+  const [isTagModalOpen, setIsTagModalOpen] = useState(false)
+  const [removingTagId, setRemovingTagId] = useState<number | null>(null)
   const [actionMessage, setActionMessage] = useState<string | null>(null)
   const [pdfViewerTarget, setPdfViewerTarget] = useState<PdfViewerTarget | null>(null)
   const [pdfViewerUrl, setPdfViewerUrl] = useState<string | null>(null)
@@ -683,9 +665,8 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
           return
         }
 
-        if (error instanceof DocumentApiError && (error.status === 401 || error.status === 403)) {
+        if (error instanceof DocumentApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
           isCurrentRequest = false
-          onSessionExpired()
           return
         }
 
@@ -741,8 +722,8 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
         if (cancelled) {
           return
         }
-        if (error instanceof DocumentApiError && (error.status === 401 || error.status === 403)) {
-          onSessionExpired()
+        if (error instanceof DocumentApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
+          cancelled = true
         }
         // 일시적인 polling 실패는 기존 화면을 유지하고 다음 주기에 다시 시도한다.
       } finally {
@@ -815,6 +796,10 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
 
   const closeDocumentDetail = useCallback(() => {
     closePdfViewer()
+    const nextPath = documentListPathAfterDetailClose(window.location.search)
+    if (`${window.location.pathname}${window.location.search}` !== nextPath) {
+      window.history.replaceState(null, '', nextPath)
+    }
     detailRequestId.current += 1
     setSelectedDocument(null)
     setDetailErrorMessage(null)
@@ -826,6 +811,8 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
     setVersionUploadFile(null)
     setVersionUploadInputKey((value) => value + 1)
     setIsVersionUploading(false)
+    setIsTagModalOpen(false)
+    setRemovingTagId(null)
   }, [closePdfViewer])
 
   const isDocumentDialogOpen =
@@ -839,7 +826,9 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
     const previousOverflow = document.body.style.overflow
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (pdfViewerTarget !== null) {
+        if (isTagModalOpen) {
+          return
+        } else if (pdfViewerTarget !== null) {
           closePdfViewer()
         } else {
           closeDocumentDetail()
@@ -852,9 +841,9 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
       document.body.style.overflow = previousOverflow
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [closeDocumentDetail, closePdfViewer, isDocumentDialogOpen, pdfViewerTarget])
+  }, [closeDocumentDetail, closePdfViewer, isDocumentDialogOpen, isTagModalOpen, pdfViewerTarget])
 
-  const handleOpenDocument = async (documentId: number) => {
+  const handleOpenDocument = useCallback(async (documentId: number) => {
     closePdfViewer()
     const requestId = detailRequestId.current + 1
     detailRequestId.current = requestId
@@ -880,8 +869,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
       if (detailRequestId.current !== requestId) {
         return
       }
-      if (error instanceof DocumentApiError && (error.status === 401 || error.status === 403)) {
-        onSessionExpired()
+      if (error instanceof DocumentApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
         return
       }
       setDetailErrorMessage('문서 상세 정보를 불러오지 못했습니다.')
@@ -890,7 +878,15 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
         setIsDetailLoading(false)
       }
     }
-  }
+  }, [closePdfViewer, onSessionExpired])
+
+  useEffect(() => {
+    const documentId = selectedDocumentIdFromSearch(window.location.search)
+    if (documentId !== null) {
+      const timeout = window.setTimeout(() => void handleOpenDocument(documentId), 0)
+      return () => window.clearTimeout(timeout)
+    }
+  }, [handleOpenDocument])
 
   const handleSaveMetadata = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -916,8 +912,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
       setActionMessage('문서 정보를 저장했습니다.')
       setReloadKey((value) => value + 1)
     } catch (error) {
-      if (error instanceof DocumentApiError && (error.status === 401 || error.status === 403)) {
-        onSessionExpired()
+      if (error instanceof DocumentApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
         return
       }
       setDetailErrorMessage('문서 정보를 저장하지 못했습니다.')
@@ -934,13 +929,11 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
     setDetailErrorMessage(null)
     try {
       await deleteDocument(selectedDocument.documentId)
-      setSelectedDocument(null)
-      setIsDeleteConfirming(false)
+      closeDocumentDetail()
       setActionMessage('문서를 삭제했습니다. 원본 파일 정리는 안전하게 백그라운드에서 진행됩니다.')
       setReloadKey((value) => value + 1)
     } catch (error) {
-      if (error instanceof DocumentApiError && (error.status === 401 || error.status === 403)) {
-        onSessionExpired()
+      if (error instanceof DocumentApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
         return
       }
       if (error instanceof DocumentApiError && error.code === 'DOCUMENT_PROCESSING') {
@@ -978,8 +971,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
       if (detailRequestId.current !== requestId) {
         return
       }
-      if (error instanceof DocumentApiError && (error.status === 401 || error.status === 403)) {
-        onSessionExpired()
+      if (error instanceof DocumentApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
         return
       }
       if (error instanceof DocumentApiError && error.code === 'DOCUMENT_VERSION_ACTIVE') {
@@ -1001,6 +993,41 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
     setVersionUploadFile(file)
     setActionMessage(null)
     setDetailErrorMessage(uploadFileValidationMessage(file))
+  }
+
+  const handleSaveDocumentTags = async (tags: Tag[]) => {
+    if (selectedDocument === null) return
+    const documentId = selectedDocument.documentId
+    const updatedTags = await replaceDocumentTags(
+      documentId,
+      tags.map((tag) => tag.tagId),
+    )
+    setSelectedDocument((current) =>
+      current?.documentId === documentId ? { ...current, tags: updatedTags } : current,
+    )
+    setIsTagModalOpen(false)
+    setActionMessage('문서 태그를 저장했습니다.')
+  }
+
+  const handleRemoveDocumentTag = async (tagId: number) => {
+    if (selectedDocument === null || removingTagId !== null) return
+    const documentId = selectedDocument.documentId
+    setRemovingTagId(tagId)
+    setDetailErrorMessage(null)
+    try {
+      await removeDocumentTag(documentId, tagId)
+      setSelectedDocument((current) => current?.documentId === documentId
+        ? { ...current, tags: current.tags.filter((tag) => tag.tagId !== tagId) }
+        : current)
+      setActionMessage('문서 태그를 제거했습니다.')
+    } catch (error) {
+      if (error instanceof TagApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
+        return
+      }
+      setDetailErrorMessage('문서 태그를 제거하지 못했습니다.')
+    } finally {
+      setRemovingTagId(null)
+    }
   }
 
   const handleVersionUpload = async (event: FormEvent<HTMLFormElement>) => {
@@ -1045,8 +1072,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
       if (detailRequestId.current !== requestId) {
         return
       }
-      if (error instanceof DocumentApiError && (error.status === 401 || error.status === 403)) {
-        onSessionExpired()
+      if (error instanceof DocumentApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
         return
       }
       if (error instanceof DocumentApiError && error.code === 'DOCUMENT_PROCESSING') {
@@ -1090,9 +1116,8 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
       if (error instanceof DOMException && error.name === 'AbortError') {
         return
       }
-      if (error instanceof DocumentApiError && (error.status === 401 || error.status === 403)) {
+      if (error instanceof DocumentApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
         closePdfViewer()
-        onSessionExpired()
         return
       }
       if (error instanceof DocumentApiError && error.code === 'ORIGINAL_FILE_NOT_FOUND') {
@@ -1429,6 +1454,25 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
                 </form>
               </section>
 
+              <section className="document-detail-section document-tag-section" aria-labelledby="document-tags-heading">
+                <div className="document-detail-section-heading">
+                  <div>
+                    <p className="section-kicker">DOCUMENT TAGS</p>
+                    <h3 id="document-tags-heading">태그</h3>
+                  </div>
+                  <p>문서를 분류할 태그를 직접 관리할 수 있습니다.</p>
+                </div>
+                <DocumentTagEditor
+                  tags={selectedDocument.tags}
+                  emptyMessage="연결된 태그가 없습니다."
+                  removeLabel={(tag) => `${tag.name} 태그 제거`}
+                  disabled={isDeleting}
+                  removingTagId={removingTagId}
+                  onRemove={(tagId) => void handleRemoveDocumentTag(tagId)}
+                  onAdd={() => setIsTagModalOpen(true)}
+                />
+              </section>
+
               <section className="document-detail-section document-version-section" aria-labelledby="versions-heading">
                 <div className="document-version-heading">
                   <div>
@@ -1653,6 +1697,15 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
         </>
       )}
 
+      {isTagModalOpen && selectedDocument !== null && (
+        <TagModal
+          selectedTags={selectedDocument.tags}
+          onSave={handleSaveDocumentTags}
+          onClose={() => setIsTagModalOpen(false)}
+          onSessionExpired={onSessionExpired}
+        />
+      )}
+
       {pdfViewerTarget !== null && (
         <>
           <button
@@ -1755,8 +1808,7 @@ function DocumentThumbnail({
         if (controller.signal.aborted) {
           return
         }
-        if (error instanceof DocumentApiError && (error.status === 401 || error.status === 403)) {
-          onSessionExpired()
+        if (error instanceof DocumentApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
           return
         }
         setThumbnailState('fallback')
@@ -1833,544 +1885,362 @@ function DocumentThumbnail({
   )
 }
 
-function CareerKeywordsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
-  const [keywords, setKeywords] = useState<CareerKeywordSummary[]>([])
-  const [documentCount, setDocumentCount] = useState(0)
-  const [keywordState, setKeywordState] = useState<SearchState>('loading')
-  const [keywordReloadKey, setKeywordReloadKey] = useState(0)
-  const [categoryFilter, setCategoryFilter] = useState<KeywordCategoryFilter>('ALL')
-  const [selectedKeyword, setSelectedKeyword] = useState<string | null>(() =>
-    selectedKeywordFromSearch(window.location.search),
+function CareerKeywordsPage({
+  onSessionExpired,
+  onNavigateToDocument,
+}: {
+  onSessionExpired: () => void
+  onNavigateToDocument: (documentId: number) => void
+}) {
+  const [tags, setTags] = useState<TagUsage[]>([])
+  const [tagState, setTagState] = useState<SearchState>('loading')
+  const [reloadKey, setReloadKey] = useState(0)
+  const [selectedTagId, setSelectedTagId] = useState<number | null>(() =>
+    selectedTagIdFromSearch(window.location.search),
   )
-  const [evidence, setEvidence] = useState<CareerKeywordEvidenceItem[]>([])
-  const [evidenceFrequency, setEvidenceFrequency] = useState(0)
-  const [evidenceState, setEvidenceState] = useState<SearchState>('idle')
-  const [originalViewerTarget, setOriginalViewerTarget] = useState<OriginalViewerTarget | null>(null)
-  const [originalViewerUrl, setOriginalViewerUrl] = useState<string | null>(null)
-  const [originalViewerText, setOriginalViewerText] = useState<string | null>(null)
-  const [originalViewerErrorMessage, setOriginalViewerErrorMessage] = useState<string | null>(null)
-  const [isOriginalViewerLoading, setIsOriginalViewerLoading] = useState(false)
-  const [isEvidenceListExpanded, setIsEvidenceListExpanded] = useState(false)
-  const evidenceRequestId = useRef(0)
-  const originalRequestId = useRef(0)
-  const originalAbortController = useRef<AbortController | null>(null)
-  const originalObjectUrl = useRef<string | null>(null)
-  const originalMatchRef = useRef<HTMLElement | null>(null)
+  const [searchResults, setSearchResults] = useState<CareerEvidenceSearchResult[]>([])
+  const [documentTypes, setDocumentTypes] = useState<Map<number, DocumentType>>(new Map())
+  const [evidenceState, setEvidenceState] = useState<SearchState>(
+    selectedTagId === null ? 'idle' : 'loading',
+  )
+  const [detailReloadKey, setDetailReloadKey] = useState(0)
+  const [pdfViewerTarget, setPdfViewerTarget] = useState<EvidencePdfViewerTarget | null>(null)
+  const closeKeywordEvidencePdfViewer = useCallback(() => setPdfViewerTarget(null), [])
+  const selectedTag = selectedTagId === null
+    ? null
+    : tags.find((tag) => tag.tagId === selectedTagId) ?? null
 
   useEffect(() => {
     const controller = new AbortController()
-
-    void getCareerKeywordMap(controller.signal)
+    void getTagUsage(controller.signal)
       .then((response) => {
-        setDocumentCount(response.documentCount)
-        setKeywords(response.keywords)
-        setKeywordState(response.keywords.length === 0 ? 'empty' : 'result')
+        const ordered = sortTagUsage(response)
+        setTags(ordered)
+        setTagState(ordered.length === 0 ? 'empty' : 'result')
       })
       .catch((error: unknown) => {
-        if (controller.signal.aborted) {
+        if (controller.signal.aborted) return
+        if (error instanceof TagApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
           return
         }
-        if (error instanceof CareerKeywordApiError && (error.status === 401 || error.status === 403)) {
-          onSessionExpired()
-          return
-        }
-        setKeywordState('error')
+        setTags([])
+        setTagState('error')
       })
-
     return () => controller.abort()
-  }, [keywordReloadKey, onSessionExpired])
-
-  const handleKeywordReload = () => {
-    evidenceRequestId.current += 1
-    setKeywords([])
-    setKeywordState('loading')
-    window.history.replaceState(null, '', keywordDetailPath(null))
-    setSelectedKeyword(null)
-    setEvidence([])
-    setEvidenceState('idle')
-    setIsEvidenceListExpanded(false)
-    setKeywordReloadKey((value) => value + 1)
-  }
-
-  const closeOriginalViewer = useCallback(() => {
-    originalRequestId.current += 1
-    originalAbortController.current?.abort()
-    originalAbortController.current = null
-    if (originalObjectUrl.current !== null) {
-      URL.revokeObjectURL(originalObjectUrl.current)
-      originalObjectUrl.current = null
-    }
-    setOriginalViewerTarget(null)
-    setOriginalViewerUrl(null)
-    setOriginalViewerText(null)
-    setOriginalViewerErrorMessage(null)
-    setIsOriginalViewerLoading(false)
-    originalMatchRef.current = null
-  }, [])
-
-  useEffect(() => () => {
-    originalAbortController.current?.abort()
-    if (originalObjectUrl.current !== null) {
-      URL.revokeObjectURL(originalObjectUrl.current)
-    }
-  }, [])
+  }, [onSessionExpired, reloadKey])
 
   useEffect(() => {
-    if (originalViewerTarget === null) {
+    const resolution = resolveSelectedTag(selectedTagId, tagState, tags)
+    if (resolution.status === 'idle' || resolution.status === 'waiting') {
+      return
+    }
+    if (resolution.status === 'unavailable') {
+      queueMicrotask(() => {
+        setSearchResults([])
+        setDocumentTypes(new Map())
+        setEvidenceState('error')
+      })
       return
     }
 
-    const previousOverflow = document.body.style.overflow
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        closeOriginalViewer()
-      }
-    }
-    document.body.style.overflow = 'hidden'
-    document.addEventListener('keydown', handleKeyDown)
-    return () => {
-      document.body.style.overflow = previousOverflow
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [closeOriginalViewer, originalViewerTarget])
-
-  useEffect(() => {
-    if (originalViewerText === null || isOriginalViewerLoading) {
-      return
-    }
-    const animationFrame = window.requestAnimationFrame(() => {
-      originalMatchRef.current?.scrollIntoView({ block: 'center' })
+    let cancelled = false
+    void loadKeywordEvidence(resolution.tag.name, {
+      search: searchCareerEvidence,
+      listDocuments: getDocuments,
     })
-    return () => window.cancelAnimationFrame(animationFrame)
-  }, [isOriginalViewerLoading, originalViewerText])
-
-  const loadKeywordEvidence = useCallback(async (keyword: string) => {
-    const requestId = evidenceRequestId.current + 1
-    evidenceRequestId.current = requestId
-    setSelectedKeyword(keyword)
-    setEvidence([])
-    setEvidenceFrequency(0)
-    setEvidenceState('loading')
-    setIsEvidenceListExpanded(false)
-
-    try {
-      const response = await getCareerKeywordEvidence(keyword)
-      if (evidenceRequestId.current !== requestId) {
-        return
-      }
-      setEvidence(response.evidence)
-      setEvidenceFrequency(response.totalFrequency)
-      setEvidenceState(response.evidence.length === 0 ? 'empty' : 'result')
-    } catch (error) {
-      if (evidenceRequestId.current !== requestId) {
-        return
-      }
-      if (error instanceof CareerKeywordApiError && (error.status === 401 || error.status === 403)) {
-        onSessionExpired()
-        return
-      }
-      setEvidenceState('error')
+      .then((loaded) => {
+        if (cancelled) return
+        setSearchResults(loaded.results)
+        setDocumentTypes(loaded.documentTypes)
+        setEvidenceState(loaded.results.length === 0 ? 'empty' : 'result')
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return
+        if (
+          (error instanceof SearchApiError || error instanceof DocumentApiError)
+          && expireSessionIfUnauthorized(error, onSessionExpired)
+        ) {
+          return
+        }
+        setSearchResults([])
+        setDocumentTypes(new Map())
+        setEvidenceState('error')
+      })
+    return () => {
+      cancelled = true
     }
-  }, [onSessionExpired])
+  }, [detailReloadKey, onSessionExpired, selectedTagId, tagState, tags])
 
   useEffect(() => {
-    if (selectedKeyword === null) {
-      return
+    const syncSelectedTag = () => {
+      const nextTagId = selectedTagIdFromSearch(window.location.search)
+      setEvidenceState(nextTagId === null ? 'idle' : 'loading')
+      setSearchResults([])
+      setDocumentTypes(new Map())
+      if (nextTagId === null) {
+        setPdfViewerTarget(null)
+      }
+      setSelectedTagId(nextTagId)
     }
-    const timeoutId = window.setTimeout(() => {
-      void loadKeywordEvidence(selectedKeyword)
-    }, 0)
-    return () => window.clearTimeout(timeoutId)
-  }, [loadKeywordEvidence, selectedKeyword])
-
-  useEffect(() => {
-    const syncSelectedKeyword = () => {
-      setSelectedKeyword(selectedKeywordFromSearch(window.location.search))
-    }
-    window.addEventListener('popstate', syncSelectedKeyword)
-    return () => window.removeEventListener('popstate', syncSelectedKeyword)
+    window.addEventListener('popstate', syncSelectedTag)
+    return () => window.removeEventListener('popstate', syncSelectedTag)
   }, [])
 
-  const handleKeywordSelect = (keyword: string) => {
-    const nextPath = keywordDetailPath(keyword)
+  const handleTagSelect = (tagId: number) => {
+    const nextPath = tagDetailPath(tagId)
     if (`${window.location.pathname}${window.location.search}` !== nextPath) {
       window.history.pushState(null, '', nextPath)
     }
-    setSelectedKeyword(keyword)
+    setSearchResults([])
+    setDocumentTypes(new Map())
+    setEvidenceState('loading')
+    setSelectedTagId(tagId)
   }
 
-  const handleKeywordBack = () => {
-    const nextPath = keywordDetailPath(null)
+  const handleTagBack = () => {
+    const nextPath = tagDetailPath(null)
     if (`${window.location.pathname}${window.location.search}` !== nextPath) {
       window.history.pushState(null, '', nextPath)
     }
-    evidenceRequestId.current += 1
-    setEvidence([])
-    setEvidenceFrequency(0)
+    setSearchResults([])
+    setDocumentTypes(new Map())
     setEvidenceState('idle')
-    setIsEvidenceListExpanded(false)
-    setSelectedKeyword(null)
-  }
-
-  const handleOpenOriginal = async (target: OriginalViewerTarget) => {
-    closeOriginalViewer()
-    const requestId = originalRequestId.current + 1
-    originalRequestId.current = requestId
-    const controller = new AbortController()
-    originalAbortController.current = controller
-    setOriginalViewerTarget(target)
-    setOriginalViewerErrorMessage(null)
-    setIsOriginalViewerLoading(true)
-
-    try {
-      const original = await getDocumentOriginal(
-        target.documentId,
-        target.documentVersionId,
-        controller.signal,
-      )
-      if (originalRequestId.current !== requestId) {
-        return
-      }
-      if (original.fileType === 'PDF') {
-        const objectUrl = URL.createObjectURL(original.blob)
-        if (originalRequestId.current !== requestId) {
-          URL.revokeObjectURL(objectUrl)
-          return
-        }
-        originalObjectUrl.current = objectUrl
-        setOriginalViewerUrl(originalViewerLocationUrl(objectUrl, target))
-      } else {
-        const originalText = await original.blob.text()
-        if (originalRequestId.current !== requestId) {
-          return
-        }
-        setOriginalViewerText(originalText)
-      }
-    } catch (error) {
-      if (originalRequestId.current !== requestId) {
-        return
-      }
-      if (error instanceof DocumentApiError && (error.status === 401 || error.status === 403)) {
-        closeOriginalViewer()
-        onSessionExpired()
-        return
-      }
-      setOriginalViewerErrorMessage('원본 파일을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.')
-    } finally {
-      if (originalRequestId.current === requestId) {
-        originalAbortController.current = null
-        setIsOriginalViewerLoading(false)
-      }
-    }
-  }
-
-  const visibleKeywords = getVisibleKeywords(keywords, categoryFilter)
-  const selectedSummary = keywords.find((keyword) => keyword.keyword === selectedKeyword)
-  const visibleEvidence = isEvidenceListExpanded ? evidence : evidence.slice(0, 3)
-
-  const handleCategorySelect = (category: KeywordCategoryFilter) => {
-    setCategoryFilter(category)
-    if (category !== 'ALL' && selectedSummary?.category !== category) {
-      handleKeywordBack()
-    }
+    setPdfViewerTarget(null)
+    setSelectedTagId(null)
   }
 
   return (
     <section className="vault-page keyword-page" aria-labelledby="keyword-title">
       <header className="page-heading keyword-page-heading">
-        <p className="eyebrow">{selectedKeyword === null ? 'MY KEYWORDS' : 'CAREER KEYWORDS'}</p>
+        <p className="eyebrow">{selectedTagId === null ? 'MY DOCUMENT TAGS' : 'TAG EVIDENCE'}</p>
         <h1 id="keyword-title">경력 키워드</h1>
-        {selectedKeyword === null ? (
-          <p>등록한 문서에서 확인된 기술과 경험을 둘러보세요.</p>
+        {selectedTagId === null ? (
+          <p>내 문서에 직접 연결한 태그와 문서 수를 확인하세요.</p>
         ) : (
           <nav className="keyword-breadcrumb" aria-label="경력 키워드 위치">
-            <button type="button" onClick={handleKeywordBack}>경력 키워드</button>
+            <button type="button" onClick={handleTagBack}>경력 키워드</button>
             <span aria-hidden="true">›</span>
-            <span aria-current="page">{selectedKeyword}</span>
+            <span aria-current="page">{selectedTag?.name ?? '태그'}</span>
           </nav>
         )}
       </header>
 
-      <div className={'keyword-workspace' + (selectedKeyword === null ? '' : ' is-detail')}>
-        {selectedKeyword === null && (
-          <>
-            <section className="keyword-cloud-panel" aria-labelledby="keyword-cloud-title">
-              <header className="keyword-panel-heading">
-                <div>
-                  <p className="section-kicker">BROWSE KEYWORDS</p>
-                  <h2 id="keyword-cloud-title">내 문서의 키워드</h2>
-                </div>
-                <span>{documentCount}개 문서</span>
-              </header>
-
-              <div className="keyword-cloud" aria-live="polite" aria-busy={keywordState === 'loading'}>
-                {keywordState === 'loading' && (
-                  <p className="keyword-state"><span className="state-spinner" aria-hidden="true" />키워드를 모으는 중입니다.</p>
-                )}
-                {keywordState === 'empty' && (
-                  <p className="keyword-state">아직 확인된 경력 키워드가 없어요. 이력서, 포트폴리오, 프로젝트 문서를 등록하면 문서에서 확인된 키워드를 보여드려요.</p>
-                )}
-                {keywordState === 'error' && (
-                  <div className="keyword-state" role="alert">
-                    <p>키워드를 불러오지 못했습니다.</p>
-                    <button type="button" className="secondary-button" onClick={handleKeywordReload}>
-                      다시 시도
-                    </button>
-                  </div>
-                )}
-                {keywordState === 'result' && visibleKeywords.length === 0 && (
-                  <p className="keyword-state">이 분류에서 확인된 키워드가 없어요.</p>
-                )}
-                {keywordState === 'result' && visibleKeywords.map((keyword) => (
-                  <button
-                    key={keyword.keyword}
-                    type="button"
-                    className="keyword-cloud-item"
-                    aria-label={`${keyword.keyword}, ${keywordMentionLabel(keyword.frequency)}, ${KEYWORD_CATEGORY_LABELS[keyword.category]}`}
-                    onClick={() => handleKeywordSelect(keyword.keyword)}
-                  >
-                    <span>{keyword.keyword}</span>
-                    <small aria-hidden="true">{keyword.frequency}</small>
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            {keywordState === 'result' && (
-              <aside className="keyword-controls" aria-label="키워드 분류">
-                <fieldset className="keyword-category-control">
-                  <legend>기술 분류</legend>
-                  <div>
-                    <button
-                      type="button"
-                      aria-pressed={categoryFilter === 'ALL'}
-                      onClick={() => handleCategorySelect('ALL')}
-                    >
-                      전체 <small>{categoryKeywordCountLabel(keywords.length)}</small>
-                    </button>
-                    {KEYWORD_CATEGORY_ORDER.map((category) => (
-                      <button
-                        key={category}
-                        type="button"
-                        aria-pressed={categoryFilter === category}
-                        onClick={() => handleCategorySelect(category)}
-                      >
-                        {KEYWORD_CATEGORY_LABELS[category]}
-                        <small>{categoryKeywordCountLabel(keywords.filter((keyword) => keyword.category === category).length)}</small>
-                      </button>
-                    ))}
-                  </div>
-                </fieldset>
-              </aside>
-            )}
-          </>
-        )}
-
-        {selectedKeyword !== null && (
-        <section className="keyword-evidence-panel" aria-labelledby="keyword-evidence-title">
-          <header className="keyword-panel-heading">
-            <div>
-              <h2 id="keyword-evidence-title">{selectedKeyword}</h2>
-              {evidenceState === 'result' && (
-                <p className="keyword-evidence-count">
-                  {keywordEvidenceCountLabel(evidence.length, evidenceFrequency)}
-                </p>
-              )}
-            </div>
-          </header>
-
-          <div className="keyword-evidence-content" aria-live="polite" aria-busy={evidenceState === 'loading'}>
-            {evidenceState === 'loading' && <p className="keyword-state"><span className="state-spinner" aria-hidden="true" />근거를 찾는 중입니다.</p>}
-            {evidenceState === 'empty' && <p className="keyword-state">현재 활성 문서에서 해당 근거를 찾지 못했습니다.</p>}
-            {evidenceState === 'error' && <p className="keyword-state" role="alert">키워드 근거를 불러오지 못했습니다.</p>}
-            {evidenceState === 'result' && (
-              <div className="keyword-evidence-results">
-                <ol className="keyword-evidence-list">
-                  {visibleEvidence.map((item, index) => {
-                    const viewerTarget: OriginalViewerTarget = {
-                      ...item,
-                      keyword: selectedKeyword,
-                    }
-                    const conciseEvidence = getConciseKeywordEvidence(item.excerpt)
-                    const evidenceContext = getKeywordEvidenceContext(item.excerpt)
-                    return (
-                      <li key={`${item.documentId}-${item.documentVersionId}-${item.sourceType}-${item.sourceIndex}`}>
-                        <article className="keyword-evidence-card">
-                          <span className="keyword-evidence-index">{String(index + 1).padStart(2, '0')}</span>
-                          <p className="keyword-context-label">찾은 내용</p>
-                          <blockquote>
-                            <HighlightedKeywordExcerpt
-                              excerpt={conciseEvidence || '관련 내용은 문서에서 확인할 수 있어요.'}
-                              terms={[selectedKeyword, ...item.matchedTerms]}
-                            />
-                          </blockquote>
-                          <p className="keyword-document-reference">
-                            <strong>문서</strong>
-                            <span>{item.documentTitle} · {item.sourceLabel}</span>
-                          </p>
-                          <div className="keyword-evidence-actions">
-                            {evidenceContext !== '' && evidenceContext !== conciseEvidence && (
-                              <details className="keyword-context-details">
-                                <summary>
-                                  <span className="keyword-context-open-label">주변 내용 보기</span>
-                                  <span className="keyword-context-close-label">주변 내용 닫기</span>
-                                </summary>
-                                <p>{evidenceContext}</p>
-                              </details>
-                            )}
-                            <button
-                              type="button"
-                              className="keyword-document-button"
-                              onClick={() => void handleOpenOriginal(viewerTarget)}
-                            >
-                              문서에서 보기
-                            </button>
-                          </div>
-                        </article>
-                      </li>
-                    )
-                  })}
-                </ol>
-                {evidence.length > visibleEvidence.length && (
-                  <button
-                    type="button"
-                    className="keyword-evidence-toggle"
-                    onClick={() => setIsEvidenceListExpanded(true)}
-                  >
-                    관련 기록 {evidence.length - visibleEvidence.length}개 더 보기
-                  </button>
-                )}
-                {isEvidenceListExpanded && evidence.length > 3 && (
-                  <button
-                    type="button"
-                    className="keyword-evidence-toggle"
-                    onClick={() => setIsEvidenceListExpanded(false)}
-                  >
-                    추가 기록 접기
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        </section>
-        )}
-      </div>
-
-      {originalViewerTarget !== null && (
-        <div className="pdf-viewer-layer">
-          <button type="button" className="pdf-viewer-backdrop" aria-label="원본 뷰어 닫기" onClick={closeOriginalViewer} />
-          <section
-            className="pdf-viewer-panel keyword-original-viewer"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="keyword-original-title"
-            aria-busy={isOriginalViewerLoading}
-          >
-            <header className="pdf-viewer-heading">
+      <div className={'keyword-workspace' + (selectedTagId === null ? '' : ' is-detail')}>
+        {selectedTagId === null && (
+          <section className="keyword-cloud-panel" aria-labelledby="keyword-cloud-title">
+            <header className="keyword-panel-heading">
               <div>
-                <p className="section-kicker">
-                  ORIGINAL {originalViewerTarget.fileType} · VERSION {originalViewerTarget.versionNo}
-                </p>
-                <h2 id="keyword-original-title">{originalViewerTarget.originalFileName}</h2>
-                <p className="keyword-original-location">
-                  {sourceLocationLabel(originalViewerTarget)} · <strong>{originalViewerTarget.keyword}</strong> 위치
-                </p>
+                <p className="section-kicker">DOCUMENT TAGS</p>
+                <h2 id="keyword-cloud-title">내 문서의 태그</h2>
               </div>
-              <button type="button" className="pdf-viewer-close-button" aria-label="원본 뷰어 닫기" onClick={closeOriginalViewer}>×</button>
+              <span>{tags.length}개 태그</span>
             </header>
-            <div className="pdf-viewer-content">
-              {isOriginalViewerLoading && <p className="pdf-viewer-state"><span className="state-spinner" aria-hidden="true" />원본을 불러오는 중입니다.</p>}
-              {originalViewerErrorMessage !== null && !isOriginalViewerLoading && (
-                <div className="pdf-viewer-error" role="alert">
-                  <strong>원본을 열 수 없습니다.</strong>
-                  <p>{originalViewerErrorMessage}</p>
-                  <button type="button" className="secondary-button" onClick={() => void handleOpenOriginal(originalViewerTarget)}>다시 시도</button>
+            <div className="keyword-cloud" aria-live="polite" aria-busy={tagState === 'loading'}>
+              {tagState === 'loading' && (
+                <p className="keyword-state"><span className="state-spinner" aria-hidden="true" />태그를 불러오는 중입니다.</p>
+              )}
+              {tagState === 'empty' && (
+                <p className="keyword-state">아직 문서에 연결된 태그가 없습니다. 문서 업로드나 상세 화면에서 태그를 추가해 주세요.</p>
+              )}
+              {tagState === 'error' && (
+                <div className="keyword-state" role="alert">
+                  <p>태그를 불러오지 못했습니다.</p>
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={() => {
+                      setTagState('loading')
+                      setReloadKey((value) => value + 1)
+                    }}
+                  >
+                    다시 시도
+                  </button>
                 </div>
               )}
-              {originalViewerUrl !== null && !isOriginalViewerLoading && (
-                <iframe className="pdf-viewer-frame" src={originalViewerUrl} title={`${originalViewerTarget.originalFileName} 미리보기`} />
-              )}
-              {originalViewerText !== null && !isOriginalViewerLoading && (
-                <pre className="keyword-original-text">
-                  <HighlightedOriginalText
-                    text={originalViewerText}
-                    terms={[originalViewerTarget.keyword, ...originalViewerTarget.matchedTerms]}
-                    onFirstMatch={(element) => {
-                      originalMatchRef.current = element
-                    }}
-                  />
-                </pre>
-              )}
+              {tagState === 'result' && tags.map((tag) => (
+                <button
+                  key={tag.tagId}
+                  type="button"
+                  className="keyword-cloud-item"
+                  aria-label={`${tag.name}, ${tag.documentCount}개 문서`}
+                  onClick={() => handleTagSelect(tag.tagId)}
+                >
+                  <span>{tag.name}</span>
+                  <small>{tag.documentCount}개 문서</small>
+                </button>
+              ))}
             </div>
           </section>
-        </div>
+        )}
+
+        {selectedTagId !== null && (
+          <KeywordEvidencePanel
+            query={selectedTag?.name ?? ''}
+            state={evidenceState === 'idle' ? 'loading' : evidenceState}
+            results={searchResults}
+            documentTypes={documentTypes}
+            documentTypeLabel={documentTypeLabel}
+            onRetry={() => {
+              setEvidenceState('loading')
+              if (keywordEvidenceRetryTarget(selectedTagId, tagState, tags) === 'usage') {
+                setTagState('loading')
+                setReloadKey((value) => value + 1)
+              } else {
+                setDetailReloadKey((value) => value + 1)
+              }
+            }}
+            onOpenPdf={setPdfViewerTarget}
+            onNavigateToDocument={onNavigateToDocument}
+          />
+        )}
+      </div>
+      {pdfViewerTarget !== null && (
+        <KeywordEvidencePdfViewer
+          target={pdfViewerTarget}
+          onClose={closeKeywordEvidencePdfViewer}
+          onSessionExpired={onSessionExpired}
+        />
       )}
     </section>
   )
 }
 
-function sourceLocationLabel(
-  item: Pick<CareerKeywordEvidenceItem, 'fileType' | 'sourceLabel'>,
-): string {
-  return `${item.fileType} · ${item.sourceLabel}`
-}
-
-function originalViewerLocationUrl(objectUrl: string, target: OriginalViewerTarget): string {
-  if (target.fileType !== 'PDF' || target.sourceType !== 'PAGE') {
-    return objectUrl
-  }
-  const searchTerm = target.matchedTerms[0] ?? target.keyword
-  return `${objectUrl}#page=${Math.max(1, target.sourceIndex)}&zoom=page-width&search=${encodeURIComponent(searchTerm)}`
-}
-
-function highlightExpression(terms: string[]): RegExp | null {
-  const uniqueTerms = [...new Set(terms.map((term) => term.trim()).filter(Boolean))]
-    .sort((left, right) => right.length - left.length)
-  if (uniqueTerms.length === 0) {
-    return null
-  }
-  const expression = uniqueTerms
-    .map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-    .join('|')
-  return new RegExp(`(${expression})`, 'gi')
-}
-
-function HighlightedKeywordExcerpt({ excerpt, terms }: { excerpt: string; terms: string[] }) {
-  const expression = highlightExpression(terms)
-  if (expression === null) {
-    return excerpt
-  }
-  const parts = excerpt.split(expression)
-  return parts.map((part, index) => index % 2 === 1
-    ? <mark key={`${part}-${index}`}>{part}</mark>
-    : part)
-}
-
-function HighlightedOriginalText({
-  text,
-  terms,
-  onFirstMatch,
+function KeywordEvidencePdfViewer({
+  target,
+  onClose,
+  onSessionExpired,
 }: {
-  text: string
-  terms: string[]
-  onFirstMatch: (element: HTMLElement | null) => void
+  target: EvidencePdfViewerTarget
+  onClose: () => void
+  onSessionExpired: () => void
 }) {
-  const expression = highlightExpression(terms)
-  if (expression === null) {
-    return text
-  }
-  const parts = text.split(expression)
-  let matched = false
-  return parts.map((part, index) => {
-    if (index % 2 !== 1) {
-      return part
-    }
-    const isFirst = !matched
-    matched = true
-    return <mark key={`${part}-${index}`} ref={isFirst ? onFirstMatch : undefined}>{part}</mark>
-  })
-}
+  const [viewerUrl, setViewerUrl] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const panelRef = useRef<HTMLElement>(null)
+  const returnFocusRef = useRef<HTMLElement | null>(
+    typeof document !== 'undefined' && document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null,
+  )
 
+  useEffect(() => {
+    const controller = new AbortController()
+    let objectUrl: string | null = null
+    void getDocumentPdf(target.documentId, target.documentVersionId, controller.signal)
+      .then((pdf) => {
+        objectUrl = URL.createObjectURL(pdf)
+        setViewerUrl(`${objectUrl}#page=${target.pageNumber}&zoom=page-width`)
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return
+        if (error instanceof DocumentApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
+          onClose()
+          return
+        }
+        if (error instanceof DocumentApiError && error.code === 'ORIGINAL_FILE_NOT_FOUND') {
+          setErrorMessage('첨부한 PDF 파일을 찾지 못했습니다.')
+        } else {
+          setErrorMessage('문서를 열지 못했습니다. 잠시 후 다시 시도해 주세요.')
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setIsLoading(false)
+        }
+      })
+
+    return () => {
+      controller.abort()
+      if (objectUrl !== null) {
+        URL.revokeObjectURL(objectUrl)
+      }
+    }
+  }, [onClose, onSessionExpired, target])
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow
+    const returnFocusTarget = returnFocusRef.current
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+    document.body.style.overflow = 'hidden'
+    focusModalEntry(panelRef.current)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', handleKeyDown)
+      restoreModalTrigger(returnFocusTarget)
+    }
+  }, [onClose])
+
+  const handlePanelKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
+    if (event.key === 'Escape') {
+      event.stopPropagation()
+      onClose()
+      return
+    }
+    if (event.key !== 'Tab' || panelRef.current === null) {
+      return
+    }
+    const focusableTargets = Array.from(panelRef.current.querySelectorAll<HTMLElement>(
+      'button:not(:disabled), input:not(:disabled), iframe, [href], [tabindex]:not([tabindex="-1"])',
+    ))
+    if (focusableTargets.length === 0) {
+      panelRef.current.focus()
+      event.preventDefault()
+      return
+    }
+    if (keepFocusWithinModal(focusableTargets, document.activeElement, event.shiftKey)) {
+      event.preventDefault()
+    }
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        className="pdf-viewer-backdrop"
+        aria-label="문서 확인 닫기"
+        onClick={onClose}
+      />
+      <section
+        ref={panelRef}
+        className="pdf-viewer-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="keyword-pdf-viewer-title"
+        aria-busy={isLoading}
+        tabIndex={-1}
+        onKeyDown={handlePanelKeyDown}
+      >
+        <header className="pdf-viewer-heading">
+          <div>
+            <p className="section-kicker">문서 · {target.pageNumber}페이지</p>
+            <h2 id="keyword-pdf-viewer-title">{target.documentTitle}</h2>
+          </div>
+          <button type="button" className="icon-button" aria-label="문서 확인 닫기" onClick={onClose}>×</button>
+        </header>
+        <div className="pdf-viewer-content">
+          {isLoading && (
+            <p className="state-message search-state">
+              <span className="state-spinner" aria-hidden="true" />
+              문서를 여는 중입니다.
+            </p>
+          )}
+          {errorMessage !== null && <p className="pdf-viewer-error" role="alert">{errorMessage}</p>}
+          {viewerUrl !== null && errorMessage === null && (
+            <iframe
+              className="pdf-viewer-frame"
+              src={viewerUrl}
+              title={`${target.documentTitle} ${target.pageNumber}페이지`}
+            />
+          )}
+        </div>
+      </section>
+    </>
+  )
+}
 function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<CareerEvidenceSearchResult[]>([])
@@ -2451,9 +2321,8 @@ function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
       if (error instanceof DOMException && error.name === 'AbortError') {
         return
       }
-      if (error instanceof DocumentApiError && (error.status === 401 || error.status === 403)) {
+      if (error instanceof DocumentApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
         closePdfViewer()
-        onSessionExpired()
         return
       }
       if (error instanceof DocumentApiError && error.code === 'ORIGINAL_FILE_NOT_FOUND') {
@@ -2491,8 +2360,7 @@ function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
       setSearchResults(results)
       setSearchState(results.length === 0 ? 'empty' : 'result')
     } catch (error) {
-      if (error instanceof SearchApiError && (error.status === 401 || error.status === 403)) {
-        onSessionExpired()
+      if (error instanceof SearchApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
         return
       }
       setSearchState('error')
@@ -2733,6 +2601,8 @@ function UploadPage({
   const [uploadTitle, setUploadTitle] = useState('')
   const [uploadDocumentType, setUploadDocumentType] = useState<DocumentType>('OTHER')
   const [uploadFile, setUploadFile] = useState<File | null>(null)
+  const [selectedUploadTags, setSelectedUploadTags] = useState<Tag[]>([])
+  const [isTagModalOpen, setIsTagModalOpen] = useState(false)
   const [uploadFormKey, setUploadFormKey] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadErrorMessage, setUploadErrorMessage] = useState<string | null>(null)
@@ -2784,15 +2654,20 @@ function UploadPage({
     setUploadSuccessMessage(null)
 
     try {
-      await uploadDocument(normalizedTitle, uploadDocumentType, uploadFile)
+      await uploadDocument(
+        normalizedTitle,
+        uploadDocumentType,
+        uploadFile,
+        selectedUploadTags.map((tag) => tag.tagId),
+      )
       setUploadSuccessMessage('문서가 등록되었습니다. 처리 상태는 문서 보관함에서 확인할 수 있습니다.')
       setUploadTitle('')
       setUploadDocumentType('OTHER')
       setUploadFile(null)
+      setSelectedUploadTags([])
       setUploadFormKey((value) => value + 1)
     } catch (error) {
-      if (error instanceof DocumentApiError && (error.status === 401 || error.status === 403)) {
-        onSessionExpired()
+      if (error instanceof DocumentApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
         return
       }
       setUploadErrorMessage(uploadFailureMessage(error))
@@ -2895,6 +2770,18 @@ function UploadPage({
             />
           </div>
 
+          <div className="form-field form-field-full upload-tag-field">
+            <label>태그</label>
+            <DocumentTagEditor
+              tags={selectedUploadTags}
+              emptyMessage="선택한 태그가 없습니다."
+              removeLabel={(tag) => `${tag.name} 선택 해제`}
+              disabled={isUploading}
+              onRemove={(tagId) => setSelectedUploadTags((current) => current.filter((item) => item.tagId !== tagId))}
+              onAdd={() => setIsTagModalOpen(true)}
+            />
+          </div>
+
           {uploadErrorMessage !== null && (
             <p
               id="upload-form-error"
@@ -2916,6 +2803,17 @@ function UploadPage({
           </button>
         </form>
       </div>
+      {isTagModalOpen && (
+        <TagModal
+          selectedTags={selectedUploadTags}
+          onSave={(tags) => {
+            setSelectedUploadTags(tags)
+            setIsTagModalOpen(false)
+          }}
+          onClose={() => setIsTagModalOpen(false)}
+          onSessionExpired={onSessionExpired}
+        />
+      )}
     </section>
   )
 }

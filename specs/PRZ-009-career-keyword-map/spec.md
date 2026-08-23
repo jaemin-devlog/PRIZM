@@ -1,21 +1,86 @@
-# PRZ-009 — 경력 키워드 맵
+# PRZ-009 — 사용자 관리형 Document Tag
 
-> **상태:** `IMPLEMENTED_UNVERIFIED`
+> **상태:** `VERIFIED`
+> **AUDIT Gate:** `PASS`
 > **유형:** Feature
 > **선행 문서:** [PRZ-000](../PRZ-000-platform-baseline/spec.md)
-> **핵심 기능 소스:** `d52c6d01a3bef916e80a3c983a43c7b1fad1139b`
-> **UI·문서 관리 확장 소스:** `3af28492` (`PRZ-009-keyword-tags-ui`)
-> **통합:** 핵심 기능 merge `5a8ea8d2b85e7d87342e11e96d1d58d1181ab6b8`; 확장 소스는 [PR #49](https://github.com/jaemin-devlog/PRIZM/pull/49) merge `550c9d4c5b1852f13335be061d1624d22ddec382`
-> **최종 확인:** 2026-08-21
+> **현재 P4 소스:** 이 branch의 uncommitted worktree — commit·PR·merge 전
+> **역사적 P1–P3 자동 추출 소스:** `d52c6d01a3bef916e80a3c983a43c7b1fad1139b`, merge `5a8ea8d2b85e7d87342e11e96d1d58d1181ab6b8`
+> **역사적 UI·문서 관리 확장:** `3af28492` (`PRZ-009-keyword-tags-ui`), [PR #49](https://github.com/jaemin-devlog/PRIZM/pull/49) merge `550c9d4c5b1852f13335be061d1624d22ddec382`
+> **최종 확인:** 2026-08-24
 
 ## 상태
 
-`IMPLEMENTED_UNVERIFIED` — 구현·전체 PostgreSQL integration·최종 감사와 확장 브랜치 commit/push 완료,
-OpenSQL opt-in `NOT_RUN`
+`VERIFIED` — 기존 원문 사전 추출형 Keyword Map을 사용자 관리형 Document Tag로
+대체했고, backend·PostgreSQL·frontend 검증과 수정에 참여하지 않은 세 관점의 독립
+재감사를 통과했다. GitHub commit·PR·merge는 아직 수행하지 않았다. 이전 구현 근거는
+이 문서 아래와 [Evidence](evidence.md)에 역사로 보존한다.
 
 시작 기준 source는 `83631f13c21eab54ac0f32ebb0f893b6c5acea0f`이다.
 
-## 목적과 사용자 흐름
+## P4 — 사용자 관리형 Document Tag 계약
+
+P4부터 PRZ-009의 제품 계약은 원문에서 Java 기술 사전으로 키워드를 자동 추출하는
+기능이 아니라, 사용자가 문서에 직접 연결하는 metadata tag다. 이 절은 아래의 기존
+P1–P3 추출 계약보다 우선한다.
+
+### 데이터와 소유권
+
+- `tags`는 표시 이름, 정규화 이름, `SYSTEM|USER` source, nullable owner와 생성 시각을 가진다.
+- SYSTEM tag는 모든 USER에게 검색·선택 가능하지만 추천 목록일 뿐 whitelist가 아니다.
+- USER tag는 생성 owner에게만 검색·선택·연결 가능하다.
+- 같은 owner의 USER tag는 공백·Unicode 호환 표기·영문 대소문자를 정규화한 이름으로
+  중복 생성하지 않는다. 같은 이름의 SYSTEM tag가 있으면 USER tag를 새로 만들지 않고
+  기존 SYSTEM tag를 재사용한다.
+- `document_tags`는 document와 tag의 다대다 연결이며 같은 연결을 중복 저장하지 않는다.
+  문서 소유권을 확인하고 SYSTEM 또는 같은 owner의 USER tag만 연결한다.
+
+### API와 document lifecycle
+
+- tag 검색·USER tag 생성 API를 제공한다.
+- 문서별 tag 조회·전체 교체·개별 제거 API를 제공한다.
+- 최초 문서 업로드 multipart 요청은 선택한 tag ID를 함께 받고, document/version/change-log와
+  같은 DB transaction에서 연결한다. tag 검증이나 연결이 실패하면 문서 메타데이터도
+  commit하지 않으며 기존 파일 rollback 보상 계약을 유지한다.
+- 새 immutable version 등록은 document-level tag 연결을 변경하지 않는다.
+- 사용 태그 집계는 현재 owner 문서에 실제 연결된 tag만 반환하며, SYSTEM 전체 목록이나
+  원문 자동 추출 결과를 포함하지 않는다.
+
+### 화면 계약
+
+- 업로드와 문서 상세는 같은 Tag Modal을 재사용한다.
+- modal은 DB 검색, 연속 다중 선택, 선택 중복 차단, 검색 결과가 없을 때 USER tag 생성을
+  제공하며 하나를 선택해도 닫히지 않는다.
+- 문서 상세는 chip으로 현재 tag를 표시하고 추가·제거를 지원한다.
+- 경력 키워드 목록은 연결된 tag별 문서 수를 metadata 기준으로 표시한다.
+- tag를 선택한 상세 화면은 tag 이름을 기존 `POST /api/career-evidence/search`의 원본
+  query로 전달하고, 현재 owner의 ACTIVE 문서 전체에서 찾은 snippet·context·문서·page를
+  표시한다. tag가 연결된 문서로 Search 범위를 제한하지 않는다.
+
+### P4 비범위와 보존 계약
+
+- PRZ-016 Search production, embedding, Dense retrieval, relevance/floor/ranking/localization을
+  변경하지 않는다.
+- PDF/TXT parsing, immutable version, processing job, ACTIVE activation과 owner isolation을
+  유지한다.
+- tag metadata를 Search filter나 ranking boost로 주입하지 않는다. 사용자가 경력 키워드
+  상세를 열 때에만 선택한 tag 이름을 명시적인 Search query로 사용한다.
+
+### P4 완료 조건
+
+- SYSTEM 검색, USER 생성, 정규화 중복, 다른 owner USER 미노출, document 연결 CRUD와
+  사용 tag 집계를 backend test로 검증한다.
+- 업로드 선택, 공용 modal 검색·연속 선택·생성·중복 차단, 상세 추가·삭제와 집계 화면을
+  frontend test·typecheck·lint·build로 검증한다.
+- 전체 backend unit·PostgreSQL integration에서 document lifecycle과 PRZ-016 Search 회귀가
+  없어야 한다.
+
+## 역사 기록 — 폐기된 P1–P3 자동 추출 계약
+
+> 아래 내용은 P4 전환 전에 구현·검증했던 자동 keyword 추출 계약의 추적 기록이다.
+> 현재 Production 계약이나 완료 조건이 아니며, 현재 동작은 위의 P4 계약만 따른다.
+
+### 목적과 사용자 흐름
 
 사용자가 등록한 이력서와 포트폴리오의 현재 검색 가능 원문에서 확인된 기술명과
 공학 개념을 태그로 둘러본다. 이 화면은 숙련도·점수·중요도를 판단하는 분석
@@ -29,14 +94,14 @@ OpenSQL opt-in `NOT_RUN`
 이 결과는 CareerFact나 검증된 역량 판정이 아니다. 원문에서 직접 산출한 탐색용
 `문서 키워드 인덱스`이며, PRIZM에 등록되지 않은 기술이나 경험을 생성하지 않는다.
 
-## 기능 구성
+### 기능 구성
 
 - owner의 ACTIVE 이력서·포트폴리오 chunk를 원문 단위로 조립한다.
 - overlap을 제거한 원문에서 등록된 기술명·공학 개념을 canonical keyword로 집계한다.
 - API는 keyword, 빈도, 문서 수와 실제 source 근거를 함께 반환한다.
 - UI는 category·고정 순서·URL 선택 상태를 적용하고 TXT/PDF owner-scoped viewer로 연결한다.
 
-## 원문과 키워드 계약
+### 원문과 키워드 계약
 
 - 인증된 사용자가 소유한 `RESUME`, `PORTFOLIO` 문서만 포함한다.
 - `documents.active_version_id`가 가리키고 상태가 `ACTIVE`인 version의 chunk만
@@ -54,9 +119,9 @@ OpenSQL opt-in `NOT_RUN`
 - 키워드 맵은 빈도 내림차순과 이름 오름차순으로 최대 60개를 반환한다. 동일한
   입력 source에는 결정적으로 같은 결과를 반환한다.
 
-## API 계약
+### API 계약
 
-### 키워드 정규화와 분류
+#### 키워드 정규화와 분류
 
 - 같은 기술의 대소문자, 한글/영문 별칭, 붙여 쓰기는 하나의 canonical keyword로 합친다.
   최소 계약은 `백엔드/Backend`, `프론트엔드/Frontend`, `데이터베이스/DB`,
@@ -67,7 +132,7 @@ OpenSQL opt-in `NOT_RUN`
   `SECURITY`, `TESTING`, `WEB`, `TOOLING`, `ENGINEERING_CONCEPT` 중 하나의 category를 가진다.
 - canonical keyword의 근거 조회는 canonical 표기와 등록된 모든 별칭의 실제 출현을 함께 찾는다.
 
-### 키워드 맵
+#### 키워드 맵
 
 - `GET /api/career-keywords`
 - 성공: `200 OK`
@@ -75,7 +140,7 @@ OpenSQL opt-in `NOT_RUN`
   실제 확인 표기 `variants` 목록을 포함한다.
 - 대상 문서 또는 추출 가능한 키워드가 없어도 빈 목록은 정상 응답이다.
 
-### 키워드 근거
+#### 키워드 근거
 
 - `GET /api/career-keywords/evidence?keyword={keyword}`
 - `keyword`는 공백일 수 없고 최대 100자다.
@@ -87,7 +152,7 @@ OpenSQL opt-in `NOT_RUN`
 - 현재 source에서 키워드를 찾지 못하면 `totalFrequency=0`, 빈 근거 목록을
   반환한다. 의미상 검색 성공이나 CareerFact로 바꾸지 않는다.
 
-## 화면 계약
+### 화면 계약
 
 - `/career-vault/keywords`와 사이드바 `경력 키워드` 메뉴를 추가한다.
 - 목록은 모든 keyword를 같은 크기의 pill/tag로 표시한다. 글자 크기·색·위치는
@@ -124,7 +189,7 @@ OpenSQL opt-in `NOT_RUN`
   위치 이동을 수행한다.
 - 좁은 화면에서는 키워드 맵 다음에 근거 목록과 원본 viewer가 쌓인다.
 
-## 보안·보존 계약
+### 보안·보존 계약
 
 - 모든 keyword query는 document·version·chunk의 `owner_user_id`, active pointer와
   `ACTIVE` 상태를 DB query에서 함께 제한한다.
@@ -135,7 +200,7 @@ OpenSQL opt-in `NOT_RUN`
 - 기존 Flyway V1–V13, chunk·embedding 저장, 처리 job, 활성화·실패 복구와 Career
   Evidence API 계약은 변경하지 않는다.
 
-## 제외 범위
+### 제외 범위
 
 - 생성형 chat model, 외부 NLP API와 사용자 문서 외부의 기술 추천
 - 키워드 수동 편집·숨김, 숙련도·연차 판정
@@ -143,62 +208,62 @@ OpenSQL opt-in `NOT_RUN`
 - 영구 keyword table, 별도 backfill/worker, 청킹·embedding·검색 score 변경
 - PRZ-008의 근거 있음/없음 판정과 검색 API 응답 변경
 
-## 요구사항과 완료 조건
+### 요구사항과 완료 조건
 
-### `PRZ-009-R1` — 요구사항
+#### `PRZ-009-R1` — 요구사항
 
 owner의 active 이력서·포트폴리오에서만 결정적 키워드 맵을 만든다.
 
-### `PRZ-009-R2` — 요구사항
+#### `PRZ-009-R2` — 요구사항
 
 overlap 중복을 줄인 실제 원문 출현 빈도와 문서 수를 반환한다.
 
-### `PRZ-009-R3` — 요구사항
+#### `PRZ-009-R3` — 요구사항
 
 키워드 선택 시 정확한 source 근거와 active 원본 version을 연결한다.
 
-### `PRZ-009-R4` — 요구사항
+#### `PRZ-009-R4` — 요구사항
 
 PDF와 TXT 원본을 기존 보안 header와 소유권 경계 안에서 열람한다.
 
-### `PRZ-009-R5` — 요구사항
+#### `PRZ-009-R5` — 요구사항
 
 화면은 loading·empty·error·selection과 반응형·키보드 동작을 구분한다.
 
-### `PRZ-009-R6` — 요구사항
+#### `PRZ-009-R6` — 요구사항
 
 기존 검색·색인·활성화·실패 복구와 PRZ-008 계약을 변경하지 않는다.
 
-### `PRZ-009-R7` — 요구사항
+#### `PRZ-009-R7` — 요구사항
 
 등록된 별칭과 Java 버전 표기는 canonical keyword로 합산되고 실제 표기는 근거에 보존된다.
 
-### `PRZ-009-R8` — 요구사항
+#### `PRZ-009-R8` — 요구사항
 
 category 필터는 backend category 계약을 그대로 사용하며, 목록은 빈도 내림차순과
 이름 안정 정렬의 단일 Browse 순서를 사용한다.
 
-### `PRZ-009-R9` — 요구사항
+#### `PRZ-009-R9` — 요구사항
 
 각 source evidence는 compact card 하나로 표시하며, 처음 세 개 뒤의 source evidence는
 `관련 기록 N개 더 보기`와 `추가 기록 접기`로 확인한다.
 
-### `PRZ-009-R10` — 요구사항
+#### `PRZ-009-R10` — 요구사항
 
 PDF는 해당 페이지, TXT는 첫 일치 표기로 owner-scoped 원본 viewer가 이동한다.
 
-### `PRZ-009-R11` — 요구사항
+#### `PRZ-009-R11` — 요구사항
 
 keyword evidence의 preview는 개인정보를 최소화하면서 keyword가 발견된 이유를 이해할 수 있는 안전한
 문구를 우선 표시하고, 노트북 100% viewport에서도 공통 Career Vault 화면의 정보 밀도를 유지한다.
 
-### `PRZ-009-R12` — 요구사항
+#### `PRZ-009-R12` — 요구사항
 
 문서 보관함 root는 existing document summary를 frontend에서 DocumentType별로 묶은 folder card만 표시한다.
 비어 있는 type은 숨기며, folder 선택은 `?type=` URL state·breadcrumb·browser back/forward로 유지한다.
 제목 검색은 모든 type을 대상으로 하고, folder 내부에서만 상태 filter와 기존 document card를 제공한다.
 
-### `PRZ-009-R13` — 요구사항
+#### `PRZ-009-R13` — 요구사항
 
 Career Vault의 로그인·회원가입, sidebar, 문서 보관함과 폴더 내부, 경력 키워드 목록·상세,
 내 경험 찾기, 문서 업로드, modal·viewer 및 loading·empty·error state는 blue/black/gray palette와
@@ -206,7 +271,7 @@ Career Vault의 로그인·회원가입, sidebar, 문서 보관함과 폴더 내
 큰 radius·약한 border·soft shadow·정돈된 spacing을 사용하고, card·button·tag hover는 작은 elevation만
 제공하며 `prefers-reduced-motion`을 존중한다. 기능·API·result ID/order/count·PDF navigation은 변경하지 않는다.
 
-### `PRZ-009-R14` — 요구사항
+#### `PRZ-009-R14` — 요구사항
 
 문서 상세의 각 과거 version은 owner-scoped 휴지통 action으로 개별 삭제할 수 있다. 삭제는 원본 파일 정리,
 change log·processing job·chunk 정리를 기존 문서 삭제와 같은 순서와 안전한 background cleanup으로 수행한다.

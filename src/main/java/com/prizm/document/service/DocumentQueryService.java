@@ -9,6 +9,7 @@ import com.prizm.document.entity.DocumentVersion;
 import com.prizm.document.exception.DocumentNotFoundException;
 import com.prizm.document.repository.DocumentRepository;
 import com.prizm.document.repository.DocumentVersionRepository;
+import com.prizm.documenttag.service.DocumentTagService;
 import com.prizm.ingestion.entity.ProcessingJob;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
 import com.prizm.ingestion.entity.ProcessingFailureCode;
@@ -27,14 +28,17 @@ public class DocumentQueryService {
     private final DocumentRepository documentRepository;
     private final DocumentVersionRepository documentVersionRepository;
     private final ProcessingJobRepository processingJobRepository;
+    private final DocumentTagService documentTagService;
 
     public DocumentQueryService(
             DocumentRepository documentRepository,
             DocumentVersionRepository documentVersionRepository,
-            ProcessingJobRepository processingJobRepository) {
+            ProcessingJobRepository processingJobRepository,
+            DocumentTagService documentTagService) {
         this.documentRepository = documentRepository;
         this.documentVersionRepository = documentVersionRepository;
         this.processingJobRepository = processingJobRepository;
+        this.documentTagService = documentTagService;
     }
 
     /** 저장된 문서를 최신 생성 순서로 요약 조회한다. */
@@ -78,6 +82,7 @@ public class DocumentQueryService {
                 document.getActiveVersionId(),
                 document.getCreatedAt(),
                 document.getUpdatedAt(),
+                documentTagService.getDocumentTags(ownerUserId, documentId),
                 versions);
     }
 

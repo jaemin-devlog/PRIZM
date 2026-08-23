@@ -55,12 +55,12 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/api/documents",
                                 "/api/documents/**",
+                                "/api/tags",
+                                "/api/tags/**",
                                 "/api/search",
                                 "/api/search/**",
                                 "/api/career-evidence/search",
-                                "/api/v2/career-evidence/search",
-                                "/api/career-keywords",
-                                "/api/career-keywords/**")
+                                "/api/v2/career-evidence/search")
                         .hasRole("USER")
                         .requestMatchers("/mcp").hasRole("USER")
                         .requestMatchers("/api/users/me").authenticated()
@@ -110,7 +110,7 @@ public class SecurityConfiguration {
     CorsConfigurationSource corsConfigurationSource(SecurityProperties properties) {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(properties.allowedOrigins());
-        configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(false);
         configuration.setMaxAge(3600L);

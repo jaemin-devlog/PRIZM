@@ -242,11 +242,11 @@ class OpenSqlMcpGateTest {
                 .filter(java.util.Objects::nonNull)
                 .map(Object::toString)
                 .toList();
-        assertThat(applied).containsAll(IntStream.rangeClosed(1, 15).mapToObj(String::valueOf).toList());
+        assertThat(applied).containsAll(IntStream.rangeClosed(1, 16).mapToObj(String::valueOf).toList());
         assertThat(flyway.info().pending()).isEmpty();
         assertThat(flyway.info().current()).isNotNull();
-        assertThat(flyway.info().current().getVersion().toString()).isEqualTo("15");
-        return new InfrastructureDetails(openSqlVersion, pgvectorVersion, "V1-V15");
+        assertThat(flyway.info().current().getVersion().toString()).isEqualTo("16");
+        return new InfrastructureDetails(openSqlVersion, pgvectorVersion, "V1-V16");
     }
 
     private void signup(String email) throws Exception {

@@ -56,9 +56,15 @@ public class DocumentController {
     public ResponseEntity<DocumentUploadResponse> upload(
             @RequestParam @NotBlank @Size(max = 200) String title,
             @RequestParam(required = false) DocumentType documentType,
+            @RequestParam(required = false) List<Long> tagIds,
             @RequestPart("file") MultipartFile file) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(documentUploadService.upload(currentUserProvider.userId(), title, documentType, file));
+                .body(documentUploadService.upload(
+                        currentUserProvider.userId(),
+                        title,
+                        documentType,
+                        tagIds == null ? List.of() : tagIds,
+                        file));
     }
 
     /** Adds a revised TXT/PDF source as the next immutable version of an existing owner-scoped document. */

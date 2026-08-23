@@ -75,7 +75,7 @@ class DocumentControllerTest {
     @Test
     void acceptsMultipartTxtUpload() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", "hello".getBytes());
-        when(documentUploadService.upload(7L, "Guide", DocumentType.PORTFOLIO, file)).thenReturn(new DocumentUploadResponse(
+        when(documentUploadService.upload(7L, "Guide", DocumentType.PORTFOLIO, List.of(), file)).thenReturn(new DocumentUploadResponse(
                 1L, 2L, "Guide", "guide.txt", DocumentType.PORTFOLIO,
                 DocumentVersionStatus.QUARANTINED, Instant.parse("2026-07-13T00:00:00Z")));
 
@@ -88,9 +88,28 @@ class DocumentControllerTest {
     }
 
     @Test
+    void acceptsRepeatedTagIdentifiersDuringUpload() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", "hello".getBytes());
+        when(documentUploadService.upload(
+                7L, "Guide", DocumentType.RESUME, List.of(3L, 4L), file))
+                .thenReturn(new DocumentUploadResponse(
+                        1L, 2L, "Guide", "guide.txt", DocumentType.RESUME,
+                        DocumentVersionStatus.QUARANTINED, Instant.parse("2026-07-13T00:00:00Z")));
+
+        mockMvc.perform(multipart("/api/documents")
+                        .file(file)
+                        .param("title", "Guide")
+                        .param("documentType", "RESUME")
+                        .param("tagIds", "3", "4"))
+                .andExpect(status().isCreated());
+
+        verify(documentUploadService).upload(7L, "Guide", DocumentType.RESUME, List.of(3L, 4L), file);
+    }
+
+    @Test
     void acceptsMultipartUploadWithoutDocumentType() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "guide.txt", "text/plain", "hello".getBytes());
-        when(documentUploadService.upload(7L, "Guide", null, file)).thenReturn(new DocumentUploadResponse(
+        when(documentUploadService.upload(7L, "Guide", null, List.of(), file)).thenReturn(new DocumentUploadResponse(
                 1L, 2L, "Guide", "guide.txt", DocumentType.OTHER,
                 DocumentVersionStatus.QUARANTINED, Instant.parse("2026-07-13T00:00:00Z")));
 
@@ -174,6 +193,7 @@ class DocumentControllerTest {
                 null,
                 createdAt,
                 createdAt,
+                List.of(),
                 List.of(new DocumentVersionResponse(
                         2L,
                         1,
@@ -205,7 +225,7 @@ class DocumentControllerTest {
         Instant createdAt = Instant.parse("2026-07-13T00:00:00Z");
         doNothing().when(documentManagementService).updateMetadata(7L, 1L, "Updated", DocumentType.RESUME);
         when(documentQueryService.get(7L, 1L)).thenReturn(new DocumentDetailResponse(
-                1L, "Updated", DocumentType.RESUME, true, null, createdAt, createdAt, List.of()));
+                1L, "Updated", DocumentType.RESUME, true, null, createdAt, createdAt, List.of(), List.of()));
 
         mockMvc.perform(patch("/api/documents/1")
                         .contentType("application/json")

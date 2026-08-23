@@ -32,7 +32,7 @@ flowchart TD
     PRZ006["PRZ-006 로컬 빠른 시작"]
     PRZ007["PRZ-007 자체 호스팅 회원가입"]
     PRZ008["PRZ-008 검색 근거 신뢰성"]
-    PRZ009["PRZ-009 경력 키워드 맵"]
+    PRZ009["PRZ-009 사용자 관리형 Document Tag"]
     PRZ010["PRZ-010 변경 로그 동기화"]
     PRZ011["PRZ-011 처리 진행 상태 UX"]
     PRZ012["PRZ-012 검색 근거 표현 품질"]
@@ -171,10 +171,10 @@ flowchart TD
   - Source commit: `2190d47`
   - Last verified: 2026-08-13 (통합된 제품 범위)
 - **Spec ID:** [PRZ-009](PRZ-009-career-keyword-map/spec.md)
-  - 이름: 경력 키워드 맵
-  - 상태: `IMPLEMENTED_UNVERIFIED`
-  - Source commit: core `d52c6d0`; UI·문서 관리 확장 `3af28492` (PR #49 merge `550c9d4`)
-  - Last verified: 2026-08-21
+  - 이름: 사용자 관리형 Document Tag
+  - 상태: `VERIFIED` (`AUDIT Gate: PASS`, GitHub 통합 전)
+  - Source commit: 기존 keyword 구현 `d52c6d0`; P4는 현재 uncommitted worktree
+  - Last verified: 2026-08-24 (backend·PostgreSQL·frontend·독립 감사 PASS, browser `USER_CONFIRMED`)
 - **Spec ID:** [PRZ-010](PRZ-010-change-log-sync/spec.md)
   - 이름: 변경 로그 동기화
   - 상태: `VERIFIED`

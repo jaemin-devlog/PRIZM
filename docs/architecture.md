@@ -9,7 +9,7 @@
 > 최종 Windows·Linux 경로 교정·CI source commit:
 > `aff3e87a9a912e44fcf217291a45328cf451cfc9`
 >
-> 문서 검토 기준일: `2026-08-21`
+> 문서 검토 기준일: `2026-08-24`
 >
 > PRZ-010 상태: `VERIFIED` — source
 > `26c546b16eb9ea42d98460dd6e5aa0bf0752212a`, `main` 통합 merge
@@ -21,11 +21,9 @@
 >
 > PRZ-004 상태: `VERIFIED` — 독립 감사, PR #25 CI와 GitHub `main` 통합 완료
 >
-> PRZ-009 상태: `IMPLEMENTED_UNVERIFIED` — source
-> `d52c6d01a3bef916e80a3c983a43c7b1fad1139b`은 `main`에 통합됐고 전체 PostgreSQL
-> integration, browser와 최종 감사는 통과했다. UI·문서 관리 확장 source `3af28492`는
-> [PR #49](https://github.com/jaemin-devlog/PRIZM/pull/49) merge `550c9d4`로 통합됐으며,
-> OpenSQL opt-in과 authenticated browser 재관찰은 `NOT_RUN`
+> PRZ-009 상태: `VERIFIED` (`AUDIT Gate: PASS`, GitHub 통합 전) — 기존 자동 keyword 추출 계약을 사용자 관리형
+> Document Tag로 교체하는 P4 구현과 PostgreSQL·frontend 검증을 완료했다. 인증된 tag
+> 브라우저 흐름은 `USER_CONFIRMED`이며 독립 재감사 blocking finding은 0건이다.
 >
 > 범위: 현재 Spring Boot 애플리케이션과 React Career Vault Reference App
 
@@ -166,9 +164,9 @@ backend로 전달합니다. ChangeLog Dispatcher와 Indexing·Cleanup Scheduler�
 
 | 구성요소 | 책임 | 직접 접근 대상 |
 |---|---|---|
-| React Career Vault | 로그인, 문서 목록·상세·업로드·관리, 검색 결과와 경력 키워드 맵 표시 | 같은 origin의 Nginx `/api` |
+| React Career Vault | 로그인, 문서 목록·상세·업로드·관리, 검색 결과와 사용자 관리형 태그 표시 | 같은 origin의 Nginx `/api` |
 | Nginx | React SPA 정적 파일 제공, `/api`·`/actuator` reverse proxy | Spring Boot backend |
-| Spring Boot API | JWT·DB 사용자 재검증, 문서 관리, 검색과 경력 키워드 요청 처리 | PostgreSQL, 파일 저장소, Ollama |
+| Spring Boot API | JWT·DB 사용자 재검증, 문서·태그 관리와 Career Evidence 검색 처리 | PostgreSQL, 파일 저장소, Ollama |
 | ChangeLog Dispatcher | PENDING 변경 로그 선점, INDEXING 작업 생성·재사용과 DISPATCHED 확정 | PostgreSQL |
 | Indexing Scheduler / Worker | 작업 선점, 추출·청킹·임베딩, ACTIVE 전환과 실패 복구 | PostgreSQL, 파일 저장소, Ollama |
 | Cleanup Scheduler / Worker | 보상 삭제와 문서 삭제에서 생긴 파일 정리 작업의 재시도·복구 | PostgreSQL, 파일 저장소 |
@@ -301,37 +299,38 @@ PostgreSQL FTS·BGE-M3 Sparse·BGE reranker 실험은 평가 전용이며 Produc
 - [opt-in 검색 profile](../src/main/java/com/prizm/search/profile/CompositeSearchProfile.java)
 - [Career Evidence v2 API](../src/main/java/com/prizm/search/controller/CareerEvidenceSearchV2Controller.java)
 
-### 경력 키워드 맵의 생성과 해석
+### 사용자 관리형 Document Tag
 
-PRZ-009 구현은 별도 keyword table이나 생성형 모델 없이 기존 active chunk를
-요청 시 읽는다. SQL은 현재 사용자의 document·version·chunk owner를 모두 제한하고,
-`active_version_id`가 가리키는 `ACTIVE` 이력서와 포트폴리오만 선택한다. TXT chunk는
-overlap을 한 번만 남겨 전체 원문으로 조립하고 PDF chunk는 페이지별로 유지한다.
+PRZ-009 P4는 Java 기술 사전으로 active chunk를 스캔하던 자동 keyword 추출을 문서
+metadata인 tag로 교체한다. `tags`는 표시 이름과 NFKC·공백·대소문자를 정규화한 이름,
+`SYSTEM|USER` source, nullable owner를 저장한다. SYSTEM tag는 모든 USER에게 추천할 수
+있고 USER tag는 생성 owner에게만 보인다. `document_tags`는 document와 tag의 다대다
+연결이며 document owner와 같은 owner scope에서만 읽고 쓴다.
 
-조립한 원문에 실제 등장한 token과 명시적으로 지원하는 복합 기술어만 정규화해
-빈도와 문서 수를 계산한다. 등록된 한영 별칭과 Java 버전 표기는 canonical keyword에
-합치되 source의 실제 표기는 variants와 matched terms로 보존한다. 각 keyword에는
-언어·프레임워크·DB·인프라 등 고정 category가 붙고 React 화면은 모든 keyword를 같은
-크기의 태그로 표시한다. 목록은 API의 빈도 내림차순·이름 안정 정렬을 사용하며,
-`frequency`는 문서에서 확인된 언급 횟수일 뿐 점수·숙련도·중요도가 아니다.
+SYSTEM tag는 V16 seed로 제공하되 whitelist가 아니다. 검색 결과가 없으면 사용자는 어떤
+이름도 USER tag로 만들 수 있다. 같은 owner의 정규화 이름 중복과 같은 document-tag
+연결은 재사용하거나 차단한다. 최초 upload의 tag ID는 파일·문서·version·ChangeLog를
+생성하는 기존 transaction 안에서 먼저 접근 가능성을 검증한 뒤 document에 연결한다.
+새 immutable version은 document-level tag를 바꾸지 않는다.
 
-이 값은 원문 탐색용 인덱스이며 CareerFact, 숙련도나 경력 진위 판정이 아니다. 화면에서
-키워드를 선택하면 `?keyword=` 상세에서 같은 active source의 발췌문과 문서·위치를
-보여준다. owner-scoped original endpoint로 UTF-8 TXT의 첫 일치 표기를 강조하거나 PDF
-built-in viewer를 page/search fragment 위치로 연다.
+React의 공용 Tag Modal은 DB 검색, 연속 다중 선택, USER tag 생성과 중복 방지를 제공하며
+upload와 document detail이 함께 사용한다. 경력 키워드 화면은 전체 SYSTEM 추천 목록이
+아니라 현재 owner 문서에 실제 연결된 tag와 문서 수만 보여 준다. tag 선택 시 이름을
+기존 Career Evidence Search의 원본 query로 전달해 현재 owner의 ACTIVE 문서 전체에서
+snippet·context·문서·page evidence를 찾는다. tag 연결 문서는 검색 범위를 제한하지 않는다.
 
-현재 소스 구현과 단위·controller test, frontend lint·build, 전체 PostgreSQL integration,
-synthetic browser 흐름과 최종 diff 감사는 완료됐다. OpenSQL opt-in integration은 전용
-검증 target을 활성화하지 않아 `NOT_RUN`이므로 이 절은 계속 `IMPLEMENTED_UNVERIFIED`
-구조를 설명하며 OpenSQL 검증 근거로 사용하지 않는다.
+Tag는 사용자가 문서를 분류하는 metadata다. PRZ-016 Search는 ACTIVE 원문의 evidence를
+찾는 별도 기능이다. tag metadata는 Search filter나 ranking boost가 아니며 사용자가 tag
+상세를 열 때 선택한 이름만 명시적 query가 된다. tag 추가·삭제는 기존 chunk, embedding,
+ACTIVE pointer, PDF page localization을 변경하지 않는다.
 
 근거:
 
-- [키워드 source SQL](../src/main/java/com/prizm/careerkeyword/repository/CareerKeywordRepository.java)
-- [원문 overlap 조립](../src/main/java/com/prizm/careerkeyword/service/KeywordSourceAssembler.java)
-- [키워드 추출](../src/main/java/com/prizm/careerkeyword/service/CareerKeywordExtractor.java)
-- [키워드 API service](../src/main/java/com/prizm/careerkeyword/service/CareerKeywordService.java)
-- [React 키워드 화면](../frontend/src/App.tsx)
+- [V16 tag schema](../src/main/resources/db/migration/V16__create_document_tags.sql)
+- [owner-scoped tag repository](../src/main/java/com/prizm/documenttag/repository/DocumentTagRepository.java)
+- [tag service](../src/main/java/com/prizm/documenttag/service/DocumentTagService.java)
+- [공용 Tag Modal](../frontend/src/TagModal.tsx)
+- [React 경력 키워드 화면](../frontend/src/App.tsx)
 - [PRZ-009 검증 기록](../specs/PRZ-009-career-keyword-map/evidence.md)
 
 ## 7. 핵심 데이터 관계
@@ -348,6 +347,8 @@ flowchart TD
     L["DocumentChangeLog<br/>owner_user_id<br/>DOCUMENT_VERSION_CREATED"]
     C["DocumentChunk<br/>owner_user_id<br/>source metadata · vector"]
     P["ProcessingJob<br/>owner_user_id<br/>한 version의 INDEXING 작업"]
+    T["Tag<br/>SYSTEM 또는 owner-scoped USER"]
+    DT["DocumentTag<br/>owner_user_id"]
     F["FileCleanupJob<br/>storage_key<br/>owner FK 없음"]
     S[("Local storage<br/>server-generated key")]
 
@@ -358,6 +359,9 @@ flowchart TD
     L -.->|"0..1 dispatch 연결"| P
     V -->|"1 : N"| C
     V -->|"1 : 1 INDEXING"| P
+    U -->|"USER tag 소유"| T
+    D -->|"0 : N"| DT
+    T -->|"0 : N"| DT
     V -->|"stored_file_path"| S
     F -->|"삭제할 storage_key"| S
 ```
@@ -367,6 +371,8 @@ flowchart TD
 `ProcessingJob`은 `(document_version_id, job_type)`가 unique이고 현재 job type은
 `INDEXING` 하나이므로 버전마다 최대 한 건입니다. `FileCleanupJob`은 사용자나
 버전에 대한 외래 키를 두지 않고 서버가 생성한 `storage_key`만 보관합니다.
+`DocumentTag`는 document owner를 복합 외래 키로 보존하고, service가 SYSTEM 또는 같은
+owner의 USER tag만 연결하도록 검증합니다.
 브라우저가 임의 경로를 등록하는 API는 없으며, owner-scoped 문서 작업이나 업로드
 rollback 보상 경로가 정리 작업을 만듭니다.
 
@@ -382,6 +388,7 @@ rollback 보상 경로가 정리 작업을 만듭니다.
 - [소유권 migration](../src/main/resources/db/migration/V8__add_document_ownership.sql)
 - [ChangeLog migration](../src/main/resources/db/migration/V14__create_document_change_logs.sql)
 - [파일 정리 migration](../src/main/resources/db/migration/V12__add_file_cleanup_jobs.sql)
+- [Document Tag migration](../src/main/resources/db/migration/V16__create_document_tags.sql)
 
 ## 8. 상태 전이
 
@@ -643,6 +650,7 @@ src/main/java/com/prizm/
 ├─ auth            로그인, JWT와 DB 사용자 재확인
 ├─ user            사용자 계정과 역할
 ├─ document        문서·immutable version 등록과 관리
+├─ documenttag     SYSTEM·owner-scoped USER tag와 document metadata 연결
 ├─ changelog       문서 버전 생성 사실과 INDEXING 작업 전달
 ├─ embedding       Ollama 연동과 embedding 검증
 ├─ ingestion       추출·청킹·색인 Worker와 복구

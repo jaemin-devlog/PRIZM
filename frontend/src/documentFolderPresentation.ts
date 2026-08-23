@@ -22,7 +22,23 @@ export function documentFolderPath(documentType: DocumentType | undefined): stri
     : `/career-vault/documents?type=${encodeURIComponent(documentType)}`
 }
 
+export function documentDetailPath(documentId: number): string {
+  return `/career-vault/documents?documentId=${documentId}`
+}
+
+export function documentListPathAfterDetailClose(search: string): string {
+  const params = new URLSearchParams(search)
+  params.delete('documentId')
+  const remaining = params.toString()
+  return `/career-vault/documents${remaining === '' ? '' : `?${remaining}`}`
+}
+
 export function selectedDocumentFolderFromSearch(search: string): DocumentType | undefined {
   const value = new URLSearchParams(search).get('type')
   return value === null || value.trim() === '' ? undefined : value as DocumentType
+}
+
+export function selectedDocumentIdFromSearch(search: string): number | null {
+  const value = Number(new URLSearchParams(search).get('documentId'))
+  return Number.isSafeInteger(value) && value > 0 ? value : null
 }

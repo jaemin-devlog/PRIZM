@@ -60,6 +60,7 @@
 
 - [x] Spec acceptance criteria와 최종 diff 독립 감사
 - [x] blocking finding 0 확인 또는 수정 뒤 재감사
-- [x] commit/push/PR/merge는 사용자 지시에 따라 범위에서 제외
+- [x] Production 주석 `6cc4726`, PRZ-017 source `de98bcf`를 현재 branch에 commit·push
+- [x] PR/merge는 사용자 지시에 따라 `NOT_RUN`
 - [x] stash와 unrelated dirty/untracked 파일 보존
 - [x] 새 UI diff 독립 감사와 보호 대상 해시 재확인

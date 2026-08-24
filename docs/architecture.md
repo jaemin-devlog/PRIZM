@@ -337,7 +337,7 @@ PDF `PAGE`는 기존 인증된 original Blob viewer에서 표시 Evidence의 1-b
 영구 저장하지 않으며 새 table, migration과 PDF viewer가 없다. PRZ-009 Tag는 별도 사용자
 metadata로 남고 PRZ-017 검색 filter나 ranking 신호가 아니다.
 
-현재 source는 `uncommitted worktree`이고 새 UI 기준 backend focused 27건, frontend unit
+현재 source commit은 `de98bcf`이고 새 UI 기준 backend focused 27건, frontend unit
 69건과 typecheck·lint·build를 통과했다. 이전 compound Gate에서는 Docker 최신 source
 rebuild와 독립 감사도 통과했고, 같은 owner의 ACTIVE PDF를 사용한 인증 브라우저에서 Docker
 compound가 0건에서 3건으로 바뀌었다. Git/협업 compound의 0건은 기존 PRZ-016 recall 한계로

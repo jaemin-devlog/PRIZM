@@ -4,20 +4,30 @@
 
 - 상태: `IN_PROGRESS`
 - 기준선: `d44f30eb4346353c4363d559be478024f191a878`
-- 현재 source: `uncommitted worktree`
+- 현재 source: `de98bcf`
 - VERIFY: 결과 상태 탭 포함 새 UI 자동 검증 `PASS`, 최신 frontend rebuild `PASS`, 새 인증 browser
   Gate `BLOCKED_BY_AUTH_ENVIRONMENT`; 이전 compound/PDF targeted Gate `PASS`
 - AUDIT: 새 UI 독립 감사와 결과 상태 탭 최종 자체 감사 `PASS` — blocking finding 0,
   보호 대상 해시 변경 0
-- commit/push/PR/merge: 사용자 지시에 따라 `NOT_RUN`
+- commit/push: `PASS` — `PRZ-017-job-evidence-v1` checkpoint
+- PR/merge: 사용자 지시에 따라 `NOT_RUN`
 
 현재 source에는 V1 수직 흐름, bounded compound query composition, section별 선택 modal,
 전용 결과 workspace와 결과 상태 탭이 구현됐다. 새 UI 자동 검증과 독립 감사는 통과했다. 인증 browser
 Gate는 기존 세션이 segmentation 요청에서 만료돼 로그인 화면으로 이동했고 비밀번호를
 코드나 자동화에 노출하지 않았으므로 `BLOCKED_BY_AUTH_ENVIRONMENT`다. 이전 Phase에서는 같은
 owner의 ACTIVE PDF를 사용한 Docker·Git compound와 PDF page 이동을 확인했다. 기존 44개
-전체 원문과 TXT 이동은 다시 실행하지 않았고 source도 uncommitted worktree이므로 전체
-상태는 `IN_PROGRESS`로 유지한다.
+전체 원문과 TXT 이동은 다시 실행하지 않았고 인증 browser Gate도 남아 있으므로 전체 상태는
+`IN_PROGRESS`로 유지한다.
+
+## Checkpoint integration
+
+- Production Java 주석 정비는 commit `6cc4726`, PRZ-017 구현·test·Spec은 source commit
+  `de98bcf`에 기록했다.
+- 두 commit과 이 통합 기록은 `PRZ-017-job-evidence-v1` 원격 branch에 push한다. PR과 merge는
+  만들거나 실행하지 않는다.
+- 인증 browser Gate의 `BLOCKED_BY_AUTH_ENVIRONMENT`, 기존 44개 전체 공고와 TXT 이동
+  `NOT_RUN`, 전체 상태 `IN_PROGRESS`를 그대로 남겨 노트북 환경에서 이어서 검증할 수 있게 한다.
 
 ## ORIENT 근거
 
@@ -174,5 +184,5 @@ PostgreSQL 결과는 OpenSQL evidence로 대체하지 않는다. 환경이 없�
 ## 남은 Gate
 
 이번 compound query Phase의 자동 검증·인증 targeted browser Gate·독립 AUDIT는 완료됐다.
-기존 44개 전체 공고와 TXT 이동은 이번 Phase에서 재실행하지 않았다. commit/push/PR/merge도
-사용자 지시에 따라 `NOT_RUN`이며 전체 상태는 `IN_PROGRESS`다.
+기존 44개 전체 공고와 TXT 이동은 이번 Phase에서 재실행하지 않았다. 현재 branch checkpoint는
+commit·push했고 PR/merge는 사용자 지시에 따라 `NOT_RUN`이며 전체 상태는 `IN_PROGRESS`다.

@@ -4,8 +4,8 @@
 
 - 상태: `IN_PROGRESS`
 - 기준선: `d44f30eb4346353c4363d559be478024f191a878`
-- 현재 source: `uncommitted worktree`
-- 검증: `NOT_VERIFIED`
+- 현재 source: `de98bcf`
+- 검증: 자동 검증·독립 감사 `PASS`, 인증 browser `BLOCKED_BY_AUTH_ENVIRONMENT`
 
 이 문서는 채용공고를 붙여넣고 필요한 항목을 사용자가 직접 선택한 뒤, 기존
 PRZ-016 Career Evidence Search로 관련 원문 기록을 확인하는 대회 제출용 V1 계약을

@@ -222,9 +222,10 @@ flowchart TD
 - **Spec ID:** [PRZ-017](PRZ-017-job-posting-evidence-v1/spec.md)
   - 이름: 채용공고 항목별 Career Evidence V1
   - 상태: `IN_PROGRESS`
-  - Source commit: `uncommitted worktree` (baseline `d44f30e`)
-  - Last verified: 2026-08-24 새 modal·결과 workspace 자동 검증·독립 감사 `PASS`, 인증
-    browser `BLOCKED_BY_AUTH_ENVIRONMENT`; 이전 compound 동일 owner/ACTIVE PDF browser Gate `PASS`
+  - Source commit: `de98bcf` (baseline `d44f30e`)
+  - Last verified: 2026-08-24 결과 상태 탭 포함 새 modal·결과 workspace 자동 검증·독립 감사
+    `PASS`, 인증 browser `BLOCKED_BY_AUTH_ENVIRONMENT`; 이전 compound 동일 owner/ACTIVE PDF
+    browser Gate `PASS`
 
 ## 환경별 판정 주의
 

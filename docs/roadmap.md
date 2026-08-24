@@ -71,7 +71,7 @@ OpenSQL/OpenProxy와 Ollama `bge-m3`에서 전체 흐름을 검증했습니다. 
    - 적합도·충족 여부·합격 가능성을 판정하지 않으며 채용공고 persistence, Tag filter,
      migration과 Search algorithm 변경은 V1 범위가 아닙니다.
    - [PRZ-017](../specs/PRZ-017-job-posting-evidence-v1/spec.md)의 현재 source는
-     `uncommitted worktree`입니다. 새 UI 기준 backend focused 27건, frontend unit 69건과
+     `de98bcf`입니다. 새 UI 기준 backend focused 27건, frontend unit 69건과
      typecheck·lint·build·독립 감사·최신 frontend rebuild는 통과했고 인증 browser Gate는
      로그인 세션 부재로
      `BLOCKED_BY_AUTH_ENVIRONMENT`입니다. 이전 compound

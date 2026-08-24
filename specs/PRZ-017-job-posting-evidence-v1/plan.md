@@ -4,7 +4,7 @@
 
 - 상태: `IN_PROGRESS`
 - 기준선: `d44f30eb4346353c4363d559be478024f191a878`
-- 현재 source: `uncommitted worktree`
+- 현재 source: `de98bcf`
 - 목표: 입력 → 결정적 분리 → 사용자 선택 → 기존 Search → 항목별 Evidence → 원문 이동의
   최소 수직 흐름을 완성한다.
 
@@ -57,7 +57,7 @@
 - [Spec](spec.md), 이 Plan, [Tasks](tasks.md), [Evidence](evidence.md)와 Registry를
   `IN_PROGRESS`로 유지한다.
 - VERIFY와 AUDIT 결과가 실제로 생기기 전에는 `VERIFIED` 또는 `PASS`로 올리지 않는다.
-- 사용자 지시에 따라 commit, push, PR과 merge는 수행하지 않는다.
+- 사용자 승인에 따라 현재 작업을 branch checkpoint로 commit·push하되 PR과 merge는 수행하지 않는다.
 
 ## 예상 변경 표면
 
@@ -182,4 +182,4 @@ git diff origin/main -- src/main/resources/db/migration
 
 - 새 dependency, model, asset과 license 영향은 예상하지 않는다.
 - 기존 Ollama dependency는 PRZ-016 embedding 전용으로 보존한다.
-- commit/push/PR/merge: 사용자 지시에 따라 `NOT_RUN`.
+- commit/push: 현재 branch checkpoint로 실행. PR/merge: 사용자 지시에 따라 `NOT_RUN`.

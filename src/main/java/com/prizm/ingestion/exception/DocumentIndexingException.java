@@ -1,6 +1,6 @@
 package com.prizm.ingestion.exception;
 
-/** 파일 내용이나 임베딩을 청크로 변환할 수 없을 때 재시도 가능 여부를 함께 전달한다. */
+/** 색인 처리 실패와 해당 실패의 재시도 가능 여부를 Coordinator에 전달한다. */
 public class DocumentIndexingException extends RuntimeException {
 
     private final boolean retryable;

@@ -13,6 +13,11 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.Locale;
 
+/**
+ * 인증 주체와 개인 데이터 소유권의 기준이 되는 사용자 계정이다.
+ * 이메일은 저장과 조회에서 같은 규칙으로 정규화한다. JWT로 인증하는 요청에서는 이 엔티티의
+ * 현재 역할과 활성 상태를 DB 기준값으로 다시 확인한다.
+ */
 @Entity
 @Table(name = "users")
 public class UserAccount {

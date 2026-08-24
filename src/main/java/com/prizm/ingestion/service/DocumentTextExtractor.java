@@ -17,6 +17,11 @@ import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Service;
 
+/**
+ * TXT는 엄격한 UTF-8 문자열로, PDF는 1부터 시작하는 원래 페이지 번호를 보존한 텍스트로 추출한다.
+ * 암호화되거나 읽을 수 없는 PDF와 텍스트가 없는 PDF를 거부하며, 페이지 수와 누적 추출 문자 수 제한을
+ * 임베딩 전에 적용한다.
+ */
 @Service
 public class DocumentTextExtractor {
 

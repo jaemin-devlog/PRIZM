@@ -14,6 +14,11 @@ import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+/**
+ * 태그와 문서-태그 관계를 JDBC로 저장하고 조회한다.
+ * SYSTEM 태그는 공용으로 열되 USER 태그와 관계 조회에는 owner 조건을 반복한다. 서비스 검증에만
+ * 의존하지 않고 다른 사용자의 태그나 문서가 결과에 섞이지 않도록 repository에서도 차단한다.
+ */
 @Repository
 public class DocumentTagRepository {
 
@@ -56,6 +61,7 @@ public class DocumentTagRepository {
     }
 
     public DocumentTag createUserTag(Long ownerUserId, String name, String normalizedName) {
+        // 정규화 이름의 unique index와 함께 쓰면 동시 생성도 한 행으로 모이고, 아래 조회가 그 행을 돌려준다.
         jdbcTemplate.update("""
                 INSERT INTO tags(name, normalized_name, source, owner_user_id)
                 VALUES (?, ?, 'USER', ?)

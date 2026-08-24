@@ -6,7 +6,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-/** 작업 선점과 실제 처리 사이의 트랜잭션 경계를 유지하는 Worker 진입점이다. */
+/**
+ * 작업 선점, 외부 문서 처리, 실패 기록의 경계를 잇는 색인 Worker 진입점이다.
+ *
+ * <p>선점 트랜잭션을 먼저 끝낸 뒤 파일 I/O와 임베딩을 수행하고, 실패하면 다시 짧은 트랜잭션으로 상태를
+ * 기록한다. 이미 임대를 잃은 Worker의 완료나 실패는 현재 처리 시도를 덮어쓰지 않도록 무시한다.</p>
+ */
 @Service
 public class IndexingCoordinator {
 
@@ -28,7 +33,7 @@ public class IndexingCoordinator {
         this.failureService = failureService;
     }
 
-    /** 대기 중인 작업을 최대 한 건 처리한다. */
+    /** 대기 중인 작업을 최대 한 건 선점해 완료 또는 실패 기록까지 진행한다. */
     public boolean processNext() {
         Optional<ClaimedProcessingJob> claimed = claimService.claimNext();
         if (claimed.isEmpty()) {

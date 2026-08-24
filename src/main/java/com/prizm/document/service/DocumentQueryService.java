@@ -20,7 +20,10 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** 문서 목록과 문서별 버전 메타데이터를 조회 응답으로 변환한다. */
+/**
+ * 소유자의 문서와 버전 메타데이터를 조회 응답으로 조합한다.
+ * 최신 버전의 처리 상태와 현재 ACTIVE 버전을 구분해 새 색인 중에도 기존 검색 상태를 그대로 보여 준다.
+ */
 @Service
 @Transactional(readOnly = true)
 public class DocumentQueryService {
@@ -41,12 +44,11 @@ public class DocumentQueryService {
         this.documentTagService = documentTagService;
     }
 
-    /** 저장된 문서를 최신 생성 순서로 요약 조회한다. */
     public List<DocumentSummaryResponse> list(Long ownerUserId, DocumentType documentType) {
         return list(ownerUserId, documentType, null, null);
     }
 
-    /** Lists only the current user's documents and applies optional user-visible filters. */
+    /** 소유자 범위를 먼저 적용한 뒤 문서 유형·제목·처리 상태 필터를 적용한다. */
     public List<DocumentSummaryResponse> list(
             Long ownerUserId,
             DocumentType documentType,
@@ -65,7 +67,6 @@ public class DocumentQueryService {
                 .toList();
     }
 
-    /** 문서와 버전 목록을 조회한다. */
     public DocumentDetailResponse get(Long ownerUserId, Long documentId) {
         Document document = documentRepository.findByIdAndOwnerUserId(documentId, ownerUserId)
                 .orElseThrow(() -> new DocumentNotFoundException(documentId));

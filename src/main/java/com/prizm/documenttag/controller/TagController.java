@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/** 공용 SYSTEM 태그와 사용자 소유 USER 태그의 검색·생성·문서별 사용 현황 API를 제공한다. */
 @RestController
 @Validated
 @RequestMapping("/api/tags")

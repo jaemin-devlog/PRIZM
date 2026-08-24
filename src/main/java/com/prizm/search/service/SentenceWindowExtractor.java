@@ -5,7 +5,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-/** Reconstructs semantic sentences while preserving exact source spans and PDF hard wraps. */
+/**
+ * 원문 위치를 보존하면서 검색 근거로 비교할 문장과 연속 구간을 구성한다.
+ *
+ * <p>PDF에서 생긴 줄바꿈은 곧바로 문장 경계로 보지 않고, 문장 부호와 빈 줄, 제목·연락처
+ * 같은 독립 메타데이터를 함께 살핀다. 새 문장을 만들어 내는 대신 원문의 시작과 끝 위치를
+ * 유지하므로, 최종 snippet은 항상 입력 원문에서 그대로 잘라낼 수 있다.</p>
+ */
 final class SentenceWindowExtractor {
 
     private static final Pattern SECTION_HEADING = Pattern.compile(
@@ -35,6 +41,7 @@ final class SentenceWindowExtractor {
     private static final Pattern EVIDENCE_LINE = Pattern.compile(
             ".*(?:구현|개선|결과|성공|차단|방지|저장|갱신|감소|단축|복구|배포|적용).*" );
 
+    /** 원문 위치를 유지한 채 본문 문장과 독립 메타데이터를 구분한다. */
     Extraction extract(String content) {
         String source = Objects.requireNonNullElse(content, "");
         if (source.isBlank()) {
@@ -64,6 +71,7 @@ final class SentenceWindowExtractor {
         return new Extraction(source, builder.sentences());
     }
 
+    /** 같은 본문 블록 안에서 지정한 길이 이하의 연속 문장 구간을 만든다. */
     List<SentenceWindow> windows(Extraction extraction, int maximumSentences) {
         List<SentenceWindow> windows = new ArrayList<>();
         List<SentenceUnit> units = extraction.sentences();
@@ -87,6 +95,7 @@ final class SentenceWindowExtractor {
         return List.copyOf(windows);
     }
 
+    /** 같은 본문 블록의 다음 문장을 원문 범위 그대로 덧붙인다. */
     String addFollowingSentence(String content, String snippet, int maximumSentences) {
         Extraction extraction = extract(content);
         String selected = Objects.requireNonNullElse(snippet, "");

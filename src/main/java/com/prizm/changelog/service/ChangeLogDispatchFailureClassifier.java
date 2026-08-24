@@ -4,7 +4,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
-/** Dispatch retry가 가능한 일시 DB 오류와 영구 계약 오류만 구분한다. */
+/** 일시적인 DB 접근 오류와 재시도해도 달라지지 않을 전달 실패를 구분한다. */
 @Component
 public class ChangeLogDispatchFailureClassifier {
 

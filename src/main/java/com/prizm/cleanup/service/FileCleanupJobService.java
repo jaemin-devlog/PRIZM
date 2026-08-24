@@ -7,7 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Registers cleanup work independently from a failed upload transaction. */
+/**
+ * 파일 삭제 작업을 호출 목적에 맞는 트랜잭션 경계에서 등록한다.
+ * 업로드 롤백 보상은 새 트랜잭션으로 남겨야 하고, 정상 메타데이터 삭제에서는 같은 트랜잭션에
+ * 묶어야 DB 삭제가 롤백될 때 cleanup 작업도 함께 취소된다.
+ */
 @Service
 public class FileCleanupJobService {
 
@@ -17,13 +21,14 @@ public class FileCleanupJobService {
         this.fileCleanupJobRepository = fileCleanupJobRepository;
     }
 
+    /** 실패한 업로드 트랜잭션과 무관하게 cleanup 작업을 확정한다. */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void registerPendingCleanup(String storageKey) {
         validateStorageKey(storageKey);
         fileCleanupJobRepository.registerPending(storageKey);
     }
 
-    /** Registers cleanup as part of a successful metadata deletion transaction. */
+    /** 메타데이터 삭제와 같은 트랜잭션에 cleanup 작업을 등록한다. */
     @Transactional(propagation = Propagation.MANDATORY)
     public void registerPendingCleanupInCurrentTransaction(String storageKey) {
         validateStorageKey(storageKey);

@@ -11,6 +11,13 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.Instant;
 
+/**
+ * 사용자가 관리하는 논리 문서와 현재 검색 대상 버전의 포인터를 보관한다.
+ *
+ * <p>새 원본은 별도 {@link DocumentVersion}으로 등록되며, 색인이 끝나기 전에는
+ * {@code activeVersionId}를 바꾸지 않는다. 그러면 새 버전 처리가 실패해도 이전 ACTIVE 버전의
+ * 검색 결과를 계속 제공할 수 있다.</p>
+ */
 @Entity
 @Table(name = "documents")
 public class Document {
@@ -62,7 +69,7 @@ public class Document {
         updatedAt = Instant.now();
     }
 
-    /** 색인이 완전히 끝난 버전만 현재 검색 대상 버전으로 연결한다. */
+    /** 색인 완료 트랜잭션에서 ACTIVE가 된 버전을 현재 검색 대상으로 연결한다. */
     public void activateVersion(Long versionId) {
         if (versionId == null) {
             throw new IllegalArgumentException("versionId must not be null");
@@ -81,7 +88,7 @@ public class Document {
         this.documentType = documentType;
     }
 
-    /** Records that a new immutable source version was attached to this document. */
+    /** 새 버전이 추가된 시각만 반영하며, 기존 ACTIVE 버전 포인터는 유지한다. */
     public void markVersionAdded() {
         this.updatedAt = Instant.now();
     }

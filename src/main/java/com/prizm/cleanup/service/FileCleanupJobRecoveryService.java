@@ -8,7 +8,10 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Recovers a cleanup claim left behind by an interrupted worker. */
+/**
+ * lease가 만료된 PROCESSING 작업을 재시도 대기 또는 최종 실패로 회수한다.
+ * 회수 갱신이 claim version도 올리므로 중단됐던 Worker가 나중에 완료 상태를 덮어쓸 수 없다.
+ */
 @Service
 public class FileCleanupJobRecoveryService {
 

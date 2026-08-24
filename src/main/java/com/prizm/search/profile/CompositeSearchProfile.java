@@ -15,8 +15,16 @@ import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 
 /**
- * Versioned opt-in search profile that combines dense candidates with source deduplication and
- * explicit evidence signals.
+ * Dense 후보를 최대 다섯 개의 Career Evidence로 좁히는 결정적 검색 정책이다.
+ *
+ * <p>같은 원문 위치의 중복을 먼저 합치고, 질의의 식별자와 숫자, 핵심 표현을 이용해 후보의
+ * 자격을 확인한다. 이후 같은 근거를 반복하는 결과를 다시 합치고, 자격을 통과한 후보에만
+ * 제한된 품질 보정을 적용한다.</p>
+ *
+ * <p>일반 질의의 dense 하한을 일괄해서 낮추지 않는다. 하한 아래 후보는 정확한 식별자나
+ * 제한된 어휘 조건을 충족할 때만 검토하므로, 검색 범위를 넓히면서 무관한 근거가 함께
+ * 유입되는 일을 막는다. 완료된 출시·배포 근거에는 더 엄격한 별도 조건을 적용한다.
+ * 이 정책의 점수와 판정은 검색 관련성을 위한 것이며 경력 사실의 진위를 뜻하지 않는다.</p>
  */
 @Component
 public class CompositeSearchProfile {
@@ -126,7 +134,7 @@ public class CompositeSearchProfile {
         return resolveIntent(querySignals(query));
     }
 
-    /** Returns only existing P4 identifiers for an explicit experience or evidence request. */
+    /** 명시적인 경험·근거 질의에서 ACTIVE 문서에 존재해야 할 식별자만 추린다. */
     public Set<String> strongIdentifiersForEvidenceGuard(String query) {
         QuerySignals signals = querySignals(query);
         if (!signals.positiveClaimQuestion()
@@ -137,6 +145,7 @@ public class CompositeSearchProfile {
         return signals.requiredIdentifiers();
     }
 
+    /** 질의 신호에 맞는 자격 판정, 중복 통합, 제한된 재정렬을 차례로 적용한다. */
     public Decision apply(String query, List<VectorSearchResult> denseCandidates) {
         if (denseCandidates.isEmpty()) {
             return new Decision(List.of(), List.of(), List.of("NO_SEARCHABLE_CANDIDATES"));
@@ -160,11 +169,13 @@ public class CompositeSearchProfile {
                 .limit(MAX_RESULTS)
                 .map(VectorSearchResult::chunkId)
                 .collect(java.util.stream.Collectors.toUnmodifiableSet());
+        // 겹치는 청크가 결과 수를 차지하지 않도록 같은 원문 위치를 자격 판정 전에 합친다.
         List<VectorSearchResult> sourceDistinctCandidates = consolidateSourceLocations(
                         intent, query, signals, denseCandidates)
                 .stream()
                 .map(CandidateGroup::representative)
                 .toList();
+        // dense 점수만으로 하한을 완화하지 않고, 질의에서 확인한 anchor 조건을 함께 적용한다.
         List<VectorSearchResult> eligibleCandidates = sourceDistinctCandidates.stream()
                 .filter(candidate -> rejectionReasons(
                         intent,
@@ -183,6 +194,7 @@ public class CompositeSearchProfile {
                             denseTopFiveChunkIds.contains(sourceDistinctCandidates.get(0).chunkId())));
         }
 
+        // 같은 근거의 반복 표현은 결과 개수를 부풀리지 않도록 대표 후보 하나로 줄인다.
         List<VectorSearchResult> diverseCandidates = consolidateQueryEvidence(
                         intent,
                         query,
@@ -459,7 +471,7 @@ public class CompositeSearchProfile {
         return candidate.score() + identifierBoost + coreTermBoost + numberBoost;
     }
 
-    /** Exposes deterministic ranking components for tests and offline evaluation only. */
+    /** 테스트와 오프라인 평가에서 재정렬 구성 요소를 재현할 수 있도록 공개한다. */
     public RankingExplanation explainRanking(String query, VectorSearchResult candidate) {
         QuerySignals signals = querySignals(query);
         double base = baseGeneralRankingScore(signals, candidate);

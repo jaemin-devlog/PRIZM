@@ -3,7 +3,7 @@ package com.prizm.search.dto.response;
 import java.util.List;
 import java.util.Objects;
 
-/** Versioned evidence-search response that distinguishes normal empty-result states. */
+/** 근거 발견과 서로 다른 빈 결과 상태를 구분하는 검색 응답이다. */
 public record CareerEvidenceSearchV2Response(
         CareerEvidenceSearchState state,
         List<CareerEvidenceSearchResponse> results) {

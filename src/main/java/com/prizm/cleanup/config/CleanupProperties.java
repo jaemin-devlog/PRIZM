@@ -4,7 +4,7 @@ import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/** Configuration shared by cleanup polling, recovery, and short-lived claims. */
+/** cleanup Worker의 실행·복구 주기, 작업 묶음 크기와 lease 기간을 설정한다. */
 @ConfigurationProperties(prefix = "prizm.cleanup")
 public class CleanupProperties {
 

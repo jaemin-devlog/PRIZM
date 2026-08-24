@@ -1,6 +1,6 @@
 package com.prizm.changelog.service;
 
-/** Transaction A가 claim한 ChangeLog의 실패를 scheduler 밖 경계까지 전달한다. */
+/** 선점한 ChangeLog 식별자를 트랜잭션 밖의 실패 기록 경계까지 전달한다. */
 public class ChangeLogDispatchFailureException extends RuntimeException {
 
     private final Long changeLogId;

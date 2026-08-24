@@ -14,7 +14,7 @@ import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Component;
 
-/** Renders only the first page of a PDF into a bounded PNG thumbnail. */
+/** PDF 첫 페이지만 최대 480x640 픽셀 범위에서 PNG 미리보기로 렌더링한다. */
 @Component
 public class PdfThumbnailRenderer {
 

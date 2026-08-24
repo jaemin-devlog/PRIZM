@@ -17,7 +17,10 @@ import com.prizm.infrastructure.storage.TransientFileStorageException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Resolves an owner-scoped version for a bounded PDF thumbnail or secured inline original view. */
+/**
+ * 문서와 버전을 모두 소유자 범위에서 확인한 뒤 PDF 미리보기나 원본을 읽는다.
+ * 저장소 키는 서비스 밖으로 내보내지 않고, 저장소 오류를 분류해 공개 API 오류로 바꾼다.
+ */
 @Service
 @Transactional(readOnly = true)
 public class DocumentThumbnailService {
@@ -45,7 +48,7 @@ public class DocumentThumbnailService {
         return new DocumentThumbnailResponse(renderer.render(originalBytes), version.getContentHash());
     }
 
-    /** Returns the immutable TXT/PDF original without exposing its storage key or local path. */
+    /** 저장소 키나 로컬 경로를 노출하지 않고 불변 TXT/PDF 원본을 반환한다. */
     public DocumentOriginalResponse getOriginal(Long ownerUserId, Long documentId, Long versionId) {
         DocumentVersion version = resolveOwnedVersion(ownerUserId, documentId, versionId);
         return new DocumentOriginalResponse(

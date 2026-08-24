@@ -10,6 +10,10 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+/**
+ * 논리 문서를 소유자 범위로 조회하고 버전 추가·삭제·활성화에 필요한 행 잠금을 제공한다.
+ * 쓰기 흐름에서 같은 문서 행을 잠가 버전 추가·삭제와 ACTIVE 포인터 갱신이 엇갈리지 않게 한다.
+ */
 public interface DocumentRepository extends JpaRepository<Document, Long> {
 
     List<Document> findAllByOwnerUserIdOrderByCreatedAtDesc(Long ownerUserId);

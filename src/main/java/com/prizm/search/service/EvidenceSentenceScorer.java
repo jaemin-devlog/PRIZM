@@ -11,7 +11,14 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Scores bounded source windows by direct query coverage and local claim completeness. */
+/**
+ * 원문의 짧은 연속 문장 구간 중 질의에 가장 직접적인 구간을 고른다.
+ *
+ * <p>질의 표현과 숫자의 포함 범위, 인접 표현, 행동·문제·결과 같은 국소적 완결성을 비교하고
+ * 연락처나 기술 목록 같은 메타데이터는 낮게 평가한다. 한 구간은 최대 세 문장으로 제한되며,
+ * 여기서 계산한 값은 근거 위치화 전용 점수다. 검색 후보의 관련성 점수나 사실 판정의
+ * 신뢰도로 사용하지 않는다.</p>
+ */
 final class EvidenceSentenceScorer {
 
     private static final Pattern TOKEN = Pattern.compile("[\\p{L}\\p{N}][\\p{L}\\p{N}+#._-]*");
@@ -51,6 +58,7 @@ final class EvidenceSentenceScorer {
             "했던", "하는", "되는", "했다", "한다", "하게", "해", "한", "을", "를", "이", "가",
             "은", "는", "과", "와", "의", "에", "로");
 
+    /** 질의 신호와 국소적 완결성을 가장 잘 충족하는 원문 구간 하나를 선택한다. */
     Selection select(String query, List<SentenceWindow> windows) {
         if (windows.isEmpty()) {
             return Selection.empty();

@@ -6,7 +6,12 @@ import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-/** 문서 청크를 pgvector 형식으로 일괄 저장하고 재처리 전 정리한다. */
+/**
+ * 문서 버전의 청크를 소유자 범위에서 교체하고 pgvector 형식으로 일괄 저장한다.
+ *
+ * <p>{@link #replaceAll(Long, Long, List)}은 완료 서비스의 트랜잭션 안에서 기존 행을 지운 뒤 새 행을
+ * 넣는다. 삭제와 삽입을 한 완료 경계에 묶어 이전 처리 시도의 일부 청크와 새 결과가 섞이지 않게 한다.</p>
+ */
 @Repository
 public class DocumentChunkRepository {
 
@@ -24,6 +29,7 @@ public class DocumentChunkRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /** 한 문서 버전의 기존 청크를 지우고 완성된 청크 목록으로 교체한다. */
     public void replaceAll(Long ownerUserId, Long documentVersionId, List<IndexedChunk> chunks) {
         deleteByOwnerUserIdAndDocumentVersionId(ownerUserId, documentVersionId);
         jdbcTemplate.batchUpdate(

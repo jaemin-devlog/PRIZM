@@ -11,7 +11,11 @@ import org.springframework.security.oauth2.server.resource.authentication.Abstra
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
-/** JWT 서명뿐 아니라 현재 DB의 사용자 상태와 권한도 요청마다 확인한다. */
+/**
+ * 서명 검증을 통과한 JWT를 현재 DB 계정과 대조해 요청의 인증 정보를 만든다.
+ * 토큰의 이메일과 역할은 발급 당시의 값이므로, 계정 비활성화나 속성 변경을 즉시 반영하려면
+ * 활성 상태·이메일·역할을 요청마다 다시 확인해야 한다. 계정이 없거나 값이 다르면 인증 실패로 처리한다.
+ */
 @Component
 public class DatabaseJwtAuthenticationConverter
         implements Converter<Jwt, AbstractOAuth2TokenAuthenticationToken<Jwt>> {

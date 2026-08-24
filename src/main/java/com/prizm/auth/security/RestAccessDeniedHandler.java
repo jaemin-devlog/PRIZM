@@ -9,6 +9,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
+/** 인증은 됐지만 요청한 자원에 필요한 권한이 없을 때 일관된 JSON 403 응답을 작성한다. */
 @Component
 public class RestAccessDeniedHandler implements AccessDeniedHandler {
 

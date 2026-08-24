@@ -7,7 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-/** Claims work briefly, deletes outside the database transaction, then records the outcome. */
+/**
+ * cleanup 작업을 짧게 claim한 뒤 파일을 지우고, 결과를 별도 DB 트랜잭션에 기록한다.
+ *
+ * <p>파일시스템과 DB는 함께 커밋할 수 없으므로 삭제하는 동안 행 잠금을 유지하지 않는다.
+ * 파일은 지워졌지만 완료 기록이 실패한 경우 PROCESSING lease를 남겨 recovery가 같은 삭제를
+ * 다시 시도하게 하며, 늦게 도착한 이전 claim의 결과는 claim version으로 무시한다.</p>
+ */
 @Service
 public class FileCleanupCoordinator {
 
@@ -32,6 +38,7 @@ public class FileCleanupCoordinator {
         this.failureService = failureService;
     }
 
+    /** claim 가능한 작업 하나를 처리하며, 작업이 없을 때만 {@code false}를 반환한다. */
     public boolean processNext() {
         Optional<ClaimedFileCleanupJob> claimed = claimService.claimNext();
         if (claimed.isEmpty()) {
@@ -62,7 +69,7 @@ public class FileCleanupCoordinator {
             log.info("Ignored stale file cleanup completion for job {}.", job.fileCleanupJobId());
         }
         catch (RuntimeException exception) {
-            // The file was already removed. Leave PROCESSING unchanged for lease recovery to retry idempotently.
+            // 파일은 이미 없어졌을 수 있으므로 PROCESSING을 유지해 lease recovery가 멱등 삭제를 다시 시도한다.
             log.error("File cleanup completion update failed for job {} with code CLEANUP_COMPLETION_UPDATE_FAILED.",
                     job.fileCleanupJobId());
         }

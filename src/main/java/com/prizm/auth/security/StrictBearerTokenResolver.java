@@ -11,7 +11,10 @@ import org.springframework.security.oauth2.server.resource.BearerTokenErrors;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.stereotype.Component;
 
-/** 단일 Authorization 헤더의 정상적인 Bearer 값만 허용한다. */
+/**
+ * 하나의 Authorization 헤더에 담긴 정상적인 Bearer 값만 인증 계층으로 넘긴다.
+ * 중복 헤더와 쉼표로 합친 값은 어느 token을 인증에 쓸지 모호하므로 거부한다.
+ */
 @Component
 public class StrictBearerTokenResolver implements BearerTokenResolver {
 

@@ -17,7 +17,15 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/** 로컬 디스크에 문서 원본을 저장하는 기본 구현체다. */
+/**
+ * 문서 원본을 서버가 구성한 로컬 디렉터리 아래에 저장한다.
+ *
+ * <p>상대 키를 정규화하고 심볼릭 링크를 따라가지 않은 채 검사해 저장 루트 밖으로 해석되는
+ * 경로를 거부한다. 삭제는 파일시스템 루트에서 연 {@link SecureDirectoryStream}을 따라 이동한 뒤
+ * 열린 부모 descriptor를 기준으로 실행하므로, 검사 뒤 경로가 바뀌는 경쟁 조건에도 외부 파일을 지우지 않는다.
+ * {@code SecureDirectoryStream}을 쓸 수 없으면 경로 기반 삭제로 우회하지 않고
+ * 실패로 닫는다.</p>
+ */
 @Component
 public class LocalFileStorage implements FileStorage {
 
@@ -58,7 +66,7 @@ public class LocalFileStorage implements FileStorage {
                     Files.deleteIfExists(temporaryFile);
                 }
                 catch (IOException ignored) {
-                    // The final target is still protected by the server-generated directory.
+                    // 임시 파일 정리 실패가 저장 결과나 원래 예외를 가리지 않게 별도로 전파하지 않는다.
                 }
             }
         }
@@ -84,7 +92,11 @@ public class LocalFileStorage implements FileStorage {
         }
     }
 
-    /** 저장 경로가 루트 밖으로 나가지 않는지 확인한 뒤 파일을 삭제한다. */
+    /**
+     * 상대 키를 검증한 뒤 심볼릭 링크를 따라가지 않는 descriptor-relative 방식으로 파일을 삭제한다.
+     * 삭제 도중 경로가 교체될 수 있으므로 사전 경로 검사만 믿지 않으며,
+     * {@code SecureDirectoryStream}이 없으면 원본을 보존한 채 영구 실패로 분류한다.
+     */
     @Override
     public void delete(String storedFilePath) {
         Path target = resolveStoredFilePath(storedFilePath);
@@ -101,6 +113,7 @@ public class LocalFileStorage implements FileStorage {
         List<Path> storageRootComponents = pathComponents(fileSystemRoot, storageRoot);
         List<Path> targetParentComponents = pathComponents(relativeTarget.getParent());
         try {
+            // 절대 경로를 다시 조회하지 않고 열린 디렉터리를 기준으로 하위 경로를 탐색한다.
             try (DirectoryStream<Path> anchorStream = openDirectoryStream(fileSystemRoot)) {
                 SecureDirectoryStream<Path> anchor = requireSecureDirectoryStream(anchorStream);
                 deleteFromFileSystemAnchor(
@@ -256,7 +269,7 @@ public class LocalFileStorage implements FileStorage {
                 Files.createDirectory(current);
             }
             catch (java.nio.file.FileAlreadyExistsException ignored) {
-                // The existing path is verified below before it is used.
+                // 기존 경로는 사용하기 전에 아래에서 디렉터리와 심볼릭 링크 여부를 다시 확인한다.
             }
 
             BasicFileAttributes attributes = Files.readAttributes(

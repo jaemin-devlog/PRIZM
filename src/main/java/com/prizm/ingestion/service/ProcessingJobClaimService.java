@@ -15,7 +15,12 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** 작업 한 건을 선점하고 격리된 문서 버전을 PROCESSING으로 바꾸는 짧은 트랜잭션이다. */
+/**
+ * 색인 작업 한 건을 선점하고 해당 문서 버전을 {@code PROCESSING}으로 전환한다.
+ *
+ * <p>작업·버전·문서를 같은 짧은 트랜잭션에서 잠그고 세 단계의 소유자가 모두 같은지 확인한다.
+ * 파일 읽기와 임베딩은 이 트랜잭션이 끝난 뒤 실행해 장시간 DB 락을 잡지 않는다.</p>
+ */
 @Service
 public class ProcessingJobClaimService {
 
@@ -38,6 +43,7 @@ public class ProcessingJobClaimService {
         this.properties = properties;
     }
 
+    /** 다음 작업을 선점하고 문서 계층과 fencing 값이 일치하는 처리 시도를 반환한다. */
     @Transactional
     public Optional<ClaimedProcessingJob> claimNext() {
         Optional<ClaimedProcessingJob> claimed = claimRepository.claimNext(properties.getLeaseDuration());

@@ -5,7 +5,13 @@ import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-/** Reads only the authenticated owner's chunks from the selected document's current ACTIVE version. */
+/**
+ * 근거 위치화를 위해 선택된 문서의 같은 ACTIVE 버전에 속한 청크를 읽는다.
+ *
+ * <p>dense 후보를 찾는 Repository와 달리 검색 범위를 넓히거나 순위를 정하지 않는다. 문서,
+ * 버전, 청크에 소유자 조건을 각각 적용하고 현재 {@code active_version_id}를 다시 확인해,
+ * 주변 근거 조회에서도 다른 사용자나 과거 버전의 내용이 섞이지 않게 한다.</p>
+ */
 @Repository
 public class EvidenceExpansionRepository {
 
@@ -39,6 +45,7 @@ public class EvidenceExpansionRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /** 선택된 문서와 버전이 여전히 현재 ACTIVE 범위일 때만 원문 순서의 청크를 반환한다. */
     public List<EvidenceChunk> findActiveVersionChunks(
             Long ownerUserId,
             Long documentId,

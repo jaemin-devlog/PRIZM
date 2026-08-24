@@ -9,6 +9,10 @@ import java.util.Set;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+/**
+ * JWT 서명 키, 만료 시간, 발급자를 시작 시점에 검증한다.
+ * 공개 예시 키나 너무 짧은 키로 애플리케이션이 실행되는 것을 설정 바인딩 단계에서 막는다.
+ */
 @Validated
 @ConfigurationProperties("prizm.jwt")
 public record JwtProperties(

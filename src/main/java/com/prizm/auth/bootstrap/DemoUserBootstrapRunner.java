@@ -18,7 +18,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Creates one local demo USER only during an explicitly enabled bootstrap run. */
+/**
+ * 명시적으로 활성화한 실행에서 로컬 데모용 USER 한 명을 만든다.
+ * 기존 이메일을 덮어쓰지 않으며, SYSTEM_ADMIN 생성 경로와 함께 사용할 수 없다.
+ */
 @Component
 @ConditionalOnProperty(prefix = "prizm.bootstrap-demo-user", name = "enabled", havingValue = "true")
 public class DemoUserBootstrapRunner implements ApplicationRunner {

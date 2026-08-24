@@ -14,7 +14,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/** Keeps a claimed processing job alive while the worker performs external document processing. */
+/**
+ * 외부 문서 처리 중에도 현재 Worker의 작업 임대가 만료되지 않도록 주기적으로 갱신한다.
+ *
+ * <p>별도 daemon 스레드가 임대 시간의 3분의 1 간격으로 갱신한다. 갱신 실패는 heartbeat 안에 보관했다가
+ * 처리 스레드가 다음 소유권 확인 지점에서 예외로 받으므로, 임대를 잃은 작업은 완료 트랜잭션으로 넘어가지
+ * 않는다.</p>
+ */
 @Service
 public class WorkerLeaseHeartbeat {
 
@@ -38,6 +44,7 @@ public class WorkerLeaseHeartbeat {
         this.executor = executor;
     }
 
+    /** 처리 시도에 묶인 heartbeat를 시작한다. 반환값을 닫으면 예약된 갱신도 중단된다. */
     public LeaseHeartbeat start(ClaimedProcessingJob claimedJob) {
         LeaseHeartbeat heartbeat = new LeaseHeartbeat(claimedJob, leaseService);
         ScheduledFuture<?> scheduledTask = executor.scheduleAtFixedRate(
@@ -69,6 +76,7 @@ public class WorkerLeaseHeartbeat {
         };
     }
 
+    /** heartbeat 갱신 실패와 처리 스레드의 중단 여부를 완료 전에 확인하는 소유권 보호 객체다. */
     public static class LeaseHeartbeat implements AutoCloseable {
 
         private final ClaimedProcessingJob claimedJob;
@@ -104,6 +112,7 @@ public class WorkerLeaseHeartbeat {
             }
         }
 
+        /** 마지막 임대 갱신이 실패했거나 처리 스레드가 중단됐으면 더 진행하지 않는다. */
         public void assertOwnership() {
             RuntimeException failure = renewalFailure.get();
             if (failure != null) {

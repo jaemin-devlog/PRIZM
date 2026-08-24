@@ -9,7 +9,13 @@ import java.time.Instant;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** PENDING 또는 준비된 RETRY_WAIT ChangeLog 하나를 INDEXING Job으로 원자적으로 전달한다. */
+/**
+ * 준비된 ChangeLog 하나를 선점해 {@code INDEXING} 작업과 원자적으로 연결한다.
+ *
+ * <p>ChangeLog 선점, 작업의 멱등 생성, 소유자·버전 검증, {@code DISPATCHED} 전환을 한 트랜잭션에서
+ * 처리한다. 중간에 실패하면 작업 생성과 상태 변경이 함께 롤백되며, 실패 상태는 이 경계가 끝난 뒤 별도
+ * 트랜잭션에서 기록한다.</p>
+ */
 @Service
 public class ChangeLogDispatchTransaction {
 
@@ -24,8 +30,10 @@ public class ChangeLogDispatchTransaction {
     }
 
     /**
-     * Transaction A의 전체 경계다. 실패하면 Job upsert와 ChangeLog 갱신이 함께 rollback된다.
-     * P4 전까지 실패 상태나 retry 정보를 기록하지 않는다.
+     * 가장 오래된 전달 가능 ChangeLog 한 건을 처리한다.
+     *
+     * <p>작업 생성은 문서 버전과 작업 유형의 고유 조건을 이용해 멱등하게 수행한다. 실패 정보는 이
+     * 트랜잭션 안에 남기지 않으므로 예외가 발생하면 작업과 ChangeLog가 모두 직전 커밋 상태로 돌아간다.</p>
      */
     @Transactional
     public boolean dispatchNext() {

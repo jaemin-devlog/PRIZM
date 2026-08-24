@@ -1,4 +1,5 @@
 /**
- * Authentication, JWT, and security-context boundaries.
+ * 로그인과 JWT 발급·검증, 보안 컨텍스트 구성을 담당한다.
+ * 토큰 서명이 유효해도 사용자 ID, 이메일, 역할, 활성 상태를 DB와 다시 대조한다.
  */
 package com.prizm.auth;

@@ -17,7 +17,13 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** 임대가 만료된 PROCESSING 작업을 DB 시간 기준으로 재시도하거나 최종 실패시킨다. */
+/**
+ * 임대가 만료된 {@code PROCESSING} 작업을 재시도 대기 또는 최종 실패로 복구한다.
+ *
+ * <p>만료 작업을 {@code SKIP LOCKED}로 한 건씩 잠그고 소유자 계층을 확인한 뒤, 남은 부분 청크를
+ * 제거한다. 복구하면서 {@code claimVersion}을 올려 이전 Worker의 권한을 끊고 DB 시간으로 다음 재시도를
+ * 계산한다. 최종 실패해도 문서의 활성 버전 포인터는 건드리지 않는다.</p>
+ */
 @Service
 public class ProcessingJobRecoveryService {
 
@@ -45,6 +51,7 @@ public class ProcessingJobRecoveryService {
         this.retryPolicy = retryPolicy;
     }
 
+    /** 가장 오래전에 만료된 작업 한 건을 잠가 현재 재시도 예산에 맞게 복구한다. */
     @Transactional
     public boolean recoverNext() {
         Optional<Long> expiredId = claimRepository.lockNextExpiredId();

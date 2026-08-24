@@ -2,7 +2,7 @@ package com.prizm.search.config;
 
 import java.util.Arrays;
 
-/** Selectable, versioned product search profiles. */
+/** 기본 복합 검색 정책과 문제 발생 시 되돌릴 legacy dense 정책을 식별한다. */
 public enum SearchProfile {
     LEGACY_DENSE_V1("legacy-dense-v1"),
     SOURCE_DEDUP_EVIDENCE_SIGNALS_V1("source-dedup-evidence-signals-v1");

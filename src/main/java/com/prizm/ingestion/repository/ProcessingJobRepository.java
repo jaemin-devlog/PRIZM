@@ -10,6 +10,13 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+/**
+ * 색인 작업의 상태 전이용 잠금 조회와 멱등 생성을 제공한다.
+ *
+ * <p>ChangeLog Dispatcher는 문서 버전과 작업 유형의 고유 조건을 이용한 {@code ON CONFLICT DO NOTHING}
+ * 삽입으로 이미 존재하는 작업을 재사용한다. 따라서 전달 트랜잭션이 다시 실행돼도 같은 버전의 색인 작업이
+ * 늘어나지 않는다.</p>
+ */
 public interface ProcessingJobRepository extends JpaRepository<ProcessingJob, Long> {
 
     Optional<ProcessingJob> findByOwnerUserIdAndDocumentVersionId(Long ownerUserId, Long documentVersionId);

@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+/** 인증된 사용자의 문서 업로드·조회·메타데이터 수정·삭제 요청을 문서 서비스에 연결한다. */
 @RestController
 @Validated
 @RequestMapping("/api/documents")
@@ -51,7 +52,7 @@ public class DocumentController {
         this.currentUserProvider = currentUserProvider;
     }
 
-    /** TXT 원본을 QUARANTINED 문서 버전으로 등록한다. */
+    /** TXT/PDF 원본을 검색 전 격리 상태인 QUARANTINED 버전으로 등록한다. */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DocumentUploadResponse> upload(
             @RequestParam @NotBlank @Size(max = 200) String title,
@@ -67,7 +68,7 @@ public class DocumentController {
                         file));
     }
 
-    /** Adds a revised TXT/PDF source as the next immutable version of an existing owner-scoped document. */
+    /** 기존 문서에 수정된 TXT/PDF 원본을 다음 불변 버전으로 추가한다. */
     @PostMapping(value = "/{documentId}/versions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DocumentUploadResponse> uploadVersion(
             @PathVariable Long documentId,
@@ -76,7 +77,6 @@ public class DocumentController {
                 .body(documentUploadService.uploadVersion(currentUserProvider.userId(), documentId, file));
     }
 
-    /** 문서 목록을 조회한다. */
     @GetMapping
     public List<DocumentSummaryResponse> list(
             @RequestParam(required = false) DocumentType documentType,
@@ -85,13 +85,12 @@ public class DocumentController {
         return documentQueryService.list(currentUserProvider.userId(), documentType, title, processingStatus);
     }
 
-    /** 문서와 버전 메타데이터를 상세 조회한다. */
     @GetMapping("/{documentId}")
     public DocumentDetailResponse get(@PathVariable Long documentId) {
         return documentQueryService.get(currentUserProvider.userId(), documentId);
     }
 
-    /** Updates only user-managed metadata; original files and versions remain immutable. */
+    /** 사용자가 관리하는 메타데이터만 바꾸며 원본과 버전은 수정하지 않는다. */
     @PatchMapping("/{documentId}")
     public DocumentDetailResponse updateMetadata(
             @PathVariable Long documentId,
@@ -101,14 +100,14 @@ public class DocumentController {
         return documentQueryService.get(ownerUserId, documentId);
     }
 
-    /** Queues orphan-file cleanup and removes terminal document metadata for the current owner only. */
+    /** 현재 사용자의 종료된 문서 메타데이터를 지우고 원본 cleanup을 예약한다. */
     @DeleteMapping("/{documentId}")
     public ResponseEntity<Void> delete(@PathVariable Long documentId) {
         documentManagementService.delete(currentUserProvider.userId(), documentId);
         return ResponseEntity.noContent().build();
     }
 
-    /** Removes one terminal historical version for the current owner without touching the active version. */
+    /** ACTIVE 버전을 건드리지 않고 현재 사용자의 종료된 과거 버전 하나를 삭제한다. */
     @DeleteMapping("/{documentId}/versions/{versionId}")
     public ResponseEntity<Void> deleteVersion(
             @PathVariable Long documentId,

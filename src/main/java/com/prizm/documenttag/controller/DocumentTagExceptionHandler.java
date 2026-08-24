@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/** 잘못된 태그 입력은 400, 접근할 수 없거나 없는 태그는 404 응답으로 변환한다. */
 @RestControllerAdvice
 public class DocumentTagExceptionHandler {
 

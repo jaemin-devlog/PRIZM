@@ -13,7 +13,10 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
-/** 짧은 수명의 서명된 access token만 발급한다. */
+/**
+ * 사용자 ID, 이메일, 역할을 담은 HS256 access token을 발급하고 검증한다.
+ * claim은 발급 시점의 값이므로 실제 요청 권한은 토큰만 믿지 않고 DB 계정과 다시 대조한다.
+ */
 @Service
 public class JwtTokenService {
 

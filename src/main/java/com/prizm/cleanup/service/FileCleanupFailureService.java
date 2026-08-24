@@ -7,6 +7,10 @@ import java.time.Instant;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 삭제 실패를 재시도 대기 또는 최종 실패로 기록한다.
+ * 재시도 가능한 오류에는 공통 backoff와 retry budget을 적용하고, 갱신할 때 현재 claim인지도 확인한다.
+ */
 @Service
 public class FileCleanupFailureService {
 

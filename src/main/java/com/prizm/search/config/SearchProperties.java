@@ -2,7 +2,7 @@ package com.prizm.search.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/** Search profile selection with an explicit legacy rollback override. */
+/** 기본 검색 정책을 선택하며, 설정값으로 legacy dense 정책을 명시할 수 있다. */
 @ConfigurationProperties("prizm.search")
 public record SearchProperties(String profile) {
 

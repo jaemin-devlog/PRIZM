@@ -35,29 +35,33 @@ export function getEvidencePdfViewerTarget(
 }
 
 export type KeywordEvidencePanelProps = {
+  headingId?: string
   query: string
   state: KeywordEvidenceState
   results: CareerEvidenceSearchResult[]
   documentTypes: Map<number, DocumentType>
   documentTypeLabel: (documentType: DocumentType) => string
+  emptyMessage?: string
   onRetry: () => void
   onOpenPdf: (target: EvidencePdfViewerTarget) => void
   onNavigateToDocument: (documentId: number) => void
 }
 
 export function KeywordEvidencePanel({
+  headingId = 'tag-evidence-title',
   query,
   state,
   results,
   documentTypes,
   documentTypeLabel,
+  emptyMessage = '이 키워드와 관련된 내용을 문서에서 찾지 못했습니다.',
   onRetry,
   onOpenPdf,
   onNavigateToDocument,
 }: KeywordEvidencePanelProps) {
   return createElement(
     'section',
-    { className: 'keyword-evidence-panel', 'aria-labelledby': 'tag-evidence-title' },
+    { className: 'keyword-evidence-panel', 'aria-labelledby': headingId },
     createElement(
       'header',
       { className: 'keyword-panel-heading' },
@@ -65,7 +69,7 @@ export function KeywordEvidencePanel({
         'div',
         null,
         createElement('p', { className: 'section-kicker' }, 'EVIDENCE RETRIEVAL'),
-        createElement('h2', { id: 'tag-evidence-title' }, `${query || '키워드'} 관련 기록`),
+        createElement('h2', { id: headingId }, `${query || '키워드'} 관련 기록`),
       ),
       state === 'result'
         ? createElement('span', null, `${results.length}건 · ${relatedEvidenceDocumentCount(results)}개 문서`)
@@ -83,7 +87,7 @@ export function KeywordEvidencePanel({
         )
         : null,
       state === 'empty'
-        ? createElement('p', { className: 'keyword-state' }, '이 키워드와 관련된 내용을 문서에서 찾지 못했습니다.')
+        ? createElement('p', { className: 'keyword-state' }, emptyMessage)
         : null,
       state === 'error'
         ? createElement(

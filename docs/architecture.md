@@ -299,6 +299,54 @@ PostgreSQL FTS·BGE-M3 Sparse·BGE reranker 실험은 평가 전용이며 Produc
 - [opt-in 검색 profile](../src/main/java/com/prizm/search/profile/CompositeSearchProfile.java)
 - [Career Evidence v2 API](../src/main/java/com/prizm/search/controller/CareerEvidenceSearchV2Controller.java)
 
+### 채용공고 항목별 Career Evidence V1 (`IMPLEMENTED`, compound Gate PASS)
+
+PRZ-017은 붙여넣은 채용공고를 줄바꿈·bullet·numbered list·문장 경계로 결정적으로
+분리하고, 사용자가 checkbox로 고른 항목만 기존 Career Evidence Search로 전달하는 소비자
+계층이다. section heading은 검색 판정이 아니라 항목의 보조 표시 정보로 유지한다.
+Production 분리·query composition 경로에는 Qwen, 다른 chat LLM, prompt와 response parser가
+없다. Ollama `bge-m3`는 기존 Search query embedding에만 사용한다.
+
+각 분리 항목은 기존 Search query 계약에 맞춰 500자 이하이고 문자·숫자 2개 이상을
+유지한다. 한 입력에서 반환하는 항목은 최대 100개이며 이를 넘으면 일부를 잘라 내지 않고
+`400 JOB_POSTING_ITEM_LIMIT_EXCEEDED`로 거부해 항목별 Search 요청 증폭을 제한한다.
+
+단순 선택 항목은 원문으로 기존 `POST /api/career-evidence/search`를 한 번 호출한다. 명확한
+`A / B`, 3항 compact slash 목록, `또는`, 독립 영문 `or` 구조는 원문과 최대 5개 alternative
+query를 같은 API로 순차 검색한다. 쉼표는 짧고 명확한 OR 목록에서만 분리하고 2항 결합
+식별자와 파일 경로는 제외한다. 결과는 원문 query부터 순서대로
+`documentId + documentVersionId + chunkId`로 중복을 제거하고 최종 5건만 원래 항목 하나에
+표시한다. Search의 owner·`ACTIVE` version, ranking, relevance floor, fallback과 localization은
+바꾸지 않으며 query별 score를 재정렬하지 않는다.
+
+분리 결과는 입력 화면 아래에 누적하지 않고 section별 선택 modal로 표시하며 heading에는
+checkbox를 만들지 않는다. 검색은 `/career-vault/job-evidence/results` 전용 route로 이동해
+loading부터 보여 준다. 결과 화면은 선택 항목 rail에서 하나를 고르고 오른쪽에서
+`requirement → document/version → Evidence row` 순으로 읽는 전용 workspace다. 같은
+문서·버전의 제목과 종류는 한 번만 표시하고, 동일 source 위치와 표시 원문이 완전히 같은
+행만 presentation 단계에서 정리한다. snippet, 주변 원문, 문서와 source 위치는 유지하며
+score·적합도·충족·합격 가능성 등의 판정은 표시하지 않는다.
+
+선택 항목 rail은 `기록 있음`과 `기록 없음` 상태 탭으로 나누며 loading 또는 error가 남아
+있을 때만 `확인 필요` 탭을 추가한다. 탭 숫자는 Evidence 행이 아니라 requirement 수이고,
+탭을 바꿔도 원래 requirement 순서와 번호를 유지한다. 상태 탭 전환은 기존 결과를 표시하는
+presentation 동작이므로 Search API를 다시 호출하지 않는다.
+
+PDF `PAGE`는 기존 인증된 original Blob viewer에서 표시 Evidence의 1-based page로
+이동하고, TXT `TEXT_CHUNK`는 기존 문서 상세를 연다. 채용공고 입력·분리 결과·선택은
+영구 저장하지 않으며 새 table, migration과 PDF viewer가 없다. PRZ-009 Tag는 별도 사용자
+metadata로 남고 PRZ-017 검색 filter나 ranking 신호가 아니다.
+
+현재 source는 `uncommitted worktree`이고 새 UI 기준 backend focused 27건, frontend unit
+69건과 typecheck·lint·build를 통과했다. 이전 compound Gate에서는 Docker 최신 source
+rebuild와 독립 감사도 통과했고, 같은 owner의 ACTIVE PDF를 사용한 인증 브라우저에서 Docker
+compound가 0건에서 3건으로 바뀌었다. Git/협업 compound의 0건은 기존 PRZ-016 recall 한계로
+유지됐고 PDF 1페이지 viewer도 확인했다. 새 modal·결과 workspace의 인증 브라우저 Gate는
+세션 만료로 `BLOCKED_BY_AUTH_ENVIRONMENT`이며
+전체 V1의 남은 Gate·완료 판정은
+[PRZ-017 Spec](../specs/PRZ-017-job-posting-evidence-v1/spec.md)과
+[Evidence](../specs/PRZ-017-job-posting-evidence-v1/evidence.md)를 따른다.
+
 ### 사용자 관리형 Document Tag
 
 PRZ-009 P4는 Java 기술 사전으로 active chunk를 스캔하던 자동 keyword 추출을 문서

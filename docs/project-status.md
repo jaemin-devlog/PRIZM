@@ -51,6 +51,7 @@
 | 현재 제품 | Spring Boot와 React Career Vault로 구현한 자동화된 AI 문서 관리 플랫폼 |
 | 구현됨 | 자체 호스팅 회원가입, 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, ChangeLog 기반 비동기 색인·복구, Ollama 자동 임베딩, pgvector 근거 검색, Career Vault 문서 관리, 읽기 전용 MCP Career Evidence 검색 |
 | 현재 단계 | 소스 전용 공개 준비, clean-clone, 실제 OpenSQL direct 기준선과 PRZ-013 OpenProxy 단일 Primary SQL Gate 검증 완료. PRZ-010 변경 로그 동기화, PRZ-011 문서 처리 상태 UX와 PRZ-015 MCP 검색은 `VERIFIED`; PRZ-016은 PR #48로 `main`에 통합됐고 P10은 `VERIFIED`, P11은 `PARTIAL_PASS`, P11.1~P14는 `PASS`이나 P15의 인증된 PDF 페이지 이동이 `NOT_VERIFIED`여서 `IN_PROGRESS`; PRZ-008 검색 개선은 `IN_PROGRESS`; PRZ-009 사용자 관리형 Document Tag는 `VERIFIED` (`AUDIT Gate: PASS`, PR #51 merge 전); PRZ-012 검색 근거 표현 품질은 `IMPLEMENTED_UNVERIFIED` |
+| PRZ-017 | 채용공고 deterministic segmentation → modal 선택 → 기존 Search → 전용 requirement/document/Evidence workspace와 PDF/TXT 이동 V1을 `uncommitted worktree`에 구현. 새 UI 자동 검증·독립 감사 `PASS`, 인증 브라우저 Gate `BLOCKED_BY_AUTH_ENVIRONMENT`; 전체 44개 원문/TXT 재검증은 `NOT_RUN` (`IN_PROGRESS`) |
 | 계획된 미구현 | CareerFact, 근거 기반 portfolio, `/api/v1`, 독립 Engine 패키지 |
 | 명시적 범위 제외 | 다중 OpenSQL DB node, DB 장애전환, OpenProxy 이중화·VIP와 서비스 연속성 보장 |
 
@@ -129,6 +130,23 @@ PRZ-005에서는 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 직�
 - 기존 Career Evidence Search를 재사용해 사용자별 데이터 격리(owner isolation)와
   현재 `ACTIVE` 버전만 검색하는 규칙(ACTIVE isolation) 유지
 
+### 진행 중인 채용공고 항목별 Evidence V1
+
+- LLM 없이 줄바꿈·list·문장 경계로 채용공고 항목을 결정적으로 분리
+- 사용자가 section별 modal에서 필요한 child 항목만 선택하고, 단순 항목은 원문 1회,
+  명확한 alternative 항목은 원문과 제한된 deterministic variant로 기존 Career Evidence
+  Search 호출
+- 결과 전용 route에서 기록 있음·없음 상태별 requirement rail → document/version → Evidence
+  row로 snippet·context를 확인하고 PDF page 또는 TXT 상세로 이동
+- 적합도·충족·합격 가능성 판정, persistence, Tag filter와 Search tuning은 비범위
+- 현재 상태 `IN_PROGRESS`, source `uncommitted worktree`. 새 UI 기준 focused backend
+  27건, frontend unit 69건, typecheck·lint·build가 통과했다. 최신 frontend rebuild도
+  통과했지만 상태 탭 인증 브라우저 Gate는 로그인 세션 부재로 `BLOCKED_BY_AUTH_ENVIRONMENT`다.
+  이전 compound Gate에서는
+  Docker rebuild, 동일 owner/ACTIVE PDF의 Docker 0→3건·Git/협업 0→0건과 PDF 1페이지 이동,
+  독립 감사 blocking finding 0건을 확인했다. 새 modal/workspace 인증 브라우저 Gate는
+  기존 세션 만료로 `BLOCKED_BY_AUTH_ENVIRONMENT`다.
+
 ### 구현됐으나 최종 Gate가 남은 기능
 
 - SYSTEM 추천 tag와 owner-scoped USER tag 생성·검색
@@ -193,6 +211,7 @@ PRZ-011은 문서 처리의 파일 읽기·텍스트 추출·청크 생성·실�
 | PRZ-016 P13 Evidence Expansion Safety | `PASS` — 통합 Gate | selected chunk의 직접 ASCII query anchor를 local evidence 우선 조건으로 보존하고 cross-chunk expansion 후보도 이를 유지하도록 제한. FCM `108→106` anchor loss는 `108→108`으로 복구됐으며 P10 frozen metric·FPR·localization·owner/ACTIVE isolation은 유지 |
 | PRZ-016 P14 Claim-Complete Snippet | `PASS` — 통합 Gate | 해결 질문의 extractive scorer가 action/problem-result complete contiguous 1–3문장 window를 우선하도록 보완. Q9 result/evidence chunk 106과 P13 safety는 유지되고 frozen P10 metric·FPR·localization·owner/ACTIVE isolation은 유지 |
 | PRZ-016 P15 PDF Document Confirmation UX | `IMPLEMENTED_UNVERIFIED` | PR #48 merge `154b9c8`로 통합. frontend unit·lint·build·Docker와 비인증 렌더링은 통과했으나, 실제 로그인 세션과 PDF fixture가 없어 인증된 PDF 페이지 이동은 `NOT_VERIFIED` |
+| PRZ-017 채용공고 항목별 Career Evidence V1 | `IN_PROGRESS` | baseline `d44f30e`, source `uncommitted worktree`. deterministic segmentation·modal 선택·bounded compound Search 소비·기록 있음/없음 상태별 requirement/document/Evidence workspace·PDF/TXT 이동 구현 완료. 새 UI 기준 backend focused 27, frontend unit 69, typecheck·lint·build·독립 감사와 최신 frontend rebuild PASS, 인증 browser BLOCKED_BY_AUTH_ENVIRONMENT. 이전 compound Docker/PDF browser PASS. migration·LLM·판정·Tag filter·Search Production 추가 diff 0. 전체 44개 원문/TXT 재검증은 NOT_RUN |
 
 세부 실행 환경과 명령은 [PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md),
 [PRZ-002 Evidence](../specs/PRZ-002-open-source-readiness/evidence.md),

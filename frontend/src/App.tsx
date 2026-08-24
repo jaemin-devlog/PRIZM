@@ -48,6 +48,11 @@ import {
   type CareerEvidenceSearchResult,
 } from './api/searchApi'
 import {
+  JobPostingApiError,
+  segmentJobPosting,
+  type JobPostingItem,
+} from './api/jobPostingApi'
+import {
   getEvidenceContext,
   getEvidenceHighlight,
   getEvidenceSourceLabel,
@@ -77,6 +82,23 @@ import { expireSessionIfUnauthorized } from './auth/sessionPolicy'
 import { focusModalEntry, keepFocusWithinModal, restoreModalTrigger } from './modalFocus'
 import { progressSummary } from './documentProcessingPresentation'
 import {
+  clearJobPostingItemSelection,
+  findJobEvidence,
+  loadingJobEvidenceGroups,
+  selectAllJobPostingItems,
+  selectedJobPostingItems,
+  toggleJobPostingItemSelection,
+  type JobEvidenceGroup,
+} from './jobEvidence'
+import {
+  JobEvidencePanel,
+  type JobEvidenceSegmentationState,
+} from './jobEvidencePanel'
+import {
+  JobEvidenceResultsWorkspace,
+  JobRequirementSelectionModal,
+} from './jobEvidenceWorkspace'
+import {
   documentDetailPath,
   documentFolderPath,
   documentListPathAfterDetailClose,
@@ -89,6 +111,8 @@ const LOGIN_PATH = '/login'
 const CAREER_VAULT_PATH = '/career-vault'
 const DOCUMENTS_PATH = '/career-vault/documents'
 const KEYWORDS_PATH = '/career-vault/keywords'
+const JOB_EVIDENCE_PATH = '/career-vault/job-evidence'
+const JOB_EVIDENCE_RESULTS_PATH = '/career-vault/job-evidence/results'
 const EVIDENCE_PATH = '/career-vault/evidence'
 const UPLOAD_PATH = '/career-vault/upload'
 const MAX_UPLOAD_FILE_SIZE_BYTES = 10 * 1024 * 1024
@@ -144,6 +168,7 @@ const NAVIGATION_ITEMS: ReadonlyArray<{
 }> = [
   { path: DOCUMENTS_PATH, label: '문서 보관함', marker: '문' },
   { path: KEYWORDS_PATH, label: '경력 키워드', marker: '키' },
+  { path: JOB_EVIDENCE_PATH, label: '채용공고 경력 찾기', marker: '공' },
   { path: EVIDENCE_PATH, label: '내 경험 찾기', marker: '경' },
   { path: UPLOAD_PATH, label: '문서 업로드', marker: '+' },
 ]
@@ -151,6 +176,8 @@ const NAVIGATION_ITEMS: ReadonlyArray<{
 type VaultPath =
   | typeof DOCUMENTS_PATH
   | typeof KEYWORDS_PATH
+  | typeof JOB_EVIDENCE_PATH
+  | typeof JOB_EVIDENCE_RESULTS_PATH
   | typeof EVIDENCE_PATH
   | typeof UPLOAD_PATH
 type AppPath = typeof LOGIN_PATH | VaultPath
@@ -167,6 +194,8 @@ type PdfViewerTarget = {
 function isVaultPath(pathname: string): pathname is VaultPath {
   return pathname === DOCUMENTS_PATH
     || pathname === KEYWORDS_PATH
+    || pathname === JOB_EVIDENCE_PATH
+    || pathname === JOB_EVIDENCE_RESULTS_PATH
     || pathname === EVIDENCE_PATH
     || pathname === UPLOAD_PATH
 }
@@ -204,6 +233,13 @@ function App() {
   const navigate = useCallback((nextPath: AppPath) => {
     if (window.location.pathname !== nextPath) {
       window.history.pushState(null, '', nextPath)
+    }
+    setPath(nextPath)
+  }, [])
+
+  const replace = useCallback((nextPath: AppPath) => {
+    if (window.location.pathname !== nextPath) {
+      window.history.replaceState(null, '', nextPath)
     }
     setPath(nextPath)
   }, [])
@@ -257,6 +293,7 @@ function App() {
         path={path}
         currentUser={currentUser}
         onNavigate={navigate}
+        onReplace={replace}
         onLogout={handleLogout}
         onSessionExpired={handleLogout}
       />
@@ -449,12 +486,14 @@ function CareerVaultShell({
   path,
   currentUser,
   onNavigate,
+  onReplace,
   onLogout,
   onSessionExpired,
 }: {
   path: VaultPath
   currentUser: CurrentUser
   onNavigate: (path: AppPath) => void
+  onReplace: (path: AppPath) => void
   onLogout: () => void
   onSessionExpired: () => void
 }) {
@@ -537,7 +576,10 @@ function CareerVaultShell({
               key={item.path}
               href={item.path}
               className="vault-navigation-link"
-              aria-current={path === item.path ? 'page' : undefined}
+              aria-current={path === item.path
+                || (item.path === JOB_EVIDENCE_PATH && path === JOB_EVIDENCE_RESULTS_PATH)
+                ? 'page'
+                : undefined}
               onClick={(event) => handleNavigationClick(event, item.path)}
             >
               <span className="navigation-marker" aria-hidden="true">
@@ -570,6 +612,19 @@ function CareerVaultShell({
           {path === KEYWORDS_PATH && (
             <CareerKeywordsPage
               onSessionExpired={onSessionExpired}
+              onNavigateToDocument={(documentId) => {
+                window.history.pushState(null, '', documentDetailPath(documentId))
+                onNavigate(DOCUMENTS_PATH)
+              }}
+            />
+          )}
+          {(path === JOB_EVIDENCE_PATH || path === JOB_EVIDENCE_RESULTS_PATH) && (
+            <JobEvidencePage
+              view={path === JOB_EVIDENCE_RESULTS_PATH ? 'results' : 'editor'}
+              onSessionExpired={onSessionExpired}
+              onNavigateToEditor={() => onNavigate(JOB_EVIDENCE_PATH)}
+              onReplaceToEditor={() => onReplace(JOB_EVIDENCE_PATH)}
+              onNavigateToResults={() => onNavigate(JOB_EVIDENCE_RESULTS_PATH)}
               onNavigateToDocument={(documentId) => {
                 window.history.pushState(null, '', documentDetailPath(documentId))
                 onNavigate(DOCUMENTS_PATH)
@@ -2098,6 +2153,277 @@ function CareerKeywordsPage({
         <KeywordEvidencePdfViewer
           target={pdfViewerTarget}
           onClose={closeKeywordEvidencePdfViewer}
+          onSessionExpired={onSessionExpired}
+        />
+      )}
+    </section>
+  )
+}
+
+function JobEvidencePage({
+  view,
+  onSessionExpired,
+  onNavigateToEditor,
+  onReplaceToEditor,
+  onNavigateToResults,
+  onNavigateToDocument,
+}: {
+  view: 'editor' | 'results'
+  onSessionExpired: () => void
+  onNavigateToEditor: () => void
+  onReplaceToEditor: () => void
+  onNavigateToResults: () => void
+  onNavigateToDocument: (documentId: number) => void
+}) {
+  const [content, setContent] = useState('')
+  const [items, setItems] = useState<JobPostingItem[]>([])
+  const [selectedItemIds, setSelectedItemIds] = useState<Set<number>>(new Set())
+  const [draftSelectedItemIds, setDraftSelectedItemIds] = useState<Set<number>>(new Set())
+  const [segmentationState, setSegmentationState] = useState<JobEvidenceSegmentationState>('idle')
+  const [groups, setGroups] = useState<JobEvidenceGroup[]>([])
+  const [documentTypes, setDocumentTypes] = useState<Map<number, DocumentType>>(new Map())
+  const [pdfViewerTarget, setPdfViewerTarget] = useState<EvidencePdfViewerTarget | null>(null)
+  const [isSelectionOpen, setSelectionOpen] = useState(false)
+  const requestGeneration = useRef(0)
+  const segmentationAbortController = useRef<AbortController | null>(null)
+  const closePdfViewer = useCallback(() => setPdfViewerTarget(null), [])
+
+  useEffect(() => () => {
+    requestGeneration.current += 1
+    segmentationAbortController.current?.abort()
+  }, [])
+
+  useEffect(() => {
+    if (view === 'results' && groups.length === 0) {
+      onReplaceToEditor()
+    }
+  }, [groups.length, onReplaceToEditor, view])
+
+  const handleContentChange = (nextContent: string) => {
+    segmentationAbortController.current?.abort()
+    segmentationAbortController.current = null
+    requestGeneration.current += 1
+    setContent(nextContent)
+    setItems([])
+    setSelectedItemIds(clearJobPostingItemSelection())
+    setDraftSelectedItemIds(clearJobPostingItemSelection())
+    setSegmentationState('idle')
+    setGroups([])
+    setDocumentTypes(new Map())
+    closePdfViewer()
+  }
+
+  const handleSegment = async () => {
+    if (content.trim() === '' || segmentationState === 'loading') {
+      return
+    }
+
+    const generation = requestGeneration.current + 1
+    requestGeneration.current = generation
+    segmentationAbortController.current?.abort()
+    const controller = new AbortController()
+    segmentationAbortController.current = controller
+    setSegmentationState('loading')
+    setItems([])
+    setSelectedItemIds(clearJobPostingItemSelection())
+    setDraftSelectedItemIds(clearJobPostingItemSelection())
+    setGroups([])
+    setDocumentTypes(new Map())
+    closePdfViewer()
+
+    try {
+      const segmentedItems = await segmentJobPosting(content, controller.signal)
+      if (requestGeneration.current !== generation) {
+        return
+      }
+      setItems(segmentedItems)
+      const initialSelection = selectAllJobPostingItems(segmentedItems)
+      setSelectedItemIds(initialSelection)
+      setDraftSelectedItemIds(new Set(initialSelection))
+      setSegmentationState('ready')
+      setSelectionOpen(true)
+    } catch (error) {
+      if (controller.signal.aborted || requestGeneration.current !== generation) {
+        return
+      }
+      if (error instanceof JobPostingApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
+        return
+      }
+      setSegmentationState('error')
+      setSelectionOpen(false)
+    } finally {
+      if (segmentationAbortController.current === controller) {
+        segmentationAbortController.current = null
+      }
+    }
+  }
+
+  const handleOpenSelection = () => {
+    setDraftSelectedItemIds(new Set(selectedItemIds))
+    setSelectionOpen(true)
+  }
+
+  const handleCloseSelection = () => {
+    setDraftSelectedItemIds(new Set(selectedItemIds))
+    setSelectionOpen(false)
+  }
+
+  const handleToggleItem = (itemId: number) => {
+    setDraftSelectedItemIds((selection) => toggleJobPostingItemSelection(selection, itemId))
+  }
+
+  const handleSelectAll = () => {
+    setDraftSelectedItemIds(selectAllJobPostingItems(items))
+  }
+
+  const handleClearAll = () => {
+    setDraftSelectedItemIds(clearJobPostingItemSelection())
+  }
+
+  const handleSearch = async () => {
+    const selectedItems = selectedJobPostingItems(items, draftSelectedItemIds)
+    if (selectedItems.length === 0 || groups.some((group) => group.state === 'loading')) {
+      return
+    }
+
+    const generation = requestGeneration.current + 1
+    requestGeneration.current = generation
+    setSelectedItemIds(new Set(draftSelectedItemIds))
+    setGroups(loadingJobEvidenceGroups(items, draftSelectedItemIds))
+    setDocumentTypes(new Map())
+    setSelectionOpen(false)
+    closePdfViewer()
+    onNavigateToResults()
+
+    try {
+      const search = await findJobEvidence(items, draftSelectedItemIds, {
+        search: searchCareerEvidence,
+        listDocuments: getDocuments,
+      })
+      if (requestGeneration.current !== generation) {
+        return
+      }
+      setGroups(search.groups)
+      setDocumentTypes(search.documentTypes)
+    } catch (error) {
+      if (requestGeneration.current !== generation) {
+        return
+      }
+      if (expireSessionIfUnauthorized(error, onSessionExpired)) {
+        return
+      }
+      setGroups((currentGroups) => currentGroups.map((group) => (
+        group.state === 'loading'
+          ? { ...group, state: 'error', results: [], error }
+          : group
+      )))
+    }
+  }
+
+  const handleRetry = async (itemId: number) => {
+    const retryGroup = groups.find((group) => group.item.itemId === itemId)
+    if (retryGroup === undefined || groups.some((group) => group.state === 'loading')) {
+      return
+    }
+
+    const generation = requestGeneration.current + 1
+    requestGeneration.current = generation
+    setGroups((currentGroups) => currentGroups.map((group) => (
+      group.item.itemId === itemId
+        ? { ...group, state: 'loading', results: [], error: null }
+        : group
+    )))
+
+    try {
+      const search = await findJobEvidence(
+        [retryGroup.item],
+        new Set([retryGroup.item.itemId]),
+        {
+          search: searchCareerEvidence,
+          listDocuments: getDocuments,
+        },
+      )
+      if (requestGeneration.current !== generation) {
+        return
+      }
+
+      const retriedGroup = search.groups[0]
+      if (retriedGroup === undefined) {
+        return
+      }
+      setGroups((currentGroups) => currentGroups.map((group) => (
+        group.item.itemId === itemId ? retriedGroup : group
+      )))
+      if (search.documentTypes.size > 0) {
+        setDocumentTypes((currentTypes) => new Map([
+          ...currentTypes,
+          ...search.documentTypes,
+        ]))
+      }
+    } catch (error) {
+      if (requestGeneration.current !== generation) {
+        return
+      }
+      if (expireSessionIfUnauthorized(error, onSessionExpired)) {
+        return
+      }
+      setGroups((currentGroups) => currentGroups.map((group) => (
+        group.item.itemId === itemId
+          ? { ...group, state: 'error', results: [], error }
+          : group
+      )))
+    }
+  }
+
+  return (
+    <section className="vault-page job-evidence-page" aria-labelledby="job-evidence-title">
+      {view === 'editor' ? (
+        <>
+          <header className="page-heading">
+            <p className="eyebrow">JOB POSTING EVIDENCE</p>
+            <h1 id="job-evidence-title">채용공고에서 관련 경력 찾기</h1>
+            <p>필요한 항목을 직접 선택하면 내 문서에서 관련 원문 기록을 찾습니다.</p>
+          </header>
+          <JobEvidencePanel
+            content={content}
+            itemCount={items.length}
+            selectedCount={selectedJobPostingItems(items, selectedItemIds).length}
+            segmentationState={segmentationState}
+            onContentChange={handleContentChange}
+            onSegment={() => void handleSegment()}
+            onOpenSelection={handleOpenSelection}
+          />
+        </>
+      ) : (
+        <JobEvidenceResultsWorkspace
+          groups={groups}
+          documentTypes={documentTypes}
+          documentTypeLabel={documentTypeLabel}
+          onEditPosting={() => {
+            setSelectionOpen(false)
+            onNavigateToEditor()
+          }}
+          onEditSelection={handleOpenSelection}
+          onRetry={(itemId) => void handleRetry(itemId)}
+          onOpenPdf={setPdfViewerTarget}
+          onNavigateToDocument={onNavigateToDocument}
+        />
+      )}
+      {isSelectionOpen && (
+        <JobRequirementSelectionModal
+          items={items}
+          selectedItemIds={draftSelectedItemIds}
+          onToggleItem={handleToggleItem}
+          onSelectAll={handleSelectAll}
+          onClearAll={handleClearAll}
+          onSearch={() => void handleSearch()}
+          onClose={handleCloseSelection}
+        />
+      )}
+      {pdfViewerTarget !== null && (
+        <KeywordEvidencePdfViewer
+          target={pdfViewerTarget}
+          onClose={closePdfViewer}
           onSessionExpired={onSessionExpired}
         />
       )}

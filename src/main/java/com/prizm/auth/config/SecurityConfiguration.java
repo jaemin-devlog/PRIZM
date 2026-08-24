@@ -59,6 +59,7 @@ public class SecurityConfiguration {
                                 "/api/tags/**",
                                 "/api/search",
                                 "/api/search/**",
+                                "/api/job-postings/segment",
                                 "/api/career-evidence/search",
                                 "/api/v2/career-evidence/search")
                         .hasRole("USER")

@@ -461,6 +461,37 @@ class AuthenticationIntegrationTest {
     }
 
     @Test
+    void protectsJobPostingSegmentationWithTheExistingUserRoleBoundary() throws Exception {
+        mockMvc.perform(post("/api/job-postings/segment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"content\":\"- API 개발 경험\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+
+        String systemAdminToken = tokenFor(UserRole.SYSTEM_ADMIN);
+        mockMvc.perform(post("/api/job-postings/segment")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(systemAdminToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"content\":\"- API 개발 경험\"}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+
+        String userToken = tokenFor(UserRole.USER);
+        mockMvc.perform(post("/api/job-postings/segment")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(userToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"content\":\"역량\\n- API 개발 경험\\n- 운영 자동화 경험\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].itemId").value(1))
+                .andExpect(jsonPath("$[0].section").value("역량"))
+                .andExpect(jsonPath("$[0].text").value("API 개발 경험"))
+                .andExpect(jsonPath("$[1].itemId").value(2))
+                .andExpect(jsonPath("$[1].section").value("역량"))
+                .andExpect(jsonPath("$[1].text").value("운영 자동화 경험"));
+    }
+
+    @Test
     void allowsAuthenticatedUserToUploadTxtDocument() throws Exception {
         UserAccount owner = createUser(UserRole.USER, true);
         String token = login(owner.getEmail());

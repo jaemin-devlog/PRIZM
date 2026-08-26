@@ -15,7 +15,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-/** 명시적으로 활성화된 한 번의 실행에서만 최초 SYSTEM_ADMIN 계정을 생성한다. */
+/**
+ * 일반 회원가입으로 만들 수 없는 최초 SYSTEM_ADMIN을 명시적인 부트스트랩 실행에서만 생성한다.
+ * 이미 SYSTEM_ADMIN이나 같은 이메일의 계정이 있으면 덮어쓰지 않고 시작을 중단한다.
+ */
 @Component
 @ConditionalOnProperty(prefix = "prizm.bootstrap-system-admin", name = "enabled", havingValue = "true")
 public class SystemAdminBootstrapRunner implements ApplicationRunner {

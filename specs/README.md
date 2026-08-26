@@ -39,9 +39,11 @@ flowchart TD
     PRZ013["PRZ-013 OpenProxy 단일 Primary Gate"]
     PRZ015["PRZ-015 읽기 전용 MCP Career Evidence 검색"]
     PRZ016["PRZ-016 Search Performance V2"]
+    PRZ017["PRZ-017 채용공고 항목별 Career Evidence V1"]
 
     PRZ000 --> PRZ001 --> PRZ008 --> PRZ012 --> PRZ015
     PRZ012 --> PRZ016
+    PRZ016 --> PRZ017
     PRZ000 --> PRZ002 --> PRZ003 --> PRZ005
     PRZ002 --> PRZ004 --> PRZ005
     PRZ005 --> PRZ013
@@ -217,6 +219,15 @@ flowchart TD
   - Source commit: P9~P15 구현 `930eced`~`404606d`; [PR #48](https://github.com/jaemin-devlog/PRIZM/pull/48) merge `154b9c8`
   - Last verified: 2026-08-21 (P10 localization, P11.1~P14 Gate와 owner/ACTIVE isolation 통과;
     P15의 인증된 PDF 페이지 이동은 `NOT_VERIFIED`)
+- **Spec ID:** [PRZ-017](PRZ-017-job-posting-evidence-v1/spec.md)
+  - 이름: 채용공고 항목별 Career Evidence V1
+  - 상태: `VERIFIED`
+  - Source: `94715cf` (baseline `d44f30e`), [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53)
+  - Last verified: 2026-08-27. 2026-08-26 frontend focused 33/33·전체 80/80,
+    typecheck·lint·build와 backend 전체 89 suites·627 tests가 실패·오류 0, 기존 조건부 test
+    20건 skip으로 통과. integration `ABORTED`. 최종 segmentation focused 50/50·compile과 인증
+    browser mixed bullet 10→11, Evidence 2개 항목, PDF 2페이지 target `PASS`. TXT 이동과
+    PayPay India·Lean In 재평가는 `NOT_RUN`
 
 ## 환경별 판정 주의
 

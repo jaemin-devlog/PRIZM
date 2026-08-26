@@ -5,7 +5,7 @@ import com.prizm.infrastructure.storage.PermanentFileStorageException;
 import com.prizm.infrastructure.storage.TransientFileStorageException;
 import org.springframework.stereotype.Component;
 
-/** Stores safe categories only; filesystem messages can contain a local path. */
+/** 로컬 경로가 섞일 수 있는 예외 메시지 대신 재시도 여부와 안전한 오류 코드만 남긴다. */
 @Component
 public class FileCleanupFailureClassifier {
 

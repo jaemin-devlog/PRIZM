@@ -12,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/** 인증 실패는 401, 잘못된 로그인·가입 요청은 400, 중복 이메일은 409 응답으로 변환한다. */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice(assignableTypes = AuthController.class)
 public class AuthExceptionHandler {

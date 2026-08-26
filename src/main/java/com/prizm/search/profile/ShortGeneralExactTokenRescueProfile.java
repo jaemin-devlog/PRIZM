@@ -11,10 +11,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Rescues at most one exact-token GENERAL result immediately below the dense floor.
+ * 짧은 일반 질의가 정확히 일치하는 근거 하나를 dense 하한 바로 아래에서 놓칠 때만 구제한다.
  *
- * <p>The existing composite decision remains authoritative unless it is empty. Completed-release
- * evidence never enters the rescue path.</p>
+ * <p>기존 복합 정책의 결과가 비어 있고, 모든 후보가 운영 하한에 못 미치며, 두 글자에서
+ * 네 글자 사이의 단일 token이 정확히 일치할 때만 후보 하나를 다시 평가한다. 자격 판정을
+ * 위해 임시로 올린 점수는 응답에 쓰지 않고 원래 점수를 복원한다. 전체 하한을 낮추는
+ * 우회로가 아니며 완료된 출시·배포 근거에는 적용하지 않는다.</p>
  */
 public final class ShortGeneralExactTokenRescueProfile {
 
@@ -33,6 +35,7 @@ public final class ShortGeneralExactTokenRescueProfile {
         this.delegate = delegate;
     }
 
+    /** 기존 결정이 허용하는 좁은 조건에서만 정확한 단일 token 후보 하나를 구제한다. */
     public CompositeSearchProfile.Decision apply(
             String query,
             List<VectorSearchResult> denseCandidates) {

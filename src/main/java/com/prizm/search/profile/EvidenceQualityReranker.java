@@ -8,7 +8,14 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Applies a bounded, deterministic evidence-quality adjustment to an eligible candidate. */
+/**
+ * 자격을 이미 통과한 후보의 표시 순서에만 제한된 품질 보정을 적용한다.
+ *
+ * <p>질의와 직접 맞닿은 문장, 행동·문제·결과 구조, 구체적인 숫자 같은 근거 신호를 가산하고
+ * 프로필 메타데이터나 요약 안내문처럼 직접성이 낮은 표현은 감산한다. 보정 폭은 정해진 상한과
+ * 하한 안에 묶고 자격을 통과한 후보만 재정렬한다. 새 후보를 만들거나 경력 사실의 진위를
+ * 판정하지 않는다.</p>
+ */
 public final class EvidenceQualityReranker {
 
     static final double MAX_ADJUSTMENT = 0.065d;
@@ -51,6 +58,7 @@ public final class EvidenceQualityReranker {
 
     private final SearchSnippetGenerator snippetGenerator = new SearchSnippetGenerator();
 
+    /** 후보의 근거 품질 신호를 계산해 제한된 점수 보정값과 진단 항목을 반환한다. */
     public Evaluation evaluate(String query, VectorSearchResult candidate) {
         SearchSnippetGenerator.SnippetSelection selection =
                 snippetGenerator.select(query, candidate.content());

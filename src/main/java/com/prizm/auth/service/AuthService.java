@@ -12,6 +12,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 로컬 계정의 회원가입과 비밀번호 로그인을 처리한다.
+ * 회원가입 역할은 USER로 고정하고, 로그인은 현재 활성화된 계정에만 access token을 발급한다.
+ */
 @Service
 public class AuthService {
 
@@ -27,6 +31,7 @@ public class AuthService {
         this.userAccountRepository = userAccountRepository;
         this.passwordPolicy = passwordPolicy;
         this.jwtTokenService = jwtTokenService;
+        // 존재하지 않는 이메일도 BCrypt 비교를 거쳐 계정 유무에 따른 처리 시간 차이를 줄인다.
         this.missingUserPasswordHash = passwordPolicy.encode("missing-user-password-check");
     }
 

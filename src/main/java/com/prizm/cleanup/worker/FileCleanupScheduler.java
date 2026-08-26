@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/** 실행 가능한 cleanup 작업을 주기적으로 설정된 batch 크기만큼 처리한다. */
 @Component
 @ConditionalOnProperty(
         prefix = "prizm.cleanup",

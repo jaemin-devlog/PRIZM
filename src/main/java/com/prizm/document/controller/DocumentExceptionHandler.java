@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
-/** 업로드·조회 실패를 API에서 일관된 오류 응답으로 변환한다. */
+/** 문서 업로드·조회·미리보기·관리 실패를 공개 API 오류 코드와 HTTP 상태로 변환한다. */
 @RestControllerAdvice
 public class DocumentExceptionHandler {
 

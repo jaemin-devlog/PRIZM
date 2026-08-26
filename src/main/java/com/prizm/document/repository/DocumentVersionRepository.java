@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+/** 문서 원본 버전을 소유자·문서 범위로 조회하고 상태 전이 시 사용할 행 잠금을 제공한다. */
 public interface DocumentVersionRepository extends JpaRepository<DocumentVersion, Long> {
 
     List<DocumentVersion> findByOwnerUserIdAndDocumentIdOrderByVersionNoDesc(Long ownerUserId, Long documentId);

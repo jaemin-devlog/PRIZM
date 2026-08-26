@@ -12,7 +12,12 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
 
-/** 한 문서 버전의 비동기 색인 상태와 재시도 정보를 저장한다. */
+/**
+ * 한 문서 버전의 비동기 색인 상태, 임대, 진행률과 재시도 이력을 보존한다.
+ *
+ * <p>{@code claimVersion}은 처리 시도마다 달라지는 fencing 값이다. 완료·실패 처리에서는 상태와 이 값을
+ * 함께 확인하고, 만료 작업을 복구할 때도 값을 올려 이전 Worker가 뒤늦게 현재 상태를 덮어쓰지 못하게 한다.</p>
+ */
 @Entity
 @Table(
         name = "processing_jobs",
@@ -94,6 +99,7 @@ public class ProcessingJob {
         return new ProcessingJob(ownerUserId, documentVersionId);
     }
 
+    /** 현재 처리 시도를 닫고 다음 실행 시각까지 작업을 대기시킨다. */
     public void scheduleRetry(
             Instant nextRetryAt,
             String errorMessage,
@@ -111,6 +117,7 @@ public class ProcessingJob {
         this.failureCode = failureCode;
     }
 
+    /** 현재 처리 시도의 임대와 오류를 지우고 색인 완료를 확정한다. */
     public void complete(Instant completedAt) {
         requireStatus(ProcessingJobStatus.PROCESSING);
         this.status = ProcessingJobStatus.COMPLETED;
@@ -125,6 +132,7 @@ public class ProcessingJob {
         this.failureCode = null;
     }
 
+    /** 재시도하지 않을 현재 처리 시도를 최종 실패로 닫는다. */
     public void fail(
             Instant completedAt,
             String errorMessage,

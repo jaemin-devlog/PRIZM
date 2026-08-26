@@ -30,10 +30,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * 질문을 임베딩하고 pgvector exact cosine 검색 결과를 API 응답으로 변환한다.
+ * Career Evidence 검색의 전체 흐름을 조율한다.
  *
- * <p>Repository가 ACTIVE이면서 documents.active_version_id에 연결된 청크만 조회하므로
- * 승인 전이거나 처리에 실패한 문서는 결과에 포함되지 않는다.</p>
+ * <p>질의를 검증하고 임베딩한 뒤 dense 후보를 조회하고, 선택한 검색 프로필에 따라 관련성을
+ * 평가한다. 기본 선택으로 근거를 찾지 못했을 때만 제한된 fallback과 rescue를 시도하며,
+ * 최종 후보는 원문 근거를 위치화한 응답으로 변환한다. fallback 질의는 후보를 넓히는 데만
+ * 사용하고, 최종 선택과 위치화는 항상 사용자가 입력한 질의를 기준으로 수행한다.</p>
+ *
+ * <p>검색 결과가 없는 것은 정상적인 제품 상태다. 이 서비스는 Career Evidence를 찾을 뿐
+ * 경력의 진위나 경험 유무, 요구사항 충족 여부를 판정하지 않는다. Repository는 문서의
+ * {@code active_version_id}가 가리키는 ACTIVE 버전만 검색하므로 QUARANTINED, PROCESSING,
+ * FAILED 버전은 후보가 되지 않는다.</p>
  */
 @Service
 public class SearchService {
@@ -69,7 +76,7 @@ public class SearchService {
     }
 
     /**
-     * 질문 길이를 검증한 뒤 동일 임베딩 모델로 가장 가까운 청크를 조회한다.
+     * 질문 길이를 검증한 뒤 동일 임베딩 모델로 가장 가까운 ACTIVE 청크 하나를 조회한다.
      *
      * @param query 사용자가 입력한 자연어 질문
      * @return 검색 내용과 cosine distance 기반 점수
@@ -96,15 +103,15 @@ public class SearchService {
     }
 
     /**
-     * Finds up to five active source chunks for the authenticated user's query.
-     * An empty result is a valid evidence-search response.
+     * 인증된 사용자의 질의와 관련된 ACTIVE 근거를 최대 다섯 개까지 찾는다.
+     * 근거가 없으면 예외 대신 빈 목록을 반환한다.
      */
     public List<CareerEvidenceSearchResponse> searchCareerEvidence(Long ownerUserId, String query) {
         return searchCareerEvidenceV2(ownerUserId, query).results();
     }
 
     /**
-     * Searches the authenticated user's active evidence and reports a normal product state.
+     * 인증된 사용자의 ACTIVE 근거를 검색하고, 빈 결과도 구분 가능한 제품 상태로 반환한다.
      */
     public CareerEvidenceSearchV2Response searchCareerEvidenceV2(Long ownerUserId, String query) {
         validateQuery(query);
@@ -144,6 +151,7 @@ public class SearchService {
             boolean fallbackAllowed = compositeSearchProfile.resolveIntent(query) == SearchIntent.GENERAL
                     || NaturalLanguageQueryFallback.isExperienceRequest(query);
             if (selected.isEmpty() && fallbackAllowed) {
+                // 변형 질의는 dense 후보만 넓힌다. 관련성 판단과 근거 위치화에는 원래 질의를 쓴다.
                 List<String> variants = NaturalLanguageQueryFallback.variants(query).stream()
                         .filter(variant -> NaturalLanguageQueryFallback.preservesRequiredAnchors(
                                 query, variant, guardedIdentifiers))
@@ -173,6 +181,7 @@ public class SearchService {
                 }
             }
             if (selected.isEmpty()) {
+                // 전체 유사도 기준을 낮추지 않고, 단위가 붙은 정확한 숫자를 포함한 후보만 다시 살핀다.
                 Set<String> normalizedNumbers = NumericQueryAnchors.extract(query).stream()
                         .filter(NumericQueryAnchors.NumericAnchor::hasUnit)
                         .map(NumericQueryAnchors.NumericAnchor::number)

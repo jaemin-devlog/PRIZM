@@ -5,7 +5,10 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
-/** Stops startup before either bootstrap runner can write when both account modes are enabled. */
+/**
+ * SYSTEM_ADMIN과 데모 USER 부트스트랩이 동시에 켜진 설정을 시작 단계에서 거부한다.
+ * 두 runner보다 먼저 실행해 부트스트랩 계정이 하나라도 생성되기 전에 실패시킨다.
+ */
 @Component
 public class BootstrapAccountConflictGuard implements ApplicationRunner, Ordered {
 

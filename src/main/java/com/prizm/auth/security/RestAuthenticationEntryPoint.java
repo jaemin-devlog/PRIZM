@@ -9,6 +9,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
+/** 인증 정보가 없거나 유효하지 않을 때 일관된 JSON 401 응답을 작성한다. */
 @Component
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 

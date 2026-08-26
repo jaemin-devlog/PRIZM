@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/** 소유자가 확인된 원본과 PDF 미리보기를 저장소 경로 없이 HTTP 응답으로 제공한다. */
 @RestController
 @RequestMapping("/api/documents")
 public class DocumentThumbnailController {
@@ -31,7 +32,7 @@ public class DocumentThumbnailController {
         this.currentUserProvider = currentUserProvider;
     }
 
-    /** Returns a bounded PNG preview without exposing the stored original PDF or its path. */
+    /** 저장된 PDF나 경로를 노출하지 않고 크기를 제한한 PNG 미리보기를 반환한다. */
     @GetMapping(value = "/{documentId}/versions/{versionId}/thumbnail", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> get(
             @PathVariable Long documentId,
@@ -46,7 +47,7 @@ public class DocumentThumbnailController {
                 .body(thumbnail.pngBytes());
     }
 
-    /** Streams an owner-scoped TXT/PDF original inline without exposing its storage key or local path. */
+    /** 저장소 키나 로컬 경로를 노출하지 않고 소유자의 TXT/PDF 원본을 inline으로 반환한다. */
     @GetMapping("/{documentId}/versions/{versionId}/original")
     public ResponseEntity<byte[]> getOriginal(
             @PathVariable Long documentId,

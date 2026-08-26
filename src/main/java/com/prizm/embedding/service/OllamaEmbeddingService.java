@@ -7,7 +7,10 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-/** Ollama의 현재 임베딩 모델을 호출하고 설정된 차원과 응답을 검증한다. */
+/**
+ * Spring AI의 Ollama 모델을 {@link EmbeddingService} 포트에 연결한다.
+ * 제공자·모델 오류를 도메인 오류 코드로 바꾸고, 성공 응답도 공통 벡터 계약을 통과시킨다.
+ */
 @Service
 public class OllamaEmbeddingService implements EmbeddingService {
 
@@ -24,10 +27,7 @@ public class OllamaEmbeddingService implements EmbeddingService {
         this.embeddingValidator = embeddingValidator;
     }
 
-    /**
-     * 현재 검증된 bge-m3 환경에서는 1024차원이어야 한다.
-     * 차원이 다르면 pgvector {@code vector(1024)}와 저장 계약이 깨지므로 즉시 실패시킨다.
-     */
+    /** 제공자 응답이 설정된 차원과 값 계약을 만족할 때만 저장·검색 계층으로 반환한다. */
     @Override
     public float[] embed(String text) {
         final float[] embedding;

@@ -8,7 +8,13 @@ import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-/** 여러 Worker가 같은 작업을 잡지 않도록 SKIP LOCKED로 한 건을 선점한다. */
+/**
+ * 여러 Worker가 같은 색인 작업을 처리하지 않도록 DB에서 한 건을 원자적으로 선점한다.
+ *
+ * <p>선점 쿼리는 처리 가능한 작업을 {@code FOR UPDATE SKIP LOCKED}로 고른 뒤 {@code PROCESSING} 전환,
+ * 임대 만료 시각 설정, {@code claim_version} 증가를 한 SQL 문으로 수행한다. 임대 갱신과 만료 작업 복구도
+ * DB 시간을 기준으로 삼아 애플리케이션 인스턴스 간 시계 차이에 의존하지 않는다.</p>
+ */
 @Repository
 public class ProcessingJobClaimRepository {
 
@@ -68,6 +74,7 @@ public class ProcessingJobClaimRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /** 처리 가능한 작업 한 건을 선점하고 새 fencing 값을 반환한다. */
     public Optional<ClaimedProcessingJob> claimNext(Duration leaseDuration) {
         List<ClaimedProcessingJob> claims = jdbcTemplate.query(
                 CLAIM_SQL,
@@ -81,6 +88,7 @@ public class ProcessingJobClaimRepository {
         return claims.stream().findFirst();
     }
 
+    /** 상태와 fencing 값이 모두 현재 처리 시도와 일치할 때만 임대를 연장한다. */
     public Optional<Instant> renewLease(Long processingJobId, long claimVersion, Duration leaseDuration) {
         List<Instant> renewedLeases = jdbcTemplate.query(
                 RENEW_LEASE_SQL,

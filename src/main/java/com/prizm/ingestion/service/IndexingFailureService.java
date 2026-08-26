@@ -17,7 +17,13 @@ import java.time.Instant;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** 실패한 작업의 부분 청크를 제거하고 재시도 또는 최종 실패 상태를 기록한다. */
+/**
+ * 실패한 처리 시도의 부분 청크를 제거하고 재시도 또는 최종 실패를 기록한다.
+ *
+ * <p>청크를 지우기 전에 claim과 작업·버전·문서의 소유자를 다시 확인해 임대를 잃은 Worker가 현재 작업을
+ * 훼손하지 못하게 한다. 재시도할 때는 버전을 {@code PROCESSING}으로 유지하고, 재시도할 수 없을 때만
+ * 버전을 실패 처리한다. 문서의 활성 버전 포인터는 바꾸지 않으므로 기존 ACTIVE 버전은 그대로 남는다.</p>
+ */
 @Service
 public class IndexingFailureService {
 
@@ -45,6 +51,7 @@ public class IndexingFailureService {
         this.retryPolicy = retryPolicy;
     }
 
+    /** 현재 claim의 실패를 재시도 정책에 따라 {@code RETRY_WAIT} 또는 {@code FAILED}로 전환한다. */
     @Transactional
     public ProcessingJobStatus handleFailure(
             ClaimedProcessingJob claimedJob,

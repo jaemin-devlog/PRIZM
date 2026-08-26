@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/** CORS에 허용할 명시적인 HTTP(S) origin만 보관하며 wildcard와 경로가 붙은 값을 거부한다. */
 @ConfigurationProperties("prizm.security")
 public record SecurityProperties(List<String> allowedOrigins) {
 

@@ -7,7 +7,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Builds one conservative retrieval fallback while preserving the original semantic query path. */
+/**
+ * 자연어 표현 차이로 dense 후보를 놓쳤을 때 사용할 보수적인 검색 변형을 만든다.
+ *
+ * <p>조사와 질문형 어미를 최소한으로 정리한 변형부터 적용하고, 필요한 경우에만 제한된
+ * 의미 별칭을 덧붙인다. 식별자와 숫자 anchor를 보존한 변형만 후보 조회에 사용하며, 최종
+ * 관련성 판단과 근거 위치화는 원래 질의를 기준으로 한다.</p>
+ */
 public final class NaturalLanguageQueryFallback {
 
     public static final int MAX_VARIANTS = 2;
@@ -40,7 +46,7 @@ public final class NaturalLanguageQueryFallback {
         return variants(query).stream().findFirst();
     }
 
-    /** Returns at most two conservative variants, ordered from the smallest rewrite to aliases. */
+    /** 변경 폭이 작은 순서로 보수적인 검색 변형을 최대 두 개 반환한다. */
     public static List<String> variants(String query) {
         LinkedHashSet<String> variants = new LinkedHashSet<>();
         String original = query.trim();
@@ -56,6 +62,7 @@ public final class NaturalLanguageQueryFallback {
         return variants.stream().limit(MAX_VARIANTS).toList();
     }
 
+    /** 변형 과정에서 원래 질의의 필수 식별자와 숫자 anchor가 모두 유지됐는지 확인한다. */
     public static boolean preservesRequiredAnchors(
             String originalQuery,
             String variant,

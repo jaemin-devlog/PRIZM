@@ -9,7 +9,12 @@ import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.stereotype.Component;
 
-/** Read-only MCP adapter for the existing owner-scoped Career Evidence V2 search. */
+/**
+ * 기존 Career Evidence V2 검색을 MCP의 읽기 전용 도구로 노출한다.
+ * 인증 컨텍스트의 사용자 ID를 그대로 {@link SearchService}에 넘기므로 REST와 같은 소유자 범위와 ACTIVE
+ * 버전 제한, 질의 검증, Evidence Retrieval과 Localization 결과를 재사용한다. 원문 전체와 내부 점수는
+ * 내보내지 않으며, 경력의 진위나 요구사항 충족 여부를 따로 판정하지 않는다.
+ */
 @Component
 public class CareerEvidenceMcpTool {
 
@@ -21,6 +26,7 @@ public class CareerEvidenceMcpTool {
         this.currentUserProvider = currentUserProvider;
     }
 
+    /** MCP 전용 검색 규칙을 더하지 않고 인증된 사용자의 V2 결과를 응답 스키마로만 옮긴다. */
     @McpTool(
             name = "search_career_evidence",
             description = "Search the authenticated user's active career documents for direct evidence.",

@@ -16,7 +16,13 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** 완성된 청크 저장과 문서 활성화·작업 완료를 한 DB 트랜잭션으로 확정한다. */
+/**
+ * 완성된 청크 저장, 문서 버전 활성화, 작업 완료를 한 DB 트랜잭션으로 확정한다.
+ *
+ * <p>현재 claim과 소유자 계층을 다시 검증한 뒤 청크를 전부 교체하고 저장 개수까지 확인한다. 이 검증이
+ * 끝나야 새 버전과 문서의 활성 버전 포인터를 함께 바꾸므로, 일부 청크만 저장된 버전은 검색 대상이 되지
+ * 않는다. 어느 단계든 실패하면 전체 트랜잭션이 롤백돼 이전 ACTIVE 버전이 유지된다.</p>
+ */
 @Service
 public class IndexingCompletionService {
 
@@ -42,6 +48,7 @@ public class IndexingCompletionService {
         this.embeddingValidator = embeddingValidator;
     }
 
+    /** 현재 처리 시도가 만든 청크를 저장하고 새 문서 버전을 원자적으로 활성화한다. */
     @Transactional
     public void complete(ClaimedProcessingJob claimedJob, List<IndexedChunk> chunks) {
         if (chunks.isEmpty()) {
@@ -66,7 +73,7 @@ public class IndexingCompletionService {
                 .orElseThrow(() -> new DocumentNotFoundException(version.getDocumentId()));
         requireSameOwner(claimedJob.ownerUserId(), document.getOwnerUserId());
 
-        // 재시도 전에 남은 미완성 청크가 있어도 같은 트랜잭션에서 전부 교체한다.
+        // 이전 처리 시도의 일부 청크가 남아 있어도 새 결과와 섞이지 않도록 같은 트랜잭션에서 전부 교체한다.
         documentChunkRepository.replaceAll(claimedJob.ownerUserId(), version.getId(), chunks);
         long storedCount = documentChunkRepository.countByOwnerUserIdAndDocumentVersionId(
                 claimedJob.ownerUserId(), version.getId());
@@ -74,6 +81,7 @@ public class IndexingCompletionService {
             throw new IllegalStateException("Stored chunk count does not match generated chunk count.");
         }
 
+        // 생성 개수와 저장 개수가 일치한 뒤에만 검색이 참조하는 ACTIVE 버전 포인터를 바꾼다.
         version.activate();
         document.activateVersion(version.getId());
         job.complete(claimRepository.currentDatabaseTime());

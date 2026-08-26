@@ -4,7 +4,12 @@ import com.prizm.ingestion.entity.ProcessingProgressStage;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-/** 현재 owner와 claim을 가진 Worker만 처리 진행 상태를 갱신하게 한다. */
+/**
+ * 현재 소유자와 claim을 가진 Worker만 색인 진행 상태를 갱신하게 한다.
+ *
+ * <p>모든 갱신 조건에 작업 상태와 {@code claim_version}을 넣어, 회수된 Worker가 뒤늦게 보낸 진행률이
+ * 새 처리 시도의 값을 덮어쓰지 못하게 한다. 청크 진행률은 이미 저장된 전체 개수 범위 안에서만 받는다.</p>
+ */
 @Repository
 public class ProcessingJobProgressRepository {
 

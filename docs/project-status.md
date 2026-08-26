@@ -1,6 +1,6 @@
 # PRIZM 현재 구현 현황
 
-> 현재 상태 기준일: 2026-08-24
+> 현재 상태 기준일: 2026-08-27
 >
 > PRZ-011 검증 source commit: `fbb3481626a3cba6f36f070845ffae502511569e`
 >
@@ -51,6 +51,7 @@
 | 현재 제품 | Spring Boot와 React Career Vault로 구현한 자동화된 AI 문서 관리 플랫폼 |
 | 구현됨 | 자체 호스팅 회원가입, 로그인, 사용자별 문서 격리, TXT/PDF 업로드, 변경 불가능한 버전 관리, ChangeLog 기반 비동기 색인·복구, Ollama 자동 임베딩, pgvector 근거 검색, Career Vault 문서 관리, 읽기 전용 MCP Career Evidence 검색 |
 | 현재 단계 | 소스 전용 공개 준비, clean-clone, 실제 OpenSQL direct 기준선과 PRZ-013 OpenProxy 단일 Primary SQL Gate 검증 완료. PRZ-010 변경 로그 동기화, PRZ-011 문서 처리 상태 UX와 PRZ-015 MCP 검색은 `VERIFIED`; PRZ-016은 PR #48로 `main`에 통합됐고 P10은 `VERIFIED`, P11은 `PARTIAL_PASS`, P11.1~P14는 `PASS`이나 P15의 인증된 PDF 페이지 이동이 `NOT_VERIFIED`여서 `IN_PROGRESS`; PRZ-008 검색 개선은 `IN_PROGRESS`; PRZ-009 사용자 관리형 Document Tag는 `VERIFIED` (`AUDIT Gate: PASS`, PR #51 merge 전); PRZ-012 검색 근거 표현 품질은 `IMPLEMENTED_UNVERIFIED` |
+| PRZ-017 | 채용공고 deterministic segmentation → modal 선택 → 기존 Search → 전용 requirement/document/Evidence workspace와 PDF/TXT 이동 V1을 구현. frontend 80/80과 backend 627 tests(실패·오류 0, skip 20), 최종 segmentation focused 50/50과 compile `PASS`; integration은 `ABORTED`. 인증 browser에서 mixed bullet 10→11, Evidence 2개 항목과 PDF 2페이지 이동을 확인해 `VERIFIED` |
 | 계획된 미구현 | CareerFact, 근거 기반 portfolio, `/api/v1`, 독립 Engine 패키지 |
 | 명시적 범위 제외 | 다중 OpenSQL DB node, DB 장애전환, OpenProxy 이중화·VIP와 서비스 연속성 보장 |
 
@@ -129,6 +130,24 @@ PRZ-005에서는 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 직�
 - 기존 Career Evidence Search를 재사용해 사용자별 데이터 격리(owner isolation)와
   현재 `ACTIVE` 버전만 검색하는 규칙(ACTIVE isolation) 유지
 
+### 검증된 채용공고 항목별 Evidence V1
+
+- LLM 없이 줄바꿈·list·문장 경계로 채용공고 항목을 결정적으로 분리
+- 사용자가 section별 modal에서 필요한 child 항목만 선택하고, 단순 항목은 원문 1회,
+  명확한 alternative 항목은 원문과 제한된 deterministic variant로 기존 Career Evidence
+  Search 호출
+- 결과 전용 route에서 검색 후보 있음·검색된 후보 없음 상태별 requirement rail → document/version → Evidence
+  row로 snippet·context를 확인하고 PDF page 또는 TXT 상세로 이동
+- 적합도·충족·합격 가능성 판정, persistence, Tag filter와 Search tuning은 비범위
+- 현재 상태는 `VERIFIED`이며 구현 기준은 source commit `94715cf`다. 2026-08-26
+  frontend focused 33/33·전체 80/80, typecheck·lint·build와 backend 전체 89 suites·627 tests가
+  실패·오류 0, 기존 조건부 test 20건 skip으로 통과했다. integration test는 실행 중 중단되어
+  `ABORTED`다. 2026-08-27 최종 mixed-bullet 수정 뒤 backend segmentation focused 50/50과
+  production/test compile이 통과했다. 최신 backend를 적용한 인증 desktop browser에서는 mixed
+  `•`/`-` 공고가 10개에서 기존 기준과 같은 selectable 11개로 복구됐고 첫 업무 문장, metadata 제외,
+  원래 순서, 2개 항목 Search, Evidence 결과와 PDF 2페이지 target이 정상 동작했다. TXT 이동,
+  PayPay India·Lean In 재평가와 mobile viewport는 최종 범위 밖이어서 `NOT_RUN`이다.
+
 ### 구현됐으나 최종 Gate가 남은 기능
 
 - SYSTEM 추천 tag와 owner-scoped USER tag 생성·검색
@@ -167,9 +186,9 @@ PRZ-011은 문서 처리의 파일 읽기·텍스트 추출·청크 생성·실�
 
 | 대상 | 상태 | 최근 기록 |
 |---|---|---|
-| Backend `test` task | `PASS` | 2026-08-05 source `2b8b600`: 전체 268개 중 253 pass, 15 skip, 실패·오류 0건 |
-| Frontend lint·typecheck·build | `PASS` | 2026-08-05 source `2b8b600`: lint·typecheck·production build 통과. 공식 unit test 명령은 없어 `NOT_RUN` |
-| 기본 integration 회귀 | `PASS` | 2026-08-05 source `2b8b600`: 전체 70개 중 67 pass, 3 skip, 실패·오류 0건. 기본 실행에서 OpenSQL opt-in test skip은 정상 |
+| Backend `test` task | `PASS` | 2026-08-26 source `84f9191` + working tree: 89 suites·627 tests, 실패·오류 0, 기존 조건부 test 20건 skip |
+| Frontend unit·lint·typecheck·build | `PASS` | 2026-08-26 source `84f9191` + working tree: unit 80/80, lint·typecheck·production build 통과 |
+| 기본 integration 회귀 | `ABORTED` | 2026-08-26 실행 중 사용자 요청으로 중단. 이전 checkpoint 결과를 현재 실행 결과로 대체하지 않음 |
 | PRZ-007 자체 호스팅 회원가입 | `VERIFIED` | PostgreSQL signup·BCrypt·활성 `USER`, 기존 login·JWT 보호 API, 두 사용자 격리, local-demo 제거, bootstrap 유지와 `http://localhost:5173` 브라우저 흐름 통과 |
 | Dense 검색 평가 | `HISTORICAL_PASS_NOT_RERUN` | 2026-07-14 합성 기준선 보존 |
 | Docker Compose | `PASS` — PRZ-004 | 2026-08-01 서로 다른 project·port·volume의 두 독립 clone에서 구성·빌드·기동과 demo `USER` 전체 흐름 확인 |
@@ -193,6 +212,7 @@ PRZ-011은 문서 처리의 파일 읽기·텍스트 추출·청크 생성·실�
 | PRZ-016 P13 Evidence Expansion Safety | `PASS` — 통합 Gate | selected chunk의 직접 ASCII query anchor를 local evidence 우선 조건으로 보존하고 cross-chunk expansion 후보도 이를 유지하도록 제한. FCM `108→106` anchor loss는 `108→108`으로 복구됐으며 P10 frozen metric·FPR·localization·owner/ACTIVE isolation은 유지 |
 | PRZ-016 P14 Claim-Complete Snippet | `PASS` — 통합 Gate | 해결 질문의 extractive scorer가 action/problem-result complete contiguous 1–3문장 window를 우선하도록 보완. Q9 result/evidence chunk 106과 P13 safety는 유지되고 frozen P10 metric·FPR·localization·owner/ACTIVE isolation은 유지 |
 | PRZ-016 P15 PDF Document Confirmation UX | `IMPLEMENTED_UNVERIFIED` | PR #48 merge `154b9c8`로 통합. frontend unit·lint·build·Docker와 비인증 렌더링은 통과했으나, 실제 로그인 세션과 PDF fixture가 없어 인증된 PDF 페이지 이동은 `NOT_VERIFIED` |
+| PRZ-017 채용공고 항목별 Career Evidence V1 | `VERIFIED` | baseline `d44f30e`, source `94715cf`, [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53). deterministic segmentation·modal 선택·bounded compound Search 소비·검색 후보 있음/없음 상태별 requirement/document/Evidence workspace·PDF/TXT 이동 구현 완료. 2026-08-26 frontend focused 33/33·전체 80/80·typecheck·lint·build와 backend 전체 89 suites·627 tests 통과(실패·오류 0, 기존 skip 20). integration은 ABORTED. 2026-08-27 최종 segmentation focused 50/50·compile과 인증 browser mixed bullet 10→11, Evidence 2개 항목, PDF 2페이지 target PASS. TXT 이동과 PayPay India·Lean In 재평가는 NOT_RUN. migration·LLM·판정·Tag filter·PRZ-016 Search Production 추가 diff 0 |
 
 세부 실행 환경과 명령은 [PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md),
 [PRZ-002 Evidence](../specs/PRZ-002-open-source-readiness/evidence.md),

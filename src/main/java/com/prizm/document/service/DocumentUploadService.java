@@ -39,7 +39,13 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
-/** TXT 원본을 검증·저장하고 문서와 첫 버전을 QUARANTINED로 등록한다. */
+/**
+ * TXT/PDF 원본을 검증해 QUARANTINED 버전과 PENDING ChangeLog를 등록한다.
+ *
+ * <p>파일시스템 쓰기는 DB 트랜잭션에 포함되지 않으므로, 커밋이 실패하면 저장한 원본을 지우고
+ * 직접 삭제에도 실패한 파일은 별도 cleanup 작업으로 남긴다. 새 버전 업로드는 ACTIVE 포인터를
+ * 건드리지 않으며, 색인 완료 흐름이 새 버전을 활성화할 때까지 기존 근거를 보존한다.</p>
+ */
 @Service
 public class DocumentUploadService {
 
@@ -114,8 +120,8 @@ public class DocumentUploadService {
     }
 
     /**
-     * Adds an immutable TXT/PDF source as the next version of an owner-scoped document.
-     * The current active version remains searchable until the new indexing job activates atomically.
+     * 소유자의 문서에 TXT/PDF 원본을 다음 불변 버전으로 추가한다.
+     * 새 색인이 완료될 때까지 현재 ACTIVE 버전은 그대로 검색된다.
      */
     @Transactional
     public DocumentUploadResponse uploadVersion(Long ownerUserId, Long documentId, MultipartFile file) {
@@ -157,7 +163,7 @@ public class DocumentUploadService {
         }
 
         version.updateStoredFilePath(storedFilePath);
-        // 파일 저장 후 DB 커밋이 실패할 수 있으므로 트랜잭션 종료 시 보상 삭제한다.
+        // 파일 저장과 DB 커밋은 원자적이지 않으므로, 롤백이 확정된 뒤 저장한 원본을 보상 삭제한다.
         registerRollbackCompensation(storedFilePath);
         documentChangeLogRepository.save(
                 DocumentChangeLog.pendingDocumentVersionCreated(ownerUserId, version.getId()));
@@ -182,6 +188,7 @@ public class DocumentUploadService {
         if (versionIds.isEmpty()) {
             return;
         }
+        // 버전 상태와 작업 상태가 어긋난 경우에도 진행 중 작업과 새 업로드가 겹치지 않게 막는다.
         boolean hasInFlightVersion = processingJobRepository
                 .findByOwnerUserIdAndDocumentVersionIdIn(ownerUserId, versionIds)
                 .stream()
@@ -293,7 +300,7 @@ public class DocumentUploadService {
         }
     }
 
-    /** DB와 파일 시스템 사이의 원자성 한계를 보완하기 위한 트랜잭션 종료 콜백이다. */
+    /** DB 롤백 뒤에만 원본을 지워 파일시스템과 메타데이터 사이의 고아 파일을 줄인다. */
     private void registerRollbackCompensation(String storedFilePath) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
             throw new IllegalStateException("File compensation requires an active transaction.");
@@ -316,6 +323,7 @@ public class DocumentUploadService {
                     }
                 }
                 else if (status == STATUS_UNKNOWN) {
+                    // 커밋 여부를 모르는 상태에서 지우면 정상 메타데이터가 가리키는 원본을 잃을 수 있다.
                     log.warn("Transaction outcome is unknown; stored document was preserved for reconciliation.");
                 }
             }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/** 로그인과 USER 회원가입을 받는 공개 HTTP 경계다. 계정 생성 역할은 서비스에서 USER로 고정한다. */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {

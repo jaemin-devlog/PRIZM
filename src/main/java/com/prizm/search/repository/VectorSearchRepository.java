@@ -9,9 +9,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 /**
- * JdbcTemplate으로 pgvector의 exact cosine distance 검색을 수행한다.
+ * pgvector의 exact cosine distance로 dense 후보를 조회하고, 식별자와 숫자 anchor를 확인한다.
  *
- * <p>인덱스 근사 검색이 아닌 전체 행 정렬을 사용해 최소 세로 흐름의 결과를 명확하게 검증한다.</p>
+ * <p>공통 검색 SQL은 문서, 버전, 청크마다 소유자 조건을 적용하고 문서의
+ * {@code active_version_id}와 버전의 ACTIVE 상태를 함께 확인한다. 호출자가 넘긴 사용자 ID나
+ * 상위 계층의 조인 조건 하나에만 의존하지 않는 이유는, 이후 쿼리가 바뀌더라도 개인 문서의
+ * 경계가 느슨해지지 않게 하기 위해서다.</p>
+ *
+ * <p>후보 순서는 근사 인덱스가 아니라 exact cosine distance와 청크 ID로 결정한다. 검색
+ * 프로필은 이 재현 가능한 후보 집합 안에서만 관련성 정책을 적용한다.</p>
  */
 @Repository
 public class VectorSearchRepository {
@@ -116,21 +122,17 @@ public class VectorSearchRepository {
         return find(ownerUserId, embedding, NEAREST_CHUNK_SQL).stream().findFirst();
     }
 
-    /**
-     * Returns up to five active chunks owned by the authenticated user, ordered by cosine distance.
-     */
+    /** 인증된 사용자가 소유한 ACTIVE 청크를 cosine distance 순으로 최대 다섯 개 조회한다. */
     public List<VectorSearchResult> findCareerEvidence(Long ownerUserId, float[] embedding) {
         return find(ownerUserId, embedding, CAREER_EVIDENCE_SQL);
     }
 
-    /**
-     * Returns the fixed top-20 dense candidate set used only by the opt-in composite profile.
-     */
+    /** 복합 검색 정책이 관련성을 평가할 고정 크기 dense 후보를 최대 스무 개 조회한다. */
     public List<VectorSearchResult> findCareerEvidenceCandidates(Long ownerUserId, float[] embedding) {
         return find(ownerUserId, embedding, CAREER_EVIDENCE_CANDIDATES_SQL);
     }
 
-    /** Returns owner-scoped ACTIVE candidates containing an exact normalized numeric anchor. */
+    /** 정확히 일치하는 정규화 숫자를 포함한 소유자 범위의 ACTIVE 후보를 조회한다. */
     public List<VectorSearchResult> findNumericAnchorCandidates(
             Long ownerUserId,
             float[] embedding,
@@ -157,7 +159,7 @@ public class VectorSearchRepository {
         return jdbcTemplate.query(sql, VectorSearchRepository::mapResult, arguments.toArray());
     }
 
-    /** Checks explicit P4 identifiers only inside the authenticated owner's ACTIVE versions. */
+    /** 질의의 명시적 식별자가 인증된 사용자의 ACTIVE 버전에 모두 존재하는지 확인한다. */
     public boolean hasAllActiveIdentifiers(Long ownerUserId, Set<String> identifiers) {
         return identifiers.stream().allMatch(identifier -> Boolean.TRUE.equals(jdbcTemplate.queryForObject(
                 ACTIVE_IDENTIFIER_EXISTS_SQL,

@@ -8,7 +8,11 @@ import com.prizm.ingestion.entity.ProcessingFailureCode;
 import org.springframework.stereotype.Component;
 import java.util.Locale;
 
-/** 일시적인 Ollama 문제와 파일·차원처럼 반복해도 해결되지 않는 실패를 구분한다. */
+/**
+ * 색인 예외를 재시도 가능 여부와 API용 실패 코드로 나눈다.
+ * 저장소의 일시 오류와 차원 불일치를 제외한 임베딩 오류는 재시도한다. 잘못된 문서·추출 실패·임베딩 차원
+ * 불일치처럼 같은 입력으로 해결되지 않을 오류는 즉시 실패 처리한다.
+ */
 @Component
 public class IndexingFailureClassifier {
 

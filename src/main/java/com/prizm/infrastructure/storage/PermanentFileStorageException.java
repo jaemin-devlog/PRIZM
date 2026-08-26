@@ -1,6 +1,6 @@
 package com.prizm.infrastructure.storage;
 
-/** Indicates a stored-file read failure that cannot succeed on retry without changing the source. */
+/** 같은 입력으로 다시 시도해도 해결되지 않는 저장소 읽기·삭제 실패다. */
 public class PermanentFileStorageException extends FileStorageException {
 
     public PermanentFileStorageException(String message) {

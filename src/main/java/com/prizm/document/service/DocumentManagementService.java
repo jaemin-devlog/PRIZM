@@ -19,7 +19,13 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Owns metadata changes and safe, asynchronous-file-backed document deletion. */
+/**
+ * 문서 메타데이터를 수정하고 종료된 문서 또는 과거 버전을 소유자 범위에서 삭제한다.
+ *
+ * <p>DB 메타데이터 삭제와 cleanup 작업 등록은 같은 트랜잭션으로 묶지만 실제 파일 삭제는
+ * 커밋 뒤 Worker에 맡긴다. 처리 중인 문서는 삭제하지 않으며, 개별 버전을 지울 때는 현재
+ * ACTIVE 버전도 보호해 검색 가능한 원본을 실수로 잃지 않는다.</p>
+ */
 @Service
 public class DocumentManagementService {
 
@@ -55,10 +61,10 @@ public class DocumentManagementService {
     }
 
     /**
-     * Deletes only terminal document metadata. File removal is queued in the same transaction and is
-     * completed later by the Cleanup Worker outside this transaction.
+     * 종료된 문서의 메타데이터와 모든 버전을 지우고 원본별 cleanup 작업을 함께 등록한다.
+     * 실제 파일은 트랜잭션 밖에서 삭제해 DB 롤백과 파일 유실이 엇갈리지 않게 한다.
      *
-     * @return {@code true} when a document was removed; {@code false} for an already absent owner-scoped document
+     * @return 문서를 삭제했으면 {@code true}, 소유자 범위에서 이미 없으면 {@code false}
      */
     @Transactional
     public boolean delete(Long ownerUserId, Long documentId) {
@@ -108,8 +114,8 @@ public class DocumentManagementService {
     }
 
     /**
-     * Removes one historical terminal version without changing the document's active search pointer.
-     * Original-file removal is delegated to the existing cleanup worker after the transaction commits.
+     * 현재 검색 포인터를 건드리지 않고 종료된 과거 버전 하나를 삭제한다.
+     * ACTIVE 버전과 처리 중 버전은 거부하고, 원본 삭제는 커밋 뒤 cleanup Worker에 맡긴다.
      */
     @Transactional
     public boolean deleteVersion(Long ownerUserId, Long documentId, Long versionId) {

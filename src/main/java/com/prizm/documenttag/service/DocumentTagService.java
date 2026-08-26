@@ -12,6 +12,11 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 문서 메타데이터인 태그의 접근 범위와 문서 연결을 관리한다.
+ * SYSTEM 태그는 모든 USER가 재사용하고 USER 태그는 소유자에게만 공개한다. 문서 소유권과 태그 접근성을
+ * 관계 변경 전에 함께 확인하며, 이 분류는 문서 본문의 검색 관련도를 뜻하지 않는다.
+ */
 @Service
 public class DocumentTagService {
 
@@ -42,6 +47,7 @@ public class DocumentTagService {
     public CreateResult createUserTag(Long ownerUserId, String requestedName) {
         String name = TagNameNormalizer.displayName(requestedName);
         String normalizedName = TagNameNormalizer.normalizedName(name);
+        // 같은 이름의 공용 태그를 먼저 재사용해 SYSTEM 태그의 개인 복제본이 생기지 않게 한다.
         var systemTag = tagRepository.findSystemByNormalizedName(normalizedName);
         if (systemTag.isPresent()) {
             return new CreateResult(TagResponse.from(systemTag.orElseThrow()), false);
@@ -63,6 +69,7 @@ public class DocumentTagService {
                 .toList();
     }
 
+    /** 문서를 소유자 범위에서 잠근 뒤 전체 태그 집합을 바꿔 동시 교체가 서로 끼어들지 않게 한다. */
     @Transactional
     public List<TagResponse> replaceDocumentTags(
             Long ownerUserId,
@@ -98,6 +105,7 @@ public class DocumentTagService {
                 tagRepository.findTaggedDocuments(ownerUserId, tagId));
     }
 
+    /** 중복을 제거한 모든 ID가 공용 또는 해당 소유자의 태그인지 한 번에 확인한다. */
     @Transactional(readOnly = true)
     public List<Long> requireAccessibleTagIds(Long ownerUserId, List<Long> requestedTagIds) {
         List<Long> tagIds = distinctTagIds(requestedTagIds);

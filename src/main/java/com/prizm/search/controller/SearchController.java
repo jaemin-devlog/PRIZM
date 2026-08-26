@@ -22,9 +22,6 @@ public class SearchController {
         this.currentUserProvider = currentUserProvider;
     }
 
-    /**
-     * 질문을 받아 임베딩 기반 검색 결과를 반환한다.
-     */
     @PostMapping
     public SearchResponse search(@Valid @RequestBody SearchRequest request) {
         return searchService.search(currentUserProvider.userId(), request.query());

@@ -17,7 +17,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-/** Expands presentation evidence without changing the already selected search result. */
+/**
+ * 이미 선택된 검색 결과에서 질의에 더 직접적인 원문 구간을 찾아 표시한다.
+ *
+ * <p>먼저 선택된 청크 안에서 근거를 위치화한다. 그 구간이 충분히 직접적이지 않을 때만 같은
+ * ACTIVE 문서 버전의 주변 청크를 살피며, 질의의 직접 식별자를 보존하고 더 나은 근거라는
+ * 조건을 충족해야 교체한다. 이 과정은 표시할 근거를 고르는 단계일 뿐 검색 결과 자체의
+ * 선택이나 순위를 바꾸지 않는다.</p>
+ *
+ * <p>확장 조회나 위치화에 실패하면 선택된 청크의 원문으로 돌아간다. 응답 생성을 위한 보조
+ * 단계의 실패가 유효한 검색 결과까지 없애지 않게 하려는 경계다.</p>
+ */
 @Service
 public class EvidenceExpansionService {
 
@@ -55,6 +65,7 @@ public class EvidenceExpansionService {
         this.searchSnippetGenerator = searchSnippetGenerator;
     }
 
+    /** 선택된 결과를 유지하면서 응답에 제시할 가장 직접적인 원문 구간과 출처를 고른다. */
     public EvidencePresentation select(Long ownerUserId, String query, VectorSearchResult result) {
         String fallbackContent = Objects.requireNonNullElse(result.content(), "");
         try {
@@ -79,6 +90,7 @@ public class EvidenceExpansionService {
                     || isSufficientLocalEvidence(query, localCandidate)) {
                 return localPresentation;
             }
+            // 검색 범위를 넓히지 않고, 이미 선택된 문서의 같은 ACTIVE 버전 안에서만 보완한다.
             return evidenceExpansionRepository.findActiveVersionChunks(
                             ownerUserId,
                             result.documentId(),
@@ -100,6 +112,7 @@ public class EvidenceExpansionService {
                             candidate.chunk().sourceLabel()))
                     .orElse(localPresentation);
         } catch (RuntimeException exception) {
+            // 표시 단계의 장애 때문에 선택이 끝난 검색 결과까지 버리지 않는다.
             LOGGER.warn(
                     "Evidence presentation failed for selected chunk {}; using selected chunk content.",
                     result.chunkId(),

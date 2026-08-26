@@ -4,7 +4,10 @@ import java.nio.charset.StandardCharsets;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-/** Enforces BCrypt's raw-password limit before encoding or matching. */
+/**
+ * BCrypt가 처리하는 72 UTF-8 바이트 경계를 인코딩과 비교에 똑같이 적용한다.
+ * 한도를 넘긴 비밀번호를 암묵적으로 잘라 서로 다른 입력이 같은 값으로 취급되는 일을 막는다.
+ */
 @Component
 public class BcryptPasswordPolicy {
 

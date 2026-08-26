@@ -11,7 +11,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 
-/** 문서 원본 한 개의 버전과 현재 처리 상태를 표현하는 JPA 엔티티다. */
+/**
+ * 한 번 업로드한 TXT/PDF 원본을 독립된 버전으로 보관한다.
+ *
+ * <p>원본의 파일명·형식·해시와 저장소 키는 버전마다 분리된다. 상태는
+ * {@code QUARANTINED -> PROCESSING -> ACTIVE|FAILED}로 바뀌며, dispatch가 최종 실패하면
+ * QUARANTINED에서 바로 FAILED가 된다. 검색 가능 여부는 {@link Document}의 ACTIVE 버전
+ * 포인터도 함께 확인한다.</p>
+ */
 @Entity
 @Table(name = "document_versions")
 public class DocumentVersion {
@@ -73,7 +80,7 @@ public class DocumentVersion {
         this.createdAt = Instant.now();
     }
 
-    /** 업로드 직후 검색에 사용하지 않는 QUARANTINED 버전을 만든다. */
+    /** 업로드 직후 검색 후보에서 제외되는 QUARANTINED 버전을 만든다. */
     public static DocumentVersion quarantined(
             Long ownerUserId,
             Long documentId,
@@ -101,17 +108,17 @@ public class DocumentVersion {
         return new DocumentVersion(ownerUserId, documentId, versionNo, originalFileName, fileType, contentHash);
     }
 
-    /** 파일 저장이 성공한 뒤 임시 경로를 실제 서버 저장 경로로 교체한다. */
+    /** 파일 저장이 끝난 뒤 생성 시 사용한 임시 값을 실제 저장소 키로 바꾼다. */
     public void updateStoredFilePath(String storedFilePath) {
         this.storedFilePath = storedFilePath;
     }
 
-    /** 검증과 원본 저장이 끝난 격리 버전을 Worker 처리 상태로 전환한다. */
+    /** 검증과 원본 저장이 끝난 격리 버전을 색인 처리 상태로 전환한다. */
     public void startProcessing() {
         transition(DocumentVersionStatus.QUARANTINED, DocumentVersionStatus.PROCESSING);
     }
 
-    /** 모든 청크 저장이 검증된 색인 작업만 활성화한다. */
+    /** 모든 청크를 검증해 저장한 색인 완료 트랜잭션에서만 ACTIVE로 전환한다. */
     public void activate() {
         transition(DocumentVersionStatus.PROCESSING, DocumentVersionStatus.ACTIVE);
     }
@@ -121,7 +128,7 @@ public class DocumentVersion {
         transition(DocumentVersionStatus.PROCESSING, DocumentVersionStatus.FAILED);
     }
 
-    /** ChangeLog dispatch가 최종 실패한 격리 버전은 색인 전에 종료한다. */
+    /** ChangeLog 전달이 영구 실패로 분류되거나 재시도 한도를 넘긴 격리 버전은 색인 전에 종료한다. */
     public void failDispatch() {
         transition(DocumentVersionStatus.QUARANTINED, DocumentVersionStatus.FAILED);
     }

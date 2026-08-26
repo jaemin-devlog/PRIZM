@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/** 인증된 사용자의 문서와 접근 가능한 태그 사이의 관계를 조회·교체·해제하는 HTTP 경계다. */
 @RestController
 @RequestMapping("/api/documents/{documentId}/tags")
 public class DocumentTagController {

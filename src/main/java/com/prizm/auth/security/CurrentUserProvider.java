@@ -6,7 +6,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
-/** 검증된 JWT의 subject에서 현재 사용자 ID를 제공한다. */
+/**
+ * 인증 변환기가 DB 상태까지 확인한 JWT의 subject를 양의 사용자 ID로 해석한다.
+ * 인증을 새로 수행하지 않고, 이미 구성된 요청 보안 컨텍스트만 읽는다.
+ */
 @Component
 public class CurrentUserProvider {
 

@@ -9,7 +9,13 @@ import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-/** Persists one pending cleanup record per storage-relative file key. */
+/**
+ * 저장소 키마다 하나의 영속적인 파일 삭제 작업을 관리한다.
+ *
+ * <p>claim 쿼리는 {@code SKIP LOCKED}로 다른 poller가 잡은 행을 기다리지 않고 다음 작업을
+ * 가져온다. 이때 lease를 설정하고 {@code claim_version}을 올리며, 완료·실패 갱신은 같은
+ * claim version일 때만 허용해, 회수된 작업을 이전 Worker가 뒤늦게 덮어쓰는 일을 막는다.</p>
+ */
 @Repository
 public class FileCleanupJobRepository {
 
@@ -123,6 +129,7 @@ public class FileCleanupJobRepository {
         jdbcTemplate.update(REGISTER_PENDING_SQL, storageKey);
     }
 
+    /** 실행 가능한 작업 하나를 PROCESSING으로 바꾸고 새 claim version과 lease를 반환한다. */
     public Optional<ClaimedFileCleanupJob> claimNext(Duration leaseDuration) {
         List<ClaimedFileCleanupJob> jobs = jdbcTemplate.query(
                 CLAIM_NEXT_SQL,
@@ -133,6 +140,7 @@ public class FileCleanupJobRepository {
         return jobs.stream().findFirst();
     }
 
+    /** lease가 만료된 PROCESSING 작업 하나를 recovery 트랜잭션에서 잠근다. */
     public Optional<ClaimedFileCleanupJob> lockNextExpired() {
         List<ClaimedFileCleanupJob> jobs = jdbcTemplate.query(
                 LOCK_NEXT_EXPIRED_SQL,

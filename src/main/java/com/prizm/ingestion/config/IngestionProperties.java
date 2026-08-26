@@ -4,7 +4,7 @@ import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/** TXT 청크 분할과 Worker 실행 주기를 관리하는 설정이다. */
+/** 텍스트 청크 분할, Worker 실행 주기, 작업 임대와 복구 주기를 관리하는 설정이다. */
 @ConfigurationProperties(prefix = "prizm.ingestion")
 public class IngestionProperties {
 

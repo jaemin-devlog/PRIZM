@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
-/** TXT 문자열을 최대 길이와 overlap 기준의 고정 길이 청크로 나눈다. */
+/** TXT 본문이나 PDF 페이지 텍스트를 최대 길이와 overlap 기준의 고정 길이 청크로 나눈다. */
 @Component
 public class TextChunker {
 

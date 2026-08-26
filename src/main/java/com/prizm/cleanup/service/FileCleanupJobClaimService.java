@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Claims one cleanup record in a short transaction before filesystem access. */
+/** 파일시스템 접근 전에 cleanup 작업 하나만 짧은 트랜잭션으로 claim한다. */
 @Service
 public class FileCleanupJobClaimService {
 

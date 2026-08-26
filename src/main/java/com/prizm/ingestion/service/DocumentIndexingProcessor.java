@@ -17,7 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-/** 락 없는 구간에서 TXT를 읽고 청크별 임베딩을 만든 뒤 완료 트랜잭션에 전달한다. */
+/**
+ * DB 락을 잡지 않은 채 TXT 또는 PDF 원문을 읽고 청크별 임베딩을 만든다.
+ *
+ * <p>파일 읽기·텍스트 추출·임베딩은 오래 걸리거나 외부 시스템에서 지연될 수 있어 선점 트랜잭션과
+ * 분리한다. 처리 중에는 heartbeat와 명시적인 임대 갱신으로 소유권을 유지하고, 외부 호출 사이에서 fencing
+ * 상태를 확인한다. 모든 청크가 준비된 뒤에만 완료 서비스로 넘겨 활성 버전 전환을 요청한다.</p>
+ */
 @Service
 public class DocumentIndexingProcessor {
 
@@ -58,8 +64,10 @@ public class DocumentIndexingProcessor {
         this.leaseRefreshChunkInterval = ingestionProperties.getLeaseRefreshChunkInterval();
     }
 
+    /** 선점된 문서 버전의 원문을 청크와 임베딩으로 준비해 완료 경계에 전달한다. */
     public void process(ClaimedProcessingJob claimedJob) {
         try (WorkerLeaseHeartbeat.LeaseHeartbeat heartbeat = workerLeaseHeartbeat.start(claimedJob)) {
+            // 외부 호출 사이마다 확인해 임대를 잃은 Worker가 청크 저장과 버전 활성화까지 진행하지 못하게 한다.
             heartbeat.assertOwnership();
             DocumentVersion version = documentVersionRepository.findById(claimedJob.documentVersionId())
                     .orElseThrow(() -> new DocumentVersionNotFoundException(claimedJob.documentVersionId()));
@@ -96,6 +104,7 @@ public class DocumentIndexingProcessor {
                         version.getFileType(), chunk.chunkNo(), chunk.pageNumber(), chunk.content(), embedding));
                 processedChunkCount++;
                 int currentPercent = progressPercent(processedChunkCount, preparedChunks.size());
+                // 청크마다 쓰지 않고 정수 퍼센트가 바뀔 때만 저장해 대량 문서의 진행률 DB 쓰기를 제한한다.
                 if (shouldPersistProgress(
                         processedChunkCount, preparedChunks.size(), lastPersistedPercent)) {
                     progressService.updateCompletedChunks(claimedJob, processedChunkCount);

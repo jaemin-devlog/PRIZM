@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/** 주기마다 lease가 만료된 cleanup 작업을 설정된 batch 크기까지 회수한다. */
 @Component
 @ConditionalOnProperty(
         prefix = "prizm.cleanup",

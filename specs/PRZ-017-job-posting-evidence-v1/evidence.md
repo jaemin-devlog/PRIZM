@@ -4,7 +4,7 @@
 
 - 상태: `VERIFIED`
 - 기준선: `d44f30eb4346353c4363d559be478024f191a878`
-- 현재 source: `84f9191` 이후 최종 통합 candidate
+- 현재 source: `94715cf`, [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53)
 - VERIFY: 2026-08-26 frontend focused 33/33·전체 80/80, typecheck·lint·build와 backend 전체
   89 suites·627 tests가 실패·오류 0, 기존 조건부 test 20건 skip으로 통과. integration
   `ABORTED`. 2026-08-27 최종 segmentation focused 50/50·compile과 인증 browser mixed bullet
@@ -12,8 +12,8 @@
 - AUDIT: PRZ-016 Search Production·PRZ-009 보호 소스 추가 diff 0, 보호 파일 hash 변화 0,
   staged 0, stash 2개와 기존 untracked 보존, `git diff --check` 및 Markdown 135개·local link
   584개 검사 `PASS`
-- commit/push: `84f9191`까지 원격 branch에 반영됨. 최종 통합 candidate는 현재 미커밋 상태
-- PR/merge: 최종 통합 절차 진행 전
+- commit/push: 최종 검증 source `94715cf`까지 원격 branch에 반영됨
+- PR/merge: [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53)의 실제 GitHub 이력을 따른다
 
 `84f9191` 당시에는 실제 ATAD 공고의 noise 제거, 복합 질의의 직접 identifier Evidence,
 긴 원문 후보, focus, 같은 제목 문서 식별과 PDF page 이동을 인증 browser에서 확인했다.

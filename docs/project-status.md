@@ -139,7 +139,7 @@ PRZ-005에서는 Spring Boot와 Ollama `bge-m3`를 실제 OpenSQL `5432`에 직�
 - 결과 전용 route에서 검색 후보 있음·검색된 후보 없음 상태별 requirement rail → document/version → Evidence
   row로 snippet·context를 확인하고 PDF page 또는 TXT 상세로 이동
 - 적합도·충족·합격 가능성 판정, persistence, Tag filter와 Search tuning은 비범위
-- 현재 상태는 `VERIFIED`이며 구현 기준은 `84f9191` 이후 최종 통합 candidate다. 2026-08-26
+- 현재 상태는 `VERIFIED`이며 구현 기준은 source commit `94715cf`다. 2026-08-26
   frontend focused 33/33·전체 80/80, typecheck·lint·build와 backend 전체 89 suites·627 tests가
   실패·오류 0, 기존 조건부 test 20건 skip으로 통과했다. integration test는 실행 중 중단되어
   `ABORTED`다. 2026-08-27 최종 mixed-bullet 수정 뒤 backend segmentation focused 50/50과
@@ -212,7 +212,7 @@ PRZ-011은 문서 처리의 파일 읽기·텍스트 추출·청크 생성·실�
 | PRZ-016 P13 Evidence Expansion Safety | `PASS` — 통합 Gate | selected chunk의 직접 ASCII query anchor를 local evidence 우선 조건으로 보존하고 cross-chunk expansion 후보도 이를 유지하도록 제한. FCM `108→106` anchor loss는 `108→108`으로 복구됐으며 P10 frozen metric·FPR·localization·owner/ACTIVE isolation은 유지 |
 | PRZ-016 P14 Claim-Complete Snippet | `PASS` — 통합 Gate | 해결 질문의 extractive scorer가 action/problem-result complete contiguous 1–3문장 window를 우선하도록 보완. Q9 result/evidence chunk 106과 P13 safety는 유지되고 frozen P10 metric·FPR·localization·owner/ACTIVE isolation은 유지 |
 | PRZ-016 P15 PDF Document Confirmation UX | `IMPLEMENTED_UNVERIFIED` | PR #48 merge `154b9c8`로 통합. frontend unit·lint·build·Docker와 비인증 렌더링은 통과했으나, 실제 로그인 세션과 PDF fixture가 없어 인증된 PDF 페이지 이동은 `NOT_VERIFIED` |
-| PRZ-017 채용공고 항목별 Career Evidence V1 | `VERIFIED` | baseline `d44f30e`, source `84f9191` 이후 최종 통합 candidate. deterministic segmentation·modal 선택·bounded compound Search 소비·검색 후보 있음/없음 상태별 requirement/document/Evidence workspace·PDF/TXT 이동 구현 완료. 2026-08-26 frontend focused 33/33·전체 80/80·typecheck·lint·build와 backend 전체 89 suites·627 tests 통과(실패·오류 0, 기존 skip 20). integration은 ABORTED. 2026-08-27 최종 segmentation focused 50/50·compile과 인증 browser mixed bullet 10→11, Evidence 2개 항목, PDF 2페이지 target PASS. TXT 이동과 PayPay India·Lean In 재평가는 NOT_RUN. migration·LLM·판정·Tag filter·PRZ-016 Search Production 추가 diff 0 |
+| PRZ-017 채용공고 항목별 Career Evidence V1 | `VERIFIED` | baseline `d44f30e`, source `94715cf`, [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53). deterministic segmentation·modal 선택·bounded compound Search 소비·검색 후보 있음/없음 상태별 requirement/document/Evidence workspace·PDF/TXT 이동 구현 완료. 2026-08-26 frontend focused 33/33·전체 80/80·typecheck·lint·build와 backend 전체 89 suites·627 tests 통과(실패·오류 0, 기존 skip 20). integration은 ABORTED. 2026-08-27 최종 segmentation focused 50/50·compile과 인증 browser mixed bullet 10→11, Evidence 2개 항목, PDF 2페이지 target PASS. TXT 이동과 PayPay India·Lean In 재평가는 NOT_RUN. migration·LLM·판정·Tag filter·PRZ-016 Search Production 추가 diff 0 |
 
 세부 실행 환경과 명령은 [PRZ-000 Evidence](../specs/PRZ-000-platform-baseline/evidence.md),
 [PRZ-002 Evidence](../specs/PRZ-002-open-source-readiness/evidence.md),

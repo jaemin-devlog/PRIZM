@@ -70,8 +70,8 @@ OpenSQL/OpenProxy와 Ollama `bge-m3`에서 전체 흐름을 검증했습니다. 
      상세로 이동합니다.
    - 적합도·충족 여부·합격 가능성을 판정하지 않으며 채용공고 persistence, Tag filter,
      migration과 Search algorithm 변경은 V1 범위가 아닙니다.
-   - [PRZ-017](../specs/PRZ-017-job-posting-evidence-v1/spec.md)의 구현 기준은 `84f9191` 이후
-     최종 통합 candidate입니다. 2026-08-26 frontend focused 33/33·전체 80/80,
+   - [PRZ-017](../specs/PRZ-017-job-posting-evidence-v1/spec.md)의 구현 기준은 source commit
+     `94715cf`와 [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53)입니다. 2026-08-26 frontend focused 33/33·전체 80/80,
      typecheck·lint·build와 backend 전체 89 suites·627 tests가 실패·오류 0, 기존 조건부 test
      20건 skip으로 통과했습니다. integration은 실행 중 중단되어 `ABORTED`입니다. 2026-08-27
      최종 segmentation focused 50/50·compile과 인증 desktop browser의 mixed bullet 10→11,

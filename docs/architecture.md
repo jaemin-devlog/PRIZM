@@ -341,7 +341,7 @@ PDF `PAGE`는 기존 인증된 original Blob viewer에서 표시 Evidence의 1-b
 영구 저장하지 않으며 새 table, migration과 PDF viewer가 없다. PRZ-009 Tag는 별도 사용자
 metadata로 남고 PRZ-017 검색 filter나 ranking 신호가 아니다.
 
-현재 구현 기준은 source commit `84f9191` 이후 최종 통합 candidate다. 2026-08-26에 frontend
+현재 구현 기준은 source commit `94715cf`다. 2026-08-26에 frontend
 focused 33/33·전체 80/80, typecheck·lint·build와 backend 전체 89 suites·627 tests가
 실패·오류 0, 기존 조건부 test 20건 skip으로 통과했다. integration test는 실행 중 중단되어
 `ABORTED`다. 2026-08-27 마지막 mixed-bullet 수정 뒤 segmentation service/controller focused

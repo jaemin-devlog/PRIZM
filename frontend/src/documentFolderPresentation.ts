@@ -22,8 +22,10 @@ export function documentFolderPath(documentType: DocumentType | undefined): stri
     : `/career-vault/documents?type=${encodeURIComponent(documentType)}`
 }
 
-export function documentDetailPath(documentId: number): string {
-  return `/career-vault/documents?documentId=${documentId}`
+export function documentDetailPath(documentId: number, search = ''): string {
+  const params = new URLSearchParams(search)
+  params.set('documentId', String(documentId))
+  return `/career-vault/documents?${params.toString()}`
 }
 
 export function documentListPathAfterDetailClose(search: string): string {

@@ -30,6 +30,10 @@ test('folder URL round-trips for browser back and forward navigation', () => {
 
 test('document detail URL accepts only a positive integer identifier', () => {
   assert.equal(documentDetailPath(42), '/career-vault/documents?documentId=42')
+  assert.equal(
+    documentDetailPath(42, '?type=RESUME'),
+    '/career-vault/documents?type=RESUME&documentId=42',
+  )
   assert.equal(selectedDocumentIdFromSearch('?documentId=42'), 42)
   assert.equal(selectedDocumentIdFromSearch('?documentId=0'), null)
   assert.equal(selectedDocumentIdFromSearch('?documentId=resume'), null)

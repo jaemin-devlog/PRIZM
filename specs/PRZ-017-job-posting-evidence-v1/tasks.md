@@ -2,6 +2,14 @@
 
 ## ORIENT / SPEC / PLAN
 
+- [x] 후보 신뢰성 Phase branch/HEAD/origin/main/status와 실제 stash 1개 확인
+- [x] query planner, merge, presentation, workspace와 관련 frontend test 흐름 확인
+- [x] backend segmentation·PRZ-016 동결 및 candidate/provenance/direct guard 계약 반영
+
+- [x] `8be904d` branch/HEAD, `origin/main@d44f30e`, clean worktree와 stash 1개 확인
+- [x] 실제 ATAD 입력의 변경 전 selectable 45개 API 결과와 noise 종류 기록
+- [x] 실사용 segmentation·`중 1개 이상` query composition 수용 기준을 Spec/Plan에 반영
+
 - [x] branch, HEAD, `origin/main`, dirty/untracked 파일과 stash 목록 확인
 - [x] 기존 Search, Evidence UI, PDF/TXT 이동, 인증·owner/ACTIVE 경계 확인
 - [x] Qwen/LLM과 과거 requirement/claim 구조의 Production 참조 여부 확인
@@ -9,6 +17,33 @@
 - [x] V1 Spec, Plan, Tasks와 초기 Evidence 작성
 
 ## IMPLEMENT
+
+### 2026-08-26 주변 내용 polish
+
+- [x] 미리보기를 포함하면서 추가 원문을 제공하는 문맥만 노출
+- [x] 유효하지 않거나 중복인 `주변 내용 보기` action 제거
+- [x] 열린 reader를 Evidence 본문 폭으로 확장
+- [x] presentation/component regression test 추가
+
+### 2026-08-26 결과 표시 polish
+
+- [x] 긴 Evidence 후보 5줄 미리보기와 기존 주변 내용·원문 action 유지
+- [x] 결과 제목 focus를 PRIZM focus token으로 표시
+- [x] document version과 같은 제목 group `n/N` 구분 표시
+- [x] component regression test 추가
+
+- [x] `등`·`등의` 명시적 enumeration query composition
+- [x] PRZ-017 candidate matched query provenance와 original-first merge
+- [x] 짧은 identifier variant direct Evidence guard
+- [x] matched display query 기반 extractive Evidence anchor
+- [x] Search 후보 중심 UI 문구와 비판정 안내
+- [x] query/guard/provenance/presentation/UI focused regression test
+
+- [x] `►/▶` heading과 list hierarchy를 보존하는 최소 ParsedLine 보정
+- [x] introduction/benefits section과 child가 있는 grouping parent 제외
+- [x] list item atomicity와 기존 500자 제한 보존
+- [x] 명시적 `중 N개 이상` comma alternative query 계획 추가
+- [x] ATAD backend fixture와 query planner positive/negative 회귀 test 추가
 
 - [x] deterministic segmentation DTO/service/controller 구현
 - [x] 500자 이하 무손실 분할과 최대 100개 Search fan-out 상한 구현
@@ -35,6 +70,36 @@
 
 ## VERIFY
 
+### 2026-08-26 주변 내용 polish
+
+- [x] PRZ-017 focused component/unit test — 30/30 `PASS`
+- [x] frontend 전체 unit·typecheck·lint·build — 77/77와 정적·production 검증 `PASS`
+- [x] Docker 최신 source rebuild와 실제 인증 browser Gate
+- [x] `git diff --check`, 보호 영역·중복·민감정보 감사
+
+### 2026-08-26 결과 표시 polish
+
+- [x] PRZ-017 focused component/unit test — 29/29 `PASS`
+- [x] frontend 전체 unit·typecheck·lint·build — 76/76와 정적·production 검증 `PASS`
+- [x] Docker frontend 최신 source rebuild와 실제 인증 desktop browser Gate
+- [ ] 최종 patch mobile viewport browser 재실행 — in-app viewport 전환 불가로 `NOT_RUN`;
+  직전 mobile Gate와 responsive CSS 회귀만 확인
+- [ ] backend focused test 재실행 — 기존 `searchEvaluation` source-set/compile 환경 오류로
+  test 실행 전에 `BLOCKED_BY_BASELINE`; 이번 Phase backend source 변경 0
+- [x] 화면상 exact duplicate 0과 cross-document 반복 Evidence의 출처 보존·구분 표시 확인
+- [x] `git diff --check`, 보호 영역·민감정보·unrelated 변경 감사
+
+- [x] frontend focused·전체 unit·typecheck·lint·build
+- [x] ATAD 18개, Java direct Evidence, Docker enumeration과 후보 UI browser Gate
+- [x] console/network 오류와 PDF Chrome Gate 상태 기록
+- [x] backend segmentation·PRZ-016 Production diff 0 확인
+
+- [x] ATAD After selectable 수·noise 0·핵심 leaf·순서·1-based ID 확인
+- [ ] backend focused/controller/전체 unit 실행 — focused 29개 `PASS`, 전체는 기존 `searchEvaluation` 컴파일 오류로 `BLOCKED_BY_BASELINE`
+- [x] frontend unit/typecheck/lint/build 실행
+- [ ] 가능한 인증 runtime/browser에서 ATAD와 Java compound Evidence 확인 — 인증 API `PASS`, browser는 로그인 확인 부재로 `BLOCKED_BY_AUTH_CONFIRMATION`
+- [x] 기준 source `8be904d` 대비 Search/embedding/auth/migration/dependency diff 0 확인
+
 - [x] backend segmentation 구조·경계·상한 계약 unit test
 - [x] backend controller validation·인증 test
 - [x] 선택·다중 Search·그룹 Evidence·empty·error·이동 frontend test
@@ -57,6 +122,65 @@
 - [ ] Docker 최신 frontend에서 기록 있음·기록 없음 탭 browser Gate — `BLOCKED_BY_AUTH_ENVIRONMENT`
 
 ## AUDIT / INTEGRATE
+
+### 2026-08-26 주변 내용 polish
+
+- [x] AC39와 presentation/workspace/CSS/component test 추적성 확인
+- [x] browser의 유효 context action 6개, 미리보기 불포함·중복 문맥 0 확인
+- [x] 열린 details/reader/본문 폭 672px 일치와 후보 2/5/5/2 유지 확인
+- [x] exact duplicate 0과 Search·embedding·SQL·Flyway·auth·dependency diff 0 재확인
+- [x] 민감정보 추가 0, `git diff --check` `PASS`, stash 1개 보존
+- [x] blocking finding 0, commit·push·PR·merge `NOT_RUN`
+
+### 2026-08-26 결과 표시 polish
+
+- [x] AC36~AC38와 구현·component test 추적성 확인
+- [x] 같은 document/version/source/display text의 exact duplicate 0 확인
+- [x] 서로 다른 document의 반복 Evidence를 합치지 않고 version·`같은 제목 문서 n/N`으로 구분
+- [x] Search·embedding·SQL·Flyway·auth·dependency diff 0 재확인
+- [x] blocking finding 0 확인
+- [x] commit·push·PR·merge `NOT_RUN`
+
+### 2026-08-24 segmentation V1 stabilization
+
+- [x] branch·HEAD·origin/main·dirty 12개·stash 1개와 보호 파일 hash 기록
+- [x] block-level V1 계약·acceptance criteria와 test-first 계획 반영
+- [ ] generic application/form·metadata/table·subheading·UNKNOWN fixture 추가
+- [ ] Production 수정 전 generic fixture 실패 재현
+- [ ] 최소 범위 block boundary·subheading·UNKNOWN 보정 구현
+- [ ] focused service/controller test 통과
+- [ ] development/regression 10건과 ATAD 18개 Gate
+- [ ] service/test freeze hash 기록
+- [ ] freeze 뒤 unseen 공개 공고 3~4건 평가
+- [ ] origin/main clean candidate 전체 backend test
+- [ ] Search·embedding·SQL·Flyway·auth·dependency와 hardcoding 감사
+- [ ] 최종 Evidence 16개 항목과 V1 판정 기록
+- [x] commit/push/PR/merge `NOT_RUN`
+
+### 2026-08-24 segmentation generalization
+
+- [x] line 구조, section role, UNKNOWN fallback과 leaf-first 정책 구현
+- [x] 회사명·공고 문장을 복제하지 않은 generic 구조 fixture 추가
+- [x] development 공개 공고 6건의 requirement loss/noise 측정
+- [x] ATAD 18개(업무 6·자격/필수 7·우대 5) 회귀 확인
+- [x] service 29개·controller 6개 focused test 통과
+- [x] service/test SHA-256 기록 후 동결
+- [x] 동결 뒤 unseen 공개 공고 3건을 실제 DOM 원문으로 평가
+- [x] holdout 3건 중 반복 heading/metadata noise를 발견하고 source/test 재수정 없이
+  `SEGMENTATION_GENERALIZATION_NEEDS_ADJUSTMENT`로 고정
+- [x] origin/main clean candidate 전체 backend test와 최종 보호영역 감사
+- [x] 최종 Evidence 14개 항목과 blocking finding 기록
+- [x] commit/push/PR/merge `NOT_RUN`
+
+- [x] 후보 신뢰성 Phase final diff와 AC21~AC24 독립 감사
+- [x] 보호 대상·dependency diff 0, stash 1개 보존, 민감정보·whitespace 검사
+- [x] Docker 실행 상태와 browser 실제 결과를 Evidence에 분리 기록
+- [x] 이번 Phase commit·push·PR·merge `NOT_RUN`
+
+- [x] `8be904d` 대비 변경 파일 8개가 PRZ-017 service/test/frontend/Spec 문서에만 한정됨을 확인
+- [x] `git diff --check`, 변경 문서 local link와 민감정보 diff 검사 `PASS`
+- [x] 시작 stash 1개 보존과 임시 focused-test helper 제거 확인
+- [x] 이번 보정 commit·push·PR·merge `NOT_RUN`
 
 - [x] Spec acceptance criteria와 최종 diff 독립 감사
 - [x] blocking finding 0 확인 또는 수정 뒤 재감사

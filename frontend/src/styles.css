@@ -1325,6 +1325,12 @@ select:disabled {
   letter-spacing: -0.04em;
 }
 
+.job-results-page-title:focus {
+  border-radius: var(--prizm-radius-compact);
+  outline: 3px solid var(--prizm-color-focus);
+  outline-offset: 4px;
+}
+
 .job-results-page-heading p:last-child {
   max-width: 680px;
   margin: var(--prizm-space-md) 0 0;
@@ -1630,11 +1636,16 @@ select:disabled {
 }
 
 .job-evidence-row-content blockquote {
+  display: -webkit-box;
   margin: var(--prizm-space-xs) 0 0;
+  overflow: hidden;
   color: var(--prizm-color-body);
   font-size: 15px;
   line-height: 25px;
+  overflow-wrap: anywhere;
   white-space: pre-line;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
 }
 
 .job-evidence-row-actions {
@@ -1643,6 +1654,16 @@ select:disabled {
   align-items: flex-start;
   gap: var(--prizm-space-sm);
   margin-top: var(--prizm-space-md);
+}
+
+.job-evidence-context-details[open] {
+  flex: 1 1 100%;
+  width: 100%;
+}
+
+.job-evidence-context-details[open] .search-result-document-reader {
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .evidence-search-panel {

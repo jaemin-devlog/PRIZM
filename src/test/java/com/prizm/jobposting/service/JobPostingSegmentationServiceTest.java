@@ -169,6 +169,409 @@ class JobPostingSegmentationServiceTest {
     }
 
     @Test
+    void keepsOnlySearchableLeafRequirementsFromRealisticNestedPosting() {
+        List<JobPostingItemResponse> items = service.segment("""
+                포지션 상세
+                아타드(ATAD)는,
+                전세계 클라우드 인프라를 AI를 통해 24시간 자율운용하는 차세대 가상 데이터 센터(V.D.C) 플랫폼 '오딘(ODiiN)'을 서비스하는 B2B 딥테크 기업입니다.
+
+                ► AI-Native Engineer
+                AI를 활용해 제품의 속도를 높일 백엔드 개발자를 찾습니다.
+                반복적인 구현은 AI에 맡기고, 개발자는 무엇을 왜 만들어야하는지 판단하며, 제품 설계와 검증, 복잡한 문제 해결에 집중합니다.
+
+                주요업무
+                ► 제품 설계·개발
+                • 서비스 설계 및 백엔드 개발
+                - 기능 설계, API, 권한 정책, 핵심 도메인 설계 및 구현
+                • 안정적인 서비스 구조 설계
+                - 인증·인가, 데이터 정합성, 트랜잭션 관리
+
+                ► 멀티클라우드
+                • 멀티클라우드 연동
+                - AWS-Azure-GCP등 API 및 계정 연동
+                • 비용·결제 시스템 운영
+                - 비용 파이프라인, 배치, 구독·결제 프로세스 관리
+
+                ► 운영·개선
+                • 서비스 운영 및 개선
+                - 피드백 기반 기능 개선과 안정적인 배포
+                • AI 기반 개발 생산성 향상
+                - 코드 리뷰, 문서화, 리서치 등 개발 자동화
+
+                자격요건
+                • 학력 : 초대졸이상
+                • 백엔드 개발 경력 1년 이상
+                • Kotlin, TypeScript, Python, Go, Java 중 1개 이상 개발 가능자
+                • MySQL 등 RDBMS 기반 서비스 개발 경험
+                • Docker, Git, Gradle 등 개발 도구 사용 경험
+
+                ► 필수 역량
+                • 설계 판단
+                - "왜 이 구조인가"를 트레이드오프로 설명할 수 있고. 코드 리뷰를 통해 함께 성장하려는 의지
+                • AI 활용
+                - AI를 도구로 쓰되 결과를 검증하고 최종 책임을 지는 태도
+                • 적극적인 커뮤니케이션
+                - 근거 있는 의견을 적극적으로 제시하고, 팀원들과 원활하게 소통하며 협업하는 자세
+
+                우대사항
+                • 확장 가능한 서비스 및 대규모 시스템 설계·운영 경험
+                • 장애 대응 및 서비스 안정화 경험
+                • OOP, DDD 기반 설계 및 개발 역량
+                • 복잡한 비즈니스 요구사항을 설계로 해결한 경험
+                • AI 개발 도구를 실무에 적극 활용해 본 경험
+
+                혜택 및 복지
+                • 유연한 근무 시간과 원격 근무 가능
+                • 직원 건강 및 복지를 위한 다양한 프로그램 제공
+                • 개인의 성장과 발전을 위한 교육 지원
+                • 성과에 따른 보상 및 인센티브 제공
+                • 최신장비 지원
+                • 야근수당 및 식대 지원
+                • 커피데이 + 치킨데이 + 무한간식
+                • OTT지원 + 생일 이벤트
+                """);
+
+        assertThat(items).containsExactly(
+                new JobPostingItemResponse(1, "서비스 설계 및 백엔드 개발", "기능 설계, API, 권한 정책, 핵심 도메인 설계 및 구현"),
+                new JobPostingItemResponse(2, "안정적인 서비스 구조 설계", "인증·인가, 데이터 정합성, 트랜잭션 관리"),
+                new JobPostingItemResponse(3, "멀티클라우드 연동", "AWS-Azure-GCP등 API 및 계정 연동"),
+                new JobPostingItemResponse(4, "비용·결제 시스템 운영", "비용 파이프라인, 배치, 구독·결제 프로세스 관리"),
+                new JobPostingItemResponse(5, "서비스 운영 및 개선", "피드백 기반 기능 개선과 안정적인 배포"),
+                new JobPostingItemResponse(6, "AI 기반 개발 생산성 향상", "코드 리뷰, 문서화, 리서치 등 개발 자동화"),
+                new JobPostingItemResponse(7, "자격요건", "백엔드 개발 경력 1년 이상"),
+                new JobPostingItemResponse(8, "자격요건", "Kotlin, TypeScript, Python, Go, Java 중 1개 이상 개발 가능자"),
+                new JobPostingItemResponse(9, "자격요건", "MySQL 등 RDBMS 기반 서비스 개발 경험"),
+                new JobPostingItemResponse(10, "자격요건", "Docker, Git, Gradle 등 개발 도구 사용 경험"),
+                new JobPostingItemResponse(11, "설계 판단", "\"왜 이 구조인가\"를 트레이드오프로 설명할 수 있고. 코드 리뷰를 통해 함께 성장하려는 의지"),
+                new JobPostingItemResponse(12, "AI 활용", "AI를 도구로 쓰되 결과를 검증하고 최종 책임을 지는 태도"),
+                new JobPostingItemResponse(13, "적극적인 커뮤니케이션", "근거 있는 의견을 적극적으로 제시하고, 팀원들과 원활하게 소통하며 협업하는 자세"),
+                new JobPostingItemResponse(14, "우대사항", "확장 가능한 서비스 및 대규모 시스템 설계·운영 경험"),
+                new JobPostingItemResponse(15, "우대사항", "장애 대응 및 서비스 안정화 경험"),
+                new JobPostingItemResponse(16, "우대사항", "OOP, DDD 기반 설계 및 개발 역량"),
+                new JobPostingItemResponse(17, "우대사항", "복잡한 비즈니스 요구사항을 설계로 해결한 경험"),
+                new JobPostingItemResponse(18, "우대사항", "AI 개발 도구를 실무에 적극 활용해 본 경험"));
+    }
+
+    @Test
+    void treatsBothTriangleMarkersAsStructuralHeadings() {
+        List<JobPostingItemResponse> items = service.segment("""
+                주요업무
+                ► 제품 개발
+                • API 개발 경험
+                ▶ 운영 개선
+                • 장애 대응 경험
+                """);
+
+        assertThat(items).containsExactly(
+                new JobPostingItemResponse(1, "제품 개발", "API 개발 경험"),
+                new JobPostingItemResponse(2, "운영 개선", "장애 대응 경험"));
+    }
+
+    @Test
+    void keepsSearchableLeavesAndExcludesIntroBenefitsAndLegalSections() {
+        List<JobPostingItemResponse> items = service.segment("""
+                Platform Engineer
+                About the organization
+                We create digital products for growing teams.
+
+                Responsibilities
+                - Design reliable backend services
+                - Operate event processing pipelines
+
+                Qualifications
+                - 3+ years of backend development experience
+                - Strong knowledge of distributed systems
+
+                Benefits and well-being
+                - Flexible working hours
+                - Learning budget
+
+                Candidate privacy notice
+                Personal information is processed for recruitment purposes.
+                """);
+
+        assertThat(items).containsExactly(
+                new JobPostingItemResponse(1, "Responsibilities", "Design reliable backend services"),
+                new JobPostingItemResponse(2, "Responsibilities", "Operate event processing pipelines"),
+                new JobPostingItemResponse(3, "Qualifications", "3+ years of backend development experience"),
+                new JobPostingItemResponse(4, "Qualifications", "Strong knowledge of distributed systems"));
+    }
+
+    @Test
+    void excludesRecruitmentProcessAndStandaloneWorkMetadata() {
+        List<JobPostingItemResponse> items = service.segment("""
+                주요 업무
+                - 인증 API를 설계하고 운영합니다
+
+                근무 정보
+                Location: Example City
+                Employment Type: Full-time
+                Workplace / Hybrid
+                Deadline / 2027-03-15
+
+                채용 절차
+                서류 접수 > 기술 인터뷰 > 최종 합류
+
+                지원 안내
+                온라인 지원서를 제출해 주세요.
+
+                참고 정보
+                - 지원자는 여러 직군 중 하나를 선택할 수 있습니다
+
+                성장 기회
+                - 다양한 분야를 폭넓게 둘러볼 수 있습니다
+
+                자격 요건
+                - 사용자 요구를 분석해 서비스로 구현한 경험
+                """);
+
+        assertThat(items).containsExactly(
+                new JobPostingItemResponse(1, "주요 업무", "인증 API를 설계하고 운영합니다"),
+                new JobPostingItemResponse(2, "자격 요건", "사용자 요구를 분석해 서비스로 구현한 경험"));
+    }
+
+    @Test
+    void usesHeadingAndParentChildStructureBeforeLeafSelection() {
+        List<JobPostingItemResponse> items = service.segment("""
+                Responsibilities
+                Backend Platform
+                • Service architecture
+                - Implement authorization boundaries
+                - Maintain transactional consistency
+                • Production operations
+                - Improve deployment reliability
+                • Data operations
+                ∘ Validate ingestion workflows
+                ∘ Monitor storage consistency
+                """);
+
+        assertThat(items).containsExactly(
+                new JobPostingItemResponse(1, "Service architecture", "Implement authorization boundaries"),
+                new JobPostingItemResponse(2, "Service architecture", "Maintain transactional consistency"),
+                new JobPostingItemResponse(3, "Production operations", "Improve deployment reliability"),
+                new JobPostingItemResponse(4, "Data operations", "Validate ingestion workflows"),
+                new JobPostingItemResponse(5, "Data operations", "Monitor storage consistency"));
+    }
+
+    @Test
+    void preservesRequirementLikeLeavesUnderUnknownHeadingsButDropsNarrative() {
+        List<JobPostingItemResponse> items = service.segment("""
+                Delivery Excellence
+                - API 설계 및 구현 경험
+                - 장애 원인 분석과 운영 개선 역량
+
+                Culture Notes
+                구성원은 새로운 아이디어를 나누며 함께 성장합니다.
+
+                우대 사항
+                - Cloud 환경을 활용한 프로젝트 경험
+                """);
+
+        assertThat(items).containsExactly(
+                new JobPostingItemResponse(1, "Delivery Excellence", "API 설계 및 구현 경험"),
+                new JobPostingItemResponse(2, "Delivery Excellence", "장애 원인 분석과 운영 개선 역량"),
+                new JobPostingItemResponse(3, "우대 사항", "Cloud 환경을 활용한 프로젝트 경험"));
+    }
+
+    @Test
+    void recognizesAnImplicitEnglishRequirementRunAfterNarrative() {
+        List<JobPostingItemResponse> items = service.segment("""
+                About the team
+                The group works across several product areas.
+                Engineers collaborate with multiple disciplines.
+
+                Design and operate low-latency backend services.
+                Lead architecture and code reviews.
+                5+ years of professional software development experience.
+                Proficiency with a JVM language and a server framework.
+
+                Benefits
+                Flexible paid time off.
+                """);
+
+        assertTexts(items,
+                "Design and operate low-latency backend services.",
+                "Lead architecture and code reviews.",
+                "5+ years of professional software development experience.",
+                "Proficiency with a JVM language and a server framework.");
+    }
+
+    @Test
+    void keepsMixedLanguageRequirementsWhileDiscardingMixedMetadata() {
+        List<JobPostingItemResponse> items = service.segment("""
+                Who we are looking for
+                - Backend 서비스 설계 experience
+                - Kubernetes 운영 및 troubleshooting 역량
+
+                Work conditions
+                고용형태 / Full-time
+                오피스 / Hybrid
+                """);
+
+        assertThat(items).containsExactly(
+                new JobPostingItemResponse(1, "Who we are looking for", "Backend 서비스 설계 experience"),
+                new JobPostingItemResponse(2, "Who we are looking for", "Kubernetes 운영 및 troubleshooting 역량"));
+    }
+
+    @Test
+    void stopsSearchableContentAtARepeatedApplicationFormBlock() {
+        List<JobPostingItemResponse> items = service.segment("""
+                Responsibilities
+                Design reliable service boundaries.
+                Maintain production observability.
+
+                Apply for this opportunity
+                Required fields are marked
+                Applicant identity *
+                Preferred contact
+                Work sample upload
+                Attach a document
+                Additional response (optional)
+                Submit application
+
+                Qualifications
+                3+ years of backend engineering experience.
+                """);
+
+        assertTexts(items,
+                "Design reliable service boundaries.",
+                "Maintain production observability.",
+                "3+ years of backend engineering experience.");
+    }
+
+    @Test
+    void excludesCompensationAndKeyValueMetadataRunsButKeepsInlineRequirements() {
+        List<JobPostingItemResponse> items = service.segment("""
+                Responsibilities
+                Build fault-tolerant backend services.
+
+                Total rewards snapshot
+                Annual salary
+                80,000 | 120,000 units
+                Performance award
+                Up to 10% annually
+                Region: Example District
+                Work arrangement | Hybrid
+                Contract type | Full-time
+
+                지원자격: Java 기반 API 개발 경험
+
+                Qualifications
+                Experience operating a relational database.
+                """);
+
+        assertTexts(items,
+                "Build fault-tolerant backend services.",
+                "지원자격: Java 기반 API 개발 경험",
+                "Experience operating a relational database.");
+    }
+
+    @Test
+    void removesMultiwordSubheadingsFromUnbulletedSearchableRuns() {
+        List<JobPostingItemResponse> items = service.segment("""
+                Responsibilities
+                Core Service Platform
+                Design authenticated APIs.
+                Operate distributed services.
+
+                Data Processing Layer
+                Build reliable ingestion pipelines.
+                Improve storage consistency.
+
+                Qualifications
+                Strong knowledge of transactional systems.
+                """);
+
+        assertTexts(items,
+                "Design authenticated APIs.",
+                "Operate distributed services.",
+                "Build reliable ingestion pipelines.",
+                "Improve storage consistency.",
+                "Strong knowledge of transactional systems.");
+    }
+
+    @Test
+    void keepsUnknownBulletLeavesAndUnmarkedRequirementRunsButDropsNarrative() {
+        List<JobPostingItemResponse> items = service.segment("""
+                About the group
+                The group shares product stories and celebrates milestones.
+
+                Delivery Notes
+                - API 설계 및 구현 경험
+                - Experience operating distributed systems
+
+                Culture Notes
+                구성원은 다양한 관심사를 나누며 함께 성장합니다.
+
+                Design and maintain low-latency services.
+                Lead architecture reviews across teams.
+                4+ years of production engineering experience.
+                """);
+
+        assertTexts(items,
+                "API 설계 및 구현 경험",
+                "Experience operating distributed systems",
+                "Design and maintain low-latency services.",
+                "Lead architecture reviews across teams.",
+                "4+ years of production engineering experience.");
+    }
+
+    @Test
+    void excludesMixedLanguageApplicationAndPrivacyBlocks() {
+        List<JobPostingItemResponse> items = service.segment("""
+                주요 업무
+                - 고객 API를 설계하고 운영합니다
+
+                지원서 작성
+                필수 항목은 별표로 표시됩니다
+                지원자 식별 정보 *
+                Contact preference
+                경력자료 upload
+                파일 attach
+
+                개인정보 처리 안내
+                제출 정보는 recruitment 목적으로만 처리됩니다.
+
+                자격 요건
+                - Cloud 환경에서 서비스 운영 경험
+                """);
+
+        assertTexts(items,
+                "고객 API를 설계하고 운영합니다",
+                "Cloud 환경에서 서비스 운영 경험");
+    }
+
+    @Test
+    void excludesBracketedRecruitmentMetadataChildrenButKeepsCareerRequirements() {
+        List<JobPostingItemResponse> items = service.segment("""
+                [경력]
+                신입 - 경력무관
+                무관
+
+                [모집인원]
+                0명
+
+                [자격요건]
+                - 백엔드 개발 경력 3년 이상
+                """);
+
+        assertTexts(items, "백엔드 개발 경력 3년 이상");
+    }
+
+    @Test
+    void keepsTheFirstBulletInABracketedPersonalitySection() {
+        List<JobPostingItemResponse> items = service.segment("""
+                [인재상]
+                - 적극적으로 업무를 수행하는 사람
+                - 협업을 중요하게 생각하는 사람
+                """);
+
+        assertTexts(items,
+                "적극적으로 업무를 수행하는 사람",
+                "협업을 중요하게 생각하는 사람");
+    }
+
+    @Test
     void normalizesMarkdownTablesAndKoreanBulletsBeforeCreatingSearchItems() {
         List<JobPostingItemResponse> items = service.segment("""
                 ## 모집부문 및 상세내용

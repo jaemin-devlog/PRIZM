@@ -2314,7 +2314,7 @@ function JobEvidencePage({
       }
       setGroups((currentGroups) => currentGroups.map((group) => (
         group.state === 'loading'
-          ? { ...group, state: 'error', results: [], error }
+          ? { ...group, state: 'error', candidates: [], error }
           : group
       )))
     }
@@ -2330,7 +2330,7 @@ function JobEvidencePage({
     requestGeneration.current = generation
     setGroups((currentGroups) => currentGroups.map((group) => (
       group.item.itemId === itemId
-        ? { ...group, state: 'loading', results: [], error: null }
+        ? { ...group, state: 'loading', candidates: [], error: null }
         : group
     )))
 
@@ -2369,7 +2369,7 @@ function JobEvidencePage({
       }
       setGroups((currentGroups) => currentGroups.map((group) => (
         group.item.itemId === itemId
-          ? { ...group, state: 'error', results: [], error }
+          ? { ...group, state: 'error', candidates: [], error }
           : group
       )))
     }

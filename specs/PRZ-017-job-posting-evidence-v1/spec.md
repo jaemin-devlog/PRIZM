@@ -39,10 +39,20 @@ PRZ-016 Career Evidence Search로 관련 원문 기록을 확인하는 대회 �
 - 행이 `:`로 끝나거나, 알려진 직무·자격·우대/채용 metadata section 성격이거나, 40 code
   point 이하의 compact 독립 행 뒤에 list 항목이 이어지면 section heading으로 취급한다.
   heading은 Search 항목이 아니라 각 child 항목의 nullable `section` 보조 정보로 유지한다.
+- `►`, `▶`로 시작하는 행은 일반 bullet이 아니라 명시적 section/subsection heading으로
+  취급한다. marker 자체와 heading 본문은 선택 항목으로 반환하지 않는다.
 - 직무·역할·자격·우대·기술요건 section의 child 항목은 선택 가능하게 유지한다. 복지,
   전형, 근무조건, 접수, 제출서류, 유의사항, 회사 소개 등 명백한 채용 metadata section의
   child 항목과 보수적으로 식별 가능한 인원·전형 단계·metadata `label: value` 행은 Search
   항목에서 제외한다.
+- `포지션 상세`, 직무/포지션 소개처럼 명백한 introduction section의 회사·포지션 설명과
+  `혜택 및 복지`를 포함한 명백한 benefits section의 모든 child는 선택 항목에서 제외한다.
+  회사명이나 제품명을 사전으로 두지 않고 section 의미만 사용한다.
+- list marker의 구조적 깊이가 바로 다음 non-empty list 행보다 얕으면 현재 행을 leaf
+  requirement가 아닌 grouping parent로 취급한다. parent는 선택 항목에서 제외하고 child는
+  원래 순서로 유지한다. 더 깊은 child가 없는 독립 list 행은 그대로 선택 가능하게 보존한다.
+- 명시적인 list item은 500자 제한 분할이 필요한 경우를 제외하고 한 행 전체를 하나의 atomic
+  requirement로 유지한다. 일반 paragraph에만 기존 명확한 문장 종결 경계 분리를 적용한다.
 - 알 수 없는 section은 heading만 구조 정보로 유지하고, 명백한 metadata가 아닌 child
   항목은 선택 가능하게 보존해 false negative를 제한한다.
 - 정규화한 본문이 완전히 같은 항목은 첫 항목과 첫 section만 남긴다.
@@ -84,13 +94,30 @@ unknown section 보존, 독립 metadata 제거, 중복·빈 항목 제거, 원�
   consumer 계층에서 결정적으로 분해하고, 원문과 최대 5개의 variant를 기존
   `POST /api/career-evidence/search`에 순서대로 전달한다. 2항 결합 식별자와 파일 경로는
   compact slash 대안으로 취급하지 않는다.
-- 쉼표는 그 자체로 분해하지 않는다. `A, B 또는 C`나 `A, B or C`처럼 명시적인 대안
-  연결어 앞의 목록에 포함될 때만 variant 경계로 사용한다. 빈 값·중복·문자나 숫자가 거의
-  없는 조각은 제거하며 회사명·기술명 사전, LLM과 동의어 확장은 사용하지 않는다.
+- 쉼표는 그 자체로 분해하지 않는다. `A, B 또는 C`, `A, B or C` 또는 짧은 식별자 목록 뒤에
+  `중 1개 이상`·`중 하나 이상`처럼 명시적인 선택 문법이 있는 경우에만 variant 경계로
+  사용한다. 일반 쉼표 문장, 숫자 천 단위 표기와 경로는 원문 하나로 유지한다. 빈 값·중복·
+  문자나 숫자가 거의 없는 조각은 제거하며 회사명·기술명 사전, LLM과 동의어 확장은 사용하지
+  않는다.
 - 원문 결과를 먼저 두고 variant 순서와 각 Search 응답 순서를 유지한다. 동일
   `documentId + documentVersionId + chunkId`는 먼저 나온 결과만 남기고, 서로 다른 문서
   버전이나 청크는 보존한 채 최종 결과를 기존 Top 5 범위로 제한한다. query별 score를
   합산·평균하거나 서로 비교해 새 순위를 만들지 않는다.
+- `A, B, C 등 ...`과 `A, B, C 등의 ...`처럼 명시적인 열거 표현도 짧고 명확한 identifier
+  목록일 때만 원문과 source-order variant로 분해한다. 일반 comma 문장, 숫자 표기, slash
+  identifier와 경로에 대한 기존 negative guard는 유지한다.
+- PRZ-017 consumer는 각 후보를 찾은 original/variant query provenance를 보존한다. 동일 chunk가
+  여러 query에서 반환되면 original-first 결과 identity와 순서는 유지하고 matched query만
+  중복 없이 합친다. ranking, Search API DTO와 Search Production은 변경하지 않는다.
+- decomposition으로 만든 짧고 명확한 identifier 또는 identifier phrase variant에 한해서
+  `content` 또는 `snippet`에 독립 identifier token이 직접 존재하는 후보만 유지한다. original
+  requirement와 자연어 semantic variant에는 이 guard를 적용하지 않는다. `Git`은 `GitHub`만으로
+  일치하지 않고 `Docker Compose`, `Java 17`, `C++`, `C#`, `Node.js`는 깨뜨리지 않는다.
+- Evidence highlight와 주변 문맥은 후보의 display query provenance를 anchor로 사용해 원문에서
+  직접 일치하는 extractive unit을 우선 표시한다. 내용을 생성·요약하거나 Search result를
+  재작성하지 않는다.
+- 결과는 요구사항 충족 판정이 아니라 확인할 Search 후보로 표현한다. `검색 후보 있음`,
+  `검색된 후보 없음`, `확인할 원문 후보`를 사용하고 원문 직접 확인 안내를 표시한다.
 - 분해와 병합은 PRZ-017 frontend orchestration에만 둔다. PRZ-017 전용 batch 검색 backend,
   embedding model, ranking, relevance floor, fallback, rescue 또는 localization을 추가하지
   않는다.
@@ -118,6 +145,17 @@ unknown section 보존, 독립 metadata 제거, 중복·빈 항목 제거, 원�
   별도 Evidence row로 보존하며 표시 건수는 실제로 보이는 고유 행을 센다.
 - 기존 Search response의 `documentId`, `documentVersionId`, `documentTitle`, `versionNo`,
   `snippet`, `content`, source/evidence source type·index·label을 재사용한다.
+- Evidence row의 기본 원문 후보는 최대 5줄 미리보기로 표시한다. highlight가 지나치게 길고 기존
+  extractive 주변 문맥이 더 짧으면 그 문맥을 기본 미리보기로 사용하며, metadata filter를 거친
+  원문만 표시한다. 긴 원문은 기존 접을 수 있는 주변 문맥과 원문 이동 action으로 계속 확인할
+  수 있어야 한다. 이 표시 제한은 Search 응답, dedup, 순서와 원문 자체를 변경하지 않는다.
+- `주변 내용 보기`는 정규화한 주변 문맥이 현재 미리보기를 포함하면서 미리보기보다 실제로 더
+  많은 원문을 제공하거나, 긴 미리보기가 시각적으로 잘려 전체 원문 확인이 필요할 때만 표시한다.
+  짧은 미리보기와 같거나 현재 미리보기를 포함하지 않는 앞부분은 주변 문맥으로 노출하지 않는다.
+  펼친 문맥은 Evidence 본문 폭을 사용하고 기존 높이 상한과 세로 scroll을 유지한다.
+- document/version group에는 Search response의 `versionNo`를 표시한다. 같은 활성 requirement
+  안에서 정규화한 제목이 같은 group이 둘 이상이면 원래 결과 순서를 기준으로 `같은 제목 문서
+  n/N`을 함께 표시해 서로 구분한다.
 - 문서 종류는 필요할 때 기존 owner-scoped 문서 API에서 보조 metadata로 읽으며 Search
   response를 확장하지 않는다.
 - `관련 기록 01`처럼 의미 없는 반복 번호는 표시하지 않는다. loading, empty와 error
@@ -126,6 +164,8 @@ unknown section 보존, 독립 metadata 제거, 중복·빈 항목 제거, 원�
 - `score`, `distance`, 적합도 %, 합격 가능성, 충족·불충족, 경험 있음·없음, PASS·FAIL,
   지원 추천·비추천을 표시하지 않는다.
 - 결과가 0건이면 `관련 경력 기록을 찾지 못했습니다.`라는 중립적 empty state를 표시한다.
+- 결과 route로 이동할 때 제목 focus는 유지하되 브라우저 기본 검은 사각형 대신 기존 PRIZM
+  focus token을 사용한 명확한 표시를 제공한다.
 
 ## `PRZ-017-R5` — 원문 이동
 
@@ -161,6 +201,49 @@ unknown section 보존, 독립 metadata 제거, 중복·빈 항목 제거, 원�
 - PRZ-016 검색 품질 조정, 신규 embedding과 새 PDF viewer
 - 지원서 생성, 추천·비추천과 합격 가능성
 
+## Segmentation generalization 계약
+
+- parser는 입력을 정규화된 순서, list level, heading marker, contextual heading,
+  grouping-parent 후보를 가진 line으로 해석하고 의미 분류보다 먼저
+  `section → parent → leaf` 구조를 판별한다.
+- section role은 `SEARCHABLE`, `EXCLUDED`, `STRUCTURAL`, `UNKNOWN`으로 분리한다.
+  `SEARCHABLE` leaf는 적극 보존하고 `EXCLUDED` child와 `STRUCTURAL` 자체는 제외한다.
+- `UNKNOWN`은 자동 searchable로 되돌리지 않는다. list/leaf 구조, requirement-like 형태,
+  인접 heading과 metadata 형태를 함께 만족하는 경우만 보수적으로 보존한다.
+- 회사명, URL/domain, 실제 공고 문장, 특정 selectable 개수는 판정 입력으로 사용하지 않는다.
+  일반적인 의미 범주의 한국어·영어 stem은 허용하되 exact 공고 문장 목록이 주 메커니즘이
+  되어서는 안 된다.
+- development set 6건과 ATAD 회귀를 통과한 뒤 service와 test를 동결하고, 그 후 처음 수집한
+  공개 공고 3건 이상은 평가에만 사용한다. holdout 실패 뒤 같은 Phase에서 parser를 수정하지
+  않는다.
+- 공개 공고 전문은 tracked fixture로 저장하지 않는다. test는 실제 회사명·공고 문장을 새로
+  복제하지 않고 발견한 구조만 추상화한 generic fixture를 사용한다. 기존 ATAD 회귀 fixture는
+  보존한다.
+
+## Segmentation V1 stabilization 계약
+
+- V1 segmentation은 정답 요구사항을 자동 확정하는 기능이 아니라 검색 가치가 높은 candidate를
+  제안하는 기능이다. 실제 Search 입력은 사용자가 checkbox로 최종 선택한 항목에 한정한다.
+- line/section 판단 위에 경량 document block 역할을 둔다. block은 최소한 job content,
+  application form, metadata/table, legal/privacy와 unknown 경계를 구분할 수 있어야 한다.
+- application form은 특정 field 이름 목록이 아니라 apply/upload 문맥 뒤에 이어지는 짧은
+  label·질문·required/optional·응답 field의 연속 구조로 식별한다. form block에 진입하면 이후
+  requirement section이 명시적으로 시작되기 전까지 candidate를 만들지 않는다.
+- metadata/table은 `label:value`, `label | value`, 연속된 짧은 key/value pair,
+  compensation/salary range, location/employment/workplace와 날짜 중심 구조로 판별한다.
+  단, searchable label과 requirement-like value를 가진 line은 보존한다.
+- searchable section 내부에서도 짧고 문장 종결 부호가 없으며 뒤의 여러 requirement leaf를
+  이끄는 line은 structural subheading으로 제외한다. exact subheading 문구 사전은 사용하지 않는다.
+- bullet marker가 사라진 문서는 연속된 requirement-like run과 surrounding section을 이용해
+  보수적으로 leaf를 보존한다. UNKNOWN plain paragraph는 보수적으로, UNKNOWN bullet leaf는
+  form/metadata/legal signal이 없을 때 recall 우선으로 처리한다.
+- 목표는 noise/loss 0%가 아니다. 대량 form·metadata·소개 noise와 requirement 대량 유실은
+  blocking이고, 사용자가 checkbox에서 쉽게 제거할 수 있는 소수의 애매한 candidate는
+  `MINOR_LIMITATION`으로 허용한다.
+- 이전 unseen PayPay·Atomicwork·Lean In은 이번 Phase부터 development/regression set으로
+  전환한다. Development Gate를 통과한 뒤 code/test hash를 동결하고, 그 뒤 처음 보는 실제
+  공개 공고 3~4건은 평가에만 사용한다.
+
 ## 완료 조건
 
 | ID | 측정 가능한 완료 조건 |
@@ -182,4 +265,25 @@ unknown section 보존, 독립 metadata 제거, 중복·빈 항목 제거, 원�
 | AC15 | 같은 문서·버전의 metadata는 한 번만 표시하고, 화면상 정확 중복은 한 행으로 정리하되 같은 page의 서로 다른 Evidence와 다른 page의 Evidence를 보존한다. |
 | AC16 | `항목 다시 선택`과 결과 route에서 입력 route로 돌아갈 때 현재 page session의 입력·선택을 보존하며, 결과 state 없는 직접 결과 route 진입은 입력 route로 안전하게 복귀한다. |
 | AC17 | 넓은 화면은 requirement rail과 Evidence의 2열 workspace, 좁은 화면은 읽을 수 있는 단일 열로 표시하고 각 Evidence의 PDF page/TXT 이동을 유지한다. |
-| AC18 | requirement rail은 `기록 있음`·`기록 없음`을 요구사항 개수와 함께 분리하고, loading/error는 필요할 때만 `확인 필요`로 표시한다. 탭 전환은 추가 Search 없이 원래 항목 순서·번호와 활성 Evidence 상태를 유지한다. |
+| AC18 | requirement rail은 `검색 후보 있음`·`검색된 후보 없음`을 요구사항 개수와 함께 분리하고, loading/error는 필요할 때만 `확인 필요`로 표시한다. 탭 전환은 추가 Search 없이 원래 항목 순서·번호와 활성 Evidence 상태를 유지한다. |
+| AC19 | ATAD 실사용 fixture에서 소개·`►/▶` heading·benefits·child가 있는 grouping parent가 0개 selectable이고, 독립 우대사항과 핵심 leaf requirement는 원문 순서와 안정적인 1-based ID로 유지된다. |
+| AC20 | `A, B, C 중 1개 이상`은 원문 우선과 최대 5개 variant 계약으로 확장되고, 일반 쉼표 문장·숫자 표기·경로·기존 explicit alternative 회귀는 유지된다. |
+| AC21 | `A, B, C 등`·`A, B, C 등의` 명시적 열거는 원문과 최대 5개 identifier variant로 확장되고 기존 negative query는 원문-only를 유지한다. |
+| AC22 | 후보는 matched query provenance를 보존하고, 동일 chunk의 original-first 순서·dedup·Top 5를 바꾸지 않으면서 provenance를 합친다. |
+| AC23 | 짧은 identifier variant 결과는 독립 token direct Evidence guard를 통과하며, original·자연어 variant에는 적용하지 않고 matched query로 extractive Evidence를 표시한다. |
+| AC24 | PRZ-017 UI는 Search 후보와 요구사항 충족 판정을 구분하고 PDF/TXT 이동 wiring, 원래 번호와 탭 전환을 유지한다. |
+| AC25 | development 공개 공고 6건에서 requirement loss와 selectable noise를 공고별로 기록하고, ATAD의 업무 6·자격/필수 7·우대 5, 총 18개 계약을 유지한다. |
+| AC26 | code/test 동결 뒤 처음 수집한 서로 다른 회사의 공개 공고 3건 이상을 평가하고, requirement leaf·loss·noise와 공고별 판정을 기록한다. |
+| AC27 | Production source에 회사명·URL·실제 공고 문장·selectable 개수 기반 분기가 없고, 새 generic test에 development/holdout 공고 문장이 복제되지 않는다. |
+| AC28 | holdout에서 heading·metadata·소개 noise 또는 requirement loss가 반복되면 코드를 다시 수정하지 않고 `SEGMENTATION_GENERALIZATION_NEEDS_ADJUSTMENT`로 판정한다. |
+| AC29 | generic fixture가 application form 전환·연속 field·metadata/table·compensation·subheading·무표식 requirement run·UNKNOWN bullet/plain·legal/privacy와 한글/영문/mixed 구조를 검증한다. |
+| AC30 | application form과 metadata/table block의 대량 noise를 제거하면서 `지원자격: Java 개발 경험` 같은 searchable inline requirement를 보존한다. |
+| AC31 | searchable section 내부 subheading은 candidate가 아니고 뒤의 requirement leaf는 원래 순서로 보존된다. |
+| AC32 | development/regression 10건에서 ATAD 18개 계약과 기존 6건 무회귀를 유지하고 PayPay form noise와 Lean In metadata/subheading noise를 대폭 줄인다. |
+| AC33 | Development Gate 뒤 service/test hash를 기록하고 unseen holdout 결과를 본 뒤 같은 Phase에서 code/test를 수정하지 않는다. |
+| AC34 | unseen holdout 3~4건에서 핵심 requirement 대부분을 보존하고 대량 noise가 없으면 소수 `MINOR_LIMITATION`을 허용해 V1 안정화 판정을 내린다. |
+| AC35 | PRZ-016 Search·embedding·pgvector SQL·Flyway·auth·dependency·query composition·candidate guard·Evidence UI의 이번 Phase diff가 0이다. |
+| AC36 | 긴 Evidence 후보는 더 짧은 metadata-free extractive 문맥을 우선한 뒤 데스크톱·좁은 화면 모두 최대 5줄 미리보기로 제한되고, 주변 내용과 PDF/TXT 원문 이동은 계속 사용할 수 있다. |
+| AC37 | 결과 제목의 programmatic focus는 유지하면서 PRIZM focus token으로 표시되고 브라우저 기본 검은 outline은 노출되지 않는다. |
+| AC38 | document/version group은 versionNo를 표시하고 같은 제목 group이 여러 개면 원래 순서의 `같은 제목 문서 n/N`으로 구분한다. |
+| AC39 | `주변 내용 보기`는 현재 미리보기를 포함하는 추가 extractive 원문 또는 잘린 긴 원문을 보여 줄 때만 표시되고, 펼친 reader는 버튼 너비로 수축하지 않고 Evidence 본문 폭을 사용한다. |

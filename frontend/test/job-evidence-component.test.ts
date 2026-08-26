@@ -12,9 +12,12 @@ import {
   JobEvidencePanel,
   type JobEvidencePanelProps,
 } from '../src/jobEvidencePanel.ts'
-import type { JobEvidenceGroup } from '../src/jobEvidence.ts'
+import type { JobEvidenceCandidate, JobEvidenceGroup } from '../src/jobEvidence.ts'
 import {
+  getJobEvidenceContext,
+  getJobEvidenceHighlight,
   groupVisibleJobEvidenceByDocument,
+  hasAdditionalJobEvidenceContext,
   visibleJobEvidenceResults,
 } from '../src/jobEvidencePresentation.ts'
 import { elementText, findElements } from './componentTestSupport.ts'
@@ -94,8 +97,36 @@ const textEvidence: CareerEvidenceSearchResult = {
   evidenceSourceLabel: '텍스트 구간 3',
 }
 
+const pdfEvidenceWithContext: CareerEvidenceSearchResult = {
+  ...pdfEvidence,
+  content: [
+    '주문 처리 프로젝트',
+    '서버 애플리케이션을 개발하고 운영했습니다.',
+    '장애 지표를 확인하며 운영 절차를 개선했습니다.',
+  ].join('\n'),
+  snippet: '서버 애플리케이션을 개발하고 운영했습니다.',
+}
+
+function candidate(
+  result: CareerEvidenceSearchResult,
+  query = items[0].text,
+  directIdentifier = false,
+): JobEvidenceCandidate {
+  return {
+    result,
+    matchedQueries: [query],
+    displayQuery: query,
+    displayQueryIsDirectIdentifier: directIdentifier,
+  }
+}
+
 function resultGroup(item: JobPostingItem, results: CareerEvidenceSearchResult[]): JobEvidenceGroup {
-  return { item, state: results.length === 0 ? 'empty' : 'result', results, error: null }
+  return {
+    item,
+    state: results.length === 0 ? 'empty' : 'result',
+    candidates: results.map((result) => candidate(result, item.text)),
+    error: null,
+  }
 }
 
 function panelProps(overrides: Partial<JobEvidencePanelProps> = {}): JobEvidencePanelProps {
@@ -193,7 +224,7 @@ test('segmented items render in an accessible sectioned selection dialog', () =>
   assert.match(html, /2개 중 1개 선택/)
   assert.equal((html.match(/type="checkbox"/g) ?? []).length, 2)
   assert.equal((html.match(/job-requirement-section-title/g) ?? []).length, 2)
-  assert.match(html, /선택한 1개 항목에서 관련 경력 찾기/)
+  assert.match(html, /선택한 1개 항목에서 원문 후보 찾기/)
 })
 
 test('zero selected items disable Search in the selection dialog', () => {
@@ -203,7 +234,7 @@ test('zero selected items disable Search in the selection dialog', () => {
   ))
 
   assert.match(html, /2개 중 0개 선택/)
-  assert.match(html, /disabled=""[^>]*>선택한 0개 항목에서 관련 경력 찾기/)
+  assert.match(html, /disabled=""[^>]*>선택한 0개 항목에서 원문 후보 찾기/)
 })
 
 test('presentation dedup only collapses the same document version, source location, and visible text', () => {
@@ -236,17 +267,81 @@ test('presentation dedup only collapses the same document version, source locati
     textEvidence,
   ]
 
-  const visible = visibleJobEvidenceResults(items[0].text, original)
-  const grouped = groupVisibleJobEvidenceByDocument(items[0].text, original)
+  const originalCandidates = original.map((result) => candidate(result))
+  const visible = visibleJobEvidenceResults(originalCandidates)
+  const grouped = groupVisibleJobEvidenceByDocument(originalCandidates)
 
-  assert.deepEqual(visible.map((result) => result.chunkId), [11, 13, 14, 98, 97, 12])
-  assert.deepEqual(grouped.map((group) => [group.key, group.results.map((result) => result.chunkId)]), [
-    ['101:201', [11, 13, 14]],
-    ['101:999', [98]],
-    ['103:203', [97]],
-    ['102:202', [12]],
+  assert.deepEqual(visible.map(({ result }) => result.chunkId), [11, 13, 14, 98, 97, 12])
+  assert.deepEqual(grouped.map((group) => [
+    group.key,
+    group.versionNo,
+    group.candidates.map(({ result }) => result.chunkId),
+  ]), [
+    ['101:201', 1, [11, 13, 14]],
+    ['101:999', 1, [98]],
+    ['103:203', 1, [97]],
+    ['102:202', 1, [12]],
   ])
   assert.equal(original.length, 7)
+})
+
+test('variant provenance anchors extractive Evidence to the matched identifier', () => {
+  const result = {
+    ...pdfEvidence,
+    content: 'Java 17과 Spring Boot로 백엔드를 개발했습니다.\nMoneyWay 예산에 맞춰 제주 여행 일정을 만드는 서비스',
+    snippet: 'Java 17과 Spring Boot로 백엔드를 개발했습니다.\nMoneyWay 예산에 맞춰 제주 여행 일정을 만드는 서비스',
+  }
+  const javaCandidate = candidate(result, 'Java', true)
+
+  assert.equal(getJobEvidenceHighlight(javaCandidate), 'Java 17과 Spring Boot로 백엔드를 개발했습니다.')
+  assert.match(getJobEvidenceContext(javaCandidate), /Java 17/)
+  assert.deepEqual(javaCandidate.matchedQueries, ['Java'])
+})
+
+test('oversized original-query Evidence falls back to shorter metadata-free extractive context', () => {
+  const longSnippet = [
+    'Java platform engineer',
+    'candidate@example.com',
+    '010-1234-5678',
+    'https://example.com/profile',
+    '프로젝트에서 서버 기능을 구현했습니다. '.repeat(20),
+  ].join('\n')
+  const result = {
+    ...pdfEvidence,
+    content: longSnippet,
+    snippet: longSnippet,
+  }
+  const originalCandidate = candidate(
+    result,
+    'Java 및 Node.js 웹 개발에 능하신 분',
+    false,
+  )
+
+  assert.equal(getJobEvidenceHighlight(originalCandidate), 'Java platform engineer')
+  assert.doesNotMatch(getJobEvidenceHighlight(originalCandidate), /@|010-|https:\/\//)
+  assert.equal(hasAdditionalJobEvidenceContext(originalCandidate), false)
+})
+
+test('surrounding context must contain the displayed Evidence and add source text', () => {
+  const usefulCandidate = candidate(pdfEvidenceWithContext)
+  const redundantCandidate = candidate(pdfEvidence)
+  const unrelatedHeader = [
+    'Applicant profile',
+    'candidate@example.com',
+    'Platform Engineer',
+    'Seoul',
+    'Java 서버 애플리케이션을 개발했습니다.',
+  ].join('\n')
+  const unrelatedCandidate = candidate({
+    ...pdfEvidence,
+    content: unrelatedHeader,
+    snippet: unrelatedHeader,
+  }, 'Java 서버 개발 경험')
+
+  assert.equal(hasAdditionalJobEvidenceContext(usefulCandidate), true)
+  assert.match(getJobEvidenceContext(usefulCandidate), /주문 처리 프로젝트/)
+  assert.equal(hasAdditionalJobEvidenceContext(redundantCandidate), false)
+  assert.equal(hasAdditionalJobEvidenceContext(unrelatedCandidate), false)
 })
 
 test('results workspace keeps requirement order and renders one active document-grouped detail', () => {
@@ -258,7 +353,7 @@ test('results workspace keeps requirement order and renders one active document-
   const errorGroup: JobEvidenceGroup = {
     item: { itemId: 3, section: null, text: '장애 대응 경험' },
     state: 'error',
-    results: [],
+    candidates: [],
     error: { status: 403 },
   }
   const groups: JobEvidenceGroup[] = [
@@ -274,22 +369,24 @@ test('results workspace keeps requirement order and renders one active document-
   ]
   const html = renderToStaticMarkup(createElement(JobEvidenceResultsView, resultsViewProps({ groups })))
 
-  assert.match(html, /id="job-evidence-title" tabindex="-1"/)
+  assert.match(html, /class="job-results-page-title" id="job-evidence-title" tabindex="-1"/)
   assert.match(html, /aria-pressed="true"/)
-  assert.match(html, /기록 있음<\/span><strong>1<\/strong>/)
-  assert.match(html, /기록 없음<\/span><strong>1<\/strong>/)
+  assert.match(html, /검색 후보 있음<\/span><strong>1<\/strong>/)
+  assert.match(html, /검색된 후보 없음<\/span><strong>1<\/strong>/)
   assert.match(html, /확인 필요<\/span><strong>1<\/strong>/)
   assert.doesNotMatch(html, new RegExp(items[1].text))
   assert.doesNotMatch(html, new RegExp(errorGroup.item.text))
-  assert.match(html, /기록 4건/)
+  assert.match(html, /원문 후보 4건/)
+  assert.match(html, /선택한 항목의 검색 후보를 확인하세요/)
+  assert.match(html, /검색 결과는 요구사항 충족 여부를 판정한 결과가 아닙니다\. 원문을 직접 확인하세요/)
   assert.match(html, /백엔드 이력서/)
-  assert.match(html, /이력서 · 관련 원문 3건/)
+  assert.match(html, /이력서 · 버전 1 · 확인할 원문 후보 3건/)
   assert.match(html, /프로젝트 기록/)
-  assert.match(html, /프로젝트 보고서 · 관련 원문 1건/)
+  assert.match(html, /프로젝트 보고서 · 버전 1 · 확인할 원문 후보 1건/)
   assert.equal((html.match(/<h3>백엔드 이력서<\/h3>/g) ?? []).length, 1)
   assert.equal((html.match(/job-document-evidence-row/g) ?? []).length, 4)
   assert.doesNotMatch(html, /관련 기록 0[1-9]/)
-  assert.doesNotMatch(html, /적합도|합격 가능성|충족|불충족|PASS|FAIL|score|distance/)
+  assert.doesNotMatch(html, /적합도|합격 가능성|충족함|불충족|PASS|FAIL|score|distance/)
 })
 
 test('requirement navigator changes the active item without issuing Search', () => {
@@ -316,7 +413,7 @@ test('requirement navigator changes the active item without issuing Search', () 
     activeItemId: items[1].itemId,
     activeFilter: 'empty',
   })))
-  assert.match(emptyHtml, /관련 경력 기록을 찾지 못했습니다/)
+  assert.match(emptyHtml, /검색된 후보가 없습니다/)
   assert.doesNotMatch(emptyHtml, /job-document-group-heading/)
 })
 
@@ -325,7 +422,7 @@ test('result status tabs separate found, empty, and unresolved requirements with
   const errorGroup: JobEvidenceGroup = {
     item: { itemId: 3, section: null, text: '장애 대응 경험' },
     state: 'error',
-    results: [],
+    candidates: [],
     error: { status: 503 },
   }
   const laterFoundGroup = resultGroup(
@@ -351,8 +448,8 @@ test('result status tabs separate found, empty, and unresolved requirements with
   )
 
   assert.equal(filterButtons.length, 3)
-  assert.match(foundHtml, /기록 있음<\/span><strong>2<\/strong>/)
-  assert.match(foundHtml, /기록 없음<\/span><strong>1<\/strong>/)
+  assert.match(foundHtml, /검색 후보 있음<\/span><strong>2<\/strong>/)
+  assert.match(foundHtml, /검색된 후보 없음<\/span><strong>1<\/strong>/)
   assert.match(foundHtml, /확인 필요<\/span><strong>1<\/strong>/)
   assert.match(foundHtml, /job-requirement-navigation-index">01<\/span>/)
   assert.match(foundHtml, /job-requirement-navigation-index">04<\/span>/)
@@ -368,7 +465,7 @@ test('result status tabs separate found, empty, and unresolved requirements with
     activeFilter: 'empty',
   })))
   assert.match(emptyHtml, /job-requirement-navigation-index">02<\/span>/)
-  assert.match(emptyHtml, /관련 경력 기록을 찾지 못했습니다/)
+  assert.match(emptyHtml, /검색된 후보가 없습니다/)
   assert.doesNotMatch(emptyHtml, new RegExp(items[0].text))
 
   const pendingHtml = renderToStaticMarkup(createElement(JobEvidenceResultsView, resultsViewProps({
@@ -376,8 +473,8 @@ test('result status tabs separate found, empty, and unresolved requirements with
     activeFilter: 'pending',
   })))
   assert.match(pendingHtml, /job-requirement-navigation-index">03<\/span>/)
-  assert.match(pendingHtml, /관련 경력 기록을 불러오지 못했습니다/)
-  assert.doesNotMatch(pendingHtml, /관련 경력 기록을 찾지 못했습니다/)
+  assert.match(pendingHtml, /검색 후보를 불러오지 못했습니다/)
+  assert.doesNotMatch(pendingHtml, /검색된 후보가 없습니다/)
 })
 
 test('active Evidence rows preserve PDF page, TXT document, context, and retry callbacks', () => {
@@ -385,7 +482,7 @@ test('active Evidence rows preserve PDF page, TXT document, context, and retry c
   const navigatedDocuments: number[] = []
   const retriedItems: number[] = []
   const resultTree = JobActiveEvidence({
-    group: resultGroup(items[0], [pdfEvidence, textEvidence]),
+    group: resultGroup(items[0], [pdfEvidenceWithContext, textEvidence]),
     documentTypes: new Map<number, DocumentType>([[101, 'RESUME'], [102, 'PROJECT_REPORT']]),
     documentTypeLabel: (type) => type === 'RESUME' ? '이력서' : '프로젝트 보고서',
     onRetry: (itemId) => retriedItems.push(itemId),
@@ -403,7 +500,7 @@ test('active Evidence rows preserve PDF page, TXT document, context, and retry c
   }
 
   const errorTree = JobActiveEvidence({
-    group: { item: items[1], state: 'error', results: [], error: { status: 403 } },
+    group: { item: items[1], state: 'error', candidates: [], error: { status: 403 } },
     documentTypes: new Map(),
     documentTypeLabel: () => '문서',
     onRetry: (itemId) => retriedItems.push(itemId),
@@ -419,7 +516,33 @@ test('active Evidence rows preserve PDF page, TXT document, context, and retry c
   assert.deepEqual(openedPages, [2])
   assert.deepEqual(navigatedDocuments, [102])
   assert.deepEqual(retriedItems, [2])
-  assert.match(renderToStaticMarkup(resultTree), /주변 내용 보기/)
+  const resultHtml = renderToStaticMarkup(resultTree)
+  assert.match(resultHtml, /class="job-evidence-preview"/)
+  assert.equal((resultHtml.match(/주변 내용 보기/g) ?? []).length, 1)
+  assert.match(resultHtml, /keyword-context-details job-evidence-context-details/)
+  assert.match(resultHtml, /주문 처리 프로젝트/)
+})
+
+test('same-title document groups show version and stable visual disambiguation', () => {
+  const sameTitleOtherDocument = {
+    ...textEvidence,
+    documentId: 103,
+    documentVersionId: 203,
+    documentTitle: pdfEvidence.documentTitle,
+    versionNo: 2,
+  }
+  const html = renderToStaticMarkup(JobActiveEvidence({
+    group: resultGroup(items[0], [pdfEvidence, sameTitleOtherDocument]),
+    documentTypes: new Map(),
+    documentTypeLabel: () => '문서',
+    onRetry: () => undefined,
+    onOpenPdf: () => undefined,
+    onNavigateToDocument: () => undefined,
+  }))
+
+  assert.match(html, /문서 · 버전 1 · 같은 제목 문서 1\/2 · 확인할 원문 후보 1건/)
+  assert.match(html, /문서 · 버전 2 · 같은 제목 문서 2\/2 · 확인할 원문 후보 1건/)
+  assert.doesNotMatch(html, /문서 ID|documentId|documentVersionId/)
 })
 
 test('compound Search results keep one original requirement in the workspace', () => {

@@ -8,20 +8,39 @@ const MAX_QUERY_VARIANTS = 5
 const MAX_RESULTS_PER_ITEM = 5
 const EXPLICIT_ALTERNATIVE_SEPARATOR = /\s+(?:또는|\bor\b)\s+/iu
 const COMMA_SEPARATOR = /\s*[,，]\s*/u
+const COUNTED_ALTERNATIVE_SELECTION = /\s+중\s+(?:\d{1,2}\s*개|하나)\s*이상(?:\s+.*)?$/u
+const ENUMERATED_ALTERNATIVE_SELECTION = /\s+등(?:의)?(?:\s+.*)?$/u
 const SPACED_SLASH_SEPARATOR = /\s+\/\s+/u
 const LETTER = /\p{L}/u
 const LOWERCASE_PATH_SEGMENT = /^[a-z][a-z0-9._-]*$/u
 const MEANINGFUL_QUERY_CHARACTER = /[\p{L}\p{N}+#]/gu
 const SINGLE_LETTER_IDENTIFIER = /^[A-Z]$/u
+const DIRECT_IDENTIFIER_VARIANT = /^[A-Za-z0-9][A-Za-z0-9+#._-]*(?:\s+[A-Za-z0-9][A-Za-z0-9+#._-]*)?$/u
 
 export type JobEvidenceGroupState = 'loading' | 'result' | 'empty' | 'error'
 
 export type JobEvidenceGroup = {
   item: JobPostingItem
   state: JobEvidenceGroupState
-  results: CareerEvidenceSearchResult[]
+  candidates: JobEvidenceCandidate[]
   error: unknown | null
 }
+
+export type JobEvidenceCandidate = {
+  result: CareerEvidenceSearchResult
+  matchedQueries: string[]
+  displayQuery: string
+  displayQueryIsDirectIdentifier: boolean
+}
+
+export type JobEvidenceQueryResultSet = {
+  query: string
+  original: boolean
+  directIdentifier: boolean
+  results: readonly CareerEvidenceSearchResult[]
+}
+
+type PlannedJobEvidenceQuery = Omit<JobEvidenceQueryResultSet, 'results'>
 
 export type JobEvidenceSearchDependencies = {
   search: (query: string) => Promise<CareerEvidenceSearchResult[]>
@@ -90,14 +109,24 @@ export function selectedJobPostingItemCount(
 }
 
 export function jobEvidenceSearchQueries(text: string): string[] {
+  return jobEvidenceSearchPlan(text).map(({ query }) => query)
+}
+
+function jobEvidenceSearchPlan(text: string): PlannedJobEvidenceQuery[] {
   const normalizedText = normalizeQueryVariant(text)
+  const countedAlternativeParts = splitCountedAlternatives(normalizedText)
+  const enumeratedAlternativeParts = splitEnumeratedAlternatives(normalizedText)
   const explicitAlternativeParts = normalizedText.split(EXPLICIT_ALTERNATIVE_SEPARATOR)
-  const fragments = explicitAlternativeParts.length > 1
-    ? splitExplicitAlternatives(explicitAlternativeParts)
-    : splitSlashAlternatives(normalizedText)
+  const fragments = countedAlternativeParts.length > 1
+    ? countedAlternativeParts
+    : enumeratedAlternativeParts.length > 1
+      ? enumeratedAlternativeParts
+      : explicitAlternativeParts.length > 1
+        ? splitExplicitAlternatives(explicitAlternativeParts)
+        : splitSlashAlternatives(normalizedText)
 
   if (fragments.length <= 1) {
-    return [text]
+    return [{ query: text, original: true, directIdentifier: false }]
   }
 
   const originalKey = normalizedQueryKey(text)
@@ -115,24 +144,47 @@ export function jobEvidenceSearchQueries(text: string): string[] {
       break
     }
   }
-  return [text, ...variants]
+  return [
+    { query: text, original: true, directIdentifier: false },
+    ...variants.map((query) => ({
+      query,
+      original: false,
+      directIdentifier: isDirectIdentifierVariant(query),
+    })),
+  ]
 }
 
 export function mergeJobEvidenceResults(
-  resultSets: readonly (readonly CareerEvidenceSearchResult[])[],
-): CareerEvidenceSearchResult[] {
-  const merged: CareerEvidenceSearchResult[] = []
-  const seen = new Set<string>()
-  for (const results of resultSets) {
-    for (const result of results) {
-      const identity = `${result.documentId}:${result.documentVersionId}:${result.chunkId}`
-      if (seen.has(identity)) {
+  resultSets: readonly JobEvidenceQueryResultSet[],
+): JobEvidenceCandidate[] {
+  const merged: JobEvidenceCandidate[] = []
+  const candidatesByIdentity = new Map<string, JobEvidenceCandidate>()
+  for (const resultSet of resultSets) {
+    for (const result of resultSet.results) {
+      if (resultSet.directIdentifier && !hasDirectIdentifierEvidence(resultSet.query, result)) {
         continue
       }
-      seen.add(identity)
-      merged.push(result)
-      if (merged.length === MAX_RESULTS_PER_ITEM) {
-        return merged
+      const identity = `${result.documentId}:${result.documentVersionId}:${result.chunkId}`
+      const existing = candidatesByIdentity.get(identity)
+      if (existing !== undefined) {
+        if (!existing.matchedQueries.includes(resultSet.query)) {
+          existing.matchedQueries.push(resultSet.query)
+        }
+        if (resultSet.directIdentifier && !existing.displayQueryIsDirectIdentifier) {
+          existing.displayQuery = resultSet.query
+          existing.displayQueryIsDirectIdentifier = true
+        }
+        continue
+      }
+      if (merged.length < MAX_RESULTS_PER_ITEM) {
+        const candidate = {
+          result,
+          matchedQueries: [resultSet.query],
+          displayQuery: resultSet.query,
+          displayQueryIsDirectIdentifier: resultSet.directIdentifier,
+        }
+        candidatesByIdentity.set(identity, candidate)
+        merged.push(candidate)
       }
     }
   }
@@ -146,7 +198,7 @@ export function loadingJobEvidenceGroups(
   return selectedJobPostingItems(items, selectedItemIds).map((item) => ({
     item,
     state: 'loading',
-    results: [],
+    candidates: [],
     error: null,
   }))
 }
@@ -160,7 +212,7 @@ export async function findJobEvidence(
   const groups = await searchSelectedItems(selectedItems, dependencies.search)
 
   const resultDocumentIds = new Set(
-    groups.flatMap((group) => group.results.map((result) => result.documentId)),
+    groups.flatMap((group) => group.candidates.map(({ result }) => result.documentId)),
   )
   if (resultDocumentIds.size === 0) {
     return {
@@ -208,15 +260,15 @@ async function searchSelectedItems(
       }
 
       try {
-        const results = await searchJobEvidenceItem(
+        const candidates = await searchJobEvidenceItem(
           item.text,
           search,
           () => authenticationError !== null,
         )
         groups[index] = {
           item,
-          state: results.length === 0 ? 'empty' : 'result',
-          results,
+          state: candidates.length === 0 ? 'empty' : 'result',
+          candidates,
           error: null,
         }
       } catch (error) {
@@ -227,7 +279,7 @@ async function searchSelectedItems(
         groups[index] = {
           item,
           state: 'error',
-          results: [],
+          candidates: [],
           error,
         }
       }
@@ -242,15 +294,57 @@ async function searchJobEvidenceItem(
   text: string,
   search: JobEvidenceSearchDependencies['search'],
   shouldStop: () => boolean,
-): Promise<CareerEvidenceSearchResult[]> {
-  const resultSets: CareerEvidenceSearchResult[][] = []
-  for (const query of jobEvidenceSearchQueries(text)) {
+): Promise<JobEvidenceCandidate[]> {
+  const resultSets: JobEvidenceQueryResultSet[] = []
+  for (const plannedQuery of jobEvidenceSearchPlan(text)) {
     if (shouldStop()) {
       break
     }
-    resultSets.push(await search(query))
+    resultSets.push({
+      ...plannedQuery,
+      results: await search(plannedQuery.query),
+    })
   }
   return mergeJobEvidenceResults(resultSets)
+}
+
+function splitCountedAlternatives(value: string): string[] {
+  return splitCommaAlternativesBefore(value, COUNTED_ALTERNATIVE_SELECTION)
+}
+
+function splitEnumeratedAlternatives(value: string): string[] {
+  const commaAlternatives = splitCommaAlternativesBefore(value, ENUMERATED_ALTERNATIVE_SELECTION)
+  return commaAlternatives.length > 1
+    ? commaAlternatives
+    : splitCompactSlashAlternativesBefore(value, ENUMERATED_ALTERNATIVE_SELECTION)
+}
+
+function splitCommaAlternativesBefore(value: string, suffix: RegExp): string[] {
+  const selection = value.match(suffix)
+  if (selection?.index === undefined) {
+    return []
+  }
+  const optionList = value.slice(0, selection.index)
+  if (/\p{N}[,，]\p{N}/u.test(optionList)) {
+    return []
+  }
+  const parts = optionList.split(COMMA_SEPARATOR)
+  return parts.length > 1 && isClearCommaAlternativeList(parts) ? parts : []
+}
+
+function splitCompactSlashAlternativesBefore(value: string, suffix: RegExp): string[] {
+  const selection = value.match(suffix)
+  if (selection?.index === undefined) {
+    return []
+  }
+  const optionList = normalizeQueryVariant(value.slice(0, selection.index))
+  if (optionList.includes('://') || optionList.includes(' ')) {
+    return []
+  }
+  const parts = optionList.split('/')
+  const clearIdentifierPair = parts.length === 2
+    && parts.every((part) => DIRECT_IDENTIFIER_VARIANT.test(part))
+  return clearIdentifierPair ? parts : []
 }
 
 function splitExplicitAlternatives(parts: readonly string[]): string[] {
@@ -318,6 +412,31 @@ function normalizedQueryKey(value: string): string {
 function isMeaningfulQueryVariant(value: string): boolean {
   return (value.match(MEANINGFUL_QUERY_CHARACTER)?.length ?? 0) >= 2
     || SINGLE_LETTER_IDENTIFIER.test(value)
+}
+
+function isDirectIdentifierVariant(value: string): boolean {
+  return [...value].length <= 80 && DIRECT_IDENTIFIER_VARIANT.test(value)
+}
+
+function hasDirectIdentifierEvidence(
+  identifier: string,
+  result: Pick<CareerEvidenceSearchResult, 'content' | 'snippet'>,
+): boolean {
+  const identifierPattern = identifier
+    .trim()
+    .split(/\s+/u)
+    .map(escapeRegularExpression)
+    .join('\\s+')
+  const tokenBoundary = 'A-Za-z0-9+#._-'
+  const directIdentifier = new RegExp(
+    `(^|[^${tokenBoundary}])${identifierPattern}(?=$|[^${tokenBoundary}])`,
+    'iu',
+  )
+  return directIdentifier.test(result.snippet) || directIdentifier.test(result.content)
+}
+
+function escapeRegularExpression(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&')
 }
 
 function documentTypesForResults(

@@ -108,6 +108,70 @@ test('compound query planning keeps the original and only expands explicit alter
   ])
 })
 
+test('compound query planning conservatively expands explicit counted alternatives', () => {
+  const counted = 'Kotlin, TypeScript, Python, Go, Java 중 1개 이상 개발 가능자'
+  assert.deepEqual(jobEvidenceSearchQueries(counted), [
+    counted,
+    'Kotlin',
+    'TypeScript',
+    'Python',
+    'Go',
+    'Java',
+  ])
+  assert.deepEqual(jobEvidenceSearchQueries('Docker, Kubernetes 중 하나 이상 운영 경험'), [
+    'Docker, Kubernetes 중 하나 이상 운영 경험',
+    'Docker',
+    'Kubernetes',
+  ])
+  const capped = '기술01, 기술02, 기술03, 기술04, 기술05, 기술06, 기술07 중 1개 이상 사용 경험'
+  assert.deepEqual(jobEvidenceSearchQueries(capped), [
+    capped,
+    '기술01',
+    '기술02',
+    '기술03',
+    '기술04',
+    '기술05',
+  ])
+  assert.deepEqual(jobEvidenceSearchQueries('요구사항, 일정, API를 조율한 경험'), [
+    '요구사항, 일정, API를 조율한 경험',
+  ])
+  assert.deepEqual(jobEvidenceSearchQueries('1,000건 처리 또는 장애 복구 경험'), [
+    '1,000건 처리 또는 장애 복구 경험',
+  ])
+  assert.deepEqual(jobEvidenceSearchQueries('CI/CD 파이프라인 경험'), [
+    'CI/CD 파이프라인 경험',
+  ])
+  assert.deepEqual(jobEvidenceSearchQueries('src/main/java'), [
+    'src/main/java',
+  ])
+})
+
+test('compound query planning conservatively expands explicit enumeration suffixes', () => {
+  assert.deepEqual(jobEvidenceSearchQueries('Alpha/Beta 등 관련 기술 사용 경험'), [
+    'Alpha/Beta 등 관련 기술 사용 경험',
+    'Alpha',
+    'Beta',
+  ])
+  assert.deepEqual(jobEvidenceSearchQueries('Docker, Git, Gradle 등 개발 도구 사용 경험'), [
+    'Docker, Git, Gradle 등 개발 도구 사용 경험',
+    'Docker',
+    'Git',
+    'Gradle',
+  ])
+  assert.deepEqual(jobEvidenceSearchQueries('Java, Kotlin 등의 언어 사용 경험'), [
+    'Java, Kotlin 등의 언어 사용 경험',
+    'Java',
+    'Kotlin',
+  ])
+  assert.deepEqual(jobEvidenceSearchQueries('요구사항, 일정, API를 조율한 경험'), [
+    '요구사항, 일정, API를 조율한 경험',
+  ])
+  assert.deepEqual(jobEvidenceSearchQueries('1,000건 처리 경험'), ['1,000건 처리 경험'])
+  assert.deepEqual(jobEvidenceSearchQueries('CI/CD 경험'), ['CI/CD 경험'])
+  assert.deepEqual(jobEvidenceSearchQueries('OAuth2/JWT 경험'), ['OAuth2/JWT 경험'])
+  assert.deepEqual(jobEvidenceSearchQueries('src/main/java'), ['src/main/java'])
+})
+
 test('compound query planning removes duplicate variants and limits variants to five', () => {
   assert.deepEqual(jobEvidenceSearchQueries('Docker, Docker 또는 Docker 사용 경험'), [
     'Docker, Docker 또는 Docker 사용 경험',
@@ -222,7 +286,63 @@ test('compound items search original and variants in order and show variant Evid
   ])
   assert.equal(search.groups[0]?.state, 'result')
   assert.equal(search.groups[0]?.item.text, compoundItem.text)
-  assert.deepEqual(search.groups[0]?.results.map((result) => result.chunkId), [41])
+  assert.deepEqual(search.groups[0]?.candidates.map(({ result }) => result.chunkId), [41])
+  assert.deepEqual(search.groups[0]?.candidates[0]?.matchedQueries, ['Docker'])
+  assert.equal(search.groups[0]?.candidates[0]?.displayQuery, 'Docker')
+  assert.equal(search.groups[0]?.candidates[0]?.displayQueryIsDirectIdentifier, true)
+})
+
+test('short identifier variants keep only direct Evidence and preserve matched query provenance', async () => {
+  const compoundItem: JobPostingItem = {
+    itemId: 13,
+    section: '자격요건',
+    text: 'Kotlin, TypeScript, Python, Go, Java 중 1개 이상 개발 가능자',
+  }
+  let javaRawResults = 0
+  const search = await findJobEvidence([compoundItem], new Set([compoundItem.itemId]), {
+    search: async (query) => {
+      if (query !== 'Java') return []
+      const results = [
+        evidence(71, 130, 'Java 17, Spring Boot 기반으로 개발했습니다.'),
+        evidence(72, 130, 'Java와 Spring으로 백엔드를 개발했습니다.'),
+        evidence(73, 130, '예산에 맞춰 제주 여행 일정을 만드는 서비스'),
+      ]
+      javaRawResults = results.length
+      return results
+    },
+    listDocuments: async () => [],
+  })
+
+  assert.equal(javaRawResults, 3)
+  assert.deepEqual(search.groups[0]?.candidates.map(({ result }) => result.chunkId), [71, 72])
+  assert.deepEqual(search.groups[0]?.candidates.map(({ matchedQueries }) => matchedQueries), [
+    ['Java'],
+    ['Java'],
+  ])
+  assert.deepEqual(search.groups[0]?.candidates.map(({ displayQuery }) => displayQuery), [
+    'Java',
+    'Java',
+  ])
+})
+
+test('direct Evidence matching respects identifier boundaries and never filters original queries', () => {
+  const original = evidence(81, 140, '원문 query가 찾은 semantic 후보')
+  const docker = evidence(82, 140, 'Docker Compose로 서비스를 실행했습니다.')
+  const githubOnly = evidence(83, 140, 'GitHub Actions로 배포했습니다.')
+  const cpp = evidence(84, 140, 'C++ 기반 모듈을 개발했습니다.')
+  const csharp = evidence(85, 140, 'C# 기반 서비스를 개발했습니다.')
+  const node = evidence(86, 140, 'Node.js 서버를 운영했습니다.')
+
+  const candidates = mergeJobEvidenceResults([
+    { query: '원래 긴 요구사항', original: true, directIdentifier: false, results: [original] },
+    { query: 'Docker', original: false, directIdentifier: true, results: [docker] },
+    { query: 'Git', original: false, directIdentifier: true, results: [githubOnly] },
+    { query: 'C++', original: false, directIdentifier: true, results: [cpp] },
+    { query: 'C#', original: false, directIdentifier: true, results: [csharp] },
+    { query: 'Node.js', original: false, directIdentifier: true, results: [node] },
+  ])
+
+  assert.deepEqual(candidates.map(({ result }) => result.chunkId), [81, 82, 84, 85, 86])
 })
 
 test('original-first merge deduplicates selected chunks, preserves distinct Evidence, and caps at five', async () => {
@@ -231,14 +351,14 @@ test('original-first merge deduplicates selected chunks, preserves distinct Evid
     section: '자격요건',
     text: 'Java 또는 Kotlin 개발 경험',
   }
-  const originalEvidence = evidence(51, 110, '원문 query가 찾은 기록')
+  const originalEvidence = evidence(51, 110, 'Java 원문 query가 찾은 기록')
   const duplicateFromVariant = {
     ...originalEvidence,
-    snippet: 'variant가 다시 찾은 같은 기록',
+    snippet: 'Java variant가 다시 찾은 같은 기록',
     score: 0.99,
   }
   const distinctSameDocument = {
-    ...evidence(52, 110, '같은 문서의 다른 기록'),
+    ...evidence(52, 110, 'Java 같은 문서의 다른 기록'),
     sourceType: 'PAGE' as const,
     sourceIndex: 1,
     sourceLabel: '1페이지',
@@ -253,8 +373,8 @@ test('original-first merge deduplicates selected chunks, preserves distinct Evid
         return [
           duplicateFromVariant,
           distinctSameDocument,
-          evidence(53, 111, '세 번째 기록'),
-          evidence(54, 112, '네 번째 기록'),
+          evidence(53, 111, 'Java 세 번째 기록'),
+          evidence(54, 112, 'Java 네 번째 기록'),
         ]
       }
       return [
@@ -266,11 +386,14 @@ test('original-first merge deduplicates selected chunks, preserves distinct Evid
   })
 
   assert.deepEqual(
-    search.groups[0]?.results.map((result) => result.chunkId),
+    search.groups[0]?.candidates.map(({ result }) => result.chunkId),
     [51, 52, 53, 54, 55],
   )
-  assert.equal(search.groups[0]?.results[0]?.snippet, '원문 query가 찾은 기록')
-  assert.equal(search.groups[0]?.results[1]?.sourceLabel, '1페이지')
+  assert.equal(search.groups[0]?.candidates[0]?.result.snippet, 'Java 원문 query가 찾은 기록')
+  assert.equal(search.groups[0]?.candidates[1]?.result.sourceLabel, '1페이지')
+  assert.deepEqual(search.groups[0]?.candidates[0]?.matchedQueries, [compoundItem.text, 'Java'])
+  assert.equal(search.groups[0]?.candidates[0]?.displayQuery, 'Java')
+  assert.equal(search.groups[0]?.candidates[0]?.displayQueryIsDirectIdentifier, true)
 })
 
 test('result merging keeps query order and only removes the same document version chunk', () => {
@@ -282,7 +405,10 @@ test('result merging keeps query order and only removes the same document versio
   const duplicate = { ...first, snippet: '나중 query 중복' }
 
   assert.deepEqual(
-    mergeJobEvidenceResults([[first], [duplicate, sameChunkInAnotherVersion]]).map((result) => (
+    mergeJobEvidenceResults([
+      { query: '원문', original: true, directIdentifier: false, results: [first] },
+      { query: '다른 query', original: false, directIdentifier: false, results: [duplicate, sameChunkInAnotherVersion] },
+    ]).map(({ result }) => (
       [result.documentVersionId, result.chunkId, result.snippet]
     )),
     [
@@ -309,7 +435,7 @@ test('all compound queries returning no Evidence produce the neutral empty state
 
   assert.equal(searchRequests, 3)
   assert.equal(search.groups[0]?.state, 'empty')
-  assert.deepEqual(search.groups[0]?.results, [])
+  assert.deepEqual(search.groups[0]?.candidates, [])
 })
 
 test('empty and failed Search groups stay independent while metadata failure keeps Evidence visible', async () => {
@@ -328,7 +454,7 @@ test('empty and failed Search groups stay independent while metadata failure kee
 
   assert.deepEqual(search.groups.map((group) => group.state), ['empty', 'error', 'result'])
   assert.equal(search.groups[1]?.error, searchFailure)
-  assert.equal(search.groups[2]?.results[0]?.snippet, '성공한 다른 그룹의 관련 기록')
+  assert.equal(search.groups[2]?.candidates[0]?.result.snippet, '성공한 다른 그룹의 관련 기록')
   assert.equal(search.metadataError, metadataFailure)
   assert.equal(search.documentTypes.size, 0)
 })

@@ -4,28 +4,202 @@
 
 - 상태: `IN_PROGRESS`
 - 기준선: `d44f30eb4346353c4363d559be478024f191a878`
-- 현재 source: `de98bcf`
-- VERIFY: 결과 상태 탭 포함 새 UI 자동 검증 `PASS`, 최신 frontend rebuild `PASS`, 새 인증 browser
-  Gate `BLOCKED_BY_AUTH_ENVIRONMENT`; 이전 compound/PDF targeted Gate `PASS`
-- AUDIT: 새 UI 독립 감사와 결과 상태 탭 최종 자체 감사 `PASS` — blocking finding 0,
-  보호 대상 해시 변경 0
-- commit/push: `PASS` — `PRZ-017-job-evidence-v1` checkpoint
+- 현재 source: `8be904d` + 미커밋 실사용 보정
+- VERIFY: 주변 내용 polish frontend focused 30개·전체 77개, typecheck·lint·build,
+  Docker 최신 source rebuild와 실제 인증 desktop browser Gate `PASS`; 최종 patch mobile viewport
+  재실행은 `NOT_RUN`
+- AUDIT: 화면상 exact duplicate 0, 보호 대상 diff 0, `git diff --check` `PASS`
+- commit/push: 이번 실사용 보정은 사용자 지시에 따라 `NOT_RUN`
 - PR/merge: 사용자 지시에 따라 `NOT_RUN`
 
-현재 source에는 V1 수직 흐름, bounded compound query composition, section별 선택 modal,
-전용 결과 workspace와 결과 상태 탭이 구현됐다. 새 UI 자동 검증과 독립 감사는 통과했다. 인증 browser
-Gate는 기존 세션이 segmentation 요청에서 만료돼 로그인 화면으로 이동했고 비밀번호를
-코드나 자동화에 노출하지 않았으므로 `BLOCKED_BY_AUTH_ENVIRONMENT`다. 이전 Phase에서는 같은
-owner의 ACTIVE PDF를 사용한 Docker·Git compound와 PDF page 이동을 확인했다. 기존 44개
-전체 원문과 TXT 이동은 다시 실행하지 않았고 인증 browser Gate도 남아 있으므로 전체 상태는
-`IN_PROGRESS`로 유지한다.
+현재 미커밋 보정은 실제 ATAD 공고의 noise를 제거하고 `중 1개 이상`·`등/등의` 복합 질의에서
+직접 identifier Evidence만 후보로 표시하는 실제 browser 경로까지 확인했다. 결과 표시 polish는
+긴 원문 후보, focus, 같은 제목 문서 식별과 중복 표시를 실제 인증 화면에서 확인했다. 최종 patch의
+mobile viewport 재실행과 기존 backend 전체 unit 장애는 별도 한계로 남아 있어 branch 전체 상태는
+`IN_PROGRESS`로 유지한다. 이전 checkpoint 검증과 통합 이력은 아래 historical 절에 분리해 보존한다.
 
-## Checkpoint integration
+## 2026-08-26 주변 내용 polish
+
+실제 인증 화면에서 `주변 내용 보기`가 summary 버튼의 flex 너비를 기준으로 약 283px까지
+수축하고, 일부 결과는 현재 미리보기를 포함하지 않은 문서 앞부분을 문맥으로 표시했다. PRZ-017
+presentation에서 미리보기를 포함하면서 추가 원문을 제공하는 문맥만 유효하게 판정하고, 열린
+details는 Evidence 본문 폭을 사용하도록 수정했다. Search response, ranking, 공통 Search
+presentation과 후보 dedup은 변경하지 않았다.
+
+| 검증 | 결과 |
+|---|---|
+| Focused frontend unit/component | `PASS` — 30/30 |
+| Frontend 전체 unit | `PASS` — 77/77 |
+| Frontend typecheck·lint·production build | `PASS` — Vite 37 modules |
+| Docker frontend rebuild | `PASS` — 최신 source `npm run build` 완료 |
+| Docker runtime | `PASS` — backend health `UP`, frontend HTTP 200, DB healthy |
+| 변경 전 실제 browser | 14개 행에 action 14개, 유효 문맥 6개, 불필요·불일치 8개 |
+| 변경 후 실제 browser | action 6개, 미리보기 불포함·중복 문맥 0 |
+| 열린 reader 폭 | `PASS` — details/reader/본문이 모두 672px; 기존 283px 수축 제거 |
+| 후보·중복 회귀 | `PASS` — 항목별 2/5/5/2 유지, exact duplicate 0 |
+
+유효한 문맥이 없는 Java·Linux 후보에서는 action을 숨겼고, Spring 1개와 MySQL 5개에서는
+미리보기부터 이어지는 추가 extractive 원문만 표시했다. PDF/TXT 원문 이동 action은 모든 행에
+그대로 남아 있다.
+
+## 2026-08-26 결과 표시 polish
+
+### 구현
+
+- 과도하게 긴 Evidence highlight는 기존 metadata-free extractive context가 더 짧을 때 그 문맥을
+  사용하고, blockquote는 최대 5줄 preview로 제한했다. 주변 내용과 PDF/TXT 원문 action은 유지한다.
+- 결과 제목의 programmatic focus를 PRIZM focus token으로 표시한다.
+- document group에 versionNo를 항상 표시하고, 같은 제목 group은 결과 순서대로
+  `같은 제목 문서 n/N`을 표시한다. 내부 document ID는 노출하지 않는다.
+
+### 자동 검증
+
+| 검증 | 결과 |
+|---|---|
+| Focused frontend unit/component | `PASS` — 29/29 |
+| Frontend 전체 unit | `PASS` — 76/76 |
+| Frontend typecheck | `PASS` |
+| Frontend lint | `PASS` |
+| Frontend production build | `PASS` — Vite 37 modules |
+| Docker frontend build/recreate | `PASS` — 최신 source로 `npm run build` 완료 |
+| Docker runtime | `PASS` — backend health `UP`, frontend HTTP 200, DB healthy, demo bootstrap `false` |
+| PRZ-016 Search·embedding·Flyway·dependency diff | `PASS` — 변경 0 |
+| `git diff --check` | `PASS` |
+
+backend focused test 재실행은 기존 `searchEvaluation` source-set compile 오류가 test 실행 전에
+발생해 `BLOCKED_BY_BASELINE`으로 기록한다. 이번 polish의 backend source 변경은 0이며 직전 Phase의
+focused service/controller 결과와 Docker backend 실행 상태는 유지된다.
+
+### 실제 인증 browser Gate와 중복 감사
+
+| 항목 | 결과 |
+|---|---|
+| 긴 Java 후보 | `PASS` — 2건 모두 35자·50px preview, email/phone/URL 노출 0 |
+| 레이아웃 | `PASS` — desktop 가로 overflow 0, 주변 내용 action 2개 유지 |
+| 제목 focus | `PASS` — programmatic focus와 PRIZM blue 3px outline 확인 |
+| exact duplicate | `PASS` — 같은 document/version/source/display text 중복 0 |
+| 같은 문장 반복 | Java 1, Spring 2, Linux 1 — 모두 서로 다른 document 사이 반복 |
+| 같은 문서의 다른 source 반복 | `PASS` — 0 |
+| 같은 제목 document group | `PASS` — version과 `같은 제목 문서 1/2`, `2/2`로 구분 |
+| browser console | `PASS` — 오류 0 |
+| 최종 patch mobile viewport | `NOT_RUN` — in-app viewport 전환 불가; 직전 mobile Gate와 responsive CSS만 재감사 |
+
+서로 다른 등록 문서의 같은 문장은 독립 Evidence source이므로 합치지 않는다. 대신 같은 제목 문서도
+사용자가 출처를 구별할 수 있게 표시한다. 화면상 완전 중복이나 사용을 막는 blocking finding은 없다.
+사용자는 일반 브라우저에서 PDF가 정상 표시됨을 확인했으며, 앱 내 브라우저 renderer 차이는 이번
+수정 대상에서 제외했다. commit·push·PR·merge는 실행하지 않았다.
+
+## 2026-08-24 Search 후보 신뢰성 보정
+
+### 구현 범위
+
+- `A, B, C 등 ...`·`A, B, C 등의 ...`를 원문 우선과 최대 5개 variant 계약 안에서만
+  보수적으로 확장한다. 일반 쉼표 문장, 숫자 comma, `CI/CD`, `OAuth2/JWT`, 경로는 원문-only다.
+- PRZ-017 후보에 matched query provenance와 display query를 보존한다. 동일 chunk의 첫 raw
+  result와 original-first 순서는 유지하고 이후 query provenance만 합친다.
+- decomposition으로 만든 짧은 ASCII identifier/phrase에만 direct Evidence guard를 적용한다.
+  `Git`은 `GitHub`만으로 통과하지 않으며 `Docker Compose`, `Java 17`, `C++`, `C#`, `Node.js`는
+  독립 identifier로 보존한다.
+- matched display query를 PRZ-017 extractive 표시 anchor로 사용한다. 공통 PRZ-016 Search
+  presentation, SearchService, threshold, ranking, rescue, embedding, SQL은 수정하지 않는다.
+- 결과 UI를 `검색 후보 있음`, `검색된 후보 없음`, `확인할 원문 후보`로 낮추고 요구사항 충족
+  판정이 아니라는 안내를 표시한다. PDF/TXT callback과 원래 항목 번호·순서는 유지한다.
+
+### 자동 검증
+
+| 검증 | 결과 |
+|---|---|
+| Focused frontend unit/component | `PASS` — 27/27 |
+| Frontend 전체 unit | `PASS` — 74/74 |
+| Frontend typecheck | `PASS` |
+| Frontend lint | `PASS` |
+| Frontend production build | `PASS` — Vite 37 modules, `index-Bkub8t-x.js` |
+| Docker Compose config | `PASS` |
+| Docker runtime | `PASS` — frontend HTTP 200, backend health `UP`, DB healthy |
+| PRZ-016 Search·embedding·Flyway·dependency diff | `PASS` — 변경 0 |
+| `git diff --check` | `PASS` |
+
+표준 Docker rebuild는 Docker Desktop DNS가 registry metadata를 해석하지 못해 완료되지 않았다.
+대신 동일 old frontend image에 검증된 `frontend/dist`를 network-free overlay하고 frontend만
+재생성했다. 실행 중 index는 `index-Bkub8t-x.js`와 `index-C2rDrxOc.css`를 제공한다. backend와
+DB는 재생성하거나 변경하지 않았다.
+
+### 실제 인증 browser Gate
+
+| 항목 | 결과 |
+|---|---|
+| ATAD segmentation | `PASS` — selectable 18, 18개 기본 선택 |
+| 결과 상태 | `PASS` — 검색 후보 있음 10, 검색된 후보 없음 8 |
+| Java 항목 | `PASS` — 후보 3건 모두 표시 원문에 `Java` 직접 포함, MoneyWay 단독 문장 0 |
+| Docker enumeration | `PASS` — 후보 2건, `Docker`와 `Docker Compose` 직접 포함 |
+| 후보 UI·비판정 안내 | `PASS` — 결과·empty 상태 모두 후보 표현과 불충족 비판정 안내 확인 |
+| PDF callback | `PASS` — 2페이지 blob iframe과 `#page=2&zoom=page-width` 연결 |
+| 브라우저 console | `PASS` — 오류 0 |
+| 일반 Chrome PDF 시각 확인 | `NOT_RUN` — 별도 Chrome 인증 세션 없이 앱 내 브라우저만 사용 |
+
+앱 내 브라우저의 PDF iframe은 blob URL과 page target은 유효하지만 화면이 흰색이었다. 이번
+Phase는 PDF renderer를 수정하지 않으므로 PRZ-017 Search 기능의 실패로 확대하지 않고, 일반
+Chrome 사람이 보는 시각 결과는 `NOT_RUN`으로 분리한다.
+
+## 2026-08-24 실사용 ATAD 보정
+
+### 범위와 기준
+
+- 작업 시작 source는 `8be904d3442cb52151fce1d9c29f4608c689d9d4`, 비교 기준
+  `origin/main`은 `d44f30eb4346353c4363d559be478024f191a878`이다.
+- 이번 보정은 PRZ-017 segmentation service/test, PRZ-017 frontend query planner/test와
+  Spec·Plan·Tasks·Evidence에만 한정했다. commit·push·PR·merge는 실행하지 않는다.
+- `PRZ-016` Search Production, embedding, auth, Flyway migration, dependency manifest는
+  수정하지 않는다.
+
+### Before / After
+
+| 항목 | Before | After |
+|---|---:|---:|
+| ATAD selectable 항목 | 45 | 18 |
+| 소개 문장 | 포함 | 0 |
+| `►/▶` 구조 heading | 포함 | 0 |
+| child가 있는 `•/●` grouping parent | 포함 | 0 |
+| 혜택·복지 항목 | 포함 | 0 |
+| 자격요건·우대사항 leaf | 혼재 | 12개 보존 |
+
+After API 결과는 업무 leaf 6개, 자격요건 7개, 우대사항 5개를 원문 순서대로 반환했다.
+`itemId`는 1부터 18까지 연속이며, explicit list item은 문장부호가 있어도 하나의 atomic item으로
+유지됐다. 각 item은 500자 상한을 계속 적용한다.
+
+### Compound query 보정
+
+- 입력: `Kotlin, TypeScript, Python, Go, Java 중 1개 이상 개발 가능자`
+- 변경 전: suffix가 명시적 alternative separator로 인식되지 않아 원문 한 번만 검색했다.
+- 변경 후: 원문, `Kotlin`, `TypeScript`, `Python`, `Go`, `Java` 순서로 검색한다. 기존 규칙대로
+  variant는 최대 5개, 원문 우선, 동일 chunk dedup, 최종 Top 5를 유지한다.
+- 실제 인증 Search API 결과는 원문/Kotlin/TypeScript/Python/Go가 각각 0건, Java가 5건이었다.
+  병합 결과는 5건이고 5건 모두 Java 결과와 일치했다.
+- 일반 쉼표 문장, `1,000`, `CI/CD`, `src/main/java`는 분해하지 않는 negative test를 유지한다.
+
+### 검증 결과
+
+| 검증 | 결과 |
+|---|---|
+| ATAD 변경 후 segmentation API | `PASS` — selectable 18, noise 0, 순서·section·1-based ID 일치 |
+| Backend focused | `PASS` — service 23/23, controller 6/6, 합계 29/29 |
+| Backend 전체 unit | `BLOCKED_BY_BASELINE` — `compileSearchEvaluationJava`가 기존 `ClaimSupportDecision` 및 `candidateClaimSupport` 참조 6건으로 실패 |
+| Frontend unit | `PASS` — 70/70 |
+| Frontend typecheck/lint/build | 모두 `PASS` — production build 37 modules |
+| Docker 최신 source rebuild | `PASS` — backend `bootJar`, frontend build, backend health `UP` |
+| 인증 Java compound API | `PASS` — 6 query, Java 5건, merged Top 5의 Java overlap 5 |
+| 실제 browser Gate | `BLOCKED_BY_AUTH_CONFIRMATION` — 로그인 화면까지 확인했으나 `.env` 자격증명 입력 승인이 없어 인증 동작을 실행하지 않음 |
+
+전체 unit 장애 파일은 `src/searchEvaluation/java/com/prizm/search/evaluation/` 아래 두 기존 평가
+테스트이며 이번 diff에 없다. 변경 범위의 source compile, focused test와 Docker runtime은 통과했다.
+브라우저 Gate를 `PASS`로 대체하지 않으며, 실제 인증 API 결과와 분리해 기록한다.
+
+## 이전 checkpoint integration (historical)
 
 - Production Java 주석 정비는 commit `6cc4726`, PRZ-017 구현·test·Spec은 source commit
   `de98bcf`에 기록했다.
-- 두 commit과 이 통합 기록은 `PRZ-017-job-evidence-v1` 원격 branch에 push한다. PR과 merge는
-  만들거나 실행하지 않는다.
+- 두 commit과 당시 통합 기록은 `PRZ-017-job-evidence-v1` 원격 branch에 push했다. PR과 merge는
+  만들거나 실행하지 않았다. 이번 미커밋 실사용 보정에는 해당하지 않는다.
 - 인증 browser Gate의 `BLOCKED_BY_AUTH_ENVIRONMENT`, 기존 44개 전체 공고와 TXT 이동
   `NOT_RUN`, 전체 상태 `IN_PROGRESS`를 그대로 남겨 노트북 환경에서 이어서 검증할 수 있게 한다.
 
@@ -183,6 +357,136 @@ PostgreSQL 결과는 OpenSQL evidence로 대체하지 않는다. 환경이 없�
 
 ## 남은 Gate
 
-이번 compound query Phase의 자동 검증·인증 targeted browser Gate·독립 AUDIT는 완료됐다.
-기존 44개 전체 공고와 TXT 이동은 이번 Phase에서 재실행하지 않았다. 현재 branch checkpoint는
-commit·push했고 PR/merge는 사용자 지시에 따라 `NOT_RUN`이며 전체 상태는 `IN_PROGRESS`다.
+이전 compound query Phase의 자동 검증·인증 targeted browser Gate·독립 AUDIT는 완료됐다.
+기존 44개 전체 공고와 TXT 이동은 당시 Phase에서 재실행하지 않았다. 이전 branch checkpoint는
+commit·push했고 PR/merge는 실행하지 않았다. 이번 2026-08-24 보정은 commit·push하지 않았고
+전체 상태는 `IN_PROGRESS`다.
+
+## 2026-08-24 segmentation generalization Phase
+
+### 1. 기존 parser의 일반화 실패 원인
+
+기존 parser는 알려진 section 밖의 `UNKNOWN`을 너무 쉽게 searchable로 되돌리고, heading과
+grouping parent를 leaf보다 먼저 구조화하지 못했다. 그 결과 requirement loss보다 회사 소개,
+직무명, heading, 근무 metadata, 복지·전형·법적 고지가 selectable로 반복 유입됐다.
+
+### 2. 새 segmentation architecture
+
+- 각 line에 정규화 본문, 원래 순서, list level, heading marker, contextual heading과
+  grouping-parent 후보를 유지한다.
+- semantic 판정보다 `section → parent → leaf`를 먼저 구성하고 child가 있는 parent 자체는
+  제외한다.
+- section은 `SEARCHABLE`, `EXCLUDED`, `STRUCTURAL`, `UNKNOWN`으로 분리한다.
+- `SEARCHABLE` leaf는 적극 보존하고 `EXCLUDED` child와 `STRUCTURAL` 자체는 제외한다.
+  `UNKNOWN`은 list/leaf, requirement-like 형태, 인접 section과 metadata 형태를 함께 보고
+  보수적으로 보존한다.
+
+### 3. 변경 파일
+
+이번 generalization 구현·검증에서 직접 변경한 파일은 다음 6개다.
+
+- `src/main/java/com/prizm/jobposting/service/JobPostingSegmentationService.java`
+- `src/test/java/com/prizm/jobposting/service/JobPostingSegmentationServiceTest.java`
+- `specs/PRZ-017-job-posting-evidence-v1/spec.md`
+- `specs/PRZ-017-job-posting-evidence-v1/plan.md`
+- `specs/PRZ-017-job-posting-evidence-v1/tasks.md`
+- `specs/PRZ-017-job-posting-evidence-v1/evidence.md`
+
+그 밖의 기존 미커밋 frontend 파일은 이번 Phase에서 수정하지 않았다.
+
+### 4. 하드코딩 방지 감사
+
+- Production segmentation source의 회사명·URL/domain·실제 공고 문장·selectable 개수 분기: 0건
+- 새 generic test의 development/holdout 회사명·실제 문장 복제: 0건
+- exact heading 문장 사전 확장: 사용하지 않음. 일반 의미 범주의 한글·영문 stem과 구조 규칙을
+  사용했다.
+- `아타드(ATAD)` 문자열 1건은 이번 Phase 이전부터 있던 명시적 회귀 fixture이며 Production
+  판정에는 사용되지 않는다.
+- source/test 동결 SHA-256은 holdout 전후 모두 각각
+  `3C5A6C3BEE811444E53284A111A8E6113AABB2A395B24CEB8FEE058DAD3F1BB2`,
+  `01F3B68B85FD877189DBAC12FEE74EFF37E9D7BAE38B77009F744A3E61824EC1`이다.
+
+### 5. Development 공고 6개 결과
+
+| 공고 | selectable | requirement leaf | loss | noise | noise rate | loss rate | 판정 |
+|---|---:|---:|---:|---:|---:|---:|---|
+| 토스뱅크 ML Backend Engineer | 10 | 10 | 0 | 0 | 0% | 0% | `PASS` |
+| DeepAuto Backend Engineer (AI Platform) | 26 | 26 | 0 | 0 | 0% | 0% | `PASS` |
+| Match Group/Tinder Seoul Senior Software Engineer, Backend | 21 | 21 | 0 | 0 | 0% | 0% | `PASS` |
+| 채널코퍼레이션 Software Engineer | 14 | 14 | 0 | 0 | 0% | 0% | `PASS` |
+| Moloco Senior Software Engineer, Ads Creative | 12 | 12 | 0 | 0 | 0% | 0% | `PASS` |
+| LG AI Research AI-Native Engineering Project | 6 | 6 | 0 | 0 | 0% | 0% | `PASS` |
+
+공개 공고 전문은 tracked fixture로 저장하지 않았고 browser/local 입력으로만 사용했다.
+
+### 6. ATAD regression
+
+selectable 18개를 유지했다. 업무 6, 자격/필수 7, 우대 5이며 소개, `►/▶` heading,
+grouping parent와 복지 noise는 0개다.
+
+### 7. 새 unseen holdout 공고
+
+| 회사·직무 | URL | 구조 특징 |
+|---|---|---|
+| PayPay India — 01.Backend Engineer | [Greenhouse](https://job-boards.greenhouse.io/pay2dc/jobs/4024283006) | 영문, bullet이 빠진 DOM text, pipe 기술 스택, 긴 지원서·privacy block |
+| Atomicwork — Backend Engineer | [Greenhouse](https://job-boards.greenhouse.io/atomicwork/jobs/4143684008) | 영문, label+설명 bullet, benefits·culture·지원절차·법적 block |
+| Lean In — Backend Engineer | [Lever](https://jobs.lever.co/sgff.org/0da89c8f-0013-4f4e-a5b1-ef8def97a283) | 영문, 대문자 하위 heading, 무표식 leaf run, 보상 table·legal block |
+
+한국어 GreetingHR 신규 후보 3건은 실제 브라우저에서 모두 `페이지를 찾을 수 없습니다`로
+확인되어 캐시 text를 holdout으로 사용하지 않았다.
+
+### 8. Holdout 결과
+
+| 공고 | selectable | requirement leaf | preserved | loss | noise | noise rate | loss rate | 판정 |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| PayPay India | 45 | 27 | 25 | 2 | 19 | 42.2% | 7.4% | `FAIL` |
+| Atomicwork | 28 | 16 | 16 | 0 | 3 | 10.7% | 0% | `MINOR_LIMITATION` |
+| Lean In | 35 | 26 | 26 | 0 | 9 | 25.7% | 0% | `FAIL` |
+
+PayPay의 19개 noise는 `Tech Stack` 설명 2, Remarks/가치 안내 4, 지원서 field 13이다.
+AI-first culture 아래 명시적 엔지니어 요구 2개는 searchable section 밖이라 유실됐다.
+Atomicwork의 3개 noise는 responsibilities 소개 1개와 qualifications 소개가 두 문장으로
+나뉜 결과다. Lean In의 9개 noise는 하위 heading 4개와 보상 metadata 5개다. 원문의 한 bullet이
+여러 문장인 경우 selectable item이 분리돼도 같은 source requirement leaf의 보존으로 계산했다.
+
+### 9. 자동 테스트 결과
+
+- focused `*JobPosting*`: service 29/29, controller 6/6, 합계 35/35 `PASS`
+- Docker backend rebuild와 health: `PASS`
+- `git diff --check`: `PASS`
+
+### 10. clean candidate backend 전체 test
+
+`origin/main` `d44f30eb4346353c4363d559be478024f191a878`에서 분리한 candidate에 PRZ-017
+대상 파일 31개만 복사했다. `./gradlew.bat test --no-daemon`은 89 suite, 613 test,
+failure 0, error 0, 기존 skip 20으로 `PASS`했다.
+
+### 11. 보호영역 diff
+
+- PRZ-016 Production Search, embedding, `application.yml`: candidate diff 0
+- pgvector/Search SQL과 Flyway migration: candidate diff 0
+- Gradle 설정, dependency lockfile와 frontend lockfile: candidate diff 0
+- `frontend/package.json`: dependency 변경 없이 PRZ-017 unit test 3개를 기존 script에 추가
+- auth: 이번 Phase working diff 0. candidate에는 기존 PRZ-017 USER segmentation endpoint
+  경계와 인증 integration test만 포함
+
+### 12. Known limitations
+
+- DOM copy가 bullet marker를 잃으면 한 source bullet의 여러 문장이 개별 item으로 분리될 수 있다.
+- searchable section 내부의 인식되지 않은 하위 heading과 설명 paragraph가 leaf로 남는다.
+- 지원서 form boundary와 보상 table에 명시적인 제외 heading이 없으면 UNKNOWN fallback이
+  metadata를 다시 포함할 수 있다.
+- 이번 unseen holdout은 실제 접근 가능한 영어 공고와 Greenhouse 2건·Lever 1건으로 구성됐다.
+  한국어 신규 공고는 접근 불가로 평가하지 못했다.
+
+### 13. Blocking finding
+
+두 holdout에서 heading·metadata noise가 19개와 9개로 반복됐다. 이는 일부 애매한 문장 한두
+개가 아니라 새로운 form/table/subheading 형식에서 UNKNOWN 경계가 다시 searchable로 열리는
+일반화 결함이다. holdout 뒤 code/test는 수정하지 않았으며 이 finding은 다음 Phase의 blocker다.
+
+### 14. 최종 판정
+
+`SEGMENTATION_GENERALIZATION_NEEDS_ADJUSTMENT`
+
+commit, push, PR, merge는 모두 `NOT_RUN`이다. PRZ-017 전체 `READY_TO_MERGE` 판정도 하지 않는다.

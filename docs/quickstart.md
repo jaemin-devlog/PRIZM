@@ -1,9 +1,10 @@
-# PRIZM 로컬 Quickstart
+# PRIZM 로컬 Quick Start
 
 이 문서는 GitHub에서 처음 clone한 사용자가 기존 계정이나 Docker volume에
 기대지 않고 PRIZM의 기본 사용자 흐름을 재현하는 절차의 단일 원본입니다.
-구현·검증 상태는 [현재 구현 현황](project-status.md)과
-[PRZ-004 Evidence](../specs/PRZ-004-clean-clone-demo/evidence.md)를 함께 확인하세요.
+구현·검증 상태는 [현재 구현 현황](project-status.md)을 확인하세요. 과거 clean-clone
+검증의 명령과 환경은 [PRZ-004 Evidence](../specs/PRZ-004-clean-clone-demo/evidence.md)에
+보존돼 있습니다.
 
 이 절차는 문서 업로드, 자동 임베딩, `ACTIVE` 전환과 사용자별 근거 검색으로
 이어지는 자동화된 AI 문서 관리 플랫폼의 현재 핵심 흐름과 같은 검색을 재사용하는
@@ -26,14 +27,9 @@ PRIZM은 새 설치에서도 인증과 소유권 검사를 유지하며 다음 �
 공개 SaaS 운영 보호는 포함하지 않습니다. 자동화 검증용 one-time demo `USER`
 bootstrap은 회원가입과 별도로 유지됩니다.
 
-이 절차는 전체 흐름 검증 commit
-`25d09e9eee9837cf4a63d7461699825ff22743e2`의 서로 다른 두 clean clone에서
-검증했습니다. 전체 흐름을 실행한 commit의 자동 검증은
-`339 PASS / 18 SKIP / 0 FAIL`이었습니다. 두 번째 환경에서는 빈 문서 목록을
-API로 확인했지만 브라우저로 직접 관찰하지 않아 해당 UI 항목은 `NOT_RUN`입니다.
-이후 Windows·Linux 경로 처리 교정과 GitHub CI를 통과해 PR #25로 `main`에
-통합했습니다. commit별 검증 범위는
-[PRZ-004 Evidence](../specs/PRZ-004-clean-clone-demo/evidence.md)를 확인하세요.
+이 절차는 서로 다른 두 clean clone에서 검증한 로컬 실행 경로입니다. 검증 당시의
+commit, 자동 검사 수치와 남은 제한은
+[PRZ-004 Evidence](../specs/PRZ-004-clean-clone-demo/evidence.md)에서 확인할 수 있습니다.
 
 ## 이 절차로 확인하는 것
 
@@ -51,7 +47,7 @@ API로 확인했지만 브라우저로 직접 관찰하지 않아 해당 UI 항�
 - 이메일 인증, 비밀번호 재설정, refresh token과 OIDC
 - 외부 네트워크에 공개하는 운영용 multi-user Compose와 공개 SaaS 보호
 - 이 PostgreSQL Quickstart에서 OpenSQL과 Ollama를 함께 사용하는 전체 사용자 흐름
-- 실제 OpenSQL·OpenProxy 단일 서버 환경과 대회 범위에서 제외한 다중 노드 구성
+- 실제 OpenSQL·OpenProxy single-node 환경과 제품 범위에서 제외한 다중 노드 구성
 - 아래 MCP 연결 절차의 실제 OpenSQL/OpenProxy 재검증
 - CareerFact와 portfolio 생성
 
@@ -210,15 +206,15 @@ MCP client는 연결 초기화(initialize)와 도구 목록 조회(`tools/list`)
 이 Quickstart의 포트를 바꿨다면 URL의 `18081`도 같은 backend host port로
 바꾸세요. JWT를 설정 파일, shell history, 로그나 문서에 저장하지 마세요.
 
-P2에서는 다음 전체 흐름(E2E)을 실제 환경에서 검증했습니다.
+단일 서버 OpenSQL·OpenProxy 환경에서는 다음 MCP 전체 흐름(E2E)을 검증했습니다.
 
 - Flyway는 단일 서버 OpenSQL `:5432`에 직접 연결
 - 애플리케이션은 OpenProxy `:6432/opensql`을 거쳐 OpenSQL에 연결
 - Ollama `bge-m3`와 공식 Java MCP Client 사용
 - 실제 USER JWT 인증, REST와 MCP 결과 일치, 사용자별 격리와 `ACTIVE` 버전 격리
 
-위 항목은 모두 `PASS`했습니다. 자세한 근거는
-[PRZ-015 Evidence](../specs/PRZ-015-mcp-career-evidence-search/evidence.md)를 확인하세요.
+이 전체 흐름의 자세한 근거는
+[PRZ-015 Evidence](../specs/PRZ-015-mcp-career-evidence-search/evidence.md)에서 확인할 수 있습니다.
 이 결과는 단일 서버 구성에만 해당하며 OpenHA나 다중 노드 검증을 뜻하지 않습니다.
 
 ## 7. 브라우저 UI 확인

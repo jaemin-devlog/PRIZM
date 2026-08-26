@@ -244,5 +244,8 @@ artifact로 보존한다.
 
 - P9~P15 구현 source는 [PR #48](https://github.com/jaemin-devlog/PRIZM/pull/48) merge
   `154b9c8fa99f0d4391bbdece7cfd0d9fb468dd55`로 `main`에 통합됐다.
+- 최종 대회 제품 기준선은 [PR #50](https://github.com/jaemin-devlog/PRIZM/pull/50) merge
+  `3cfe9dc06938d85cd32a5d35ce38669099c00cef`로 `main`에 통합됐다.
+- P16 literal candidate 실험은 `NEEDS_ADJUSTMENT`였으며 Production 검색에 적용하지 않았다.
 - 이 통합은 P15 인증된 PDF 페이지 이동을 검증한 결과가 아니다. 해당 Gate는 실제 로그인
   세션과 PDF fixture가 없어 계속 `NOT_VERIFIED`이며, 전체 상태는 `IN_PROGRESS`를 유지한다.

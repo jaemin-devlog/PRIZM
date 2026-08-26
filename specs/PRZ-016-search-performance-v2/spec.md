@@ -1,9 +1,12 @@
 # PRZ-016: Search Performance V2
 
 - 상태: `IN_PROGRESS`
-- 통합: [PR #48](https://github.com/jaemin-devlog/PRIZM/pull/48) merge `154b9c8fa99f0d4391bbdece7cfd0d9fb468dd55`
+- 통합: P9–P15는 [PR #48](https://github.com/jaemin-devlog/PRIZM/pull/48) merge
+  `154b9c8fa99f0d4391bbdece7cfd0d9fb468dd55`, 최종 제품 기준선은
+  [PR #50](https://github.com/jaemin-devlog/PRIZM/pull/50) merge
+  `3cfe9dc06938d85cd32a5d35ce38669099c00cef`로 `main`에 통합
 - 현재 제한: P15 인증된 PDF 페이지 이동은 `NOT_VERIFIED`이며, 이 문서는 이를 `VERIFIED`로
-  표현하지 않는다.
+  표현하지 않는다. P16 실험은 `NEEDS_ADJUSTMENT`로 Production 검색에 적용하지 않았다.
 - 목표: PRIZM 커리어 근거 검색의 retrieval, ranking, query understanding과 evidence
   localization을 같은 평가 기준으로 측정하고 단계적으로 개선한다.
 
@@ -44,8 +47,9 @@ P4는 focused 검증과 동일 72-query benchmark를 통과했다. P5와 P7-B는
 조건에서 모두 일반화 Gate를 통과하지 못했다. P7-B는 앞으로 `DIAGNOSTIC / HISTORICAL
 DATASET`으로만 보존하며 threshold, prompt, rule 또는 model tuning에 다시 사용하지 않는다.
 P1~P4의 deterministic 검색 구현은 유지하되 현재 연구 Phase는 `STATE_FROZEN`으로 닫고,
-새 사용자·문서·질문과 multiple acceptable evidence 계약을 갖춘
-`FRESH_GENERALIZATION_EVALUATION_V2`에서만 재개한다.
+  새 사용자·문서·질문과 multiple acceptable evidence 계약을 갖춘
+`FRESH_GENERALIZATION_EVALUATION_V2`에서만 재개한다. 현재 기능 개발은 종료됐으며 이
+조건은 역사적 재개 기준으로만 보존한다.
 
 P8은 위 재개 조건에 따라 시작한다. P7-B는 instrumentation 정합성 검증에만 사용하고
 질문·Ground Truth·결과를 P8 fresh dataset 설계나 검색 tuning에 사용하지 않는다.

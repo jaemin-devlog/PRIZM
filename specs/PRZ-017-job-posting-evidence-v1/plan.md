@@ -4,7 +4,9 @@
 
 - 상태: `VERIFIED`
 - 기준선: `d44f30eb4346353c4363d559be478024f191a878`
-- 현재 source: `94715cf`, [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53)
+- 현재 source: `94715cf`
+- GitHub 통합: [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53),
+  `main` merge commit `b78ec42e8cd06ebe001dd02fbaf2a3abd0e15d22`
 - 목표: 입력 → 결정적 분리 → 사용자 선택 → 기존 Search → 항목별 Evidence → 원문 이동의
   최소 수직 흐름을 완성한다.
 

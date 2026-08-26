@@ -4,7 +4,9 @@
 
 - 상태: `VERIFIED`
 - 기준선: `d44f30eb4346353c4363d559be478024f191a878`
-- 현재 source: `94715cf`, [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53)
+- 현재 source: `94715cf`
+- GitHub 통합: [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53),
+  `main` merge commit `b78ec42e8cd06ebe001dd02fbaf2a3abd0e15d22`
 - 검증: 2026-08-26 frontend focused 33/33·전체 80/80, typecheck·lint·build와 backend 전체
   89 suites·627 tests가 실패·오류 0, 기존 조건부 test 20건 skip으로 통과. integration
   `ABORTED`. 2026-08-27 최종 segmentation focused 50/50·compile과 인증 browser mixed bullet

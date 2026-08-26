@@ -1,31 +1,8 @@
 # PRIZM Architecture
 
-> PRZ-004 GitHub 통합 merge commit:
-> `1f9a5ad964778a2e72de9949a0fadae042008392`
+> 문서 기준일: 2026-08-27
 >
-> PRZ-004 전체 clean-clone 검증 source commit:
-> `25d09e9eee9837cf4a63d7461699825ff22743e2`
->
-> 최종 Windows·Linux 경로 교정·CI source commit:
-> `aff3e87a9a912e44fcf217291a45328cf451cfc9`
->
-> 문서 검토 기준일: `2026-08-27`
->
-> PRZ-010 상태: `VERIFIED` — source
-> `26c546b16eb9ea42d98460dd6e5aa0bf0752212a`, `main` 통합 merge
-> `d616dac95b5d29c6f45babb51435d95d20f39fa8`
->
-> PRZ-011 상태: `VERIFIED` — source
-> `fbb3481626a3cba6f36f070845ffae502511569e`, `main` 통합 merge
-> `e46d55f0c889bf570fa6fd796cb780b738ab75d7`
->
-> PRZ-004 상태: `VERIFIED` — 독립 감사, PR #25 CI와 GitHub `main` 통합 완료
->
-> PRZ-009 상태: `VERIFIED` (`AUDIT Gate: PASS`, PR #51 merge 전) — 기존 자동 keyword 추출 계약을 사용자 관리형
-> Document Tag로 교체하는 P4 구현과 PostgreSQL·frontend 검증을 완료했다. 인증된 tag
-> 브라우저 흐름은 `USER_CONFIRMED`이며 독립 재감사 blocking finding은 0건이다.
->
-> 범위: 현재 Spring Boot 애플리케이션과 React Career Vault Reference App
+> 범위: Spring Boot 애플리케이션과 React Career Vault Reference App
 
 ## 1. 문서 목적과 범위
 
@@ -40,8 +17,8 @@ Career Vault Reference App입니다.
 호출할 수 있습니다.
 
 장기 목표인 Career Intelligence Engine과 현재 구현을 구분합니다. 세부 기능의
-구현·검증 상태는 [현재 구현 현황](project-status.md), 앞으로의 제품 개발 순서는
-[개발 로드맵](roadmap.md), 설치와 실행 절차는 [로컬 Quickstart](quickstart.md)를
+구현·검증 상태는 [현재 구현 현황](project-status.md), 제품 범위는
+[제품 범위와 향후 방향](roadmap.md), 설치와 실행 절차는 [로컬 Quick Start](quickstart.md)를
 따릅니다. 이 문서는 실행 명령이나 날짜별 검증 결과를 반복하지 않습니다.
 
 ## 2. Architecture drivers와 핵심 불변식
@@ -175,9 +152,9 @@ backend로 전달합니다. ChangeLog Dispatcher와 Indexing·Cleanup Scheduler�
 | Ollama `bge-m3` | 문서 조각과 검색 질문의 1024차원 임베딩 생성 | Spring Boot 프로세스 |
 
 문서 목록과 열린 상세는 `PENDING`, `PROCESSING`, `RETRY_WAIT` 등 비종료 작업이
-있는 동안 약 2초 간격으로 owner-scoped 문서 API를 다시 조회한다. 응답이
-`COMPLETED`, `FAILED` 또는 다른 종료 상태가 되면 polling을 중지한다. 이 polling은
-별도 push 채널이나 Worker 제어 경로가 아니라 기존 읽기 API의 화면 갱신 책임이다.
+있는 동안 약 2초 간격으로 owner-scoped 문서 API를 다시 조회합니다. 응답이
+`COMPLETED`, `FAILED` 또는 다른 종료 상태가 되면 polling을 중지합니다. 이 polling은
+별도 push 채널이나 Worker 제어 경로가 아니라 기존 읽기 API의 화면 갱신 책임입니다.
 
 ## 6. 문서 업로드부터 검색까지
 
@@ -250,42 +227,50 @@ sequenceDiagram
 
 ### 검색 결과의 생성과 해석
 
-검색 질문과 문서 chunk를 같은 `bge-m3` 모델로 1024차원 embedding으로 바꿉니다.
-저장과 검색 전에는 차원 수, 모든 값의 유한성, 0이 아닌 norm을 검사합니다.
-PostgreSQL pgvector의 exact cosine distance 연산자 `<=>`로 후보를 정렬하며 ANN
-인덱스는 사용하지 않습니다. 기본 `source-dedup-evidence-signals-v1` profile은 상위
-20개 후보에서 TXT와 PDF의 meaningful exact boundary overlap을 축약합니다. PDF는
-같은 page라는 이유만으로 합치지 않고, 같은 page이면서 기존 최소 overlap 길이·비율을
-함께 만족할 때만 같은 source evidence로 간주합니다. 이 P11 변경은 실제 이력서
-retention을 개선했지만 frozen Stress duplicate Gate가 실패해 `PARTIAL_PASS`이며 아직
-검증 완료 상태가 아닙니다. P11.1은 source identity를 되돌리지 않고 같은 document
-version 안의 substantial repeated text span만 query-evidence representative 기준으로
-축약했다. 이후 dense score를 주 신호로 최대 5건을 반환합니다.
-GENERAL 검색은 기본 `0.50` floor를 유지하되 기존 결과가
-비어 있고 정규화된 질의가 단일 2–4자 token이며 본문 exact token이 일치할 때만
-`0.49 <= score < 0.50` 후보 한 건을 제한적으로 복구합니다. 부분 문자열은 인정하지
-않고 원래 score와 distance를 반환합니다. 완료 배포·출시 검색은 이 복구 경로를
-사용하지 않으며 기존 Claim Gate와 `0.50` floor를 유지합니다. 명시적
-`legacy-dense-v1` override는 rollback 경로로 남아 있습니다.
+PRIZM Search는 사용자의 `ACTIVE` 문서에서 질문과 관련된 원문을 찾고 위치를
+연결하는 **Evidence Retrieval + Localization**입니다. 현재 Production 경로는 다음
+순서로 동작합니다.
 
-`score = 1 - distance`는 정렬 결과를 보여 주는 유사도 값이지 정확도나 확률이
-아닙니다. 단일 검색 API는 가장 가까운 한 건을 반환합니다. 기존 Career Evidence
-API는 배열 형식을 유지하고, v2 API는 `EVIDENCE_FOUND`, `NO_RELEVANT_RESULTS`,
-`NO_EVIDENCE`, `NO_SEARCHABLE_DOCUMENTS`와 결과 배열을 반환합니다. GENERAL 질의의
-관련 결과 부재는 `NO_RELEVANT_RESULTS`, 완료 배포·출시 근거 검증 실패는
-`NO_EVIDENCE`로 구분합니다. 최종 결과가 선택된 뒤 PDF hard wrap을 임의의
-문장 경계로 보지 않고 원문 offset을 보존한 semantic sentence를 구성합니다.
-같은 source block의 연속 1–3문장 window 중 query 포함 범위와 numeric/metric,
-수행·문제·결과·상태 신호를 직접적으로 보여 주는 최소 extractive span을
-`snippet`으로 선택합니다. Selected chunk가 충분하면 evidence를 이동하지 않고,
-부족할 때만 기존 owner/document/ACTIVE-version 범위의 expansion을 사용합니다.
-ranking과 score는 다시 계산하지 않으며 응답은 전체 `content`도 유지합니다. frontend는 찾은 내용,
-문서·페이지, 주변 내용 순서로 표시하고 전체 문맥을 펼치거나 접을 수 있습니다. PDF `PAGE` 결과의
-`문서에서 보기`는 기존 owner-scoped original endpoint에서 받은 인증된 Blob PDF를 열고 해당 1-based
-페이지로 이동한다. TXT 결과에는 이 PDF 동작을 노출하지 않는다. TXT chunk는 `TEXT_CHUNK`와 텍스트
-구간 번호를, PDF chunk는 `PAGE`와 페이지 번호를 원문 위치로 반환합니다.
-PostgreSQL FTS·BGE-M3 Sparse·BGE reranker 실험은 평가 전용이며 Production 경로에
-포함되지 않습니다.
+```mermaid
+flowchart LR
+    Q[사용자 질문] --> E[bge-m3 embedding]
+    E --> D[owner·ACTIVE 범위<br/>Dense Top 20]
+    D --> S[source consolidation]
+    S --> C[relevance eligibility]
+    C --> G[query-evidence consolidation]
+    G --> R[bounded ranking<br/>최대 5건]
+    R --> L[extractive localization]
+    L --> A[snippet·context·TXT/PDF 위치]
+```
+
+검색 질문과 문서 chunk는 같은 `bge-m3` 모델의 1024차원 embedding을 사용합니다.
+저장과 검색 전에는 차원 수, 모든 값의 유한성, 0이 아닌 norm을 검사합니다.
+PostgreSQL pgvector의 exact cosine distance 연산자 `<=>`로 최대 20개 후보를 가져오며,
+SQL 단계에서 owner와 `ACTIVE` version을 제한합니다.
+
+후속 단계는 실제로 겹치는 source span을 먼저 축약합니다. 이후 Dense score와 exact
+identifier anchor로 후보 관련성을 제한하고, numeric anchor와 query core term 같은
+제한된 신호를 후보 복구와 순위화에 사용합니다. 같은 PDF page라도 다른 프로젝트나
+독립된 원문 근거라면 합치지 않습니다. 같은 근거를 반복한 후보를 query-evidence
+consolidation으로 다시 축약한 뒤 최대 5건을 선택합니다.
+
+GENERAL 검색은 기본 `0.50` floor를 유지합니다. 결과가 비어 있고 정규화된 질의가
+단일 2–4자 token이며 본문에서 exact token이 일치할 때만 `0.49 <= score < 0.50`
+후보 한 건을 제한적으로 복구합니다. 부분 문자열은 인정하지 않으며 원래 score와
+distance를 반환합니다. 완료 배포·출시 검색은 이 복구 경로를 사용하지 않습니다.
+`legacy-dense-v1`은 명시적 rollback 경로로 남아 있습니다.
+
+최종 후보에서는 원문 offset을 보존한 연속 1–3문장을 `snippet`으로 선택합니다.
+선택된 chunk가 충분하면 다른 위치로 옮기지 않고, 부족할 때만 같은
+owner·document·`ACTIVE` version 범위에서 주변 근거를 확인합니다. 이 과정은 결과의
+순위와 score를 다시 계산하지 않으며 전체 `content`도 유지합니다. TXT는
+`TEXT_CHUNK`와 텍스트 구간 번호를, PDF는 `PAGE`와 1-based 페이지 번호를 반환합니다.
+
+`score = 1 - distance`는 후보 정렬을 위한 유사도이지 정확도나 사실 확률이 아닙니다.
+Search는 사용자가 해당 경험을 실제로 수행했는지, 경력 내용이 사실인지, 원문의
+주체가 사용자인지, 채용 요구를 충족하는지, 직무에 적합한지 또는 합격 가능성이
+있는지 판정하지 않습니다. PostgreSQL FTS, BGE-M3 Sparse와 별도 BGE reranker는
+현재 Production 경로에 포함되지 않습니다.
 
 추가 근거:
 
@@ -296,88 +281,61 @@ PostgreSQL FTS·BGE-M3 Sparse·BGE reranker 실험은 평가 전용이며 Produc
 - [벡터 검색 SQL](../src/main/java/com/prizm/search/repository/VectorSearchRepository.java)
 - [검색 서비스 테스트](../src/test/java/com/prizm/search/service/SearchServiceTest.java)
 - [Career Evidence API 테스트](../src/test/java/com/prizm/search/controller/CareerEvidenceSearchControllerTest.java)
-- [opt-in 검색 profile](../src/main/java/com/prizm/search/profile/CompositeSearchProfile.java)
+- [Composite Search Profile](../src/main/java/com/prizm/search/profile/CompositeSearchProfile.java)
 - [Career Evidence v2 API](../src/main/java/com/prizm/search/controller/CareerEvidenceSearchV2Controller.java)
 
-### 채용공고 항목별 Career Evidence V1 (`VERIFIED`)
+### 채용공고 항목별 Career Evidence
 
-PRZ-017은 붙여넣은 채용공고를 줄바꿈·bullet·numbered list·문장 경계로 결정적으로
-분리하고, 사용자가 checkbox로 고른 항목만 기존 Career Evidence Search로 전달하는 소비자
-계층이다. section heading은 검색 판정이 아니라 항목의 보조 표시 정보로 유지한다.
-Production 분리·query composition 경로에는 Qwen, 다른 chat LLM, prompt와 response parser가
-없다. Ollama `bge-m3`는 기존 Search query embedding에만 사용한다.
+Job Posting Evidence는 붙여넣은 채용공고를 줄바꿈, 목록과 문장 경계로 결정적으로
+분리합니다. section heading은 항목을 묶는 표시 정보로 유지하고, 사용자가 고를 수 있는
+child 항목과 구분합니다. 사용자가 선택한 항목만 기존 Career Evidence Search에
+전달합니다. 분리와 query 구성에는 Qwen, 다른 chat LLM, prompt와 response parser를
+사용하지 않습니다. Ollama `bge-m3`는 기존 Search의 query embedding에만 사용합니다.
 
 각 분리 항목은 기존 Search query 계약에 맞춰 500자 이하이고 문자·숫자 2개 이상을
-유지한다. 한 입력에서 반환하는 항목은 최대 100개이며 이를 넘으면 일부를 잘라 내지 않고
-`400 JOB_POSTING_ITEM_LIMIT_EXCEEDED`로 거부해 항목별 Search 요청 증폭을 제한한다.
+유지합니다. 한 입력에서 반환하는 항목은 최대 100개이며 이를 넘으면 일부를 잘라 내지 않고
+`400 JOB_POSTING_ITEM_LIMIT_EXCEEDED`로 거부해 항목별 Search 요청 증폭을 제한합니다.
 
-단순 선택 항목은 원문으로 기존 `POST /api/career-evidence/search`를 한 번 호출한다. 명확한
-`A / B`, 3항 compact slash 목록, `또는`, 독립 영문 `or` 구조는 원문과 최대 5개 alternative
-query를 같은 API로 순차 검색한다. 쉼표는 짧고 명확한 OR 목록에서만 분리하고 2항 결합
-식별자와 파일 경로는 제외한다. 결과는 원문 query부터 순서대로
+단순 선택 항목은 원문으로 기존 `POST /api/career-evidence/search`를 호출합니다. 명확한
+`A / B`, compact slash 목록, `또는`, 독립 영문 `or` 구조는 원문과 최대 5개 alternative
+query로 제한합니다. 결과는 원문 query부터 순서대로
 `documentId + documentVersionId + chunkId`로 중복을 제거하고 최종 5건만 원래 항목 하나에
-표시한다. Search의 owner·`ACTIVE` version, ranking, relevance floor, fallback과 localization은
-바꾸지 않으며 query별 score를 재정렬하지 않는다.
+표시합니다. Job Posting Evidence는 Search의 owner·`ACTIVE` version, ranking, relevance
+floor, fallback과 localization을 바꾸지 않으며 query별 score를 재정렬하지 않습니다.
 
-공백 없는 단독 query는 같은 Search 응답에서 `content` 또는 `snippet`에 독립 token이 있는
-후보를 먼저 표시하되, 원래 semantic 후보도 삭제하지 않는다. 따라서 기술 식별자의 직접 원문을
-우선하면서 한 단어 자연 역량의 관련 후보를 잃지 않는다.
-
-분리 결과는 입력 화면 아래에 누적하지 않고 section별 선택 modal로 표시하며 heading에는
-checkbox를 만들지 않는다. 검색은 `/career-vault/job-evidence/results` 전용 route로 이동해
-loading부터 보여 준다. 결과 화면은 선택 항목 rail에서 하나를 고르고 오른쪽에서
-`requirement → document/version → Evidence row` 순으로 읽는 전용 workspace다. 같은
-문서·버전의 제목과 종류는 한 번만 표시하고, 동일 source 위치와 표시 원문이 완전히 같은
-행만 presentation 단계에서 정리한다. snippet, 주변 원문, 문서와 source 위치는 유지하며
-score·적합도·충족·합격 가능성 등의 판정은 표시하지 않는다.
-
-선택 항목 rail은 `검색 후보 있음`과 `검색된 후보 없음` 상태 탭으로 나누며 loading 또는 error가 남아
-있을 때만 `확인 필요` 탭을 추가한다. 탭 숫자는 Evidence 행이 아니라 requirement 수이고,
-탭을 바꿔도 원래 requirement 순서와 번호를 유지한다. 상태 탭 전환은 기존 결과를 표시하는
-presentation 동작이므로 Search API를 다시 호출하지 않는다.
+분리 결과는 section별 선택 modal로 표시하며 heading에는 checkbox를 만들지 않습니다.
+결과 화면은 선택 항목별로 document/version과 Evidence row를 묶어 보여 줍니다. 동일한
+source 위치와 표시 원문만 presentation 단계에서 정리하고 snippet, 주변 원문과 문서 위치는
+유지합니다.
 
 PDF `PAGE`는 기존 인증된 original Blob viewer에서 표시 Evidence의 1-based page로
-이동하고, TXT `TEXT_CHUNK`는 기존 문서 상세를 연다. 채용공고 입력·분리 결과·선택은
-영구 저장하지 않으며 새 table, migration과 PDF viewer가 없다. PRZ-009 Tag는 별도 사용자
-metadata로 남고 PRZ-017 검색 filter나 ranking 신호가 아니다.
-
-현재 구현 기준은 source commit `94715cf`다. 2026-08-26에 frontend
-focused 33/33·전체 80/80, typecheck·lint·build와 backend 전체 89 suites·627 tests가
-실패·오류 0, 기존 조건부 test 20건 skip으로 통과했다. integration test는 실행 중 중단되어
-`ABORTED`다. 2026-08-27 마지막 mixed-bullet 수정 뒤 segmentation service/controller focused
-50/50과 production/test compile이 통과했다. 최신 backend를 적용한 인증 desktop browser에서는
-기존 동일 bullet 11개 기준을 유지하고 mixed `•`/`-` 공고도 10개에서 11개로 복구했다. 첫 업무
-문장은 heading이 아닌 checkbox로 표시됐고 metadata 제외와 순서, 2개 항목 Search, Evidence 결과와
-PDF 2페이지 target이 정상 동작했다. 이 V1 Gate는 `VERIFIED`다. TXT 이동과 PayPay India·Lean In
-재평가, mobile viewport는 명시한 최종 범위 밖이어서 `NOT_RUN`이다.
-전체 V1의 남은 Gate·완료 판정은
-[PRZ-017 Spec](../specs/PRZ-017-job-posting-evidence-v1/spec.md)과
-[Evidence](../specs/PRZ-017-job-posting-evidence-v1/evidence.md)를 따른다.
+이동하고, TXT `TEXT_CHUNK`는 기존 문서 상세를 엽니다. 채용공고 입력, 분리 결과와
+선택은 영구 저장하지 않습니다. 별도 table, migration, PDF viewer, Tag filter를 두지
+않으며 Production Search도 수정하지 않습니다. 구현·검증 상세는
+[PRZ-017 Evidence](../specs/PRZ-017-job-posting-evidence-v1/evidence.md)를 확인하세요.
 
 ### 사용자 관리형 Document Tag
 
-PRZ-009 P4는 Java 기술 사전으로 active chunk를 스캔하던 자동 keyword 추출을 문서
-metadata인 tag로 교체한다. `tags`는 표시 이름과 NFKC·공백·대소문자를 정규화한 이름,
-`SYSTEM|USER` source, nullable owner를 저장한다. SYSTEM tag는 모든 USER에게 추천할 수
-있고 USER tag는 생성 owner에게만 보인다. `document_tags`는 document와 tag의 다대다
-연결이며 document owner와 같은 owner scope에서만 읽고 쓴다.
+Document Tag는 사용자가 문서에 직접 연결하는 metadata입니다. `tags`는 표시 이름과
+NFKC·공백·대소문자를 정규화한 이름, `SYSTEM|USER` source와 nullable owner를
+저장합니다. SYSTEM tag는 모든 USER에게 보이고 USER tag는 생성 owner에게만 보입니다.
+`document_tags`는 document와 tag의 다대다 연결이며 document owner와 같은 owner
+범위에서만 읽고 씁니다.
 
-SYSTEM tag는 V16 seed로 제공하되 whitelist가 아니다. 검색 결과가 없으면 사용자는 어떤
-이름도 USER tag로 만들 수 있다. 같은 owner의 정규화 이름 중복과 같은 document-tag
-연결은 재사용하거나 차단한다. 최초 upload의 tag ID는 파일·문서·version·ChangeLog를
-생성하는 기존 transaction 안에서 먼저 접근 가능성을 검증한 뒤 document에 연결한다.
-새 immutable version은 document-level tag를 바꾸지 않는다.
+SYSTEM tag는 추천 목록이며 whitelist가 아닙니다. 사용자는 별도 USER tag를 만들 수
+있고 같은 owner의 정규화 이름 중복은 재사용합니다. 최초 upload에서는 tag 접근
+가능성을 확인한 뒤 문서 생성 transaction 안에서 연결합니다. 새 immutable version은
+document-level tag를 바꾸지 않습니다.
 
-React의 공용 Tag Modal은 DB 검색, 연속 다중 선택, USER tag 생성과 중복 방지를 제공하며
-upload와 document detail이 함께 사용한다. 경력 키워드 화면은 전체 SYSTEM 추천 목록이
-아니라 현재 owner 문서에 실제 연결된 tag와 문서 수만 보여 준다. tag 선택 시 이름을
-기존 Career Evidence Search의 원본 query로 전달해 현재 owner의 ACTIVE 문서 전체에서
-snippet·context·문서·page evidence를 찾는다. tag 연결 문서는 검색 범위를 제한하지 않는다.
+React의 공용 Tag Modal은 tag 검색, 다중 선택과 USER tag 생성을 제공하며 upload와
+document detail에서 함께 사용합니다. 경력 키워드 화면은 현재 owner 문서에 실제로
+연결된 tag와 문서 수를 보여 줍니다. tag를 선택하면 이름을 Career Evidence Search의
+원본 query로 전달해 owner의 `ACTIVE` 문서 전체에서 근거를 찾습니다. tag가 연결된
+문서로 검색 범위를 제한하지 않습니다.
 
-Tag는 사용자가 문서를 분류하는 metadata다. PRZ-016 Search는 ACTIVE 원문의 evidence를
-찾는 별도 기능이다. tag metadata는 Search filter나 ranking boost가 아니며 사용자가 tag
-상세를 열 때 선택한 이름만 명시적 query가 된다. tag 추가·삭제는 기존 chunk, embedding,
-ACTIVE pointer, PDF page localization을 변경하지 않는다.
+Tag는 문서 분류 metadata이며 Search filter나 ranking 신호가 아닙니다. 사용자가 tag
+상세를 열 때 선택한 이름만 명시적 query가 됩니다. tag 추가·삭제는 기존 chunk,
+embedding, `ACTIVE` pointer와 PDF page localization을 변경하지 않습니다.
 
 근거:
 
@@ -508,16 +466,16 @@ stateDiagram-v2
 수동 재시도나 terminal 상태에서 되돌아가는 경로는 현재 구현에 없습니다.
 
 현재 claim의 실제 처리 단계는 `FILE_READING → TEXT_EXTRACTION → CHUNK_CREATION →
-EMBEDDING → SAVING → COMPLETED`로 별도 저장한다. 단계와 청크 진행 갱신은
+EMBEDDING → SAVING → COMPLETED`로 별도 저장합니다. 단계와 청크 진행 갱신은
 `processing_job_id`, `owner_user_id`, `PROCESSING`, `claim_version`을 모두 만족하는
-Worker만 수행할 수 있다. 전체 청크 수가 확정되기 전에는 청크 수와 퍼센트를
-제공하지 않으며, 확정 뒤에는 `completed_chunks / total_chunks`만 사용한다.
+Worker만 수행할 수 있습니다. 전체 청크 수가 확정되기 전에는 청크 수와 퍼센트를
+제공하지 않으며, 확정 뒤에는 `completed_chunks / total_chunks`만 사용합니다.
 임베딩 중 DB 저장은 이 실제 비율의 정수 퍼센트가 바뀌거나 최종 청크가
 완료될 때만 checkpoint로 수행하고, 단계 변경과 완료·실패·재시도 전이는
-기존 짧은 transaction 계약을 유지한다.
+기존 짧은 transaction 계약을 유지합니다.
 재시도·실패 시 내부 예외는 서버 로그와 제한된 내부 필드에 남기고 API에는
 Ollama 연결, model 미설치, GPU/model 실행, 일반 처리 실패의 allowlist 코드만
-노출한다.
+노출합니다.
 
 근거:
 
@@ -624,10 +582,6 @@ Ollama 연결, model 미설치, GPU/model 실행, 일반 처리 실패의 allowl
 줄입니다. 파일시스템이 필요한 `SecureDirectoryStream`을 제공하지 않으면 안전하지
 않은 path 기반 fallback을 사용하지 않고 fail-closed로 중단합니다.
 
-Windows에서는 `SecureDirectoryStream` 성공 경로를 제공하지 않아 fail-closed
-동작만 확인했습니다. 성공 경로는 Linux에서 별도 재검증했으며, 두 결과를 같은
-플랫폼 결과로 합치지 않습니다.
-
 근거:
 
 - [로컬 파일 저장소](../src/main/java/com/prizm/infrastructure/storage/LocalFileStorage.java)
@@ -637,55 +591,25 @@ Windows에서는 `SecureDirectoryStream` 성공 경로를 제공하지 않아 fa
 - [cleanup 만료 복구](../src/main/java/com/prizm/cleanup/service/FileCleanupJobRecoveryService.java)
 - [cleanup worker migration](../src/main/resources/db/migration/V13__add_file_cleanup_worker_fields.sql)
 - [파일 저장소 테스트](../src/test/java/com/prizm/infrastructure/storage/LocalFileStorageTest.java)
-- [PRZ-003 플랫폼 검증 기록](../specs/PRZ-003-opensql-single-node-gate/evidence.md#Windows-UTF-8과-플랫폼-재검증)
+- [PRZ-003 플랫폼 검증 기록](../specs/PRZ-003-opensql-single-node-gate/evidence.md#windows-utf-8과-플랫폼-재검증)
 
-## 12. PostgreSQL과 OpenSQL 검증 경계
+## 12. PostgreSQL과 OpenSQL 경계
 
 ### PostgreSQL 16+pgvector
 
-- 목적: 로컬 실행, 자동 통합 테스트와 clean-clone 구성
-- 검증한 범위: 애플리케이션 회귀, migration, 벡터 검색, ownership, Worker·파일
-  정리와 두 독립 환경의 demo `USER` 로그인 → TXT/PDF 업로드 → `ACTIVE` →
-  검색·브라우저 흐름
-- 검증하지 않은 범위: OpenSQL 호환성
+기본 Docker Compose는 PostgreSQL 16+pgvector를 사용합니다. 관계형 데이터, 작업
+상태와 embedding vector를 한 DB에 저장하며 로컬 실행과 자동 통합 테스트의
+기준 환경입니다.
 
 ### OpenSQL single-node
 
-- 목적: SQL 호환성 Gate와 실제 애플리케이션 환경 검증
-- 검증한 범위: Flyway V1–V14, `vector(1024)`, owner·`ACTIVE` 검색 조건,
-  processing·cleanup job SQL, V14 ChangeLog 제약·`SKIP LOCKED`·멱등 dispatch,
-  Spring Boot·Ollama direct `5432` V1→V2 E2E와 실패 시 V1 보존
-- 추가 검증 범위: V15 OpenSQL direct 기준선과 OpenProxy 단일 Primary
-  SQL routing·`prizm_app` 인증·focused runtime E2E
-- 명시적 비범위: OpenProxy 이중화·VIP와 다중 노드 service continuity
-- 현재 미구현: 영구 journal
+OpenSQL 검증 경로는 single-node 구성을 사용합니다. Flyway는 OpenSQL Primary의
+`:5432`에 직접 연결하고 애플리케이션 runtime은 OpenProxy의 단일 Primary SQL 경로
+`:6432/opensql`을 사용합니다. PostgreSQL과 같은 문서·작업·검색 계약을 유지하지만,
+OpenSQL 공급 자산은 저장소와 기본 Compose에 포함하지 않습니다.
 
-OpenSQL single-node SQL Gate는 PRZ-003 Evidence 기준 `PASS`입니다. PRZ-005에서는
-직접 `5432` 경로의 OpenSQL·Ollama 전체 사용자 흐름을 별도로 검증했습니다.
-현재 상태는 다음과 같습니다.
-
-- OpenSQL+Ollama 직접 `5432` API·브라우저·두 사용자 격리: `VERIFIED`
-- OpenProxy TCP 연결: `VERIFIED`
-- OpenProxy 단일 Primary SQL routing과 `prizm_app` 인증: `VERIFIED`
-- Flyway direct `:5432` / runtime OpenProxy `:6432` focused E2E: `VERIFIED`
-- OpenProxy 재시작 후 새 SQL 연결: `VERIFIED`
-- 지속 application process의 무재시작 회복: 명시적 비범위
-- 대회 OpenSQL 다중 노드 구성: `REJECTED` — 공식 Single-only 설치 범위
-
-PRZ-004에서는 PostgreSQL·pgvector와 호스트 Ollama를 사용한 두 독립 clean clone을
-검증하고 PR #25로 `main`에 통합했습니다. 두 번째 browser의 업로드 전 빈 목록
-직접 관찰은 여전히 `NOT_RUN`입니다.
-
-PRZ-005에서는 실제 OpenSQL single-node에 Spring Boot와 Ollama `bge-m3`를 연결해
-로그인, 합성 TXT/PDF 업로드, 임베딩 저장, `ACTIVE` 전환, 원문 검색과 브라우저
-흐름을 확인했습니다. 두 사용자 문서·검색 격리와 전용 DB의 OpenSQL opt-in
-integration test도 통과했으며 PR #26으로 `main`에 통합했습니다.
-
-PRZ-010에서는 같은 direct `5432` 경계에서 V14 ChangeLog schema·제약,
-`FOR UPDATE SKIP LOCKED`, ProcessingJob 멱등 생성과 owner isolation을 확인했습니다.
-실제 Ollama `bge-m3`를 사용한 V1 ACTIVE→V2 ChangeLog→ProcessingJob→V2 ACTIVE와
-dispatch·indexing 실패 시 V1 보존도 별도 E2E로 통과했습니다. 이 결과는 OpenProxy,
-OpenHA나 V15 OpenSQL 적용의 근거가 아닙니다.
+다중 OpenSQL DB node, DB failover, OpenProxy 이중화·VIP와 지속적인 application
+service continuity는 이 구조의 범위가 아닙니다. 영구 journal도 구현하지 않았습니다.
 
 PostgreSQL 테스트 통과는 OpenSQL 결과가 아니며, OpenSQL SQL Gate 통과도 전체
 사용자 흐름이나 고가용성 근거가 아닙니다.
@@ -709,6 +633,7 @@ src/main/java/com/prizm/
 ├─ changelog       문서 버전 생성 사실과 INDEXING 작업 전달
 ├─ embedding       Ollama 연동과 embedding 검증
 ├─ ingestion       추출·청킹·색인 Worker와 복구
+├─ jobposting      채용공고의 결정적 항목 분리와 응답
 ├─ mcp             읽기 전용 Career Evidence MCP tool과 응답 매핑
 ├─ search          owner-scoped 원문 근거 검색
 ├─ cleanup         파일 정리 작업·Worker와 복구
@@ -743,18 +668,14 @@ frontend/src/
 다중 OpenSQL DB node, DB 장애전환, OpenProxy 이중화·VIP와 서비스 연속성 보장은
 명시적 비범위이며 이후 제품 후보로 두지 않습니다.
 
-상세 상태와 가장 가까운 제품 작업은 [현재 구현 현황](project-status.md)과
-[개발 로드맵](roadmap.md)을 따릅니다.
+상세 상태와 제품 범위는 [현재 구현 현황](project-status.md)과
+[제품 범위와 향후 방향](roadmap.md)을 따릅니다.
 
 ## 15. 관련 문서
 
 - [현재 구현 현황](project-status.md)
-- [로컬 Quickstart](quickstart.md)
-- [개발 로드맵](roadmap.md)
+- [로컬 Quick Start](quickstart.md)
+- [제품 범위와 향후 방향](roadmap.md)
 - [대표 문제 해결 사례](showcase/problem-solving-case-studies.md)
 - [OpenSQL 기술 Gate](opensql-gate.md)
 - [Spec Registry](../specs/README.md)
-- [PRZ-000 플랫폼 기준선 Evidence](../specs/PRZ-000-platform-baseline/evidence.md)
-- [PRZ-003 OpenSQL single-node Evidence](../specs/PRZ-003-opensql-single-node-gate/evidence.md)
-- [PRZ-004 clean-clone Evidence](../specs/PRZ-004-clean-clone-demo/evidence.md)
-- [PRZ-010 변경 로그 동기화 Evidence](../specs/PRZ-010-change-log-sync/evidence.md)

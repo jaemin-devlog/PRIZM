@@ -1,8 +1,8 @@
-# Security Policy
+# 보안 정책
 
 ## 지원 범위
 
-PRIZM은 현재 `main`의 소스 전용 배포를 지원합니다. 공개 컨테이너 이미지, 호스팅 서비스, 모델 가중치와 OpenSQL 자산은 제공하지 않습니다. 기본 Docker Compose는 로컬 개발용이며 외부에 공개하는 운영 구성이 아닙니다.
+PRIZM은 현재 `main`의 소스코드만 배포합니다. 공개 컨테이너 이미지, 호스팅 서비스, 모델 가중치와 OpenSQL 자산은 제공하지 않습니다. 기본 Docker Compose는 로컬 개발용이며 외부에 공개하는 운영 구성이 아닙니다.
 
 ## 취약점 신고
 
@@ -21,4 +21,4 @@ API token, JWT, password, 개인 문서와 실제 사용자 데이터는 공개 
 
 ## 범위 참고
 
-인증, owner isolation, `ACTIVE` version 전환과 파일 정리 안전 계약은 [Architecture](docs/architecture.md)에 설명돼 있습니다. 이메일 인증, 비밀번호 재설정, OIDC와 공개 SaaS 보호는 현재 구현 범위가 아닙니다.
+인증, 사용자별 데이터 분리, `ACTIVE` 버전 전환과 안전한 파일 정리 방식은 [아키텍처](docs/architecture.md)에 설명돼 있습니다. 이메일 인증, 비밀번호 재설정, OIDC와 공개 SaaS 보호는 현재 구현 범위가 아닙니다.

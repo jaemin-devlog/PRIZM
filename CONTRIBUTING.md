@@ -5,9 +5,9 @@
 ## 시작하기
 
 1. [README](README.md)에서 현재 제품 범위를 확인합니다.
-2. [Quick Start](docs/quickstart.md)로 로컬 실행 환경을 준비합니다.
-3. [Architecture](docs/architecture.md)와 [Current Status](docs/project-status.md)에서 관련 계약과 알려진 한계를 확인합니다.
-4. 기존 Issue와 [Spec Registry](specs/README.md)에 같은 문제가 있는지 살펴봅니다.
+2. [빠른 시작](docs/quickstart.md)으로 로컬 실행 환경을 준비합니다.
+3. [아키텍처](docs/architecture.md)와 [현재 구현 현황](docs/project-status.md)에서 관련 동작과 알려진 한계를 확인합니다.
+4. 기존 Issue와 [기능별 검증 기록](specs/README.md)에 같은 문제가 있는지 살펴봅니다.
 
 ## 기본 기여 흐름
 
@@ -23,7 +23,7 @@ AI 도구를 사용할 필요는 없습니다. 일반 기여자는 위 흐름만
 
 - 소스 코드, 적용된 Flyway migration과 실행 가능한 테스트를 구현의 기준으로 삼습니다.
 - 등록 문서에 없는 경력, 기술, 성과나 수치를 만들지 않습니다.
-- 문서와 검색 결과의 owner isolation, `ACTIVE` version 안전 계약을 지킵니다.
+- 문서와 검색 결과의 사용자별 데이터 분리, `ACTIVE` 버전 보호 방식을 지킵니다.
 - PostgreSQL 결과를 OpenSQL 검증으로 표현하지 않습니다.
 - 적용된 Flyway migration은 수정하지 않고 새 migration을 추가합니다.
 - `.env`, token, private key, 업로드 원본, DB volume, 모델 파일과 개인 경로를 제출하지 않습니다.
@@ -32,17 +32,17 @@ AI 도구를 사용할 필요는 없습니다. 일반 기여자는 위 흐름만
 ## 변경 제안과 검증
 
 - 버그는 재현 절차, 기대 결과, 실제 결과와 환경을 Issue에 적습니다.
-- 기능이나 관찰 가능한 계약을 바꾸려면 구현 전에 작은 Spec과 검증 계획을 작성합니다.
+- 기능이나 사용자가 확인할 수 있는 동작을 바꾸려면 구현 전에 작은 Spec과 검증 계획을 작성합니다.
 - 문서 전용 변경은 수정한 파일, 확인한 근거와 링크 검사 결과를 남깁니다.
 - 코드 변경은 관련 단위·통합 검사와 저장소의 OSS readiness 검사를 통과해야 합니다.
 - 실행하지 못한 검사는 `NOT_RUN` 또는 `NOT_VERIFIED`로 구분합니다.
 
 Pull Request에는 변경 이유, 범위, 검증 결과, 남은 제한을 짧게 적어 주세요. 큰 변경은 한 PR에 섞지 않습니다.
 
-핵심 계약이나 저장소 운영 절차를 바꾸는 유지관리자는 [프로젝트 규칙](AGENTS.md)과
-[상세 유지관리 Workflow](docs/ai-agent-workflow.md)를 참고할 수 있습니다. 이는 일반
+핵심 동작이나 저장소 운영 절차를 바꾸는 유지관리자는 [프로젝트 규칙](AGENTS.md)과
+[상세 유지관리 절차](docs/ai-agent-workflow.md)를 참고할 수 있습니다. 이는 일반
 기여에 AI 도구 사용을 요구하는 절차가 아닙니다.
 
 ## 행동 기준과 보안
 
-[Code of Conduct](CODE_OF_CONDUCT.md)를 지켜 주세요. 취약점이나 민감한 정보는 공개하지 말고 [Security Policy](SECURITY.md)의 연락 절차를 따라 주세요.
+[행동 강령](CODE_OF_CONDUCT.md)을 지켜 주세요. 취약점이나 민감한 정보는 공개하지 말고 [보안 정책](SECURITY.md)의 연락 절차를 따라 주세요.

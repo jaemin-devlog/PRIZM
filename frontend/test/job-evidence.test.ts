@@ -325,6 +325,60 @@ test('short identifier variants keep only direct Evidence and preserve matched q
   ])
 })
 
+test('a standalone identifier prioritizes an independent source token without deleting semantic candidates', async () => {
+  const identifierItem: JobPostingItem = {
+    itemId: 14,
+    section: '기술 스택',
+    text: 'ZephyrDB',
+  }
+  const search = await findJobEvidence([identifierItem], new Set([identifierItem.itemId]), {
+    search: async () => [
+      evidence(74, 131, 'ZephyrDB로 검색 인덱스를 운영했습니다.'),
+      evidence(75, 131, 'ZephyrDBCloud를 검토했습니다.'),
+    ],
+    listDocuments: async () => [],
+  })
+
+  assert.deepEqual(search.groups[0]?.candidates.map(({ result }) => result.chunkId), [74, 75])
+  assert.equal(search.groups[0]?.candidates[0]?.displayQueryIsDirectIdentifier, true)
+  assert.equal(search.groups[0]?.candidates[1]?.displayQueryIsDirectIdentifier, false)
+})
+
+test('a natural one-word requirement keeps its original semantic Search result', async () => {
+  const requirementItem: JobPostingItem = {
+    itemId: 15,
+    section: 'Qualifications',
+    text: 'Ownership',
+  }
+  const search = await findJobEvidence([requirementItem], new Set([requirementItem.itemId]), {
+    search: async () => [evidence(76, 132, '제품 결과를 끝까지 책임졌습니다.')],
+    listDocuments: async () => [],
+  })
+
+  assert.equal(search.groups[0]?.state, 'result')
+  assert.deepEqual(search.groups[0]?.candidates.map(({ result }) => result.chunkId), [76])
+  assert.equal(search.groups[0]?.candidates[0]?.displayQueryIsDirectIdentifier, false)
+})
+
+test('a dot-prefixed standalone identifier uses the same independent-token priority', async () => {
+  const identifierItem: JobPostingItem = {
+    itemId: 16,
+    section: '기술 스택',
+    text: '.NET',
+  }
+  const search = await findJobEvidence([identifierItem], new Set([identifierItem.itemId]), {
+    search: async () => [
+      evidence(77, 133, '.NET 8로 API를 개발했습니다.'),
+      evidence(78, 133, 'Python으로 배치 서비스를 개발했습니다.'),
+    ],
+    listDocuments: async () => [],
+  })
+
+  assert.deepEqual(search.groups[0]?.candidates.map(({ result }) => result.chunkId), [77, 78])
+  assert.equal(search.groups[0]?.candidates[0]?.displayQueryIsDirectIdentifier, true)
+  assert.equal(search.groups[0]?.candidates[1]?.displayQueryIsDirectIdentifier, false)
+})
+
 test('direct Evidence matching respects identifier boundaries and never filters original queries', () => {
   const original = evidence(81, 140, '원문 query가 찾은 semantic 후보')
   const docker = evidence(82, 140, 'Docker Compose로 서비스를 실행했습니다.')

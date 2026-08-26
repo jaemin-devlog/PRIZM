@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/** 채용공고 원문을 저장하지 않고 Evidence Search에 사용할 항목으로 나누는 API를 제공한다. */
 @RestController
 @RequestMapping("/api/job-postings")
 public class JobPostingSegmentationController {

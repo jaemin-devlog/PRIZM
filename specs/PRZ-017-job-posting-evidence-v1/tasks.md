@@ -18,14 +18,23 @@
 
 ## IMPLEMENT
 
-### 2026-08-26 주변 내용 polish
+### 2026-08-26 개인 문서 원문 일치 안정화
+
+- [x] 연속 application field, 보상 범위, 기술 목록 안내문과 구조용 하위 제목 noise 보정
+- [x] `Required ...` 자격 문장의 application form 오인 방지
+- [x] 기존 원문+명시적 compound variant 계약 유지
+- [x] 공백 없는 단독 query의 exact 원문 우선과 semantic 후보 보존
+- [x] 경험 진위·충족 판정이 아니라 원문 발췌와 문서 위치를 보여 주는 UI 안내 유지
+- [x] 특정 사용자 문장·회사명·기술명 사전 없는 최소 회귀 추가
+
+### 2026-08-26 주변 내용 polish (historical checkpoint)
 
 - [x] 미리보기를 포함하면서 추가 원문을 제공하는 문맥만 노출
 - [x] 유효하지 않거나 중복인 `주변 내용 보기` action 제거
 - [x] 열린 reader를 Evidence 본문 폭으로 확장
 - [x] presentation/component regression test 추가
 
-### 2026-08-26 결과 표시 polish
+### 2026-08-26 결과 표시 polish (historical checkpoint)
 
 - [x] 긴 Evidence 후보 5줄 미리보기와 기존 주변 내용·원문 action 유지
 - [x] 결과 제목 focus를 PRIZM focus token으로 표시
@@ -64,20 +73,51 @@
 - [x] 화면상 정확 중복 행 정리와 같은 page의 서로 다른 Evidence 보존
 - [x] 항목 다시 선택·입력 복귀·결과 route 직접 진입 안전 처리
 - [x] desktop 2열·mobile 단일 열과 PDF/TXT row 이동 유지
-- [x] requirement rail을 기록 있음·기록 없음 상태 탭으로 분리
+- [x] requirement rail을 검색 후보 있음·검색된 후보 없음 상태 탭으로 분리
 - [x] loading/error를 조건부 확인 필요 탭으로 분리
 - [x] 상태 탭 안에서 원래 requirement 순서·번호와 Search 비호출 유지
 
 ## VERIFY
 
-### 2026-08-26 주변 내용 polish
+### 2026-08-27 mixed bullet 마지막 Gate
+
+- [x] 같은 들여쓰기의 mixed `•`/`-`를 sibling leaf로 처리
+- [x] 실제로 더 들여쓴 parent-child 구조 유지
+- [x] segmentation service/controller focused 50/50, 실패·오류·skip 0
+- [x] production/test compile과 `git diff --check` `PASS`
+- [x] 인증 browser mixed bullet selectable 10→11, metadata 제외·순서 유지
+- [x] Java·Docker 2개 항목 Evidence와 PDF 2페이지 target smoke `PASS`
+- [x] PRZ-016 Search Production·PRZ-009·기존 주석·unrelated·stash 보호
+
+### 2026-08-26 개인 문서 원문 일치 안정화 (historical checkpoint)
+
+- [x] frontend PRZ-017 focused unit/component 33/33 `PASS`
+- [x] backend segmentation focused 43/43 `PASS`
+- [x] frontend 전체 unit 80/80·typecheck·lint·build `PASS`
+- [x] backend 전체 unit `PASS` — 89 suites, 627 tests, 실패·오류 0, 기존 조건부 test 20건 skip
+- [ ] backend integration 최종 재실행 — 실행 중 사용자 요청으로 중단, `ABORTED`
+- [ ] 최신 working tree 실제 인증 browser 원문·PDF page 이동 Gate — `NEEDS_ADJUSTMENT`:
+  동일 bullet 11개·Search·empty·context와 자동 PDF page target은 통과했고 실제 PDF 표시는 사용자가
+  확인했으나, 혼합 bullet 첫 업무 문장 1개 오인
+- [ ] TXT 이동과 PayPay India·Lean In 최신 재평가 — `NOT_RUN`
+- [x] Search Production·PRZ-009·기존 주석·staged/stash/untracked 보호 최종 감사
+
+### 2026-08-26 desktop 동기화 (historical checkpoint)
+
+- [x] 원격 source `84f9191` fast-forward와 변경 파일 13개 확인
+- [x] frontend 전체 unit 77/77·typecheck·lint·build `PASS`
+- [x] backend segmentation service/controller focused 42/42 `PASS`
+- [ ] 최종 mobile viewport browser 재실행 — 사용자 결정으로 `NOT_RUN`; 이번 checkpoint의
+  필수 Gate에서는 제외
+
+### 2026-08-26 주변 내용 polish (historical checkpoint)
 
 - [x] PRZ-017 focused component/unit test — 30/30 `PASS`
 - [x] frontend 전체 unit·typecheck·lint·build — 77/77와 정적·production 검증 `PASS`
 - [x] Docker 최신 source rebuild와 실제 인증 browser Gate
 - [x] `git diff --check`, 보호 영역·중복·민감정보 감사
 
-### 2026-08-26 결과 표시 polish
+### 2026-08-26 결과 표시 polish (historical checkpoint)
 
 - [x] PRZ-017 focused component/unit test — 29/29 `PASS`
 - [x] frontend 전체 unit·typecheck·lint·build — 76/76와 정적·production 검증 `PASS`
@@ -123,7 +163,13 @@
 
 ## AUDIT / INTEGRATE
 
-### 2026-08-26 주변 내용 polish
+### 2026-08-26 desktop 동기화 (historical checkpoint)
+
+- [x] local HEAD와 `origin/PRZ-017-job-evidence-v1`이 `84f9191`로 일치
+- [x] tracked clean·staged 0, untracked 5개 해시와 stash 2개 보존
+- [x] merge commit·새 로컬 commit·PR·merge 없음
+
+### 2026-08-26 주변 내용 polish (historical checkpoint)
 
 - [x] AC39와 presentation/workspace/CSS/component test 추적성 확인
 - [x] browser의 유효 context action 6개, 미리보기 불포함·중복 문맥 0 확인
@@ -132,7 +178,7 @@
 - [x] 민감정보 추가 0, `git diff --check` `PASS`, stash 1개 보존
 - [x] blocking finding 0, commit·push·PR·merge `NOT_RUN`
 
-### 2026-08-26 결과 표시 polish
+### 2026-08-26 결과 표시 polish (historical checkpoint)
 
 - [x] AC36~AC38와 구현·component test 추적성 확인
 - [x] 같은 document/version/source/display text의 exact duplicate 0 확인
@@ -141,7 +187,7 @@
 - [x] blocking finding 0 확인
 - [x] commit·push·PR·merge `NOT_RUN`
 
-### 2026-08-24 segmentation V1 stabilization
+### 2026-08-24 segmentation V1 stabilization (historical checkpoint)
 
 - [x] branch·HEAD·origin/main·dirty 12개·stash 1개와 보호 파일 hash 기록
 - [x] block-level V1 계약·acceptance criteria와 test-first 계획 반영
@@ -157,7 +203,7 @@
 - [ ] 최종 Evidence 16개 항목과 V1 판정 기록
 - [x] commit/push/PR/merge `NOT_RUN`
 
-### 2026-08-24 segmentation generalization
+### 2026-08-24 segmentation generalization (historical checkpoint)
 
 - [x] line 구조, section role, UNKNOWN fallback과 leaf-first 정책 구현
 - [x] 회사명·공고 문장을 복제하지 않은 generic 구조 fixture 추가

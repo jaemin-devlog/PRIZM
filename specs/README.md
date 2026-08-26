@@ -221,11 +221,13 @@ flowchart TD
     P15의 인증된 PDF 페이지 이동은 `NOT_VERIFIED`)
 - **Spec ID:** [PRZ-017](PRZ-017-job-posting-evidence-v1/spec.md)
   - 이름: 채용공고 항목별 Career Evidence V1
-  - 상태: `IN_PROGRESS`
-  - Source commit: `de98bcf` (baseline `d44f30e`)
-  - Last verified: 2026-08-24 결과 상태 탭 포함 새 modal·결과 workspace 자동 검증·독립 감사
-    `PASS`, 인증 browser `BLOCKED_BY_AUTH_ENVIRONMENT`; 이전 compound 동일 owner/ACTIVE PDF
-    browser Gate `PASS`
+  - 상태: `VERIFIED`
+  - Source: `84f9191` 이후 최종 통합 candidate (baseline `d44f30e`)
+  - Last verified: 2026-08-27. 2026-08-26 frontend focused 33/33·전체 80/80,
+    typecheck·lint·build와 backend 전체 89 suites·627 tests가 실패·오류 0, 기존 조건부 test
+    20건 skip으로 통과. integration `ABORTED`. 최종 segmentation focused 50/50·compile과 인증
+    browser mixed bullet 10→11, Evidence 2개 항목, PDF 2페이지 target `PASS`. TXT 이동과
+    PayPay India·Lean In 재평가는 `NOT_RUN`
 
 ## 환경별 판정 주의
 

@@ -2,23 +2,113 @@
 
 ## 현재 판정
 
-- 상태: `IN_PROGRESS`
+- 상태: `VERIFIED`
 - 기준선: `d44f30eb4346353c4363d559be478024f191a878`
-- 현재 source: `8be904d` + 미커밋 실사용 보정
-- VERIFY: 주변 내용 polish frontend focused 30개·전체 77개, typecheck·lint·build,
-  Docker 최신 source rebuild와 실제 인증 desktop browser Gate `PASS`; 최종 patch mobile viewport
-  재실행은 `NOT_RUN`
-- AUDIT: 화면상 exact duplicate 0, 보호 대상 diff 0, `git diff --check` `PASS`
-- commit/push: 이번 실사용 보정은 사용자 지시에 따라 `NOT_RUN`
-- PR/merge: 사용자 지시에 따라 `NOT_RUN`
+- 현재 source: `84f9191` 이후 최종 통합 candidate
+- VERIFY: 2026-08-26 frontend focused 33/33·전체 80/80, typecheck·lint·build와 backend 전체
+  89 suites·627 tests가 실패·오류 0, 기존 조건부 test 20건 skip으로 통과. integration
+  `ABORTED`. 2026-08-27 최종 segmentation focused 50/50·compile과 인증 browser mixed bullet
+  10→11, Evidence 2개 항목, PDF 2페이지 target `PASS`
+- AUDIT: PRZ-016 Search Production·PRZ-009 보호 소스 추가 diff 0, 보호 파일 hash 변화 0,
+  staged 0, stash 2개와 기존 untracked 보존, `git diff --check` 및 Markdown 135개·local link
+  584개 검사 `PASS`
+- commit/push: `84f9191`까지 원격 branch에 반영됨. 최종 통합 candidate는 현재 미커밋 상태
+- PR/merge: 최종 통합 절차 진행 전
 
-현재 미커밋 보정은 실제 ATAD 공고의 noise를 제거하고 `중 1개 이상`·`등/등의` 복합 질의에서
-직접 identifier Evidence만 후보로 표시하는 실제 browser 경로까지 확인했다. 결과 표시 polish는
-긴 원문 후보, focus, 같은 제목 문서 식별과 중복 표시를 실제 인증 화면에서 확인했다. 최종 patch의
-mobile viewport 재실행과 기존 backend 전체 unit 장애는 별도 한계로 남아 있어 branch 전체 상태는
-`IN_PROGRESS`로 유지한다. 이전 checkpoint 검증과 통합 이력은 아래 historical 절에 분리해 보존한다.
+`84f9191` 당시에는 실제 ATAD 공고의 noise 제거, 복합 질의의 직접 identifier Evidence,
+긴 원문 후보, focus, 같은 제목 문서 식별과 PDF page 이동을 인증 browser에서 확인했다.
+최종 통합 candidate에는 segmentation 구조 보정과 단독 identifier exact 우선·semantic 후보 보존이
+추가됐다. 마지막 mixed-bullet false negative는 실제 indentation 기반 목록 깊이로 수정했고 focused
+test·compile·인증 browser Gate를 통과했다. integration `ABORTED`는 최종 결함 수정 범위의 필수
+Gate가 아니며 소급해 `PASS`로 바꾸지 않는다.
 
-## 2026-08-26 주변 내용 polish
+## 2026-08-27 mixed bullet 마지막 Gate
+
+- 원인은 bullet 종류를 목록 깊이로 사용해 같은 indentation의 `•`를 parent, 뒤의 `-`를 child로
+  오인한 것이었다. 목록 깊이를 실제 선행 indentation으로 계산하도록 수정했다.
+- 같은 indentation의 mixed bullet 3개가 모두 sibling leaf로 남고, 실제로 더 들여쓴 child는 기존
+  grouping parent 아래에 남는 회귀를 한 테스트 묶음으로 확인했다.
+- segmentation service 44개와 controller 6개, 총 50개가 실패·오류·skip 없이 통과했고
+  production/test compile과 backend Docker `bootJar`도 통과했다.
+- 인증 browser에서 동일 공고의 mixed `•`/`-` selectable이 10개에서 기존 기준과 같은 11개로
+  복구됐다. 첫 Java 업무 문장은 heading이 아닌 checkbox였고 metadata 제외와 원래 순서를 유지했다.
+- Java·Docker 2개 항목은 각각 Evidence 3건을 표시했고, 올바른 PDF의
+  `#page=2&zoom=page-width` target을 열었다.
+- PRZ-016 Search Production과 PRZ-009 추가 diff 0, staged 0, stash 2개와 기존 unrelated
+  dirty/untracked 보존, `git diff --check` `PASS`를 확인했다.
+
+## 2026-08-26 개인 문서 원문 일치 안정화 (historical checkpoint)
+
+### 제품 계약
+
+PRZ-017은 사용자가 관리하는 이력서·포트폴리오에서 채용공고 항목과 관련된 원문을 찾아 문서와
+PDF page 또는 TXT 상세 위치를 연결한다. 원문에 `Java`가 있으면 그 내용을 Evidence로 표시하는
+것으로 충분하며, 사용자가 그 경험을 실제로 했는지 또는 채용 요구를 충족하는지는 판정하지 않는다.
+이 원칙은 특정 개인 문서뿐 아니라 처음 등록되는 다른 사용자의 문서에도 동일하게 적용한다.
+
+### 구현 근거
+
+- segmentation은 반복 확인된 지원서 field, 보상 범위, 기술 목록 안내문과 구조용 하위 제목만
+  구조 신호로 제외한다. 실제 기술 목록과 업무·자격 문장은 보존한다.
+- query planner의 기존 원문+명시적 compound variant 계약은 그대로다. 공백 없는 단독 query는
+  독립 token 직접 일치 후보를 먼저 배치하되 original semantic 후보를 삭제하지 않는다.
+- 임의 식별자 `ZephyrDB`는 실제 token 일치 원문을 먼저 표시하고, 자연 역량 `Ownership`은 의미상
+  관련된 원문을 계속 표시하는 회귀로 기술명 사전 없이 exact 우선과 recall을 함께 확인한다.
+- PRZ-016의 ranking·threshold·fallback·rescue·embedding·localization은 수정하지 않았다.
+- 결과와 empty 문구는 Search 후보 및 원문 위치만 설명하며 진위·충족·적합도 판정을 하지 않는다.
+
+### 현재 검증
+
+| 검증 | 결과 |
+|---|---|
+| PRZ-017 focused frontend | `PASS` — 33/33 |
+| Frontend 전체 unit·typecheck·lint·build | `PASS` — 80/80, 정적 검사와 production build 통과 |
+| Backend segmentation focused | `PASS` — 43/43 |
+| Backend 전체 unit | `PASS` — 89 suites, 627 tests, 실패·오류 0, 기존 조건부 test 20건 skip |
+| Backend integration | `ABORTED` — 실행 중 사용자 요청으로 중단 |
+| 최신 source 실제 인증 browser | `NEEDS_ADJUSTMENT` — 동일 bullet 핵심 흐름은 통과, 혼합 bullet 첫 업무 문장 1개 오인 |
+| PDF page target | `PASS` — 자동 검증으로 올바른 문서의 2페이지 blob target 확인 |
+| PDF 실제 표시 | `USER_CONFIRMED` — 사용자가 실제 화면에서 정상 표시를 확인 |
+| TXT 문서 이동 | `NOT_RUN` — 등록된 TXT fixture 없음 |
+| Browser console·API | `PASS` — console error 0, 관련 API 모두 200, 반복 loop 없음 |
+| Docker current-source build | `PASS` — frontend production build, backend `bootJar`, backend health `UP` |
+| PayPay India·Lean In 최신 재평가 | `NOT_RUN` |
+
+과거 PayPay India·Lean In holdout의 실패 수치는 당시 source의 역사적 결과로 아래에 그대로 보존한다.
+이번 안정화 결과로 소급해 `PASS`로 바꾸지 않는다.
+
+### 최신 인증 browser Gate
+
+- 현재 working tree로 backend·frontend 이미지를 다시 빌드하고 기존 DB·문서 volume은 유지했다.
+- 동일한 `-` bullet 공고는 업무 3개·자격 3개·우대 3개·기술요건 2개, 총 11개를 원래 순서로
+  표시했다. 복지·전형·근무·접수·채용 인원은 selectable 에서 제외됐고 heading과 bullet prefix는
+  checkbox에 포함되지 않았다.
+- 전체 해제 시 `11개 중 0개 선택`과 검색 비활성화, 전체 선택 시 11개 선택을 확인했다.
+- 5개 항목을 검색해 `검색 후보 있음` 3개, `검색된 후보 없음` 2개를 표시했다. 선택하지 않은
+  항목의 결과 그룹은 만들지 않았고, empty state는 경험 부재나 요건 불충족으로 판정하지 않았다.
+- 주변 내용은 extractive 원문으로 열렸고, PDF는 올바른 문서의 `#page=2&zoom=page-width`로
+  연결됐다. PDF 실표시는 사용자가 확인했다. 등록 문서가 PDF 1개뿐이어서 TXT 이동은 `NOT_RUN`이다.
+- 현재 로그인 계정의 등록 문서 1개에서만 결과가 표시됐고 owner/ACTIVE 이상 징후는 없었다.
+  이번 Gate에서 두 사용자·비활성 버전 fixture를 새로 만들지는 않았으므로 기존 격리 회귀를
+  다시 실행한 결과로 확대하지 않는다.
+- 같은 들여쓰기에서 `•` 첫 항목 뒤에 `-` 항목이 이어진 공고는 첫 업무 문장을 grouping parent로
+  해석해 selectable이 11개에서 10개로 줄었다. 기대한 checkbox 대신 heading으로 표시되므로
+  browser Gate를 `PASS`로 올리지 않는다.
+- 이번 문서·browser 작업 중 Production source와 test hash는 작업 시작 기준과 같았으며 코드 수정은
+  없었다. current-source 확인을 위해 Docker backend·frontend 컨테이너만 다시 만들었고 DB와 저장
+  volume은 유지했다.
+
+## 2026-08-26 desktop 동기화(역사적 checkpoint)
+
+- 원격 commit `84f9191`을 merge commit 없이 fast-forward했고 local HEAD와 원격 branch가 일치한다.
+- 이 PC에서 frontend 전체 unit 77/77, typecheck·lint·build와 backend segmentation
+  service/controller focused 42/42를 재실행해 모두 통과했다.
+- 최종 mobile viewport는 사용자가 이번 checkpoint에 필요하지 않다고 결정해 `NOT_RUN`으로
+  유지한다. 노트북에서 완료한 인증 desktop browser 결과를 mobile 검증으로 확대하지 않는다.
+- 당시 tracked source는 깨끗했고 staged는 0이었다. 기존 untracked 5개와 stash 2개의 내용은
+  동기화 전후 그대로 보존했다. 이는 이후 미커밋 working tree 상태를 뜻하지 않는다.
+
+## 2026-08-26 주변 내용 polish (historical checkpoint)
 
 실제 인증 화면에서 `주변 내용 보기`가 summary 버튼의 flex 너비를 기준으로 약 283px까지
 수축하고, 일부 결과는 현재 미리보기를 포함하지 않은 문서 앞부분을 문맥으로 표시했다. PRZ-017
@@ -42,7 +132,7 @@ presentation과 후보 dedup은 변경하지 않았다.
 미리보기부터 이어지는 추가 extractive 원문만 표시했다. PDF/TXT 원문 이동 action은 모든 행에
 그대로 남아 있다.
 
-## 2026-08-26 결과 표시 polish
+## 2026-08-26 결과 표시 polish (historical checkpoint)
 
 ### 구현
 
@@ -89,7 +179,7 @@ focused service/controller 결과와 Docker backend 실행 상태는 유지된�
 사용자는 일반 브라우저에서 PDF가 정상 표시됨을 확인했으며, 앱 내 브라우저 renderer 차이는 이번
 수정 대상에서 제외했다. commit·push·PR·merge는 실행하지 않았다.
 
-## 2026-08-24 Search 후보 신뢰성 보정
+## 2026-08-24 Search 후보 신뢰성 보정 (historical checkpoint)
 
 ### 구현 범위
 
@@ -141,7 +231,7 @@ DB는 재생성하거나 변경하지 않았다.
 Phase는 PDF renderer를 수정하지 않으므로 PRZ-017 Search 기능의 실패로 확대하지 않고, 일반
 Chrome 사람이 보는 시각 결과는 `NOT_RUN`으로 분리한다.
 
-## 2026-08-24 실사용 ATAD 보정
+## 2026-08-24 실사용 ATAD 보정 (historical checkpoint)
 
 ### 범위와 기준
 
@@ -199,11 +289,12 @@ After API 결과는 업무 leaf 6개, 자격요건 7개, 우대사항 5개를 �
 - Production Java 주석 정비는 commit `6cc4726`, PRZ-017 구현·test·Spec은 source commit
   `de98bcf`에 기록했다.
 - 두 commit과 당시 통합 기록은 `PRZ-017-job-evidence-v1` 원격 branch에 push했다. PR과 merge는
-  만들거나 실행하지 않았다. 이번 미커밋 실사용 보정에는 해당하지 않는다.
+  만들거나 실행하지 않았다. 이후 실사용 보정은 commit `84f9191`에 기록해 같은 원격 branch에
+  push했다.
 - 인증 browser Gate의 `BLOCKED_BY_AUTH_ENVIRONMENT`, 기존 44개 전체 공고와 TXT 이동
   `NOT_RUN`, 전체 상태 `IN_PROGRESS`를 그대로 남겨 노트북 환경에서 이어서 검증할 수 있게 한다.
 
-## ORIENT 근거
+## 초기 구현 checkpoint ORIENT 근거 (historical)
 
 - 시작 branch `PRZ-017-job-evidence-v1`, `HEAD`와 `origin/main`은 모두 기준선
   `d44f30e`였다.
@@ -217,7 +308,7 @@ After API 결과는 업무 leaf 6개, 자격요건 7개, 우대사항 5개를 �
 - Qwen/OpenAI judge는 `scripts/evaluation`, `src/searchEvaluation`과 PRZ-016 연구 Evidence에
   남은 평가 자료이며 Production 경로가 아니다. 이 자료는 삭제하지 않는다.
 
-## 기존 구조 분류
+## 기존 구조 분류 (historical checkpoint)
 
 | 분류 | 대상 |
 |---|---|
@@ -226,9 +317,9 @@ After API 결과는 업무 leaf 6개, 자격요건 7개, 우대사항 5개를 �
 | 제거 | 현재 PRZ-017 Production에는 제거할 Qwen/LLM/fit 코드가 없음 |
 | 신규 구현 | stateless segmentation, 입력·선택 UI, 선택 항목별 Search orchestration과 그룹 상태 |
 
-## 요구사항 추적
+## 요구사항 추적 (historical checkpoint)
 
-| 요구사항 | source/test | 현재 결과 |
+| 요구사항 | source/test | 당시 결과 |
 |---|---|---|
 | R1 deterministic segmentation | `jobposting` service/controller, service 21개·controller 6개 test | `PASS` |
 | R2 사용자 선택 | 입력 전용 `JobEvidencePanel`, 접근 가능한 selection modal과 component test | 자동 test `PASS`, browser `BLOCKED_BY_AUTH_ENVIRONMENT` |
@@ -238,7 +329,7 @@ After API 결과는 업무 leaf 6개, 자격요건 7개, 우대사항 5개를 �
 | R6 인증·owner/ACTIVE | USER 200·무인증 401·admin 403와 전체 PostgreSQL integration | `PASS` |
 | migration·dependency·Search diff 0 | origin/main 기준 final path diff·독립 감사 | `PASS` |
 
-## 검증 결과
+## 초기 구현 checkpoint 검증 결과 (historical)
 
 | 검증 | 결과 |
 |---|---|
@@ -259,7 +350,7 @@ After API 결과는 업무 leaf 6개, 자격요건 7개, 우대사항 5개를 �
 | Markdown 검사 | `PASS` — tracked Markdown 135개, local link 584개 |
 | 독립 AUDIT | `PASS` — 초기 401/fan-out/heading/bullet/분할 finding 수정 뒤 blocking 0 |
 
-## 선택 modal·전용 결과 workspace 보정 근거
+## 선택 modal·전용 결과 workspace 보정 근거 (historical checkpoint)
 
 - segmentation 성공 뒤 항목은 입력 화면 아래에 누적하지 않고 section별 modal에서 선택한다.
   heading은 그룹 제목만 담당하고 checkbox는 child 항목에만 있다. 전체 선택·해제, 선택 수와
@@ -279,7 +370,7 @@ After API 결과는 업무 leaf 6개, 자격요건 7개, 우대사항 5개를 �
   만료된 인증으로 401 처리되어 로그인 화면으로 이동했다. 새 modal, 결과 route, requirement
   전환과 PDF page 동작은 이번 UI Phase에서 실제 브라우저로 검증하지 못했다.
 
-## 결과 상태 탭 보정 근거
+## 결과 상태 탭 보정 근거 (historical checkpoint)
 
 - requirement rail 상단에 `기록 있음`과 `기록 없음` 탭을 항상 표시하고, loading/error가
   있을 때만 `확인 필요` 탭을 표시한다. 각 숫자는 Evidence 행이 아니라 requirement 수다.
@@ -294,7 +385,7 @@ After API 결과는 업무 leaf 6개, 자격요건 7개, 우대사항 5개를 �
   결과에서 두 탭을 클릭하는 Gate는 `BLOCKED_BY_AUTH_ENVIRONMENT`로 남긴다. 인증 우회와
   Production/auth source 변경은 하지 않았다.
 
-## 작업공간 보호 감사
+## 작업공간 보호 감사 (historical checkpoint)
 
 - branch, HEAD, `origin/main`, merge-base는 모두 기준선 `d44f30e`로 유지됐고 staged는 0,
   stash 2개는 시작 시점과 동일하다.
@@ -306,7 +397,7 @@ After API 결과는 업무 leaf 6개, 자격요건 7개, 우대사항 5개를 �
   작업의 명령에는 해당 문서 생성·복구·이동·수정이 없고 파일 내용도 열지 않았다. 외부에서
   다시 나타난 이 4개를 그대로 보존했으며, 그 밖의 예상치 못한 변경·추가는 없다.
 
-## Segmentation UX 보정 근거
+## Segmentation UX 보정 근거 (historical checkpoint)
 
 - 기존에는 section heading이 `section` 보조 정보로만 전달되면서 frontend가 각 checkbox
   안에 반복 표시했고, 알려진 채용 metadata section과 독립 metadata를 Search item에서
@@ -326,7 +417,7 @@ After API 결과는 업무 leaf 6개, 자격요건 7개, 우대사항 5개를 �
   있었다. 구조 마크업을 먼저 정규화하는 회귀 fixture에서 업무 5개, 자격 5개, 우대 5개,
   총 15개만 selectable하게 반환하고 복지·학력/경력·채용인원·빈 표 셀은 제외했다.
 
-## Compound query composition 보정 근거
+## Compound query composition 보정 근거 (historical checkpoint)
 
 - 구현 위치는 PRZ-017 전용 `frontend/src/jobEvidence.ts`다. 공통 Search API client와
   PRZ-016 Search Production은 수정하지 않았다.
@@ -355,14 +446,14 @@ After API 결과는 업무 leaf 6개, 자격요건 7개, 우대사항 5개를 �
 PostgreSQL 결과는 OpenSQL evidence로 대체하지 않는다. 환경이 없거나 실행하지 않은 Gate를
 `PASS` 또는 `VERIFIED`로 기록하지 않는다.
 
-## 남은 Gate
+## 남은 Gate (historical checkpoint)
 
 이전 compound query Phase의 자동 검증·인증 targeted browser Gate·독립 AUDIT는 완료됐다.
 기존 44개 전체 공고와 TXT 이동은 당시 Phase에서 재실행하지 않았다. 이전 branch checkpoint는
 commit·push했고 PR/merge는 실행하지 않았다. 이번 2026-08-24 보정은 commit·push하지 않았고
 전체 상태는 `IN_PROGRESS`다.
 
-## 2026-08-24 segmentation generalization Phase
+## 2026-08-24 segmentation generalization Phase (historical checkpoint)
 
 ### 1. 기존 parser의 일반화 실패 원인
 

@@ -9,7 +9,7 @@
 > 최종 Windows·Linux 경로 교정·CI source commit:
 > `aff3e87a9a912e44fcf217291a45328cf451cfc9`
 >
-> 문서 검토 기준일: `2026-08-24`
+> 문서 검토 기준일: `2026-08-27`
 >
 > PRZ-010 상태: `VERIFIED` — source
 > `26c546b16eb9ea42d98460dd6e5aa0bf0752212a`, `main` 통합 merge
@@ -299,7 +299,7 @@ PostgreSQL FTS·BGE-M3 Sparse·BGE reranker 실험은 평가 전용이며 Produc
 - [opt-in 검색 profile](../src/main/java/com/prizm/search/profile/CompositeSearchProfile.java)
 - [Career Evidence v2 API](../src/main/java/com/prizm/search/controller/CareerEvidenceSearchV2Controller.java)
 
-### 채용공고 항목별 Career Evidence V1 (`IMPLEMENTED`, compound Gate PASS)
+### 채용공고 항목별 Career Evidence V1 (`VERIFIED`)
 
 PRZ-017은 붙여넣은 채용공고를 줄바꿈·bullet·numbered list·문장 경계로 결정적으로
 분리하고, 사용자가 checkbox로 고른 항목만 기존 Career Evidence Search로 전달하는 소비자
@@ -319,6 +319,10 @@ query를 같은 API로 순차 검색한다. 쉼표는 짧고 명확한 OR 목록
 표시한다. Search의 owner·`ACTIVE` version, ranking, relevance floor, fallback과 localization은
 바꾸지 않으며 query별 score를 재정렬하지 않는다.
 
+공백 없는 단독 query는 같은 Search 응답에서 `content` 또는 `snippet`에 독립 token이 있는
+후보를 먼저 표시하되, 원래 semantic 후보도 삭제하지 않는다. 따라서 기술 식별자의 직접 원문을
+우선하면서 한 단어 자연 역량의 관련 후보를 잃지 않는다.
+
 분리 결과는 입력 화면 아래에 누적하지 않고 section별 선택 modal로 표시하며 heading에는
 checkbox를 만들지 않는다. 검색은 `/career-vault/job-evidence/results` 전용 route로 이동해
 loading부터 보여 준다. 결과 화면은 선택 항목 rail에서 하나를 고르고 오른쪽에서
@@ -327,7 +331,7 @@ loading부터 보여 준다. 결과 화면은 선택 항목 rail에서 하나를
 행만 presentation 단계에서 정리한다. snippet, 주변 원문, 문서와 source 위치는 유지하며
 score·적합도·충족·합격 가능성 등의 판정은 표시하지 않는다.
 
-선택 항목 rail은 `기록 있음`과 `기록 없음` 상태 탭으로 나누며 loading 또는 error가 남아
+선택 항목 rail은 `검색 후보 있음`과 `검색된 후보 없음` 상태 탭으로 나누며 loading 또는 error가 남아
 있을 때만 `확인 필요` 탭을 추가한다. 탭 숫자는 Evidence 행이 아니라 requirement 수이고,
 탭을 바꿔도 원래 requirement 순서와 번호를 유지한다. 상태 탭 전환은 기존 결과를 표시하는
 presentation 동작이므로 Search API를 다시 호출하지 않는다.
@@ -337,12 +341,15 @@ PDF `PAGE`는 기존 인증된 original Blob viewer에서 표시 Evidence의 1-b
 영구 저장하지 않으며 새 table, migration과 PDF viewer가 없다. PRZ-009 Tag는 별도 사용자
 metadata로 남고 PRZ-017 검색 filter나 ranking 신호가 아니다.
 
-현재 source commit은 `de98bcf`이고 새 UI 기준 backend focused 27건, frontend unit
-69건과 typecheck·lint·build를 통과했다. 이전 compound Gate에서는 Docker 최신 source
-rebuild와 독립 감사도 통과했고, 같은 owner의 ACTIVE PDF를 사용한 인증 브라우저에서 Docker
-compound가 0건에서 3건으로 바뀌었다. Git/협업 compound의 0건은 기존 PRZ-016 recall 한계로
-유지됐고 PDF 1페이지 viewer도 확인했다. 새 modal·결과 workspace의 인증 브라우저 Gate는
-세션 만료로 `BLOCKED_BY_AUTH_ENVIRONMENT`이며
+현재 구현 기준은 source commit `84f9191` 이후 최종 통합 candidate다. 2026-08-26에 frontend
+focused 33/33·전체 80/80, typecheck·lint·build와 backend 전체 89 suites·627 tests가
+실패·오류 0, 기존 조건부 test 20건 skip으로 통과했다. integration test는 실행 중 중단되어
+`ABORTED`다. 2026-08-27 마지막 mixed-bullet 수정 뒤 segmentation service/controller focused
+50/50과 production/test compile이 통과했다. 최신 backend를 적용한 인증 desktop browser에서는
+기존 동일 bullet 11개 기준을 유지하고 mixed `•`/`-` 공고도 10개에서 11개로 복구했다. 첫 업무
+문장은 heading이 아닌 checkbox로 표시됐고 metadata 제외와 순서, 2개 항목 Search, Evidence 결과와
+PDF 2페이지 target이 정상 동작했다. 이 V1 Gate는 `VERIFIED`다. TXT 이동과 PayPay India·Lean In
+재평가, mobile viewport는 명시한 최종 범위 밖이어서 `NOT_RUN`이다.
 전체 V1의 남은 Gate·완료 판정은
 [PRZ-017 Spec](../specs/PRZ-017-job-posting-evidence-v1/spec.md)과
 [Evidence](../specs/PRZ-017-job-posting-evidence-v1/evidence.md)를 따른다.

@@ -378,7 +378,8 @@ test('results workspace keeps requirement order and renders one active document-
   assert.doesNotMatch(html, new RegExp(errorGroup.item.text))
   assert.match(html, /원문 후보 4건/)
   assert.match(html, /선택한 항목의 검색 후보를 확인하세요/)
-  assert.match(html, /검색 결과는 요구사항 충족 여부를 판정한 결과가 아닙니다\. 원문을 직접 확인하세요/)
+  assert.match(html, /내 문서에서 항목과 관련된 원문과 위치를 보여줍니다/)
+  assert.match(html, /경험의 진위나 채용 요건 충족 여부를 판정하지 않습니다/)
   assert.match(html, /백엔드 이력서/)
   assert.match(html, /이력서 · 버전 1 · 확인할 원문 후보 3건/)
   assert.match(html, /프로젝트 기록/)
@@ -414,6 +415,7 @@ test('requirement navigator changes the active item without issuing Search', () 
     activeFilter: 'empty',
   })))
   assert.match(emptyHtml, /검색된 후보가 없습니다/)
+  assert.match(emptyHtml, /경험이 없다는 판정도/)
   assert.doesNotMatch(emptyHtml, /job-document-group-heading/)
 })
 

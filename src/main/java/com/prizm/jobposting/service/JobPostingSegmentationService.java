@@ -12,7 +12,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 
-/** Deterministically separates job-posting structure without a model or external service. */
+/**
+ * 채용공고 원문을 사용자가 검토하고 선택할 수 있는 Career Evidence 검색 항목으로 나눈다.
+ *
+ * <p>모델이나 외부 서비스 없이 섹션, 목록 계층, 문장 경계를 해석한다. 업무·자격·우대 항목은 원문
+ * 순서와 소속 섹션을 유지하고, 복지·채용 절차·근무 조건처럼 명백한 메타데이터만 제외한다. 분류되지
+ * 않은 섹션은 일괄 제외하지 않아 회사마다 표현이 달라도 검색할 만한 항목을 놓치지 않도록 한다.</p>
+ *
+ * <p>반환값은 기존 Search에 전달할 검색 질의 후보다. 이 서비스는 지원자의 경력 진위나 요구사항 충족
+ * 여부, 직무 적합도를 판정하지 않는다.</p>
+ */
 @Service
 public class JobPostingSegmentationService {
 
@@ -20,7 +29,6 @@ public class JobPostingSegmentationService {
     public static final int MAX_ITEM_COUNT = 100;
     private static final int MAX_SECTION_HEADING_CODE_POINTS = 40;
     private static final int PRIMARY_LIST_LEVEL = 1;
-    private static final int SECONDARY_LIST_LEVEL = 2;
 
     private static final Pattern UNICODE_WHITESPACE = Pattern.compile(
             "[\\p{Z}\\s]+", Pattern.UNICODE_CHARACTER_CLASS);
@@ -63,6 +71,10 @@ public class JobPostingSegmentationService {
     private static final Pattern PERCENTAGE_METADATA = Pattern.compile(
             "(?i)^(?:up\\s+to\\s+)?\\d{1,3}(?:\\.\\d+)?%\\s+.+$",
             Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern COMPENSATION_SIGNAL = Pattern.compile(
+            "(?i)^.*(?:\\p{Sc}|\\b(?:salary|compensation|pay|bonus|equity|annually|annual|"
+                    + "monthly|hourly|per\\s+(?:year|month|hour))\\b).*$",
+            Pattern.UNICODE_CHARACTER_CLASS);
     private static final Pattern BRACKETED_HEADING = Pattern.compile(
             "^\\[[^]\\r\\n]{2,80}]$", Pattern.UNICODE_CHARACTER_CLASS);
     private static final Pattern ENGLISH_ACTION_REQUIREMENT = Pattern.compile(
@@ -79,7 +91,8 @@ public class JobPostingSegmentationService {
     private static final Set<String> SEARCHABLE_SECTION_STEMS = Set.of(
             "업무", "역할", "자격", "요건", "역량", "우대", "찾고", "함께하고싶", "이면좋", "더좋",
             "responsibil", "requirement", "qualification", "preferred", "lookingfor",
-            "whoyouare", "whatyoudo", "whatyoull", "yourimpact", "skills");
+            "whoyouare", "whatyoudo", "whatyoull", "yourimpact", "skills",
+            "techstack", "technologystack");
     private static final Set<String> EXCLUDED_SECTION_STEMS = Set.of(
             "복지", "혜택", "기회", "참고", "전형", "접수", "지원안내", "지원방법", "제출서류", "유의사항",
             "근무조건", "근무정보", "근무지", "근무시간", "급여", "연봉", "고용형태",
@@ -110,7 +123,7 @@ public class JobPostingSegmentationService {
             "applicationmethod");
     private static final Set<String> METADATA_SECTION_HEADINGS = Set.of(
             "학력", "경력", "경력사항", "경력구분", "채용인원", "모집인원", "채용인원수", "모집인원수",
-            "headcount", "openings", "numberofopenings");
+            "headcount", "openings", "numberofopenings", "remark", "remarks");
     private static final Set<String> APPLICATION_CONTEXT_STEMS = Set.of(
             "apply", "applying", "application", "submit", "지원서", "입사지원", "지원하기", "제출");
     private static final Set<String> FORM_CONTROL_STEMS = Set.of(
@@ -122,10 +135,18 @@ public class JobPostingSegmentationService {
             "급여", "연봉", "보상", "성과급", "근무지", "고용형태", "근무형태");
     private static final Set<String> LEGAL_PRIVACY_STEMS = Set.of(
             "privacy", "legal", "personalinformation", "dataprocessing", "개인정보", "법적");
-    private static final Set<String> HEADING_CONNECTORS = Set.of(
-            "and", "the", "of", "to", "for", "in", "with");
-
-    /** Returns normalized items in source order with stable, one-based identifiers. */
+    /**
+     * 채용공고 원문에서 검색 항목을 골라 원문 순서대로 반환한다.
+     *
+     * <p>표시용 목록 기호와 공백은 정리하지만, 각 목록 항목은 작성자가 나눈 의미 단위로 유지한다.
+     * Search 질의의 길이 제한에 맞춰 항목을 최대 500자로 나누며, 분리 결과가 100개를 넘으면 일부를
+     * 누락한 채 반환하지 않고 요청을 거절한다.</p>
+     *
+     * @param content 사용자가 입력한 채용공고 원문
+     * @return 섹션 정보와 원문 순서대로 1부터 부여한 식별자를 담은 검색 항목
+     * @throws JobPostingItemLimitExceededException 분리 결과가 검색 fan-out 상한을 넘는 경우
+     * @throws InvalidJobPostingSegmentationException 항목을 Search 길이 제한 안에서 손실 없이 나눌 수 없는 경우
+     */
     public List<JobPostingItemResponse> segment(String content) {
         if (content == null) {
             return List.of();
@@ -183,6 +204,10 @@ public class JobPostingSegmentationService {
                 currentSection = normalizeSection(line.text());
                 groupingSection = null;
                 groupingListLevel = 0;
+                continue;
+            }
+            if (currentRole == SectionRole.SEARCHABLE
+                    && isTechnologySectionIntroduction(lines, index)) {
                 continue;
             }
             if (groupingSection != null
@@ -244,6 +269,7 @@ public class JobPostingSegmentationService {
         boolean markdownHeading = MARKDOWN_HEADING_PREFIX
                 .matcher(normalizeWhitespace(rawLine))
                 .find();
+        int indentation = leadingIndentationWidth(rawLine);
         String remaining = normalizePresentationMarkup(rawLine);
         if (MARKDOWN_TABLE_SEPARATOR.matcher(remaining).matches()) {
             return new ParsedLine("", 0, false, false, false);
@@ -262,19 +288,18 @@ public class JobPostingSegmentationService {
             if (asciiOrDashBullet.find()) {
                 remaining = normalizePresentationMarkup(
                         remaining.substring(asciiOrDashBullet.end()));
-                listLevel = SECONDARY_LIST_LEVEL;
+                listLevel = PRIMARY_LIST_LEVEL + indentation;
                 groupingCandidate = false;
             }
             else if (unicodeBullet.find()) {
                 int marker = remaining.codePointAt(0);
                 remaining = normalizePresentationMarkup(remaining.substring(unicodeBullet.end()));
                 groupingCandidate = marker == '•' || marker == '●';
-                boolean nestedMarker = marker == '◦' || marker == '∘';
-                listLevel = nestedMarker ? SECONDARY_LIST_LEVEL : PRIMARY_LIST_LEVEL;
+                listLevel = PRIMARY_LIST_LEVEL + indentation;
             }
             else if (numbered.find()) {
                 remaining = normalizePresentationMarkup(remaining.substring(numbered.end()));
-                listLevel = SECONDARY_LIST_LEVEL;
+                listLevel = PRIMARY_LIST_LEVEL + indentation;
                 groupingCandidate = false;
             }
             else {
@@ -282,6 +307,18 @@ public class JobPostingSegmentationService {
             }
         }
         return new ParsedLine(remaining, listLevel, markdownHeading, false, groupingCandidate);
+    }
+
+    private static int leadingIndentationWidth(String value) {
+        int width = 0;
+        while (width < value.length()) {
+            char character = value.charAt(width);
+            if (character != ' ' && character != '\t') {
+                break;
+            }
+            width++;
+        }
+        return width;
     }
 
     private static String normalizePresentationMarkup(String value) {
@@ -500,13 +537,19 @@ public class JobPostingSegmentationService {
 
     private static boolean startsApplicationFormBlock(List<ParsedLine> lines, int index) {
         ParsedLine current = lines.get(index);
-        if (current.listItem()
-                || endsWithSentenceTerminator(current.text())
-                || !containsAny(canonicalizeHeading(current.text()), APPLICATION_CONTEXT_STEMS)) {
+        if (current.listItem() || endsWithSentenceTerminator(current.text())) {
             return false;
         }
 
-        int signalCount = 0;
+        boolean explicitFormStart = containsAny(
+                canonicalizeHeading(current.text()), APPLICATION_CONTEXT_STEMS);
+        boolean implicitFieldStart = isStrongFormControlLike(current.text());
+        if (!explicitFormStart && !implicitFieldStart) {
+            return false;
+        }
+
+        int signalCount = implicitFieldStart ? 1 : 0;
+        int requiredSignalCount = explicitFormStart ? 2 : 3;
         int inspectedCount = 0;
         for (int nextIndex = index + 1;
                 nextIndex < lines.size() && inspectedCount < 10;
@@ -520,14 +563,24 @@ public class JobPostingSegmentationService {
                 break;
             }
             inspectedCount++;
-            if (isFormControlLike(next.text())) {
+            if ((explicitFormStart && isFormControlLike(next.text()))
+                    || (!explicitFormStart && isStrongFormControlLike(next.text()))) {
                 signalCount++;
             }
-            if (signalCount >= 2) {
+            if (signalCount >= requiredSignalCount) {
                 return true;
             }
         }
         return false;
+    }
+
+    private static boolean isStrongFormControlLike(String text) {
+        String canonical = canonicalizeHeading(text);
+        return !isRequirementLike(text)
+                && (containsAny(canonical, FORM_CONTROL_STEMS)
+                        || text.endsWith("*")
+                        || text.endsWith("?")
+                        || text.endsWith("？"));
     }
 
     private static boolean isFormControlLike(String text) {
@@ -591,8 +644,9 @@ public class JobPostingSegmentationService {
     }
 
     private static boolean isCompensationValue(String text) {
-        return COMPENSATION_RANGE.matcher(text).matches()
-                || PERCENTAGE_METADATA.matcher(text).matches();
+        return COMPENSATION_SIGNAL.matcher(text).matches()
+                && (COMPENSATION_RANGE.matcher(text).matches()
+                        || PERCENTAGE_METADATA.matcher(text).matches());
     }
 
     private static boolean isMetadataPipe(String text) {
@@ -616,10 +670,41 @@ public class JobPostingSegmentationService {
         return !current.listItem()
                 && !endsWithSentenceTerminator(current.text())
                 && !hasInlineLabelValue(current.text())
+                && !isRequirementLike(current.text())
                 && current.text().codePointCount(0, current.text().length()) <= 60
                 && current.text().split(" ").length <= 6
-                && hasHeadingCase(current.text())
                 && followingRequirementLeafCount(lines, index, 5) >= 2;
+    }
+
+    private static boolean isTechnologySectionIntroduction(
+            List<ParsedLine> lines,
+            int index) {
+        ParsedLine current = lines.get(index);
+        if (current.listItem()
+                || !endsWithSentenceTerminator(current.text())
+                || isRequirementLike(current.text())) {
+            return false;
+        }
+
+        int technologyRows = 0;
+        int inspected = 0;
+        for (int nextIndex = index + 1;
+                nextIndex < lines.size() && inspected < 3;
+                nextIndex++) {
+            ParsedLine next = lines.get(nextIndex);
+            if (next.text().isEmpty()) {
+                continue;
+            }
+            if (isSectionHeading(lines, nextIndex)) {
+                break;
+            }
+            inspected++;
+            if (!looksLikeTechnologyList(next.text())) {
+                break;
+            }
+            technologyRows++;
+        }
+        return technologyRows >= 2;
     }
 
     private static int followingRequirementLeafCount(
@@ -648,28 +733,22 @@ public class JobPostingSegmentationService {
     }
 
     private static boolean looksLikeTechnologyList(String text) {
-        return text.codePointCount(0, text.length()) <= 160
-                && text.chars().filter(value -> value == ',').limit(2).count() >= 2;
-    }
-
-    private static boolean hasHeadingCase(String text) {
-        boolean foundCasedLetter = false;
-        for (String word : text.split(" ")) {
-            String lower = word.toLowerCase(Locale.ROOT);
-            if (HEADING_CONNECTORS.contains(lower)) {
-                continue;
-            }
-            int firstLetter = word.codePoints().filter(Character::isLetter).findFirst().orElse(-1);
-            if (firstLetter < 0 || (!Character.isUpperCase(firstLetter)
-                    && !Character.isTitleCase(firstLetter))) {
-                if (word.codePoints().anyMatch(Character::isLowerCase)) {
-                    return false;
-                }
-                continue;
-            }
-            foundCasedLetter = true;
+        if (text.codePointCount(0, text.length()) > 160) {
+            return false;
         }
-        return foundCasedLetter || text.codePoints().noneMatch(Character::isLowerCase);
+        if (text.chars().filter(value -> value == ',').limit(2).count() >= 2) {
+            return true;
+        }
+        String[] pipeParts = text.split("\\|", -1);
+        if (pipeParts.length < 2) {
+            return false;
+        }
+        for (String part : pipeParts) {
+            if (!hasEnoughLettersOrDigits(normalizeWhitespace(part))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static boolean startsImplicitSearchableRun(List<ParsedLine> lines, int index) {

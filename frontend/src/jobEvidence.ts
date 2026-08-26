@@ -15,7 +15,7 @@ const LETTER = /\p{L}/u
 const LOWERCASE_PATH_SEGMENT = /^[a-z][a-z0-9._-]*$/u
 const MEANINGFUL_QUERY_CHARACTER = /[\p{L}\p{N}+#]/gu
 const SINGLE_LETTER_IDENTIFIER = /^[A-Z]$/u
-const DIRECT_IDENTIFIER_VARIANT = /^[A-Za-z0-9][A-Za-z0-9+#._-]*(?:\s+[A-Za-z0-9][A-Za-z0-9+#._-]*)?$/u
+const DIRECT_IDENTIFIER_VARIANT = /^(?:\.[A-Za-z0-9]|[A-Za-z0-9])[A-Za-z0-9+#._-]*(?:\s+[A-Za-z0-9][A-Za-z0-9+#._-]*)?$/u
 
 export type JobEvidenceGroupState = 'loading' | 'result' | 'empty' | 'error'
 
@@ -305,6 +305,15 @@ async function searchJobEvidenceItem(
       results: await search(plannedQuery.query),
     })
   }
+  if (resultSets.length === 1 && isStandaloneIdentifierQuery(text)) {
+    const original = resultSets[0]
+    if (original !== undefined) {
+      return mergeJobEvidenceResults([
+        { ...original, directIdentifier: true },
+        original,
+      ])
+    }
+  }
   return mergeJobEvidenceResults(resultSets)
 }
 
@@ -416,6 +425,10 @@ function isMeaningfulQueryVariant(value: string): boolean {
 
 function isDirectIdentifierVariant(value: string): boolean {
   return [...value].length <= 80 && DIRECT_IDENTIFIER_VARIANT.test(value)
+}
+
+function isStandaloneIdentifierQuery(value: string): boolean {
+  return !/\s/u.test(value) && isDirectIdentifierVariant(value)
 }
 
 function hasDirectIdentifierEvidence(

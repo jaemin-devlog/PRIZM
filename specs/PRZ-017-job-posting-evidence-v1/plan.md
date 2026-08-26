@@ -2,13 +2,27 @@
 
 ## 상태와 목표
 
-- 상태: `IN_PROGRESS`
+- 상태: `VERIFIED`
 - 기준선: `d44f30eb4346353c4363d559be478024f191a878`
-- 현재 source: `de98bcf`
+- 현재 source: `84f9191` 이후 최종 통합 candidate
 - 목표: 입력 → 결정적 분리 → 사용자 선택 → 기존 Search → 항목별 Evidence → 원문 이동의
   최소 수직 흐름을 완성한다.
 
 ## 선택한 접근
+
+### 2026-08-26 개인 Career Vault 원문 일치 안정화
+
+- PRZ-017의 책임을 개인 문서에 있는 관련 원문과 문서·page 위치를 찾아 주는 Evidence Retrieval로
+  고정한다. 이력서 내용의 진위, 실제 수행 여부, 채용 요구 충족 여부는 검증하지 않는다.
+- segmentation은 holdout에서 반복된 지원서 field, 보상 범위, 기술 목록 안내문과 구조용 하위
+  제목만 보정한다. 회사·직무·기술을 판별하는 자연어 분류기나 고유명사 사전은 만들지 않는다.
+- 기존 원문 query와 명시적 compound variant 계약은 유지한다. 공백 없는 단독 query에서는
+  독립 token 직접 일치 후보를 먼저 보여 주되 original semantic 후보를 삭제하지 않는다.
+- 임의 식별자와 한 단어 자연 역량 회귀를 함께 두어 새 사용자의 다른 문서에서도 exact 우선과
+  semantic recall이 함께 유지되는지 확인한다. PRZ-016 Search Production은 동결한다.
+- focused 검증 뒤 frontend 전체 unit·typecheck·lint·build, backend 전체 unit·integration,
+  Search Production diff와 working tree 보호 감사를 수행한다. 최신 source 브라우저를 실행하지 못하면
+  그 결과는 `NOT_RUN`으로 남긴다.
 
 ### 2026-08-24 Search 후보 신뢰성 보정
 
@@ -181,7 +195,7 @@ DB에 추가 write path는 없다. segmentation 결과와 선택은 frontend ses
 | 문서 metadata 중복 호출 | result 전체 ID를 모은 뒤 기존 문서 목록을 한 번 mapping |
 | 입력·선택·결과가 한 페이지에 누적 | 선택은 modal, 검색은 같은 controller의 전용 결과 route로 분리 |
 | keyword·경험 화면과 같은 flat card 반복 | PRZ-017만 requirement rail과 document group 전용 workspace 사용 |
-| 결과 없음과 loading/error를 같은 상태로 오인 | `기록 없음`은 확정 empty만 포함하고 loading/error는 조건부 `확인 필요` 탭으로 분리 |
+| 결과 없음과 loading/error를 같은 상태로 오인 | `검색된 후보 없음`은 확정 empty만 포함하고 loading/error는 조건부 `확인 필요` 탭으로 분리 |
 | 상태 탭으로 원래 requirement 순서·번호 손실 | 전체 group index를 보존한 presentation filter와 component test |
 | 화면상 같은 문구가 다른 chunk로 반복 | source 위치와 표시 원문이 완전히 같은 행만 presentation dedup |
 | PDF ranked chunk와 표시 Evidence page 혼동 | `evidenceSourceType/index`만 viewer target으로 사용 |
@@ -232,7 +246,7 @@ git diff origin/main -- src/main/resources/db/migration
 ```text
 로그인 → 채용공고 입력 → 항목 분리 modal → 여러 항목 선택
 → 관련 경력 찾기 → 결과 전용 route → requirement rail 전환
-→ 기록 있음/기록 없음 상태 탭 전환 → document별 여러/빈 Evidence
+→ 검색 후보 있음/검색된 후보 없음 상태 탭 전환 → document별 여러/빈 Evidence
 → 항목 다시 선택 → 문서에서 보기
 → PDF 해당 page 또는 TXT 문서 상세
 ```

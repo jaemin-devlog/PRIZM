@@ -1,6 +1,6 @@
 # PRIZM 개발 로드맵
 
-> 기준일: 2026-08-24
+> 기준일: 2026-08-27
 
 이 문서는 제품이 발전하는 순서만 설명합니다. 현재 구현과 검증 결과는
 [현재 구현 현황](project-status.md), 기능별 근거는
@@ -60,23 +60,23 @@ OpenSQL/OpenProxy와 Ollama `bge-m3`에서 전체 흐름을 검증했습니다. 
       AUDIT Gate는 `PASS`입니다. 구현 commit `1c1d8d2`와 PR #51을 생성했고 merge 전입니다.
      PostgreSQL integration·frontend 검증은 통과했고 인증된 브라우저 흐름은
      `USER_CONFIRMED`입니다. 독립 재감사 blocking finding은 0건입니다.
-3. **채용공고 항목별 Career Evidence V1 — `IN_PROGRESS` (자동 검증 PASS)**
+3. **채용공고 항목별 Career Evidence V1 — `VERIFIED`**
    - 붙여넣은 채용공고를 LLM 없이 줄·목록·문장 경계로 분리하고 사용자가 section별
      modal에서 필요한 child 항목을 직접 선택합니다.
    - 단순 선택 항목은 원문으로, 명확한 alternative 항목은 원문과 제한된 deterministic
      variant로 기존 PRZ-016 Career Evidence Search를 호출합니다. owner의 `ACTIVE` 문서
      Evidence는 원래 항목 하나로 병합합니다. 결과 전용 route의 requirement rail에서
-     기록 있음·없음을 나눠 항목을 전환하고 문서별 Evidence row에서 PDF page 또는 TXT 문서
+     검색 후보 있음·검색된 후보 없음을 나눠 항목을 전환하고 문서별 Evidence row에서 PDF page 또는 TXT 문서
      상세로 이동합니다.
    - 적합도·충족 여부·합격 가능성을 판정하지 않으며 채용공고 persistence, Tag filter,
      migration과 Search algorithm 변경은 V1 범위가 아닙니다.
-   - [PRZ-017](../specs/PRZ-017-job-posting-evidence-v1/spec.md)의 현재 source는
-     `de98bcf`입니다. 새 UI 기준 backend focused 27건, frontend unit 69건과
-     typecheck·lint·build·독립 감사·최신 frontend rebuild는 통과했고 인증 browser Gate는
-     로그인 세션 부재로
-     `BLOCKED_BY_AUTH_ENVIRONMENT`입니다. 이전 compound
-     Phase의 Docker rebuild·독립 감사·동일 owner/ACTIVE PDF browser Gate는 통과했습니다.
-     기존 44개 전체 원문과 TXT 이동 재검증은 이번 Phase에서 실행하지 않았습니다.
+   - [PRZ-017](../specs/PRZ-017-job-posting-evidence-v1/spec.md)의 구현 기준은 `84f9191` 이후
+     최종 통합 candidate입니다. 2026-08-26 frontend focused 33/33·전체 80/80,
+     typecheck·lint·build와 backend 전체 89 suites·627 tests가 실패·오류 0, 기존 조건부 test
+     20건 skip으로 통과했습니다. integration은 실행 중 중단되어 `ABORTED`입니다. 2026-08-27
+     최종 segmentation focused 50/50·compile과 인증 desktop browser의 mixed bullet 10→11,
+     Evidence 2개 항목, PDF 2페이지 target을 확인해 V1을 `VERIFIED`로 판정했습니다. TXT 이동,
+     PayPay India·Lean In 재평가와 mobile viewport는 최종 범위 밖이어서 `NOT_RUN`입니다.
 
 다중 OpenSQL DB node, DB 장애전환, OpenProxy 이중화·VIP와 서비스 연속성 보장은
 로드맵에 포함하지 않습니다.

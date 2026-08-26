@@ -358,7 +358,9 @@ export function JobEvidenceResultsView({
       <div className="job-results-summary" role="status">
         <strong>선택 항목 {groups.length}개</strong>
         <span>선택한 항목의 검색 후보를 확인하세요.</span>
-        <span role="note">검색 결과는 요구사항 충족 여부를 판정한 결과가 아닙니다. 원문을 직접 확인하세요.</span>
+        <span role="note">
+          내 문서에서 항목과 관련된 원문과 위치를 보여줍니다. 경험의 진위나 채용 요건 충족 여부를 판정하지 않습니다.
+        </span>
       </div>
 
       <div className="job-results-workspace">
@@ -465,7 +467,7 @@ export function JobActiveEvidence({
       {group.state === 'empty' ? (
         <div className="job-result-state">
           <strong>검색된 후보가 없습니다.</strong>
-          <span>현재 PRIZM에 등록된 문서 검색에서 원문 후보를 찾지 못했습니다. 요구사항 불충족 판정이 아닙니다.</span>
+          <span>현재 등록된 문서에서 관련 원문을 찾지 못했습니다. 경험이 없다는 판정도, 채용 요건을 충족하지 못한다는 판정도 아닙니다.</span>
         </div>
       ) : null}
       {group.state === 'error' ? (

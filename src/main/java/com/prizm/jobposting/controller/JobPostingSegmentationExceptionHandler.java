@@ -9,7 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/** Maps segmentation input failures to the existing safe JSON error shape. */
+/** 항목 분리 과정에서 발생한 입력 오류를 공통 오류 응답으로 바꾸되 내부 구현 정보는 노출하지 않는다. */
 @RestControllerAdvice(assignableTypes = JobPostingSegmentationController.class)
 public class JobPostingSegmentationExceptionHandler {
 

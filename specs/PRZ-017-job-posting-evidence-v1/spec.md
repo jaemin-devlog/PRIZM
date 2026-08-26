@@ -2,10 +2,14 @@
 
 ## 상태
 
-- 상태: `IN_PROGRESS`
+- 상태: `VERIFIED`
 - 기준선: `d44f30eb4346353c4363d559be478024f191a878`
-- 현재 source: `de98bcf`
-- 검증: 자동 검증·독립 감사 `PASS`, 인증 browser `BLOCKED_BY_AUTH_ENVIRONMENT`
+- 현재 source: `84f9191` 이후 최종 통합 candidate
+- 검증: 2026-08-26 frontend focused 33/33·전체 80/80, typecheck·lint·build와 backend 전체
+  89 suites·627 tests가 실패·오류 0, 기존 조건부 test 20건 skip으로 통과. integration
+  `ABORTED`. 2026-08-27 최종 segmentation focused 50/50·compile과 인증 browser mixed bullet
+  10→11, Evidence 2개 항목, PDF 2페이지 target `PASS`; TXT 이동과 PayPay India·Lean In
+  재평가 `NOT_RUN`
 
 이 문서는 채용공고를 붙여넣고 필요한 항목을 사용자가 직접 선택한 뒤, 기존
 PRZ-016 Career Evidence Search로 관련 원문 기록을 확인하는 대회 제출용 V1 계약을
@@ -55,6 +59,8 @@ PRZ-016 Career Evidence Search로 관련 원문 기록을 확인하는 대회 �
   requirement로 유지한다. 일반 paragraph에만 기존 명확한 문장 종결 경계 분리를 적용한다.
 - 알 수 없는 section은 heading만 구조 정보로 유지하고, 명백한 metadata가 아닌 child
   항목은 선택 가능하게 보존해 false negative를 제한한다.
+- 지원서 form field는 연속된 입력 control 신호가 확인될 때만 제외한다. `Required experience with
+  Java`처럼 자격요건 자체가 `required`로 시작하는 문장은 form field로 취급하지 않는다.
 - 정규화한 본문이 완전히 같은 항목은 첫 항목과 첫 section만 남긴다.
 - 빈 항목과 정규화 뒤 문자·숫자가 2개 미만인 항목은 제거한다.
 - Search query 제한에 맞춰 각 항목은 500자 이하로 무손실 분할하고, 분할된 각 항목도
@@ -109,15 +115,19 @@ unknown section 보존, 독립 metadata 제거, 중복·빈 항목 제거, 원�
 - PRZ-017 consumer는 각 후보를 찾은 original/variant query provenance를 보존한다. 동일 chunk가
   여러 query에서 반환되면 original-first 결과 identity와 순서는 유지하고 matched query만
   중복 없이 합친다. ranking, Search API DTO와 Search Production은 변경하지 않는다.
-- decomposition으로 만든 짧고 명확한 identifier 또는 identifier phrase variant에 한해서
-  `content` 또는 `snippet`에 독립 identifier token이 직접 존재하는 후보만 유지한다. original
-  requirement와 자연어 semantic variant에는 이 guard를 적용하지 않는다. `Git`은 `GitHub`만으로
-  일치하지 않고 `Docker Compose`, `Java 17`, `C++`, `C#`, `Node.js`는 깨뜨리지 않는다.
+- decomposition으로 만든 짧고 명확한 identifier 또는 identifier phrase는 `content` 또는
+  `snippet`에 독립 identifier token이 직접 존재하는 후보만 유지한다. 공백 없는 단독 query는
+  직접 일치 후보를 먼저 보여 주되 original semantic 후보를 삭제하지 않는다. 따라서 `Java`
+  원문은 `JavaScript`만 있는 후보와 구분해 먼저 표시하면서도, `Ownership` 같은 한 단어 역량의
+  semantic Evidence를 잃지 않는다.
 - Evidence highlight와 주변 문맥은 후보의 display query provenance를 anchor로 사용해 원문에서
   직접 일치하는 extractive unit을 우선 표시한다. 내용을 생성·요약하거나 Search result를
   재작성하지 않는다.
 - 결과는 요구사항 충족 판정이 아니라 확인할 Search 후보로 표현한다. `검색 후보 있음`,
   `검색된 후보 없음`, `확인할 원문 후보`를 사용하고 원문 직접 확인 안내를 표시한다.
+- PRIZM에 등록된 이력서·포트폴리오는 현재 사용자가 관리하는 자기 문서다. 후보 원문에 검색한
+  내용이 있으면 그 발췌와 문서·PDF page 또는 TXT 상세 위치를 보여 주며, 그 경험이 사실인지,
+  채용 요구를 충족하는지 또는 사용자가 실제로 수행했는지를 별도로 검증하지 않는다.
 - 분해와 병합은 PRZ-017 frontend orchestration에만 둔다. PRZ-017 전용 batch 검색 backend,
   embedding model, ranking, relevance floor, fallback, rescue 또는 localization을 추가하지
   않는다.
@@ -129,12 +139,13 @@ unknown section 보존, 독립 metadata 제거, 중복·빈 항목 제거, 원�
 ## `PRZ-017-R4` — 항목별 Evidence 표시
 
 - 결과는 다른 Career Vault 목록과 같은 flat card 반복이 아니라 전용 결과 route의
-  requirement 탐색 workspace로 표시한다. requirement rail은 `기록 있음`과 `기록 없음`
+  requirement 탐색 workspace로 표시한다. requirement rail은 `검색 후보 있음`과 `검색된 후보 없음`
   상태 탭으로 나누고 각 탭에 해당하는 requirement 개수를 표시한다. loading 또는 error는
   Evidence 부재로 오인하지 않도록 해당 항목이 있을 때만 `확인 필요` 탭으로 분리한다.
 - 각 상태 탭 안에서는 선택 항목의 원래 순서와 원래 번호를 유지한다. 탭과 requirement
-  전환은 presentation state만 바꾸며 추가 Search 요청을 보내지 않는다. 기본 탭은 기록이
-  있으면 `기록 있음`, 없으면 `기록 없음`, 두 상태가 아직 확정되지 않았으면 `확인 필요`다.
+  전환은 presentation state만 바꾸며 추가 Search 요청을 보내지 않는다. 검색 후보가 한 건 이상이면
+  `검색 후보 있음`, Search 완료 후 후보가 0건이면 `검색된 후보 없음`, 아직 확정되지 않았으면
+  `확인 필요`다.
   오른쪽에는 현재 탭에서 사용자가 선택한 requirement 하나의 상태와 Evidence만 표시한다.
 - 오른쪽 결과는 `requirement → document/version → Evidence row` 계층을 사용한다. 동일
   `documentId + documentVersionId`의 문서 제목·종류는 한 번만 표시하고, 각 Evidence row는
@@ -163,7 +174,8 @@ unknown section 보존, 독립 metadata 제거, 중복·빈 항목 제거, 원�
   필요한 재시도 action을 표시한다.
 - `score`, `distance`, 적합도 %, 합격 가능성, 충족·불충족, 경험 있음·없음, PASS·FAIL,
   지원 추천·비추천을 표시하지 않는다.
-- 결과가 0건이면 `관련 경력 기록을 찾지 못했습니다.`라는 중립적 empty state를 표시한다.
+- 결과가 0건이면 `현재 등록된 문서에서 관련 원문을 찾지 못했습니다. 경험이 없다는 판정도,
+  채용 요건을 충족하지 못한다는 판정도 아닙니다.`라는 중립적 empty state를 표시한다.
 - 결과 route로 이동할 때 제목 focus는 유지하되 브라우저 기본 검은 사각형 대신 기존 PRIZM
   focus token을 사용한 명확한 표시를 제공한다.
 
@@ -287,3 +299,6 @@ unknown section 보존, 독립 metadata 제거, 중복·빈 항목 제거, 원�
 | AC37 | 결과 제목의 programmatic focus는 유지하면서 PRIZM focus token으로 표시되고 브라우저 기본 검은 outline은 노출되지 않는다. |
 | AC38 | document/version group은 versionNo를 표시하고 같은 제목 group이 여러 개면 원래 순서의 `같은 제목 문서 n/N`으로 구분한다. |
 | AC39 | `주변 내용 보기`는 현재 미리보기를 포함하는 추가 extractive 원문 또는 잘린 긴 원문을 보여 줄 때만 표시되고, 펼친 reader는 버튼 너비로 수축하지 않고 Evidence 본문 폭을 사용한다. |
+| AC40 | 연속 지원서 field, 보상 범위, 기술 목록 안내문과 구조용 하위 제목은 selectable에서 제외하되 실제 기술 목록과 업무·자격 문장은 보존한다. |
+| AC41 | 공백 없는 단독 query는 독립 token 직접 일치 후보를 먼저 표시하되 original semantic 후보를 삭제하지 않아 `Java`와 `Ownership`을 모두 안전하게 처리한다. |
+| AC42 | 회사명·개인 문서 문장·기술명 사전 없이 같은 구조 규칙을 적용하고, 경험 진위·요구사항 충족·적합도는 판정하거나 표시하지 않는다. |

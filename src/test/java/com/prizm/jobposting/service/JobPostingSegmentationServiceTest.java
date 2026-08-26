@@ -40,6 +40,21 @@ class JobPostingSegmentationServiceTest {
     }
 
     @Test
+    void treatsMixedBulletMarkersAtTheSameIndentationAsSiblingLeaves() {
+        List<JobPostingItemResponse> items = service.segment("""
+                담당업무
+                • 첫 번째 업무 문장
+                - 두 번째 업무 문장
+                • 세 번째 업무 문장
+                """);
+
+        assertThat(items).containsExactly(
+                new JobPostingItemResponse(1, "담당업무", "첫 번째 업무 문장"),
+                new JobPostingItemResponse(2, "담당업무", "두 번째 업무 문장"),
+                new JobPostingItemResponse(3, "담당업무", "세 번째 업무 문장"));
+    }
+
+    @Test
     void separatesDotAndParenthesisNumberedLists() {
         List<JobPostingItemResponse> items = service.segment("""
                 1. 서버 애플리케이션 개발
@@ -182,21 +197,21 @@ class JobPostingSegmentationServiceTest {
                 주요업무
                 ► 제품 설계·개발
                 • 서비스 설계 및 백엔드 개발
-                - 기능 설계, API, 권한 정책, 핵심 도메인 설계 및 구현
+                  - 기능 설계, API, 권한 정책, 핵심 도메인 설계 및 구현
                 • 안정적인 서비스 구조 설계
-                - 인증·인가, 데이터 정합성, 트랜잭션 관리
+                  - 인증·인가, 데이터 정합성, 트랜잭션 관리
 
                 ► 멀티클라우드
                 • 멀티클라우드 연동
-                - AWS-Azure-GCP등 API 및 계정 연동
+                  - AWS-Azure-GCP등 API 및 계정 연동
                 • 비용·결제 시스템 운영
-                - 비용 파이프라인, 배치, 구독·결제 프로세스 관리
+                  - 비용 파이프라인, 배치, 구독·결제 프로세스 관리
 
                 ► 운영·개선
                 • 서비스 운영 및 개선
-                - 피드백 기반 기능 개선과 안정적인 배포
+                  - 피드백 기반 기능 개선과 안정적인 배포
                 • AI 기반 개발 생산성 향상
-                - 코드 리뷰, 문서화, 리서치 등 개발 자동화
+                  - 코드 리뷰, 문서화, 리서치 등 개발 자동화
 
                 자격요건
                 • 학력 : 초대졸이상
@@ -207,11 +222,11 @@ class JobPostingSegmentationServiceTest {
 
                 ► 필수 역량
                 • 설계 판단
-                - "왜 이 구조인가"를 트레이드오프로 설명할 수 있고. 코드 리뷰를 통해 함께 성장하려는 의지
+                  - "왜 이 구조인가"를 트레이드오프로 설명할 수 있고. 코드 리뷰를 통해 함께 성장하려는 의지
                 • AI 활용
-                - AI를 도구로 쓰되 결과를 검증하고 최종 책임을 지는 태도
+                  - AI를 도구로 쓰되 결과를 검증하고 최종 책임을 지는 태도
                 • 적극적인 커뮤니케이션
-                - 근거 있는 의견을 적극적으로 제시하고, 팀원들과 원활하게 소통하며 협업하는 자세
+                  - 근거 있는 의견을 적극적으로 제시하고, 팀원들과 원활하게 소통하며 협업하는 자세
 
                 우대사항
                 • 확장 가능한 서비스 및 대규모 시스템 설계·운영 경험
@@ -336,13 +351,13 @@ class JobPostingSegmentationServiceTest {
                 Responsibilities
                 Backend Platform
                 • Service architecture
-                - Implement authorization boundaries
-                - Maintain transactional consistency
+                  - Implement authorization boundaries
+                  - Maintain transactional consistency
                 • Production operations
-                - Improve deployment reliability
+                  - Improve deployment reliability
                 • Data operations
-                ∘ Validate ingestion workflows
-                ∘ Monitor storage consistency
+                  ∘ Validate ingestion workflows
+                  ∘ Monitor storage consistency
                 """);
 
         assertThat(items).containsExactly(
@@ -716,6 +731,160 @@ class JobPostingSegmentationServiceTest {
                 "ZephyrDB 기반 처리 경험",
                 "NimbusQueue 운영 자동화",
                 "AuroraMesh troubleshooting");
+    }
+
+    @Test
+    void dropsApplicationAndMetadataNoiseWithoutDroppingTechnologyRows() {
+        List<JobPostingItemResponse> items = service.segment("""
+                Responsibilities
+                - Design high-throughput backend services.
+                - Operate distributed production systems.
+
+                Technology Stack
+                The team selects tools according to each system.
+                | ZephyrDB, NimbusQueue, AuroraMesh
+                | Spring Boot, Kafka, Redis
+
+                Remarks
+                Read the separate role guide before applying.
+                Team principles
+                Refer to the company values page.
+
+                Apply for this role
+                indicates a required field
+                First Name*
+                Last Name*
+                Email*
+                Resume/CV*
+                Attach a document
+                Submit application
+
+                Qualifications
+                - Experience designing authenticated APIs.
+                """);
+
+        assertTexts(items,
+                "Design high-throughput backend services.",
+                "Operate distributed production systems.",
+                "ZephyrDB, NimbusQueue, AuroraMesh",
+                "Spring Boot, Kafka, Redis",
+                "Experience designing authenticated APIs.");
+    }
+
+    @Test
+    void detectsApplicationFieldsWhenTheFormHeadingIsMissing() {
+        List<JobPostingItemResponse> items = service.segment("""
+                Responsibilities
+                - Design high-throughput backend services.
+
+                First Name*
+                Last Name*
+                Email*
+                Resume/CV*
+                Attach a document
+                Submit application
+
+                Qualifications
+                - 3+ years of backend engineering experience.
+                """);
+
+        assertTexts(items,
+                "Design high-throughput backend services.",
+                "3+ years of backend engineering experience.");
+    }
+
+    @Test
+    void doesNotTreatRequirementSentencesAsApplicationFields() {
+        List<JobPostingItemResponse> items = service.segment("""
+                Qualifications
+                Required experience with distributed systems
+                Required knowledge of relational databases
+                Required ability to review production incidents
+                """);
+
+        assertTexts(items,
+                "Required experience with distributed systems",
+                "Required knowledge of relational databases",
+                "Required ability to review production incidents");
+    }
+
+    @Test
+    void keepsExperienceRangesWhileExcludingCompensationRanges() {
+        List<JobPostingItemResponse> items = service.segment("""
+                Qualifications
+                - 3-5 years of backend experience.
+                - 1-2 production systems operated at scale.
+
+                Compensation
+                $80,000 - $120,000 per year
+                """);
+
+        assertTexts(items,
+                "3-5 years of backend experience.",
+                "1-2 production systems operated at scale.");
+    }
+
+    @Test
+    void preservesVersionedTechnologyRowsSeparatedByPipes() {
+        List<JobPostingItemResponse> items = service.segment("""
+                Technology Stack
+                The team selects versions according to each service.
+                Java 17 | Spring Boot 3
+                PostgreSQL 16 | Redis 7
+
+                Compensation
+                $80,000 - $120,000 per year
+
+                Qualifications
+                - Experience designing authenticated APIs.
+                """);
+
+        assertTexts(items,
+                "Java 17 | Spring Boot 3",
+                "PostgreSQL 16 | Redis 7",
+                "Experience designing authenticated APIs.");
+    }
+
+    @Test
+    void removesStructuralSubheadingsButKeepsActionRequirements() {
+        List<JobPostingItemResponse> items = service.segment("""
+                What You'll Do
+                Build the backend
+                - Design and deploy scalable APIs.
+                - Troubleshoot production services.
+
+                Engineer the data
+                - Build reliable ingestion pipelines.
+                - Improve warehouse consistency.
+                """);
+
+        assertTexts(items,
+                "Build the backend",
+                "Design and deploy scalable APIs.",
+                "Troubleshoot production services.",
+                "Build reliable ingestion pipelines.",
+                "Improve warehouse consistency.");
+    }
+
+    @Test
+    void removesStructuralSubheadingsBeforeUnbulletedRequirements() {
+        List<JobPostingItemResponse> items = service.segment("""
+                What You'll Do
+                Build the backend
+                Design and deploy scalable APIs.
+                Troubleshoot production services.
+
+                Engineer the data
+                Build reliable ingestion pipelines.
+                Improve warehouse consistency.
+                """);
+
+        assertTexts(items,
+                "Build the backend",
+                "Design and deploy scalable APIs.",
+                "Troubleshoot production services.",
+                "Build reliable ingestion pipelines.",
+                "Improve warehouse consistency.");
     }
 
     @Test

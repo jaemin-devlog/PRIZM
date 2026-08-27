@@ -2,9 +2,9 @@
 
 > 기준일: 2026-08-27
 >
-> 현재 `main`: `d3b0096385366d0c3f617dd688d5b22d77f20c6f`
+> 이 문서가 정리한 기능 기준: [PR #58](https://github.com/jaemin-devlog/PRIZM/pull/58), 병합 `12acb3a`
 >
-> 최종 기능 통합: [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53)
+> 최근 기능·UI 통합: [PR #56](https://github.com/jaemin-devlog/PRIZM/pull/56), [PR #58](https://github.com/jaemin-devlog/PRIZM/pull/58)
 
 현재 상태는 소스 코드, 적용된 Flyway migration과 실행 가능한 test를 기준으로 판단합니다. Spec과 이 문서는 구현 증거를 대신하지 않습니다.
 
@@ -50,6 +50,7 @@
 - UTF-8 TXT와 텍스트가 포함된 비암호화 PDF 업로드
 - 원본 파일, SHA-256 hash와 변경 불가능한 버전 보존
 - 문서 목록·상세·수정·삭제, 새 버전 등록과 PDF 열람
+- 별도 상세 페이지에서 PDF 첫 페이지 썸네일과 버전별 미리보기 제공
 - 12개 `DocumentType`과 사용자가 관리하는 문서 태그
 
 ### 문서 처리와 상태 변화
@@ -77,6 +78,7 @@
 - 사용자가 검색할 항목을 직접 선택
 - 기존 경력 근거 검색을 사용해 항목별 결과를 표시
 - 결과에서 PDF 페이지 또는 TXT 문서 상세로 이동
+- 추가 문맥이 없는 결과도 비활성 상태로 표시해 문서 보기와 문맥 보기의 위치를 통일
 
 채용공고 저장, 태그 필터, 적합도 판정과 별도 검색 알고리즘은 포함하지 않습니다. PRZ-017은 PR #53, 소스 `94715cf`, `main` 병합 `b78ec42`로 통합돼 `VERIFIED`입니다.
 
@@ -103,6 +105,8 @@
 | 문서 태그 | `VERIFIED` | PRZ-009, [PR #51](https://github.com/jaemin-devlog/PRIZM/pull/51), 병합 `d44f30e` |
 | 현재 적용 검색 기준 | 통합됨 | PRZ-016, [PR #50](https://github.com/jaemin-devlog/PRIZM/pull/50), 병합 `3cfe9dc` |
 | 채용공고 항목별 근거 검색 V1 | `VERIFIED` | PRZ-017, PR #53, 병합 `b78ec42` |
+| 문서 상세 미리보기 페이지 | `VERIFIED` | PRZ-018, [PR #56](https://github.com/jaemin-devlog/PRIZM/pull/56), 병합 `a9ca679` |
+| 채용공고 근거 보기 동작 통일 | 통합됨 | [PR #58](https://github.com/jaemin-devlog/PRIZM/pull/58), 병합 `12acb3a` |
 
 PostgreSQL 성공은 OpenSQL 증거가 아닙니다. OpenSQL·OpenProxy 검증은 단일 서버 환경에 한정하며 다중 노드, DB 장애 전환과 서비스 연속성을 포함하지 않습니다. 명령, 환경과 수치는 [기능별 검증 기록](../specs/README.md)에서 확인할 수 있습니다.
 

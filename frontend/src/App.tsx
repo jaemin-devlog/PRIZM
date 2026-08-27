@@ -658,6 +658,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [reloadKey, setReloadKey] = useState(0)
   const [selectedDocument, setSelectedDocument] = useState<DocumentDetail | null>(null)
+  const [selectedPreviewVersionId, setSelectedPreviewVersionId] = useState<number | null>(null)
   const [isDetailLoading, setIsDetailLoading] = useState(false)
   const [detailErrorMessage, setDetailErrorMessage] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState('')
@@ -683,12 +684,6 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
   const pdfRequestId = useRef(0)
   const pdfAbortController = useRef<AbortController | null>(null)
   const pdfObjectUrl = useRef<string | null>(null)
-
-  useEffect(() => {
-    const syncFolder = () => setSelectedDocumentType(selectedDocumentFolderFromSearch(window.location.search))
-    window.addEventListener('popstate', syncFolder)
-    return () => window.removeEventListener('popstate', syncFolder)
-  }, [])
 
   const selectDocumentFolder = useCallback((documentType: DocumentType | undefined) => {
     const nextPath = documentFolderPath(documentType)
@@ -849,14 +844,11 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
     }
   }, [])
 
-  const closeDocumentDetail = useCallback(() => {
+  const resetDocumentDetailState = useCallback(() => {
     closePdfViewer()
-    const nextPath = documentListPathAfterDetailClose(window.location.search)
-    if (`${window.location.pathname}${window.location.search}` !== nextPath) {
-      window.history.replaceState(null, '', nextPath)
-    }
     detailRequestId.current += 1
     setSelectedDocument(null)
+    setSelectedPreviewVersionId(null)
     setDetailErrorMessage(null)
     setIsDetailLoading(false)
     setIsDeleteConfirming(false)
@@ -870,24 +862,26 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
     setRemovingTagId(null)
   }, [closePdfViewer])
 
-  const isDocumentDialogOpen =
+  const closeDocumentDetail = useCallback(() => {
+    const nextPath = documentListPathAfterDetailClose(window.location.search)
+    if (`${window.location.pathname}${window.location.search}` !== nextPath) {
+      window.history.replaceState(null, '', nextPath)
+    }
+    resetDocumentDetailState()
+  }, [resetDocumentDetailState])
+
+  const isDocumentDetailOpen =
     isDetailLoading || selectedDocument !== null || detailErrorMessage !== null
 
   useEffect(() => {
-    if (!isDocumentDialogOpen) {
+    if (pdfViewerTarget === null) {
       return
     }
 
     const previousOverflow = document.body.style.overflow
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (isTagModalOpen) {
-          return
-        } else if (pdfViewerTarget !== null) {
-          closePdfViewer()
-        } else {
-          closeDocumentDetail()
-        }
+        closePdfViewer()
       }
     }
     document.body.style.overflow = 'hidden'
@@ -896,7 +890,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
       document.body.style.overflow = previousOverflow
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [closeDocumentDetail, closePdfViewer, isDocumentDialogOpen, isTagModalOpen, pdfViewerTarget])
+  }, [closePdfViewer, pdfViewerTarget])
 
   const handleOpenDocument = useCallback(async (documentId: number) => {
     closePdfViewer()
@@ -918,6 +912,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
         return
       }
       setSelectedDocument(detail)
+      setSelectedPreviewVersionId(detail.activeVersionId ?? detail.versions[0]?.versionId ?? null)
       setEditTitle(detail.title)
       setEditDocumentType(detail.documentType)
     } catch (error) {
@@ -936,11 +931,32 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
   }, [closePdfViewer, onSessionExpired])
 
   useEffect(() => {
-    const documentId = selectedDocumentIdFromSearch(window.location.search)
-    if (documentId !== null) {
-      const timeout = window.setTimeout(() => void handleOpenDocument(documentId), 0)
-      return () => window.clearTimeout(timeout)
+    const syncLocation = () => {
+      setSelectedDocumentType(selectedDocumentFolderFromSearch(window.location.search))
+      const documentId = selectedDocumentIdFromSearch(window.location.search)
+      if (documentId === null) {
+        resetDocumentDetailState()
+        return
+      }
+      if (selectedDocument?.documentId !== documentId) {
+        void handleOpenDocument(documentId)
+      }
     }
+
+    const timeout = window.setTimeout(syncLocation, 0)
+    window.addEventListener('popstate', syncLocation)
+    return () => {
+      window.clearTimeout(timeout)
+      window.removeEventListener('popstate', syncLocation)
+    }
+  }, [handleOpenDocument, resetDocumentDetailState, selectedDocument?.documentId])
+
+  const navigateToDocumentDetail = useCallback((documentId: number) => {
+    const nextPath = documentDetailPath(documentId, window.location.search)
+    if (`${window.location.pathname}${window.location.search}` !== nextPath) {
+      window.history.pushState(null, '', nextPath)
+    }
+    void handleOpenDocument(documentId)
   }, [handleOpenDocument])
 
   const handleSaveMetadata = async (event: FormEvent<HTMLFormElement>) => {
@@ -1202,6 +1218,9 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
   const activeVersion = selectedDocument?.versions.find(
     (version) => version.versionId === selectedDocument.activeVersionId,
   ) ?? null
+  const previewVersion = selectedDocument?.versions.find(
+    (version) => version.versionId === selectedPreviewVersionId,
+  ) ?? activeVersion ?? latestVersion
   const hasMetadataChanges = selectedDocument !== null && (
     editTitle.trim() !== selectedDocument.title || editDocumentType !== selectedDocument.documentType
   )
@@ -1209,7 +1228,11 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
   const isSearchingDocuments = appliedTitleQuery !== ''
 
   return (
-    <section className="vault-page documents-page" aria-labelledby="documents-title">
+    <section
+      className={'vault-page documents-page' + (isDocumentDetailOpen ? ' is-detail' : '')}
+      aria-labelledby={isDocumentDetailOpen ? 'document-detail-title' : 'documents-title'}
+    >
+      {!isDocumentDetailOpen && <>
       <header className="page-heading-row">
         <div className="page-heading">
           <p className="eyebrow">MY DOCUMENTS</p>
@@ -1376,7 +1399,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
                     <button
                       type="button"
                       className="document-detail-button"
-                      onClick={() => void handleOpenDocument(document.documentId)}
+                      onClick={() => navigateToDocumentDetail(document.documentId)}
                     >
                       상세 보기
                     </button>
@@ -1389,35 +1412,29 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
         )}
       </div>
 
-      {isDocumentDialogOpen && (
-        <>
-          <button
-            type="button"
-            className="document-detail-backdrop"
-            aria-label="문서 상세 닫기"
-            onClick={closeDocumentDetail}
-          />
-          <section
-            className="document-detail-panel"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="document-detail-title"
-            aria-hidden={pdfViewerTarget !== null}
-            aria-live="polite"
-            aria-busy={isDetailLoading}
-          >
+      </>}
+
+      {isDocumentDetailOpen && (
+        <section
+          className="document-detail-page"
+          aria-labelledby="document-detail-title"
+          aria-hidden={pdfViewerTarget !== null}
+          aria-live="polite"
+          aria-busy={isDetailLoading}
+        >
           <div className="document-detail-heading">
             <div>
-              <p className="eyebrow">DOCUMENT MANAGEMENT</p>
-              <h2 id="document-detail-title">문서 상세 및 관리</h2>
+              <p className="document-detail-breadcrumb">문서 보관함 / 문서 상세</p>
+              <h2 id="document-detail-title">
+                {selectedDocument?.title ?? '문서 상세'}
+              </h2>
             </div>
             <button
               type="button"
-              className="icon-close-button"
-              aria-label="문서 상세 닫기"
+              className="secondary-button document-detail-back-button"
               onClick={closeDocumentDetail}
             >
-              ×
+              목록으로
             </button>
           </div>
           {isDetailLoading && (
@@ -1432,31 +1449,54 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
             </p>
           )}
           {selectedDocument !== null && !isDetailLoading && (
-            <>
-              <div className="document-detail-hero">
-                <div className="document-detail-file-mark" aria-hidden="true">
-                  {activeVersion?.fileType ?? selectedDocument.versions[0]?.fileType ?? 'DOC'}
-                </div>
-                <div className="document-detail-hero-copy">
+            <div className="document-detail-layout">
+              <div className="document-detail-main">
+              <section className="document-detail-preview" aria-labelledby="document-preview-heading">
+                <header className="document-preview-toolbar">
+                  <div>
+                    <h3 id="document-preview-heading">
+                      {previewVersion?.originalFileName ?? '미리볼 버전이 없습니다.'}
+                    </h3>
+                    {previewVersion !== null && <span>v{previewVersion.versionNo}</span>}
+                  </div>
+                  {previewVersion?.fileType === 'PDF' && (
+                    <button
+                      type="button"
+                      className="primary-button document-original-open-button"
+                      onClick={() => void handleOpenPdf({
+                        documentId: selectedDocument.documentId,
+                        versionId: previewVersion.versionId,
+                        versionNo: previewVersion.versionNo,
+                        originalFileName: previewVersion.originalFileName,
+                      })}
+                      disabled={isDeleting}
+                    >
+                      원문 열기
+                    </button>
+                  )}
+                </header>
+
+                <DocumentVersionPreview
+                  key={previewVersion?.versionId ?? 'empty'}
+                  documentId={selectedDocument.documentId}
+                  documentTitle={selectedDocument.title}
+                  version={previewVersion}
+                  onSessionExpired={onSessionExpired}
+                />
+
+                <footer className="document-preview-summary">
                   <span className="type-badge">{documentTypeLabel(selectedDocument.documentType)}</span>
-                  <h3>{selectedDocument.title}</h3>
-                  <p>{activeVersion?.originalFileName ?? '아직 활성화된 원본이 없습니다.'}</p>
-                </div>
-                <dl className="document-detail-summary">
-                  <div>
-                    <dt>현재 버전</dt>
-                    <dd>{activeVersion === null ? '준비 중' : `v${activeVersion.versionNo}`}</dd>
-                  </div>
-                  <div>
-                    <dt>전체 버전</dt>
-                    <dd>{selectedDocument.versions.length}개</dd>
-                  </div>
-                  <div>
-                    <dt>최근 변경</dt>
-                    <dd>{formatCreatedAt(selectedDocument.updatedAt)}</dd>
-                  </div>
-                </dl>
-              </div>
+                  <span>{selectedDocument.versions.length}개 버전</span>
+                  {previewVersion?.versionId === selectedDocument.activeVersionId && (
+                    <span className="active-version-label">검색에 사용 중</span>
+                  )}
+                  {previewVersion !== null && (
+                    <time dateTime={previewVersion.createdAt}>
+                      {formatCreatedAt(previewVersion.createdAt)}
+                    </time>
+                  )}
+                </footer>
+              </section>
 
               {actionMessage !== null && (
                 <p className="feedback-message document-detail-success" role="status">
@@ -1464,7 +1504,10 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
                 </p>
               )}
 
-              <section className="document-detail-section" aria-labelledby="metadata-heading">
+              <section
+                className="document-detail-section document-management-card"
+                aria-label="문서 기본 정보 및 태그"
+              >
                 <div className="document-detail-section-heading">
                   <div>
                     <p className="section-kicker">BASIC INFORMATION</p>
@@ -1507,32 +1550,33 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
                     {isSaving ? '저장 중' : '정보 저장'}
                   </button>
                 </form>
-              </section>
 
-              <section className="document-detail-section document-tag-section" aria-labelledby="document-tags-heading">
-                <div className="document-detail-section-heading">
-                  <div>
-                    <p className="section-kicker">DOCUMENT TAGS</p>
-                    <h3 id="document-tags-heading">태그</h3>
+                <div className="document-management-tag-section">
+                  <div className="document-detail-section-heading">
+                    <div>
+                      <p className="section-kicker">DOCUMENT TAGS</p>
+                      <h3 id="document-tags-heading">태그</h3>
+                    </div>
+                    <p>문서를 분류할 태그를 직접 관리할 수 있습니다.</p>
                   </div>
-                  <p>문서를 분류할 태그를 직접 관리할 수 있습니다.</p>
+                  <DocumentTagEditor
+                    tags={selectedDocument.tags}
+                    emptyMessage="연결된 태그가 없습니다."
+                    removeLabel={(tag) => `${tag.name} 태그 제거`}
+                    disabled={isDeleting}
+                    removingTagId={removingTagId}
+                    onRemove={(tagId) => void handleRemoveDocumentTag(tagId)}
+                    onAdd={() => setIsTagModalOpen(true)}
+                  />
                 </div>
-                <DocumentTagEditor
-                  tags={selectedDocument.tags}
-                  emptyMessage="연결된 태그가 없습니다."
-                  removeLabel={(tag) => `${tag.name} 태그 제거`}
-                  disabled={isDeleting}
-                  removingTagId={removingTagId}
-                  onRemove={(tagId) => void handleRemoveDocumentTag(tagId)}
-                  onAdd={() => setIsTagModalOpen(true)}
-                />
               </section>
+              </div>
 
               <section className="document-detail-section document-version-section" aria-labelledby="versions-heading">
                 <div className="document-version-heading">
                   <div>
                     <p className="section-kicker">VERSION HISTORY</p>
-                    <h3 id="versions-heading">버전 관리</h3>
+                    <h3 id="versions-heading">버전</h3>
                   </div>
                   <button
                     type="button"
@@ -1549,7 +1593,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
                     }}
                     disabled={isDeleting || isVersionUploading}
                   >
-                    {isVersionUploadFormOpen ? '닫기' : '+ 새 버전 추가'}
+                    {isVersionUploadFormOpen ? '닫기' : '+ 추가'}
                   </button>
                 </div>
 
@@ -1590,45 +1634,25 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
 
                 <ul className="document-version-list">
                   {selectedDocument.versions.map((version) => (
-                    <li key={version.versionId}>
-                      <div className="version-row-main">
-                        <span className="version-number">v{version.versionNo}</span>
-                        <div className="version-row-copy">
-                          <strong>{version.originalFileName}</strong>
-                          <span>{version.fileType} · {formatCreatedAt(version.createdAt)}</span>
-                        </div>
-                        {version.versionId === selectedDocument.activeVersionId && (
-                          <span className="active-version-label">검색에 사용 중</span>
-                        )}
-                      </div>
+                    <li
+                      key={version.versionId}
+                      className={version.versionId === previewVersion?.versionId ? 'is-selected' : ''}
+                    >
+                      <button
+                        type="button"
+                        className="version-select-button"
+                        aria-pressed={version.versionId === previewVersion?.versionId}
+                        onClick={() => setSelectedPreviewVersionId(version.versionId)}
+                      >
+                        <strong>v{version.versionNo}</strong>
+                        <span>
+                          {version.versionId === selectedDocument.activeVersionId
+                            ? '현재 · ACTIVE'
+                            : versionHistoryStatusLabel(version)}
+                        </span>
+                        <time dateTime={version.createdAt}>{formatCreatedAt(version.createdAt)}</time>
+                      </button>
                       <div className="version-row-actions">
-                        {version.versionId !== selectedDocument.activeVersionId && (
-                          <span
-                            className={
-                              'status-badge ' +
-                              versionHistoryStatusClassName(version)
-                            }
-                          >
-                            {versionHistoryStatusLabel(version)}
-                          </span>
-                        )}
-                        {version.fileType === 'PDF' && (
-                          <button
-                            type="button"
-                            className="pdf-open-button"
-                            aria-label={`${version.originalFileName} PDF 열기`}
-                            onClick={() => void handleOpenPdf({
-                              documentId: selectedDocument.documentId,
-                              versionId: version.versionId,
-                              versionNo: version.versionNo,
-                              originalFileName: version.originalFileName,
-                            })}
-                            disabled={isDeleting}
-                          >
-                            <span aria-hidden="true">↗</span>
-                            PDF 열기
-                          </button>
-                        )}
                         {version.versionId !== selectedDocument.activeVersionId && !isDocumentVersionInFlight(version) && (
                           <button
                             type="button"
@@ -1746,10 +1770,9 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
                   </div>
                 )}
               </section>
-            </>
+            </div>
           )}
-          </section>
-        </>
+        </section>
       )}
 
       {isTagModalOpen && selectedDocument !== null && (
@@ -1925,6 +1948,112 @@ function DocumentThumbnail({
             <button
               type="button"
               className="thumbnail-retry-button"
+              onClick={() => {
+                setThumbnailState('idle')
+                setThumbnailUrl(null)
+                setThumbnailRetryKey((value) => value + 1)
+              }}
+            >
+              미리보기 다시 시도
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function DocumentVersionPreview({
+  documentId,
+  documentTitle,
+  version,
+  onSessionExpired,
+}: {
+  documentId: number
+  documentTitle: string
+  version: DocumentVersion | null
+  onSessionExpired: () => void
+}) {
+  const canLoad = version?.fileType === 'PDF'
+  const versionId = version?.versionId ?? null
+  const [thumbnailState, setThumbnailState] = useState<ThumbnailState>('idle')
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null)
+  const [thumbnailRetryKey, setThumbnailRetryKey] = useState(0)
+
+  useEffect(() => {
+    if (!canLoad || versionId === null) {
+      return
+    }
+
+    const controller = new AbortController()
+    let objectUrl: string | null = null
+    void getDocumentThumbnail(documentId, versionId, controller.signal)
+      .then((blob) => {
+        if (controller.signal.aborted) {
+          return
+        }
+        objectUrl = URL.createObjectURL(blob)
+        setThumbnailUrl(objectUrl)
+        setThumbnailState('ready')
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) {
+          return
+        }
+        if (error instanceof DocumentApiError && expireSessionIfUnauthorized(error, onSessionExpired)) {
+          return
+        }
+        setThumbnailState('fallback')
+      })
+
+    return () => {
+      controller.abort()
+      if (objectUrl !== null) {
+        URL.revokeObjectURL(objectUrl)
+      }
+    }
+  }, [canLoad, documentId, onSessionExpired, thumbnailRetryKey, versionId])
+
+  if (version === null) {
+    return (
+      <div className="document-version-preview-canvas is-empty">
+        <p>미리볼 문서 버전이 없습니다.</p>
+      </div>
+    )
+  }
+
+  const isLoading = canLoad && thumbnailState === 'idle'
+  return (
+    <div className="document-version-preview-canvas" aria-busy={isLoading}>
+      {thumbnailState === 'ready' && thumbnailUrl !== null ? (
+        <img
+          src={thumbnailUrl}
+          alt={`${documentTitle} v${version.versionNo} 첫 페이지 미리보기`}
+          decoding="async"
+        />
+      ) : (
+        <div className="document-version-preview-fallback">
+          {isLoading && <span className="state-spinner" aria-hidden="true" />}
+          {!canLoad && (
+            <div className="document-preview-sheet">
+              <strong aria-hidden="true">{version.fileType}</strong>
+              <span aria-hidden="true" />
+              <span aria-hidden="true" />
+              <span aria-hidden="true" />
+              <span aria-hidden="true" />
+            </div>
+          )}
+          <p>
+            {isLoading
+              ? '첫 페이지 미리보기를 불러오는 중입니다.'
+              : version.fileType === 'TXT'
+                ? 'TXT 문서는 원본 파일 형식으로 보관됩니다.'
+                : '첫 페이지 미리보기를 표시할 수 없습니다.'}
+          </p>
+          {thumbnailState === 'fallback' && canLoad && (
+            <button
+              type="button"
+              className="secondary-button thumbnail-retry-button"
               onClick={() => {
                 setThumbnailState('idle')
                 setThumbnailUrl(null)
@@ -3206,14 +3335,6 @@ function versionHistoryStatusLabel(version: DocumentVersion): string {
     return documentStatusLabel(status)
   }
   return '이전 버전 · 검색 제외'
-}
-
-function versionHistoryStatusClassName(version: DocumentVersion): string {
-  const status = version.processingStatus ?? version.status
-  if (isDocumentVersionInFlight(version) || status === 'FAILED') {
-    return documentStatusClassName(status)
-  }
-  return 'status-archived'
 }
 
 function retrySummary(

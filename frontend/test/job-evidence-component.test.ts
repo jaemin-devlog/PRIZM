@@ -521,7 +521,12 @@ test('active Evidence rows preserve PDF page, TXT document, context, and retry c
   const resultHtml = renderToStaticMarkup(resultTree)
   assert.match(resultHtml, /class="job-evidence-preview"/)
   assert.equal((resultHtml.match(/주변 내용 보기/g) ?? []).length, 1)
+  assert.equal((resultHtml.match(/추가 문맥 없음/g) ?? []).length, 1)
   assert.match(resultHtml, /keyword-context-details job-evidence-context-details/)
+  assert.match(
+    resultHtml,
+    /class="keyword-document-button job-evidence-context-unavailable" disabled=""/,
+  )
   assert.match(resultHtml, /주문 처리 프로젝트/)
 })
 

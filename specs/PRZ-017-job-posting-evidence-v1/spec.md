@@ -14,7 +14,7 @@
   재평가 `NOT_RUN`
 
 이 문서는 채용공고를 붙여넣고 필요한 항목을 사용자가 직접 선택한 뒤, 기존
-PRZ-016 Career Evidence Search로 관련 원문 기록을 확인하는 대회 제출용 V1 계약을
+PRZ-016 경력 근거 검색으로 관련 원문 기록을 확인하는 현재 V1 계약을
 정의한다. Spec과 화면 문구는 구현·검증 증거가 아니며 실제 상태는 source와 실행
 가능한 test, [Evidence](evidence.md)를 따른다.
 
@@ -26,7 +26,7 @@ PRZ-016 Career Evidence Search로 관련 원문 기록을 확인하는 대회 �
 → 항목 나누기
 → modal에서 필요한 항목 선택
 → 관련 경력 찾기
-→ 결과 전용 화면에서 선택 항목별 Career Evidence 확인
+→ 결과 전용 화면에서 선택 항목별 경력 근거 확인
 → PDF 해당 페이지 또는 TXT 문서 상세로 이동
 ```
 

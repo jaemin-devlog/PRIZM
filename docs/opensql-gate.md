@@ -1,6 +1,6 @@
 # OpenSQL 단일 서버 검증 기록
 
-> 상태: `PASS_SINGLE_NODE_SQL_GATE` (2026-07-30)
+> 역사 판정: `PASS_SINGLE_NODE_SQL_GATE` (2026-07-30)
 
 이 문서는 OpenSQL 설치 가이드가 아닙니다. PRIZM이 OpenSQL 환경에서 실제로 검증한 범위와 다시 실행할 때 지켜야 할 경계를 기록합니다.
 
@@ -11,7 +11,22 @@
 
 PostgreSQL 성공을 OpenSQL 성공으로 바꾸어 표현하지 않습니다.
 
-## 완료 기준
+## 현재 재실행 범위
+
+현재 소스를 다시 검증할 때는 Flyway V1~V16을 포함해 재실행 시점의 최신 migration을
+모두 적용해야 합니다. 아래 V1~V13과 V1~V15 표기는 각각 2026-07-30과
+2026-08-13 실행 당시의 역사적 범위이며, 현재 migration 기준으로 사용하지 않습니다.
+
+기본 로컬·자동 통합 테스트의 PostgreSQL 16+pgvector 결과는 OpenSQL 증거가 아닙니다.
+OpenSQL 결과로 기록하려면 실제 단일 서버 OpenSQL을 대상으로 direct `:5432` SQL
+검증 또는 관련 PRZ의 OpenSQL·OpenProxy 실행 조건을 그대로 재현해야 합니다.
+OpenProxy 결과도 단일 Primary SQL routing 범위에 한정하며 이중화, DB 장애 전환과
+서비스 연속성으로 확대하지 않습니다.
+
+아래 날짜별 G0·G1과 최초 SQL Gate는 당시 소스·migration·환경의 역사 실행
+기록입니다. 과거 `PASS`는 현재 소스에서 다시 실행한 결과가 아닙니다.
+
+## 2026-07-30 SQL Gate 완료 기준 — 역사 실행 기록
 
 다음 조건을 실제 OpenSQL 단일 서버 환경에서 모두 확인해 `PASS`로 판정했습니다.
 
@@ -25,7 +40,7 @@ PostgreSQL 성공을 OpenSQL 성공으로 바꾸어 표현하지 않습니다.
    `evidence.md`에 기록합니다. 공급 package/version, installer 내부 명령과 log는
    Git 밖의 비공개 근거로만 보존합니다.
 
-## 실행 환경 확인
+### 당시 실행 환경
 
 | 항목 | 상태 |
 |---|---|
@@ -40,7 +55,7 @@ PostgreSQL 성공을 OpenSQL 성공으로 바꾸어 표현하지 않습니다.
 
 민감한 JDBC URL, 사용자명, 비밀번호와 host 목록은 Git에 기록하지 않습니다.
 
-## 실행
+### 당시 실행 명령
 
 Flyway와 실행용 datasource는 migration 전에 각각 base table이 없는지 확인합니다.
 조회 권한이 부족하거나 기존 table이 있으면 테스트용 데이터 생성 전에 실패해야 합니다.
@@ -62,7 +77,7 @@ $env:PRIZM_FLYWAY_PASSWORD='<migration password>'
 Flyway가 만든 비활성 UUID marker를 실행 계정이 같은 ID로 읽어야만 테스트용 데이터 생성을
 시작합니다. 전역 `DELETE`나 `TRUNCATE` 없이 실행별 UUID와 생성 ID만 정리합니다.
 
-## 2026-07-30 실행 결과
+### 당시 실행 결과
 
 - `OpenSqlInfrastructureTest` 1건, 실패 0·오류 0·건너뜀 0
 - Gradle 종료 코드 0, `BUILD SUCCESSFUL`
@@ -73,11 +88,11 @@ Flyway가 만든 비활성 UUID marker를 실행 계정이 같은 ID로 읽어�
 - 실제 통합: [PR #24](https://github.com/jaemin-devlog/PRIZM/pull/24),
   merge commit `777e184f206d2a2770d055940ddabf139abfed9d`
 
-상세 비식별 결과와 보안 경계는
+2026-07-30 SQL Gate의 상세 비식별 결과와 보안 경계는
 [PRZ-003 검증 기록](../specs/PRZ-003-opensql-single-node-gate/evidence.md)을
-현재 기준으로 사용합니다.
+따릅니다.
 
-## 현재 검증에 포함하지 않는 것
+### 당시 SQL Gate에 포함하지 않은 것
 
 - Ollama와 실제 임베딩 생성
 - Indexing·Cleanup Scheduler 실행과 실제 파일 삭제
@@ -85,7 +100,7 @@ Flyway가 만든 비활성 UUID marker를 실행 계정이 같은 ID로 읽어�
 - OpenProxy 실행 연결
 - 다중 DB 노드 장애전환, RTO와 RPO
 
-OpenProxy 단일 Primary SQL routing은 별도 spec에서 검증합니다. 대회 제공 OpenSQL은
+OpenProxy 단일 Primary SQL routing은 별도 spec에서 검증합니다. 별도로 제공된 OpenSQL 환경은
 공식 안내에 따라 단일 서버 설치만 사용하며, 다중 DB 노드 장애전환은 착수하지 않습니다.
 
 ## 실패·미확보 처리
@@ -97,10 +112,10 @@ OpenProxy 단일 Primary SQL routing은 별도 spec에서 검증합니다. 대�
 - 전체 JDBC URL, host, 계정과 비밀번호는 출력하지 않습니다.
 - OpenSQL이 없으면 PostgreSQL 16+pgvector 회귀 test를 유지하되 별도 결과로 기록합니다.
 
-현재 구현은 [현재 구현 현황](project-status.md), 설치 환경과 실행 결과는
+현재 구현은 [현재 구현 현황](project-status.md), 2026-07-30 최초 설치 환경과 실행 결과는
 [PRZ-003 검증 기록](../specs/PRZ-003-opensql-single-node-gate/evidence.md)을 기준으로 합니다.
 
-## 2026-08-13 OpenSQL V15 G0 기준 재검증
+## 역사 실행 기록 — 2026-08-13 OpenSQL V15 G0 기준 재검증
 
 ### 목적과 범위
 
@@ -222,7 +237,7 @@ PRIZM 실행 트래픽
 
 이 단계에서는 단일 Primary SQL routing만 검증합니다.
 
-## 2026-08-14 OpenProxy 단일 Primary G1 검증
+## 역사 실행 기록 — 2026-08-14 OpenProxy 단일 Primary G1 검증
 
 ### 목적과 구성
 
@@ -275,6 +290,6 @@ G1 OpenProxy 단일 Primary SQL 검증
 → VERIFIED
 ```
 
-대회 제공 OpenSQL은 공식 안내에 따라 단일 서버 구성만 사용합니다. 따라서 이 문서에는
+별도로 제공된 OpenSQL은 공식 안내에 따라 단일 서버 구성만 사용합니다. 따라서 이 문서에는
 다중 노드 후속 검증 단계를 두지 않습니다. G1은 Replica 승격, Primary 장애 주입,
 OpenProxy 이중화나 VIP를 검증한 결과가 아닙니다.

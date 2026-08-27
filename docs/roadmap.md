@@ -14,10 +14,11 @@
 - 사용자별 경력 근거 검색과 원문 위치 연결
 - 사용자가 관리하는 문서 태그
 - 채용공고 항목별 근거 검색
+- 문서별 미리보기와 TXT/PDF 원문 보기
 - 기존 검색을 재사용하는 읽기 전용 MCP 도구
 - PostgreSQL·pgvector 로컬 경로와 단일 서버 OpenSQL·OpenProxy 검증 경로
 
-PRZ-017은 [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53), `main` 병합 커밋 `b78ec42`로 통합됐습니다. 현재 진행 중인 기능 개발 단계는 없습니다.
+최신 통합 범위는 [현재 구현 현황](project-status.md)과 [PRZ Registry](../specs/README.md)에서 확인합니다. 현재 진행 중인 기능 개발 단계는 없습니다.
 
 ## 남아 있는 검증 기록
 
@@ -27,7 +28,7 @@ PRZ-008과 PRZ-016에는 완료하지 않았거나 채택하지 않은 평가 �
 - PRZ-016의 P15 인증 PDF 페이지 이동은 `NOT_VERIFIED`입니다.
 - PRZ-016 P16 literal candidate 실험은 `NEEDS_ADJUSTMENT`였고 현재 검색에 적용하지 않았습니다.
 
-현재 적용된 검색과 알려진 한계는 [검색 최종 요약](../specs/PRZ-016-search-performance-v2/SEARCH-FINAL-SUMMARY.md)에 정리돼 있습니다.
+현재 적용된 검색과 알려진 한계는 [PRZ-016 검색 문서 안내](../specs/PRZ-016-search-performance-v2/README.md)에서 확인할 수 있습니다.
 
 ## 일정이 정해지지 않은 장기 방향
 

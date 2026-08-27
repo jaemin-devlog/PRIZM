@@ -19,7 +19,7 @@ PRZ-008과 PRZ-016의 `IN_PROGRESS`는 필수 검증 항목이 모두 끝나지 
 
 | 구분 | PRZ | 의미 |
 |---|---|---|
-| 현재 제품 기준에 통합 | 001–007, 009–013, 015–018 | 016의 현재 적용 검색을 포함하며 형식 상태는 아래 목록에서 별도 표시 |
+| 현재 제품 기준에 통합 | 001–007, 009–013, 015–019 | 016의 현재 적용 검색을 포함하며 형식 상태는 아래 목록에서 별도 표시 |
 | 목록 도입 전 기준 | 000 | Spec 목록 도입 전 구현을 `AS_BUILT_BASELINE`으로 기록 |
 | 미완료 검증 보존 | 008, 016 | 현재 제품 기준과 별개로 완료하지 않거나 채택하지 않은 평가가 있음 |
 | 검토 후 거절 | 014 | 검증 범위를 단일 서버로 확정해 OpenHA 다중 노드 구성을 채택하지 않음 |
@@ -44,7 +44,7 @@ PRZ-008과 PRZ-016의 `IN_PROGRESS`는 필수 검증 항목이 모두 끝나지 
 | [PRZ-013](PRZ-013-openproxy-single-primary-gate/spec.md) | OpenProxy 단일 Primary 검증 | `VERIFIED` | `a65f91d` |
 | [PRZ-014](PRZ-014-openha-topology-gate/spec.md) | OpenHA topology 검토 | `REJECTED` | Single-only 범위로 확정 |
 | [PRZ-015](PRZ-015-mcp-career-evidence-search/spec.md) | 읽기 전용 MCP 검색 | `VERIFIED` | `97c01cb`, [PR #46](https://github.com/jaemin-devlog/PRIZM/pull/46), 병합 `23166e7` |
-| [PRZ-016](PRZ-016-search-performance-v2/spec.md) | Search Performance V2 | `IN_PROGRESS` | 현재 적용 검색 [PR #50](https://github.com/jaemin-devlog/PRIZM/pull/50), 병합 `3cfe9dc`; P15 `NOT_VERIFIED`, P16 미채택 |
+| [PRZ-016](PRZ-016-search-performance-v2/README.md) | Search Performance V2 | `IN_PROGRESS` | 당시 통합 [PR #50](https://github.com/jaemin-devlog/PRIZM/pull/50), 병합 `3cfe9dc`; 현재 구조는 패키지 안내, P15 `NOT_VERIFIED`, P16 미채택 |
 | [PRZ-017](PRZ-017-job-posting-evidence-v1/spec.md) | 채용공고 항목별 근거 검색 V1 | `VERIFIED` | `94715cf`, [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53), 병합 `b78ec42` |
 | [PRZ-018](PRZ-018-document-detail-page/spec.md) | 문서 상세 미리보기 페이지 | `VERIFIED` | `186be99`, [PR #56](https://github.com/jaemin-devlog/PRIZM/pull/56), 병합 `a9ca679` |
 | [PRZ-019](PRZ-019-document-usability-fixes/spec.md) | 태그 문서 수 명확화와 TXT 원문 미리보기 | `VERIFIED` | `4932aa8`, [PR #60](https://github.com/jaemin-devlog/PRIZM/pull/60), 병합 `01d6c46` |

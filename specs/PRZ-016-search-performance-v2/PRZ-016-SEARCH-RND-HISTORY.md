@@ -1,12 +1,16 @@
 # PRZ-016 검색 R&D 최종 기록
 
-## 현재 상태
+> **역사 기록:** 이 문서는 PRZ-016 연구 당시의 단계, 실패, rollback과 판단을 보존한다.
+> `StructuredClaimSupportEvaluator`를 포함한 아래 "현재" 표현은 당시 snapshot을 뜻한다.
+> 실제 현재 제품 검색은 [현재 검색 요약](SEARCH-FINAL-SUMMARY.md)을 따른다.
 
-- Competition baseline: 안정 `StructuredClaimSupportEvaluator` 경로
+## 당시 최종 상태
+
+- 당시 Competition baseline: 안정 `StructuredClaimSupportEvaluator` 경로
 - Retrieval: BGE-M3 + pgvector exact Dense Top20
 - ClaimVerifierV2: 연구 전용, Production 미채택
 - Judge C 공식 판정: `HOLD`
-- 현재 결정: 대회 전 추가 검색 튜닝 중단
+- 당시 결정: 대회 전 추가 검색 튜닝 중단
 - 제품 범위: Evidence-first Career Search
 
 ## 1. 목표
@@ -15,7 +19,7 @@ PRZ-016은 검색 점수를 한 번 높이는 작업이 아니었다. 개발용 
 변경이 처음 보는 문서와 질문에서도 유지되는지 확인하고, 실패했을 때 정답이 어느
 단계에서 사라졌는지 설명할 수 있는 검색 구조를 만드는 작업이었다.
 
-현재 PRIZM Search의 제품 범위는 다음과 같다.
+당시 PRIZM Search의 제품 범위는 다음과 같았다.
 
 > 사용자가 등록한 이력서·포트폴리오·프로젝트 문서에서 질문과 관련된 확인 가능한
 > 내용을 찾아 출처 문서와 위치와 함께 보여주는 Evidence-first Career Search
@@ -416,10 +420,10 @@ ORIGINAL eligibility가 비었다.
 `StructuredClaimSupportEvaluator` 경로를 사용하며, V2와 preselector는
 `src/searchEvaluation`의 연구 artifact로만 남아 있다.
 
-## 11. 현재 안정 버전
+## 11. 당시 안정 버전
 
-현재 as-built 흐름은 다음과 같다. 세부 계약은
-[`SEARCH-FINAL-ARCHITECTURE.md`](SEARCH-FINAL-ARCHITECTURE.md)에 정리했다.
+당시 as-built 흐름은 다음과 같다. 당시 세부 계약은
+[과거 통합 아키텍처](history/2026-08-search-integration-architecture.md)에 보존했다.
 
 ```text
 Query
@@ -456,11 +460,11 @@ metric 개선으로 계산하지 않는다.
 
 - 독립 Judge C의 공식 Search Freeze 판정은 `HOLD`였다. 이후 새로운 독립 Judge가
   안정 rollback 버전을 통과했다는 artifact는 없다.
-- 반면 실패한 V2 통합보다 현재 안정 버전이 넓은 P9/P10·실제 이력서 계약에서 더
+- 반면 실패한 V2 통합보다 당시 안정 버전이 넓은 P9/P10·실제 이력서 계약에서 더
   안전하다는 근거는 있다. 따라서 운영 선택은 현재 버전을 보존하고, 새로운 rule이나
   verifier를 계속 붙이지 않는 것이다.
 
-즉, 현재 상태는 “모든 자연어 claim을 해결했으므로 Search Freeze를 통과했다”가 아니다.
+즉, 당시 상태는 “모든 자연어 claim을 해결했으므로 Search Freeze를 통과했다”가 아니다.
 대회 전 추가 검색 튜닝을 중단하고, 검증된 안정 경로를 Competition baseline으로 고정한
 선택이다. claim verification을 다시 열려면 새로운 architecture와 넓은 frozen suite를
 함께 준비해야 한다.
@@ -497,7 +501,7 @@ metric 개선으로 계산하지 않는다.
 | Qwen verifier | local semantic sufficiency | D2 `26/29`, FP `2/30`, 평균 `679.31ms` | 미채택 | safety-first deterministic보다 이득 없이 비용 증가 |
 | ClaimVerifierV2 | safety-first claim verification | 좁은 replay `29/29`, FP `0/30`; 넓은 P9/P10에서 FP·Positive 회귀 | 연구 전용 | Production regression으로 통합 철회 |
 | source consolidation | 실제 중복 제거와 다른 claim 보존 | P11/P11.1에서 page identity와 evidence identity 분리 | 채택 | 같은 page의 다른 프로젝트를 보존하면서 강한 overlap만 축약 |
-| Structured claim support | 부정·미도입·actor·숫자/metric 안전성 | P9에서 P8.1 FPR을 0으로 낮춤, 새 표현 일반화 한계도 확인 | 채택·안정 경로 | 넓은 frozen regression이 V2보다 안정적 |
+| Structured claim support | 부정·미도입·actor·숫자/metric 안전성 | P9에서 P8.1 FPR을 0으로 낮춤, 새 표현 일반화 한계도 확인 | 당시 채택·안정 경로 | 넓은 frozen regression이 V2보다 안정적 |
 | evidence localization | 질문 관련 원문 표시 | P10/P13/P14에서 selection과 표시를 분리해 개선 | 채택 | 결과 ID·순위는 유지하고 extractive evidence만 표시 |
 
 ## 관련 문서

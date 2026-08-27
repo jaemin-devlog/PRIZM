@@ -234,15 +234,21 @@ PRIZM 검색은 사용자의 `ACTIVE` 문서에서 질문과 관련된 원문을
 순서로 동작합니다.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Q[사용자 질문] --> E[bge-m3 임베딩]
     E --> D[owner·ACTIVE 범위<br/>Dense Top 20]
-    D --> S[source consolidation]
-    S --> C[relevance eligibility]
+    D --> I[identifier corpus guard]
+    I --> S[source consolidation]
+    S --> C[eligibility]
     C --> G[query-evidence consolidation]
     G --> R[bounded ranking<br/>최대 5건]
-    R --> L[extractive localization]
-    L --> A[snippet·context·TXT/PDF 위치]
+    R --> X[짧은 exact-token rescue<br/>numeric post-filter]
+    X --> F{결과가 비었는가}
+    F -->|예| N[제한적 자연어 fallback<br/>이후 numeric exact rescue]
+    F -->|아니요| P[표시 내용 중복 제거]
+    N --> P
+    P --> L[선택 chunk 우선 localization<br/>필요할 때만 주변 근거 확장]
+    L --> A[extractive snippet·TXT/PDF 위치]
 ```
 
 검색 질문과 문서 조각은 같은 `bge-m3` 모델의 1024차원 임베딩을 사용합니다.
@@ -250,11 +256,12 @@ flowchart LR
 PostgreSQL pgvector의 exact cosine distance 연산자 `<=>`로 최대 20개 후보를 가져오며,
 SQL 단계에서 owner와 `ACTIVE` version을 제한합니다.
 
-후속 단계는 실제로 겹치는 source span을 먼저 축약합니다. 이후 Dense score와 exact
-identifier anchor로 후보 관련성을 제한하고, numeric anchor와 query core term 같은
-제한된 신호를 후보 복구와 순위화에 사용합니다. 같은 PDF page라도 다른 프로젝트나
-독립된 원문 근거라면 합치지 않습니다. 같은 근거를 반복한 후보를
-`query-evidence consolidation` 단계에서 다시 축약한 뒤 최대 5건을 선택합니다.
+직접 구현·완료·identifier 질의에는 strong identifier가 문서 집합에 실제로 있는지
+먼저 확인합니다. 이후 실제로 겹치는 source span을 축약하고, Dense score와 exact
+identifier anchor, numeric anchor와 query core term 같은 제한된 신호로 후보 자격을
+판정합니다. 자격을 통과한 후보에서 같은 질문 근거의 반복을 다시 축약하고, GENERAL
+검색은 `EvidenceQualityReranker`의 제한된 보정값을 포함해 순위를 정한 뒤 최대 5건을
+선택합니다. 같은 PDF page라도 다른 프로젝트나 독립된 원문 근거라면 합치지 않습니다.
 
 GENERAL 검색은 기본 `0.50` floor를 유지합니다. 결과가 비어 있고 정규화된 질의가
 단일 2–4자 token이며 본문에서 exact token이 일치할 때만 `0.49 <= score < 0.50`
@@ -262,10 +269,19 @@ GENERAL 검색은 기본 `0.50` floor를 유지합니다. 결과가 비어 있�
 distance를 반환합니다. 완료 배포·출시 검색은 이 복구 경로를 사용하지 않습니다.
 `legacy-dense-v1`은 명시적 rollback 경로로 남아 있습니다.
 
-최종 후보에서는 원문 offset을 보존한 연속 1–3문장을 `snippet`으로 선택합니다.
-선택된 chunk가 충분하면 다른 위치로 옮기지 않고, 부족할 때만 같은
+단위가 붙은 숫자 질의는 선택 결과에 숫자 주변 문맥이 함께 있는지 다시 확인합니다.
+결과가 비어 있고 질의 형태가 허용될 때만 최대 두 개의 제한된 자연어 변형을 순서대로
+조회합니다. 변형 질의는 후보를 넓히는 데만 쓰고, 최종 선택과 위치 찾기는 원래 질의를
+기준으로 합니다. 그래도 결과가 없고 단위가 붙은 숫자가 있으면 숫자 경계를 정확히
+일치시키는 rescue를 마지막으로 시도합니다. 최종 응답에서는 표시할 원문이 같은 결과를
+한 번 더 정리합니다.
+
+최종 후보에서는 선택된 chunk 안에서 먼저 원문 위치를 찾습니다. 그 chunk가 충분하면
+다른 위치로 옮기지 않고, 부족할 때만 같은
 owner·document·`ACTIVE` version 범위에서 주변 근거를 확인합니다. 이 과정은 결과의
-순위와 score를 다시 계산하지 않으며 전체 `content`도 유지합니다. TXT는
+선택과 순위, score를 다시 계산하지 않으며 전체 `content`도 유지합니다. 마지막에는
+가능하면 원문 offset을 보존한 연속 1–3문장을 `snippet`으로 구성하고, 문장을 분리할 수
+없거나 위치화가 실패하면 선택된 chunk 원문으로 돌아갑니다. TXT는
 `TEXT_CHUNK`와 텍스트 구간 번호를, PDF는 `PAGE`와 1-based 페이지 번호를 반환합니다.
 
 `score = 1 - distance`는 후보 정렬을 위한 유사도이지 정확도나 사실 확률이 아닙니다.
@@ -281,7 +297,14 @@ Search는 사용자가 해당 경험을 실제로 수행했는지, 경력 내용
 - [PDF 페이지 출처 migration](../src/main/resources/db/migration/V11__support_pdf_page_sources.sql)
 - [임베딩 검증](../src/main/java/com/prizm/embedding/service/EmbeddingValidator.java)
 - [벡터 검색 SQL](../src/main/java/com/prizm/search/repository/VectorSearchRepository.java)
+- [제한된 근거 품질 재정렬](../src/main/java/com/prizm/search/profile/EvidenceQualityReranker.java)
+- [제한적 자연어 fallback](../src/main/java/com/prizm/search/profile/NaturalLanguageQueryFallback.java)
+- [짧은 exact-token rescue](../src/main/java/com/prizm/search/profile/ShortGeneralExactTokenRescueProfile.java)
+- [numeric exact rescue](../src/main/java/com/prizm/search/profile/NumericAnchorRescueProfile.java)
+- [주변 근거 확장](../src/main/java/com/prizm/search/service/EvidenceExpansionService.java)
+- [extractive snippet 생성](../src/main/java/com/prizm/search/service/SearchSnippetGenerator.java)
 - [검색 서비스 테스트](../src/test/java/com/prizm/search/service/SearchServiceTest.java)
+- [주변 근거 확장 테스트](../src/test/java/com/prizm/search/service/EvidenceExpansionServiceTest.java)
 - [경력 근거 API 테스트](../src/test/java/com/prizm/search/controller/CareerEvidenceSearchControllerTest.java)
 - [Composite Search Profile](../src/main/java/com/prizm/search/profile/CompositeSearchProfile.java)
 - [경력 근거 v2 API](../src/main/java/com/prizm/search/controller/CareerEvidenceSearchV2Controller.java)

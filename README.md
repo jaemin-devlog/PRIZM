@@ -85,7 +85,7 @@ PRIZM은 사용자의 현재 문서에서 질문과 관련된 원문을 찾고, 
 - 채용 요구사항 충족 여부
 - 직무 적합도나 합격 가능성
 
-검색의 현재 동작과 알려진 한계는 [현재 구현 현황](docs/project-status.md)과 [검색 최종 요약](specs/PRZ-016-search-performance-v2/SEARCH-FINAL-SUMMARY.md)을 확인하세요.
+검색의 현재 동작과 알려진 한계는 [현재 구현 현황](docs/project-status.md)과 [PRZ-016 검색 문서 안내](specs/PRZ-016-search-performance-v2/README.md)를 확인하세요.
 
 ## 채용공고 항목별 근거 검색
 

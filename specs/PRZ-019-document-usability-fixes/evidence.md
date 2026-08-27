@@ -1,7 +1,7 @@
 # PRZ-019 — Evidence
 
 > **상태:** `VERIFIED`
-> **기준 소스:** `5b2c50fbe0d6fac0a9ee5c9d51f5365392c37a69`
+> **검증 소스:** `4932aa8`
 
 ## 원인 확인
 
@@ -37,7 +37,14 @@
 - backend production source, SQL/migration, Gradle/npm dependency 변경: 0
 - 검색, MCP, tag 집계 SQL과 owner-scoped original API 계약 변경: 0
 - 기존 미추적 `tmp/` 영상 작업: 보존, 변경 없음
-- commit, push, PR: `NOT_RUN`
+
+## INTEGRATE
+
+- source commit: `4932aa8`
+- pull request: [#60](https://github.com/jaemin-devlog/PRIZM/pull/60)
+- merge commit: `01d6c4682723840409e70e74eece711f341bfc22`
+- GitHub CI: backend, frontend, License/Markdown/SBOM 모두 `PASS`
+- 임시 local/remote branch: 병합 후 삭제 완료
 
 ## 판정
 

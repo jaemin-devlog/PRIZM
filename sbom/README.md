@@ -7,7 +7,7 @@ file checksums, and source-only distribution boundary.
 PRIZM publishes source and configuration under Apache-2.0. Java artifacts,
 frontend bundles, container images, PostgreSQL·pgvector, Ollama, model weights,
 OpenSQL assets, database volumes, and uploaded documents are not redistributed
-in the source archive. The current source-only license Gate is `PASS` with no
+in the source archive. The current source-only license check is `PASS` with no
 known blocking `UNKNOWN`, `CONFLICT`, or `BLOCKED` result. Any future binary,
 image, or model distribution requires a new artifact-specific review.
 
@@ -75,4 +75,4 @@ node scripts/verify-sbom.mjs
 ```
 
 CI never runs `--write-checksums`. An unexpected change must fail instead of
-silently becoming the new baseline.
+silently becoming the newly recorded value.

@@ -2351,6 +2351,13 @@ select:disabled {
   list-style: none;
 }
 
+.job-evidence-context-unavailable:disabled {
+  border-color: var(--prizm-color-border);
+  color: var(--prizm-color-muted);
+  background: var(--prizm-color-surface-alt);
+  opacity: 0.72;
+}
+
 .keyword-context-details summary::-webkit-details-marker {
   display: none;
 }
@@ -4343,7 +4350,7 @@ select:disabled {
 
   .document-detail-button:hover,
   .search-result-document-button:hover,
-  .keyword-document-button:hover,
+  .keyword-document-button:hover:not(:disabled),
   .keyword-context-details summary:hover,
   .keyword-evidence-toggle:hover,
   .keyword-source-location:hover,
@@ -4360,7 +4367,7 @@ select:disabled {
 
 .document-detail-button:active,
 .search-result-document-button:active,
-.keyword-document-button:active,
+.keyword-document-button:active:not(:disabled),
 .keyword-context-details summary:active,
 .keyword-evidence-toggle:active,
 .keyword-source-location:active,

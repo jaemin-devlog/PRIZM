@@ -533,7 +533,16 @@ export function JobActiveEvidence({
                                     {context}
                                   </div>
                                 </details>
-                              ) : null}
+                              ) : (
+                                <button
+                                  type="button"
+                                  className="keyword-document-button job-evidence-context-unavailable"
+                                  disabled
+                                  title="현재 표시된 원문 외에 추가로 보여줄 주변 내용이 없습니다."
+                                >
+                                  추가 문맥 없음
+                                </button>
+                              )}
                             </div>
                           </div>
                         </article>

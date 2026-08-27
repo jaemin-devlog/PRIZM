@@ -4,6 +4,7 @@ import {
   addUniqueTag,
   canCreateTag,
   keywordEvidenceRetryTarget,
+  linkedDocumentCountLabel,
   normalizeTagName,
   resolveSelectedTag,
   selectedTagIdFromSearch,
@@ -44,6 +45,11 @@ test('used tags sort by document count and stable name', () => {
     { tagId: 3, name: 'Docker', source: 'SYSTEM', documentCount: 2 },
   ]
   assert.deepEqual(sortTagUsage(usage).map((tag) => tag.name), ['Spring Boot', 'Docker', 'Redis'])
+})
+
+test('tag usage labels count linked documents rather than keyword occurrences', () => {
+  assert.equal(linkedDocumentCountLabel(0), '0개 연결 문서')
+  assert.equal(linkedDocumentCountLabel(1), '1개 연결 문서')
 })
 
 test('tag detail URL accepts only a positive integer identifier', () => {

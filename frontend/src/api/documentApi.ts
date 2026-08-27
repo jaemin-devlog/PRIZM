@@ -1,5 +1,5 @@
-import { getAccessToken } from '../auth/tokenStorage'
-import type { Tag } from './tagApi'
+import { getAccessToken } from '../auth/tokenStorage.ts'
+import type { Tag } from './tagApi.ts'
 
 export type DocumentType =
   | 'RESUME'

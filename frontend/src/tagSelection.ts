@@ -28,6 +28,10 @@ export function sortTagUsage(tags: TagUsage[]): TagUsage[] {
   )
 }
 
+export function linkedDocumentCountLabel(count: number): string {
+  return `${count}개 연결 문서`
+}
+
 export function tagDetailPath(tagId: number | null): string {
   return tagId === null ? '/career-vault/keywords' : `/career-vault/keywords?tagId=${tagId}`
 }

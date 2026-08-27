@@ -11,9 +11,9 @@ Spec은 구현 증거가 아닙니다. 실제 상태는 소스 코드, 적용된
 3. 구현 전 선택과 단계가 필요할 때만 `plan.md`와 `tasks.md`를 읽습니다.
 4. 단계별 문서와 원시 benchmark 결과물은 해당 판정의 상세 근거가 필요할 때만 확인합니다.
 
-현재 활성 기능 개발 단계는 없습니다. PRZ-008과 PRZ-016의 `IN_PROGRESS`는 필수
-검증 항목이 모두 끝나지 않았다는 형식 상태이며, 현재 진행 중인 개발을 뜻하지
-않습니다.
+PRZ-019는 로컬 구현·자동 검사·사용자 브라우저 확인을 마쳤으며 통합은 아직
+실행하지 않았습니다. PRZ-008과 PRZ-016의 `IN_PROGRESS`는 필수 검증 항목이 모두
+끝나지 않았다는 형식 상태이며, 현재 진행 중인 개발을 뜻하지 않습니다.
 
 ## 현재 상태 요약
 
@@ -47,6 +47,7 @@ Spec은 구현 증거가 아닙니다. 실제 상태는 소스 코드, 적용된
 | [PRZ-016](PRZ-016-search-performance-v2/spec.md) | Search Performance V2 | `IN_PROGRESS` | 현재 적용 검색 [PR #50](https://github.com/jaemin-devlog/PRIZM/pull/50), 병합 `3cfe9dc`; P15 `NOT_VERIFIED`, P16 미채택 |
 | [PRZ-017](PRZ-017-job-posting-evidence-v1/spec.md) | 채용공고 항목별 근거 검색 V1 | `VERIFIED` | `94715cf`, [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53), 병합 `b78ec42` |
 | [PRZ-018](PRZ-018-document-detail-page/spec.md) | 문서 상세 미리보기 페이지 | `VERIFIED` | `186be99`, [PR #56](https://github.com/jaemin-devlog/PRIZM/pull/56), 병합 `a9ca679` |
+| [PRZ-019](PRZ-019-document-usability-fixes/spec.md) | 태그 문서 수 명확화와 TXT 원문 미리보기 | `VERIFIED` | 로컬 검증 기준 `5b2c50f`, 통합 `NOT_RUN` |
 
 ## 상태와 결과
 

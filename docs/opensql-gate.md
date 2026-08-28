@@ -20,8 +20,8 @@ PostgreSQL 성공을 OpenSQL 성공으로 바꾸어 표현하지 않습니다.
 기본 로컬·자동 통합 테스트의 PostgreSQL 16+pgvector 결과는 OpenSQL 증거가 아닙니다.
 OpenSQL 결과로 기록하려면 실제 단일 서버 OpenSQL을 대상으로 direct `:5432` SQL
 검증 또는 관련 PRZ의 OpenSQL·OpenProxy 실행 조건을 그대로 재현해야 합니다.
-OpenProxy 결과도 단일 Primary SQL routing 범위에 한정하며 이중화, DB 장애 전환과
-서비스 연속성으로 확대하지 않습니다.
+OpenProxy 결과는 기록된 single-Primary SQL routing, source revision과 사용자 흐름
+범위 안에서만 사용합니다.
 
 아래 날짜별 G0·G1과 최초 SQL Gate는 당시 소스·migration·환경의 역사 실행
 기록입니다. 과거 `PASS`는 현재 소스에서 다시 실행한 결과가 아닙니다.
@@ -290,6 +290,6 @@ G1 OpenProxy 단일 Primary SQL 검증
 → VERIFIED
 ```
 
-별도로 제공된 OpenSQL은 공식 안내에 따라 단일 서버 구성만 사용합니다. 따라서 이 문서에는
-다중 노드 후속 검증 단계를 두지 않습니다. G1은 Replica 승격, Primary 장애 주입,
-OpenProxy 이중화나 VIP를 검증한 결과가 아닙니다.
+이 문서가 기록한 G1 검증 범위는 OpenSQL 단일 서버와 OpenProxy single-Primary SQL
+routing입니다. 역사적 인프라 탐색과 비채택 판정은
+[PRZ-014](../specs/PRZ-014-openha-topology-gate/spec.md)에 분리해 보존합니다.

@@ -111,21 +111,20 @@
 | 채용공고 근거 보기 동작 통일 | 통합됨 | [PR #58](https://github.com/jaemin-devlog/PRIZM/pull/58), 병합 `12acb3a` |
 | 태그 연결 문서 수·TXT 미리보기·TXT/PDF 원문 보기 | `VERIFIED` | PRZ-019, [PR #60](https://github.com/jaemin-devlog/PRIZM/pull/60), 병합 `01d6c46` |
 
-PostgreSQL 성공은 OpenSQL 증거가 아닙니다. OpenSQL·OpenProxy 검증은 단일 서버 환경에 한정하며 다중 노드, DB 장애 전환과 서비스 연속성을 포함하지 않습니다. 명령, 환경과 수치는 [기능별 검증 기록](../specs/README.md)에서 확인할 수 있습니다.
+PostgreSQL 성공은 OpenSQL 증거가 아닙니다. OpenSQL·OpenProxy 결과는 기록된 단일
+서버 direct 연결과 single-Primary 실행 경로에 한정합니다. 명령, 환경과 수치는
+[기능별 검증 기록](../specs/README.md)에서 확인할 수 있습니다.
 
-## 남아 있는 검증 기록
+## 검색 연구·검증 이력
 
-- PRZ-008은 통합된 검색 범위와 별개로 일부 최적화 검증을 완료하지 않아 형식 상태가 `IN_PROGRESS`입니다.
-- PRZ-016은 현재 적용 검색을 PR #50으로 통합했지만 P15 인증 PDF 페이지 이동이 `NOT_VERIFIED`이고, P16 실험은 `NEEDS_ADJUSTMENT`로 현재 검색에 적용하지 않아 형식 상태를 `IN_PROGRESS`로 보존합니다.
-- 이 두 상태는 현재 기능 개발이 진행 중이라는 뜻이 아닙니다. 자세한 배경은 [제품 범위와 향후 방향](roadmap.md)을 확인하세요.
-
-## 구현되지 않은 기능
-
-- 구조화된 경력 정보와 확인·거절 흐름
-- 근거 기반 포트폴리오 생성
-- `/api/v1`, OpenAPI와 webhook/outbox
-- 독립 실행 가능한 커리어 문서 분석·검색 모듈과 기관용 workspace
-- persistent journal
+- PRZ-008은 제품에 통합된 검색 범위와 별개로 일부 최적화 검증을 완료하지 않아
+  원문 lifecycle 상태 `IN_PROGRESS`를 보존합니다.
+- PRZ-016은 현재 검색 구조를 통합한 뒤에도 P15 `NOT_VERIFIED`와 제품에 적용하지
+  않은 P16 `NEEDS_ADJUSTMENT`를 역사 판정으로 보존해 lifecycle 상태가
+  `IN_PROGRESS`입니다.
+- 이 상태들은 현재 기능 개발이 진행 중이라는 뜻이 아닙니다. 현재 검색과 연구
+  기록의 경계는 [PRZ-016 검색 문서 안내](../specs/PRZ-016-search-performance-v2/README.md)를
+  따릅니다.
 
 ## 알려진 한계
 

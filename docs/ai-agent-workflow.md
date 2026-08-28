@@ -13,8 +13,8 @@ code), Flyway 마이그레이션(migration)과 실행 가능한 테스트(test)�
 
 1. **가정과 영향을 먼저 확인한다.** 결과, 보안, 데이터 계약이나 외부 상태를
    바꿀 수 있는 모호함은 선택지와 영향을 밝히고 필요하면 사용자 판단을 구한다.
-2. **요청을 해결하는 최소 변경을 선택한다.** 단일 사용처를 위한 추상화나 아직
-   요청하지 않은 미래 기능을 추가하지 않는다.
+2. **요청을 해결하는 최소 변경을 선택한다.** 단일 사용처를 위한 추상화나 요청
+   범위를 벗어난 기능을 추가하지 않는다.
 3. **관계없는 작업을 보존한다.** 요청과 직접 관계없는 코드, 문서, 포맷, 생성
    파일과 사용자 변경은 수정하지 않는다.
 4. **성공 조건을 먼저 정한다.** 변경 전에 관찰 가능한 완료 조건과 검증 명령을
@@ -91,7 +91,7 @@ INTEGRATE`를 모두 적용한다.
 1. 현재 branch, HEAD, 원격 기준선과 작업 트리 변경
 2. [AGENTS.md](../AGENTS.md), [문서 안내](README.md),
    [현재 구현 현황](project-status.md), [Architecture](architecture.md),
-   [개발 로드맵](roadmap.md), [Spec Registry](../specs/README.md)
+   [PRIZM 제품 범위](roadmap.md), [Spec Registry](../specs/README.md)
 3. 관련 spec·evidence, source, migration, 설정과 test
 4. 배포 범위가 바뀌면 [LICENSE](../LICENSE), [NOTICE](../NOTICE),
    [SBOM 안내](../sbom/README.md)와 machine-readable manifest
@@ -100,7 +100,7 @@ INTEGRATE`를 모두 적용한다.
 
 출력과 Gate:
 
-- 현재 동작과 미구현 경계
+- 현재 동작과 지원·검증 경계
 - 가정, 가능한 선택지와 선택 이유
 - 예상 변경 파일과 건드리지 않을 파일
 - 성공 조건, 검증 환경과 명령
@@ -207,21 +207,20 @@ spec 전용 명령을 추가한다. 적용되지 않는 명령은 자동으로 �
 
 - 정확한 명령, source commit과 실행 환경
 - 성공·실패·오류·건너뜀 수
-- Docker, PostgreSQL, pgvector, Ollama, OpenSQL, OpenProxy와 OpenHA의 실제 사용
-  여부
+- 해당 변경에 실제로 사용한 DB, proxy, 모델과 외부 서비스
 - 실패 또는 skip의 원인과 검증 범위
 - 요구사항별 source·migration·test·환경 결과
 - 실제로 존재하는 Issue·PR·CI URL
 
-PostgreSQL·pgvector 결과를 OpenSQL 결과로 대체하지 않는다. OpenSQL
-single-node 결과를 OpenProxy·OpenHA·DB failover 또는 전체 사용자 흐름으로
-확대하지 않는다. 필요한 환경이 없으면 `NOT_RUN`으로 남긴다.
+PostgreSQL·pgvector 결과를 OpenSQL 결과로 대체하지 않는다. 각 결과는 실제로
+실행한 database, connection path와 사용자 흐름 범위 안에서만 사용한다. 필요한
+환경이 없으면 `NOT_RUN`으로 남긴다.
 
 문서 전용 검증은 최소한 다음을 포함한다.
 
 - Markdown 로컬 링크
 - 명령·파일명·환경 변수의 실제 저장소 대조
-- 구현·미구현·검증 상태의 문서 간 일치
+- source 구현과 검증 상태의 문서 간 일치
 - 후행 공백과 code fence
 - `git diff --check`
 
@@ -244,7 +243,7 @@ Gate:
 - Flyway forward-only와 데이터 호환성
 - 실패 버전·기존 active version·Worker 복구 계약
 - test의 실패·skip·환경 범위
-- 문서의 구현·미구현·OpenSQL 표현
+- 문서의 구현·검증·OpenSQL 표현
 - dependency, license와 배포 경계
 - 관계없는 사용자 변경과 민감정보 포함 여부
 
@@ -322,7 +321,7 @@ Gate:
 | `docs/README.md` | 문서를 추가·이동·이름 변경·보관·삭제하거나 독자 경로가 바뀔 때 |
 | `docs/project-status.md` | source와 실행 근거가 현재 구현·검증 상태를 바꿀 때 |
 | `docs/architecture.md` | 현재 구성 요소, 데이터 흐름 또는 설계 계약이 바뀔 때 |
-| `docs/roadmap.md` | 제품 우선순위와 순서가 바뀔 때 |
+| `docs/roadmap.md` | 현재 제품 범위나 변경 원칙이 바뀔 때 |
 | `specs/PRZ-###/spec.md` | 구현 전 의도·범위·acceptance criteria가 바뀔 때 |
 | `specs/PRZ-###/plan.md`, `tasks.md` | 구현 전 계획과 구현 중 작업 상태·deviation이 바뀔 때 |
 | `specs/PRZ-###/evidence.md` | VERIFY·AUDIT 결과와 실제 GitHub 통합 근거가 생길 때 |
@@ -350,7 +349,7 @@ Gate:
 
 - Markdown 규칙은 기술적으로 작업을 차단하지 않는다. CI, 권한, sandbox와
   review가 별도로 필요하다.
-- test 통과만으로 실제 OpenSQL·OpenProxy·OpenHA 또는 외부 서비스 호환성을
+- test 통과만으로 실행하지 않은 외부 DB, proxy, 모델이나 서비스 호환성을
   증명할 수 없다.
 - `REVIEW_NOT_AVAILABLE_SOLO`는 정직한 절차 기록일 뿐 제3자 review가 아니다.
 - 로컬 Codex skill은 설치한 컴퓨터에서만 동작한다. 저장소 공통 규칙은

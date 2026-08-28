@@ -22,7 +22,8 @@
 
 | 구분 | 내용 |
 |---|---|
-| [개발 기록](../development-log.md) | 주요 변경과 검증을 시간순으로 남긴 개발 기록 |
+| [전체 개발 기록](development-log-full-history.md) | 당시 계획·실험·실패와 판정을 포함해 주요 변경과 검증을 시간순으로 보존한 원문 |
+| [Spec Registry 도입 전 구현 이력](../../specs/000-pre-spec-implementation-history.md) | `e995a5f` source cut까지 source·migration·test로 확인한 구현 순서 |
 | [`experiments/`](experiments/) | 가설, 조건, 결과와 비채택 여부를 남긴 실험 기록 |
 | [`verification/`](verification/) | 특정 날짜·소스·환경에서 수행한 구현·호환성 검증 기록 |
 | [검색 평가 실행 이력](evaluation/search-evaluation-history.md) | 현재 평가 계약에서 분리한 날짜별 검색 평가 결과 |

@@ -161,8 +161,8 @@ JWT를 설정 파일, shell history, 로그나 문서에 저장하지 마세요.
 OpenProxy `:6432/opensql`, Ollama `bge-m3`, 공식 Java MCP Client를 사용해 REST/MCP
 결과 일치와 사용자별·`ACTIVE` 버전 격리를 검증했습니다. 자세한 근거는
 [PRZ-015 검증 기록](../specs/PRZ-015-mcp-career-evidence-search/evidence.md)을
-확인하세요. 이 결과는 단일 서버 구성에만 해당하며 OpenHA나 다중 노드 검증을
-뜻하지 않습니다.
+확인하세요. 이 결과의 범위는 OpenSQL 단일 서버와 OpenProxy single-Primary
+연결 경로입니다.
 
 ## 재현 가능한 새 설치 환경 검증
 
@@ -180,14 +180,13 @@ PRIZM의 핵심 동작을 재현할 때 사용합니다. 과거 두 새 설치 �
 - TXT `TEXT_CHUNK`, PDF `PAGE`와 페이지 번호 검색
 - 브라우저 로그인, 문서 상세, PDF 원문, 검색과 로그아웃
 
-### 이 절차가 확인하지 않는 것
+### 검증 결과를 해석하는 범위
 
-- 이메일 인증, 비밀번호 재설정, refresh token과 OIDC
-- 외부 네트워크에 공개하는 multi-user 운영 구성과 공개 SaaS 보호
-- 이 PostgreSQL 빠른 시작에서 OpenSQL과 Ollama를 함께 사용하는 전체 사용자 흐름
-- 실제 OpenSQL·OpenProxy 단일 서버 환경과 제품 범위에서 제외한 다중 노드 구성
-- 아래 MCP 절차의 실제 OpenSQL·OpenProxy 재검증
-- 구조화된 경력 정보와 포트폴리오 생성
+- 이 절차의 DB 결과는 PostgreSQL 16+pgvector 새 설치 환경에 해당합니다.
+- OpenSQL direct 연결과 OpenProxy single-Primary 결과는 이 절차에서 다시 실행하지
+  않으며 각 PRZ의 기록된 source·환경·명령을 기준으로 확인합니다.
+- MCP 연결 값은 안내하지만, OpenSQL·OpenProxy MCP E2E의 현재 재실행 절차는
+  아닙니다.
 
 PostgreSQL·pgvector 성공을 OpenSQL 성공으로 기록하면 안 됩니다. OpenSQL direct
 `5432` 검증 결과는
@@ -363,8 +362,6 @@ PostgreSQL·pgvector 결과도 OpenSQL 결과가 아닙니다.
 
 - 기본 Compose는 `127.0.0.1`에만 바인딩된 자체 호스팅 환경을 전제로 합니다.
 - 계정과 문서는 브라우저 저장소가 아니라 PostgreSQL과 Docker volume에 저장됩니다.
-- 회원가입에는 이메일 인증, 비밀번호 재설정, 계정 복구와 공개 서비스용 abuse
-  protection이 없습니다.
 - Compose는 Ollama나 `bge-m3`를 설치하지 않습니다. 모델 가중치와 cache도 PRIZM
   배포물에 포함되지 않습니다.
 - 회원가입은 JWT를 발급하지 않습니다. 로그인 뒤 기존 인증과 사용자별 데이터 분리 방식이 적용됩니다.

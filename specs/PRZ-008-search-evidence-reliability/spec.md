@@ -7,6 +7,12 @@
 > **통합:** [PR #40](https://github.com/jaemin-devlog/PRIZM/pull/40), merge `9b24808b37424f2d11ca0afe374d5703c81868fc`
 > **최종 확인:** 2026-08-13
 
+> **역사 기록 안내:** 이 Spec은 검색 개선과 후속 실험의 2026-08-13 snapshot을
+> 보존합니다. 제품에 통합된 범위와 별개로 미완료 연구 Gate가 있어 lifecycle
+> 상태 `IN_PROGRESS`를 그대로 유지합니다. 현재 Production 검색은
+> [PRZ-016 검색 문서 안내](../PRZ-016-search-performance-v2/README.md)와 실제
+> source·test를 먼저 확인합니다. 이 안내는 아래 판정과 실험 이력을 바꾸지 않습니다.
+
 ## 상태
 
 `IN_PROGRESS` — P0–P18과 snippet·완전중복 표시 보정의 구현·평가·전체 회귀가

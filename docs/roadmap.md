@@ -1,52 +1,53 @@
-# PRIZM 제품 범위와 향후 방향
+# PRIZM 제품 범위
 
 > 기준일: 2026-08-27
 
-현재 `main`에 통합된 구현 범위와 일정이 정해지지 않은 장기 방향을 구분합니다. 구현·검증 상태는 [현재 구현 현황](project-status.md), 상세 근거는 [기능별 검증 기록](../specs/README.md)을 기준으로 확인합니다.
+PRIZM은 Spring Boot backend와 React frontend로 실행하는 self-hosted 오픈소스
+커리어 문서 관리·원문 근거 검색 웹 애플리케이션입니다. 이 문서는 미래 기능
+목록을 유지하지 않고 현재 제품 정의와 새 변경을 시작하는 원칙을 고정합니다.
+구현·검증 상태는 [현재 구현 현황](project-status.md), 상세 근거와 lifecycle은
+[기능별 검증 기록](../specs/README.md)을 따릅니다.
 
-## 현재 구현 범위
+## 현재 제품 정의
 
-현재 저장소에는 Spring Boot와 React로 만든 PRIZM 웹 애플리케이션이 있습니다. 다음 흐름을 `main`에 통합했습니다.
+- UTF-8 TXT와 text-layer PDF 원본, SHA-256과 변경 불가능한 문서 버전을 보존합니다.
+- ChangeLog, Dispatcher와 Worker가 추출·문서 분할·Ollama `bge-m3` 임베딩을
+  처리합니다.
+- 처리가 끝난 버전만 `ACTIVE`로 전환하고, 실패하면 기존 `ACTIVE` 버전을
+  유지합니다.
+- 로그인한 사용자의 문서와 현재 `ACTIVE` 버전에서만 관련 원문을 찾고 TXT 구간
+  또는 PDF 페이지를 함께 보여 줍니다.
+- 문서 목록·상세·버전·원문 보기, 사용자 관리형 문서 태그와 채용공고 항목별
+  원문 근거 검색을 제공합니다.
+- `search_career_evidence` MCP 도구는 같은 owner-scoped 검색을 읽기 전용으로
+  재사용합니다.
 
-- TXT/PDF 원본과 변경 불가능한 버전 보존
-- 변경 기록(ChangeLog) 기반 비동기 추출·문서 분할·임베딩
-- 처리가 끝난 버전만 `ACTIVE`로 전환
-- 사용자별 경력 근거 검색과 원문 위치 연결
-- 사용자가 관리하는 문서 태그
-- 채용공고 항목별 근거 검색
-- 문서별 미리보기와 TXT/PDF 원문 보기
-- 기존 검색을 재사용하는 읽기 전용 MCP 도구
-- PostgreSQL·pgvector 로컬 경로와 단일 서버 OpenSQL·OpenProxy 검증 경로
+검색 결과는 경력의 진위, 경험 보유, 채용 요구 충족, 직무 적합도나 합격
+가능성을 판정하지 않습니다. 관련 근거가 없으면 현재 등록된 문서에서 찾지
+못했다고 표시합니다.
 
-최신 통합 범위는 [현재 구현 현황](project-status.md)과 [PRZ Registry](../specs/README.md)에서 확인합니다. 현재 진행 중인 기능 개발 단계는 없습니다.
+## 실행·검증 경계
 
-## 남아 있는 검증 기록
+- 기본 로컬 실행은 PostgreSQL 16+pgvector와 호스트 Ollama를 사용합니다.
+- OpenSQL 근거는 기록된 단일 서버 direct 연결과 OpenProxy single-Primary 경로에
+  한정합니다. PostgreSQL 결과를 OpenSQL 결과로 바꾸어 쓰지 않습니다.
+- 기본 Compose는 loopback에 바인딩된 로컬 self-hosted 개발 구성입니다.
+- 배포물은 Apache-2.0 source-only 범위이며 DB volume, 업로드 원본, 모델 가중치와
+  OpenSQL 공급 자산을 포함하지 않습니다.
 
-PRZ-008과 PRZ-016에는 완료하지 않았거나 채택하지 않은 평가 항목이 남아 있어 목록의 형식 상태를 `IN_PROGRESS`로 보존합니다. 이는 현재 기능 개발이 진행 중이라는 뜻이 아닙니다.
+검색 연구의 lifecycle과 현재 제품 검색은 분리해 읽습니다. PRZ-008·PRZ-016의
+원문 판정과 현재 검색 진입점은
+[검색 연구·평가 기록](../specs/README.md#검색-연구평가-기록)에서 확인합니다.
+역사적 비채택 결정도 [Spec Registry](../specs/README.md#역사적-비채택-결정)에
+원문 상태로 보존합니다.
 
-- PRZ-008의 일부 문서 분할·검색 처리 최적화 검증은 완료되지 않았습니다.
-- PRZ-016의 P15 인증 PDF 페이지 이동은 `NOT_VERIFIED`입니다.
-- PRZ-016 P16 literal candidate 실험은 `NEEDS_ADJUSTMENT`였고 현재 검색에 적용하지 않았습니다.
+## 새 변경을 시작하는 방법
 
-현재 적용된 검색과 알려진 한계는 [PRZ-016 검색 문서 안내](../specs/PRZ-016-search-performance-v2/README.md)에서 확인할 수 있습니다.
+새 제품 변경은 미리 적어 둔 backlog에서 가져오지 않습니다. 실제 필요가 생겼을 때
+Issue로 문제와 사용자 영향을 확인하고, 새 `PRZ-###` Spec에서 범위·비범위·보존
+계약과 검증 방법을 정의합니다. 구현 여부는 source code, 적용된 Flyway migration,
+실행 가능한 test와 필요한 환경 evidence로만 판정합니다.
 
-## 일정이 정해지지 않은 장기 방향
-
-다음 항목은 현재 구현이 아니며 착수 일정도 정하지 않았습니다.
-
-- 원문과 연결된 구조화된 경력 정보
-- 검증된 근거로 만드는 JSON·Markdown 포트폴리오와 원문 출처 목록
-- 교체 가능한 문서 분석기, 분할기, 임베딩, 벡터 DB와 저장소 어댑터
-- `/api/v1`, OpenAPI와 webhook/outbox
-- 독립 실행 가능한 커리어 문서 분석·검색 모듈과 멀티모듈 패키징
-- 기관용 workspace, profile, membership와 권한
-
-새 작업을 시작한다면 소스와 실행 검증으로 범위를 다시 확정합니다. 계획만으로 구현됐다고 표시하지 않습니다.
-
-## 제품 범위에서 제외한 항목
-
-- 다중 OpenSQL DB node와 DB 장애 전환
-- OpenProxy 이중화·VIP
-- 다중 노드 서비스 연속성 보장
-
-검증 대상 OpenSQL 환경을 단일 서버로 고정했으며, PRZ-014에서 다중 노드 구성을 검토 후 거절했습니다.
+문서 설명만으로 기능을 제품 범위에 추가하지 않습니다. 작업을 미루거나 채택하지
+않는 결정은 관련 Spec과 Evidence에 이유와 당시 판정을 남겨 역사 기록으로
+보존합니다.

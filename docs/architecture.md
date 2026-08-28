@@ -7,19 +7,18 @@
 ## 1. 문서 목적과 범위
 
 이 문서는 현재 PRIZM의 구성 요소, 책임, 데이터 흐름, 상태 전이, 실패 복구와
-코드 위치를 한 흐름으로 설명합니다. 지금 저장소는 재사용 가능한 독립 모듈
-패키지가 아닙니다. 현재 구현은 하나의 Spring Boot 애플리케이션과 React 기반
-PRIZM 웹 애플리케이션입니다.
+코드 위치를 한 흐름으로 설명합니다. PRIZM은 하나의 Spring Boot backend와
+React frontend로 실행하는 self-hosted 웹 애플리케이션입니다.
 
 제품 관점에서는 문서 업로드, 변경 기록(ChangeLog) 기반 작업 전달,
 자동 임베딩(텍스트를 검색용 벡터로 변환), 안전한 `ACTIVE` 전환과 사용자별 원문 근거 검색을 연결한 커리어 문서 관리·근거
 검색 도구입니다. 표준 MCP client도 같은 경력 근거 검색을 읽기 전용으로
 호출할 수 있습니다.
 
-장기 목표인 독립 실행 가능한 커리어 문서 분석·검색 모듈과 현재 구현을 구분합니다. 세부 기능의
-구현·검증 상태는 [현재 구현 현황](project-status.md), 제품 범위는
-[제품 범위와 향후 방향](roadmap.md), 설치와 실행 절차는 [로컬 빠른 시작](quickstart.md)을
-따릅니다. 이 문서는 실행 명령이나 날짜별 검증 결과를 반복하지 않습니다.
+세부 기능의 구현·검증 상태는 [현재 구현 현황](project-status.md), 제품 정의와 변경
+원칙은 [PRIZM 제품 범위](roadmap.md), 설치와 실행 절차는
+[로컬 빠른 시작](quickstart.md)을 따릅니다. 이 문서는 실행 명령이나 날짜별 검증
+결과를 반복하지 않습니다.
 
 ## 2. 설계 기준과 핵심 불변식
 
@@ -535,8 +534,8 @@ Ollama 연결, model 미설치, GPU/model 실행, 일반 처리 실패의 allowl
 만들지 않습니다. 사용자는 이어서 기존 로그인 API를 사용합니다. 자동 검증에는
 기본적으로 꺼져 있고 명시적으로 한 번만 켜는 demo `USER` 계정 초기 생성(bootstrap)을 계속
 사용합니다. demo 계정도 일반 로그인, JWT·DB 사용자 재확인과 사용자별
-문서·검색 경로를 그대로 사용합니다. 이메일 인증·계정 복구, 저장 데이터 암호화,
-감사 로그, 기관용 workspace와 외부 인증은 현재 구조에 포함하지 않습니다.
+문서·검색 경로를 그대로 사용합니다. 기본 Compose는 loopback에 바인딩된 로컬
+self-hosted 실행 구성이며 공개 SaaS 운영 구성을 대신하지 않습니다.
 
 근거:
 
@@ -629,15 +628,12 @@ Ollama 연결, model 미설치, GPU/model 실행, 일반 처리 실패의 allowl
 ### OpenSQL 단일 서버
 
 OpenSQL 검증 경로는 단일 서버 구성을 사용합니다. Flyway는 OpenSQL Primary의
-`:5432`에 직접 연결하고 애플리케이션 실행 트래픽은 OpenProxy의 단일 Primary SQL 경로
-`:6432/opensql`을 사용합니다. PostgreSQL과 같은 문서·작업·검색 방식을 유지하지만,
-OpenSQL 공급 자산은 저장소와 기본 Compose에 포함하지 않습니다.
+`:5432`에 직접 연결하고 애플리케이션 실행 트래픽은 OpenProxy single-Primary SQL
+경로 `:6432/opensql`을 사용합니다. PostgreSQL과 같은 문서·작업·검색 방식을
+유지하지만 OpenSQL 공급 자산은 저장소와 기본 Compose에 포함하지 않습니다.
 
-다중 OpenSQL DB node, DB failover, OpenProxy 이중화·VIP와 지속적인 application
-service continuity는 이 구조의 범위가 아닙니다. 영구 journal도 구현하지 않았습니다.
-
-PostgreSQL 테스트 통과는 OpenSQL 결과가 아니며, OpenSQL SQL 검증 통과도 전체
-사용자 흐름이나 고가용성 근거가 아닙니다.
+PostgreSQL 테스트와 OpenSQL 검증은 서로 다른 근거입니다. OpenSQL 결과도 실제로
+기록한 database, 연결 경로, 사용자 흐름과 source revision 범위 안에서만 사용합니다.
 
 근거:
 
@@ -679,28 +675,11 @@ frontend/src/
 전체 파일 목록보다 책임 단위로 먼저 찾고, 각 절의 근거 링크에서 실제 구현으로
 내려가는 것을 권장합니다.
 
-## 14. 현재 미구현·명시적 비범위
-
-다음 항목은 계획된 목표 또는 이후 후보이며 현재 구현으로 보지 않습니다.
-
-- 재사용 가능한 독립 커리어 문서 분석·검색 모듈
-- 구조화된 경력 정보 후보·확인·거절
-- 검증된 경력 정보 기반 포트폴리오 생성
-- ChangeLog 다중 consumer별 전달·중간 상태 기록
-- 기관용 workspace와 멤버십
-- 여러 vector DB·storage adapter
-
-다중 OpenSQL DB node, DB 장애전환, OpenProxy 이중화·VIP와 서비스 연속성 보장은
-명시적 비범위이며 이후 제품 후보로 두지 않습니다.
-
-상세 상태와 제품 범위는 [현재 구현 현황](project-status.md)과
-[제품 범위와 향후 방향](roadmap.md)을 따릅니다.
-
-## 15. 관련 문서
+## 14. 관련 문서
 
 - [현재 구현 현황](project-status.md)
 - [로컬 빠른 시작](quickstart.md)
-- [제품 범위와 향후 방향](roadmap.md)
+- [PRIZM 제품 범위](roadmap.md)
 - [대표 문제 해결 사례](showcase/problem-solving-case-studies.md)
 - [OpenSQL 검증 기록](opensql-gate.md)
 - [기능별 검증 기록](../specs/README.md)

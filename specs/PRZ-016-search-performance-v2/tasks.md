@@ -1,5 +1,8 @@
 # PRZ-016 Search Performance V2 Tasks
 
+> **문서 역할:** 이 파일은 단계별 완료·미완료 검증 체크리스트를 보존한다. 현재 상태의
+> 빠른 확인은 [현재 검색 요약](SEARCH-FINAL-SUMMARY.md)과 [Evidence](evidence.md)를 따른다.
+
 ## P6 Retrieval Architecture Shadow Benchmark
 
 - [x] ORIENT: branch/HEAD/worktree, workflow, architecture/status/roadmap, PRZ-008 P13/P14,

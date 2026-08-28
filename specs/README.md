@@ -4,27 +4,57 @@
 
 Spec은 구현 증거가 아닙니다. 실제 상태는 소스 코드, 적용된 Flyway migration과 실행 가능한 test로 판단합니다.
 
+## Pre-Spec Implementation History
+
+Spec Registry는 2026-07-23 commit `3233bad7`에서 처음 도입됐습니다. 그 직전 source
+cut `e995a5f`까지의 실제 구현 순서는
+[Spec Registry 도입 전 구현 이력](000-pre-spec-implementation-history.md)에서
+확인합니다. 당시 계획·실험·실패와 판정을 포함한 날짜별 원문은
+[전체 개발 기록](../docs/archive/development-log-full-history.md)에 보존합니다.
+
+PRZ-000은 이 구현을 소급 계획으로 꾸미지 않고 `AS_BUILT_BASELINE`으로 기록한
+첫 Registry 기준선입니다.
+
 ## 읽는 방법
 
-1. `spec.md`에서 범위와 반드시 지켜야 할 동작을 확인합니다.
-2. `evidence.md`에서 최종 판정, 소스, 환경과 실행 결과를 확인합니다.
-3. 구현 전 선택과 단계가 필요할 때만 `plan.md`와 `tasks.md`를 읽습니다.
-4. 단계별 문서와 원시 benchmark 결과물은 해당 판정의 상세 근거가 필요할 때만 확인합니다.
+1. Registry 전 구현은 위 Pre-Spec 이력과 PRZ-000을 먼저 확인합니다.
+2. `spec.md`에서 범위와 반드시 지켜야 할 동작을 확인합니다.
+3. `evidence.md`에서 최종 판정, 소스, 환경과 실행 결과를 확인합니다.
+4. 구현 전 선택과 단계가 필요할 때만 `plan.md`와 `tasks.md`를 읽습니다.
+5. 단계별 문서와 원시 benchmark 결과물은 해당 판정의 상세 근거가 필요할 때만 확인합니다.
 
 PRZ-019는 구현·자동 검사·사용자 브라우저 확인과 GitHub 통합을 마쳤습니다.
 PRZ-008과 PRZ-016의 `IN_PROGRESS`는 필수 검증 항목이 모두 끝나지 않았다는 형식
 상태이며, 현재 진행 중인 개발을 뜻하지 않습니다.
 
-## 현재 상태 요약
+## 현재 제품에 통합된 기능
 
-| 구분 | PRZ | 의미 |
+| 구분 | PRZ | 현재 제품과의 관계 |
 |---|---|---|
-| 현재 제품 기준에 통합 | 001–007, 009–013, 015–018 | 016의 현재 적용 검색을 포함하며 형식 상태는 아래 목록에서 별도 표시 |
-| 목록 도입 전 기준 | 000 | Spec 목록 도입 전 구현을 `AS_BUILT_BASELINE`으로 기록 |
-| 미완료 검증 보존 | 008, 016 | 현재 제품 기준과 별개로 완료하지 않거나 채택하지 않은 평가가 있음 |
-| 검토 후 거절 | 014 | 검증 범위를 단일 서버로 확정해 OpenHA 다중 노드 구성을 채택하지 않음 |
+| Registry 도입 전 제품 기준 | [000](PRZ-000-platform-baseline/spec.md) | source cut `e995a5f`를 `AS_BUILT_BASELINE`으로 기록 |
+| 현재 제품에 통합 | 001–007, 009–013, 015, 017–019 | 각 기능의 현재 lifecycle과 source는 아래 ledger에서 확인 |
+| 현재 Production 검색 | [016 현재 검색 문서](PRZ-016-search-performance-v2/README.md) | 현재 source·test 진입점과 연구 lifecycle을 분리해 안내 |
 
-## 전체 목록
+## 검색 연구·평가 기록
+
+| 기록 | Lifecycle 상태 | 현재 제품과의 관계 |
+|---|---|---|
+| [PRZ-008 검색 근거 신뢰성](PRZ-008-search-evidence-reliability/spec.md) | `IN_PROGRESS` | 통합된 검색 개선과 미완료 최적화 연구 Gate를 함께 보존 |
+| [PRZ-016 Search Performance V2](PRZ-016-search-performance-v2/README.md) | `IN_PROGRESS` | 현재 검색 source와 `FAIL`·`NO_GO`·`NOT_VERIFIED`·`NEEDS_ADJUSTMENT` 연구 판정을 분리해 안내 |
+
+이 lifecycle 상태는 현재 제품 검색 source가 없거나 기능 개발이 진행 중이라는 뜻이
+아닙니다. 현재 동작은 실제 source·test와 각 current 문서를 우선합니다.
+
+## 역사적 비채택 결정
+
+- [PRZ-014 인프라 topology 검토](PRZ-014-openha-topology-gate/spec.md) —
+  lifecycle `REJECTED`. 당시 탐색, `PASS`·`NOT_RUN`과 rollback을 보존하며 현재
+  제품 변경 후보로 해석하지 않습니다.
+
+## 전체 lifecycle ledger
+
+아래 표는 모든 PRZ의 원문 lifecycle 상태와 source·통합 근거를 보존합니다. 위의
+제품·연구·비채택 navigation은 이 판정을 바꾸지 않습니다.
 
 | ID | 이름 | 상태 | 기준 소스 / 통합 |
 |---|---|---|---|
@@ -44,7 +74,7 @@ PRZ-008과 PRZ-016의 `IN_PROGRESS`는 필수 검증 항목이 모두 끝나지 
 | [PRZ-013](PRZ-013-openproxy-single-primary-gate/spec.md) | OpenProxy 단일 Primary 검증 | `VERIFIED` | `a65f91d` |
 | [PRZ-014](PRZ-014-openha-topology-gate/spec.md) | OpenHA topology 검토 | `REJECTED` | Single-only 범위로 확정 |
 | [PRZ-015](PRZ-015-mcp-career-evidence-search/spec.md) | 읽기 전용 MCP 검색 | `VERIFIED` | `97c01cb`, [PR #46](https://github.com/jaemin-devlog/PRIZM/pull/46), 병합 `23166e7` |
-| [PRZ-016](PRZ-016-search-performance-v2/spec.md) | Search Performance V2 | `IN_PROGRESS` | 현재 적용 검색 [PR #50](https://github.com/jaemin-devlog/PRIZM/pull/50), 병합 `3cfe9dc`; P15 `NOT_VERIFIED`, P16 미채택 |
+| [PRZ-016](PRZ-016-search-performance-v2/README.md) | Search Performance V2 | `IN_PROGRESS` | 당시 통합 [PR #50](https://github.com/jaemin-devlog/PRIZM/pull/50), 병합 `3cfe9dc`; 현재 구조는 패키지 안내, P15 `NOT_VERIFIED`, P16 미채택 |
 | [PRZ-017](PRZ-017-job-posting-evidence-v1/spec.md) | 채용공고 항목별 근거 검색 V1 | `VERIFIED` | `94715cf`, [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53), 병합 `b78ec42` |
 | [PRZ-018](PRZ-018-document-detail-page/spec.md) | 문서 상세 미리보기 페이지 | `VERIFIED` | `186be99`, [PR #56](https://github.com/jaemin-devlog/PRIZM/pull/56), 병합 `a9ca679` |
 | [PRZ-019](PRZ-019-document-usability-fixes/spec.md) | 태그 문서 수 명확화와 TXT 원문 미리보기 | `VERIFIED` | `4932aa8`, [PR #60](https://github.com/jaemin-devlog/PRIZM/pull/60), 병합 `01d6c46` |

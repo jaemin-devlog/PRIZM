@@ -1,5 +1,8 @@
 # PRZ-016 Search Performance V2 Plan
 
+> **문서 역할:** 이 파일은 P6 이후 단계별 실행 계획과 비채택 선택지를 보존한다.
+> 현재 채택된 제품 흐름은 [현재 검색 아키텍처](SEARCH-FINAL-ARCHITECTURE.md)를 따른다.
+
 ## P6 Retrieval Architecture Shadow Benchmark
 
 ### 변경 경계

@@ -8,7 +8,8 @@ PRIZM은 이력서·포트폴리오 같은 커리어 문서를 업로드하면 �
 
 경력 기록은 이력서, 경력기술서, 포트폴리오처럼 여러 문서에 흩어져 있고 같은 문서도 버전별로 쌓입니다. 필요한 내용을 찾더라도 어느 문서의 어느 위치에서 나온 정보인지 다시 확인하기 어렵습니다. PRIZM은 원본과 문서 버전을 보존하면서 내용을 검색할 수 있게 정리하고, 관련 원문을 TXT 구간이나 PDF 페이지와 함께 보여 줍니다. 검색 결과는 등록한 문서의 원문에서만 찾으며, 문서에 없는 경력이나 성과를 만들지 않습니다. 관련 근거를 찾지 못하면 결과 없음으로 표시합니다.
 
-현재 저장소에는 Spring Boot와 React로 만든 **PRIZM 웹 애플리케이션**이 들어 있습니다. 독립 실행 가능한 커리어 문서 분석·검색 모듈, 구조화된 경력 정보와 포트폴리오 생성은 아직 구현되지 않았습니다.
+현재 저장소에는 Spring Boot backend와 React frontend로 실행하는 self-hosted
+**PRIZM 웹 애플리케이션**이 들어 있습니다.
 
 ## 주요 기능
 
@@ -85,7 +86,7 @@ PRIZM은 사용자의 현재 문서에서 질문과 관련된 원문을 찾고, 
 - 채용 요구사항 충족 여부
 - 직무 적합도나 합격 가능성
 
-검색의 현재 동작과 알려진 한계는 [현재 구현 현황](docs/project-status.md)과 [검색 최종 요약](specs/PRZ-016-search-performance-v2/SEARCH-FINAL-SUMMARY.md)을 확인하세요.
+검색의 현재 동작과 알려진 한계는 [현재 구현 현황](docs/project-status.md)과 [PRZ-016 검색 문서 안내](specs/PRZ-016-search-performance-v2/README.md)를 확인하세요.
 
 ## 채용공고 항목별 근거 검색
 
@@ -102,7 +103,10 @@ MCP는 별도 검색 정책을 두지 않고 기존 경력 근거 검색을 읽�
 
 ## OpenSQL 검증
 
-로컬 빠른 시작은 PostgreSQL·pgvector를 사용합니다. OpenSQL 단일 서버 검증 환경에서는 Flyway를 OpenSQL에 직접 연결하고, 애플리케이션 트래픽은 OpenProxy의 단일 Primary 경로로 실행했습니다. OpenSQL 자산은 저장소에 포함하지 않으며 다중 노드 OpenHA, DB 장애 전환과 OpenProxy 이중화는 제품 범위가 아닙니다. 상세 근거는 [OpenSQL 검증 기록](docs/opensql-gate.md)에서 확인할 수 있습니다.
+로컬 빠른 시작은 PostgreSQL·pgvector를 사용합니다. 별도 OpenSQL 검증은 단일 서버
+direct 연결과 OpenProxy single-Primary 경로에서 수행했습니다. OpenSQL 자산은 저장소에
+포함하지 않으며, 정확한 환경·연결 경로와 결과는
+[OpenSQL 검증 기록](docs/opensql-gate.md)에서 확인할 수 있습니다.
 
 ## 문서 안내
 

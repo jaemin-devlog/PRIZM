@@ -1,5 +1,8 @@
 # PRZ-016 Search Performance V2 Evidence
 
+> **문서 역할:** benchmark 수치와 당시 판정을 소급 변경하지 않고 보존한다. 현재 제품
+> 검색 구조는 [현재 검색 아키텍처](SEARCH-FINAL-ARCHITECTURE.md)를 따른다.
+
 관리 구조 정리일: 2026-08-14
 
 ## 역사 보존

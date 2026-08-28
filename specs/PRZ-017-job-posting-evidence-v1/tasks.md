@@ -58,7 +58,7 @@
 - [x] 500자 이하 무손실 분할과 최대 100개 Search fan-out 상한 구현
 - [x] segmentation endpoint를 활성 `ROLE_USER` 경계에 추가
 - [x] 입력·분리·checkbox·전체 선택/해제·선택 수·재수정 UX 구현
-- [x] 선택 항목별 기존 Career Evidence Search orchestration 구현
+- [x] 선택 항목별 기존 경력 근거 검색 호출 흐름 구현
 - [x] 항목별 Evidence/empty/error와 재시도 UI 구현
 - [x] 기존 PDF page/TXT document detail 이동 연결
 - [x] 금지된 판정·score UI와 Qwen/LLM Production 참조 0 확인
@@ -90,6 +90,8 @@
 - [x] PRZ-016 Search Production·PRZ-009·기존 주석·unrelated·stash 보호
 
 ### 2026-08-26 개인 문서 원문 일치 안정화 (historical checkpoint)
+
+> 이 절은 최종 수정 전의 과거 체크포인트다. 현재 최종 판정은 [Evidence 상단](evidence.md#현재-판정)의 `VERIFIED`를 따른다.
 
 - [x] frontend PRZ-017 focused unit/component 33/33 `PASS`
 - [x] backend segmentation focused 43/43 `PASS`

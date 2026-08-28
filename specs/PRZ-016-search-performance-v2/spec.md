@@ -1,10 +1,15 @@
 # PRZ-016: Search Performance V2
 
+> **문서 역할:** 현재 보존 계약과 PRZ-016의 단계별 연구 계약을 함께 유지한다.
+> 현재 제품 호출 순서는 [현재 검색 아키텍처](SEARCH-FINAL-ARCHITECTURE.md), 짧은
+> 상태 요약은 [현재 검색 요약](SEARCH-FINAL-SUMMARY.md)을 우선한다.
+
 - 상태: `IN_PROGRESS`
-- 통합: P9–P15는 [PR #48](https://github.com/jaemin-devlog/PRIZM/pull/48) merge
-  `154b9c8fa99f0d4391bbdece7cfd0d9fb468dd55`, 최종 제품 기준선은
+- 역사적 통합: P9–P15는 [PR #48](https://github.com/jaemin-devlog/PRIZM/pull/48) merge
+  `154b9c8fa99f0d4391bbdece7cfd0d9fb468dd55`, 당시 제품 기준선은
   [PR #50](https://github.com/jaemin-devlog/PRIZM/pull/50) merge
-  `3cfe9dc06938d85cd32a5d35ce38669099c00cef`로 `main`에 통합
+  `3cfe9dc06938d85cd32a5d35ce38669099c00cef`로 `main`에 통합됐다. 이후 변경을 포함한
+  현재 구현은 위 현재 문서와 실제 `src/main`을 따른다.
 - 현재 제한: P15 인증된 PDF 페이지 이동은 `NOT_VERIFIED`이며, 이 문서는 이를 `VERIFIED`로
   표현하지 않는다. P16 실험은 `NEEDS_ADJUSTMENT`로 Production 검색에 적용하지 않았다.
 - 목표: PRIZM 커리어 근거 검색의 retrieval, ranking, query understanding과 evidence

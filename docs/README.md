@@ -19,11 +19,11 @@
 |---|---|---|
 | 실행 | [빠른 시작](quickstart.md) | PostgreSQL·pgvector 기반 로컬 실행과 MCP 연결 |
 | 구조 | [아키텍처](architecture.md) | 인증, 문서 버전, 자동 문서 처리, 검색, MCP와 복구 방식 |
-| 현재 상태 | [현재 구현 현황](project-status.md) | 구현된 기능, 검증된 환경, 미구현 기능과 제외 범위 |
+| 현재 상태 | [현재 구현 현황](project-status.md) | 구현된 기능, 검증된 환경과 지원 경계 |
 | OpenSQL | [OpenSQL 검증 기록](opensql-gate.md) | 단일 서버 OpenSQL·OpenProxy 검증 범위 |
 | 검색 품질 | [검색 평가](evaluation/search-evaluation.md) | 검색 평가 방법과 지표 해석 |
 | 설계 사례 | [문제 해결 사례](showcase/problem-solving-case-studies.md) | 주요 설계 판단과 장단점 |
-| 제품 방향 | [제품 범위와 향후 방향](roadmap.md) | 현재 구현 범위와 일정이 정해지지 않은 장기 방향 |
+| 제품 범위 | [PRIZM 제품 범위](roadmap.md) | 현재 제품 정의와 새 변경을 시작하는 원칙 |
 | 상세 근거 | [기능별 검증 기록](../specs/README.md) | PRZ별 Spec, 계획과 검증 기록 안내 |
 | 라이선스 | [SBOM 안내](../sbom/README.md) | 구성 요소, 모델, checksum과 재배포 범위 |
 
@@ -32,9 +32,12 @@
 다음 문서는 일반 사용자가 제품을 이해하거나 실행하는 데 필요하지 않습니다. 운영 또는 추적성이 필요할 때만 확인합니다.
 
 - [유지관리자와 AI 에이전트 작업 절차](ai-agent-workflow.md) — 복잡한 변경을 위한 선택적 상세 절차. 일반 기여의 필수 문서가 아님
-- [개발 기록](development-log.md) — 주요 변경과 설계 판단 기록
+- [Spec Registry 도입 전 구현 이력](../specs/000-pre-spec-implementation-history.md) —
+  2026-07-11부터 Registry 기준선까지 source로 확인한 구현 순서
+- [전체 개발 기록](archive/development-log-full-history.md) — 당시 계획·실험·실패와
+  판정을 포함한 날짜별 원문 기록
 - [OpenSQL VM 재현 절차](lab-opensql-vm-runbook.md) — OpenSQL 검증 환경을 재현하는 유지관리자용 절차
-- [`archive/`](archive/) — 종료된 실험과 초기 검증 기록
+- [보관 문서 안내](archive/README.md) — 종료된 실험, 초기 검증과 전체 개발 기록
 
 ## 상태 표기
 

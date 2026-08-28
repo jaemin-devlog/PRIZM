@@ -200,14 +200,12 @@ Health:   http://localhost:8080/actuator/health
 
 ```text
 OpenSQL Single only
-OpenHA 사용 안 함
-Replica 없음
-Witness 없음
-자동 failover 검증 안 함
+OpenProxy single-Primary
 ```
 
-PRZ-014의 다중 노드 OpenHA 시도는 `REJECTED`입니다. Replica, Witness, etcd cluster
-확장, DB failover와 OpenProxy 이중화는 이 Runbook의 복구 대상이 아닙니다.
+이 Runbook은 아래에 적힌 단일 VM·Primary·proxy 경로만 복구합니다. 역사적 인프라
+탐색과 `REJECTED` 판정은 [PRZ-014](../specs/PRZ-014-openha-topology-gate/spec.md)에
+별도로 보존합니다.
 
 ```text
 Windows Host
@@ -230,8 +228,8 @@ Ollama
 → 1024 dimensions
 ```
 
-PostgreSQL·pgvector 환경의 성공을 OpenSQL 증거로 사용하지 않고, OpenSQL Single의
-성공을 OpenHA나 failover 증거로 확대하지 않습니다.
+PostgreSQL·pgvector 환경의 성공을 OpenSQL 증거로 사용하지 않고, 이 단일 경로의
+성공을 실행하지 않은 topology의 증거로 확대하지 않습니다.
 
 ## 3. VM 정보
 
@@ -966,9 +964,7 @@ OpenSQL 재설치 금지
 DB 전체 초기화 금지
 실제 prizm DB 삭제 금지
 
-OpenHA 구성 금지
-Replica/Witness 생성 금지
-etcd cluster 확장 금지
+현재 목록에 없는 DB·etcd member 생성 금지
 
 prizm_owner superuser 승격 금지
 prizm_app 권한 확대 금지
@@ -1035,7 +1031,7 @@ OpenProxy runtime URL의 /opensql을
 관련 세부 근거:
 
 - [PRZ-003 OpenSQL single-node Evidence](../specs/PRZ-003-opensql-single-node-gate/evidence.md)
-- [PRZ-014 OpenHA 시도 거절 기록](../specs/PRZ-014-openha-topology-gate/spec.md)
+- [PRZ-014 비채택 인프라 탐색 기록](../specs/PRZ-014-openha-topology-gate/spec.md)
 - [환경 변수 예제](../.env.example)
 - [OpenSQL profile](../src/main/resources/application-opensql.yml)
 - [공통 application 설정](../src/main/resources/application.yml)

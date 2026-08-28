@@ -2,9 +2,9 @@
 
 > 기준일: 2026-08-28
 >
-> 통합 기준선: `origin/main` `332c093`
+> 통합 기준선: `origin/main` `adb033b`
 >
-> 현재 작업: PRZ-020 branch 검증 완료. 아직 `main`에 통합되지 않음
+> 현재 작업: PRZ-020은 [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b`로 `main`에 통합됨
 
 현재 상태는 소스 코드, 적용된 Flyway migration과 실행 가능한 test를 기준으로 판단합니다. Spec과 이 문서는 구현 증거를 대신하지 않습니다.
 
@@ -112,7 +112,7 @@
 | 문서 상세 미리보기 페이지 | `VERIFIED` | PRZ-018, [PR #56](https://github.com/jaemin-devlog/PRIZM/pull/56), 병합 `a9ca679` |
 | 채용공고 근거 보기 동작 통일 | 통합됨 | [PR #58](https://github.com/jaemin-devlog/PRIZM/pull/58), 병합 `12acb3a` |
 | 태그 연결 문서 수·TXT 미리보기·TXT/PDF 원문 보기 | `VERIFIED` | PRZ-019, [PR #60](https://github.com/jaemin-devlog/PRIZM/pull/60), 병합 `01d6c46` |
-| 인증 초기화 제거와 단일 `USER` 역할 전환 | branch `VERIFIED` | PRZ-020. 아직 `main` 통합 전 |
+| 인증 초기화 제거와 단일 `USER` 역할 전환 | `VERIFIED` | PRZ-020, [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b` |
 
 PostgreSQL 성공은 OpenSQL 증거가 아닙니다. OpenSQL·OpenProxy 결과는 기록된 단일
 서버 direct 연결과 single-Primary 실행 경로에 한정합니다. 명령, 환경과 수치는

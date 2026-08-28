@@ -4,7 +4,7 @@
 > **기준선:** `332c0930d6dc3b9ae656b299f62832eb2ecf446e`
 > **검증 대상:** 기준선에서 시작한 로컬 미커밋 `PRZ-020-auth-bootstrap-cleanup` 작업 트리
 > **검증일:** 2026-08-28
-> **통합 상태:** branch 검증 완료, `main` 통합 전
+> **통합 상태:** `main` 통합 완료 ([PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b`)
 
 ## ORIENT와 역할 Gate
 
@@ -116,10 +116,18 @@ bootstrap 변수에 의존하는 참조는 없다.
 ## INTEGRATE 경계와 판정
 
 이 Evidence의 VERIFY·AUDIT는 `main` 통합 전에 완료했다. commit, PR, CI와 merge 상태는
-실제 GitHub 기록을 기준으로 하며, `main` 병합 뒤 Registry에 통합 근거를 반영한다.
-branch VERIFY·AUDIT 판정은 다음과 같다.
+실제 GitHub 기록을 기준으로 한다. 당시 branch VERIFY·AUDIT 판정은 다음과 같다.
 
 `AUTH_BOOTSTRAP_CLEANUP_READY`
+
+### GitHub 통합 결과
+
+- implementation commit: `831b2bb5b0285ea15a1c2f0369e0c1412649e354`
+- PR: [#62 — PRZ-020: 인증 초기화 흐름 단순화](https://github.com/jaemin-devlog/PRIZM/pull/62)
+- merge commit: `adb033b185a2eebcb637946a612db3b121e6a5ac`
+- merged at: 2026-08-28
+- main integration: `COMPLETE`
+- final lifecycle: `VERIFIED`
 
 필수 PostgreSQL·clean-clone·frontend·tracked backend 검증과 보안·migration 감사가
 통과했다. OpenSQL `NOT_RUN`과 host·ignored artifact 한계는 위 범위를 넘어 주장하지

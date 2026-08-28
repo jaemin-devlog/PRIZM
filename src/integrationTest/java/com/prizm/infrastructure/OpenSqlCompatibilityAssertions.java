@@ -45,13 +45,13 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 final class OpenSqlCompatibilityAssertions {
 
-    private static final int EXPECTED_MIGRATION_COUNT = 16;
+    private static final int EXPECTED_MIGRATION_COUNT = 17;
     private static final Duration LEASE_DURATION = Duration.ofSeconds(30);
     private static final List<String> DOMAIN_TABLES = List.of(
             "users", "documents", "document_versions", "document_chunks",
             "processing_jobs", "file_cleanup_jobs", "document_change_logs", "document_tags");
-    private static final Pattern MIGRATION_FILE_PATTERN = Pattern.compile("(?i)\\bV(1[0-6]|[1-9])(?:__|\\b)");
-    private static final Pattern MIGRATION_VERSION_PATTERN = Pattern.compile("(?i)\\bversion\\s+['\"]?(1[0-6]|[1-9])\\b");
+    private static final Pattern MIGRATION_FILE_PATTERN = Pattern.compile("(?i)\\bV(1[0-7]|[1-9])(?:__|\\b)");
+    private static final Pattern MIGRATION_VERSION_PATTERN = Pattern.compile("(?i)\\bversion\\s+['\"]?(1[0-7]|[1-9])\\b");
 
     private OpenSqlCompatibilityAssertions() {
     }
@@ -148,10 +148,10 @@ final class OpenSqlCompatibilityAssertions {
                     .cleanDisabled(true)
                     .load();
             MigrateResult latestMigration = latestFlyway.migrate();
-            assertThat(latestMigration.migrationsExecuted).isEqualTo(3);
+            assertThat(latestMigration.migrationsExecuted).isEqualTo(4);
             assertSuccessfulMigrationVersions(flywayJdbc, EXPECTED_MIGRATION_COUNT);
             assertThat(latestFlyway.info().current()).isNotNull();
-            assertThat(latestFlyway.info().current().getVersion().getVersion()).isEqualTo("16");
+            assertThat(latestFlyway.info().current().getVersion().getVersion()).isEqualTo("17");
             assertPreV14ProcessingFixturePreserved(flywayJdbc, preV14Fixture);
 
             MigrateResult secondMigration = latestFlyway.migrate();
@@ -423,6 +423,7 @@ final class OpenSqlCompatibilityAssertions {
                 "uq_document_change_logs_version_event",
                 "uq_document_change_logs_processing_job"));
         assertConstraints(jdbcTemplate, "c", List.of(
+                "ck_users_role",
                 "ck_document_versions_status",
                 "ck_processing_jobs_status",
                 "ck_processing_jobs_claim_version",
@@ -1308,7 +1309,8 @@ final class OpenSqlCompatibilityAssertions {
             case "14" -> "ChangeLog table, CHECK/unique/composite foreign keys and claim indexes";
             case "15" -> "processing progress columns and CHECK constraints";
             case "16" -> "document tags, owner-scoped user tags and SYSTEM seed data";
-            default -> "V1-V16 Flyway SQL";
+            case "17" -> "legacy SYSTEM_ADMIN deactivation and USER-only role CHECK";
+            default -> "V1-V17 Flyway SQL";
         };
     }
 

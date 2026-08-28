@@ -1,4 +1,4 @@
-package com.prizm.auth.bootstrap;
+package com.prizm.auth.security;
 
 import java.nio.charset.StandardCharsets;
 import org.springframework.security.crypto.password.PasswordEncoder;

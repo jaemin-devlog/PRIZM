@@ -1,10 +1,10 @@
 package com.prizm.auth.service;
 
-import com.prizm.auth.bootstrap.BcryptPasswordPolicy;
 import com.prizm.auth.dto.request.LoginRequest;
 import com.prizm.auth.dto.response.AuthenticatedUserResponse;
 import com.prizm.auth.dto.response.LoginResponse;
 import com.prizm.auth.exception.InvalidCredentialsException;
+import com.prizm.auth.security.BcryptPasswordPolicy;
 import com.prizm.user.entity.UserAccount;
 import com.prizm.user.entity.UserRole;
 import com.prizm.user.repository.UserAccountRepository;

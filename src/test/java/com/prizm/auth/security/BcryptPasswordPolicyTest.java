@@ -1,4 +1,4 @@
-package com.prizm.auth.bootstrap;
+package com.prizm.auth.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

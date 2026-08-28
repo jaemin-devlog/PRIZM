@@ -16,7 +16,7 @@
 - 소유자를 알 수 없는 legacy 문서를 임의 사용자에게 귀속하지 않고 migration을 중단한다.
 - 목록·상세·관리 API는 owner-scoped repository를 사용한다.
 - 벡터 검색 SQL은 거리 계산 후보 단계에서 document·version·chunk owner, ACTIVE 상태와 `active_version_id`를 함께 검사한다.
-- `SYSTEM_ADMIN`은 개인 문서·검색 API를 사용할 수 없도록 역할 경계를 유지한다.
+- 현재 제품 역할은 `USER` 하나이며 개인 문서·검색 API에 역할 기반 우회 권한을 두지 않는다.
 
 ### 검증과 트레이드오프
 

@@ -63,7 +63,8 @@ if (Test-Path -LiteralPath .env) { throw '.env already exists' }
 Copy-Item .env.example .env
 ```
 
-`.env`의 JWT와 DB 비밀값을 바꾼 뒤 Ollama 모델과 PRIZM을 실행합니다.
+`.env`의 JWT와 DB 비밀값을 바꾼 뒤 Ollama 모델과 PRIZM을 실행합니다. 이 값들은
+서버와 DB가 사용하는 비밀값이며, 브라우저에서 가입할 이메일·비밀번호가 아닙니다.
 
 ```powershell
 ollama pull bge-m3

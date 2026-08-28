@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto'
-import { chmodSync, existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
@@ -75,7 +75,7 @@ function resolvePorts(content, overrides) {
   return ports
 }
 
-export function prepareDemoEnvironment({
+export function prepareCleanCloneEnvironment({
   examplePath = defaultExamplePath,
   envPath = defaultEnvPath,
   projectName,
@@ -104,9 +104,6 @@ export function prepareDemoEnvironment({
   content = replaceRequiredValue(content, 'PRIZM_JWT_SECRET', generatedSecret(randomBytesFunction, 48))
   content = replaceRequiredValue(content, 'PRIZM_DB_PASSWORD', generatedSecret(randomBytesFunction))
   content = replaceRequiredValue(content, 'PRIZM_FLYWAY_PASSWORD', generatedSecret(randomBytesFunction))
-  content = replaceRequiredValue(content, 'PRIZM_BOOTSTRAP_DEMO_USER_ENABLED', 'true')
-  content = replaceRequiredValue(content, 'PRIZM_BOOTSTRAP_DEMO_USER_EMAIL', 'demo@prizm.local')
-  content = replaceRequiredValue(content, 'PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD', generatedSecret(randomBytesFunction))
 
   writeFileSync(envPath, content, {
     encoding: 'utf8',
@@ -117,26 +114,10 @@ export function prepareDemoEnvironment({
   return Object.freeze({ envPath, projectName: selectedProjectName, ports: Object.freeze(ports) })
 }
 
-export function disableDemoBootstrap(envPath = defaultEnvPath) {
-  const content = readFileSync(envPath, 'utf8')
-  const enabled = requiredValue(content, 'PRIZM_BOOTSTRAP_DEMO_USER_ENABLED').trim().toLowerCase()
-  if (!['true', 'false'].includes(enabled)) {
-    throw new Error('PRIZM_BOOTSTRAP_DEMO_USER_ENABLED must be true or false')
-  }
-  const updated = replaceRequiredValue(content, 'PRIZM_BOOTSTRAP_DEMO_USER_ENABLED', 'false')
-  writeFileSync(envPath, updated, { encoding: 'utf8', flag: 'w', mode: 0o600 })
-  if (process.platform !== 'win32') chmodSync(envPath, 0o600)
-  return envPath
-}
-
 export function parsePrepareArguments(args) {
   const options = { portOverrides: {} }
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index]
-    if (argument === '--disable-bootstrap') {
-      if (args.length !== 1) throw new Error('--disable-bootstrap cannot be combined with other options')
-      return Object.freeze({ disableBootstrap: true })
-    }
     const value = args[index + 1]
     if (!value) throw new Error(`${argument} requires a value`)
     if (argument === '--project-name') options.projectName = validateComposeProjectName(value)
@@ -155,15 +136,10 @@ const isMain = process.argv[1]
 if (isMain) {
   try {
     const options = parsePrepareArguments(process.argv.slice(2))
-    if (options.disableBootstrap) {
-      disableDemoBootstrap()
-      console.log('Disabled the one-time demo USER bootstrap in the ignored .env file.')
-    } else {
-      const result = prepareDemoEnvironment(options)
-      console.log(`Prepared an ignored .env for Compose project ${result.projectName}.`)
-      console.log(`Host ports: database ${result.ports.db}, backend ${result.ports.backend}, frontend ${result.ports.frontend}.`)
-      console.log('Generated secrets were not printed. Start the bootstrap run only once.')
-    }
+    const result = prepareCleanCloneEnvironment(options)
+    console.log(`Prepared an ignored .env for Compose project ${result.projectName}.`)
+    console.log(`Host ports: database ${result.ports.db}, backend ${result.ports.backend}, frontend ${result.ports.frontend}.`)
+    console.log('Generated server and database secrets were not printed.')
   } catch (error) {
     console.error(error instanceof Error ? error.message : 'Failed to prepare the clean-clone environment')
     process.exitCode = 1

@@ -2,7 +2,7 @@
 
 > 기준일: 2026-08-28
 >
-> 통합 기준선: `origin/main` `adb033b`
+> PRZ-020 기능 통합 근거: [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b`
 >
 > 현재 작업: PRZ-020은 [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b`로 `main`에 통합됨
 

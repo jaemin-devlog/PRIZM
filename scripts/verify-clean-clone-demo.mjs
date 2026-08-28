@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto'
+import { createHash, randomBytes } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { basename, dirname, isAbsolute, relative, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -13,9 +13,6 @@ const VERIFIER_SHELL_OVERRIDE_KEYS = new Set([
   'COMPOSE_PROJECT_NAME',
   'SERVER_PORT',
   'PRIZM_FRONTEND_PORT',
-  'PRIZM_BOOTSTRAP_DEMO_USER_ENABLED',
-  'PRIZM_BOOTSTRAP_DEMO_USER_EMAIL',
-  'PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD',
   'PRIZM_DEMO_BASE_URL',
   'PRIZM_OLLAMA_BASE_URL',
   'PRIZM_COMPOSE_OLLAMA_BASE_URL',
@@ -57,16 +54,12 @@ export function normalizeLoopbackBaseUrl(value) {
     || (url.pathname !== '' && url.pathname !== '/')
     || url.search !== ''
     || url.hash !== '') {
-    throw new Error('Demo verification only accepts a credential-free loopback HTTP(S) origin')
+    throw new Error('Clean-clone verification only accepts a credential-free loopback HTTP(S) origin')
   }
   return url.origin
 }
 
-function utf8Length(value) {
-  return Buffer.byteLength(value, 'utf8')
-}
-
-export function readDemoConfiguration(
+export function readCleanCloneConfiguration(
   envFile = resolve(repositoryRoot, '.env'),
   environment = process.env,
 ) {
@@ -75,25 +68,31 @@ export function readDemoConfiguration(
     .map((key) => key.toUpperCase())
     .filter((key) => VERIFIER_SHELL_OVERRIDE_KEYS.has(key)))].sort()
   if (conflictingKeys.length > 0) {
-    throw new Error(`Demo verification does not accept shell overrides: ${conflictingKeys.join(', ')}`)
+    throw new Error(`Clean-clone verification does not accept shell overrides: ${conflictingKeys.join(', ')}`)
   }
   const value = (key, fallback = '') => fileValues[key] ?? fallback
-  const email = value('PRIZM_BOOTSTRAP_DEMO_USER_EMAIL').trim().toLowerCase()
-  const password = value('PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD')
-  const enabled = value('PRIZM_BOOTSTRAP_DEMO_USER_ENABLED', 'false').trim().toLowerCase()
-  if (email === '') throw new Error('PRIZM_BOOTSTRAP_DEMO_USER_EMAIL is required')
-  if (password.length < 12 || utf8Length(password) > 72) {
-    throw new Error('Demo password must contain at least 12 characters and at most 72 UTF-8 bytes')
-  }
-  if (enabled !== 'false') {
-    throw new Error('Disable the one-time demo bootstrap and recreate the backend before smoke verification')
-  }
-
   const configuredBaseUrl = value('PRIZM_DEMO_BASE_URL')
   const baseUrl = normalizeLoopbackBaseUrl(
     configuredBaseUrl || `http://127.0.0.1:${value('SERVER_PORT', '8080')}`,
   )
-  return Object.freeze({ email, password, baseUrl, bootstrapEnabled: false })
+  return Object.freeze({ baseUrl })
+}
+
+function secureRandomValue(randomBytesFunction, bytes) {
+  const value = randomBytesFunction(bytes)
+  if (!Buffer.isBuffer(value) || value.length !== bytes) {
+    throw new Error('The secure random source returned an invalid value')
+  }
+  return value.toString('base64url').toLowerCase()
+}
+
+export function generateVerificationCredentials(randomBytesFunction = randomBytes) {
+  const email = `clean-clone-${secureRandomValue(randomBytesFunction, 12)}@example.invalid`
+  const password = secureRandomValue(randomBytesFunction, 32)
+  if (password.length < 12 || Buffer.byteLength(password, 'utf8') > 72) {
+    throw new Error('Generated verification password is outside the BCrypt input boundary')
+  }
+  return Object.freeze({ email, password })
 }
 
 function sha256(value) {
@@ -160,9 +159,20 @@ async function login(fetchImpl, baseUrl, email, password) {
     || !Number.isInteger(response.user?.id)
     || response.user?.role !== 'USER'
     || response.user?.email?.trim().toLowerCase() !== email) {
-    throw new Error('Login response did not contain the configured active demo USER')
+    throw new Error('Login response did not contain the newly registered active USER')
   }
   return response.accessToken
+}
+
+async function signup(fetchImpl, baseUrl, email, password) {
+  const response = await fetchWithTimeout(fetchImpl, `${baseUrl}/api/auth/signup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  })
+  if (response.status !== 201) {
+    throw new Error(`POST /api/auth/signup returned HTTP ${response.status}`)
+  }
 }
 
 async function uploadDocument(fetchImpl, baseUrl, token, document) {
@@ -188,7 +198,7 @@ async function verifyEmptyOwnerDocumentList(fetchImpl, baseUrl, token) {
     headers: { Authorization: `Bearer ${token}` },
   }, 200)
   if (!Array.isArray(documents) || documents.length !== 0) {
-    throw new Error('Demo USER already has documents; this is not an isolated clean-clone database')
+    throw new Error('Verification USER already has documents; this is not an isolated clean-clone database')
   }
 }
 
@@ -285,9 +295,7 @@ async function verifyLoggedOutBoundary(fetchImpl, baseUrl) {
 
 export async function verifyCleanCloneDemo({
   baseUrl,
-  email,
-  password,
-  bootstrapEnabled,
+  credentials = generateVerificationCredentials(),
   manifestPath = defaultManifestPath,
   fetchImpl = fetch,
   timeoutMs,
@@ -297,10 +305,9 @@ export async function verifyCleanCloneDemo({
   sleep,
 }) {
   const safeBaseUrl = normalizeLoopbackBaseUrl(baseUrl)
-  if (bootstrapEnabled !== false) {
-    throw new Error('Smoke verification requires an explicitly disabled demo bootstrap')
-  }
+  const { email, password } = credentials
   const manifest = readFixtureManifest(manifestPath)
+  await signup(fetchImpl, safeBaseUrl, email, password)
   const token = await login(fetchImpl, safeBaseUrl, email, password)
   await verifyEmptyOwnerDocumentList(fetchImpl, safeBaseUrl, token)
   const allowedUploads = []
@@ -340,15 +347,15 @@ const isMain = process.argv[1]
   && import.meta.url === pathToFileURL(resolve(process.argv[1])).href
 
 if (isMain) {
-  let password = ''
+  let credentials
   try {
-    const configuration = readDemoConfiguration()
-    password = configuration.password
-    const result = await verifyCleanCloneDemo(configuration)
+    const configuration = readCleanCloneConfiguration()
+    credentials = generateVerificationCredentials()
+    const result = await verifyCleanCloneDemo({ ...configuration, credentials })
     console.log(`Verified ${result.documentsVerified} synthetic documents and the logged-out 401 boundary.`)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Clean-clone verification failed'
-    console.error(redactSecrets(message, [password]))
+    console.error(redactSecrets(message, [credentials?.email, credentials?.password]))
     process.exitCode = 1
   }
 }

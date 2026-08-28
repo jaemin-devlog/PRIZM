@@ -22,13 +22,13 @@ class DatabaseJwtAuthenticationConverterTest {
     private final DatabaseJwtAuthenticationConverter converter = new DatabaseJwtAuthenticationConverter(repository);
 
     @Test
-    void convertsSystemAdminRoleToSpringSecurityAuthority() {
-        UserAccount user = user(11L, UserRole.SYSTEM_ADMIN, true);
+    void convertsUserRoleToSpringSecurityAuthority() {
+        UserAccount user = user(11L, UserRole.USER, true);
         when(repository.findById(11L)).thenReturn(Optional.of(user));
 
         AbstractOAuth2TokenAuthenticationToken<Jwt> authentication = converter.convert(jwt(user));
 
-        assertThat(authentication.getAuthorities()).extracting("authority").containsExactly("ROLE_SYSTEM_ADMIN");
+        assertThat(authentication.getAuthorities()).extracting("authority").containsExactly("ROLE_USER");
         assertThat(authentication.getName()).isEqualTo("user@example.com");
     }
 

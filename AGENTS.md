@@ -51,8 +51,8 @@ agent. The detailed delivery procedure lives in
   jobs, chunks, queries, and search results. New read and write paths must remain
   owner-scoped at the appropriate service, repository, SQL, and database levels.
 - Preserve JWT authentication and database revalidation of the user's active
-  state, email, and role. Do not let `SYSTEM_ADMIN` bypass personal `USER` data
-  boundaries.
+  state, email, and `USER` role. Do not add a role-based bypass around personal
+  user data boundaries.
 - A failed or incomplete document version must never become a search candidate.
   Activate a new version only after its chunks are complete, and preserve the
   previous `active_version_id` when processing fails.

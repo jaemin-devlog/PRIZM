@@ -518,8 +518,8 @@ Ollama 연결, model 미설치, GPU/model 실행, 일반 처리 실패의 allowl
   subject를 현재 사용자 ID로 사용합니다.
 - JWT 서명이 맞아도 사용자 상태가 확정된 것은 아닙니다. 매 요청마다 DB에서
   계정이 enabled인지 확인하고 JWT의 email·role이 현재 값과 같은지 비교합니다.
-- 개인 문서와 검색 API는 `USER` 역할에만 열려 있습니다. `SYSTEM_ADMIN`은 개인
-  USER 데이터를 대신 조회하는 우회 권한이 없습니다.
+- 개인 문서와 검색 API는 활성 `USER` 역할에만 열려 있으며 역할 기반 우회 권한은
+  없습니다.
 - document·version·ChangeLog·chunk·processing job에는 `owner_user_id`가 전달되고, service,
   repository SQL과 복합 외래 키가 같은 사용자 관계를 확인합니다.
 - 검색 SQL은 cosine distance를 계산하기 전에 document·version·chunk owner와
@@ -531,11 +531,14 @@ Ollama 연결, model 미설치, GPU/model 실행, 일반 처리 실패의 allowl
 
 새 설치에서는 `POST /api/auth/signup`으로 활성 일반 `USER`를 만들 수 있습니다.
 요청은 이메일과 비밀번호만 받고 BCrypt hash를 저장하며 성공 응답은 JWT나 세션을
-만들지 않습니다. 사용자는 이어서 기존 로그인 API를 사용합니다. 자동 검증에는
-기본적으로 꺼져 있고 명시적으로 한 번만 켜는 demo `USER` 계정 초기 생성(bootstrap)을 계속
-사용합니다. demo 계정도 일반 로그인, JWT·DB 사용자 재확인과 사용자별
-문서·검색 경로를 그대로 사용합니다. 기본 Compose는 loopback에 바인딩된 로컬
-self-hosted 실행 구성이며 공개 SaaS 운영 구성을 대신하지 않습니다.
+만들지 않습니다. 사용자는 이어서 기존 로그인 API로 JWT를 발급받습니다. 서버 기동
+과정은 사용자 계정을 만들지 않습니다. 새 설치 자동 검증도 실행 중 생성한 임시 자격
+증명으로 같은 signup → login → JWT 경로를 사용합니다. 기본 Compose는 loopback에
+바인딩된 로컬 self-hosted 실행 구성이며 공개 SaaS 운영 구성을 대신하지 않습니다.
+
+V17 migration은 과거 `SYSTEM_ADMIN` 행을 삭제하지 않고 비활성화한 뒤 `USER`로
+변환합니다. 따라서 기존 소유 관계는 보존되지만 이전 계정과 JWT는 인증에 사용할 수
+없습니다. 현재 스키마와 애플리케이션 역할은 `USER` 하나만 허용합니다.
 
 근거:
 
@@ -544,10 +547,10 @@ self-hosted 실행 구성이며 공개 SaaS 운영 구성을 대신하지 않습
 - [현재 사용자 추출](../src/main/java/com/prizm/auth/security/CurrentUserProvider.java)
 - [문서 조회 서비스](../src/main/java/com/prizm/document/service/DocumentQueryService.java)
 - [벡터 검색 SQL](../src/main/java/com/prizm/search/repository/VectorSearchRepository.java)
-- [demo USER 계정 초기 생성](../src/main/java/com/prizm/auth/bootstrap/DemoUserBootstrapRunner.java)
-- [계정 초기 생성 충돌 차단](../src/main/java/com/prizm/auth/bootstrap/BootstrapAccountConflictGuard.java)
-- [BCrypt 입력 경계](../src/main/java/com/prizm/auth/bootstrap/BcryptPasswordPolicy.java)
-- [demo 환경 생성](../scripts/prepare-clean-clone-demo-env.mjs)
+- [회원가입·로그인 서비스](../src/main/java/com/prizm/auth/service/AuthService.java)
+- [BCrypt 입력 경계](../src/main/java/com/prizm/auth/security/BcryptPasswordPolicy.java)
+- [사용자 역할 정리 migration](../src/main/resources/db/migration/V17__remove_system_admin_role.sql)
+- [새 설치 환경 생성](../scripts/prepare-clean-clone-demo-env.mjs)
 - [새 설치 환경 기본 검증](../scripts/verify-clean-clone-demo.mjs)
 - [인증·격리 통합 테스트](../src/integrationTest/java/com/prizm/infrastructure/AuthenticationIntegrationTest.java)
 - [migration 통합 테스트](../src/integrationTest/java/com/prizm/infrastructure/CareerPlatformMigrationTest.java)

@@ -1,4 +1,4 @@
-export type UserRole = 'USER' | 'SYSTEM_ADMIN'
+export type UserRole = 'USER'
 
 export type CurrentUser = {
   id: number

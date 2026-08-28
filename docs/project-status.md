@@ -1,10 +1,10 @@
 # PRIZM 현재 구현 현황
 
-> 기준일: 2026-08-27
+> 기준일: 2026-08-28
 >
-> 이 문서가 정리한 기능 기준: [PR #60](https://github.com/jaemin-devlog/PRIZM/pull/60), 병합 `01d6c46`
+> 통합 기준선: `origin/main` `332c093`
 >
-> 현재 저장소 기준선: `origin/main` `4e80417`
+> 현재 작업: PRZ-020 branch 검증 완료. 아직 `main`에 통합되지 않음
 
 현재 상태는 소스 코드, 적용된 Flyway migration과 실행 가능한 test를 기준으로 판단합니다. Spec과 이 문서는 구현 증거를 대신하지 않습니다.
 
@@ -39,9 +39,11 @@
 ### 인증과 사용자 격리
 
 - 이메일·비밀번호 기반 자체 호스팅 회원가입과 JWT 로그인
+- 서버 기동과 분리된 일반 사용자 가입 흐름. 계정 bootstrap 없음
 - 요청마다 사용자의 활성 상태, 이메일과 역할을 DB에서 재확인
 - 문서, 버전, 처리·정리 작업과 검색 결과의 사용자별 데이터 분리
-- `SYSTEM_ADMIN`도 개인 `USER` 데이터 경계를 우회하지 않음
+- 현재 역할은 `USER` 하나이며 역할 기반 데이터 우회 권한 없음
+- V17에서 기존 `SYSTEM_ADMIN` 계정을 비활성화·`USER` 전환하고 소유 관계는 보존
 
 이메일 인증, 비밀번호 재설정, refresh token, OIDC와 공개 SaaS 운영 보호는 제공하지 않습니다.
 
@@ -110,6 +112,7 @@
 | 문서 상세 미리보기 페이지 | `VERIFIED` | PRZ-018, [PR #56](https://github.com/jaemin-devlog/PRIZM/pull/56), 병합 `a9ca679` |
 | 채용공고 근거 보기 동작 통일 | 통합됨 | [PR #58](https://github.com/jaemin-devlog/PRIZM/pull/58), 병합 `12acb3a` |
 | 태그 연결 문서 수·TXT 미리보기·TXT/PDF 원문 보기 | `VERIFIED` | PRZ-019, [PR #60](https://github.com/jaemin-devlog/PRIZM/pull/60), 병합 `01d6c46` |
+| 인증 초기화 제거와 단일 `USER` 역할 전환 | branch `VERIFIED` | PRZ-020. 아직 `main` 통합 전 |
 
 PostgreSQL 성공은 OpenSQL 증거가 아닙니다. OpenSQL·OpenProxy 결과는 기록된 단일
 서버 direct 연결과 single-Primary 실행 경로에 한정합니다. 명령, 환경과 수치는

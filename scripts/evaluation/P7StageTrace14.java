@@ -79,9 +79,7 @@ public final class P7StageTrace14 {
                 "server.port", "0",
                 "prizm.ingestion.worker-enabled", "false",
                 "prizm.cleanup.worker-enabled", "false",
-                "prizm.change-log.scheduler.enabled", "false",
-                "prizm.bootstrap-system-admin.enabled", "false",
-                "prizm.bootstrap-demo-user.enabled", "false");
+                "prizm.change-log.scheduler.enabled", "false");
         try (ConfigurableApplicationContext context = new SpringApplicationBuilder(PrizmApplication.class)
                 .web(WebApplicationType.SERVLET)
                 .properties(properties)

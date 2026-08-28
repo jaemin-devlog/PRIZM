@@ -10,8 +10,6 @@ AI 모델은 포함하지 않습니다. 구현·검증 범위는 [현재 구현 
 
 ## 가장 빠르게 시작하기
 
-### 1. 사전 준비
-
 다음 도구가 필요합니다.
 
 - Git
@@ -23,20 +21,14 @@ Compose 빌드 이미지가 Java 17과 Node `22.17.0`을 사용하므로 일반 
 `0.32.3`과 manifest가 확인된 `bge-m3:latest`입니다. 다른 Ollama·모델 버전을 같은
 결과로 간주하지 않습니다.
 
-Ollama를 시작한 뒤 모델을 준비합니다.
-
-```powershell
-ollama pull bge-m3
-```
-
-### 2. 저장소 받기
+### 1. 저장소 받기
 
 ```powershell
 git clone https://github.com/jaemin-devlog/PRIZM.git
 Set-Location PRIZM
 ```
 
-### 3. 로컬 환경 설정
+### 2. 로컬 환경 설정
 
 예제 파일을 복사합니다.
 
@@ -52,11 +44,20 @@ Copy-Item .env.example .env
 - `PRIZM_FLYWAY_PASSWORD`
 
 기본 포트를 바꾼다면 `SERVER_PORT`, `PRIZM_FRONTEND_PORT`, `PRIZM_DB_PORT`와
-`PRIZM_CORS_ALLOWED_ORIGINS`도 함께 맞춥니다. `PRIZM_BOOTSTRAP_SYSTEM_ADMIN_ENABLED`와
-`PRIZM_BOOTSTRAP_DEMO_USER_ENABLED`는 일반 사용 흐름에서 `false`로 둡니다.
+`PRIZM_CORS_ALLOWED_ORIGINS`도 함께 맞춥니다. `PRIZM_JWT_SECRET`은 서버가 JWT를
+서명하는 값이고 두 DB 비밀번호는 애플리케이션과 Flyway가 DB에 접속하는 값입니다.
+셋 다 브라우저에서 가입할 이메일·비밀번호가 아닙니다.
 
 `.env`는 Git ignore 대상입니다. 비밀번호, JWT와 `.env` 내용을 저장소, 이슈, 로그나
 스크린샷에 올리지 마세요.
+
+### 3. Ollama 준비
+
+Ollama를 시작한 뒤 모델을 준비합니다.
+
+```powershell
+ollama pull bge-m3
+```
 
 ### 4. PRIZM 실행
 
@@ -173,8 +174,7 @@ PRIZM의 핵심 동작을 재현할 때 사용합니다. 과거 두 새 설치 �
 ### 이 절차로 확인하는 것
 
 - 고유한 Compose project와 새 PostgreSQL·pgvector volume 사용
-- 브라우저 회원가입과 기존 JWT 로그인
-- 한 번만 활성화하는 고정 `USER` 데모 계정 초기 생성(bootstrap)
+- 검증 때마다 새 `USER` 회원가입과 기존 JWT 로그인
 - PRIZM 자체 합성 TXT와 텍스트 레이어가 있는 PDF 업로드
 - Ollama `bge-m3` 임베딩과 두 문서의 `ACTIVE` 전환
 - TXT `TEXT_CHUNK`, PDF `PAGE`와 페이지 번호 검색
@@ -235,8 +235,7 @@ node scripts/prepare-clean-clone-demo-env.mjs `
 이 명령은 다음 작업만 수행합니다.
 
 - 무작위 suffix를 붙인 고유 `COMPOSE_PROJECT_NAME` 생성
-- JWT, DB와 demo 비밀번호를 안전한 난수로 생성
-- 역할을 바꿀 수 없는 고정 `USER` 데모 계정의 초기 생성을 한 번만 활성화
+- JWT와 두 DB 비밀번호를 안전한 난수로 생성
 - 생성 비밀값을 터미널에 출력하지 않음
 - 기존 `.env`가 있으면 덮어쓰지 않고 실패
 
@@ -255,7 +254,7 @@ node scripts/generate-clean-clone-demo-fixtures.mjs
 경력·성과에서 가져오지 않은 first-party 합성 자료이며, manifest의 SHA-256으로 업로드
 전 변조 여부를 확인합니다.
 
-### 4. Compose 구성 확인과 최초 기동
+### 4. Compose 구성 확인과 기동
 
 일반 `docker compose config`는 치환된 비밀번호를 화면에 표시할 수 있습니다. 검증
 절차에서는 출력 없이 유효성만 확인하는 `--quiet`를 사용합니다.
@@ -271,51 +270,39 @@ wrapper는 현재 PowerShell의 `COMPOSE_PROJECT_NAME`이나 `COMPOSE_FILE`보�
 생성된 고유 project, 저장소의 `compose.yaml`과 `.env`를 명시적으로 사용합니다.
 project·file·env file을 덮어쓰는 옵션은 거부합니다.
 
-health가 아직 준비되지 않았다면 잠시 뒤 다시 확인합니다. 최초 기동에서 demo
-`USER`가 생성됩니다. 고정된 email은 합성 로컬 계정이며 비밀번호는 ignored `.env`에만
-있습니다. `SYSTEM_ADMIN` 계정 초기 생성과 동시에 켜면 애플리케이션이 계정을 쓰기 전에
-시작을 거부합니다.
+health가 아직 준비되지 않았다면 잠시 뒤 다시 확인합니다. 서버 기동만으로 사용자
+계정을 만들지는 않습니다.
 
-### 5. 일회성 계정 초기 생성 끄기
-
-계정이 생성된 뒤 즉시 초기 생성 기능을 끄고 backend를 새 설정으로 다시 만듭니다.
-
-```powershell
-node scripts/prepare-clean-clone-demo-env.mjs --disable-bootstrap
-node scripts/run-clean-clone-compose.mjs up -d --no-deps --force-recreate backend
-Invoke-RestMethod http://127.0.0.1:18081/actuator/health
-```
-
-검증 도구는 이 값이 실제로 `false`가 아니면 로그인 정보를 전송하지 않습니다.
-
-### 6. API 전체 흐름 검증
+### 5. API 전체 흐름 검증
 
 ```powershell
 node scripts/verify-clean-clone-demo.mjs
 ```
 
 검증 도구는 loopback 주소(`localhost`, `127.0.0.1`, `::1`)만 허용하며 HTTP redirect를
-따라가지 않습니다. 로그인 직후 문서 목록이 비어 있는지도 확인하므로 과거 DB volume을
-실수로 재사용한 환경은 실패합니다. 성공하면 다음을 실제로 확인한 것입니다.
+따라가지 않습니다. 실행할 때마다 안전한 임시 이메일·비밀번호를 메모리에서 만들고
+`POST /api/auth/signup`으로 새 `USER`를 가입시킨 뒤 로그인합니다. 이 자격 증명과 JWT는
+`.env`에 저장하거나 출력하지 않습니다. 가입 이메일이 이미 존재하면 과거 DB volume을
+재사용한 것으로 보고 실패합니다. 성공하면 다음을 실제로 확인한 것입니다.
 
-1. 데모 계정이 `USER` 역할로 로그인됨
-2. TXT와 PDF 업로드
-3. 각 새 버전의 `ACTIVE` 전환
-4. TXT `TEXT_CHUNK` 표시 문자열 검색
-5. PDF `PAGE` 표시 문자열과 유효한 페이지 번호 검색
-6. token 없이 보호 경로를 요청했을 때 `401` 응답
+1. 새 계정이 `USER` 역할로 가입되고 로그인됨
+2. 로그인 직후 소유 문서 목록이 비어 있음
+3. TXT와 PDF 업로드
+4. 각 새 버전의 `ACTIVE` 전환
+5. TXT `TEXT_CHUNK` 표시 문자열 검색
+6. PDF `PAGE` 표시 문자열과 유효한 페이지 번호 검색
+7. token 없이 보호 경로를 요청했을 때 `401` 응답
 
 비밀번호와 JWT는 성공·실패 출력에 포함하지 않습니다.
 
-### 7. 브라우저 UI 확인
+### 6. 브라우저 UI 확인
 
 브라우저에서 `http://localhost:15174`를 엽니다. 기본 화면에서 이메일·비밀번호와
 비밀번호 확인을 입력해 가입합니다. 성공하면 로그인 화면으로 전환되며, 같은
 이메일·비밀번호로 로그인하면 기존 JWT를 발급한 뒤 문서 보관함으로 이동합니다.
 
-6단계의 API 자동 검증은 별도의 초기 생성 계정 `demo@prizm.local`을 사용합니다.
-Git에서 제외된 `.env`의 데모 이메일과 비밀번호를 자동 로그인 검증에 사용할 때에도
-비밀번호를 명령 출력, 스크린샷이나 검증 기록에 복사하지 마세요.
+5단계의 API 자동 검증 계정은 브라우저에서 직접 만든 계정과 별개입니다. 검증 도구가
+실행 중에만 임시 자격 증명을 보유하므로 이를 복사하거나 관리할 단계는 없습니다.
 
 다음 항목을 순서대로 확인합니다.
 
@@ -327,7 +314,7 @@ Git에서 제외된 `.env`의 데모 이메일과 비밀번호를 자동 로그�
 - 두 합성 표시 문자열을 경력 근거 검색에서 찾을 수 있는가
 - 로그아웃 뒤 보호 화면이 다시 로그인으로 돌아가는가
 
-### 8. 안전한 종료
+### 7. 안전한 종료
 
 ```powershell
 node scripts/run-clean-clone-compose.mjs down

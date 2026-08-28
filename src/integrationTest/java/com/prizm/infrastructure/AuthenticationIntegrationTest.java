@@ -15,11 +15,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
-import com.prizm.auth.bootstrap.BcryptPasswordPolicy;
-import com.prizm.auth.bootstrap.BootstrapDemoUserProperties;
-import com.prizm.auth.bootstrap.BootstrapSystemAdminProperties;
-import com.prizm.auth.bootstrap.DemoUserBootstrapRunner;
-import com.prizm.auth.bootstrap.SystemAdminBootstrapRunner;
 import com.prizm.auth.dto.request.LoginRequest;
 import com.prizm.auth.service.AuthService;
 import com.prizm.changelog.service.ChangeLogDispatchTransaction;
@@ -43,7 +38,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
-import jakarta.validation.Validator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,7 +48,6 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -111,9 +104,6 @@ class AuthenticationIntegrationTest {
     PasswordEncoder passwordEncoder;
 
     @Autowired
-    BcryptPasswordPolicy bcryptPasswordPolicy;
-
-    @Autowired
     JwtEncoder jwtEncoder;
 
     @Autowired
@@ -143,9 +133,6 @@ class AuthenticationIntegrationTest {
     @Autowired
     FileCleanupCoordinator fileCleanupCoordinator;
 
-    @Autowired
-    Validator validator;
-
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -170,69 +157,19 @@ class AuthenticationIntegrationTest {
 
     @Test
     void loginEndpointReturnsAccessTokenAndPublicUserInformation() throws Exception {
-        createUser(UserRole.SYSTEM_ADMIN, true);
+        createUser(UserRole.USER, true);
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"email":"system-admin@prizm.local","password":"test-password"}
+                                {"email":"user@prizm.local","password":"test-password"}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
                 .andExpect(jsonPath("$.tokenType").value("Bearer"))
                 .andExpect(jsonPath("$.expiresIn").value(3600))
-                .andExpect(jsonPath("$.user.email").value("system-admin@prizm.local"))
-                .andExpect(jsonPath("$.user.role").value("SYSTEM_ADMIN"));
-    }
-
-    @Test
-    void createsInitialSystemAdminInCleanDatabaseOnlyWhenExplicitlyInvoked() throws Exception {
-        SystemAdminBootstrapRunner runner = new SystemAdminBootstrapRunner(
-                new BootstrapSystemAdminProperties(
-                        true, "SYSTEM-ADMIN@Prizm.Local", "integration-password"),
-                userAccountRepository,
-                bcryptPasswordPolicy,
-                validator);
-
-        runner.run(new DefaultApplicationArguments(new String[0]));
-
-        UserAccount systemAdmin = userAccountRepository.findByEmail("system-admin@prizm.local").orElseThrow();
-        assertThat(systemAdmin.getRole()).isEqualTo(UserRole.SYSTEM_ADMIN);
-        assertThat(systemAdmin.isEnabled()).isTrue();
-        assertThat(systemAdmin.getPasswordHash()).isNotEqualTo("integration-password");
-        assertThat(passwordEncoder.matches("integration-password", systemAdmin.getPasswordHash())).isTrue();
-    }
-
-    @Test
-    void bootstrappedDemoUserLogsInThroughHttpAndUsesJwtProtectedRoute() throws Exception {
-        DemoUserBootstrapRunner runner = new DemoUserBootstrapRunner(
-                new BootstrapDemoUserProperties(
-                        true, "DEMO-USER@Prizm.Local", "integration-password"),
-                userAccountRepository,
-                bcryptPasswordPolicy,
-                validator);
-        runner.run(new DefaultApplicationArguments(new String[0]));
-
-        String responseBody = mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {"email":"demo-user@prizm.local","password":"integration-password"}
-                                """))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").isNotEmpty())
-                .andExpect(jsonPath("$.user.email").value("demo-user@prizm.local"))
-                .andExpect(jsonPath("$.user.role").value("USER"))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        String accessToken = JsonPath.read(responseBody, "$.accessToken");
-
-        mockMvc.perform(get("/api/users/me")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(accessToken)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("demo-user@prizm.local"))
-                .andExpect(jsonPath("$.role").value("USER"));
-        assertThat(userAccountRepository.existsByRole(UserRole.SYSTEM_ADMIN)).isFalse();
+                .andExpect(jsonPath("$.user.email").value("user@prizm.local"))
+                .andExpect(jsonPath("$.user.role").value("USER"));
     }
 
     @Test
@@ -314,8 +251,6 @@ class AuthenticationIntegrationTest {
     void permitsAllUserTagRoutesAndPreservesTheirAuthenticationBoundary() throws Exception {
         UserAccount user = createUser("tag-user@prizm.local", UserRole.USER, true);
         String userToken = login(user.getEmail());
-        UserAccount systemAdmin = createUser("tag-admin@prizm.local", UserRole.SYSTEM_ADMIN, true);
-        String systemAdminToken = login(systemAdmin.getEmail());
         Long documentId = jdbcTemplate.queryForObject(
                 "INSERT INTO documents(owner_user_id, title, document_type) VALUES (?, ?, 'OTHER') RETURNING id",
                 Long.class,
@@ -381,83 +316,6 @@ class AuthenticationIntegrationTest {
         mockMvc.perform(delete("/api/documents/{documentId}/tags/{tagId}", documentId, redisTagId))
                 .andExpect(status().isUnauthorized());
 
-        mockMvc.perform(get("/api/tags")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(systemAdminToken)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
-        mockMvc.perform(post("/api/tags")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(systemAdminToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Denied\"}"))
-                .andExpect(status().isForbidden());
-        mockMvc.perform(get("/api/tags/usage")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(systemAdminToken)))
-                .andExpect(status().isForbidden());
-        mockMvc.perform(get("/api/tags/{tagId}/documents", redisTagId)
-                        .header(HttpHeaders.AUTHORIZATION, bearer(systemAdminToken)))
-                .andExpect(status().isForbidden());
-        mockMvc.perform(get("/api/documents/{documentId}/tags", documentId)
-                        .header(HttpHeaders.AUTHORIZATION, bearer(systemAdminToken)))
-                .andExpect(status().isForbidden());
-        mockMvc.perform(put("/api/documents/{documentId}/tags", documentId)
-                        .header(HttpHeaders.AUTHORIZATION, bearer(systemAdminToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"tagIds\":[]}"))
-                .andExpect(status().isForbidden());
-        mockMvc.perform(delete("/api/documents/{documentId}/tags/{tagId}", documentId, redisTagId)
-                        .header(HttpHeaders.AUTHORIZATION, bearer(systemAdminToken)))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void rejectsSystemAdminDocumentUploadListDetailThumbnailAndSearchAccessWith403() throws Exception {
-        String token = tokenFor(UserRole.SYSTEM_ADMIN);
-        MockMultipartFile file = new MockMultipartFile(
-                "file", "system-admin-upload.txt", "text/plain", "document content".getBytes(StandardCharsets.UTF_8));
-
-        mockMvc.perform(multipart("/api/documents")
-                        .file(file)
-                        .param("title", "System admin document")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
-        mockMvc.perform(get("/api/documents")
-                        .param("documentType", "PORTFOLIO")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
-        mockMvc.perform(get("/api/documents/1")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
-        mockMvc.perform(get("/api/documents/1/versions/1/thumbnail")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
-        mockMvc.perform(post("/api/search")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {"query":"career evidence"}
-                                """))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
-        mockMvc.perform(post("/api/career-evidence/search")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {"query":"career evidence"}
-                                """))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
-        mockMvc.perform(post("/api/v2/career-evidence/search")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {"query":"career evidence"}
-                                """))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
     }
 
     @Test
@@ -467,14 +325,6 @@ class AuthenticationIntegrationTest {
                         .content("{\"content\":\"- API 개발 경험\"}"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
-
-        String systemAdminToken = tokenFor(UserRole.SYSTEM_ADMIN);
-        mockMvc.perform(post("/api/job-postings/segment")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(systemAdminToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"content\":\"- API 개발 경험\"}"))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
 
         String userToken = tokenFor(UserRole.USER);
         mockMvc.perform(post("/api/job-postings/segment")
@@ -1024,7 +874,7 @@ class AuthenticationIntegrationTest {
 
     @Test
     void deniesUnregisteredPathEvenForAuthenticatedUser() throws Exception {
-        String token = tokenFor(UserRole.SYSTEM_ADMIN);
+        String token = tokenFor(UserRole.USER);
 
         mockMvc.perform(get("/unregistered-path")
                         .header(HttpHeaders.AUTHORIZATION, bearer(token)))
@@ -1123,8 +973,7 @@ class AuthenticationIntegrationTest {
     }
 
     private UserAccount createUser(UserRole role, boolean enabled) {
-        String email = role == UserRole.SYSTEM_ADMIN ? "system-admin@prizm.local" : "user@prizm.local";
-        return createUser(email, role, enabled);
+        return createUser("user@prizm.local", role, enabled);
     }
 
     private UserAccount createUser(String email, UserRole role, boolean enabled) {

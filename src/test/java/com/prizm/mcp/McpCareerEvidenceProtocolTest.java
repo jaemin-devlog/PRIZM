@@ -104,10 +104,9 @@ class McpCareerEvidenceProtocolTest {
     }
 
     @Test
-    void rejectsAnonymousInvalidJwtAndSystemAdminButAcceptsEachUserOwner() throws Exception {
+    void rejectsAnonymousInvalidJwtAndUntrustedOriginButAcceptsEachUserOwner() throws Exception {
         assertThat(postInitialize(null).statusCode()).isEqualTo(401);
         assertThat(postInitialize("not-a-jwt").statusCode()).isEqualTo(401);
-        assertThat(postInitialize(tokenFor(1L, UserRole.SYSTEM_ADMIN)).statusCode()).isEqualTo(403);
         String originUserToken = tokenFor(2L, UserRole.USER);
         assertThat(postInitialize(originUserToken, "https://untrusted.example").statusCode()).isEqualTo(403);
         assertThat(postInitialize(originUserToken, "http://localhost:5173").statusCode()).isEqualTo(200);

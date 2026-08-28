@@ -85,8 +85,6 @@ class OpenSqlMcpGateTest {
         registry.add("prizm.change-log.scheduler.enabled", () -> false);
         registry.add("prizm.ingestion.worker-enabled", () -> false);
         registry.add("prizm.cleanup.worker-enabled", () -> false);
-        registry.add("prizm.bootstrap-system-admin.enabled", () -> false);
-        registry.add("prizm.bootstrap-demo-user.enabled", () -> false);
     }
 
     @LocalServerPort
@@ -242,11 +240,11 @@ class OpenSqlMcpGateTest {
                 .filter(java.util.Objects::nonNull)
                 .map(Object::toString)
                 .toList();
-        assertThat(applied).containsAll(IntStream.rangeClosed(1, 16).mapToObj(String::valueOf).toList());
+        assertThat(applied).containsAll(IntStream.rangeClosed(1, 17).mapToObj(String::valueOf).toList());
         assertThat(flyway.info().pending()).isEmpty();
         assertThat(flyway.info().current()).isNotNull();
-        assertThat(flyway.info().current().getVersion().toString()).isEqualTo("16");
-        return new InfrastructureDetails(openSqlVersion, pgvectorVersion, "V1-V16");
+        assertThat(flyway.info().current().getVersion().toString()).isEqualTo("17");
+        return new InfrastructureDetails(openSqlVersion, pgvectorVersion, "V1-V17");
     }
 
     private void signup(String email) throws Exception {

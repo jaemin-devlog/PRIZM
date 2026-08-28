@@ -78,6 +78,7 @@ PRZ-008과 PRZ-016의 `IN_PROGRESS`는 필수 검증 항목이 모두 끝나지 
 | [PRZ-017](PRZ-017-job-posting-evidence-v1/spec.md) | 채용공고 항목별 근거 검색 V1 | `VERIFIED` | `94715cf`, [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53), 병합 `b78ec42` |
 | [PRZ-018](PRZ-018-document-detail-page/spec.md) | 문서 상세 미리보기 페이지 | `VERIFIED` | `186be99`, [PR #56](https://github.com/jaemin-devlog/PRIZM/pull/56), 병합 `a9ca679` |
 | [PRZ-019](PRZ-019-document-usability-fixes/spec.md) | 태그 문서 수 명확화와 TXT 원문 미리보기 | `VERIFIED` | `4932aa8`, [PR #60](https://github.com/jaemin-devlog/PRIZM/pull/60), 병합 `01d6c46` |
+| [PRZ-020](PRZ-020-auth-bootstrap-cleanup/spec.md) | 인증 초기화 제거와 빠른 시작 단순화 | `VERIFIED` | 2026-08-28 branch VERIFY·AUDIT. `main` 통합 전 |
 
 ## 상태와 결과
 

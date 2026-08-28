@@ -23,9 +23,8 @@ import {
   generateDemoFixtures,
 } from './generate-clean-clone-demo-fixtures.mjs'
 import {
-  disableDemoBootstrap,
   parsePrepareArguments,
-  prepareDemoEnvironment,
+  prepareCleanCloneEnvironment,
 } from './prepare-clean-clone-demo-env.mjs'
 import {
   buildCleanCloneComposeInvocation,
@@ -35,7 +34,8 @@ import {
 } from './run-clean-clone-compose.mjs'
 import {
   parseEnvFile,
-  readDemoConfiguration,
+  generateVerificationCredentials,
+  readCleanCloneConfiguration,
   readFixtureManifest,
   redactSecrets,
   validateSearchResults,
@@ -59,9 +59,6 @@ function environmentTemplate() {
     'PRIZM_DB_PORT=5432',
     'PRIZM_DB_PASSWORD=replace-runtime',
     'PRIZM_FLYWAY_PASSWORD=replace-owner',
-    'PRIZM_BOOTSTRAP_DEMO_USER_ENABLED=false',
-    'PRIZM_BOOTSTRAP_DEMO_USER_EMAIL=',
-    'PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD=',
   ].join('\n')
 }
 
@@ -115,19 +112,19 @@ test('prepares unique isolated env files without overwriting or printing secrets
   writeFileSync(examplePath, environmentTemplate())
   const randomBytesFunction = deterministicRandom()
 
-  const first = prepareDemoEnvironment({
+  const first = prepareCleanCloneEnvironment({
     examplePath,
     envPath: firstPath,
     portOverrides: { db: 15433, backend: 18081, frontend: 15174 },
     randomBytesFunction,
   })
-  const second = prepareDemoEnvironment({
+  const second = prepareCleanCloneEnvironment({
     examplePath,
     envPath: secondPath,
     portOverrides: { db: 15434, backend: 18082, frontend: 15175 },
     randomBytesFunction,
   })
-  prepareDemoEnvironment({
+  prepareCleanCloneEnvironment({
     examplePath,
     envPath: standardHttpPath,
     portOverrides: { db: 15435, backend: 18083, frontend: 80 },
@@ -145,14 +142,13 @@ test('prepares unique isolated env files without overwriting or printing secrets
   assert.equal(firstValues.PRIZM_CORS_ALLOWED_ORIGINS, 'http://localhost:15174')
   assert.equal(secondValues.PRIZM_CORS_ALLOWED_ORIGINS, 'http://localhost:15175')
   assert.equal(standardHttpValues.PRIZM_CORS_ALLOWED_ORIGINS, 'http://localhost')
-  assert.equal(firstValues.PRIZM_BOOTSTRAP_DEMO_USER_ENABLED, 'true')
-  assert.equal(firstValues.PRIZM_BOOTSTRAP_DEMO_USER_EMAIL, 'demo@prizm.local')
+  assert.equal(Object.keys(firstValues).some((key) => key.startsWith('PRIZM_BOOTSTRAP_')), false)
   assert.ok(firstValues.PRIZM_JWT_SECRET.length >= 32)
   assert.ok(firstValues.PRIZM_DB_PASSWORD.length >= 32)
-  assert.ok(Buffer.byteLength(firstValues.PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD, 'utf8') <= 72)
+  assert.ok(firstValues.PRIZM_FLYWAY_PASSWORD.length >= 32)
   assert.notEqual(firstValues.PRIZM_DB_PASSWORD, secondValues.PRIZM_DB_PASSWORD)
   assert.throws(
-    () => prepareDemoEnvironment({ examplePath, envPath: firstPath, randomBytesFunction }),
+    () => prepareCleanCloneEnvironment({ examplePath, envPath: firstPath, randomBytesFunction }),
     /refusing to overwrite/,
   )
 })
@@ -162,18 +158,16 @@ test('creates .env with POSIX 0600 mode', { skip: process.platform === 'win32' }
   const examplePath = join(directory, '.env.example')
   const envPath = join(directory, '.env')
   writeFileSync(examplePath, environmentTemplate())
-  prepareDemoEnvironment({ examplePath, envPath, randomBytesFunction: deterministicRandom() })
+  prepareCleanCloneEnvironment({ examplePath, envPath, randomBytesFunction: deterministicRandom() })
   assert.equal(statSync(envPath).mode & 0o777, 0o600)
 })
 
-test('disables bootstrap explicitly and validates safe CLI overrides', (t) => {
+test('validates safe CLI overrides without exposing a bootstrap mode', (t) => {
   const directory = temporaryDirectory(t)
   const examplePath = join(directory, '.env.example')
   const envPath = join(directory, '.env')
   writeFileSync(examplePath, environmentTemplate())
-  prepareDemoEnvironment({ examplePath, envPath, randomBytesFunction: deterministicRandom() })
-  disableDemoBootstrap(envPath)
-  assert.equal(parseEnvFile(readFileSync(envPath, 'utf8')).PRIZM_BOOTSTRAP_DEMO_USER_ENABLED, 'false')
+  prepareCleanCloneEnvironment({ examplePath, envPath, randomBytesFunction: deterministicRandom() })
   assert.deepEqual(parsePrepareArguments([
     '--project-name', 'prizm-clean-clone-manual',
     '--db-port', '15433',
@@ -184,6 +178,7 @@ test('disables bootstrap explicitly and validates safe CLI overrides', (t) => {
     portOverrides: { db: '15433', backend: '18081', frontend: '15174' },
   })
   assert.throws(() => parsePrepareArguments(['--db-port', '70000']), /between 1 and 65535/)
+  assert.throws(() => parsePrepareArguments(['--disable-bootstrap']), /requires a value/)
 })
 
 test('builds explicit isolated Compose invocations for two different env files', (t) => {
@@ -228,12 +223,6 @@ test('uses a Docker executable outside PATH and removes Compose environment over
     'PRIZM_FLYWAY_USERNAME=prizm_owner',
     'PRIZM_FLYWAY_PASSWORD=file-owner-password',
     'PRIZM_JWT_SECRET=file-jwt-secret',
-    'PRIZM_BOOTSTRAP_DEMO_USER_ENABLED=false',
-    'PRIZM_BOOTSTRAP_DEMO_USER_EMAIL=demo@prizm.local',
-    'PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD=file-demo-password',
-    'PRIZM_BOOTSTRAP_SYSTEM_ADMIN_ENABLED=false',
-    'PRIZM_BOOTSTRAP_SYSTEM_ADMIN_EMAIL=admin@prizm.local',
-    'PRIZM_BOOTSTRAP_SYSTEM_ADMIN_PASSWORD=file-admin-password',
     'PRIZM_OLLAMA_BASE_URL=http://localhost:11434',
     'PRIZM_COMPOSE_OLLAMA_BASE_URL=http://host.docker.internal:11434',
     'PRIZM_EMBEDDING_MODEL=bge-m3',
@@ -256,12 +245,6 @@ test('uses a Docker executable outside PATH and removes Compose environment over
       PRIZM_FLYWAY_USERNAME: 'shell-owner-user',
       PRIZM_FLYWAY_PASSWORD: 'shell-owner-secret',
       PRIZM_JWT_SECRET: 'shell-jwt-secret',
-      PRIZM_BOOTSTRAP_DEMO_USER_ENABLED: 'true',
-      PRIZM_BOOTSTRAP_DEMO_USER_EMAIL: 'shell-demo@example.invalid',
-      PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD: 'shell-demo-secret',
-      PRIZM_BOOTSTRAP_SYSTEM_ADMIN_ENABLED: 'true',
-      PRIZM_BOOTSTRAP_SYSTEM_ADMIN_EMAIL: 'shell-admin@example.invalid',
-      PRIZM_BOOTSTRAP_SYSTEM_ADMIN_PASSWORD: 'shell-admin-secret',
       PRIZM_OLLAMA_BASE_URL: 'https://external-host.example.invalid',
       PRIZM_COMPOSE_OLLAMA_BASE_URL: 'https://external.example.invalid',
       PRIZM_EMBEDDING_MODEL: 'external-model',
@@ -292,12 +275,6 @@ test('uses a Docker executable outside PATH and removes Compose environment over
     'PRIZM_FLYWAY_USERNAME',
     'PRIZM_FLYWAY_PASSWORD',
     'PRIZM_JWT_SECRET',
-    'PRIZM_BOOTSTRAP_DEMO_USER_ENABLED',
-    'PRIZM_BOOTSTRAP_DEMO_USER_EMAIL',
-    'PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD',
-    'PRIZM_BOOTSTRAP_SYSTEM_ADMIN_ENABLED',
-    'PRIZM_BOOTSTRAP_SYSTEM_ADMIN_EMAIL',
-    'PRIZM_BOOTSTRAP_SYSTEM_ADMIN_PASSWORD',
     'PRIZM_OLLAMA_BASE_URL',
     'PRIZM_COMPOSE_OLLAMA_BASE_URL',
     'PRIZM_EMBEDDING_MODEL',
@@ -307,7 +284,7 @@ test('uses a Docker executable outside PATH and removes Compose environment over
   }
   assert.doesNotMatch(
     JSON.stringify(captured),
-    /shell-db-secret|shell-owner-secret|shell-jwt-secret|shell-demo-secret|shell-admin-secret|shell-demo@example\.invalid|shell-admin@example\.invalid|external.*example\.invalid/,
+    /shell-db-secret|shell-owner-secret|shell-jwt-secret|external.*example\.invalid/,
   )
 })
 
@@ -337,56 +314,43 @@ test('rejects secret-rendering config, Compose overrides, and volume deletion', 
   assert.deepEqual(cleaned, { SAFE: 'yes' })
 })
 
-test('parses only unambiguous env data, requires disabled bootstrap, and enforces BCrypt bytes', (t) => {
+test('parses only unambiguous env data and generates in-memory BCrypt-safe credentials', (t) => {
   assert.deepEqual(parseEnvFile('A=one\nB="two"\n# comment\n'), { A: 'one', B: 'two' })
   assert.throws(() => parseEnvFile('A=one\nA=two\n'), /Duplicate/)
   const directory = temporaryDirectory(t)
   const envPath = join(directory, '.env')
-  writeFileSync(envPath, [
-    'SERVER_PORT=8181',
-    'PRIZM_BOOTSTRAP_DEMO_USER_ENABLED=false',
-    'PRIZM_BOOTSTRAP_DEMO_USER_EMAIL=DEMO@Prizm.Local',
-    'PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD=private-demo-password',
-  ].join('\n'))
-  assert.deepEqual(readDemoConfiguration(envPath, {}), {
-    email: 'demo@prizm.local',
-    password: 'private-demo-password',
+  writeFileSync(envPath, 'SERVER_PORT=8181\n')
+  assert.deepEqual(readCleanCloneConfiguration(envPath, {}), {
     baseUrl: 'http://127.0.0.1:8181',
-    bootstrapEnabled: false,
   })
-  writeFileSync(envPath, readFileSync(envPath, 'utf8').replace('ENABLED=false', 'ENABLED=true'))
-  assert.throws(() => readDemoConfiguration(envPath, {}), /Disable the one-time demo bootstrap/)
-  writeFileSync(envPath, readFileSync(envPath, 'utf8')
-    .replace('ENABLED=true', 'ENABLED=false')
-    .replace('private-demo-password', '가'.repeat(25)))
-  assert.throws(() => readDemoConfiguration(envPath, {}), /72 UTF-8 bytes/)
+  const credentials = generateVerificationCredentials(deterministicRandom())
+  assert.match(credentials.email, /^clean-clone-[a-z0-9_-]+@example\.invalid$/)
+  assert.ok(credentials.password.length >= 12)
+  assert.ok(Buffer.byteLength(credentials.password, 'utf8') <= 72)
+  assert.doesNotMatch(readFileSync(envPath, 'utf8'), new RegExp(credentials.email))
+  assert.throws(() => generateVerificationCredentials(() => Buffer.alloc(1)), /invalid value/)
 })
 
 test('rejects shell overrides instead of masking the clone .env configuration', (t) => {
   const directory = temporaryDirectory(t)
   const envPath = join(directory, '.env')
-  writeFileSync(envPath, [
-    'SERVER_PORT=8181',
-    'PRIZM_BOOTSTRAP_DEMO_USER_ENABLED=true',
-    'PRIZM_BOOTSTRAP_DEMO_USER_EMAIL=file-demo@prizm.local',
-    'PRIZM_BOOTSTRAP_DEMO_USER_PASSWORD=file-private-demo-password',
-  ].join('\n'))
+  writeFileSync(envPath, 'SERVER_PORT=8181\n')
 
   assert.throws(
-    () => readDemoConfiguration(envPath, { PRIZM_BOOTSTRAP_DEMO_USER_ENABLED: 'false' }),
+    () => readCleanCloneConfiguration(envPath, { SERVER_PORT: '9191' }),
     (error) => {
-      assert.match(error.message, /PRIZM_BOOTSTRAP_DEMO_USER_ENABLED/)
-      assert.doesNotMatch(error.message, /true|false/)
+      assert.match(error.message, /SERVER_PORT/)
+      assert.doesNotMatch(error.message, /8181|9191/)
       return true
     },
   )
   assert.throws(
-    () => readDemoConfiguration(envPath, {
-      PRIZM_BOOTSTRAP_DEMO_USER_EMAIL: 'shell-demo@example.invalid',
+    () => readCleanCloneConfiguration(envPath, {
+      PRIZM_DEMO_BASE_URL: 'https://external.example.invalid',
     }),
     (error) => {
-      assert.match(error.message, /PRIZM_BOOTSTRAP_DEMO_USER_EMAIL/)
-      assert.doesNotMatch(error.message, /file-demo@prizm\.local|shell-demo@example\.invalid/)
+      assert.match(error.message, /PRIZM_DEMO_BASE_URL/)
+      assert.doesNotMatch(error.message, /external\.example\.invalid/)
       return true
     },
   )
@@ -399,31 +363,13 @@ test('rejects every non-loopback credential destination before calling fetch', a
   await assert.rejects(
     verifyCleanCloneDemo({
       baseUrl: 'https://example.invalid',
-      email: 'demo@prizm.local',
-      password: 'private-demo-password',
-      bootstrapEnabled: false,
+      credentials: { email: 'demo@prizm.local', password: 'private-demo-password' },
       manifestPath,
       fetchImpl: async () => { called = true; return Response.json({}) },
     }),
     /loopback/,
   )
   assert.equal(called, false)
-})
-
-test('requires an explicit disabled-bootstrap precondition', async (t) => {
-  const allowedRoot = temporaryDirectory(t)
-  const { manifestPath } = generateDemoFixtures(join(allowedRoot, 'fixtures'), { allowedRoot })
-  await assert.rejects(
-    verifyCleanCloneDemo({
-      baseUrl: 'http://127.0.0.1:8080',
-      email: 'demo@prizm.local',
-      password: 'private-demo-password',
-      bootstrapEnabled: true,
-      manifestPath,
-      fetchImpl: async () => Response.json({}),
-    }),
-    /explicitly disabled/,
-  )
 })
 
 test('never follows a credential-bearing HTTP redirect', async (t) => {
@@ -452,9 +398,7 @@ test('never follows a credential-bearing HTTP redirect', async (t) => {
   await assert.rejects(
     verifyCleanCloneDemo({
       baseUrl: `http://127.0.0.1:${redirectorPort}`,
-      email: 'demo@prizm.local',
-      password: 'private-demo-password',
-      bootstrapEnabled: false,
+      credentials: { email: 'demo@prizm.local', password: 'private-demo-password' },
       manifestPath,
     }),
     /fetch failed|redirect/i,
@@ -462,7 +406,7 @@ test('never follows a credential-bearing HTTP redirect', async (t) => {
   assert.equal(redirectedRequests, 0)
 })
 
-test('verifies USER login, TXT/PDF ACTIVE sources, and logged-out 401', async (t) => {
+test('verifies USER signup/login, TXT/PDF ACTIVE sources, and logged-out 401', async (t) => {
   const allowedRoot = temporaryDirectory(t)
   const { manifestPath } = generateDemoFixtures(join(allowedRoot, 'fixtures'), { allowedRoot })
   const polls = new Map()
@@ -470,8 +414,18 @@ test('verifies USER login, TXT/PDF ACTIVE sources, and logged-out 401', async (t
     ['PRIZM Clean Clone Synthetic TXT', { documentId: 11, versionId: 101, sourceType: 'TEXT_CHUNK', marker: 'GLASS ORBIT TEXT EVIDENCE 2026' }],
     ['PRIZM Clean Clone Synthetic PDF', { documentId: 12, versionId: 102, sourceType: 'PAGE', marker: 'AMBER PAGE SOURCE EVIDENCE 2026' }],
   ])
+  const requests = []
   const fetchImpl = async (url, init) => {
     const { pathname } = new URL(url)
+    requests.push(pathname)
+    if (pathname === '/api/auth/signup') {
+      assert.equal(init.redirect, 'error')
+      assert.deepEqual(JSON.parse(init.body), {
+        email: 'demo@prizm.local',
+        password: 'private-demo-password',
+      })
+      return new Response(null, { status: 201 })
+    }
     if (pathname === '/api/auth/login') {
       assert.equal(init.redirect, 'error')
       assert.equal(JSON.parse(init.body).password, 'private-demo-password')
@@ -531,9 +485,7 @@ test('verifies USER login, TXT/PDF ACTIVE sources, and logged-out 401', async (t
   let clock = 0
   const result = await verifyCleanCloneDemo({
     baseUrl: 'http://127.0.0.1:8080',
-    email: 'demo@prizm.local',
-    password: 'private-demo-password',
-    bootstrapEnabled: false,
+    credentials: { email: 'demo@prizm.local', password: 'private-demo-password' },
     manifestPath,
     fetchImpl,
     timeoutMs: 10,
@@ -544,34 +496,29 @@ test('verifies USER login, TXT/PDF ACTIVE sources, and logged-out 401', async (t
   assert.equal(result.documentsVerified, 2)
   assert.equal(result.unauthenticatedAccessRejected, true)
   assert.deepEqual(result.uploads.map((upload) => upload.sourceType), ['TEXT_CHUNK', 'PAGE'])
+  assert.deepEqual(requests.slice(0, 3), ['/api/auth/signup', '/api/auth/login', '/api/documents'])
 })
 
-test('rejects a reused database that already contains demo USER documents', async (t) => {
+test('rejects a reused database when verification signup is not new', async (t) => {
   const allowedRoot = temporaryDirectory(t)
   const { manifestPath } = generateDemoFixtures(join(allowedRoot, 'fixtures'), { allowedRoot })
+  let loginCalled = false
   const fetchImpl = async (url) => {
     const { pathname } = new URL(url)
-    if (pathname === '/api/auth/login') {
-      return Response.json({
-        accessToken: 'temporary-token',
-        tokenType: 'Bearer',
-        user: { id: 7, email: 'demo@prizm.local', role: 'USER' },
-      })
-    }
-    if (pathname === '/api/documents') return Response.json([{ documentId: 999 }])
+    if (pathname === '/api/auth/signup') return Response.json({}, { status: 409 })
+    if (pathname === '/api/auth/login') loginCalled = true
     return Response.json({}, { status: 404 })
   }
   await assert.rejects(
     verifyCleanCloneDemo({
       baseUrl: 'http://localhost:8080',
-      email: 'demo@prizm.local',
-      password: 'private-demo-password',
-      bootstrapEnabled: false,
+      credentials: { email: 'demo@prizm.local', password: 'private-demo-password' },
       manifestPath,
       fetchImpl,
     }),
-    /not an isolated clean-clone database/,
+    /signup returned HTTP 409/,
   )
+  assert.equal(loginCalled, false)
 })
 
 test('rejects empty, foreign, mismatched-version, and invalid-source search results', () => {

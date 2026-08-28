@@ -46,7 +46,8 @@ class CareerPlatformMigrationTest {
         assertPdfFileTypeSchema(database.jdbcTemplate());
         assertFileCleanupJobSchema(database.jdbcTemplate());
         assertProcessingProgressSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(16L);
+        assertUserRoleSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(17L);
         for (String table : DOCUMENT_TABLES) {
             assertThat(rowCount(database.jdbcTemplate(), table)).isZero();
         }
@@ -54,12 +55,13 @@ class CareerPlatformMigrationTest {
     }
 
     @Test
-    void migratesEmptyDocumentTablesWhenUserAndSystemAdminExist() {
+    void disablesAndConvertsLegacySystemAdminWhenMigratingLatest() {
         MigrationDatabase database = createMigrationDatabase();
 
         migrateTo(database, "7");
         createUser(database.jdbcTemplate(), "owner@prizm.local", "USER", true);
-        createUser(database.jdbcTemplate(), "operator@prizm.local", "SYSTEM_ADMIN", true);
+        Long legacySystemAdminId = createUser(
+                database.jdbcTemplate(), "operator@prizm.local", "SYSTEM_ADMIN", true);
 
         migrateLatest(database);
 
@@ -67,9 +69,46 @@ class CareerPlatformMigrationTest {
         assertDocumentTypeSchema(database.jdbcTemplate());
         assertFileCleanupJobSchema(database.jdbcTemplate());
         assertProcessingProgressSchema(database.jdbcTemplate());
+        assertUserRoleSchema(database.jdbcTemplate());
+        assertThat(database.jdbcTemplate().queryForObject(
+                "SELECT role FROM users WHERE id = ?", String.class, legacySystemAdminId)).isEqualTo("USER");
+        assertThat(database.jdbcTemplate().queryForObject(
+                "SELECT enabled FROM users WHERE id = ?", Boolean.class, legacySystemAdminId)).isFalse();
         for (String table : DOCUMENT_TABLES) {
             assertThat(rowCount(database.jdbcTemplate(), table)).isZero();
         }
+    }
+
+    @Test
+    void preservesLegacySystemAdminOwnedRowsWhileDisablingTheAccount() {
+        MigrationDatabase database = createMigrationDatabase();
+
+        migrateTo(database, "16");
+        Long legacySystemAdminId = createUser(
+                database.jdbcTemplate(), "legacy-admin@prizm.local", "SYSTEM_ADMIN", true);
+        String legacyPasswordHash = database.jdbcTemplate().queryForObject(
+                "SELECT password_hash FROM users WHERE id = ?", String.class, legacySystemAdminId);
+        Long documentId = database.jdbcTemplate().queryForObject(
+                "INSERT INTO documents(owner_user_id, title, document_type) VALUES (?, 'legacy-owned', 'OTHER') RETURNING id",
+                Long.class,
+                legacySystemAdminId);
+
+        migrateLatest(database);
+
+        assertThat(database.jdbcTemplate().queryForObject(
+                "SELECT role FROM users WHERE id = ?", String.class, legacySystemAdminId)).isEqualTo("USER");
+        assertThat(database.jdbcTemplate().queryForObject(
+                "SELECT enabled FROM users WHERE id = ?", Boolean.class, legacySystemAdminId)).isFalse();
+        assertThat(database.jdbcTemplate().queryForObject(
+                "SELECT password_hash FROM users WHERE id = ?", String.class, legacySystemAdminId))
+                .isEqualTo(legacyPasswordHash);
+        assertThat(database.jdbcTemplate().queryForObject(
+                "SELECT owner_user_id FROM documents WHERE id = ?", Long.class, documentId))
+                .isEqualTo(legacySystemAdminId);
+        assertUserRoleSchema(database.jdbcTemplate());
+        assertThatThrownBy(() -> createUser(
+                database.jdbcTemplate(), "rejected-admin@prizm.local", "SYSTEM_ADMIN", true))
+                .hasMessageContaining("ck_users_role");
     }
 
     @Test
@@ -93,7 +132,8 @@ class CareerPlatformMigrationTest {
         assertPdfFileTypeSchema(database.jdbcTemplate());
         assertFileCleanupJobSchema(database.jdbcTemplate());
         assertProcessingProgressSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(16L);
+        assertUserRoleSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(17L);
     }
 
     @Test
@@ -165,7 +205,8 @@ class CareerPlatformMigrationTest {
         assertPdfFileTypeSchema(database.jdbcTemplate());
         assertFileCleanupJobSchema(database.jdbcTemplate());
         assertProcessingProgressSchema(database.jdbcTemplate());
-        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(16L);
+        assertUserRoleSchema(database.jdbcTemplate());
+        assertThat(successfulMigrationCount(database.jdbcTemplate())).isEqualTo(17L);
     }
 
     @Test
@@ -451,6 +492,14 @@ class CareerPlatformMigrationTest {
                 String.class)).contains(
                         "OLLAMA_UNAVAILABLE", "OLLAMA_MODEL_NOT_INSTALLED",
                         "OLLAMA_RUNTIME_FAILURE", "DOCUMENT_PROCESSING_FAILED");
+    }
+
+    private void assertUserRoleSchema(JdbcTemplate jdbcTemplate) {
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'ck_users_role'",
+                String.class))
+                .contains("USER")
+                .doesNotContain("SYSTEM_ADMIN", "ADMIN");
     }
 
     private long ownerColumnCount(JdbcTemplate jdbcTemplate, String tableName) {

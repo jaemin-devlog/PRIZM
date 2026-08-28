@@ -8,10 +8,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import com.prizm.auth.bootstrap.BcryptPasswordPolicy;
 import com.prizm.auth.dto.request.LoginRequest;
 import com.prizm.auth.dto.response.LoginResponse;
 import com.prizm.auth.exception.InvalidCredentialsException;
+import com.prizm.auth.security.BcryptPasswordPolicy;
 import com.prizm.user.entity.UserAccount;
 import com.prizm.user.entity.UserRole;
 import com.prizm.user.repository.UserAccountRepository;
@@ -40,18 +40,18 @@ class AuthServiceTest {
     @Test
     void logsInWithARealBcryptPasswordHash() {
         UserAccount user = UserAccount.create(
-                "system-admin@example.com",
+                "user@example.com",
                 passwordEncoder.encode("correct-password"),
-                UserRole.SYSTEM_ADMIN);
-        when(userAccountRepository.findByEmail("system-admin@example.com")).thenReturn(Optional.of(user));
+                UserRole.USER);
+        when(userAccountRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
         when(jwtTokenService.issue(user)).thenReturn(new IssuedAccessToken("signed-token", 3600));
 
         LoginResponse response = authService.login(
-                new LoginRequest("SYSTEM-ADMIN@example.com", "correct-password"));
+                new LoginRequest("USER@example.com", "correct-password"));
 
         assertThat(response.accessToken()).isEqualTo("signed-token");
         assertThat(response.tokenType()).isEqualTo("Bearer");
-        assertThat(response.user().role()).isEqualTo(UserRole.SYSTEM_ADMIN);
+        assertThat(response.user().role()).isEqualTo(UserRole.USER);
     }
 
     @Test

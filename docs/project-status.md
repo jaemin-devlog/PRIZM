@@ -4,7 +4,7 @@
 >
 > PRZ-020 기능 통합 근거: [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b`
 >
-> 현재 작업: PRZ-021 Fresh Clone 첫 사용자 경험 정합화는 구현 commit `a0c2977`로 검증됐으며 [PR #65](https://github.com/jaemin-devlog/PRIZM/pull/65)가 열려 있음
+> PRZ-021 기능 통합 근거: 구현 `a0c2977`, [PR #65](https://github.com/jaemin-devlog/PRIZM/pull/65), 병합 `60e5fc6` — main 통합 완료
 
 현재 상태는 소스 코드, 적용된 Flyway migration과 실행 가능한 test를 기준으로 판단합니다. Spec과 이 문서는 구현 증거를 대신하지 않습니다.
 
@@ -114,7 +114,7 @@
 | 채용공고 근거 보기 동작 통일 | 통합됨 | [PR #58](https://github.com/jaemin-devlog/PRIZM/pull/58), 병합 `12acb3a` |
 | 태그 연결 문서 수·TXT 미리보기·TXT/PDF 원문 보기 | `VERIFIED` | PRZ-019, [PR #60](https://github.com/jaemin-devlog/PRIZM/pull/60), 병합 `01d6c46` |
 | 인증 초기화 제거와 단일 `USER` 역할 전환 | `VERIFIED` | PRZ-020, [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b` |
-| Fresh Clone 첫 사용자 경험 정합화 | `VERIFIED` (PR open) | 구현 `a0c2977`, [PR #65](https://github.com/jaemin-devlog/PRIZM/pull/65), [PRZ-021 검증 기록](../specs/PRZ-021-first-user-experience/evidence.md) |
+| Fresh Clone 첫 사용자 경험 정합화 | `VERIFIED` | 구현 `a0c2977`, [PR #65](https://github.com/jaemin-devlog/PRIZM/pull/65), 병합 `60e5fc6`, [PRZ-021 검증 기록](../specs/PRZ-021-first-user-experience/evidence.md) |
 
 PostgreSQL 성공은 OpenSQL 증거가 아닙니다. OpenSQL·OpenProxy 결과는 기록된 단일
 서버 direct 연결과 single-Primary 실행 경로에 한정합니다. 명령, 환경과 수치는

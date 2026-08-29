@@ -18,7 +18,10 @@
 - 시작 시 열린 PR / Issue: `0 / 0`
 - baseline CI: [CI run 33262813914](https://github.com/jaemin-devlog/PRIZM/actions/runs/33262813914) `PASS`
 - baseline OSS Readiness: [run 33262813898](https://github.com/jaemin-devlog/PRIZM/actions/runs/33262813898) `PASS`
-- closeout PR·branch CI: PR 생성 뒤 최종 확인
+- closeout PR: [#68](https://github.com/jaemin-devlog/PRIZM/pull/68)
+- closeout source commit: `3d20fe038c0e2d0d961767ff4d36b6e6a946c2d6`
+- closeout PR CI: [CI run 33264765801](https://github.com/jaemin-devlog/PRIZM/actions/runs/33264765801) `PASS`
+- closeout PR OSS Readiness: [run 33264765866](https://github.com/jaemin-devlog/PRIZM/actions/runs/33264765866) `PASS`
 
 ## 제품 범위와 source 감사
 
@@ -155,5 +158,5 @@ baseline에서 다시 실행했다는 뜻이 아니다. PostgreSQL 결과를 이
 - Agent 독립 감사: `PASS`
 - GitHub review: `REVIEW_NOT_AVAILABLE_SOLO`
 - 새 기능·Production source·migration 변경: 0
-- commit·push·PR: 통합 단계에서 실행
+- commit·push·PR: `PASS` — PR [#68](https://github.com/jaemin-devlog/PRIZM/pull/68)
 - merge·tag·GitHub Release: `NOT_RUN`

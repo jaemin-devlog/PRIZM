@@ -13,4 +13,4 @@
 - [x] VERIFY: OpenSQL/OpenProxy 현재 재실행 가능성 판단과 정확한 상태 기록
 - [x] AUDIT: 전체 diff와 blocking correctness/security finding 재감사
 - [x] EVIDENCE: final baseline·실행 결과·known limitations·최종 판정 기록
-- [ ] INTEGRATE: Closeout 파일만 commit·push, PR 생성, CI 확인(merge·tag·release 제외)
+- [x] INTEGRATE: Closeout 파일만 commit·push, PR 생성, CI 확인(merge·tag·release 제외)

@@ -40,6 +40,7 @@ PRZ-008과 PRZ-016의 `IN_PROGRESS`는 필수 검증 항목이 모두 끝나지 
 | PRZ | 상태 | 범위 |
 |---|---|---|
 | [PRZ-021](PRZ-021-first-user-experience/spec.md) | `VERIFIED` | TXT 원문 이동, Quickstart·clean-clone owner 정합화와 fresh MCP/client 재검증. 구현 `a0c2977`, [PR #65](https://github.com/jaemin-devlog/PRIZM/pull/65), 병합 `60e5fc6` |
+| [PRZ-022](PRZ-022-backend-reliability-evidence/spec.md) | `VERIFIED` | 기준선 `3af4db0`의 Worker·USER owner isolation·cleanup을 PostgreSQL/Linux에서 실행. 검색은 `HISTORICAL_EVIDENCE_VERIFIED`로 한정 |
 
 ## 검색 연구·평가 기록
 
@@ -86,6 +87,7 @@ PRZ-008과 PRZ-016의 `IN_PROGRESS`는 필수 검증 항목이 모두 끝나지 
 | [PRZ-019](PRZ-019-document-usability-fixes/spec.md) | 태그 문서 수 명확화와 TXT 원문 미리보기 | `VERIFIED` | `4932aa8`, [PR #60](https://github.com/jaemin-devlog/PRIZM/pull/60), 병합 `01d6c46` |
 | [PRZ-020](PRZ-020-auth-bootstrap-cleanup/spec.md) | 인증 초기화 제거와 빠른 시작 단순화 | `VERIFIED` | `831b2bb`, [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b` |
 | [PRZ-021](PRZ-021-first-user-experience/spec.md) | Fresh Clone 첫 사용자 경험 정합화 | `VERIFIED` | 기준선 `fb8befe`, 구현 `a0c2977`, [PR #65](https://github.com/jaemin-devlog/PRIZM/pull/65), 병합 `60e5fc6` |
+| [PRZ-022](PRZ-022-backend-reliability-evidence/spec.md) | 백엔드 신뢰성 Evidence 재검증 | `VERIFIED` | 기준선 `3af4db0`; PostgreSQL Worker·USER 격리·cleanup D1–D6 및 Linux 23건 PASS, 검색은 과거 동결 근거만 재검증 |
 
 ## 상태와 결과
 

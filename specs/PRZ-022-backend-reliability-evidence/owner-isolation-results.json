@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "baselineMain": "3af4db05f5f1b2d9802335de5eac9ad7b98555fa",
+  "environment": "Windows JVM / PostgreSQL 16 + pgvector Testcontainers Linux container / USER-only / Ollama bge-m3",
+  "users": ["USER_A", "USER_B", "USER_C"],
+  "repetitions": 10,
+  "totalAttempts": 240,
+  "readAttempts": 100,
+  "mutationAttempts": 80,
+  "restSearchAttempts": 30,
+  "mcpSearchAttempts": 30,
+  "dataExposure": 0,
+  "unauthorizedMutation": 0,
+  "inactiveLeak": 0,
+  "restCrossOwnerResult": 0,
+  "mcpCrossOwnerEvidence": 0,
+  "status": "PASS"
+}

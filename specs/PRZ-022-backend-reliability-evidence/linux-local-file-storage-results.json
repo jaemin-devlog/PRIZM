@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "baselineMain": "3af4db05f5f1b2d9802335de5eac9ad7b98555fa",
+  "environment": "Docker Linux / gradle:8.14.3-jdk17 / Java 17",
+  "testClass": "com.prizm.infrastructure.storage.LocalFileStorageTest",
+  "total": 23,
+  "passed": 23,
+  "skipped": 0,
+  "failed": 0,
+  "verifiedContracts": [
+    "path traversal rejection",
+    "symbolic-link rejection",
+    "parent replacement protection",
+    "SecureDirectoryStream descriptor-relative deletion",
+    "NOFOLLOW_LINKS",
+    "fail-closed without unsafe fallback",
+    "missing-file idempotency"
+  ],
+  "status": "PASS"
+}

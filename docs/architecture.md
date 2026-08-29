@@ -46,21 +46,7 @@ PRIZM의 구조는 다음 조건을 지키기 위해 선택되었습니다.
 임베딩 생성을 요청합니다.
 Ollama는 벡터를 만들 뿐 사용자 권한이나 검색 가능 여부를 판단하지 않습니다.
 
-```mermaid
-flowchart LR
-    U["사용자"]
-    M["표준 MCP client<br/>MCP 호환 프로그램"]
-    P["PRIZM<br/>웹 화면과 Spring Boot"]
-    DB[("관계형 DB와 vector")]
-    FS[("로컬 원본 저장소")]
-    O["외부 Ollama<br/>bge-m3"]
-
-    U <--> P
-    M -->|"POST /mcp"| P
-    P <--> DB
-    P <--> FS
-    P <--> O
-```
+[![PRIZM 사용자, MCP 클라이언트, 웹 API, PostgreSQL·pgvector, 원본 저장소와 Ollama의 연결](assets/diagrams/prizm-system-architecture.png)](assets/diagrams/prizm-system-architecture.png)
 
 MCP 경로는 연결 상태를 서버에 저장하지 않는(stateless) Streamable HTTP와 통신
 규격(protocol) `2025-11-25`를 사용합니다.
@@ -84,39 +70,7 @@ Docker Compose는 `db`, `backend`, `frontend` 세 컨테이너와 두 named volu
 구성합니다. Ollama `bge-m3`는 Compose 서비스가 아니라 호스트에서 별도로
 실행합니다.
 
-```mermaid
-flowchart LR
-    U["사용자 브라우저"]
-
-    subgraph FE["Frontend container"]
-        N["Nginx 실행 환경<br/>React SPA 제공<br/>/api · /actuator reverse proxy"]
-    end
-
-    subgraph BE["Backend container · 하나의 Spring Boot 프로세스"]
-        API["REST API<br/>인증 · 문서 관리 · 검색"]
-        CD["ChangeLog Dispatcher"]
-        IW["Indexing Scheduler / Worker"]
-        CW["Cleanup Scheduler / Worker"]
-    end
-
-    DB[("PostgreSQL 16 + pgvector")]
-    DV[("DB volume")]
-    FS[("Backend 실행 volume<br/>업로드 원본")]
-    O["Host Ollama<br/>bge-m3"]
-
-    U <--> N
-    N -->|"/api · /actuator"| API
-    API <--> DB
-    API <--> FS
-    API <--> O
-    CD <--> DB
-    IW <--> DB
-    IW <--> FS
-    IW <--> O
-    CW <--> DB
-    CW <--> FS
-    DB --- DV
-```
+[![Docker Compose의 Frontend, Backend, PostgreSQL 컨테이너와 볼륨, 호스트 Ollama 연결](assets/diagrams/prizm-local-deployment-architecture.png)](assets/diagrams/prizm-local-deployment-architecture.png)
 
 Frontend 이미지는 Node build stage에서 React 정적 파일을 만든 뒤, 최종 Nginx
 실행 stage에 결과만 복사합니다. 실제 요청은 Nginx가 `/api`와 `/actuator`를
@@ -162,51 +116,7 @@ backend로 전달합니다. ChangeLog Dispatcher와 Indexing·Cleanup Scheduler�
 구성 요소입니다. 정상 흐름은 다음과 같습니다. DB 작업을 짧게 나누기 때문에 파일 읽기,
 PDF 추출, 문서 분할과 Ollama 호출 중에는 완료 트랜잭션의 행 잠금을 유지하지 않습니다.
 
-```mermaid
-sequenceDiagram
-    participant U as 사용자 브라우저
-    participant N as Nginx
-    participant A as Spring Boot API
-    participant DB as PostgreSQL
-    participant FS as 원본 저장소
-    participant D as ChangeLog Dispatcher
-    participant W as Indexing Worker
-    participant O as Ollama bge-m3
-
-    U->>N: JWT와 TXT/PDF 업로드
-    N->>A: /api 요청 전달
-    A->>DB: JWT subject의 enabled·email·role 재확인
-    A->>FS: 서버 생성 경로에 원본 저장
-    A->>DB: 문서·QUARANTINED 버전·PENDING ChangeLog를 한 transaction으로 commit
-    Note over DB: 새 버전은 아직 검색 대상이 아님
-
-    D->>DB: PENDING ChangeLog를 SKIP LOCKED로 선점
-    D->>DB: INDEXING 작업 생성·재사용, ChangeLog DISPATCHED
-
-    W->>DB: 작업 선점·버전을 PROCESSING으로 전환
-    Note over W,DB: FILE_READING 단계 기록
-    W->>FS: 원본 읽기
-    W->>DB: TEXT_EXTRACTION → CHUNK_CREATION 단계 기록
-    W->>W: TXT/PDF 추출과 문서 조각 분할
-    W->>DB: EMBEDDING 0/N 기록
-    loop 각 chunk
-        W->>O: 임베딩 요청
-        O-->>W: 검증할 1024차원 벡터
-        W->>DB: completed_chunks 갱신
-    end
-    W->>DB: SAVING 단계 기록
-    W->>DB: 완료 transaction
-    Note over W,DB: 문서 조각 교체·버전 ACTIVE·active_version_id 교체·작업 COMPLETED
-
-    U->>N: JWT와 자연어 검색
-    N->>A: /api 요청 전달
-    A->>DB: 현재 사용자 재확인
-    A->>O: 질문 임베딩 요청
-    O-->>A: 검증할 1024차원 벡터
-    A->>DB: owner·ACTIVE 후보에서 거리 계산
-    DB-->>A: 원문과 페이지·텍스트 위치
-    A-->>U: 최대 5개의 경력 근거
-```
+[![사용자 브라우저부터 Nginx, Spring Boot, PostgreSQL, 원본 저장소, Dispatcher, Worker와 Ollama를 거치는 업로드·색인·검색 시퀀스](assets/diagrams/prizm-upload-index-search.png)](assets/diagrams/prizm-upload-index-search.png)
 
 업로드 트랜잭션이 원본 저장 뒤 rollback되면 보상 삭제를 시도합니다. 이 삭제도
 실패하면 정리 작업을 등록합니다. 문서 처리 완료 시에는 생성한 모든 임베딩을 다시
@@ -232,23 +142,7 @@ PRIZM 검색은 사용자의 `ACTIVE` 문서에서 질문과 관련된 원문을
 연결합니다. 즉, 관련 원문 검색 및 위치 찾기를 수행합니다. 현재 적용된 검색은 다음
 순서로 동작합니다.
 
-```mermaid
-flowchart TD
-    Q[사용자 질문] --> E[bge-m3 임베딩]
-    E --> D[owner·ACTIVE 범위<br/>Dense Top 20]
-    D --> I[identifier corpus guard]
-    I --> S[source consolidation]
-    S --> C[eligibility]
-    C --> G[query-evidence consolidation]
-    G --> R[bounded ranking<br/>최대 5건]
-    R --> X[짧은 exact-token rescue<br/>numeric post-filter]
-    X --> F{결과가 비었는가}
-    F -->|예| N[제한적 자연어 fallback<br/>이후 numeric exact rescue]
-    F -->|아니요| P[표시 내용 중복 제거]
-    N --> P
-    P --> L[선택 chunk 우선 localization<br/>필요할 때만 주변 근거 확장]
-    L --> A[extractive snippet·TXT/PDF 위치]
-```
+[![사용자 질문에서 후보 검색, 보호·통합·재정렬·제한적 보강을 거쳐 원문 위치와 발췌문을 만드는 검색 파이프라인](assets/diagrams/prizm-search-result-pipeline.png)](assets/diagrams/prizm-search-result-pipeline.png)
 
 검색 질문과 문서 조각은 같은 `bge-m3` 모델의 1024차원 임베딩을 사용합니다.
 저장과 검색 전에는 차원 수, 모든 값의 유한성, 0이 아닌 norm을 검사합니다.

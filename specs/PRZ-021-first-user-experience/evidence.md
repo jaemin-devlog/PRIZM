@@ -2,9 +2,9 @@
 
 > **상태:** `VERIFIED`
 > **기준선:** `fb8befe3fa876882f1c8b918097d3e7d4774d53d`
-> **검증 대상:** 기준선에서 시작한 로컬 미커밋 `PRZ-021-first-user-experience` 작업 트리
+> **검증 대상:** `PRZ-021-first-user-experience` 구현 commit `a0c2977`
 > **검증일:** 2026-08-29
-> **통합 상태:** commit / push / PR `NOT_RUN`
+> **통합 상태:** 원격 branch push 완료, [PR #65](https://github.com/jaemin-devlog/PRIZM/pull/65) `OPEN`, merge `NOT_RUN`
 
 ## 원인 확인
 
@@ -144,7 +144,8 @@ config를 삭제했으며 token과 credential은 tracked file이나 Evidence에 
   DB schema 변경: 0
 - MCP Production code, dependency, logger와 transport 변경: 0
 - 임시 MCP credential config, tracked secret과 unrelated change: 0
-- commit, push와 PR: `NOT_RUN`
+- 구현 commit `a0c2977`, 원격 branch push와 [PR #65](https://github.com/jaemin-devlog/PRIZM/pull/65) 생성: 완료
+- merge: `NOT_RUN`
 - 독립 구현 재감사: blocking finding 0
 
 `FIRST_USER_EXPERIENCE_READY`

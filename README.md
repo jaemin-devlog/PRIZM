@@ -15,7 +15,11 @@ PRIZM은 이력서·포트폴리오 같은 커리어 문서를 업로드하면 �
 
 PRIZM에 로그인하면 등록한 커리어 문서를 바탕으로 필요한 내용을 찾고, 관련 원문을 다시 열어볼 수 있습니다.
 
-[![PRIZM 시작 화면. 흩어진 커리어 기록을 한곳에서 찾고 다시 열어볼 수 있다는 안내가 표시됩니다.](docs/assets/screenshots/prizm-welcome.png)](docs/assets/screenshots/prizm-welcome.png)
+<p align="center">
+  <a href="docs/assets/screenshots/prizm-welcome.png">
+    <img src="docs/assets/screenshots/prizm-welcome.png" alt="PRIZM 시작 화면. 흩어진 커리어 기록을 한곳에서 찾고 다시 열어볼 수 있다는 안내가 표시됩니다." width="50%">
+  </a>
+</p>
 
 문서 상세 화면에서는 업로드한 PDF를 미리 보고, 보존된 버전과 현재 검색에 사용하는 `ACTIVE` 버전을 함께 확인할 수 있습니다. 아래 화면의 이름과 문서는 기능 설명을 위한 시연용 데이터입니다.
 

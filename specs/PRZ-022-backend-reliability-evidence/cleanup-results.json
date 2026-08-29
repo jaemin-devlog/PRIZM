@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "baselineMain": "3af4db05f5f1b2d9802335de5eac9ad7b98555fa",
+  "environment": "Linux JVM / PostgreSQL 16 + pgvector external Docker container / SecureDirectoryStream",
+  "repetitions": 10,
+  "workerCounts": [2, 4, 8],
+  "compensationCompleted": 10,
+  "cleanupJobs": 70,
+  "completed": 70,
+  "retry": 30,
+  "recovered": 20,
+  "claimAttempts": 140,
+  "duplicateClaims": 0,
+  "staleAttempts": 20,
+  "staleAccepted": 0,
+  "duplicateCompletionAttempts": 30,
+  "duplicateCompletionAccepted": 0,
+  "unrecovered": 0,
+  "orphanRemaining": 0,
+  "unrelatedFileDeletion": 0,
+  "status": "PASS"
+}

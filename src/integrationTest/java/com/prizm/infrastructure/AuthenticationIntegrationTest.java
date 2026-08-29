@@ -27,6 +27,7 @@ import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.infrastructure.storage.FileStorage;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
 import com.prizm.ingestion.repository.ProcessingJobRepository;
+import com.prizm.mcp.CareerEvidenceMcpTool;
 import com.prizm.user.entity.UserAccount;
 import com.prizm.user.entity.UserRole;
 import com.prizm.user.repository.UserAccountRepository;
@@ -38,6 +39,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,6 +60,10 @@ import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -133,6 +139,9 @@ class AuthenticationIntegrationTest {
     @Autowired
     FileCleanupCoordinator fileCleanupCoordinator;
 
+    @Autowired
+    CareerEvidenceMcpTool careerEvidenceMcpTool;
+
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -153,6 +162,250 @@ class AuthenticationIntegrationTest {
         jdbcTemplate.update("DELETE FROM documents");
         jdbcTemplate.update("DELETE FROM tags WHERE source = 'USER'");
         userAccountRepository.deleteAll();
+    }
+
+    @Test
+    void recordsPrz022UserOnlyOwnerIsolationMatrix() throws Exception {
+        int repetitions = 10;
+        UserAccount userA = createUser("prz022-a@prizm.local", UserRole.USER, true);
+        UserAccount userB = createUser("prz022-b@prizm.local", UserRole.USER, true);
+        UserAccount userC = createUser("prz022-c@prizm.local", UserRole.USER, true);
+        String tokenA = login(userA.getEmail());
+        String tokenB = login(userB.getEmail());
+        String tokenC = login(userC.getEmail());
+
+        DocumentUploadResponse txtA = documentUploadService.upload(
+                userA.getId(),
+                "PRZ-022 A TXT",
+                DocumentType.RESUME,
+                new MockMultipartFile(
+                        "file",
+                        "owner-a.txt",
+                        MediaType.TEXT_PLAIN_VALUE,
+                        "owner A original TXT".getBytes(StandardCharsets.UTF_8)));
+        DocumentUploadResponse pdfA = documentUploadService.upload(
+                userA.getId(),
+                "PRZ-022 A PDF",
+                DocumentType.PORTFOLIO,
+                new MockMultipartFile(
+                        "file",
+                        "owner-a.pdf",
+                        MediaType.APPLICATION_PDF_VALUE,
+                        textPdf("Owner A PDF")));
+        ActiveDocument searchA = createActiveDocument(
+                userA.getId(), "PRZ-022 A searchable", "AXQ-7741 owner A private evidence");
+        ActiveDocument searchB = createActiveDocument(
+                userB.getId(), "PRZ-022 B searchable", "BETA-5520 owner B evidence");
+        ActiveDocument searchC = createActiveDocument(
+                userC.getId(), "PRZ-022 C searchable", "GAMMA-6630 owner C evidence");
+
+        Long inactiveVersionId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO document_versions(
+                    owner_user_id, document_id, version_no, original_file_name, stored_file_path, file_type,
+                    content_hash, status
+                )
+                VALUES (?, ?, 2, 'owner-a-inactive.txt', 'pending', 'TXT', repeat('9', 64), 'FAILED')
+                RETURNING id
+                """,
+                Long.class,
+                userA.getId(),
+                txtA.documentId());
+        String inactiveStorageKey = fileStorage.store(
+                txtA.documentId(),
+                inactiveVersionId,
+                "owner-a-inactive.txt",
+                "INACTIVE-ZQX-9917 owner A hidden version".getBytes(StandardCharsets.UTF_8));
+        jdbcTemplate.update(
+                "UPDATE document_versions SET stored_file_path = ? WHERE id = ?",
+                inactiveStorageKey,
+                inactiveVersionId);
+        jdbcTemplate.update(
+                """
+                INSERT INTO document_chunks(
+                    owner_user_id, content, embedding, document_version_id, chunk_no, page_no,
+                    source_type, source_index, source_label
+                )
+                VALUES (?, ?, CAST(? AS vector), ?, 1, NULL, 'TEXT_CHUNK', 1, '텍스트 구간 1')
+                """,
+                userA.getId(),
+                "INACTIVE-ZQX-9917 owner A hidden version",
+                toVectorLiteral(embeddingService.embed("INACTIVE-ZQX-9917 owner A hidden version")),
+                inactiveVersionId);
+
+        String txtStorageKey = jdbcTemplate.queryForObject(
+                "SELECT stored_file_path FROM document_versions WHERE id = ?", String.class, txtA.versionId());
+        String pdfStorageKey = jdbcTemplate.queryForObject(
+                "SELECT stored_file_path FROM document_versions WHERE id = ?", String.class, pdfA.versionId());
+        Set<Long> ownerADocumentIds = Set.of(txtA.documentId(), pdfA.documentId(), searchA.documentId());
+        int readAttempts = 0;
+        int mutationAttempts = 0;
+        int restAttempts = 0;
+        int mcpAttempts = 0;
+
+        try {
+            for (int repetition = 0; repetition < repetitions; repetition++) {
+                for (String otherToken : List.of(tokenB, tokenC)) {
+                    String listBody = mockMvc.perform(get("/api/documents")
+                                    .header(HttpHeaders.AUTHORIZATION, bearer(otherToken)))
+                            .andExpect(status().isOk())
+                            .andReturn().getResponse().getContentAsString();
+                    List<Number> listedIds = JsonPath.read(listBody, "$[*].documentId");
+                    assertThat(listedIds.stream().map(Number::longValue).toList())
+                            .doesNotContainAnyElementsOf(ownerADocumentIds);
+                    readAttempts++;
+
+                    mockMvc.perform(get("/api/documents/{documentId}", txtA.documentId())
+                                    .header(HttpHeaders.AUTHORIZATION, bearer(otherToken)))
+                            .andExpect(status().isNotFound());
+                    readAttempts++;
+                    mockMvc.perform(get("/api/documents/{documentId}/versions/{versionId}/original",
+                                    txtA.documentId(), txtA.versionId())
+                                    .header(HttpHeaders.AUTHORIZATION, bearer(otherToken)))
+                            .andExpect(status().isNotFound());
+                    readAttempts++;
+                    mockMvc.perform(get("/api/documents/{documentId}/versions/{versionId}/original",
+                                    pdfA.documentId(), pdfA.versionId())
+                                    .header(HttpHeaders.AUTHORIZATION, bearer(otherToken)))
+                            .andExpect(status().isNotFound());
+                    readAttempts++;
+                    mockMvc.perform(get("/api/documents/{documentId}/versions/{versionId}/original",
+                                    txtA.documentId(), inactiveVersionId)
+                                    .header(HttpHeaders.AUTHORIZATION, bearer(otherToken)))
+                            .andExpect(status().isNotFound());
+                    readAttempts++;
+
+                    String originalTitle = jdbcTemplate.queryForObject(
+                            "SELECT title FROM documents WHERE id = ?", String.class, txtA.documentId());
+                    Long originalVersionCount = jdbcTemplate.queryForObject(
+                            "SELECT COUNT(*) FROM document_versions WHERE document_id = ?",
+                            Long.class,
+                            txtA.documentId());
+
+                    mockMvc.perform(patch("/api/documents/{documentId}", txtA.documentId())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content("{\"title\":\"unauthorized\",\"documentType\":\"OTHER\"}")
+                                    .header(HttpHeaders.AUTHORIZATION, bearer(otherToken)))
+                            .andExpect(status().isNotFound());
+                    mutationAttempts++;
+                    mockMvc.perform(delete("/api/documents/{documentId}", txtA.documentId())
+                                    .header(HttpHeaders.AUTHORIZATION, bearer(otherToken)))
+                            .andExpect(status().isNoContent());
+                    mutationAttempts++;
+                    mockMvc.perform(multipart("/api/documents/{documentId}/versions", txtA.documentId())
+                                    .file(new MockMultipartFile(
+                                            "file",
+                                            "unauthorized.txt",
+                                            MediaType.TEXT_PLAIN_VALUE,
+                                            "must not persist".getBytes(StandardCharsets.UTF_8)))
+                                    .header(HttpHeaders.AUTHORIZATION, bearer(otherToken)))
+                            .andExpect(status().isNotFound());
+                    mutationAttempts++;
+                    mockMvc.perform(delete("/api/documents/{documentId}/versions/{versionId}",
+                                    txtA.documentId(), inactiveVersionId)
+                                    .header(HttpHeaders.AUTHORIZATION, bearer(otherToken)))
+                            .andExpect(status().isNoContent());
+                    mutationAttempts++;
+
+                    assertThat(jdbcTemplate.queryForObject(
+                            "SELECT title FROM documents WHERE id = ?", String.class, txtA.documentId()))
+                            .isEqualTo(originalTitle);
+                    assertThat(jdbcTemplate.queryForObject(
+                            "SELECT COUNT(*) FROM document_versions WHERE document_id = ?",
+                            Long.class,
+                            txtA.documentId())).isEqualTo(originalVersionCount);
+                    assertThat(jdbcTemplate.queryForObject(
+                            "SELECT COUNT(*) FROM document_versions WHERE id = ?",
+                            Long.class,
+                            inactiveVersionId)).isEqualTo(1L);
+
+                    String restBody = mockMvc.perform(post("/api/v2/career-evidence/search")
+                                    .header(HttpHeaders.AUTHORIZATION, bearer(otherToken))
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content("{\"query\":\"AXQ-7741\"}"))
+                            .andExpect(status().isOk())
+                            .andReturn().getResponse().getContentAsString();
+                    List<Number> restDocumentIds = JsonPath.read(restBody, "$.results[*].documentId");
+                    assertThat(restDocumentIds.stream().map(Number::longValue).toList())
+                            .doesNotContain(searchA.documentId());
+                    restAttempts++;
+
+                    UserAccount mcpUser = otherToken.equals(tokenB) ? userB : userC;
+                    setMcpUser(mcpUser);
+                    CareerEvidenceMcpTool.CareerEvidenceMcpResponse mcp = careerEvidenceMcpTool.search("AXQ-7741");
+                    assertThat(mcp.results())
+                            .extracting(CareerEvidenceMcpTool.CareerEvidenceMcpResult::documentId)
+                            .doesNotContain(searchA.documentId());
+                    mcpAttempts++;
+                    SecurityContextHolder.clearContext();
+                }
+
+                String inactiveRestBody = mockMvc.perform(post("/api/v2/career-evidence/search")
+                                .header(HttpHeaders.AUTHORIZATION, bearer(tokenA))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"query\":\"INACTIVE-ZQX-9917\"}"))
+                        .andExpect(status().isOk())
+                        .andReturn().getResponse().getContentAsString();
+                List<Number> inactiveRestVersions = JsonPath.read(
+                        inactiveRestBody, "$.results[*].documentVersionId");
+                assertThat(inactiveRestVersions.stream().map(Number::longValue).toList())
+                        .doesNotContain(inactiveVersionId);
+                restAttempts++;
+
+                setMcpUser(userA);
+                CareerEvidenceMcpTool.CareerEvidenceMcpResponse inactiveMcp =
+                        careerEvidenceMcpTool.search("INACTIVE-ZQX-9917");
+                assertThat(inactiveMcp.results())
+                        .extracting(CareerEvidenceMcpTool.CareerEvidenceMcpResult::documentVersionId)
+                        .doesNotContain(inactiveVersionId);
+                mcpAttempts++;
+                SecurityContextHolder.clearContext();
+            }
+
+            int totalAttempts = readAttempts + mutationAttempts + restAttempts + mcpAttempts;
+            assertThat(readAttempts).isEqualTo(100);
+            assertThat(mutationAttempts).isEqualTo(80);
+            assertThat(restAttempts).isEqualTo(30);
+            assertThat(mcpAttempts).isEqualTo(30);
+            String result = """
+                    {
+                      "schemaVersion": 1,
+                      "baselineMain": "3af4db05f5f1b2d9802335de5eac9ad7b98555fa",
+                      "environment": "Windows JVM / PostgreSQL 16 + pgvector Testcontainers Linux container / USER-only / Ollama bge-m3",
+                      "users": ["USER_A", "USER_B", "USER_C"],
+                      "repetitions": %d,
+                      "totalAttempts": %d,
+                      "readAttempts": %d,
+                      "mutationAttempts": %d,
+                      "restSearchAttempts": %d,
+                      "mcpSearchAttempts": %d,
+                      "dataExposure": 0,
+                      "unauthorizedMutation": 0,
+                      "inactiveLeak": 0,
+                      "restCrossOwnerResult": 0,
+                      "mcpCrossOwnerEvidence": 0,
+                      "status": "PASS"
+                    }
+                    """.formatted(
+                    repetitions,
+                    totalAttempts,
+                    readAttempts,
+                    mutationAttempts,
+                    restAttempts,
+                    mcpAttempts);
+            Files.writeString(
+                    Path.of("specs/PRZ-022-backend-reliability-evidence/owner-isolation-results.json"),
+                    result,
+                    StandardCharsets.UTF_8);
+        }
+        finally {
+            SecurityContextHolder.clearContext();
+            for (String storageKey : List.of(txtStorageKey, pdfStorageKey, inactiveStorageKey)) {
+                Files.deleteIfExists(STORAGE_ROOT.resolve(storageKey));
+            }
+            assertThat(documentRepositoryCount(searchB.documentId())).isEqualTo(1L);
+            assertThat(documentRepositoryCount(searchC.documentId())).isEqualTo(1L);
+        }
     }
 
     @Test
@@ -919,6 +1172,25 @@ class AuthenticationIntegrationTest {
     private String tokenFor(UserRole role) {
         UserAccount user = createUser(role, true);
         return login(user.getEmail());
+    }
+
+    private void setMcpUser(UserAccount user) {
+        Jwt jwt = Jwt.withTokenValue("prz022-evidence-token")
+                .header("alg", "none")
+                .subject(user.getId().toString())
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plusSeconds(300))
+                .claim("email", user.getEmail())
+                .claim("role", user.getRole().name())
+                .build();
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(new JwtAuthenticationToken(jwt, List.of()));
+        SecurityContextHolder.setContext(context);
+    }
+
+    private Long documentRepositoryCount(Long documentId) {
+        return jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM documents WHERE id = ?", Long.class, documentId);
     }
 
     private String login(String email) {

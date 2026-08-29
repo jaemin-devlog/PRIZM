@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "baselineMain": "3af4db05f5f1b2d9802335de5eac9ad7b98555fa",
+  "generatedAt": "2026-08-29T12:08:23.966Z",
+  "scope": "historical frozen raw-result consistency and current Production-path audit",
+  "currentAccuracyClaim": "NOT_CLAIMED",
+  "phases": {
+    "P0": {
+      "file": "specs/PRZ-016-search-performance-v2/p0-benchmark/baseline-results.json",
+      "sha256": "a8048a2a5d5f5d9952b86061cedf590b671235d5c4a152b2618879ec8b94f35d",
+      "recorded": {
+        "totalQueries": 72,
+        "positiveQueries": 56,
+        "negativeQueries": 16,
+        "top1Accuracy": 0.5714285714285714,
+        "recallAt3": 0.6607142857142857,
+        "recallAt5": 0.6785714285714286,
+        "mrrAt5": 0.6145833333333333,
+        "negativeFalsePositiveRate": 0.0625
+      },
+      "recomputed": {
+        "totalQueries": 72,
+        "positiveQueries": 56,
+        "negativeQueries": 16,
+        "top1Accuracy": 0.5714285714285714,
+        "recallAt3": 0.6607142857142857,
+        "recallAt5": 0.6785714285714286,
+        "mrrAt5": 0.6145833333333333,
+        "negativeFalsePositiveRate": 0.0625
+      },
+      "consistent": true
+    },
+    "P4": {
+      "file": "specs/PRZ-016-search-performance-v2/p4-evidence-localization/benchmark-results.json",
+      "sha256": "64bf9229e73e25b8aa9befcdd54556f746fb9e3da5755a900302042364d900b3",
+      "recorded": {
+        "totalQueries": 72,
+        "positiveQueries": 56,
+        "negativeQueries": 16,
+        "top1Accuracy": 0.8214285714285714,
+        "recallAt3": 0.8571428571428571,
+        "recallAt5": 0.8571428571428571,
+        "mrrAt5": 0.8363095238095238,
+        "negativeFalsePositiveRate": 0
+      },
+      "recomputed": {
+        "totalQueries": 72,
+        "positiveQueries": 56,
+        "negativeQueries": 16,
+        "top1Accuracy": 0.8214285714285714,
+        "recallAt3": 0.8571428571428571,
+        "recallAt5": 0.8571428571428571,
+        "mrrAt5": 0.8363095238095238,
+        "negativeFalsePositiveRate": 0
+      },
+      "consistent": true
+    },
+    "P5": {
+      "file": "specs/PRZ-016-search-performance-v2/p5-final-holdout/holdout-results.json",
+      "sha256": "5c1e57e5950fc4fa060bcc3c756ec5a000b7a2db10aa03e68fc3c271b53cf752",
+      "recorded": {
+        "totalQueries": 48,
+        "positiveQueries": 36,
+        "negativeQueries": 12,
+        "top1Accuracy": 0.5,
+        "recallAt3": 0.6111111111111112,
+        "recallAt5": 0.6111111111111112,
+        "mrrAt5": 0.5509259259259259,
+        "negativeFalsePositiveRate": 0.25
+      },
+      "recomputed": {
+        "totalQueries": 48,
+        "positiveQueries": 36,
+        "negativeQueries": 12,
+        "top1Accuracy": 0.5,
+        "recallAt3": 0.6111111111111112,
+        "recallAt5": 0.6111111111111112,
+        "mrrAt5": 0.5509259259259259,
+        "negativeFalsePositiveRate": 0.25
+      },
+      "consistent": true
+    },
+    "P7-B": {
+      "file": "specs/PRZ-016-search-performance-v2/p7-b-independent-generalization/evaluated-results.json",
+      "sha256": "249a34668f4daaba833ad1885dec4c439d34959e05d7808e0fafa2466436d78e",
+      "recorded": {
+        "total": 48,
+        "positive": 36,
+        "negative": 12,
+        "top1": 0.3333333333333333,
+        "recallAt3": 0.5833333333333334,
+        "recallAt5": 0.5833333333333334,
+        "mrrAt5": 0.449074074074074,
+        "negativeFpr": 0.4166666666666667
+      },
+      "recomputed": {
+        "total": 48,
+        "positive": 36,
+        "negative": 12,
+        "top1": 0.3333333333333333,
+        "recallAt3": 0.5833333333333334,
+        "recallAt5": 0.5833333333333334,
+        "mrrAt5": 0.449074074074074,
+        "negativeFpr": 0.4166666666666667
+      },
+      "consistent": true
+    }
+  },
+  "freezeChecks": {
+    "p5Dataset": true,
+    "p5GroundTruth": true,
+    "p7Raw": true
+  },
+  "shadowNotPromoted": {
+    "postgresFts": true,
+    "reciprocalRankFusion": true,
+    "evidenceJudge": true,
+    "semanticNli": true
+  },
+  "limitation": "P0/P4/P5/P7-B are frozen historical executions; this audit does not rerun Ollama retrieval on current main.",
+  "status": "PASS"
+}

@@ -28,6 +28,7 @@
 - [문서 조회 서비스](../../src/main/java/com/prizm/document/service/DocumentQueryService.java)
 - [벡터 검색 SQL](../../src/main/java/com/prizm/search/repository/VectorSearchRepository.java)
 - [인증·격리 통합 테스트](../../src/integrationTest/java/com/prizm/infrastructure/AuthenticationIntegrationTest.java)
+- [현재 기준 Evidence 감사](../../specs/PRZ-022-backend-reliability-evidence/evidence.md#3-user-owner-isolation)
 
 ## 2. 긴 비동기 처리에서 중복 선점과 늦은 완료 차단
 
@@ -54,6 +55,7 @@ PDF 추출과 Ollama 호출 동안 DB 행 잠금을 유지하면 다른 작업�
 - [lease heartbeat](../../src/main/java/com/prizm/ingestion/service/WorkerLeaseHeartbeat.java)
 - [원자적 완료](../../src/main/java/com/prizm/ingestion/service/IndexingCompletionService.java)
 - [Worker 통합 테스트](../../src/integrationTest/java/com/prizm/infrastructure/PgVectorInfrastructureTest.java)
+- [현재 기준 Evidence 감사](../../specs/PRZ-022-backend-reliability-evidence/evidence.md#2-비동기-worker-correctness)
 
 ## 3. DB transaction 밖의 원본 파일을 안전하게 정리
 
@@ -80,3 +82,34 @@ DB rollback 뒤 원본 보상 삭제도 실패하면 고아 파일이 남는다.
 - [cleanup coordinator](../../src/main/java/com/prizm/cleanup/service/FileCleanupCoordinator.java)
 - [안전한 파일 삭제](../../src/main/java/com/prizm/infrastructure/storage/LocalFileStorage.java)
 - [V12](../../src/main/resources/db/migration/V12__add_file_cleanup_jobs.sql), [V13](../../src/main/resources/db/migration/V13__add_file_cleanup_worker_fields.sql)
+- [현재 기준 Evidence 감사](../../specs/PRZ-022-backend-reliability-evidence/evidence.md#4-db--filesystem-cleanup-실패-복구)
+
+## 4. 검색 개선 수치와 일반화 실패를 분리해 해석
+
+### 문제
+
+development dataset에서 좋아진 수치를 현재 제품의 일반화 정확도로 소개하면 unseen
+질문이나 독립 사용자 문서에서 확인된 실패가 가려진다. 실패한 shadow 실험까지 현재
+Production 검색에 섞으면 제3자가 실제 동작을 재현하기도 어렵다.
+
+### 해결
+
+- P0와 P4 development, P5 frozen holdout, P7-B independent corpus를 별도 단계로 보존했다.
+- 단계별 원시 JSON에서 Top1·Recall@5·MRR@5·Negative FPR을 다시 계산하고 freeze hash를
+  확인하는 스크립트를 제공한다.
+- P4 Top1 82.14%를 현재 정확도라고 부르지 않고 P5와 P7-B의 `FAIL` 판정을 함께 제시한다.
+- PostgreSQL FTS·RRF·Judge·NLI shadow가 현재 Production 검색 경로로 승격되지 않았는지도
+  source에서 따로 확인한다.
+
+### 검증과 트레이드오프
+
+동결 원시 결과와 기록된 summary는 일치했다. 다만 이번 검증의 범위는 과거 결과의
+무결성과 현재 source 경로까지다. 현재 `main`에서 Ollama 검색을 다시 실행한
+generalization benchmark는 아니다. 현재 정확도를 주장하려면 corpus·질문·model·source를
+새로 freeze한 뒤 독립 실행해야 한다.
+
+근거:
+
+- [PRZ-016 검색 연구 기록](../../specs/PRZ-016-search-performance-v2/README.md)
+- [PRZ-022 검색 재계산 결과](../../specs/PRZ-022-backend-reliability-evidence/search-results-summary.json)
+- [PRZ-022 최종 판정](../../specs/PRZ-022-backend-reliability-evidence/evidence.md#1-검색-품질일반화)

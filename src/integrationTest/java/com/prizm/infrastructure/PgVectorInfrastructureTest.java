@@ -28,6 +28,7 @@ import com.prizm.cleanup.service.FileCleanupJobService;
 import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.embedding.service.EmbeddingValidator;
 import com.prizm.infrastructure.storage.FileStorage;
+import com.prizm.infrastructure.storage.TransientFileStorageException;
 import com.prizm.ingestion.entity.ProcessingJobStatus;
 import com.prizm.ingestion.entity.ChunkSourceType;
 import com.prizm.ingestion.exception.DocumentIndexingException;
@@ -62,6 +63,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SecureDirectoryStream;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -70,6 +72,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -83,6 +86,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.http.MediaType;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -1353,6 +1357,520 @@ class PgVectorInfrastructureTest {
         }
         finally {
             testMaintenanceJdbcTemplate().update("DELETE FROM file_cleanup_jobs WHERE storage_key = ?", storageKey);
+        }
+    }
+
+    @Test
+    void recordsPrz022WorkerReliabilityEvidence() throws Exception {
+        int repetitions = 10;
+        int[] workerCounts = {2, 4, 8};
+        int claimAttempts = 0;
+        int successfulClaims = 0;
+        int emptyClaims = 0;
+        int duplicateClaims = 0;
+        int completionAttempts = 0;
+        int completed = 0;
+        int staleCompletionAttempts = 0;
+        int staleCompletionAccepted = 0;
+        int duplicateCompletionAttempts = 0;
+        int duplicateCompletionAccepted = 0;
+        int lostJobEquivalent = 0;
+        int recovered = 0;
+        int heartbeatMaintained = 0;
+        int activeStabilityAssertions = 0;
+
+        for (int workerCount : workerCounts) {
+            for (int repetition = 0; repetition < repetitions; repetition++) {
+                PendingJobFixture fixture = createPendingIndexingJob(
+                        "PRZ-022 claim competition " + workerCount + "-" + repetition);
+                ExecutorService executor = Executors.newFixedThreadPool(workerCount);
+                CountDownLatch start = new CountDownLatch(1);
+                try {
+                    List<Future<Optional<ClaimedProcessingJob>>> futures = new ArrayList<>();
+                    for (int worker = 0; worker < workerCount; worker++) {
+                        futures.add(executor.submit(() -> {
+                            start.await(5, TimeUnit.SECONDS);
+                            return processingJobClaimService.claimNext();
+                        }));
+                    }
+                    start.countDown();
+                    List<ClaimedProcessingJob> claims = new ArrayList<>();
+                    for (Future<Optional<ClaimedProcessingJob>> future : futures) {
+                        future.get(10, TimeUnit.SECONDS).ifPresent(claims::add);
+                    }
+                    claimAttempts += workerCount;
+                    successfulClaims += claims.size();
+                    emptyClaims += workerCount - claims.size();
+                    duplicateClaims += Math.max(0, claims.size() - 1);
+                    assertThat(claims).hasSize(1);
+                    assertThat(claims.get(0).processingJobId()).isEqualTo(fixture.processingJobId());
+
+                    completionAttempts++;
+                    indexingCompletionService.complete(claims.get(0), List.of(indexedChunk("competition result")));
+                    completed++;
+                    assertThat(documentRepository.findById(fixture.documentId()).orElseThrow().getActiveVersionId())
+                            .isEqualTo(fixture.documentVersionId());
+                    activeStabilityAssertions++;
+                }
+                finally {
+                    executor.shutdownNow();
+                    assertThat(executor.awaitTermination(5, TimeUnit.SECONDS)).isTrue();
+                    deleteCommittedDocumentData();
+                }
+            }
+        }
+
+        for (int repetition = 0; repetition < repetitions; repetition++) {
+            PendingJobFixture fixture = createPendingIndexingJob("PRZ-022 duplicate completion " + repetition);
+            try {
+                ClaimedProcessingJob claim = processingJobClaimService.claimNext().orElseThrow();
+                indexingCompletionService.complete(claim, List.of(indexedChunk("first completion")));
+                completionAttempts++;
+                completed++;
+                duplicateCompletionAttempts++;
+                completionAttempts++;
+                assertThatThrownBy(() -> indexingCompletionService.complete(
+                        claim, List.of(indexedChunk("duplicate completion"))))
+                        .isInstanceOf(StaleProcessingJobClaimException.class);
+                assertThat(jdbcTemplate.queryForObject(
+                        "SELECT COUNT(*) FROM document_chunks WHERE document_version_id = ?",
+                        Long.class,
+                        fixture.documentVersionId())).isEqualTo(1L);
+                activeStabilityAssertions++;
+            }
+            finally {
+                deleteCommittedDocumentData();
+            }
+        }
+
+        for (int repetition = 0; repetition < repetitions; repetition++) {
+            PendingJobFixture fixture = createPendingIndexingJob("PRZ-022 lost job recovery " + repetition);
+            try {
+                ClaimedProcessingJob workerA = processingJobClaimService.claimNext().orElseThrow();
+                lostJobEquivalent++;
+                jdbcTemplate.update(
+                        "UPDATE processing_jobs SET lease_expires_at = now() - INTERVAL '1 second' WHERE id = ?",
+                        fixture.processingJobId());
+                assertThat(processingJobRecoveryService.recoverNext()).isTrue();
+                recovered++;
+                jdbcTemplate.update(
+                        "UPDATE processing_jobs SET next_retry_at = now() - INTERVAL '1 second' WHERE id = ?",
+                        fixture.processingJobId());
+                ClaimedProcessingJob workerB = processingJobClaimService.claimNext().orElseThrow();
+
+                staleCompletionAttempts++;
+                completionAttempts++;
+                assertThatThrownBy(() -> indexingCompletionService.complete(
+                        workerA, List.of(indexedChunk("stale result"))))
+                        .isInstanceOf(StaleProcessingJobClaimException.class);
+                assertThat(jdbcTemplate.queryForObject(
+                        "SELECT COUNT(*) FROM document_chunks WHERE document_version_id = ?",
+                        Long.class,
+                        fixture.documentVersionId())).isZero();
+
+                completionAttempts++;
+                indexingCompletionService.complete(workerB, List.of(indexedChunk("recovered result")));
+                completed++;
+                assertThat(documentRepository.findById(fixture.documentId()).orElseThrow().getActiveVersionId())
+                        .isEqualTo(fixture.documentVersionId());
+                activeStabilityAssertions++;
+            }
+            finally {
+                deleteCommittedDocumentData();
+            }
+        }
+
+        for (int repetition = 0; repetition < repetitions; repetition++) {
+            PendingJobFixture fixture = createPendingIndexingJob("PRZ-022 heartbeat " + repetition);
+            try {
+                ClaimedProcessingJob worker = processingJobClaimService.claimNext().orElseThrow();
+                jdbcTemplate.update(
+                        "UPDATE processing_jobs SET lease_expires_at = now() - INTERVAL '1 second' WHERE id = ?",
+                        fixture.processingJobId());
+                processingJobLeaseService.renew(worker);
+                assertThat(processingJobRecoveryService.recoverNext()).isFalse();
+                heartbeatMaintained++;
+                completionAttempts++;
+                indexingCompletionService.complete(worker, List.of(indexedChunk("heartbeat result")));
+                completed++;
+                assertThat(documentRepository.findById(fixture.documentId()).orElseThrow().getActiveVersionId())
+                        .isEqualTo(fixture.documentVersionId());
+                activeStabilityAssertions++;
+            }
+            finally {
+                deleteCommittedDocumentData();
+            }
+        }
+
+        assertThat(duplicateClaims).isZero();
+        assertThat(staleCompletionAccepted).isZero();
+        assertThat(duplicateCompletionAccepted).isZero();
+        assertThat(recovered).isEqualTo(lostJobEquivalent);
+        String result = """
+                {
+                  "schemaVersion": 1,
+                  "baselineMain": "3af4db05f5f1b2d9802335de5eac9ad7b98555fa",
+                  "environment": "Windows JVM / PostgreSQL 16 + pgvector Testcontainers Linux container",
+                  "repetitions": %d,
+                  "workerCounts": [2, 4, 8],
+                  "claimAttempts": %d,
+                  "successfulClaims": %d,
+                  "emptyClaims": %d,
+                  "duplicateClaims": %d,
+                  "completionAttempts": %d,
+                  "completed": %d,
+                  "duplicateCompletionAttempts": %d,
+                  "duplicateCompletionAccepted": %d,
+                  "lostJobEquivalent": %d,
+                  "lostJobDefinition": "claim 이후 heartbeat/completion이 중단된 Worker 소실 등가 상태",
+                  "recovered": %d,
+                  "heartbeatMaintained": %d,
+                  "staleCompletionAttempts": %d,
+                  "staleCompletionAccepted": %d,
+                  "activeStabilityAssertions": %d,
+                  "unrecovered": %d,
+                  "status": "PASS"
+                }
+                """.formatted(
+                repetitions,
+                claimAttempts,
+                successfulClaims,
+                emptyClaims,
+                duplicateClaims,
+                completionAttempts,
+                completed,
+                duplicateCompletionAttempts,
+                duplicateCompletionAccepted,
+                lostJobEquivalent,
+                recovered,
+                heartbeatMaintained,
+                staleCompletionAttempts,
+                staleCompletionAccepted,
+                activeStabilityAssertions,
+                lostJobEquivalent - recovered);
+        Files.writeString(
+                Path.of("specs/PRZ-022-backend-reliability-evidence/worker-results.json"),
+                result,
+                StandardCharsets.UTF_8);
+    }
+
+    @Test
+    void recordsPrz022CleanupReliabilityEvidence() throws Exception {
+        assumeSecureFileDeletionSupported();
+        int repetitions = 10;
+        int[] workerCounts = {2, 4, 8};
+        int compensationCompleted = 0;
+        int cleanupJobs = 0;
+        int completed = 0;
+        int retry = 0;
+        int recovered = 0;
+        int staleAttempts = 0;
+        int staleAccepted = 0;
+        int duplicateCompletionAttempts = 0;
+        int duplicateCompletionAccepted = 0;
+        int claimAttempts = 0;
+        int duplicateClaims = 0;
+        int orphanRemaining = 0;
+        int unrelatedFileDeletion = 0;
+
+        try {
+            for (int repetition = 0; repetition < repetitions; repetition++) {
+                int currentRepetition = repetition;
+                Long ownerUserId = createUser();
+                String[] storageKey = new String[1];
+                TransactionTemplate transaction = new TransactionTemplate(transactionManager);
+                transaction.executeWithoutResult(status -> {
+                    DocumentUploadResponse upload = documentUploadService.upload(
+                            ownerUserId,
+                            "PRZ-022 D1 " + currentRepetition,
+                            new MockMultipartFile(
+                                    "file",
+                                    "d1.txt",
+                                    MediaType.TEXT_PLAIN_VALUE,
+                                    "rollback compensation".getBytes(StandardCharsets.UTF_8)));
+                    documentVersionRepository.flush();
+                    storageKey[0] = jdbcTemplate.queryForObject(
+                            "SELECT stored_file_path FROM document_versions WHERE id = ?",
+                            String.class,
+                            upload.versionId());
+                    status.setRollbackOnly();
+                });
+                assertThat(Files.exists(STORAGE_ROOT.resolve(storageKey[0]))).isFalse();
+                assertThat(jdbcTemplate.queryForObject(
+                        "SELECT COUNT(*) FROM file_cleanup_jobs WHERE storage_key = ?",
+                        Long.class,
+                        storageKey[0])).isZero();
+                compensationCompleted++;
+                testMaintenanceJdbcTemplate().update("DELETE FROM users WHERE id = ?", ownerUserId);
+            }
+
+            for (int repetition = 0; repetition < repetitions; repetition++) {
+                int currentRepetition = repetition;
+                Long ownerUserId = createUser();
+                String[] storageKey = new String[1];
+                Path unrelated = STORAGE_ROOT.resolve("prz022-unrelated/d2-" + repetition + ".txt");
+                Files.createDirectories(unrelated.getParent());
+                Files.writeString(unrelated, "must remain", StandardCharsets.UTF_8);
+                TransactionTemplate transaction = new TransactionTemplate(transactionManager);
+                transaction.executeWithoutResult(status -> {
+                    DocumentUploadResponse upload = documentUploadService.upload(
+                            ownerUserId,
+                            "PRZ-022 D2 " + currentRepetition,
+                            new MockMultipartFile(
+                                    "file",
+                                    "d2.txt",
+                                    MediaType.TEXT_PLAIN_VALUE,
+                                    "compensation failure".getBytes(StandardCharsets.UTF_8)));
+                    documentVersionRepository.flush();
+                    storageKey[0] = jdbcTemplate.queryForObject(
+                            "SELECT stored_file_path FROM document_versions WHERE id = ?",
+                            String.class,
+                            upload.versionId());
+                    Path stored = STORAGE_ROOT.resolve(storageKey[0]);
+                    try {
+                        Files.delete(stored);
+                        Files.createSymbolicLink(stored, unrelated);
+                    }
+                    catch (IOException exception) {
+                        throw new UncheckedIOException(exception);
+                    }
+                    status.setRollbackOnly();
+                });
+                cleanupJobs++;
+                assertThat(cleanupStatus(storageKey[0])).isEqualTo("PENDING");
+                Path stored = STORAGE_ROOT.resolve(storageKey[0]);
+                Files.delete(stored);
+                assertThat(fileCleanupCoordinator.processNext()).isTrue();
+                assertThat(cleanupStatus(storageKey[0])).isEqualTo("COMPLETED");
+                completed++;
+                if (!Files.exists(unrelated)) {
+                    unrelatedFileDeletion++;
+                }
+                Files.deleteIfExists(unrelated);
+                testMaintenanceJdbcTemplate().update("DELETE FROM users WHERE id = ?", ownerUserId);
+            }
+
+            for (int repetition = 0; repetition < repetitions; repetition++) {
+                String storageKey = "documents/prz022/d3-" + repetition + ".txt";
+                Path file = STORAGE_ROOT.resolve(storageKey);
+                Files.createDirectories(file.getParent());
+                Files.writeString(file, "transient", StandardCharsets.UTF_8);
+                AtomicInteger deleteAttempts = new AtomicInteger();
+                FileStorage transientOnce = new FileStorage() {
+                    @Override
+                    public String store(long documentId, long versionId, String originalFileName, byte[] content) {
+                        return fileStorage.store(documentId, versionId, originalFileName, content);
+                    }
+
+                    @Override
+                    public byte[] read(String storedFilePath) {
+                        return fileStorage.read(storedFilePath);
+                    }
+
+                    @Override
+                    public void delete(String storedFilePath) {
+                        if (deleteAttempts.getAndIncrement() == 0) {
+                            throw new TransientFileStorageException(
+                                    "simulated transient cleanup failure",
+                                    new IOException("simulated"));
+                        }
+                        fileStorage.delete(storedFilePath);
+                    }
+                };
+                FileCleanupCoordinator coordinator = new FileCleanupCoordinator(
+                        fileCleanupJobClaimService,
+                        transientOnce,
+                        fileCleanupCompletionService,
+                        fileCleanupFailureClassifier,
+                        fileCleanupFailureService);
+                fileCleanupJobService.registerPendingCleanup(storageKey);
+                cleanupJobs++;
+                assertThat(coordinator.processNext()).isTrue();
+                assertThat(cleanupStatus(storageKey)).isEqualTo("RETRY_WAIT");
+                retry++;
+                jdbcTemplate.update(
+                        "UPDATE file_cleanup_jobs SET available_at = now() - INTERVAL '1 second' WHERE storage_key = ?",
+                        storageKey);
+                assertThat(coordinator.processNext()).isTrue();
+                assertThat(cleanupStatus(storageKey)).isEqualTo("COMPLETED");
+                assertThat(Files.exists(file)).isFalse();
+                completed++;
+            }
+
+            for (int repetition = 0; repetition < repetitions; repetition++) {
+                String storageKey = "documents/prz022/d4-" + repetition + ".txt";
+                Path file = STORAGE_ROOT.resolve(storageKey);
+                Files.createDirectories(file.getParent());
+                Files.writeString(file, "completion failure", StandardCharsets.UTF_8);
+                FileCleanupCompletionService failingCompletion = new FileCleanupCompletionService(
+                        fileCleanupJobRepository) {
+                    @Override
+                    public void complete(ClaimedFileCleanupJob job) {
+                        throw new DataAccessResourceFailureException("simulated completion update failure");
+                    }
+                };
+                FileCleanupCoordinator coordinator = new FileCleanupCoordinator(
+                        fileCleanupJobClaimService,
+                        fileStorage,
+                        failingCompletion,
+                        fileCleanupFailureClassifier,
+                        fileCleanupFailureService);
+                fileCleanupJobService.registerPendingCleanup(storageKey);
+                cleanupJobs++;
+                assertThat(coordinator.processNext()).isTrue();
+                assertThat(cleanupStatus(storageKey)).isEqualTo("PROCESSING");
+                long jobId = jdbcTemplate.queryForObject(
+                        "SELECT id FROM file_cleanup_jobs WHERE storage_key = ?", Long.class, storageKey);
+                long claimVersion = jdbcTemplate.queryForObject(
+                        "SELECT claim_version FROM file_cleanup_jobs WHERE storage_key = ?", Long.class, storageKey);
+                ClaimedFileCleanupJob stale = new ClaimedFileCleanupJob(
+                        jobId, storageKey, 0, claimVersion, Instant.EPOCH);
+                jdbcTemplate.update(
+                        "UPDATE file_cleanup_jobs SET lease_expires_at = now() - INTERVAL '1 second' WHERE storage_key = ?",
+                        storageKey);
+                assertThat(fileCleanupJobRecoveryService.recoverNext()).isTrue();
+                retry++;
+                recovered++;
+                staleAttempts++;
+                assertThatThrownBy(() -> fileCleanupCompletionService.complete(stale))
+                        .isInstanceOf(StaleFileCleanupJobClaimException.class);
+                jdbcTemplate.update(
+                        "UPDATE file_cleanup_jobs SET available_at = now() - INTERVAL '1 second' WHERE storage_key = ?",
+                        storageKey);
+                assertThat(fileCleanupCoordinator.processNext()).isTrue();
+                assertThat(cleanupStatus(storageKey)).isEqualTo("COMPLETED");
+                completed++;
+            }
+
+            for (int repetition = 0; repetition < repetitions; repetition++) {
+                String storageKey = "documents/prz022/d5-" + repetition + ".txt";
+                Path file = STORAGE_ROOT.resolve(storageKey);
+                Files.createDirectories(file.getParent());
+                Files.writeString(file, "stale cleanup", StandardCharsets.UTF_8);
+                fileCleanupJobService.registerPendingCleanup(storageKey);
+                cleanupJobs++;
+                ClaimedFileCleanupJob workerA = fileCleanupJobClaimService.claimNext().orElseThrow();
+                jdbcTemplate.update(
+                        "UPDATE file_cleanup_jobs SET lease_expires_at = now() - INTERVAL '1 second' WHERE storage_key = ?",
+                        storageKey);
+                assertThat(fileCleanupJobRecoveryService.recoverNext()).isTrue();
+                retry++;
+                recovered++;
+                jdbcTemplate.update(
+                        "UPDATE file_cleanup_jobs SET available_at = now() - INTERVAL '1 second' WHERE storage_key = ?",
+                        storageKey);
+                ClaimedFileCleanupJob workerB = fileCleanupJobClaimService.claimNext().orElseThrow();
+                staleAttempts++;
+                assertThatThrownBy(() -> fileCleanupCompletionService.complete(workerA))
+                        .isInstanceOf(StaleFileCleanupJobClaimException.class);
+                fileStorage.delete(storageKey);
+                fileCleanupCompletionService.complete(workerB);
+                assertThat(cleanupStatus(storageKey)).isEqualTo("COMPLETED");
+                completed++;
+            }
+
+            for (int workerCount : workerCounts) {
+                for (int repetition = 0; repetition < repetitions; repetition++) {
+                    String storageKey = "documents/prz022/d6-" + workerCount + "-" + repetition + ".txt";
+                    Path file = STORAGE_ROOT.resolve(storageKey);
+                    Files.createDirectories(file.getParent());
+                    Files.writeString(file, "competition", StandardCharsets.UTF_8);
+                    fileCleanupJobService.registerPendingCleanup(storageKey);
+                    cleanupJobs++;
+                    ExecutorService executor = Executors.newFixedThreadPool(workerCount);
+                    CountDownLatch start = new CountDownLatch(1);
+                    try {
+                        List<Future<Optional<ClaimedFileCleanupJob>>> futures = new ArrayList<>();
+                        for (int worker = 0; worker < workerCount; worker++) {
+                            futures.add(executor.submit(() -> {
+                                start.await(5, TimeUnit.SECONDS);
+                                return fileCleanupJobClaimService.claimNext();
+                            }));
+                        }
+                        start.countDown();
+                        List<ClaimedFileCleanupJob> claims = new ArrayList<>();
+                        for (Future<Optional<ClaimedFileCleanupJob>> future : futures) {
+                            future.get(10, TimeUnit.SECONDS).ifPresent(claims::add);
+                        }
+                        claimAttempts += workerCount;
+                        duplicateClaims += Math.max(0, claims.size() - 1);
+                        assertThat(claims).hasSize(1);
+                        ClaimedFileCleanupJob winner = claims.get(0);
+                        fileStorage.delete(storageKey);
+                        fileCleanupCompletionService.complete(winner);
+                        completed++;
+                        duplicateCompletionAttempts++;
+                        assertThatThrownBy(() -> fileCleanupCompletionService.complete(winner))
+                                .isInstanceOf(StaleFileCleanupJobClaimException.class);
+                    }
+                    finally {
+                        executor.shutdownNow();
+                        assertThat(executor.awaitTermination(5, TimeUnit.SECONDS)).isTrue();
+                    }
+                }
+            }
+
+            orphanRemaining = (int) Files.walk(STORAGE_ROOT)
+                    .filter(Files::isRegularFile)
+                    .filter(path -> path.toString().contains("prz022"))
+                    .count();
+            assertThat(cleanupJobs).isEqualTo(70);
+            assertThat(completed).isEqualTo(cleanupJobs);
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM file_cleanup_jobs WHERE status <> 'COMPLETED'",
+                    Long.class)).isZero();
+            assertThat(staleAccepted).isZero();
+            assertThat(duplicateCompletionAccepted).isZero();
+            assertThat(duplicateClaims).isZero();
+            assertThat(orphanRemaining).isZero();
+            assertThat(unrelatedFileDeletion).isZero();
+
+            String result = """
+                    {
+                      "schemaVersion": 1,
+                      "baselineMain": "3af4db05f5f1b2d9802335de5eac9ad7b98555fa",
+                      "environment": "Linux JVM / PostgreSQL 16 + pgvector external Docker container / SecureDirectoryStream",
+                      "repetitions": %d,
+                      "workerCounts": [2, 4, 8],
+                      "compensationCompleted": %d,
+                      "cleanupJobs": %d,
+                      "completed": %d,
+                      "retry": %d,
+                      "recovered": %d,
+                      "claimAttempts": %d,
+                      "duplicateClaims": %d,
+                      "staleAttempts": %d,
+                      "staleAccepted": %d,
+                      "duplicateCompletionAttempts": %d,
+                      "duplicateCompletionAccepted": %d,
+                      "unrecovered": %d,
+                      "orphanRemaining": %d,
+                      "unrelatedFileDeletion": %d,
+                      "status": "PASS"
+                    }
+                    """.formatted(
+                    repetitions,
+                    compensationCompleted,
+                    cleanupJobs,
+                    completed,
+                    retry,
+                    recovered,
+                    claimAttempts,
+                    duplicateClaims,
+                    staleAttempts,
+                    staleAccepted,
+                    duplicateCompletionAttempts,
+                    duplicateCompletionAccepted,
+                    cleanupJobs - completed,
+                    orphanRemaining,
+                    unrelatedFileDeletion);
+            Files.writeString(
+                    Path.of("specs/PRZ-022-backend-reliability-evidence/cleanup-results.json"),
+                    result,
+                    StandardCharsets.UTF_8);
+        }
+        finally {
+            deleteCommittedDocumentData();
         }
     }
 

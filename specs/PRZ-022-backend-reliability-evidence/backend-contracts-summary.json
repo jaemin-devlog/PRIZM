@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "baselineMain": "3af4db05f5f1b2d9802335de5eac9ad7b98555fa",
+  "generatedAt": "2026-08-29T12:11:18.519Z",
+  "scope": "current-source and executable-test contract presence; not runtime evidence",
+  "contracts": {
+    "worker": {
+      "src/main/java/com/prizm/ingestion/repository/ProcessingJobClaimRepository.java": {
+        "sha256": "bd2c532fc097d2db74752c5232c42f3726f239c3ec770a3bb91c3b7852f55bb6",
+        "checks": {
+          "FOR UPDATE OF job SKIP LOCKED": true,
+          "now()": true,
+          "claim_version = claim_version + 1": true
+        }
+      },
+      "src/main/java/com/prizm/ingestion/service/WorkerLeaseHeartbeat.java": {
+        "sha256": "85ca61c552af20025d6d0a2562860a5c1ec1562166ea25af67044bdcf0e625c4",
+        "checks": {
+          "ProcessingJobLeaseService": true
+        }
+      },
+      "src/main/java/com/prizm/ingestion/service/ProcessingJobLeaseService.java": {
+        "sha256": "c7cdedcf0af52c29ac4b441da8735703a71bd0b868aaf4040ee2ca8b3ba693e0",
+        "checks": {
+          "claimVersion": true
+        }
+      },
+      "src/main/java/com/prizm/ingestion/service/ProcessingJobRecoveryService.java": {
+        "sha256": "19ae95c3a7206486b07c2f1a3745cf1484c5f7bbb622b4c775b6e8f7d3cd2840",
+        "checks": {
+          "recoverNext": true
+        }
+      },
+      "src/main/java/com/prizm/ingestion/service/IndexingCompletionService.java": {
+        "sha256": "cdbf1f75a861ac75892afdc1bd52b569283020a44d1f820d0b52a47b47fe4aff",
+        "checks": {
+          "@Transactional": true,
+          "claimVersion": true
+        }
+      }
+    },
+    "ownerIsolation": {
+      "src/main/java/com/prizm/document/service/DocumentQueryService.java": {
+        "sha256": "037a24f9884d263645f406ed8f8058bd2b871bcd3ea5a0f1584b2ecc54232e7a",
+        "checks": {
+          "ownerUserId": true
+        }
+      },
+      "src/main/java/com/prizm/document/service/DocumentManagementService.java": {
+        "sha256": "7e68a8bfef2455e15e011336cb3b082378bd0ae379e56c6dc6e07f11442435bf",
+        "checks": {
+          "findByIdAndOwnerUserIdForUpdate": true
+        }
+      },
+      "src/main/java/com/prizm/document/service/DocumentUploadService.java": {
+        "sha256": "06e7455da993b88f31baa8f46841008199b805b1e021c9161d83d8de1aed3500",
+        "checks": {
+          "findByIdAndOwnerUserIdForUpdate": true
+        }
+      },
+      "src/main/java/com/prizm/document/service/DocumentThumbnailService.java": {
+        "sha256": "0b948577d72e387adc69c74a677bba32e2dad2479dc76951ec7b59886943d905",
+        "checks": {
+          "findByIdAndOwnerUserIdAndDocumentId": true
+        }
+      },
+      "src/main/java/com/prizm/search/repository/VectorSearchRepository.java": {
+        "sha256": "e570d952f0ec8bc9d3c2dd4e4598cb29aa28c13fba18c69d3dcfbd77c985d10a",
+        "checks": {
+          "owner_user_id": true,
+          "active_version_id": true
+        }
+      },
+      "src/main/java/com/prizm/mcp/CareerEvidenceMcpTool.java": {
+        "sha256": "b3182bf5d0e5acdd3288834e198f171b718b09ea6b4cc86e2c4efefec351975f",
+        "checks": {
+          "currentUserProvider.userId()": true,
+          "searchCareerEvidenceV2": true
+        }
+      }
+    },
+    "cleanup": {
+      "src/main/java/com/prizm/document/service/DocumentUploadService.java": {
+        "sha256": "06e7455da993b88f31baa8f46841008199b805b1e021c9161d83d8de1aed3500",
+        "checks": {
+          "STATUS_ROLLED_BACK": true,
+          "STATUS_UNKNOWN": true
+        }
+      },
+      "src/main/java/com/prizm/cleanup/service/FileCleanupJobService.java": {
+        "sha256": "0579ab89606ffecd024a89abc58127fc575812ded32342770298449a8b1c1db6",
+        "checks": {
+          "Propagation.REQUIRES_NEW": true
+        }
+      },
+      "src/main/java/com/prizm/cleanup/repository/FileCleanupJobRepository.java": {
+        "sha256": "424338708f26a33ba9495137dcd99b57daf31ad4e985bf5c43d675f95cd4749f",
+        "checks": {
+          "FOR UPDATE SKIP LOCKED": true,
+          "claim_version": true
+        }
+      },
+      "src/main/java/com/prizm/cleanup/service/FileCleanupJobRecoveryService.java": {
+        "sha256": "9d19be9be185d2ff5a49e56b2f1ab3ef0036d7964b8cc452da63b3d390ae0ce6",
+        "checks": {
+          "recoverNext": true
+        }
+      },
+      "src/main/java/com/prizm/infrastructure/storage/LocalFileStorage.java": {
+        "sha256": "962b6379bd24ee65ab404601acd904cf0b79a6284c46e52ee591673bf65b2185",
+        "checks": {
+          "SecureDirectoryStream": true,
+          "LinkOption.NOFOLLOW_LINKS": true,
+          "requireSecureDirectoryStream": true
+        }
+      }
+    }
+  },
+  "tests": {
+    "src/integrationTest/java/com/prizm/infrastructure/PgVectorInfrastructureTest.java": {
+      "sha256": "d081ac40ad0cd28f3e3f9e1e33abe1d3be56a29ac183ac17e935a6a349202237",
+      "checks": {
+        "allowsOnlyOneIndependentTransactionToClaimTheSamePendingJob": true,
+        "recoversExpiredLeaseAndRejectsCompletionFromTheOldWorker": true,
+        "renewsHeartbeatLeaseBeforeRecoveryWithoutChangingTheClaimVersion": true,
+        "cleanupClaimSkipsLockedFirstJobAndClaimsNextJobBeforeLockRelease": true,
+        "cleanupWorkerConvergesToCompletedAfterCompletionUpdateFailureAndLeaseRecovery": true,
+        "staleCleanupClaimCannotOverwriteRetryOrFailureStateOwnedByNewWorker": true,
+        "keepsExistingActiveVersionSearchableWhenReplacementVersionFails": true,
+        "recordsPrz022WorkerReliabilityEvidence": true,
+        "recordsPrz022CleanupReliabilityEvidence": true
+      }
+    },
+    "src/integrationTest/java/com/prizm/infrastructure/AuthenticationIntegrationTest.java": {
+      "sha256": "31bc3b54fc4b0281f637557ed3df898fa0e69181073a7ecbe536819ba0111746",
+      "checks": {
+        "isolatesDocumentListAndDetailByAuthenticatedUser": true,
+        "managesOnlyOwnersDocumentsAndQueuesCleanupAfterTerminalDeletion": true,
+        "isolatesVectorSearchCandidatesByAuthenticatedUser": true,
+        "protectsPdfThumbnailByAuthenticationAndDocumentOwnership": true,
+        "recordsPrz022UserOnlyOwnerIsolationMatrix": true
+      }
+    },
+    "src/test/java/com/prizm/mcp/CareerEvidenceMcpToolTest.java": {
+      "sha256": "bc39e500df5680e4a6309de5cc0671b8814b311775950e7015bb16426f5852d7",
+      "checks": {
+        "UsesTheAuthenticatedUser": true
+      }
+    },
+    "src/test/java/com/prizm/infrastructure/storage/LocalFileStorageTest.java": {
+      "sha256": "c138790d6b21b041220efbb220544754cd75a1b8fc2c82a2a668952a19217359",
+      "checks": {
+        "failsClosedWithoutUnsafeFallbackWhenSecureDirectoryStreamIsUnavailable": true
+      }
+    }
+  },
+  "status": "PASS"
+}

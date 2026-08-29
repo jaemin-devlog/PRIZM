@@ -5,6 +5,8 @@
 > PRZ-020 기능 통합 근거: [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b`
 >
 > PRZ-021 기능 통합 근거: 구현 `a0c2977`, [PR #65](https://github.com/jaemin-devlog/PRIZM/pull/65), 병합 `60e5fc6` — main 통합 완료
+>
+> PRZ-022 Evidence 감사 기준선은 `3af4db0`입니다. PostgreSQL Worker·USER A/B/C 격리·cleanup D1–D6와 Linux `LocalFileStorage` 23건을 실제 실행했습니다. 검색은 동결 원시 자료의 무결성만 재검증했으며 현재 정확도로 확대하지 않습니다. [최종 판정](../specs/PRZ-022-backend-reliability-evidence/evidence.md)은 `BACKEND_EVIDENCE_READY`입니다.
 
 현재 상태는 소스 코드, 적용된 Flyway migration과 실행 가능한 test를 기준으로 판단합니다. Spec과 이 문서는 구현 증거를 대신하지 않습니다.
 

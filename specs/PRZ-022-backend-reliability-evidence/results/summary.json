@@ -39,7 +39,7 @@
     "staleCompletionAccepted": 0,
     "activeStabilityAssertions": 60,
     "unrecovered": 0,
-    "resultFile": "worker-results.json"
+    "resultFile": "worker.json"
   },
   "ownerIsolation": {
     "verdict": "VERIFIED",
@@ -55,7 +55,7 @@
     "inactiveLeak": 0,
     "restCrossOwnerResult": 0,
     "mcpCrossOwnerEvidence": 0,
-    "resultFile": "owner-isolation-results.json"
+    "resultFile": "owner-isolation.json"
   },
   "cleanup": {
     "verdict": "VERIFIED",
@@ -76,7 +76,7 @@
     "unrecovered": 0,
     "orphanRemaining": 0,
     "unrelatedFileDeletion": 0,
-    "resultFile": "cleanup-results.json"
+    "resultFile": "cleanup.json"
   },
   "linuxLocalFileStorage": {
     "verdict": "VERIFIED",
@@ -84,7 +84,7 @@
     "passed": 23,
     "skipped": 0,
     "failed": 0,
-    "resultFile": "linux-local-file-storage-results.json"
+    "resultFile": "local-file-storage.json"
   },
   "verification": {
     "workerFocused": { "total": 1, "passed": 1, "skipped": 0, "failed": 0 },

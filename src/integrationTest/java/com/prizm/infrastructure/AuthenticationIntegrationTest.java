@@ -394,7 +394,7 @@ class AuthenticationIntegrationTest {
                     restAttempts,
                     mcpAttempts);
             Files.writeString(
-                    Path.of("specs/PRZ-022-backend-reliability-evidence/owner-isolation-results.json"),
+                    Path.of("specs/PRZ-022-backend-reliability-evidence/results/owner-isolation.json"),
                     result,
                     StandardCharsets.UTF_8);
         }

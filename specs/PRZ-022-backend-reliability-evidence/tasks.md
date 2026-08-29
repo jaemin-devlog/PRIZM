@@ -10,4 +10,5 @@
 - [x] VERIFY: Markdown/local link, JSON parse, diff check
 - [x] AUDIT: Production 변경과 secret/artifact가 없고 문서 수치·한계가 일치함을 확인
 - [x] Evidence에 raw count와 `BACKEND_EVIDENCE_READY` 판정 기록
+- [x] DOCUMENTATION: 결과 JSON 7개를 `results/` 아래에 역할별 이름으로 정리
 - [x] OpenSQL은 선택 범위로 남겨 `NOT_RUN` 기록

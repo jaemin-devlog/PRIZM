@@ -1549,7 +1549,7 @@ class PgVectorInfrastructureTest {
                 activeStabilityAssertions,
                 lostJobEquivalent - recovered);
         Files.writeString(
-                Path.of("specs/PRZ-022-backend-reliability-evidence/worker-results.json"),
+                Path.of("specs/PRZ-022-backend-reliability-evidence/results/worker.json"),
                 result,
                 StandardCharsets.UTF_8);
     }
@@ -1865,7 +1865,7 @@ class PgVectorInfrastructureTest {
                     orphanRemaining,
                     unrelatedFileDeletion);
             Files.writeString(
-                    Path.of("specs/PRZ-022-backend-reliability-evidence/cleanup-results.json"),
+                    Path.of("specs/PRZ-022-backend-reliability-evidence/results/cleanup.json"),
                     result,
                     StandardCharsets.UTF_8);
         }

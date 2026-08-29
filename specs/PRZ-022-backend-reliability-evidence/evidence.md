@@ -26,9 +26,19 @@ Production 소스, migration, 설정은 바꾸지 않았다. 이번 변경은 �
 - current-main 검색 정확도 재실행: `NOT_RUN_BY_SCOPE`
 - OpenSQL: `NOT_RUN`
 
-전체 집계는 [results-summary.json](results-summary.json), source/test 계약 hash는
-[backend-contracts-summary.json](backend-contracts-summary.json), 검색 재계산 결과는
-[search-results-summary.json](search-results-summary.json)에 기록했다.
+전체 집계는 [results/summary.json](results/summary.json), source/test 계약 hash는
+[results/backend-contracts.json](results/backend-contracts.json), 검색 재계산 결과는
+[results/search.json](results/search.json)에 기록했다.
+
+### 결과 파일 구조 정리
+
+2026년 8월 30일에 일곱 JSON을 `results/` 아래로 이동하고 역할이 바로 보이도록
+파일명을 줄였다. 판정, 수치, 실행 환경, `baselineMain`과 실행 시각은 바꾸지 않았으며,
+`results/summary.json`의 `resultFile` 값과 평가 통합 테스트의 출력 경로만 새 위치에
+맞췄다.
+
+`results/backend-contracts.json`의 source/test hash는 기준선 `3af4db0`에서 동결한
+근거다. 이번 경로 정리를 현재 source hash 재검증으로 확대하지 않는다.
 
 ## 실행 결과 요약
 
@@ -60,7 +70,7 @@ P5와 P7-B의 Gate는 각각 `FAIL`이며, 이번 작업은 현재 코드로 Oll
 
 ## 2. 비동기 Worker correctness
 
-[worker-results.json](worker-results.json)은 10회 반복에서 2·4·8 Worker 동시 claim과
+[results/worker.json](results/worker.json)은 10회 반복에서 2·4·8 Worker 동시 claim과
 lease·heartbeat·recovery·fencing·ACTIVE 안정성을 검증한 결과다. claim 이후
 heartbeat/completion이 중단된 Worker 소실 등가 상태를 만들었다.
 
@@ -84,7 +94,7 @@ PRZ-020 이후의 현재 계약대로 A·B·C 모두 활성 `USER`로 만들었�
 검색을 10회 반복했다. 각 mutation 뒤에는 owner A의 문서와 버전 row가 그대로인지 DB에서
 다시 확인했다.
 
-[owner-isolation-results.json](owner-isolation-results.json)의 원시 수치는 다음과 같다.
+[results/owner-isolation.json](results/owner-isolation.json)의 원시 수치는 다음과 같다.
 
 | 항목 | 원시 수치 |
 |---|---:|
@@ -103,7 +113,7 @@ PRZ-020 이후의 현재 계약대로 A·B·C 모두 활성 `USER`로 만들었�
 
 ## 4. DB ↔ Filesystem Cleanup 실패 복구
 
-[cleanup-results.json](cleanup-results.json)은 Linux에서 Production cleanup service와
+[results/cleanup.json](results/cleanup.json)은 Linux에서 Production cleanup service와
 PostgreSQL을 연결해 D1–D6를 실행한 결과다.
 
 - D1 DB rollback 뒤 동기 보상 삭제
@@ -124,7 +134,7 @@ PostgreSQL을 연결해 D1–D6를 실행한 결과다.
 | unrecovered / orphan remaining | 0 / 0 |
 | unrelated file deletion | 0 |
 
-Linux `LocalFileStorageTest`는 [별도 결과](linux-local-file-storage-results.json)에 기록했다.
+Linux `LocalFileStorageTest`는 [별도 결과](results/local-file-storage.json)에 기록했다.
 경로 이탈, symlink, 부모 교체, descriptor-relative 삭제, `NOFOLLOW_LINKS`, fail-closed,
 missing-file 멱등성을 포함한 23건이 `23 PASS / 0 SKIP / 0 FAIL`이었다. Windows skip을
 Linux PASS로 간주한 것이 아니라 Linux 컨테이너에서 테스트 클래스를 직접 다시 실행했다.

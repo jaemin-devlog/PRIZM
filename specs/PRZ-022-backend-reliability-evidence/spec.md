@@ -66,7 +66,7 @@ Fault-injected `FileStorage` + Production Cleanup Service + PostgreSQL 결과와
 
 ## 완료 조건
 
-- 네 축의 source/test/수치/한계를 `evidence.md`와 parse 가능한 JSON에서 확인할 수 있다.
+- 네 축의 source/test/수치/한계를 `evidence.md`와 `results/*.json`에서 확인할 수 있다.
 - focused test, backend unit, PostgreSQL integration, Linux filesystem test,
   Markdown/local link, JSON parse, `git diff --check` 결과를 기록한다.
 - OpenSQL은 `NOT_RUN`으로 기록한다.

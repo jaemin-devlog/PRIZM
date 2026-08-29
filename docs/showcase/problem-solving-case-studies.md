@@ -111,5 +111,5 @@ generalization benchmark는 아니다. 현재 정확도를 주장하려면 corpu
 근거:
 
 - [PRZ-016 검색 연구 기록](../../specs/PRZ-016-search-performance-v2/README.md)
-- [PRZ-022 검색 재계산 결과](../../specs/PRZ-022-backend-reliability-evidence/search-results-summary.json)
+- [PRZ-022 검색 재계산 결과](../../specs/PRZ-022-backend-reliability-evidence/results/search.json)
 - [PRZ-022 최종 판정](../../specs/PRZ-022-backend-reliability-evidence/evidence.md#1-검색-품질일반화)

@@ -140,7 +140,6 @@ PostgreSQL 성공은 OpenSQL 증거가 아닙니다. OpenSQL·OpenProxy 결과�
 - 브라우저 E2E 전체 자동화는 제공하지 않습니다.
 - 일부 파일시스템에서 안전한 삭제 기능을 사용할 수 없으면 자동 파일 정리를 중단합니다.
 - 기본 Compose는 로컬 개발용이며 공개 SaaS 배포 구성이 아닙니다.
-- 공개 저장소에 제품 화면 이미지는 아직 없습니다.
 - Spring AI/MCP Java SDK `2.0.0` stateless server는 정상적인
   `notifications/initialized` 뒤에도 handler warning을 남길 수 있습니다.
 

@@ -11,6 +11,16 @@ PRIZM은 이력서·포트폴리오 같은 커리어 문서를 업로드하면 �
 현재 저장소에는 Spring Boot backend와 React frontend로 실행하는 self-hosted
 **PRIZM 웹 애플리케이션**이 들어 있습니다.
 
+## 제품 화면
+
+PRIZM에 로그인하면 등록한 커리어 문서를 바탕으로 필요한 내용을 찾고, 관련 원문을 다시 열어볼 수 있습니다.
+
+[![PRIZM 시작 화면. 흩어진 커리어 기록을 한곳에서 찾고 다시 열어볼 수 있다는 안내가 표시됩니다.](docs/assets/screenshots/prizm-welcome.png)](docs/assets/screenshots/prizm-welcome.png)
+
+문서 상세 화면에서는 업로드한 PDF를 미리 보고, 보존된 버전과 현재 검색에 사용하는 `ACTIVE` 버전을 함께 확인할 수 있습니다. 아래 화면의 이름과 문서는 기능 설명을 위한 시연용 데이터입니다.
+
+[![PRIZM 문서 상세 화면. PDF 미리보기, 버전 이력, 현재 검색에 사용하는 버전과 문서 기본 정보가 표시됩니다.](docs/assets/screenshots/prizm-document-detail-demo.png)](docs/assets/screenshots/prizm-document-detail-demo.png)
+
 ## 주요 기능
 
 - **TXT/PDF 문서 보관함** — UTF-8 TXT와 텍스트가 포함된 PDF를 업로드하고 원본을 확인합니다.

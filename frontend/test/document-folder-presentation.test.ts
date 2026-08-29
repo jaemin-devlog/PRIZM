@@ -5,8 +5,10 @@ import {
   documentFolderPath,
   documentListPathAfterDetailClose,
   groupDocumentsByType,
+  resolveDocumentPreviewVersionId,
   selectedDocumentFolderFromSearch,
   selectedDocumentIdFromSearch,
+  selectedDocumentVersionIdFromSearch,
 } from '../src/documentFolderPresentation.ts'
 import type { DocumentSummary } from '../src/api/documentApi.ts'
 
@@ -34,9 +36,16 @@ test('document detail URL accepts only a positive integer identifier', () => {
     documentDetailPath(42, '?type=RESUME'),
     '/career-vault/documents?type=RESUME&documentId=42',
   )
+  assert.equal(
+    documentDetailPath(42, '?type=RESUME', 84),
+    '/career-vault/documents?type=RESUME&documentId=42&versionId=84',
+  )
   assert.equal(selectedDocumentIdFromSearch('?documentId=42'), 42)
   assert.equal(selectedDocumentIdFromSearch('?documentId=0'), null)
   assert.equal(selectedDocumentIdFromSearch('?documentId=resume'), null)
+  assert.equal(selectedDocumentVersionIdFromSearch('?documentId=42&versionId=84'), 84)
+  assert.equal(selectedDocumentVersionIdFromSearch('?versionId=0'), null)
+  assert.equal(selectedDocumentVersionIdFromSearch('?versionId=1.5'), null)
 })
 
 test('closing TXT document detail removes only the deep-link identifier', () => {
@@ -45,7 +54,16 @@ test('closing TXT document detail removes only the deep-link identifier', () => 
     '/career-vault/documents',
   )
   assert.equal(
-    documentListPathAfterDetailClose('?type=RESUME&documentId=42'),
+    documentListPathAfterDetailClose('?type=RESUME&documentId=42&versionId=84'),
     '/career-vault/documents?type=RESUME',
   )
+})
+
+test('document detail selects only a requested version present in the owner-scoped detail', () => {
+  const versions = [{ versionId: 84 }, { versionId: 85 }]
+  assert.equal(resolveDocumentPreviewVersionId(84, 85, versions), 84)
+  assert.equal(resolveDocumentPreviewVersionId(999, 85, versions), 85)
+  assert.equal(resolveDocumentPreviewVersionId(null, 85, versions), 85)
+  assert.equal(resolveDocumentPreviewVersionId(null, null, versions), 84)
+  assert.equal(resolveDocumentPreviewVersionId(999, null, []), null)
 })

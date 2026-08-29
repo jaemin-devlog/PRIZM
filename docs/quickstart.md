@@ -13,7 +13,7 @@ AI 모델은 포함하지 않습니다. 구현·검증 범위는 [현재 구현 
 다음 도구가 필요합니다.
 
 - Git
-- Docker Desktop과 Docker Compose
+- Docker Desktop과 Docker Compose. 명령만 설치된 상태가 아니라 Docker Engine도 실행 중이어야 함
 - 호스트에서 실행 중인 Ollama와 `bge-m3`
 
 Compose 빌드 이미지가 Java 17과 Node `22.17.0`을 사용하므로 일반 사용 흐름에서는
@@ -51,6 +51,11 @@ Copy-Item .env.example .env
 `.env`는 Git ignore 대상입니다. 비밀번호, JWT와 `.env` 내용을 저장소, 이슈, 로그나
 스크린샷에 올리지 마세요.
 
+기존 Docker 환경과 데이터까지 분리해서 실행해야 할 때만 `.env`의
+`COMPOSE_PROJECT_NAME`을 다른 고유한 값으로 바꿀 수 있습니다. 일반 Quickstart에서는
+기본값을 그대로 사용해도 됩니다. 분리한 환경을 `down` 뒤 다시 올릴 때는 같은 값을
+유지해야 기존 volume의 계정과 문서를 다시 사용합니다.
+
 ### 3. Ollama 준비
 
 Ollama를 시작한 뒤 모델을 준비합니다.
@@ -70,10 +75,16 @@ docker compose --env-file .env ps
 Invoke-RestMethod http://127.0.0.1:8080/actuator/health
 ```
 
-health 응답이 아직 준비되지 않았다면 잠시 뒤 마지막 명령을 다시 실행합니다.
-Docker Desktop이 PATH 밖에 있어 `docker` 명령을 찾지 못한다면, 아래
-[새 설치 환경 검증](#재현-가능한-새-설치-환경-검증)의 사전 검사와 Compose wrapper를
-사용하세요.
+health 응답의 `status`가 정확히 `UP`이 될 때까지 잠시 기다렸다가 마지막 명령을
+다시 실행합니다. `UP` 전에 회원가입이나 업로드를 시작하지 마세요.
+
+`docker` 또는 `ollama`를 명령으로 찾지 못하면 해당 도구의 설치 여부를 확인하고,
+설치 뒤 PowerShell을 다시 연 다음 PATH가 반영됐는지 `docker --version` 또는
+`ollama --version`으로 확인합니다. `docker` 명령은 있으나 서버에 연결할 수 없으면
+Docker Desktop을 열어 Docker Engine이 실행 중인지 확인합니다. `ollama` 명령은
+있으나 모델 요청이 실패하면 Ollama가 실행 중인지 확인한 뒤 다시 시도합니다.
+유지관리자용 격리 검증에서는 아래 [새 설치 환경 검증](#재현-가능한-새-설치-환경-검증)의
+사전 검사와 Compose wrapper로 PATH 밖의 일반 Docker 설치 위치도 확인할 수 있습니다.
 
 ### 5. 회원가입하고 로그인하기
 
@@ -88,16 +99,19 @@ PRIZM은 로그인한 사용자를 DB에서 다시 확인하고, 그 사용자�
 ### 6. 문서 업로드하기
 
 왼쪽 메뉴의 **문서 업로드**에서 UTF-8 TXT 또는 텍스트가 포함된 PDF를 등록합니다.
-처리가 끝나 문서 상태가 **검색에 사용 중**으로 바뀔 때까지 기다립니다. 이 상태가
-현재 검색 대상인 `ACTIVE` 버전입니다. 새 버전 처리에 실패하면 이전 `ACTIVE`
-버전을 유지합니다.
+업로드 뒤 왼쪽 메뉴의 **문서 보관함**을 열고, 업로드할 때 선택한 문서 유형 폴더에서
+문서를 확인합니다. 처리가 끝나면 목록 카드에는 **검색 준비 완료**, 문서 상세에는
+**검색에 사용 중**, 현재 version 행에는 **현재 · ACTIVE**가 표시됩니다. 세 표시는
+모두 처리가 완료되어 그 version이 현재 검색 대상이라는 같은 상태를 서로 다른
+화면에서 표현합니다. 새 version 처리에 실패하면 이전 `ACTIVE` version을 유지합니다.
 
 ### 7. 경력 근거 검색하기
 
 왼쪽 메뉴의 **내 경험 찾기**에서 찾을 내용을 입력합니다. PRIZM은 현재 사용자의
 `ACTIVE` 문서에서 관련 원문을 찾고, 문서명과 TXT 구간 또는 PDF 페이지를 함께
-보여 줍니다. 관련 원문을 찾지 못하면 경험이 없다고 판정하지 않고 결과 없음으로
-표시합니다.
+보여 줍니다. 결과의 **문서에서 보기**를 누르면 TXT는 해당 문서·version의 기존
+문서 상세로, PDF는 해당 문서·version의 페이지 원문으로 이동합니다. 관련 원문을
+찾지 못하면 경험이 없다고 판정하지 않고 결과 없음으로 표시합니다.
 
 ### 8. 종료하기
 
@@ -154,6 +168,12 @@ MCP client는 연결 초기화(initialize)와 도구 목록 조회(`tools/list`)
 도구를 호출해야 합니다. MCP는 별도 검색 정책이나 데이터 경로를 두지 않고 기존
 경력 근거 검색을 읽기 전용으로 사용합니다. 따라서 현재 사용자에게 속한
 `ACTIVE` 버전만 검색합니다.
+
+현재 사용하는 Spring AI/MCP Java SDK `2.0.0` stateless server는 정상적인
+`notifications/initialized`를 처리한 뒤에도 등록된 notification handler가 없다는
+warning을 남길 수 있습니다. initialize, `tools/list`와 도구 호출이 성공했다면 이
+warning 자체는 요청 실패를 뜻하지 않습니다. SDK를 올리거나 warning을 숨길 때는
+별도 dependency 검증이 필요합니다.
 
 기본 backend 포트를 바꿨다면 로그인과 MCP URL의 `8080`도 같은 값으로 바꿉니다.
 JWT를 설정 파일, shell history, 로그나 문서에 저장하지 마세요.
@@ -270,8 +290,8 @@ wrapper는 현재 PowerShell의 `COMPOSE_PROJECT_NAME`이나 `COMPOSE_FILE`보�
 생성된 고유 project, 저장소의 `compose.yaml`과 `.env`를 명시적으로 사용합니다.
 project·file·env file을 덮어쓰는 옵션은 거부합니다.
 
-health가 아직 준비되지 않았다면 잠시 뒤 다시 확인합니다. 서버 기동만으로 사용자
-계정을 만들지는 않습니다.
+health 응답의 `status`가 정확히 `UP`이 될 때까지 잠시 기다렸다가 다시 확인합니다.
+서버 기동만으로 사용자 계정을 만들지는 않습니다.
 
 ### 5. API 전체 흐름 검증
 
@@ -303,14 +323,25 @@ node scripts/verify-clean-clone-demo.mjs
 
 5단계의 API 자동 검증 계정은 브라우저에서 직접 만든 계정과 별개입니다. 검증 도구가
 실행 중에만 임시 자격 증명을 보유하므로 이를 복사하거나 관리할 단계는 없습니다.
+따라서 새 브라우저 계정에서는 helper가 업로드한 문서나 그 검색 결과가 보여서는
+안 됩니다. 이는 실패가 아니라 owner isolation의 음성 검증입니다.
+
+브라우저에서 양성 흐름도 확인하려면 새 계정으로 로그인한 채 **문서 업로드**에서
+`local/clean-clone-demo/prizm-clean-clone-synthetic.txt`와
+`local/clean-clone-demo/prizm-clean-clone-synthetic.pdf`를 각각 직접 업로드합니다.
+각 문서는 선택한 문서 유형 폴더에서 확인하고 현재 version이 `ACTIVE`가 된 뒤
+검색합니다. 자동 API 검증과 수동 브라우저 검증이 동일한 파일을 사용하더라도 문서
+소유권은 각 업로드를 수행한 USER에게 따로 유지됩니다.
 
 다음 항목을 순서대로 확인합니다.
 
 - 최초 화면이 회원가입이며 성공 뒤 로그인 화면으로 전환되는가
 - 로그인 화면에서 회원가입으로 돌아갈 수 있고 기존 로그인 뒤 보관함으로 들어가는가
-- 합성 TXT와 PDF 두 문서가 목록에 보이는가
-- 두 문서의 상세와 `ACTIVE` 버전을 확인할 수 있는가
-- PDF 원문을 열 수 있는가
+- 로그인 직후 문서와 두 합성 표시 문자열의 검색 결과가 모두 0건인가
+- 브라우저 USER가 직접 업로드한 합성 TXT와 PDF가 해당 문서 유형 폴더에 보이는가
+- 목록의 **검색 준비 완료**, 상세의 **검색에 사용 중**, version의 **현재 · ACTIVE**를 확인할 수 있는가
+- TXT 검색 결과에서 해당 document/version의 문서 상세를 열 수 있는가
+- PDF 검색 결과에서 해당 document/version의 페이지 원문을 열 수 있는가
 - 두 합성 표시 문자열을 경력 근거 검색에서 찾을 수 있는가
 - 로그아웃 뒤 보호 화면이 다시 로그인으로 돌아가는가
 

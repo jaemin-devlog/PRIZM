@@ -26,6 +26,36 @@ Spec 목록은 2026년 7월 23일 커밋 `3233bad7`에서 처음 도입됐습니
 소스 기준으로 정리했습니다. [PRZ&#8209;000](PRZ-000-platform-baseline/spec.md)은
 그 구현을 뒤늦은 계획으로 꾸미지 않고 `AS_BUILT_BASELINE`으로 남긴 기준선입니다.
 
+## 한눈에 보는 PRZ 기록과 제품 흐름
+
+> 이 그림은 아래 Registry를 바탕으로 PRZ&#8209;022까지의 제목과 상태를 정리한
+> 스냅샷입니다. 이후 새 기록이 생기거나 상태가 바뀌면 아래 목록과 각
+> `spec.md`·`evidence.md`를 현재 기준으로 사용해 주세요.
+
+[![PRIZM의 공식 변경 절차, PRZ-000부터 PRZ-022까지의 제목과 상태, 문서 업로드부터 ACTIVE 전환과 근거 검색까지의 흐름](assets/prizm-spec-registry-and-product-flow.svg)](assets/prizm-spec-registry-and-product-flow.svg)
+
+*그림 1. PRZ 기록과 현재 제품 흐름. 이미지를 선택하면 원본 크기로 볼 수 있습니다.*
+
+그림 위쪽의 카드는 PRZ&#8209;000부터 PRZ&#8209;022까지를 빠짐없이 보여 줍니다.
+회색은 Registry 도입 전 구현 기준선인 `AS_BUILT_BASELINE`, 파란색은
+`VERIFIED`, 주황색은 `IN_PROGRESS`, 빨간색은 `REJECTED`입니다. 이 색은 작업
+전체의 진행 상태를 나타내며, 개별 테스트의 `PASS`·`FAIL`과는 구분해야 합니다.
+그 위의 띠에는 제품 변경에 적용하는 공식
+`ORIENT → SPEC → PLAN → IMPLEMENT → VERIFY → AUDIT → INTEGRATE` 절차를
+표시했습니다.
+
+아래쪽은 현재 제품의 대표 처리 흐름입니다. 사용자가 가입·로그인한 뒤 UTF-8 TXT나
+텍스트가 포함된 비암호화 PDF를 올리면, PRIZM은 원본과 변경 불가능한 버전,
+`PENDING ChangeLog`를 저장합니다. Dispatcher와 비동기 Worker가 원문 추출·분할과
+Ollama `bge-m3` 임베딩을 처리하고, 모든 문서 조각을 저장한 버전만 `ACTIVE`로
+전환합니다. 처리가 실패하면 새 버전은 검색에서 제외하고 이전 `ACTIVE` 버전을
+유지합니다.
+
+웹과 MCP 검색은 모두 로그인한 사용자가 소유한 `ACTIVE` 근거만 조회하며, 결과를
+TXT 구간이나 PDF 페이지로 연결합니다. 기본 실행 환경은 PostgreSQL 16과 pgvector를
+사용합니다. OpenSQL direct 연결과 OpenProxy single-Primary는 이 기본 환경과 구분해
+검증한 선택적 DB 경로이며 MCP 처리의 다음 단계가 아닙니다.
+
 ## PRZ 폴더에는 무엇이 들어 있나요?
 
 대부분의 PRZ 폴더에는 다음 네 문서가 있습니다.

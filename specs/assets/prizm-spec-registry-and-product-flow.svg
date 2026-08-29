@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1280" viewBox="0 0 1800 1280" role="img" aria-labelledby="title desc">
+  <title id="title">PRIZM Spec Registry와 제품 흐름</title>
+  <desc id="desc">PRZ-000부터 PRZ-022까지의 정확한 제목과 상태, 공식 변경 절차, 회원가입과 문서 업로드부터 비동기 색인, ACTIVE 전환, 사용자별 근거 검색과 원문 확인까지의 흐름을 보여 주는 그림</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <linearGradient id="flowHeader" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.09"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+    <style>
+      text { font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Segoe UI", sans-serif; fill: #0f172a; }
+      .title { font-size: 34px; font-weight: 800; letter-spacing: -0.5px; }
+      .subtitle { font-size: 17px; fill: #475569; }
+      .section-title { font-size: 25px; font-weight: 800; }
+      .section-note { font-size: 14px; fill: #64748b; }
+      .workflow-label { font-size: 16px; font-weight: 800; fill: #1e3a8a; }
+      .workflow-step { font-size: 16px; font-weight: 700; fill: #1e40af; }
+      .card-id { font-size: 17px; font-weight: 800; fill: #ffffff; }
+      .card-status { font-size: 10.5px; font-weight: 800; fill: #ffffff; letter-spacing: 0.2px; }
+      .card-title { font-size: 15px; font-weight: 750; }
+      .legend { font-size: 13px; font-weight: 650; fill: #334155; }
+      .node-index { font-size: 13px; font-weight: 800; fill: #ffffff; }
+      .node-title { font-size: 16px; font-weight: 800; fill: #ffffff; }
+      .node-body { font-size: 14px; font-weight: 650; fill: #1e293b; }
+      .resource-title { font-size: 16px; font-weight: 800; }
+      .resource-body { font-size: 13px; fill: #475569; }
+      .note-title { font-size: 15px; font-weight: 800; }
+      .note-body { font-size: 13.5px; fill: #334155; }
+    </style>
+  </defs>
+
+  <rect x="1" y="1" width="1798" height="1278" rx="24" fill="url(#background)" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text x="40" y="54" class="title">PRIZM Spec Registry와 제품 흐름</text>
+  <text x="40" y="86" class="subtitle">PRZ는 작업 식별자이며 중요도·완료 순서·선후 의존성을 뜻하지 않습니다. 정확한 판정은 각 spec.md와 evidence.md에서 확인합니다.</text>
+
+  <rect x="40" y="108" width="1720" height="66" rx="14" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="64" y="147" class="workflow-label">공식 변경 절차</text>
+  <text x="250" y="147" class="workflow-step">ORIENT</text>
+  <text x="342" y="147" class="workflow-step">→</text>
+  <text x="378" y="147" class="workflow-step">SPEC</text>
+  <text x="446" y="147" class="workflow-step">→</text>
+  <text x="482" y="147" class="workflow-step">PLAN</text>
+  <text x="550" y="147" class="workflow-step">→</text>
+  <text x="586" y="147" class="workflow-step">IMPLEMENT</text>
+  <text x="708" y="147" class="workflow-step">→</text>
+  <text x="744" y="147" class="workflow-step">VERIFY</text>
+  <text x="830" y="147" class="workflow-step">→</text>
+  <text x="866" y="147" class="workflow-step">AUDIT</text>
+  <text x="944" y="147" class="workflow-step">→</text>
+  <text x="980" y="147" class="workflow-step">INTEGRATE</text>
+  <text x="1190" y="137" class="section-note">제품 동작을 바꾸지 않는 설명·오타·링크 교정은</text>
+  <text x="1190" y="158" class="section-note">축소 절차를 사용할 수 있습니다.</text>
+
+  <text x="40" y="218" class="section-title">1. PRZ 기록 지도</text>
+  <text x="287" y="218" class="section-note">PRZ-000부터 PRZ-022까지의 현재 Registry 제목과 상태</text>
+
+  <rect x="1125" y="195" width="15" height="15" rx="4" fill="#64748b"/><text x="1148" y="208" class="legend">기준선</text>
+  <rect x="1235" y="195" width="15" height="15" rx="4" fill="#2563eb"/><text x="1258" y="208" class="legend">검증 완료</text>
+  <rect x="1365" y="195" width="15" height="15" rx="4" fill="#92400e"/><text x="1388" y="208" class="legend">진행 중</text>
+  <rect x="1470" y="195" width="15" height="15" rx="4" fill="#dc2626"/><text x="1493" y="208" class="legend">비채택</text>
+  <text x="1570" y="208" class="section-note">상태와 검사 결과는 별도입니다.</text>
+
+  <!-- Row 1 -->
+  <g transform="translate(40 240)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#f1f5f9" stroke="#94a3b8"/>
+    <rect width="265" height="32" rx="11" fill="#64748b"/>
+    <text x="14" y="22" class="card-id">PRZ-000</text><text x="132" y="21" class="card-status" style="font-size: 8.8px">AS_BUILT_BASELINE</text>
+    <text x="14" y="57" class="card-title">플랫폼·문서 보관함 기준</text>
+  </g>
+  <g transform="translate(331 240)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-001</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="57" class="card-title">검색 평가 정합성</text>
+  </g>
+  <g transform="translate(622 240)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-002</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="57" class="card-title">오픈소스 준비</text>
+  </g>
+  <g transform="translate(913 240)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-003</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="57" class="card-title">OpenSQL 단일 서버 검증</text>
+  </g>
+  <g transform="translate(1204 240)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-004</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="57" class="card-title">새 설치 환경 데모</text>
+  </g>
+  <g transform="translate(1495 240)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-005</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="57" class="card-title">OpenSQL·Ollama E2E</text>
+  </g>
+
+  <!-- Row 2 -->
+  <g transform="translate(40 340)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-006</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="57" class="card-title">로컬 빠른 시작</text>
+  </g>
+  <g transform="translate(331 340)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-007</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="57" class="card-title">자체 호스팅 회원가입</text>
+  </g>
+  <g transform="translate(622 340)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#fffbeb" stroke="#fbbf24"/>
+    <rect width="265" height="32" rx="11" fill="#92400e"/>
+    <text x="14" y="22" class="card-id">PRZ-008</text><text x="164" y="21" class="card-status">IN_PROGRESS</text>
+    <text x="14" y="57" class="card-title">검색 근거 신뢰성</text>
+  </g>
+  <g transform="translate(913 340)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-009</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="57" class="card-title">사용자가 관리하는 문서 태그</text>
+  </g>
+  <g transform="translate(1204 340)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-010</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="57" class="card-title">ChangeLog 동기화</text>
+  </g>
+  <g transform="translate(1495 340)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-011</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="57" class="card-title">문서 처리 상태 UX</text>
+  </g>
+
+  <!-- Row 3 -->
+  <g transform="translate(40 440)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-012</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="57" class="card-title">검색 근거 표현</text>
+  </g>
+  <g transform="translate(331 440)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-013</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="57" class="card-title">OpenProxy 단일 Primary 검증</text>
+  </g>
+  <g transform="translate(622 440)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#fef2f2" stroke="#fca5a5"/>
+    <rect width="265" height="32" rx="11" fill="#dc2626"/>
+    <text x="14" y="22" class="card-id">PRZ-014</text><text x="185" y="21" class="card-status">REJECTED</text>
+    <text x="14" y="57" class="card-title">OpenHA topology 검토</text>
+  </g>
+  <g transform="translate(913 440)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-015</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="57" class="card-title">읽기 전용 MCP 검색</text>
+  </g>
+  <g transform="translate(1204 440)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#fffbeb" stroke="#fbbf24"/>
+    <rect width="265" height="32" rx="11" fill="#92400e"/>
+    <text x="14" y="22" class="card-id">PRZ-016</text><text x="164" y="21" class="card-status">IN_PROGRESS</text>
+    <text x="14" y="57" class="card-title">Search Performance V2</text>
+  </g>
+  <g transform="translate(1495 440)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-017</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="55" class="card-title">채용공고 항목별</text>
+    <text x="14" y="75" class="card-title">근거 검색 V1</text>
+  </g>
+
+  <!-- Row 4 -->
+  <g transform="translate(40 540)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-018</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="57" class="card-title">문서 상세 미리보기 페이지</text>
+  </g>
+  <g transform="translate(331 540)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-019</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="55" class="card-title">태그 문서 수 명확화와</text>
+    <text x="14" y="75" class="card-title">TXT 원문 미리보기</text>
+  </g>
+  <g transform="translate(622 540)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-020</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="55" class="card-title">인증 초기화 제거와</text>
+    <text x="14" y="75" class="card-title">빠른 시작 단순화</text>
+  </g>
+  <g transform="translate(913 540)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-021</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="55" class="card-title">Fresh Clone</text>
+    <text x="14" y="75" class="card-title">첫 사용자 경험 정합화</text>
+  </g>
+  <g transform="translate(1204 540)" filter="url(#shadow)">
+    <rect width="265" height="86" rx="11" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect width="265" height="32" rx="11" fill="#2563eb"/>
+    <text x="14" y="22" class="card-id">PRZ-022</text><text x="183" y="21" class="card-status">VERIFIED</text>
+    <text x="14" y="55" class="card-title">백엔드 신뢰성 근거</text>
+    <text x="14" y="75" class="card-title">재검증</text>
+  </g>
+  <g transform="translate(1495 540)">
+    <rect width="265" height="86" rx="11" fill="#ffffff" stroke="#cbd5e1" stroke-dasharray="6 5"/>
+    <text x="14" y="27" class="card-title" fill="#334155">읽는 법</text>
+    <text x="14" y="50" class="section-note">아래 Registry가 현재 기준</text>
+    <text x="14" y="71" class="section-note">상세 근거는 evidence.md</text>
+  </g>
+
+  <line x1="40" y1="661" x2="1760" y2="661" stroke="#cbd5e1"/>
+  <text x="40" y="706" class="section-title">2. 문서가 검색 가능한 근거가 되는 과정</text>
+  <text x="510" y="706" class="section-note">실선은 주 처리 흐름, 점선은 저장소·DB 연결을 나타냅니다.</text>
+
+  <!-- Flow arrows -->
+  <line x1="220" y1="820" x2="252" y2="820" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="440" y1="820" x2="472" y2="820" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="660" y1="820" x2="692" y2="820" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="880" y1="820" x2="912" y2="820" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="1100" y1="820" x2="1132" y2="820" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="1320" y1="820" x2="1352" y2="820" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="1540" y1="820" x2="1572" y2="820" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <!-- Flow nodes -->
+  <g transform="translate(40 750)" filter="url(#shadow)">
+    <rect width="180" height="140" rx="14" fill="#ffffff" stroke="#93c5fd"/>
+    <rect width="180" height="42" rx="14" fill="url(#flowHeader)"/>
+    <circle cx="22" cy="21" r="12" fill="#ffffff" fill-opacity="0.2"/><text x="18" y="26" class="node-index">1</text>
+    <text x="44" y="27" class="node-title">사용자 인증</text>
+    <text x="16" y="70" class="node-body">회원가입·로그인</text>
+    <text x="16" y="94" class="node-body">JWT 확인 뒤 DB에서</text>
+    <text x="16" y="116" class="node-body">활성 USER 재검증</text>
+  </g>
+  <g transform="translate(260 750)" filter="url(#shadow)">
+    <rect width="180" height="140" rx="14" fill="#ffffff" stroke="#93c5fd"/>
+    <rect width="180" height="42" rx="14" fill="url(#flowHeader)"/>
+    <circle cx="22" cy="21" r="12" fill="#ffffff" fill-opacity="0.2"/><text x="18" y="26" class="node-index">2</text>
+    <text x="44" y="27" class="node-title">문서 업로드</text>
+    <text x="16" y="70" class="node-body">UTF-8 TXT</text>
+    <text x="16" y="94" class="node-body">텍스트 레이어 PDF</text>
+    <text x="16" y="116" class="node-body">원본 파일 보존</text>
+  </g>
+  <g transform="translate(480 750)" filter="url(#shadow)">
+    <rect width="180" height="140" rx="14" fill="#ffffff" stroke="#93c5fd"/>
+    <rect width="180" height="42" rx="14" fill="url(#flowHeader)"/>
+    <circle cx="22" cy="21" r="12" fill="#ffffff" fill-opacity="0.2"/><text x="18" y="26" class="node-index">3</text>
+    <text x="44" y="27" class="node-title">변경 기록</text>
+    <text x="16" y="70" class="node-body">변경 불가능한 버전</text>
+    <text x="16" y="94" class="node-body">PENDING ChangeLog</text>
+    <text x="16" y="116" class="node-body">아직 검색 대상 아님</text>
+  </g>
+  <g transform="translate(700 750)" filter="url(#shadow)">
+    <rect width="180" height="140" rx="14" fill="#ffffff" stroke="#93c5fd"/>
+    <rect width="180" height="42" rx="14" fill="url(#flowHeader)"/>
+    <circle cx="22" cy="21" r="12" fill="#ffffff" fill-opacity="0.2"/><text x="18" y="26" class="node-index">4</text>
+    <text x="44" y="27" class="node-title">비동기 처리</text>
+    <text x="16" y="70" class="node-body">ChangeLog Dispatcher</text>
+    <text x="16" y="94" class="node-body">Indexing Worker</text>
+    <text x="16" y="116" class="node-body">lease·복구·fencing</text>
+  </g>
+  <g transform="translate(920 750)" filter="url(#shadow)">
+    <rect width="180" height="140" rx="14" fill="#ffffff" stroke="#93c5fd"/>
+    <rect width="180" height="42" rx="14" fill="url(#flowHeader)"/>
+    <circle cx="22" cy="21" r="12" fill="#ffffff" fill-opacity="0.2"/><text x="18" y="26" class="node-index">5</text>
+    <text x="44" y="27" class="node-title">임베딩</text>
+    <text x="16" y="70" class="node-body">추출·문서 분할</text>
+    <text x="16" y="94" class="node-body">Ollama bge-m3</text>
+    <text x="16" y="116" class="node-body">1024차원 벡터 검증</text>
+  </g>
+  <g transform="translate(1140 750)" filter="url(#shadow)">
+    <rect width="180" height="140" rx="14" fill="#f0fdf4" stroke="#86efac"/>
+    <rect width="180" height="42" rx="14" fill="#15803d"/>
+    <circle cx="22" cy="21" r="12" fill="#ffffff" fill-opacity="0.2"/><text x="18" y="26" class="node-index">6</text>
+    <text x="44" y="27" class="node-title">완료·활성화</text>
+    <text x="16" y="70" class="node-body">DocumentChunk 저장</text>
+    <text x="16" y="94" class="node-body">모두 완료한 버전만</text>
+    <text x="16" y="116" class="node-body">ACTIVE 전환</text>
+  </g>
+  <g transform="translate(1360 750)" filter="url(#shadow)">
+    <rect width="180" height="140" rx="14" fill="#ffffff" stroke="#93c5fd"/>
+    <rect width="180" height="42" rx="14" fill="url(#flowHeader)"/>
+    <circle cx="22" cy="21" r="12" fill="#ffffff" fill-opacity="0.2"/><text x="18" y="26" class="node-index">7</text>
+    <text x="44" y="27" class="node-title">근거 검색</text>
+    <text x="16" y="70" class="node-body">웹 REST · MCP</text>
+    <text x="16" y="94" class="node-body">owner + ACTIVE 범위</text>
+    <text x="16" y="116" class="node-body">관련 원문 최대 5건</text>
+  </g>
+  <g transform="translate(1580 750)" filter="url(#shadow)">
+    <rect width="180" height="140" rx="14" fill="#ffffff" stroke="#93c5fd"/>
+    <rect width="180" height="42" rx="14" fill="url(#flowHeader)"/>
+    <circle cx="22" cy="21" r="12" fill="#ffffff" fill-opacity="0.2"/><text x="18" y="26" class="node-index">8</text>
+    <text x="44" y="27" class="node-title">원문 확인</text>
+    <text x="16" y="70" class="node-body">TXT TEXT_CHUNK</text>
+    <text x="16" y="94" class="node-body">PDF PAGE</text>
+    <text x="16" y="116" class="node-body">문서·버전·위치 연결</text>
+  </g>
+
+  <!-- Runtime stores and boundaries -->
+  <path d="M350 890 V965" stroke="#60a5fa" stroke-width="2.5" stroke-dasharray="7 6"/>
+  <path d="M570 890 V930 H900 V965" stroke="#60a5fa" stroke-width="2.5" stroke-dasharray="7 6" fill="none"/>
+  <path d="M790 890 V930 H900" stroke="#60a5fa" stroke-width="2.5" stroke-dasharray="7 6" fill="none"/>
+  <path d="M1230 890 V930 H900" stroke="#60a5fa" stroke-width="2.5" stroke-dasharray="7 6" fill="none"/>
+  <path d="M1450 890 V930 H900" stroke="#60a5fa" stroke-width="2.5" stroke-dasharray="7 6" fill="none"/>
+
+  <rect x="170" y="965" width="360" height="80" rx="14" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="195" y="995" class="resource-title">로컬 원본 저장소</text>
+  <text x="195" y="1020" class="resource-body">서버가 만든 상대 경로에 업로드한 TXT·PDF 원본 보존</text>
+
+  <rect x="600" y="965" width="600" height="80" rx="14" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="625" y="995" class="resource-title">기본 런타임 DB · PostgreSQL 16 + pgvector</text>
+  <text x="625" y="1020" class="resource-body">사용자·문서·버전·작업·DocumentChunk·벡터 저장과 owner 범위 exact cosine 검색</text>
+
+  <rect x="1270" y="965" width="490" height="80" rx="14" fill="#fffbeb" stroke="#fbbf24"/>
+  <text x="1295" y="995" class="resource-title">별도로 검증한 선택적 DB 경로</text>
+  <text x="1295" y="1014" class="resource-body">OpenSQL direct 연결 · OpenProxy single-Primary</text>
+  <text x="1295" y="1035" class="resource-body">MCP의 다음 단계가 아닌 별도 DB 검증 경로</text>
+
+  <rect x="40" y="1080" width="840" height="116" rx="16" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="68" y="1114" class="note-title" fill="#166534">안전한 ACTIVE 전환</text>
+  <text x="68" y="1143" class="note-body">문서 조각이 모두 저장되고 검증된 버전만 검색 대상으로 전환합니다.</text>
+  <text x="68" y="1168" class="note-body">처리가 실패하거나 끝나지 않으면 새 버전은 검색에서 제외하고 기존 ACTIVE 버전을 유지합니다.</text>
+
+  <rect x="920" y="1080" width="840" height="116" rx="16" fill="#eff6ff" stroke="#93c5fd"/>
+  <text x="948" y="1114" class="note-title" fill="#1e40af">한 사용자의 근거만</text>
+  <text x="948" y="1143" class="note-body">문서·버전·처리 작업·검색 후보와 결과는 로그인한 사용자의 소유 범위로 제한합니다.</text>
+  <text x="948" y="1168" class="note-body">MCP도 별도 검색 구현 없이 같은 SearchService와 ACTIVE·owner 경계를 읽기 전용으로 사용합니다.</text>
+
+  <text x="40" y="1240" class="section-note">이 그림은 PRZ-022까지의 Registry 스냅샷입니다. 새 기록이나 상태 변경이 생기면 specs/README.md와 각 evidence.md를 현재 기준으로 사용합니다.</text>
+</svg>

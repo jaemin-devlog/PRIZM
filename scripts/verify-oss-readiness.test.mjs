@@ -6,6 +6,7 @@ import {
   classifyExternalStatus,
   extractMarkdownLinks,
   isApprovedBinaryFixture,
+  markdownHeadingAnchors,
   markdownFindings,
   sensitiveContentFindings,
 } from './verify-oss-readiness.mjs'
@@ -36,6 +37,23 @@ test('extracts inline, image, and reference Markdown links', () => {
     '../README.md#start',
     'assets/example.png',
     'https://example.com/docs',
+  ])
+})
+
+test('builds GitHub-style anchors for Korean headings, punctuation, duplicates, and explicit ids', () => {
+  const anchors = markdownHeadingAnchors([
+    '## 1. 검색 품질·일반화',
+    '## 검색 품질·일반화',
+    '```markdown',
+    '## 코드 블록 제목',
+    '```',
+    '<a id="kept-anchor"></a>',
+  ].join('\n'))
+
+  assert.deepEqual([...anchors], [
+    '1-검색-품질일반화',
+    '검색-품질일반화',
+    'kept-anchor',
   ])
 })
 

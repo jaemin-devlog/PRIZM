@@ -234,6 +234,58 @@ export function extractMarkdownLinks(content) {
   return targets
 }
 
+function githubHeadingSlug(heading) {
+  return heading
+    .replace(/!?(?:\[([^\]]*)])\([^)]*\)/g, '$1')
+    .replace(/<[^>]+>/g, '')
+    .replace(/[`*_~]/g, '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{M}\p{N}_\- ]/gu, '')
+    .replace(/ /g, '-')
+}
+
+export function markdownHeadingAnchors(content) {
+  const anchors = new Set()
+  const duplicateCounts = new Map()
+  const lines = content.split('\n')
+  let fence
+
+  for (const line of lines) {
+    const fenceMatch = line.match(/^\s{0,3}(`{3,}|~{3,})(.*)$/)
+    if (fenceMatch) {
+      const marker = fenceMatch[1]
+      if (!fence) {
+        fence = { character: marker[0], length: marker.length }
+      } else if (
+        marker[0] === fence.character
+        && marker.length >= fence.length
+        && fenceMatch[2].trim() === ''
+      ) {
+        fence = undefined
+      }
+      continue
+    }
+    if (fence) continue
+
+    const headingMatch = line.match(/^\s{0,3}#{1,6}\s+(.+?)\s*#*\s*$/)
+    if (headingMatch) {
+      const base = githubHeadingSlug(headingMatch[1])
+      if (base) {
+        const duplicateCount = duplicateCounts.get(base) ?? 0
+        anchors.add(duplicateCount === 0 ? base : `${base}-${duplicateCount}`)
+        duplicateCounts.set(base, duplicateCount + 1)
+      }
+    }
+
+    for (const match of line.matchAll(/<(?:a|span)\b[^>]*(?:id|name)=["']([^"']+)["'][^>]*>/gi)) {
+      anchors.add(match[1])
+    }
+  }
+
+  return anchors
+}
+
 function isExternalLink(target) {
   return /^https?:\/\//i.test(target)
 }
@@ -242,6 +294,7 @@ function assertMarkdown() {
   const files = candidateFiles().filter((file) => file.toLowerCase().endsWith('.md'))
   const findings = []
   const externalLinks = new Set()
+  const anchorCache = new Map()
   let localLinkCount = 0
 
   for (const fileName of files) {
@@ -254,24 +307,42 @@ function assertMarkdown() {
         externalLinks.add(rawTarget)
         continue
       }
-      if (/^(?:mailto:|data:|#)/i.test(rawTarget)) continue
+      if (/^(?:mailto:|data:)/i.test(rawTarget)) continue
 
-      const withoutFragment = rawTarget.split('#', 1)[0].split('?', 1)[0]
-      if (!withoutFragment) continue
-      let decoded
+      const fragmentIndex = rawTarget.indexOf('#')
+      const pathAndQuery = fragmentIndex >= 0 ? rawTarget.slice(0, fragmentIndex) : rawTarget
+      const rawFragment = fragmentIndex >= 0 ? rawTarget.slice(fragmentIndex + 1) : ''
+      const withoutFragment = pathAndQuery.split('?', 1)[0]
+      let decodedPath
+      let decodedFragment
       try {
-        decoded = decodeURIComponent(withoutFragment)
+        decodedPath = decodeURIComponent(withoutFragment)
+        decodedFragment = decodeURIComponent(rawFragment)
       } catch {
         findings.push(`${fileName}:${line} has an invalid encoded link: ${rawTarget}`)
         continue
       }
 
       localLinkCount += 1
-      const targetPath = isAbsolute(decoded)
-        ? resolve(root, decoded.replace(/^[/\\]+/, ''))
-        : resolve(dirname(fullPath), decoded)
+      const targetPath = decodedPath === ''
+        ? fullPath
+        : isAbsolute(decodedPath)
+          ? resolve(root, decodedPath.replace(/^[/\\]+/, ''))
+          : resolve(dirname(fullPath), decodedPath)
       if (!existsSync(targetPath)) {
         findings.push(`${fileName}:${line} points to missing local target: ${rawTarget}`)
+        continue
+      }
+
+      if (decodedFragment && extname(targetPath).toLowerCase() === '.md') {
+        let anchors = anchorCache.get(targetPath)
+        if (!anchors) {
+          anchors = markdownHeadingAnchors(readFileSync(targetPath, 'utf8'))
+          anchorCache.set(targetPath, anchors)
+        }
+        if (!anchors.has(decodedFragment)) {
+          findings.push(`${fileName}:${line} points to missing Markdown anchor: ${rawTarget}`)
+        }
       }
     }
   }

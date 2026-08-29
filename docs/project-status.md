@@ -1,6 +1,6 @@
 # PRIZM 현재 구현 현황
 
-> 기준일: 2026-08-29
+> 기준일: 2026-08-30
 >
 > PRZ-020 기능 통합 근거: [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b`
 >
@@ -117,6 +117,8 @@
 | 태그 연결 문서 수·TXT 미리보기·TXT/PDF 원문 보기 | `VERIFIED` | PRZ-019, [PR #60](https://github.com/jaemin-devlog/PRIZM/pull/60), 병합 `01d6c46` |
 | 인증 초기화 제거와 단일 `USER` 역할 전환 | `VERIFIED` | PRZ-020, [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b` |
 | Fresh Clone 첫 사용자 경험 정합화 | `VERIFIED` | 구현 `a0c2977`, [PR #65](https://github.com/jaemin-devlog/PRIZM/pull/65), 병합 `60e5fc6`, [PRZ-021 검증 기록](../specs/PRZ-021-first-user-experience/evidence.md) |
+| Worker·USER 격리·cleanup·Linux 파일 저장소 재검증 | `VERIFIED` | 기준선 `3af4db0`, [PRZ-022 검증 기록](../specs/PRZ-022-backend-reliability-evidence/evidence.md) — 검색은 과거 동결 자료 무결성만 재확인 |
+| 프로젝트 최종 Closeout | `VERIFIED` | final baseline `6e966e5`, [PRZ-023 검증 기록](../specs/PRZ-023-project-closeout/evidence.md) — OpenSQL은 final main에서 재실행하지 않은 역사 근거 |
 
 PostgreSQL 성공은 OpenSQL 증거가 아닙니다. OpenSQL·OpenProxy 결과는 기록된 단일
 서버 direct 연결과 single-Primary 실행 경로에 한정합니다. 명령, 환경과 수치는

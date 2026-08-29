@@ -37,8 +37,8 @@ PRIZM은 Spring Boot backend와 React frontend로 실행하는 self-hosted 오�
 
 검색 연구의 lifecycle과 현재 제품 검색은 분리해 읽습니다. PRZ-008·PRZ-016의
 원문 판정과 현재 검색 진입점은
-[검색 연구·평가 기록](../specs/README.md#검색-연구평가-기록)에서 확인합니다.
-역사적 비채택 결정도 [Spec Registry](../specs/README.md#역사적-비채택-결정)에
+[연구·미채택 기록](../specs/README.md#연구미채택-기록)에서 확인합니다.
+역사적 비채택 결정도 [같은 기록](../specs/README.md#연구미채택-기록)에
 원문 상태로 보존합니다.
 
 ## 새 변경을 시작하는 방법

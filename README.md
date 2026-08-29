@@ -125,6 +125,8 @@ direct 연결과 OpenProxy single-Primary 경로에서 수행했습니다. OpenS
 | [기능별 검증 기록](specs/README.md) | 기능별 Spec과 상세 검증 기록 안내 |
 | [기여 안내](CONTRIBUTING.md) | 이슈, 변경, 검증과 PR 기준 |
 | [보안 정책](SECURITY.md) | 보안 문제 신고 방법과 지원 범위 |
+| [지원 정책](SUPPORT.md) | 지원 대상, 문의 경로와 지원하지 않는 범위 |
+| [유지관리 정책](MAINTAINERS.md) | 현재 유지관리자와 변경·릴리스 결정 방식 |
 
 ## 오픈소스 기여
 

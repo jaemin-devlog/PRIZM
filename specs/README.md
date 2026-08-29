@@ -11,9 +11,9 @@ PRZ는 PRIZM의 기능 개발과 기술 검증을 작업 단위로 남기는 기
 
 ## PRZ 기록과 제품 흐름
 
-[![PRIZM의 공식 변경 절차, PRZ-000부터 PRZ-023까지의 제목과 상태, 문서 업로드부터 ACTIVE 전환과 근거 검색까지의 흐름](assets/prizm-spec-registry-and-product-flow.svg)](assets/prizm-spec-registry-and-product-flow.svg)
+[![PRIZM의 공식 변경 절차, PRZ-000부터 PRZ-024까지의 제목과 상태, 문서 업로드부터 ACTIVE 전환과 근거 검색까지의 흐름](assets/prizm-spec-registry-and-product-flow.svg)](assets/prizm-spec-registry-and-product-flow.svg)
 
-그림 위쪽은 `PRZ&#8209;000`부터 `PRZ&#8209;023`까지의 상태와 공식 변경 절차를,
+그림 위쪽은 `PRZ&#8209;000`부터 `PRZ&#8209;024`까지의 상태와 공식 변경 절차를,
 아래쪽은 문서 업로드부터 `ACTIVE` 전환과 근거 검색까지의 대표 흐름을 보여 줍니다.
 기본 실행 환경인 PostgreSQL·pgvector와 별도로 검증한 OpenSQL direct·OpenProxy 경로는
 서로의 근거를 대신하지 않습니다.
@@ -68,6 +68,7 @@ PRZ는 PRIZM의 기능 개발과 기술 검증을 작업 단위로 남기는 기
 | PRZ&#8209;021 | [Fresh Clone 첫 사용자 경험 정합화](PRZ-021-first-user-experience/spec.md) | `VERIFIED` | [근거](PRZ-021-first-user-experience/evidence.md) |
 | PRZ&#8209;022 | [백엔드 신뢰성 근거 재검증](PRZ-022-backend-reliability-evidence/spec.md) | `VERIFIED` | [근거](PRZ-022-backend-reliability-evidence/evidence.md) |
 | PRZ&#8209;023 | [PRIZM 프로젝트 최종 Closeout](PRZ-023-project-closeout/spec.md) | `VERIFIED` | [근거](PRZ-023-project-closeout/evidence.md) |
+| PRZ&#8209;024 | [PRIZM v1.0.0 소스 릴리스](PRZ-024-release-v1.0.0/spec.md) | `IN_PROGRESS` | [근거](PRZ-024-release-v1.0.0/evidence.md) |
 
 ## 연구·미채택 기록
 

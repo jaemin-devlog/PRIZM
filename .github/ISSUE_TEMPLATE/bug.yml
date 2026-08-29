@@ -1,0 +1,55 @@
+name: 버그 보고
+description: 재현 가능한 PRIZM 동작 오류를 알려 주세요.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        공개 Issue에 비밀번호, JWT, 실제 경력 문서와 개인정보를 올리지 마세요.
+        보안 취약점은 SECURITY.md의 비공개 신고 경로를 사용해 주세요.
+  - type: textarea
+    id: description
+    attributes:
+      label: 문제 설명
+      description: 기대와 다르게 동작한 내용을 설명해 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 재현 절차
+      description: 민감정보를 제거한 최소 재현 순서를 적어 주세요.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대 결과
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 실제 결과
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 환경
+      description: PRIZM commit 또는 release와 OS, Java, Node, 관련 외부 서비스 버전을 적어 주세요.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: 공개 정보 확인
+      options:
+        - label: 비밀정보·개인정보·실제 업로드 문서를 제거했습니다.
+          required: true
+        - label: 보안 취약점 신고가 아님을 확인했습니다.
+          required: true

@@ -184,3 +184,11 @@ PR #22에 requested reviewer·comment·review가 없었다. 독립 agent 감사�
 - release 전에 source·SBOM snapshot과 checksum은 별도 Gate에서 고정해야 한다.
 - OpenSQL·OpenProxy·OpenHA 검증은 이 Spec의 결과가 아니다.
 - `bge-m3` 변환 lineage의 `UNVERIFIED_LINEAGE` 경계는 그대로 유지한다.
+
+## 2026-08-30 첫 소스 릴리스 Gate 재개
+
+PRZ-024에서 첫 외부 소스 릴리스 준비를 시작해 `OR-005`·`OR-006`의 재개 조건이
+충족됐다. GitHub Private Vulnerability Reporting은 API 조회 기준 `enabled=true`로
+활성화했다. SECURITY·SUPPORT·유지관리 정책과 Issue/PR template은 PRZ-024
+릴리스 준비 브랜치에서 구현 중이며, 기본 브랜치 통합과 실제 Release 검증 전까지
+이 문서의 기존 `DEFERRED` 판정을 소급해 `PASS`로 바꾸지 않는다.

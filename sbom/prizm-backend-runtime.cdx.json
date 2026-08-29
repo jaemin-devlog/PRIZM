@@ -5,11 +5,11 @@
     "metadata": {
         "component": {
             "type": "application",
-            "bom-ref": "pkg:maven/com.prizm/prizm@0.0.1-SNAPSHOT",
+            "bom-ref": "pkg:maven/com.prizm/prizm@1.0.0",
             "group": "com.prizm",
             "name": "prizm",
-            "version": "0.0.1-SNAPSHOT",
-            "purl": "pkg:maven/com.prizm/prizm@0.0.1-SNAPSHOT"
+            "version": "1.0.0",
+            "purl": "pkg:maven/com.prizm/prizm@1.0.0"
         },
         "properties": [
             {

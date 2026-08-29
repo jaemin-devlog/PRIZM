@@ -119,6 +119,7 @@
 | Fresh Clone 첫 사용자 경험 정합화 | `VERIFIED` | 구현 `a0c2977`, [PR #65](https://github.com/jaemin-devlog/PRIZM/pull/65), 병합 `60e5fc6`, [PRZ-021 검증 기록](../specs/PRZ-021-first-user-experience/evidence.md) |
 | Worker·USER 격리·cleanup·Linux 파일 저장소 재검증 | `VERIFIED` | 기준선 `3af4db0`, [PRZ-022 검증 기록](../specs/PRZ-022-backend-reliability-evidence/evidence.md) — 검색은 과거 동결 자료 무결성만 재확인 |
 | 프로젝트 최종 Closeout | `VERIFIED` | final baseline `6e966e5`, [PRZ-023 검증 기록](../specs/PRZ-023-project-closeout/evidence.md) — OpenSQL은 final main에서 재실행하지 않은 역사 근거 |
+| `v1.0.0` 소스 릴리스 준비 | `IN_PROGRESS` | [PRZ-024](../specs/PRZ-024-release-v1.0.0/spec.md) — 버전·SBOM·보안 신고·지원 정책과 GitHub Release Gate |
 
 PostgreSQL 성공은 OpenSQL 증거가 아닙니다. OpenSQL·OpenProxy 결과는 기록된 단일
 서버 direct 연결과 single-Primary 실행 경로에 한정합니다. 명령, 환경과 수치는

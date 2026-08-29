@@ -8,8 +8,18 @@ import { verifyRepository } from './verify-sbom.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const requiredFiles = [
+  '.github/ISSUE_TEMPLATE/bug.yml',
+  '.github/ISSUE_TEMPLATE/config.yml',
+  '.github/ISSUE_TEMPLATE/documentation.yml',
+  '.github/ISSUE_TEMPLATE/feature.yml',
+  '.github/pull_request_template.md',
+  'CODE_OF_CONDUCT.md',
+  'CONTRIBUTING.md',
   'LICENSE',
+  'MAINTAINERS.md',
   'NOTICE',
+  'SECURITY.md',
+  'SUPPORT.md',
   'sbom/README.md',
   'sbom/SHA256SUMS',
   'sbom/prizm-ai-model-manifest.json',
@@ -48,6 +58,22 @@ const forbiddenBinaryExtensions = new Set([
 
 function fail(message) {
   throw new Error(`OSS readiness verification failed: ${message}`)
+}
+
+export function releaseMetadataFindings(metadata) {
+  const entries = Object.entries(metadata)
+  const findings = entries
+    .filter(([, value]) => typeof value !== 'string' || value.length === 0)
+    .map(([name]) => `${name} has no release version`)
+  if (findings.length > 0) {
+    return findings
+  }
+
+  const versions = new Set(entries.map(([, value]) => value))
+  if (versions.size > 1) {
+    findings.push(`release versions differ: ${entries.map(([name, value]) => `${name}=${value}`).join(', ')}`)
+  }
+  return findings
 }
 
 function run(command, args, options = {}) {
@@ -519,6 +545,28 @@ function assertRequiredFiles() {
   console.log(`Required OSS files exist: ${requiredFiles.length}.`)
 }
 
+function assertReleaseMetadata() {
+  const gradleContent = readFileSync(resolve(root, 'build.gradle'), 'utf8')
+  const gradleMatch = gradleContent.match(/^version = '([^']+)'$/m)
+  const frontendPackage = JSON.parse(readFileSync(resolve(root, 'frontend/package.json'), 'utf8'))
+  const frontendLock = JSON.parse(readFileSync(resolve(root, 'frontend/package-lock.json'), 'utf8'))
+  const backendSbom = JSON.parse(readFileSync(resolve(root, 'sbom/prizm-backend-runtime.cdx.json'), 'utf8'))
+  const frontendSbom = JSON.parse(readFileSync(resolve(root, 'sbom/prizm-frontend.cdx.json'), 'utf8'))
+  const metadata = {
+    gradle: gradleMatch?.[1],
+    frontendPackage: frontendPackage.version,
+    frontendLock: frontendLock.version,
+    frontendLockRoot: frontendLock.packages?.['']?.version,
+    backendSbom: backendSbom.metadata?.component?.version,
+    frontendSbom: frontendSbom.metadata?.component?.version,
+  }
+  const findings = releaseMetadataFindings(metadata)
+  if (findings.length > 0) {
+    fail(`release metadata is inconsistent:\n- ${findings.join('\n- ')}`)
+  }
+  console.log(`Release metadata version checks passed: ${metadata.gradle}.`)
+}
+
 function regenerateAndVerifySbom() {
   const before = new Map(generatedSbomFiles.map((fileName) => [fileName, sha256(fileName)]))
   const gradle = process.platform === 'win32'
@@ -541,6 +589,7 @@ function regenerateAndVerifySbom() {
 
 export async function verifyOssReadiness() {
   assertRequiredFiles()
+  assertReleaseMetadata()
   const externalLinks = assertMarkdown()
   assertTrackedSafety()
   assertLicensePolicy()

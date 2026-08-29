@@ -8,8 +8,33 @@ import {
   isApprovedBinaryFixture,
   markdownHeadingAnchors,
   markdownFindings,
+  releaseMetadataFindings,
   sensitiveContentFindings,
 } from './verify-oss-readiness.mjs'
+
+test('accepts identical release versions and reports missing or mismatched metadata', () => {
+  assert.deepEqual(releaseMetadataFindings({
+    gradle: '1.0.0',
+    frontendPackage: '1.0.0',
+    frontendLock: '1.0.0',
+    backendSbom: '1.0.0',
+  }), [])
+
+  assert.deepEqual(releaseMetadataFindings({
+    gradle: '1.0.0',
+    frontendPackage: '1.0.1',
+    frontendLock: '',
+  }), [
+    'frontendLock has no release version',
+  ])
+
+  assert.deepEqual(releaseMetadataFindings({
+    gradle: '1.0.0',
+    frontendPackage: '1.0.1',
+  }), [
+    'release versions differ: gradle=1.0.0, frontendPackage=1.0.1',
+  ])
+})
 
 test('reports trailing whitespace and an unclosed code fence with file and line', () => {
   const findings = markdownFindings('docs/example.md', '# Example  \n\n```text\nbody\n')

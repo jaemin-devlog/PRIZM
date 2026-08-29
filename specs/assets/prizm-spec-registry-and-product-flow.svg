@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1004" viewBox="0 0 1600 1004" role="img" aria-labelledby="title desc">
   <title id="title">PRIZM Spec Registry와 제품 흐름</title>
-  <desc id="desc">PRZ-000부터 PRZ-023까지의 상태와 인증, 업로드, 버전 기록, 색인, ACTIVE 전환, 근거 검색 흐름</desc>
+  <desc id="desc">PRZ-000부터 PRZ-024까지의 상태와 인증, 업로드, 버전 기록, 색인, ACTIVE 전환, 근거 검색 흐름</desc>
   <defs>
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
       <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.08"/>
@@ -25,14 +25,14 @@
     </style>
   </defs>
 
-  <rect width="1600" height="920" fill="#f8fafc"/>
-  <rect x="20" y="20" width="1560" height="880" rx="28" fill="#ffffff" stroke="#dbe4f0"/>
+  <rect width="1600" height="1004" fill="#f8fafc"/>
+  <rect x="20" y="20" width="1560" height="964" rx="28" fill="#ffffff" stroke="#dbe4f0"/>
 
   <!-- Header -->
   <rect x="48" y="50" width="18" height="18" rx="5" fill="#2563eb" transform="rotate(45 57 59)"/>
   <text x="82" y="55" class="eyebrow">PRIZM</text>
   <text x="82" y="84" class="title">Spec Registry</text>
-  <text x="294" y="82" class="count">PRZ-000 — PRZ-023</text>
+  <text x="294" y="82" class="count">PRZ-000 — PRZ-024</text>
 
   <g transform="translate(970 58)">
     <circle cx="0" cy="0" r="5" fill="#64748b"/><text x="12" y="4" class="legend">AS_BUILT_BASELINE</text>
@@ -43,7 +43,7 @@
 
   <!-- Registry -->
   <text x="48" y="132" class="section">PRZ 기록 지도</text>
-  <text x="188" y="132" class="count">24 records</text>
+  <text x="188" y="132" class="count">25 records</text>
 
   <!-- Row 1 -->
   <g transform="translate(48 154)">
@@ -155,6 +155,14 @@
     <text x="18" y="25" class="id">PRZ-023</text><text x="208" y="24" text-anchor="end" class="status" fill="#2563eb">VERIFIED</text><text x="18" y="51" class="card-title">프로젝트 Closeout</text>
   </g>
 
+  <!-- Row 5 -->
+  <g transform="translate(48 490)">
+    <rect width="240" height="72" rx="12" fill="#fffaf0" stroke="#fbbf24"/><rect width="5" height="72" rx="3" fill="#d97706"/>
+    <text x="18" y="25" class="id">PRZ-024</text><text x="224" y="24" text-anchor="end" class="status" fill="#b45309">IN_PROGRESS</text><text x="18" y="51" class="card-title">v1.0.0 소스 릴리스</text>
+  </g>
+
+  <g transform="translate(0 84)">
+
   <line x1="48" y1="518" x2="1552" y2="518" stroke="#e2e8f0"/>
 
   <!-- Product flow -->
@@ -236,5 +244,6 @@
     <text x="177" y="33" class="chip">Ollama · bge-m3</text>
   </g>
 
-  <text x="800" y="879" text-anchor="middle" class="count">Registry snapshot · PRZ-023</text>
+  <text x="800" y="879" text-anchor="middle" class="count">Registry snapshot · PRZ-024</text>
+  </g>
 </svg>

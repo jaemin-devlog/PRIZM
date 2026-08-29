@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 보안 취약점 비공개 신고
+    url: https://github.com/jaemin-devlog/PRIZM/security/advisories/new
+    about: 취약점 세부 내용은 공개 Issue 대신 Private Vulnerability Reporting으로 보내 주세요.
+  - name: 지원 범위 확인
+    url: https://github.com/jaemin-devlog/PRIZM/blob/main/SUPPORT.md
+    about: 새 Issue를 열기 전에 지원 대상과 문의 경로를 확인해 주세요.

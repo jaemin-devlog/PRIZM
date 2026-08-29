@@ -1,0 +1,33 @@
+name: 문서 개선
+description: 잘못된 설명, 끊어진 링크나 이해하기 어려운 문서를 알려 주세요.
+title: "[Docs] "
+body:
+  - type: input
+    id: location
+    attributes:
+      label: 문서 위치
+      description: 파일 경로나 공개 URL과 해당 heading을 적어 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: 현재 문제
+      description: 무엇이 잘못됐거나 이해하기 어려운지 설명해 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: 제안하는 수정
+    validations:
+      required: true
+  - type: checkboxes
+    id: evidence
+    attributes:
+      label: 사실 경계 확인
+      options:
+        - label: 실행하지 않은 기능이나 환경을 PASS로 표현하지 않았습니다.
+          required: true
+        - label: 비밀정보·개인정보·로컬 절대 경로를 포함하지 않았습니다.
+          required: true

@@ -10,13 +10,13 @@
 주세요. 지금 사용할 수 있는 기능과 검증 범위는
 [현재 구현 현황](../docs/project-status.md)에서 확인할 수 있습니다.
 
-> **중요:** Spec은 구현 증거가 아닙니다. 실제 구현 여부는 소스 코드, 적용된
+> 중요: Spec은 구현 증거가 아닙니다. 실제 구현 여부는 소스 코드, 적용된
 > Flyway 마이그레이션, 실행 가능한 테스트와 필요한 환경에서 얻은 검증 결과로
 > 판단합니다.
 
 ## PRZ 기록이란 무엇인가요?
 
-**PRZ&#8209;###**는 하나의 기능이나 변경 범위를 식별하는 번호입니다. 번호는 기록을 찾기
+PRZ&#8209;###는 하나의 기능이나 변경 범위를 식별하는 번호입니다. 번호는 기록을 찾기
 위한 식별자일 뿐, 중요도나 완료 순서를 뜻하지 않습니다. 새 제품 변경을 시작하면
 GitHub Issue에 문제와 사용자 영향을 기록하고, 새 PRZ의 `spec.md`에서 범위와
 검증 방법을 정합니다.
@@ -30,13 +30,13 @@ Spec 목록은 2026년 7월 23일 커밋 `3233bad7`에서 처음 도입됐습니
 
 대부분의 PRZ 폴더에는 다음 네 문서가 있습니다.
 
-- **`spec.md` — 무엇을 바꿀지:** 문제, 사용자 시나리오, 범위와 제외 범위,
+- `spec.md` — 무엇을 바꿀지: 문제, 사용자 시나리오, 범위와 제외 범위,
   보존해야 할 계약, 완료 조건을 정의합니다.
-- **`plan.md` — 어떻게 바꿀지:** 수정할 코드와 데이터 흐름, 보안·마이그레이션
+- `plan.md` — 어떻게 바꿀지: 수정할 코드와 데이터 흐름, 보안·마이그레이션
   영향, 테스트 방법과 실패 시 대응을 정리합니다.
-- **`tasks.md` — 어떤 순서로 진행할지:** 구현, 테스트, 문서화와 검증 작업을
+- `tasks.md` — 어떤 순서로 진행할지: 구현, 테스트, 문서화와 검증 작업을
   실제 파일 단위로 나눕니다. 진행 중 계획이 달라졌다면 그 차이도 기록합니다.
-- **`evidence.md` — 무엇으로 확인했는지:** 기준 소스, 실행한 명령과 환경,
+- `evidence.md` — 무엇으로 확인했는지: 기준 소스, 실행한 명령과 환경,
   성공·실패·미실행 결과, Pull Request와 병합 근거를 기록합니다.
 
 필요한 경우 벤치마크 결과, 데이터 세트, 실패 분석이나 구현 보고서가 추가됩니다.
@@ -50,47 +50,47 @@ PRZ&#8209;000은 이미 존재하던 구현의 기준선이므로 `plan.md`와 `
 
 용어가 낯설다면 다음 뜻만 먼저 알아두면 됩니다.
 
-- **브랜치와 `main`:** 브랜치는 변경을 분리해 작업하는 공간이고, `main`은 검토를
+- 브랜치와 `main`: 브랜치는 변경을 분리해 작업하는 공간이고, `main`은 검토를
   마친 변경을 모으는 기본 브랜치입니다.
-- **원격 기준선과 작업 트리:** 원격 기준선은 GitHub에 올라간 최신 기준이고,
+- 원격 기준선과 작업 트리: 원격 기준선은 GitHub에 올라간 최신 기준이고,
   작업 트리는 내 컴퓨터에서 현재 편집 중인 파일 상태입니다.
-- **Flyway 마이그레이션:** 데이터베이스 구조를 순서대로 바꾸는 파일입니다. 이미
+- Flyway 마이그레이션: 데이터베이스 구조를 순서대로 바꾸는 파일입니다. 이미
   적용한 파일은 고치지 않고 다음 번호의 파일을 추가합니다.
-- **diff, Pull Request, CI:** diff는 바뀐 줄의 비교 결과, Pull Request는 변경을
+- diff, Pull Request, CI: diff는 바뀐 줄의 비교 결과, Pull Request는 변경을
   `main`에 합치기 위한 제안, CI는 그 변경을 자동으로 검사하는 절차입니다.
 
-1. **`ORIENT` — 현재 상태 확인**
+1. `ORIENT` — 현재 상태 확인
 
    브랜치와 원격 기준선, 작업 트리, 관련 소스·테스트·문서를 확인합니다. 범위,
    위험, 보존할 계약과 검증 명령을 정하며 이 단계에서는 파일을 수정하지 않습니다.
 
-2. **`SPEC` — 요구사항 확정**
+2. `SPEC` — 요구사항 확정
 
    사용자 문제, 범위와 제외 범위, 보안·호환성 영향, 실행 결과로 판단할 수 있는
    완료 조건을 `spec.md`에 적습니다.
 
-3. **`PLAN` — 구현과 검증 설계**
+3. `PLAN` — 구현과 검증 설계
 
    어떤 파일과 데이터 흐름을 바꿀지, 완료 조건을 어떤 테스트로 확인할지,
    실패하면 어디서 멈추거나 되돌릴지를 `plan.md`와 `tasks.md`에 연결합니다.
 
-4. **`IMPLEMENT` — 최소 범위 구현**
+4. `IMPLEMENT` — 최소 범위 구현
 
    합의한 범위만 구현하고 필요한 테스트를 함께 작성합니다. 적용된 Flyway
    마이그레이션이나 관계없는 작업은 수정하지 않습니다.
 
-5. **`VERIFY` — 실제 환경에서 검증**
+5. `VERIFY` — 실제 환경에서 검증
 
    정해 둔 명령을 실행하고 결과를 있는 그대로 기록합니다. 실행하지 못한 검사는
    `NOT_RUN`으로 남깁니다. 그 때문에 목표 동작을 입증하지 못했다면
    `NOT_VERIFIED`로 판정합니다.
 
-6. **`AUDIT` — 최종 변경 검토**
+6. `AUDIT` — 최종 변경 검토
 
    요구사항과 실제 diff가 맞는지, 사용자 데이터 경계와 보안 계약을 지켰는지,
    테스트와 문서가 결과를 과장하지 않는지 다시 확인합니다.
 
-7. **`INTEGRATE` — Pull Request와 병합**
+7. `INTEGRATE` — Pull Request와 병합
 
    GitHub 쓰기와 병합이 작업 범위에 포함될 때만 진행합니다. 실제 Pull Request,
    CI와 검토 결과를 확인한 뒤 `main`에 병합하고, 기준 소스와 통합 근거를
@@ -103,26 +103,26 @@ PRZ&#8209;000은 이미 존재하던 구현의 기준선이므로 `plan.md`와 `
 
 ## 상태와 검사 결과를 구분해서 읽어 주세요
 
-PRZ의 **진행 상태**는 작업 전체가 어디까지 왔는지를 나타냅니다.
+PRZ의 진행 상태는 작업 전체가 어디까지 왔는지를 나타냅니다.
 
-- **`AS_BUILT_BASELINE`** — Spec 목록 도입 전에 존재하던 구현을 소스 기준으로
+- `AS_BUILT_BASELINE` — Spec 목록 도입 전에 존재하던 구현을 소스 기준으로
   기록한 역사적 기준선입니다.
-- **`PLANNED`** — 요구사항과 완료 조건을 정했지만 구현을 시작하지 않았습니다.
-- **`IN_PROGRESS`** — 구현이나 필수 검증 중 일부가 남아 있습니다.
-- **`IMPLEMENTED_UNVERIFIED`** — 코드는 구현했지만 필수 검증 근거가 부족합니다.
-- **`VERIFIED`** — 해당 PRZ의 근거를 검토해 현재 목록에서 검증 완료로
+- `PLANNED` — 요구사항과 완료 조건을 정했지만 구현을 시작하지 않았습니다.
+- `IN_PROGRESS` — 구현이나 필수 검증 중 일부가 남아 있습니다.
+- `IMPLEMENTED_UNVERIFIED` — 코드는 구현했지만 필수 검증 근거가 부족합니다.
+- `VERIFIED` — 해당 PRZ의 근거를 검토해 현재 목록에서 검증 완료로
   판정했습니다. 현재 작업 절차에서는 필수 `VERIFY`와 `AUDIT`를 모두 마쳐야 합니다.
-- **`DEFERRED`** — 재개 조건을 남기고 작업을 미뤘습니다.
-- **`REJECTED`** — 검토나 실험 뒤 채택하지 않기로 결정했습니다.
+- `DEFERRED` — 재개 조건을 남기고 작업을 미뤘습니다.
+- `REJECTED` — 검토나 실험 뒤 채택하지 않기로 결정했습니다.
 
-반면 아래 표기는 특정 검사나 환경에서 얻은 **개별 결과**입니다.
+반면 아래 표기는 특정 검사나 환경에서 얻은 개별 결과입니다.
 
-- **`PASS` / `FAIL`** — 기록된 소스와 환경에서 해당 검사가 통과하거나
+- `PASS` / `FAIL` — 기록된 소스와 환경에서 해당 검사가 통과하거나
   실패했습니다.
-- **`SKIPPED`** — 검사 항목을 건너뛰었습니다. 통과한 결과로 보지 않습니다.
-- **`NOT_RUN`** — 검사를 실행하지 않았습니다.
-- **`NOT_VERIFIED`** — 목표 동작을 입증할 근거가 충분하지 않습니다.
-- **`HISTORICAL_PASS_NOT_RERUN`** — 과거에는 통과했지만 현재 소스에서 다시
+- `SKIPPED` — 검사 항목을 건너뛰었습니다. 통과한 결과로 보지 않습니다.
+- `NOT_RUN` — 검사를 실행하지 않았습니다.
+- `NOT_VERIFIED` — 목표 동작을 입증할 근거가 충분하지 않습니다.
+- `HISTORICAL_PASS_NOT_RERUN` — 과거에는 통과했지만 현재 소스에서 다시
   실행하지 않았습니다.
 
 `PASS` 하나가 PRZ 전체의 `VERIFIED`를 뜻하지는 않습니다. PostgreSQL에서 얻은
@@ -147,11 +147,11 @@ PRZ의 **진행 상태**는 작업 전체가 어디까지 왔는지를 나타냅
 
 ## Spec 목록 도입 전 기준선
 
-- [**Spec 목록 도입 전 구현 이력**](000-pre-spec-implementation-history.md) —
+- [Spec 목록 도입 전 구현 이력](000-pre-spec-implementation-history.md) —
   2026년 7월 23일 이전 구현 순서를 소스 기준으로 정리했습니다. 당시
   계획·실험·실패와 판정을 포함한 날짜별 원문은
   [전체 개발 기록](../docs/archive/development-log-full-history.md)에 보존합니다.
-- [**PRZ&#8209;000 · 플랫폼·문서 보관함 기준**](PRZ-000-platform-baseline/spec.md) —
+- [PRZ&#8209;000 · 플랫폼·문서 보관함 기준](PRZ-000-platform-baseline/spec.md) —
   `AS_BUILT_BASELINE`; 기준 소스 `e995a5f`.
 
 ## 현재 제품에 통합되고 검증된 기록
@@ -162,66 +162,66 @@ PRZ의 **진행 상태**는 작업 전체가 어디까지 왔는지를 나타냅
 
 ### 제품 기반과 실행 환경
 
-- [**PRZ&#8209;001 · 검색 평가 정합성**](PRZ-001-search-evaluation-integrity/spec.md) —
+- [PRZ&#8209;001 · 검색 평가 정합성](PRZ-001-search-evaluation-integrity/spec.md) —
   `VERIFIED`; 기준 소스 `36c8610`.
-- [**PRZ&#8209;002 · 오픈소스 준비**](PRZ-002-open-source-readiness/spec.md) —
+- [PRZ&#8209;002 · 오픈소스 준비](PRZ-002-open-source-readiness/spec.md) —
   `VERIFIED`; 기준 소스 `f54e3d9`.
-- [**PRZ&#8209;003 · OpenSQL 단일 서버 검증**](PRZ-003-opensql-single-node-gate/spec.md) —
+- [PRZ&#8209;003 · OpenSQL 단일 서버 검증](PRZ-003-opensql-single-node-gate/spec.md) —
   `VERIFIED`; 기준 소스 `777e184`.
-- [**PRZ&#8209;004 · 새 설치 환경 데모**](PRZ-004-clean-clone-demo/spec.md) —
+- [PRZ&#8209;004 · 새 설치 환경 데모](PRZ-004-clean-clone-demo/spec.md) —
   `VERIFIED`; 기준 소스 `aff3e87`,
   [PR #25](https://github.com/jaemin-devlog/PRIZM/pull/25).
-- [**PRZ&#8209;005 · OpenSQL·Ollama E2E**](PRZ-005-opensql-ollama-e2e/spec.md) —
+- [PRZ&#8209;005 · OpenSQL·Ollama E2E](PRZ-005-opensql-ollama-e2e/spec.md) —
   `VERIFIED`; 기준 소스 `eab32c8`,
   [PR #26](https://github.com/jaemin-devlog/PRIZM/pull/26).
-- [**PRZ&#8209;006 · 로컬 빠른 시작**](PRZ-006-local-single-user-demo/spec.md) —
+- [PRZ&#8209;006 · 로컬 빠른 시작](PRZ-006-local-single-user-demo/spec.md) —
   `VERIFIED`; 기준 소스 `bfd8600`.
-- [**PRZ&#8209;007 · 자체 호스팅 회원가입**](PRZ-007-self-hosted-signup/spec.md) —
+- [PRZ&#8209;007 · 자체 호스팅 회원가입](PRZ-007-self-hosted-signup/spec.md) —
   `VERIFIED`; 기준 소스 `2b8b600`,
   [PR #33](https://github.com/jaemin-devlog/PRIZM/pull/33).
 
 ### 문서 처리와 근거 검색
 
-- [**PRZ&#8209;009 · 사용자가 관리하는 문서 태그**](PRZ-009-career-keyword-map/spec.md) —
+- [PRZ&#8209;009 · 사용자가 관리하는 문서 태그](PRZ-009-career-keyword-map/spec.md) —
   `VERIFIED`; P4 소스 `1c1d8d2`, [PR #51](https://github.com/jaemin-devlog/PRIZM/pull/51),
   병합 `d44f30e`.
-- [**PRZ&#8209;010 · ChangeLog 동기화**](PRZ-010-change-log-sync/spec.md) —
+- [PRZ&#8209;010 · ChangeLog 동기화](PRZ-010-change-log-sync/spec.md) —
   `VERIFIED`; 기준 소스 `26c546b`,
   [PR #39](https://github.com/jaemin-devlog/PRIZM/pull/39).
-- [**PRZ&#8209;011 · 문서 처리 상태 UX**](PRZ-011-document-processing-status-ux/spec.md) —
+- [PRZ&#8209;011 · 문서 처리 상태 UX](PRZ-011-document-processing-status-ux/spec.md) —
   `VERIFIED`; 기준 소스 `fbb3481`,
   [PR #41](https://github.com/jaemin-devlog/PRIZM/pull/41).
-- [**PRZ&#8209;012 · 검색 근거 표현**](PRZ-012-search-evidence-presentation/spec.md) —
+- [PRZ&#8209;012 · 검색 근거 표현](PRZ-012-search-evidence-presentation/spec.md) —
   현재 목록 상태 `VERIFIED`; 2026년 8월 13일 `VERIFY` 결과 `PASS`. 당시
   `AUDIT`와 `INTEGRATE`는 요청 범위 밖이었다는 기록을 함께 보존합니다
   ([검증 기록](PRZ-012-search-evidence-presentation/evidence.md)).
-- [**PRZ&#8209;013 · OpenProxy 단일 Primary 검증**](PRZ-013-openproxy-single-primary-gate/spec.md) —
+- [PRZ&#8209;013 · OpenProxy 단일 Primary 검증](PRZ-013-openproxy-single-primary-gate/spec.md) —
   `VERIFIED`; 기준 소스 `a65f91d`.
-- [**PRZ&#8209;015 · 읽기 전용 MCP 검색**](PRZ-015-mcp-career-evidence-search/spec.md) —
+- [PRZ&#8209;015 · 읽기 전용 MCP 검색](PRZ-015-mcp-career-evidence-search/spec.md) —
   `VERIFIED`; 기준 소스 `97c01cb`, [PR #46](https://github.com/jaemin-devlog/PRIZM/pull/46),
   병합 `23166e7`.
 
 ### 화면과 첫 사용자 경험
 
-- [**PRZ&#8209;017 · 채용공고 항목별 근거 검색 V1**](PRZ-017-job-posting-evidence-v1/spec.md) —
+- [PRZ&#8209;017 · 채용공고 항목별 근거 검색 V1](PRZ-017-job-posting-evidence-v1/spec.md) —
   `VERIFIED`; 기준 소스 `94715cf`, [PR #53](https://github.com/jaemin-devlog/PRIZM/pull/53),
   병합 `b78ec42`.
-- [**PRZ&#8209;018 · 문서 상세 미리보기 페이지**](PRZ-018-document-detail-page/spec.md) —
+- [PRZ&#8209;018 · 문서 상세 미리보기 페이지](PRZ-018-document-detail-page/spec.md) —
   `VERIFIED`; 기준 소스 `186be99`, [PR #56](https://github.com/jaemin-devlog/PRIZM/pull/56),
   병합 `a9ca679`.
-- [**PRZ&#8209;019 · 태그 문서 수 명확화와 TXT 원문 미리보기**](PRZ-019-document-usability-fixes/spec.md) —
+- [PRZ&#8209;019 · 태그 문서 수 명확화와 TXT 원문 미리보기](PRZ-019-document-usability-fixes/spec.md) —
   `VERIFIED`; 기준 소스 `4932aa8`, [PR #60](https://github.com/jaemin-devlog/PRIZM/pull/60),
   병합 `01d6c46`.
-- [**PRZ&#8209;020 · 인증 초기화 제거와 빠른 시작 단순화**](PRZ-020-auth-bootstrap-cleanup/spec.md) —
+- [PRZ&#8209;020 · 인증 초기화 제거와 빠른 시작 단순화](PRZ-020-auth-bootstrap-cleanup/spec.md) —
   `VERIFIED`; 기준 소스 `831b2bb`, [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62),
   병합 `adb033b`.
-- [**PRZ&#8209;021 · Fresh Clone 첫 사용자 경험 정합화**](PRZ-021-first-user-experience/spec.md) —
+- [PRZ&#8209;021 · Fresh Clone 첫 사용자 경험 정합화](PRZ-021-first-user-experience/spec.md) —
   `VERIFIED`; 기준선 `fb8befe`, 구현 `a0c2977`,
   [PR #65](https://github.com/jaemin-devlog/PRIZM/pull/65), 병합 `60e5fc6`.
 
 ### 백엔드 신뢰성 근거
 
-- [**PRZ&#8209;022 · 백엔드 신뢰성 근거 재검증**](PRZ-022-backend-reliability-evidence/spec.md) —
+- [PRZ&#8209;022 · 백엔드 신뢰성 근거 재검증](PRZ-022-backend-reliability-evidence/spec.md) —
   `VERIFIED`; 기준선 `3af4db0`에서 Worker, `USER` 소유권 격리와 파일 정리를
   PostgreSQL·Linux 환경에서 재검증했습니다. 소유권 격리에는 REST·MCP 검색 경로가
   포함됐습니다. 검색 품질·일반화 평가는 새로 실행하지 않았고 과거 동결 근거의
@@ -234,11 +234,11 @@ PRZ의 **진행 상태**는 작업 전체가 어디까지 왔는지를 나타냅
 있다는 뜻이 아닙니다. 제품에 반영된 개선과 아직 끝내지 않은 연구 검증이 한 기록에
 함께 남아 있어 진행 상태를 그대로 보존한 것입니다.
 
-- [**PRZ&#8209;008 · 검색 근거 신뢰성**](PRZ-008-search-evidence-reliability/spec.md) —
+- [PRZ&#8209;008 · 검색 근거 신뢰성](PRZ-008-search-evidence-reliability/spec.md) —
   `IN_PROGRESS`; 기준 소스 `2190d47`,
   [PR #40](https://github.com/jaemin-devlog/PRIZM/pull/40). 제품에 통합된 검색
   개선과 완료하지 않은 최적화 검증을 함께 보존합니다.
-- [**PRZ&#8209;016 · Search Performance V2**](PRZ-016-search-performance-v2/README.md) —
+- [PRZ&#8209;016 · Search Performance V2](PRZ-016-search-performance-v2/README.md) —
   `IN_PROGRESS`; 당시 통합 [PR #50](https://github.com/jaemin-devlog/PRIZM/pull/50),
   병합 `3cfe9dc`. 현재 검색 소스와 테스트 진입점, P15 `NOT_VERIFIED`, 제품에
   적용하지 않은 P16 판정을 구분해 안내합니다.
@@ -250,7 +250,7 @@ PRZ의 **진행 상태**는 작업 전체가 어디까지 왔는지를 나타냅
 
 ## 역사적 비채택 결정
 
-- [**PRZ&#8209;014 · OpenHA topology 검토**](PRZ-014-openha-topology-gate/spec.md) —
+- [PRZ&#8209;014 · OpenHA topology 검토](PRZ-014-openha-topology-gate/spec.md) —
   `REJECTED`. 당시 탐색과 `PASS`·`NOT_RUN`, 되돌림 근거를 보존하지만 현재 제품의
   변경 후보로 해석하지 않습니다.
 

@@ -35,6 +35,12 @@ PRZ-008과 PRZ-016의 `IN_PROGRESS`는 필수 검증 항목이 모두 끝나지 
 | 현재 제품에 통합 | 001–007, 009–013, 015, 017–020 | 각 기능의 현재 lifecycle과 source는 아래 ledger에서 확인 |
 | 현재 Production 검색 | [016 현재 검색 문서](PRZ-016-search-performance-v2/README.md) | 현재 source·test 진입점과 연구 lifecycle을 분리해 안내 |
 
+## 최근 local 검증
+
+| PRZ | 상태 | 범위 |
+|---|---|---|
+| [PRZ-021](PRZ-021-first-user-experience/spec.md) | `VERIFIED` | TXT 원문 이동, Quickstart·clean-clone owner 정합화와 fresh MCP/client 재검증. commit·PR 없음 |
+
 ## 검색 연구·평가 기록
 
 | 기록 | Lifecycle 상태 | 현재 제품과의 관계 |
@@ -79,6 +85,7 @@ PRZ-008과 PRZ-016의 `IN_PROGRESS`는 필수 검증 항목이 모두 끝나지 
 | [PRZ-018](PRZ-018-document-detail-page/spec.md) | 문서 상세 미리보기 페이지 | `VERIFIED` | `186be99`, [PR #56](https://github.com/jaemin-devlog/PRIZM/pull/56), 병합 `a9ca679` |
 | [PRZ-019](PRZ-019-document-usability-fixes/spec.md) | 태그 문서 수 명확화와 TXT 원문 미리보기 | `VERIFIED` | `4932aa8`, [PR #60](https://github.com/jaemin-devlog/PRIZM/pull/60), 병합 `01d6c46` |
 | [PRZ-020](PRZ-020-auth-bootstrap-cleanup/spec.md) | 인증 초기화 제거와 빠른 시작 단순화 | `VERIFIED` | `831b2bb`, [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b` |
+| [PRZ-021](PRZ-021-first-user-experience/spec.md) | Fresh Clone 첫 사용자 경험 정합화 | `VERIFIED` | 기준선 `fb8befe`; local branch, commit·PR 없음 |
 
 ## 상태와 결과
 

@@ -60,10 +60,13 @@ import {
 } from './searchEvidencePresentation'
 import { loadKeywordEvidence } from './keywordEvidence'
 import {
-  getEvidencePdfViewerTarget,
   KeywordEvidencePanel,
   type EvidencePdfViewerTarget,
 } from './keywordEvidencePanel'
+import {
+  EvidenceSourceAction,
+  type EvidenceDocumentDetailTarget,
+} from './evidenceSourceAction'
 import {
   keywordEvidenceRetryTarget,
   linkedDocumentCountLabel,
@@ -105,8 +108,10 @@ import {
   documentFolderPath,
   documentListPathAfterDetailClose,
   groupDocumentsByType,
+  resolveDocumentPreviewVersionId,
   selectedDocumentIdFromSearch,
   selectedDocumentFolderFromSearch,
+  selectedDocumentVersionIdFromSearch,
 } from './documentFolderPresentation'
 import { txtPreviewText } from './documentOriginalPresentation'
 
@@ -635,7 +640,19 @@ function CareerVaultShell({
               }}
             />
           )}
-          {path === EVIDENCE_PATH && <EvidencePage onSessionExpired={onSessionExpired} />}
+          {path === EVIDENCE_PATH && (
+            <EvidencePage
+              onSessionExpired={onSessionExpired}
+              onNavigateToDocument={(target) => {
+                window.history.pushState(
+                  null,
+                  '',
+                  documentDetailPath(target.documentId, '', target.documentVersionId),
+                )
+                onNavigate(DOCUMENTS_PATH)
+              }}
+            />
+          )}
           {path === UPLOAD_PATH && (
             <UploadPage
               onSessionExpired={onSessionExpired}
@@ -898,7 +915,10 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
     }
   }, [closeOriginalViewer, originalViewerTarget])
 
-  const handleOpenDocument = useCallback(async (documentId: number) => {
+  const handleOpenDocument = useCallback(async (
+    documentId: number,
+    requestedVersionId: number | null = null,
+  ) => {
     closeOriginalViewer()
     const requestId = detailRequestId.current + 1
     detailRequestId.current = requestId
@@ -918,7 +938,11 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
         return
       }
       setSelectedDocument(detail)
-      setSelectedPreviewVersionId(detail.activeVersionId ?? detail.versions[0]?.versionId ?? null)
+      setSelectedPreviewVersionId(resolveDocumentPreviewVersionId(
+        requestedVersionId,
+        detail.activeVersionId,
+        detail.versions,
+      ))
       setEditTitle(detail.title)
       setEditDocumentType(detail.documentType)
     } catch (error) {
@@ -940,12 +964,19 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
     const syncLocation = () => {
       setSelectedDocumentType(selectedDocumentFolderFromSearch(window.location.search))
       const documentId = selectedDocumentIdFromSearch(window.location.search)
+      const requestedVersionId = selectedDocumentVersionIdFromSearch(window.location.search)
       if (documentId === null) {
         resetDocumentDetailState()
         return
       }
       if (selectedDocument?.documentId !== documentId) {
-        void handleOpenDocument(documentId)
+        void handleOpenDocument(documentId, requestedVersionId)
+      } else {
+        setSelectedPreviewVersionId(resolveDocumentPreviewVersionId(
+          requestedVersionId,
+          selectedDocument.activeVersionId,
+          selectedDocument.versions,
+        ))
       }
     }
 
@@ -955,7 +986,13 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
       window.clearTimeout(timeout)
       window.removeEventListener('popstate', syncLocation)
     }
-  }, [handleOpenDocument, resetDocumentDetailState, selectedDocument?.documentId])
+  }, [
+    handleOpenDocument,
+    resetDocumentDetailState,
+    selectedDocument?.activeVersionId,
+    selectedDocument?.documentId,
+    selectedDocument?.versions,
+  ])
 
   const navigateToDocumentDetail = useCallback((documentId: number) => {
     const nextPath = documentDetailPath(documentId, window.location.search)
@@ -964,6 +1001,21 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
     }
     void handleOpenDocument(documentId)
   }, [handleOpenDocument])
+
+  const selectDocumentVersion = useCallback((versionId: number) => {
+    if (selectedDocument === null) {
+      return
+    }
+    const nextPath = documentDetailPath(
+      selectedDocument.documentId,
+      window.location.search,
+      versionId,
+    )
+    if (`${window.location.pathname}${window.location.search}` !== nextPath) {
+      window.history.pushState(null, '', nextPath)
+    }
+    setSelectedPreviewVersionId(versionId)
+  }, [selectedDocument])
 
   const handleSaveMetadata = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -1658,7 +1710,7 @@ function DocumentsPage({ onSessionExpired }: { onSessionExpired: () => void }) {
                         type="button"
                         className="version-select-button"
                         aria-pressed={version.versionId === previewVersion?.versionId}
-                        onClick={() => setSelectedPreviewVersionId(version.versionId)}
+                        onClick={() => selectDocumentVersion(version.versionId)}
                       >
                         <strong>v{version.versionNo}</strong>
                         <span>
@@ -2791,7 +2843,13 @@ function KeywordEvidencePdfViewer({
     </>
   )
 }
-function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
+function EvidencePage({
+  onSessionExpired,
+  onNavigateToDocument,
+}: {
+  onSessionExpired: () => void
+  onNavigateToDocument: (target: EvidenceDocumentDetailTarget) => void
+}) {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<CareerEvidenceSearchResult[]>([])
   const [searchState, setSearchState] = useState<SearchState>('idle')
@@ -3006,7 +3064,6 @@ function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
             <ol className="search-result-list">
               {searchResults.map((result, index) => {
                 const displayedEvidence = getEvidenceHighlight(searchQuery, result)
-                const viewerTarget = getEvidencePdfViewerTarget(result)
                 return (
                   <li key={result.chunkId}>
                     <article className="search-result-card">
@@ -3026,16 +3083,11 @@ function EvidencePage({ onSessionExpired }: { onSessionExpired: () => void }) {
                           <p className="search-result-source-label">문서</p>
                           <h3>{result.documentTitle} · {getEvidenceSourceLabel(result)}</h3>
                         </div>
-                        {viewerTarget !== null && (
-                          <button
-                            type="button"
-                            className="search-result-document-button"
-                            onClick={() => void handleOpenPdf(viewerTarget)}
-                            aria-label={`${result.documentTitle} ${viewerTarget.pageNumber}페이지에서 보기`}
-                          >
-                            문서에서 보기
-                          </button>
-                        )}
+                        <EvidenceSourceAction
+                          result={result}
+                          onOpenPdf={(target) => void handleOpenPdf(target)}
+                          onNavigateToDocument={onNavigateToDocument}
+                        />
                       </footer>
                       <details className="search-result-full-content">
                         <summary>

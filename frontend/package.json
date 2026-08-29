@@ -12,7 +12,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "test:unit": "node --experimental-strip-types --test test/document-processing-presentation.test.ts test/search-evidence-presentation.test.ts test/tag-selection.test.ts test/document-folder-presentation.test.ts test/document-api.test.ts test/document-original-presentation.test.ts test/keyword-evidence.test.ts test/session-policy.test.ts test/tag-components.test.ts test/keyword-evidence-component.test.ts test/job-evidence.test.ts test/job-evidence-component.test.ts test/job-posting-api.test.ts",
+    "test:unit": "node --experimental-strip-types --test test/document-processing-presentation.test.ts test/search-evidence-presentation.test.ts test/evidence-source-action.test.ts test/tag-selection.test.ts test/document-folder-presentation.test.ts test/document-api.test.ts test/document-original-presentation.test.ts test/keyword-evidence.test.ts test/session-policy.test.ts test/tag-components.test.ts test/keyword-evidence-component.test.ts test/job-evidence.test.ts test/job-evidence-component.test.ts test/job-posting-api.test.ts",
     "typecheck": "tsc -b --pretty false",
     "preview": "vite preview",
     "sbom": "node ../scripts/generate-frontend-sbom.mjs"

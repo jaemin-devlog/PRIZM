@@ -1,10 +1,10 @@
 # PRIZM 현재 구현 현황
 
-> 기준일: 2026-08-28
+> 기준일: 2026-08-29
 >
 > PRZ-020 기능 통합 근거: [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b`
 >
-> 현재 작업: PRZ-020은 [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b`로 `main`에 통합됨
+> 현재 작업: PRZ-021 Fresh Clone 첫 사용자 경험 정합화는 local branch에서 검증됐으며 commit·push·PR은 없음
 
 현재 상태는 소스 코드, 적용된 Flyway migration과 실행 가능한 test를 기준으로 판단합니다. Spec과 이 문서는 구현 증거를 대신하지 않습니다.
 
@@ -71,7 +71,8 @@
 - 단일 결과와 최대 5개의 경력 근거 결과
 - TXT `TEXT_CHUNK`, PDF `PAGE` 원문 위치 정보
 - 원문을 보존하면서 관련 1–3문장을 먼저 표시
-- 문서, 버전, 관련도와 전체 원문 확인
+- 문서, 버전, 관련도와 전체 원문 확인. TXT 결과는 해당 version의 문서 상세,
+  PDF 결과는 해당 version의 페이지 원문으로 이동
 - 문서 태그 이름을 질문으로 사용하되 태그가 연결된 문서로 검색 범위를 제한하지 않음
 
 검색은 관련 근거를 찾고 원문 위치를 연결합니다. 경력의 진위, 경험 보유 여부, 채용 요구 충족, 직무 적합도나 합격 가능성은 판정하지 않습니다.
@@ -113,6 +114,7 @@
 | 채용공고 근거 보기 동작 통일 | 통합됨 | [PR #58](https://github.com/jaemin-devlog/PRIZM/pull/58), 병합 `12acb3a` |
 | 태그 연결 문서 수·TXT 미리보기·TXT/PDF 원문 보기 | `VERIFIED` | PRZ-019, [PR #60](https://github.com/jaemin-devlog/PRIZM/pull/60), 병합 `01d6c46` |
 | 인증 초기화 제거와 단일 `USER` 역할 전환 | `VERIFIED` | PRZ-020, [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b` |
+| Fresh Clone 첫 사용자 경험 정합화 | `VERIFIED` (local) | [PRZ-021 검증 기록](../specs/PRZ-021-first-user-experience/evidence.md); commit·PR 없음 |
 
 PostgreSQL 성공은 OpenSQL 증거가 아닙니다. OpenSQL·OpenProxy 결과는 기록된 단일
 서버 direct 연결과 single-Primary 실행 경로에 한정합니다. 명령, 환경과 수치는
@@ -137,6 +139,8 @@ PostgreSQL 성공은 OpenSQL 증거가 아닙니다. OpenSQL·OpenProxy 결과�
 - 일부 파일시스템에서 안전한 삭제 기능을 사용할 수 없으면 자동 파일 정리를 중단합니다.
 - 기본 Compose는 로컬 개발용이며 공개 SaaS 배포 구성이 아닙니다.
 - 공개 저장소에 제품 화면 이미지는 아직 없습니다.
+- Spring AI/MCP Java SDK `2.0.0` stateless server는 정상적인
+  `notifications/initialized` 뒤에도 handler warning을 남길 수 있습니다.
 
 ## 상세 문서
 

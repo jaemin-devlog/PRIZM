@@ -32,7 +32,7 @@ PRZ-008과 PRZ-016의 `IN_PROGRESS`는 필수 검증 항목이 모두 끝나지 
 | 구분 | PRZ | 현재 제품과의 관계 |
 |---|---|---|
 | Registry 도입 전 제품 기준 | [000](PRZ-000-platform-baseline/spec.md) | source cut `e995a5f`를 `AS_BUILT_BASELINE`으로 기록 |
-| 현재 제품에 통합 | 001–007, 009–013, 015, 017–019 | 각 기능의 현재 lifecycle과 source는 아래 ledger에서 확인 |
+| 현재 제품에 통합 | 001–007, 009–013, 015, 017–020 | 각 기능의 현재 lifecycle과 source는 아래 ledger에서 확인 |
 | 현재 Production 검색 | [016 현재 검색 문서](PRZ-016-search-performance-v2/README.md) | 현재 source·test 진입점과 연구 lifecycle을 분리해 안내 |
 
 ## 검색 연구·평가 기록

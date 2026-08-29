@@ -39,18 +39,7 @@ PRIZM에 로그인하면 등록한 커리어 문서를 바탕으로 필요한 �
 
 ## 동작 방식
 
-```mermaid
-flowchart LR
-    A[TXT/PDF 업로드] --> B[원본·버전·변경 기록 저장]
-    B --> C[작업 전달]
-    C --> D[텍스트 추출·문서 분할]
-    D --> E[Ollama 임베딩]
-    E --> F[완료된 버전을 검색 대상으로 전환]
-    F --> G[경력 근거 검색]
-    G --> H[TXT 구간 또는 PDF 페이지]
-```
-
-새 버전은 처리가 끝난 뒤에만 `ACTIVE`, 즉 현재 검색에 사용하는 버전이 됩니다. 검색과 MCP는 로그인한 사용자에게 속한 `ACTIVE` 버전만 조회합니다.
+[![PRIZM의 문서 업로드, 버전 보관, 작업 전달, 텍스트 분할, 벡터 변환, 버전 활성화, 근거 검색, 원문 확인 흐름](docs/assets/diagrams/prizm-workflow.png)](docs/assets/diagrams/prizm-workflow.png)
 
 ## 아키텍처
 

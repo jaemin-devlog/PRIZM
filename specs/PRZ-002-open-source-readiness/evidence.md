@@ -51,11 +51,11 @@ Windows·Linux clean clone·GitHub Actions 검증
   - 판정: `PASS`
   - 근거: 직접 작성 코드 저작권자와 Codex 보조도구 경계를 LICENSE·NOTICE·AI 명세에 분리
 - **ID:** `OR-005`
-  - 판정: `DEFERRED`
-  - 근거: 외부 기여 접수 또는 첫 지원 release·외부 배포 중 먼저 도래하는 시점에 재개
+  - 초기 판정: `DEFERRED`
+  - 후속 판정: `PASS` — PRZ-024 첫 정식 소스 릴리스에서 운영 정책과 실제 비공개 보안 신고 경로 검증
 - **ID:** `OR-006`
-  - 판정: `DEFERRED`
-  - 근거: 외부 Issue·PR 접수를 공식 지원하기 전에 재개
+  - 초기 판정: `DEFERRED`
+  - 후속 판정: `PASS` — PRZ-024에서 Issue Form·PR Template을 추가하고 GitHub 실제 화면 확인
 - **ID:** `OR-007`
   - 판정: `PASS`
   - 근거: README·Quickstart·문서 색인이 구현·계획·환경 한계와 OpenSQL 검증 범위를 구분
@@ -176,19 +176,23 @@ SBOM SHA-256은
 PR #22에 requested reviewer·comment·review가 없었다. 독립 agent 감사와 사용자
 병합 승인은 GitHub review가 아니므로 `REVIEW_NOT_AVAILABLE_SOLO`로 기록한다.
 
-## 남은 제한
+## 완료된 후속 항목과 남은 제한
 
-- G-02·T-06은 외부 기여 접수 또는 첫 지원 release·외부 배포 전에 재개한다.
-- T-07은 외부 Issue·PR 접수를 공식 지원하기 전에 재개한다.
+- G-02·T-06은 첫 지원 릴리스인 PRZ-024에서 완료했다. Private Vulnerability Reporting은
+  Release 공개 후 API 재조회에서도 `enabled=true`였다.
+- T-07은 PRZ-024에서 완료했다. GitHub Issue chooser에 세 Issue Form과 비공개 보안
+  신고 링크가 실제로 노출되고 PR Template이 Community Profile API에서 인식됐다.
+- `v1.0.0` 공개 전 source·SBOM snapshot과 checksum을 고정했다. 이후 릴리스도 같은
+  Gate를 반복해야 한다.
 - JAR, `dist`, image, Ollama binary와 모델 가중치 배포는 별도 감사가 필요하다.
-- release 전에 source·SBOM snapshot과 checksum은 별도 Gate에서 고정해야 한다.
 - OpenSQL·OpenProxy·OpenHA 검증은 이 Spec의 결과가 아니다.
 - `bge-m3` 변환 lineage의 `UNVERIFIED_LINEAGE` 경계는 그대로 유지한다.
 
-## 2026-08-30 첫 소스 릴리스 Gate 재개
+## 2026-08-30 첫 소스 릴리스 Gate 완료
 
 PRZ-024에서 첫 외부 소스 릴리스 준비를 시작해 `OR-005`·`OR-006`의 재개 조건이
 충족됐다. GitHub Private Vulnerability Reporting은 API 조회 기준 `enabled=true`로
-활성화했다. SECURITY·SUPPORT·유지관리 정책과 Issue/PR template은 PRZ-024
-릴리스 준비 브랜치에서 구현 중이며, 기본 브랜치 통합과 실제 Release 검증 전까지
-이 문서의 기존 `DEFERRED` 판정을 소급해 `PASS`로 바꾸지 않는다.
+활성화했다. SECURITY·SUPPORT·유지관리 정책과 Issue/PR template을 [PR #69](https://github.com/jaemin-devlog/PRIZM/pull/69)로
+통합했고, `v1.0.0` Release 공개 뒤 실제 비공개 신고 경로와 Issue chooser를 다시
+확인했다. 초기 `DEFERRED` 판정은 위 요구사항별 기록에 그대로 보존하고 후속 판정을
+`PASS`로 구분했다. 상세 근거는 [PRZ-024](../PRZ-024-release-v1.0.0/evidence.md)를 따른다.

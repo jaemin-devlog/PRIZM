@@ -2,9 +2,10 @@
 
 ## 상태
 
-- lifecycle: `IMPLEMENTED_UNVERIFIED`
+- lifecycle: `VERIFIED`
 - baseline main: `8ba056b5c94228d1782e306a1310b84a8a063493`
-- branch: `PRZ-024-release-v1.0.0`
+- release source commit: `76a87482a70d89b3bb5c7dabed69dff4764e04bb`
+- branch: `PRZ-024-release-v1.0.0` — 병합 뒤 로컬·원격 삭제
 - 허용 단계: `ORIENT → SPEC → PLAN → IMPLEMENT → VERIFY → AUDIT → INTEGRATE → RELEASE`
 
 ## 목적

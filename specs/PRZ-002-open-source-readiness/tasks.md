@@ -29,10 +29,9 @@
 - [x] `G-03B` PR, solo review 예외와
   [통합 기록](evidence.md#github-통합과-review)을 남겼다.
 
-## 후속 또는 제외 범위
+## 완료된 후속 항목
 
-- [ ] `G-02` 실제 비공개 보안 신고 경로는 [제한 사항](evidence.md#남은-제한)에 따라
-  `DEFERRED`다.
-- [ ] `T-06` 기여·행동강령·보안·지원 정책은 외부 운영 전까지 `DEFERRED`다.
-- [ ] `T-07` Issue Form과 PR Template은 외부 접수 전까지 `DEFERRED`다. 두 요구사항의
-  판정은 [OR-005·OR-006 Evidence](evidence.md#요구사항별-판정)를 따른다.
+- [x] `G-02` 실제 비공개 보안 신고 경로를 PRZ-024에서 활성화하고 검증했다.
+- [x] `T-06` 기여·행동강령·보안·지원·유지관리 정책을 PRZ-024에서 정리했다.
+- [x] `T-07` Issue Form과 PR Template을 추가하고 GitHub 실제 화면에서 확인했다. 초기
+  `DEFERRED`와 후속 `PASS` 근거는 [OR-005·OR-006 Evidence](evidence.md#요구사항별-판정)에 남겼다.

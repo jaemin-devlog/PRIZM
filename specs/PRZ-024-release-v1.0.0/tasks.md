@@ -9,6 +9,6 @@
 - [x] IMPLEMENT: OSS readiness 릴리스 필수 파일 Gate와 Registry 갱신
 - [x] VERIFY: backend·frontend·dependency·SBOM·Markdown·민감정보·diff 검사
 - [x] AUDIT: source-only 범위와 blocking correctness/security/license finding 재감사
-- [ ] INTEGRATE: 릴리스 준비 commit·push·PR·CI·merge·브랜치 정리
-- [ ] RELEASE: annotated `v1.0.0` tag와 정식 GitHub Release 생성·검증
-- [ ] EVIDENCE: 실제 Release URL·tag object·commit·최종 main 상태 기록
+- [x] INTEGRATE: 릴리스 준비 commit·push·PR·CI·merge·브랜치 정리
+- [x] RELEASE: annotated `v1.0.0` tag와 정식 GitHub Release 생성·검증
+- [x] EVIDENCE: 실제 Release URL·tag object·commit·최종 main 상태 기록

@@ -158,7 +158,7 @@
   <!-- Row 5 -->
   <g transform="translate(48 490)">
     <rect width="240" height="72" rx="12" fill="#fffaf0" stroke="#fbbf24"/><rect width="5" height="72" rx="3" fill="#d97706"/>
-    <text x="18" y="25" class="id">PRZ-024</text><text x="224" y="24" text-anchor="end" class="status" fill="#b45309">IN_PROGRESS</text><text x="18" y="51" class="card-title">v1.0.0 소스 릴리스</text>
+    <text x="18" y="25" class="id">PRZ-024</text><text x="224" y="24" text-anchor="end" class="status" fill="#2563eb">VERIFIED</text><text x="18" y="51" class="card-title">v1.0.0 소스 릴리스</text>
   </g>
 
   <g transform="translate(0 84)">

@@ -2,7 +2,7 @@
 
 ## 현재 판정
 
-`IMPLEMENTED_UNVERIFIED`
+`VERIFIED`
 
 ## 기준선
 
@@ -29,11 +29,13 @@
 
 ### 보안·지원 운영 Gate
 
-- GitHub Private Vulnerability Reporting 활성화: API `204`, 최초 조회와 최종 Audit 전 재조회 모두 `enabled=true`
+- GitHub Private Vulnerability Reporting 활성화: API `204`, 최초 조회·최종 Audit 전·Release 공개 후 재조회 모두 `enabled=true`
 - `SECURITY.md`: 공개 Issue가 아닌 실제 Private Vulnerability Reporting URL 안내
 - `SUPPORT.md`: 최신 소스 릴리스, 가능한 범위의 지원·무 SLA와 지원 제외 범위 명시
 - `MAINTAINERS.md`: 단일 유지관리자의 변경·보안·릴리스 책임과 solo review 경계 명시
-- `버그 보고`·`기능 제안`·`문서 개선` Issue Form과 blank issue 차단·보안 contact link 추가
+- `버그 보고`·`기능 제안`·`문서 개선` Issue Form과 `blank_issues_enabled: false`·보안 contact link 추가
+- GitHub Issue chooser 실제 화면에서 세 Issue Form과 비공개 보안 신고·지원 링크 노출 확인.
+  blank issue는 유지관리자에게만 노출
 - Pull Request template에 범위·검증·영향·비밀정보·migration·OpenSQL 경계 추가
 - YAML parse: 6 files `PASS`
 
@@ -58,7 +60,7 @@
 | Frontend lint·typecheck·production build | 모두 `PASS` |
 | npm 전체·production audit | 취약점 각각 0 |
 | Docker Compose `config --quiet` | `PASS` |
-| OSS Readiness | required 18, Markdown 176 files·760 local links, external 91 `PASS` |
+| OSS Readiness | required 18, tracked 865 files, Markdown 176 files·760 local links, external 91 `PASS` |
 | SBOM·license·tracked sensitive-data | `PASS` |
 | YAML 6 files·Registry SVG XML | `PASS` |
 | `git diff --check` | `PASS` |
@@ -79,10 +81,31 @@ opt-in 조건이다. OpenSQL/OpenProxy는 릴리스 메타데이터와 source-on
 - Production Java·React source 변경: 0
 - Flyway migration·Production config 변경: 0
 - blocking correctness·security·license finding: 0 — 독립 diff 감사와 한국어 윤문 후 재감사 모두 `PASS`
-- 릴리스 준비 PR·CI·merge: `NOT_RUN`
-- annotated tag·GitHub Release: `NOT_RUN`
+- Release 후 evidence-only diff 독립 감사: blocking finding 0, `PASS`
+- 릴리스 준비 commit: `5c7ed0f127b6069d738e83580c1c22e47a5d6afb`
+- [PR #69](https://github.com/jaemin-devlog/PRIZM/pull/69): `MERGED`, merge commit `76a87482a70d89b3bb5c7dabed69dff4764e04bb`
+- PR final CI: [run 33269648512](https://github.com/jaemin-devlog/PRIZM/actions/runs/33269648512) `PASS`
+- PR final OSS Readiness: [run 33269648524](https://github.com/jaemin-devlog/PRIZM/actions/runs/33269648524) `PASS`
+- release source main CI: [run 33269851195](https://github.com/jaemin-devlog/PRIZM/actions/runs/33269851195) `PASS`
+- release source main OSS Readiness: [run 33269851146](https://github.com/jaemin-devlog/PRIZM/actions/runs/33269851146) `PASS`
+- Release URL과 후속 근거를 포함한 로컬 OSS Readiness: external 97, permanent·indeterminate failure 0 `PASS`
+- 임시 브랜치 `PRZ-024-release-v1.0.0`: 병합 상태·고유 commit 0개·변경 파일 28개 확인 뒤 로컬·원격 삭제
+
+## Tag와 GitHub Release
+
+- annotated tag: `v1.0.0`
+- tag object: `964d9d403b26a237e3b1c40e44a3c5a3bae74b0e`
+- peeled source commit: `76a87482a70d89b3bb5c7dabed69dff4764e04bb`
+- GitHub Release: [PRIZM v1.0.0 — 첫 번째 소스 릴리스](https://github.com/jaemin-devlog/PRIZM/releases/tag/v1.0.0)
+- 공개 시각: `2026-08-29T19:09:01Z`
+- 상태: draft `false`, prerelease `false`
+- 별도 첨부 자산: 0개 — GitHub source archive만 제공
+- target commit: `76a87482a70d89b3bb5c7dabed69dff4764e04bb`
+- 근거 시점: tag의 source snapshot에는 공개 전 판정인 `IMPLEMENTED_UNVERIFIED`가
+  남는다. 실제 공개 결과는 tag를 이동하지 않고 이 후속 기록으로 확정했다.
 
 ## 최종 판정
 
-현재 구현·로컬 검증은 완료했지만 독립 감사, GitHub 통합, tag와 Release가 남아 있다.
-모두 끝나기 전에는 `VERIFIED`로 전환하지 않는다.
+완료 조건 9개를 모두 충족했다. PRIZM `v1.0.0`은 검증된 `main`의 정확한 commit을
+가리키는 source-only 정식 릴리스이며, Production source·migration 변경이나 별도
+binary 첨부는 없다. 최종 판정은 `VERIFIED`다.

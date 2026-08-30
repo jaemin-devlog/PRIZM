@@ -39,7 +39,7 @@ class Prz027RerankerPairExportTest {
 
     @Test
     void exportsFrozenB3AndGoldFreeTop20PairsFromDevCalibrationOnly() {
-        String inputFreezeCommit = System.getProperty("prizm.prz027.input-freeze-commit", "");
+        String inputFreezeCommit = freezeCommit();
         assertThat(inputFreezeCommit).matches(COMMIT_SHA);
         SearchV3DenseAblationDataset loader = new SearchV3DenseAblationDataset();
         SearchV3DenseAblationDataset.SealedManifestMetadata sealedBefore =
@@ -122,6 +122,12 @@ class Prz027RerankerPairExportTest {
                 label,
                 slices,
                 engine.run(slices, client, model, "PRZ-027-R0-B3-DENSE-FROZEN-" + label));
+    }
+
+    private String freezeCommit() {
+        return System.getProperty(
+                "prizm.prz027.input-freeze-commit",
+                System.getenv().getOrDefault("PRIZM_PRZ027_INPUT_FREEZE_COMMIT", ""));
     }
 
     private Map<String, String> sourceSnapshot() {

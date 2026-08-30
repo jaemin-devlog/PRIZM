@@ -33,7 +33,9 @@ class Prz027CrossEncoderBenchmarkTest {
 
     @Test
     void importsExactScoresAndEvaluatesR0R1WithoutSealedFinal() throws IOException {
-        String inputFreezeCommit = System.getProperty("prizm.prz027.input-freeze-commit", "");
+        String inputFreezeCommit = System.getProperty(
+                "prizm.prz027.input-freeze-commit",
+                System.getenv().getOrDefault("PRIZM_PRZ027_INPUT_FREEZE_COMMIT", ""));
         assertThat(inputFreezeCommit).matches(COMMIT_SHA);
         Path inputPath = propertyPath("prizm.prz027.input", DEFAULT_INPUT);
         Path baselinePath = propertyPath("prizm.prz027.baseline", DEFAULT_BASELINE);

@@ -2,7 +2,7 @@
 
 - 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_PROMISING`
 - A/B 실행 결과: `COMPLETED — PROMISING` (B1/B2 및 최초 B3 `NEEDS_ADJUSTMENT` 기록 유지)
-- C/D Parent 단계: `NOT_RUN`
+- C1 Parent Context: `INPUT_READY / BENCHMARK_NOT_RUN`; Parent Dense: `NOT_RUN`
 
 - [x] ORIENT: `origin/main`, PRZ-025 HEAD/merge 관계와 격리 branch/worktree 확인
 - [x] ORIENT: PRZ-025 계약, frozen manifests, Production TextChunker/model과 평가 인프라 확인
@@ -34,6 +34,22 @@
 - [x] AUDIT: blocking finding 0 및 최종 `NEEDS_ADJUSTMENT`
 - [x] INTEGRATE: local branch commit only
 - [ ] Parent Context/Parent Dense/push/PR/merge — `NOT_RUN` (금지)
+
+## Phase 1 C1 Structural Heading Path Parent Context
+
+- [x] ORIENT: clean HEAD `1bbc1d7...`, B3/EvidenceChild hashes와 SEALED guard 확인
+- [x] SPEC: B3 불변·heading-path-only treatment·parity/Safety/Search Gate 고정
+- [x] PLAN: unit test → input-freeze commit → B3/C1 1회 benchmark → audit 순서 고정
+- [x] TEST/IMPLEMENT: contextual passage와 `STRUCTURAL_HEADING_PATH_V1` builder
+- [x] TEST/IMPLEMENT: B3/C1 parity, source-only Gold와 context-only false-hit 진단
+- [x] IMPLEMENT: Original/Long-form/robustness B3/C1 동일 query-vector runner
+- [ ] INTEGRATE-INPUT: 결과 전 source/test/contract local commit
+- [ ] VERIFY: 동일 BGE-M3 B3/C1 benchmark 1회 실행
+- [ ] VERIFY: aggregate/user/profession/language와 direct win/loss/tie 기록
+- [ ] VERIFY: SEALED hash/flags, PRZ-025 validator, diff/OSS/scope와 관련 test
+- [ ] AUDIT: blocking finding과 C1/Parent Dense 진입 판정
+- [ ] INTEGRATE: result/evidence local commit only
+- [ ] Parent Dense/push/PR/merge — `NOT_RUN` (금지)
 
 ## Phase 1 Retrieval Passage
 

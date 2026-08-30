@@ -159,6 +159,72 @@ class SearchV3DenseAblationEngineTest {
     }
 
     @Test
+    void parentContextChangesOnlyRetrievalTextAcrossEveryFrozenDevCalibrationSuite() {
+        List<SearchV3DenseAblationDataset.DatasetSlice> slices = List.of(
+                loader.load(SearchV3DenseAblationDataset.Split.DEV),
+                loader.load(SearchV3DenseAblationDataset.Split.CALIBRATION),
+                loader.loadLongForm(SearchV3DenseAblationDataset.Split.DEV),
+                loader.loadLongForm(SearchV3DenseAblationDataset.Split.CALIBRATION),
+                loader.loadRobustness(SearchV3DenseAblationDataset.Split.DEV),
+                loader.loadRobustness(SearchV3DenseAblationDataset.Split.CALIBRATION));
+
+        for (SearchV3DenseAblationDataset.DatasetSlice slice : slices) {
+            SearchV3DenseAblationEngine.CandidateBuild structural = engine.buildStructuralCandidates(slice);
+            SearchV3DenseAblationEngine.PassageCandidateBuild passage =
+                    engine.buildPassageCandidates(slice, structural);
+            SearchV3DenseAblationEngine.ContextCandidateBuild context =
+                    engine.buildParentContextCandidates(slice, passage);
+
+            assertThat(context.candidateBuild().candidates())
+                    .hasSameSizeAs(passage.candidateBuild().candidates());
+            for (int index = 0; index < passage.candidateBuild().candidates().size(); index++) {
+                SearchV3DenseAblationEngine.CandidateSpec b3 =
+                        passage.candidateBuild().candidates().get(index);
+                SearchV3DenseAblationEngine.CandidateSpec c1 =
+                        context.candidateBuild().candidates().get(index);
+                assertThat(c1.candidateId()).isEqualTo(b3.candidateId());
+                assertThat(c1.sourceText()).isEqualTo(b3.sourceText());
+                assertThat(c1.ranges()).isEqualTo(b3.ranges());
+                assertThat(c1.sourceBlockIds()).isEqualTo(b3.sourceBlockIds());
+                assertThat(c1.contextBlockIds()).isEqualTo(b3.contextBlockIds());
+                assertThat(c1.evidenceChildren()).isEqualTo(b3.evidenceChildren());
+                assertThat(c1.retrievalText()).isEqualTo(c1.contextText().isBlank()
+                        ? b3.retrievalText()
+                        : c1.contextText() + "\n" + b3.retrievalText());
+            }
+            assertThat(context.contextStats().sourceParityViolationCount()).isZero();
+            assertThat(context.contextStats().evidenceChildParityViolationCount()).isZero();
+            assertThat(context.contextStats().crossParentContextViolationCount()).isZero();
+        }
+    }
+
+    @Test
+    void contextOnlyFalseHitUsesSourceMappedGoldAndReportsOnlyContextPromotedNoise() {
+        SearchV3DenseAblationDataset.Query query = query(
+                new SearchV3DenseAblationDataset.AspectExpression("ALL", List.of("A"), 1),
+                List.of(singleAspect("A", "U-A", "G-A")));
+        SearchV3DenseAblationEngine.RankedCandidate directB3 = ranked(
+                1, "DIRECT", "", List.of("U-A"), List.of("E-DIRECT"));
+        SearchV3DenseAblationEngine.RankedCandidate noiseB3 = ranked(
+                2, "NOISE", "", List.of(), List.of("E-NOISE"));
+        SearchV3DenseAblationEngine.RankedCandidate noiseC1 = ranked(
+                1, "NOISE", "Relevant heading", List.of(), List.of("E-NOISE"));
+        SearchV3DenseAblationEngine.RankedCandidate directC1 = ranked(
+                2, "DIRECT", "Other heading", List.of("U-A"), List.of("E-DIRECT"));
+
+        List<SearchV3DenseAblationEngine.ContextOnlyFalseHit> falseHits =
+                engine.contextOnlyFalseHits(query, List.of(directB3, noiseB3), List.of(noiseC1, directC1));
+
+        assertThat(falseHits).singleElement().satisfies(finding -> {
+            assertThat(finding.candidateId()).isEqualTo("NOISE");
+            assertThat(finding.passageRank()).isEqualTo(2);
+            assertThat(finding.contextRank()).isEqualTo(1);
+            assertThat(finding.contextText()).isEqualTo("Relevant heading");
+            assertThat(finding.evidenceChildIds()).containsExactly("E-NOISE");
+        });
+    }
+
+    @Test
     void modelAndRankingConstantsCannotDriftBetweenProfiles() {
         assertThat(OllamaBgeM3EmbeddingClient.MODEL).isEqualTo("bge-m3");
         assertThat(OllamaBgeM3EmbeddingClient.DIMENSIONS).isEqualTo(1024);
@@ -166,6 +232,7 @@ class SearchV3DenseAblationEngineTest {
         assertThat(SearchV3DenseAblationEngine.FIXED_PROFILE).contains("BGE_M3_DENSE");
         assertThat(SearchV3DenseAblationEngine.STRUCTURAL_PROFILE).contains("BGE_M3_DENSE");
         assertThat(SearchV3DenseAblationEngine.PASSAGE_PROFILE).contains("BGE_M3_DENSE");
+        assertThat(SearchV3DenseAblationEngine.PARENT_CONTEXT_PROFILE).contains("BGE_M3_DENSE");
     }
 
     @Test
@@ -229,6 +296,31 @@ class SearchV3DenseAblationEngineTest {
                 "profile", 1, 1, 10, 10.0d, 10, 0, 0, 0.0d, 0, 0.0d,
                 duplicates, mappings, mappings == 0 ? 0.0d : (double) duplicates / mappings,
                 0, 0, 0, 0, Map.of(), Map.of(), 0.0d);
+    }
+
+    private SearchV3DenseAblationEngine.RankedCandidate ranked(
+            int rank,
+            String candidateId,
+            String contextText,
+            List<String> coveredUnitIds,
+            List<String> evidenceChildIds) {
+        return new SearchV3DenseAblationEngine.RankedCandidate(
+                rank,
+                candidateId,
+                1.0d / rank,
+                "DOC",
+                "VERSION",
+                "RETRIEVAL_PASSAGE",
+                "source",
+                contextText,
+                contextText.isBlank() ? "source" : contextText + "\nsource",
+                "PARENT",
+                6,
+                evidenceChildIds,
+                contextText.isBlank() ? List.of() : List.of("HEADING"),
+                coveredUnitIds,
+                coveredUnitIds.isEmpty() ? List.of() : List.of("G-A"),
+                coveredUnitIds.isEmpty() ? List.of() : List.of("PARENT"));
     }
 
     private SearchV3DenseAblationDataset.GoldUnit goldUnit(String unitId, String groupId) {

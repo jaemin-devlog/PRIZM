@@ -1,7 +1,7 @@
 # PRZ-026 Structural Parsing and Parent-Child Retrieval
 
 - 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_PROMISING`
-- 현재 Phase: `Phase 1 Retrieval Passage Robustness — COMPLETED / PROMISING`
+- 현재 Phase: `Phase 1 C1 Structural Heading Path Parent Context — INPUT_READY / BENCHMARK_NOT_RUN`
 - 선행 조건: `DEPENDS_ON_PRZ_025`
 - 기준 source: `PRZ-025-search-v3-foundation@5f8229f88251938dc5b34588676cc69edf409c99`
 - Production 적용: `NOT_RUN`
@@ -21,7 +21,7 @@ Recall을 개선한다는 것이다. 결과를 본 뒤 gold, split 또는 SEALED
 | B1. Structural Child v1 + BGE-M3 Dense | `COMPLETED — NEEDS_ADJUSTMENT` |
 | B2. Structural Child v2 + BGE-M3 Dense | `COMPLETED — NEEDS_ADJUSTMENT` |
 | B3. Structural Retrieval Passage + BGE-M3 Dense | `COMPLETED — PROMISING` (최초 판정 `NEEDS_ADJUSTMENT` 보존) |
-| C. Structural Child + Parent Context + BGE-M3 Dense | `NOT_RUN` |
+| C1. Structural Retrieval Passage + `STRUCTURAL_HEADING_PATH_V1` + BGE-M3 Dense | `IN_PROGRESS / NOT_RUN` |
 | D. Parent-Child Retrieval + BGE-M3 Dense | `NOT_RUN` |
 
 ## 2. 범위와 보존 계약
@@ -221,3 +221,44 @@ DIRECT Gold Child 보존은 100%였다. fresh 전체는 `NON_INFERIOR`; 새 fron
 `INSUFFICIENT_SAMPLE`, 누적 frontend와 EN은 `INCONCLUSIVE`이며 blocking regression은 0이다.
 따라서 evaluation-only Parent Context 실험 진입 판정은 `PROMISING`이다. 이는 Production 채택이나
 Fresh Final 검증을 뜻하지 않는다.
+
+## 13. C1 Structural Heading Path Parent Context contract
+
+C1은 commit `1bbc1d761bd314a17e8f3ed4e2bcceb23a2fc96a`의 B3를 불변 기준선으로 사용한다.
+EvidenceChild, heading eligibility, `120/320/480` passage grouping, passage/Child ID, source text,
+provenance, table context와 contamination 정책은 바꾸지 않는다. 공식 B3/C1 비교의 유일한 treatment는
+document embedding 입력의 `retrievalText`다.
+
+- B3: 기존 passage `retrievalText`
+- C1: `contextText + newline + B3 retrievalText`; context가 없으면 B3와 byte-for-byte 동일
+- `contextText`: 실제 ancestor heading의 source-derived text만 ` > `로 연결
+- Markdown heading level은 명시적 hierarchy로 사용한다. level 신호가 없는 heading은 hierarchy를
+  추측하지 않고 가장 가까운 heading 한 개만 사용한다.
+- 최대 2 headings, 120 code points. 초과 시 먼 ancestor부터 제외하고, 가장 가까운 단일 heading도
+  넘으면 source-derived 앞 120 code points만 사용한다.
+- 다른 Parent 본문, 다른 Child, query/Gold/domain/actor/completion 신호, 생성 label·요약은 금지한다.
+- 기존 table-header retrieval context는 B3 입력 안에 그대로 유지하며 C1의 heading context와
+  provenance를 구분한다.
+
+C1 passage는 `sourceText`, `contextText`, `retrievalText`, `contextSourceBlockIds`, ordered
+`evidenceChildIds`를 분리한다. Gold Unit/Group/Parent hit는 B3와 동일한 atomic Child source range로만
+계산하며 context 문자열이나 heading block은 DIRECT_SUPPORT가 될 수 없다. B3/C1 candidate ID,
+candidate/embedding 수, sourceText, source ranges, evidenceChildIds와 parent ID가 다르면 실험 설계
+오류로 fail-closed한다.
+
+`context-only false hit`은 direct-support query에서 context가 추가된 non-direct candidate가 B3보다
+상승해 C1의 첫 DIRECT candidate보다 앞선 경우로 고정한다. 이는 진단 label이며 해당 candidate를
+DIRECT_SUPPORT로 재라벨링하지 않는다.
+
+공식 실행은 새 fixture 없이 기존 Original Seed, Long-form 1.1.0, B3 robustness 1.0.0의 DEV/CAL만
+각각 분리해 사용한다. 동일 run 안에서 B3/C1은 같은 query vector, `bge-m3` digest, 1024 dimensions와
+cosine raw Dense ranking을 공유한다. A/B2, Parent Dense, reranker, sparse/FTS/RRF, query policy,
+Production과 SEALED FINAL search는 실행하지 않는다.
+
+C1 `PROMISING` Gate는 candidate/embedding parity, Gold Child 보존 100%, contamination 0,
+fragmentation 비열화 0, cross-parent context violation 0, Recall@5/10/20/50 비열화 0,
+각 dataset의 user-macro Top1/MRR 비열화 0, profession/language 신규 aggregate 회귀 0과
+context-only false hit 0을 모두 요구한다. 그 위에서 aggregate Top1/MRR 개선 또는 서로 다른 2개
+이상 user bundles의 DIRECT rank 개선 중 하나가 있어야 한다. Safety 실패는 `NO_GO`; Safety는
+유지하지만 ranking/slice/false-hit 회귀가 있으면 `NEEDS_ADJUSTMENT`; 의미 있는 순증이 없으면
+`NO_GO`다. 이 Gate는 Parent Dense의 evaluation-only 진입 판단이며 Production 채택 Gate가 아니다.

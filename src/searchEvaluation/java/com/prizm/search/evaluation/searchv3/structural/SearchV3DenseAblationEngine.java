@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -33,6 +34,8 @@ final class SearchV3DenseAblationEngine {
             "B2_STRUCTURAL_CHILD_CONTEXT_ONLY_HEADING_BGE_M3_DENSE";
     static final String PASSAGE_PROFILE =
             "B3_STRUCTURAL_RETRIEVAL_PASSAGE_BGE_M3_DENSE";
+    static final String PARENT_CONTEXT_PROFILE =
+            "C1_STRUCTURAL_RETRIEVAL_PASSAGE_HEADING_PATH_V1_BGE_M3_DENSE";
     private static final int FIXED_MAX_CHARACTERS = 800;
     private static final int FIXED_OVERLAP_CHARACTERS = 120;
     private static final List<Integer> CUTOFFS = List.of(5, 10, 20, 50);
@@ -41,6 +44,8 @@ final class SearchV3DenseAblationEngine {
     private final StructuralBlockParser parser = new StructuralBlockParser();
     private final StructuralEvidenceChildBuilder childBuilder = new StructuralEvidenceChildBuilder();
     private final StructuralRetrievalPassageBuilder passageBuilder = new StructuralRetrievalPassageBuilder();
+    private final StructuralHeadingPathContextBuilder contextBuilder =
+            new StructuralHeadingPathContextBuilder();
     private final TextChunker productionTextChunker;
 
     SearchV3DenseAblationEngine() {
@@ -188,6 +193,462 @@ final class SearchV3DenseAblationEngine {
                 decision);
     }
 
+    ParentContextExperimentReport runParentContext(
+            List<DatasetSlice> slices,
+            OllamaBgeM3EmbeddingClient embeddingClient,
+            OllamaBgeM3EmbeddingClient.ModelMetadata modelMetadata,
+            String phase,
+            String inputFreezeCommit) {
+        Set<String> datasetVersions = slices.stream()
+                .map(DatasetSlice::datasetVersion)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        if (datasetVersions.size() != 1) {
+            throw new IllegalArgumentException("One B3/C1 run cannot mix Search V3 dataset versions");
+        }
+        embeddingClient.embedOne("PRIZM Search V3 parent context evaluation warmup");
+
+        List<ParentContextSplitRun> splitRuns = new ArrayList<>();
+        for (DatasetSlice slice : slices) {
+            CandidateBuild structural = buildStructuralCandidates(slice);
+            PassageCandidateBuild passageBuild = buildPassageCandidates(slice, structural);
+            ContextCandidateBuild contextBuild = buildParentContextCandidates(slice, passageBuild);
+            assertParentContextParity(passageBuild.candidateBuild(), contextBuild.candidateBuild());
+
+            PreparedProfile passage = prepare(passageBuild.candidateBuild(), embeddingClient);
+            PreparedProfile context = prepare(contextBuild.candidateBuild(), embeddingClient);
+            if (passage.corpusStats().embeddingCount() != context.corpusStats().embeddingCount()) {
+                throw new IllegalStateException("B3/C1 document embedding count parity failed");
+            }
+            List<ParentContextQueryResult> queryResults = evaluateParentContextQueries(
+                    slice, passage, context, embeddingClient);
+            splitRuns.add(new ParentContextSplitRun(
+                    slice,
+                    passage,
+                    context,
+                    passageBuild.passageStats(),
+                    contextBuild.contextStats(),
+                    queryResults));
+        }
+
+        List<ParentContextQueryResult> allQueries = splitRuns.stream()
+                .flatMap(run -> run.queryResults().stream())
+                .toList();
+        ProfileCorpusStats passageCorpus = combineCorpusStats(
+                PASSAGE_PROFILE, splitRuns.stream().map(run -> run.passage().corpusStats()).toList());
+        ProfileCorpusStats contextCorpus = combineCorpusStats(
+                PARENT_CONTEXT_PROFILE, splitRuns.stream().map(run -> run.context().corpusStats()).toList());
+        PassageCorpusStats passageStats = combinePassageStats(
+                splitRuns.stream().map(ParentContextSplitRun::passageStats).toList());
+        ParentContextCorpusStats contextStats = combineParentContextStats(
+                splitRuns.stream().map(ParentContextSplitRun::contextStats).toList());
+        ProfileLatency passageLatency = combineLatency(
+                PASSAGE_PROFILE,
+                splitRuns.stream().map(run -> run.passage().latency()).toList(),
+                allQueries.stream().map(result -> result.passage().totalLatencyMs()).toList(),
+                allQueries.stream().map(result -> result.passage().rankingLatencyMs()).toList());
+        ProfileLatency contextLatency = combineLatency(
+                PARENT_CONTEXT_PROFILE,
+                splitRuns.stream().map(run -> run.context().latency()).toList(),
+                allQueries.stream().map(result -> result.context().totalLatencyMs()).toList(),
+                allQueries.stream().map(result -> result.context().rankingLatencyMs()).toList());
+
+        Map<String, String> splitManifests = new LinkedHashMap<>();
+        slices.forEach(slice -> splitManifests.put(
+                slice.split().manifestName(), slice.manifestCombinedSha256()));
+        return new ParentContextExperimentReport(
+                1,
+                phase,
+                Instant.now().toString(),
+                datasetVersions.iterator().next(),
+                inputFreezeCommit,
+                "DEPENDS_ON_PRZ_025",
+                Map.copyOf(splitManifests),
+                modelMetadata,
+                new ParentContextContract(
+                        PASSAGE_PROFILE,
+                        PARENT_CONTEXT_PROFILE,
+                        StructuralHeadingPathContextBuilder.POLICY,
+                        StructuralHeadingPathContextBuilder.MAX_HEADING_DEPTH,
+                        StructuralHeadingPathContextBuilder.MAX_CONTEXT_CODE_POINTS,
+                        OllamaBgeM3EmbeddingClient.MODEL,
+                        OllamaBgeM3EmbeddingClient.DIMENSIONS,
+                        OllamaBgeM3EmbeddingClient.SIMILARITY,
+                        "RAW_DENSE_ONLY",
+                        "SAME_QUERY_VECTOR_PER_B3_C1",
+                        "SOURCE_RANGE_ONLY_CONTEXT_NEVER_GOLD",
+                        "PARENT_DENSE_NOT_RUN"),
+                passageCorpus,
+                contextCorpus,
+                passageStats,
+                contextStats,
+                passageLatency,
+                contextLatency,
+                latencySummary(allQueries.stream().map(ParentContextQueryResult::queryEmbeddingLatencyMs).toList()),
+                parentContextAggregate(allQueries),
+                parentContextMacro(allQueries, ParentContextQueryResult::userBundleId),
+                parentContextGrouped(allQueries, result -> result.split().manifestName()),
+                parentContextGrouped(allQueries, ParentContextQueryResult::professionGroup),
+                parentContextGrouped(allQueries, ParentContextQueryResult::language),
+                List.copyOf(allQueries),
+                false,
+                false,
+                "NOT_RUN");
+    }
+
+    ContextCandidateBuild buildParentContextCandidates(
+            DatasetSlice slice,
+            PassageCandidateBuild passageBuild) {
+        long started = System.nanoTime();
+        Map<String, CandidateSpec> baseById = passageBuild.candidateBuild().candidates().stream()
+                .collect(Collectors.toMap(
+                        CandidateSpec::candidateId,
+                        Function.identity(),
+                        (left, right) -> {
+                            throw new IllegalStateException("duplicate B3 passage ID");
+                        },
+                        LinkedHashMap::new));
+        List<CandidateSpec> candidates = new ArrayList<>();
+        List<ContextualRetrievalPassage> contextualPassages = new ArrayList<>();
+        for (SourceDocument document : activeDocuments(slice)) {
+            List<StructuralBlock> blocks = parser.parse(document.structuralDocument());
+            List<RetrievalPassage> documentPassages = passageBuild.passages().stream()
+                    .filter(passage -> passage.documentId().equals(document.documentId()))
+                    .filter(passage -> passage.versionId().equals(document.versionId()))
+                    .toList();
+            List<ContextualRetrievalPassage> contextual = contextBuilder.build(blocks, documentPassages);
+            contextualPassages.addAll(contextual);
+            for (ContextualRetrievalPassage value : contextual) {
+                CandidateSpec base = baseById.get(value.basePassage().passageId());
+                if (base == null) {
+                    throw new IllegalStateException("C1 context has no matching B3 passage candidate");
+                }
+                candidates.add(new CandidateSpec(
+                        PARENT_CONTEXT_PROFILE,
+                        base.candidateId(),
+                        base.userBundleId(),
+                        base.documentId(),
+                        base.versionId(),
+                        value.sourceText(),
+                        value.contextText(),
+                        value.retrievalText(),
+                        base.sourceBlockType(),
+                        base.parentAnnotationCandidateId(),
+                        base.ranges(),
+                        base.sourceBlockIds(),
+                        base.contextBlockIds(),
+                        value.contextSourceBlockIds(),
+                        base.evidenceChildren()));
+            }
+        }
+        long contextConstructionNanos = System.nanoTime() - started;
+        long totalConstructionNanos = passageBuild.candidateBuild().constructionNanos() + contextConstructionNanos;
+        ProfileCorpusStats corpus = copyCorpusStats(
+                PARENT_CONTEXT_PROFILE,
+                passageBuild.candidateBuild().corpusStats(),
+                totalConstructionNanos);
+        CandidateBuild candidateBuild = new CandidateBuild(
+                PARENT_CONTEXT_PROFILE,
+                slice,
+                List.copyOf(candidates),
+                totalConstructionNanos,
+                corpus);
+        assertParentContextParity(passageBuild.candidateBuild(), candidateBuild);
+        return new ContextCandidateBuild(
+                candidateBuild,
+                parentContextStats(contextualPassages, contextConstructionNanos),
+                List.copyOf(contextualPassages));
+    }
+
+    private ProfileCorpusStats copyCorpusStats(
+            String profile,
+            ProfileCorpusStats base,
+            long constructionNanos) {
+        return new ProfileCorpusStats(
+                profile,
+                base.candidateCount(),
+                0,
+                base.minimumCodePointLength(),
+                base.averageCodePointLength(),
+                base.maximumCodePointLength(),
+                base.activeGoldUnitCount(),
+                base.fragmentedGoldUnitCount(),
+                base.fragmentationRate(),
+                base.contaminatedCandidateCount(),
+                base.contaminationRate(),
+                base.duplicateGroupMappingCount(),
+                base.goldGroupMappingCount(),
+                base.duplicateRatio(),
+                base.tableHeaderContextChildCount(),
+                base.headingOnlyCandidateCount(),
+                base.contextOnlyHeadingCount(),
+                base.veryShortCandidateCount(),
+                base.lengthBucketCandidateCount(),
+                base.goldParentCountPerCandidateDistribution(),
+                nanosToMillis(constructionNanos));
+    }
+
+    private ParentContextCorpusStats parentContextStats(
+            List<ContextualRetrievalPassage> passages,
+            long constructionNanos) {
+        List<ContextualRetrievalPassage> applied = passages.stream()
+                .filter(value -> !value.contextText().isBlank())
+                .toList();
+        List<Integer> lengths = applied.stream()
+                .map(value -> value.contextText().codePointCount(0, value.contextText().length()))
+                .toList();
+        List<Integer> depths = applied.stream().map(value -> value.contextSourceBlockIds().size()).toList();
+        Map<String, Long> depthDistribution = passages.stream().collect(Collectors.groupingBy(
+                value -> Integer.toString(value.contextSourceBlockIds().size()),
+                LinkedHashMap::new,
+                Collectors.counting()));
+        return new ParentContextCorpusStats(
+                StructuralHeadingPathContextBuilder.POLICY,
+                passages.size(),
+                applied.size(),
+                ratio(applied.size(), passages.size()),
+                lengths.stream().mapToInt(Integer::intValue).min().orElse(0),
+                lengths.stream().mapToInt(Integer::intValue).average().orElse(0.0d),
+                lengths.stream().mapToInt(Integer::intValue).max().orElse(0),
+                depths.stream().mapToInt(Integer::intValue).min().orElse(0),
+                depths.stream().mapToInt(Integer::intValue).average().orElse(0.0d),
+                depths.stream().mapToInt(Integer::intValue).max().orElse(0),
+                Map.copyOf(depthDistribution),
+                0,
+                0,
+                0,
+                nanosToMillis(constructionNanos));
+    }
+
+    private ParentContextCorpusStats combineParentContextStats(List<ParentContextCorpusStats> values) {
+        long passages = values.stream().mapToLong(ParentContextCorpusStats::passageCount).sum();
+        long applied = values.stream().mapToLong(ParentContextCorpusStats::contextPassageCount).sum();
+        double weightedLength = values.stream()
+                .mapToDouble(value -> value.averageContextCodePointLength() * value.contextPassageCount())
+                .sum();
+        double weightedDepth = values.stream()
+                .mapToDouble(value -> value.averageHeadingDepth() * value.contextPassageCount())
+                .sum();
+        Map<String, Long> depthDistribution = new LinkedHashMap<>();
+        values.forEach(value -> value.headingDepthDistribution()
+                .forEach((depth, count) -> depthDistribution.merge(depth, count, Long::sum)));
+        return new ParentContextCorpusStats(
+                StructuralHeadingPathContextBuilder.POLICY,
+                passages,
+                applied,
+                ratio(applied, passages),
+                values.stream().mapToInt(ParentContextCorpusStats::minimumContextCodePointLength).min().orElse(0),
+                applied == 0 ? 0.0d : weightedLength / applied,
+                values.stream().mapToInt(ParentContextCorpusStats::maximumContextCodePointLength).max().orElse(0),
+                values.stream().mapToInt(ParentContextCorpusStats::minimumHeadingDepth).min().orElse(0),
+                applied == 0 ? 0.0d : weightedDepth / applied,
+                values.stream().mapToInt(ParentContextCorpusStats::maximumHeadingDepth).max().orElse(0),
+                Map.copyOf(depthDistribution),
+                values.stream().mapToLong(ParentContextCorpusStats::crossParentContextViolationCount).sum(),
+                values.stream().mapToLong(ParentContextCorpusStats::sourceParityViolationCount).sum(),
+                values.stream().mapToLong(ParentContextCorpusStats::evidenceChildParityViolationCount).sum(),
+                values.stream().mapToDouble(ParentContextCorpusStats::contextConstructionLatencyMs).sum());
+    }
+
+    private void assertParentContextParity(CandidateBuild passage, CandidateBuild context) {
+        if (passage.candidates().size() != context.candidates().size()) {
+            throw new IllegalStateException("B3/C1 candidate count parity failed");
+        }
+        for (int index = 0; index < passage.candidates().size(); index++) {
+            CandidateSpec base = passage.candidates().get(index);
+            CandidateSpec contextual = context.candidates().get(index);
+            boolean same = base.candidateId().equals(contextual.candidateId())
+                    && base.userBundleId().equals(contextual.userBundleId())
+                    && base.documentId().equals(contextual.documentId())
+                    && base.versionId().equals(contextual.versionId())
+                    && base.sourceText().equals(contextual.sourceText())
+                    && base.sourceBlockType().equals(contextual.sourceBlockType())
+                    && Objects.equals(base.parentAnnotationCandidateId(), contextual.parentAnnotationCandidateId())
+                    && base.ranges().equals(contextual.ranges())
+                    && base.sourceBlockIds().equals(contextual.sourceBlockIds())
+                    && base.contextBlockIds().equals(contextual.contextBlockIds())
+                    && base.evidenceChildren().equals(contextual.evidenceChildren());
+            String expectedRetrieval = contextual.contextText().isBlank()
+                    ? base.retrievalText()
+                    : contextual.contextText() + "\n" + base.retrievalText();
+            if (!same || !expectedRetrieval.equals(contextual.retrievalText())) {
+                throw new IllegalStateException("C1 changed B3 passage identity, source, evidence, or provenance");
+            }
+        }
+    }
+
+    private List<ParentContextQueryResult> evaluateParentContextQueries(
+            DatasetSlice slice,
+            PreparedProfile passage,
+            PreparedProfile context,
+            OllamaBgeM3EmbeddingClient embeddingClient) {
+        List<ParentContextQueryResult> results = new ArrayList<>();
+        for (Query query : slice.queries()) {
+            OllamaBgeM3EmbeddingClient.EmbeddingBatch queryBatch = embeddingClient.embedOne(query.text());
+            float[] queryVector = queryBatch.embeddings().get(0);
+            long passageStarted = System.nanoTime();
+            List<RankedCandidate> passageRanking =
+                    rank(queryVector, query.userBundleId(), passage.candidates(), slice);
+            long passageNanos = System.nanoTime() - passageStarted;
+            long contextStarted = System.nanoTime();
+            List<RankedCandidate> contextRanking =
+                    rank(queryVector, query.userBundleId(), context.candidates(), slice);
+            long contextNanos = System.nanoTime() - contextStarted;
+            QueryProfileResult passageResult = queryResult(
+                    query, passageRanking, slice, queryBatch.elapsedNanos(), passageNanos);
+            QueryProfileResult contextResult = queryResult(
+                    query, contextRanking, slice, queryBatch.elapsedNanos(), contextNanos);
+            UserBundle bundle = slice.bundles().stream()
+                    .filter(value -> value.userBundleId().equals(query.userBundleId()))
+                    .findFirst()
+                    .orElseThrow();
+            RankOutcome outcome = directRankOutcome(query, passageResult, contextResult);
+            results.add(new ParentContextQueryResult(
+                    query.queryId(),
+                    query.userBundleId(),
+                    slice.split(),
+                    bundle.professionGroup(),
+                    query.language(),
+                    query.answerability(),
+                    query.categories(),
+                    query.hasDirectSupport(),
+                    nanosToMillis(queryBatch.elapsedNanos()),
+                    outcome.name(),
+                    directRankDelta(query, passageResult, contextResult),
+                    contextOnlyFalseHits(query, passageRanking, contextRanking),
+                    passageResult,
+                    contextResult));
+        }
+        return List.copyOf(results);
+    }
+
+    private RankOutcome directRankOutcome(
+            Query query,
+            QueryProfileResult passage,
+            QueryProfileResult context) {
+        if (!query.hasDirectSupport()) {
+            return RankOutcome.NOT_APPLICABLE;
+        }
+        int delta = directRankDelta(query, passage, context);
+        return delta > 0 ? RankOutcome.WIN : delta < 0 ? RankOutcome.LOSS : RankOutcome.TIE;
+    }
+
+    private int directRankDelta(
+            Query query,
+            QueryProfileResult passage,
+            QueryProfileResult context) {
+        if (!query.hasDirectSupport()) {
+            return 0;
+        }
+        if (passage.firstDirectRank() == null || context.firstDirectRank() == null) {
+            throw new IllegalStateException("source-preserving B3/C1 lost a DIRECT_SUPPORT rank");
+        }
+        return passage.firstDirectRank() - context.firstDirectRank();
+    }
+
+    List<ContextOnlyFalseHit> contextOnlyFalseHits(
+            Query query,
+            List<RankedCandidate> passageRanking,
+            List<RankedCandidate> contextRanking) {
+        if (!query.hasDirectSupport()) {
+            return List.of();
+        }
+        Set<String> directUnitIds = query.allExpectedEvidence().stream()
+                .filter(expected -> "DIRECT_SUPPORT".equals(expected.supportRelation()))
+                .map(ExpectedEvidence::evidenceUnitId)
+                .collect(Collectors.toSet());
+        Integer firstDirect = contextRanking.stream()
+                .filter(candidate -> candidate.coveredUnitIds().stream().anyMatch(directUnitIds::contains))
+                .map(RankedCandidate::rank)
+                .findFirst()
+                .orElse(null);
+        if (firstDirect == null || firstDirect == 1) {
+            return List.of();
+        }
+        Map<String, Integer> passageRankById = passageRanking.stream().collect(Collectors.toMap(
+                RankedCandidate::candidateId, RankedCandidate::rank));
+        return contextRanking.stream()
+                .filter(candidate -> candidate.rank() < firstDirect)
+                .filter(candidate -> !candidate.contextText().isBlank())
+                .filter(candidate -> candidate.coveredUnitIds().stream().noneMatch(directUnitIds::contains))
+                .filter(candidate -> passageRankById.getOrDefault(candidate.candidateId(), Integer.MAX_VALUE)
+                        > candidate.rank())
+                .map(candidate -> new ContextOnlyFalseHit(
+                        query.queryId(),
+                        candidate.candidateId(),
+                        passageRankById.getOrDefault(candidate.candidateId(), Integer.MAX_VALUE),
+                        candidate.rank(),
+                        firstDirect,
+                        candidate.contextText(),
+                        candidate.evidenceChildIds()))
+                .toList();
+    }
+
+    private ParentContextAggregateComparison parentContextAggregate(List<ParentContextQueryResult> values) {
+        return new ParentContextAggregateComparison(
+                aggregateParentContext(values, ParentContextQueryResult::passage),
+                aggregateParentContext(values, ParentContextQueryResult::context));
+    }
+
+    private ParentContextAggregateComparison parentContextMacro(
+            List<ParentContextQueryResult> values,
+            Function<ParentContextQueryResult, String> key) {
+        Map<String, List<ParentContextQueryResult>> groups = values.stream().collect(Collectors.groupingBy(
+                key, LinkedHashMap::new, Collectors.toList()));
+        List<AggregateMetrics> passage = groups.values().stream()
+                .map(group -> aggregateParentContext(group, ParentContextQueryResult::passage))
+                .filter(metric -> metric.directQueryCount() > 0)
+                .toList();
+        List<AggregateMetrics> context = groups.values().stream()
+                .map(group -> aggregateParentContext(group, ParentContextQueryResult::context))
+                .filter(metric -> metric.directQueryCount() > 0)
+                .toList();
+        return new ParentContextAggregateComparison(averageAggregates(passage), averageAggregates(context));
+    }
+
+    private Map<String, ParentContextAggregateComparison> parentContextGrouped(
+            List<ParentContextQueryResult> values,
+            Function<ParentContextQueryResult, String> key) {
+        Map<String, List<ParentContextQueryResult>> groups = values.stream().collect(Collectors.groupingBy(
+                key, LinkedHashMap::new, Collectors.toList()));
+        Map<String, ParentContextAggregateComparison> result = new LinkedHashMap<>();
+        groups.forEach((name, group) -> result.put(name, parentContextAggregate(group)));
+        return Map.copyOf(result);
+    }
+
+    private AggregateMetrics aggregateParentContext(
+            List<ParentContextQueryResult> values,
+            Function<ParentContextQueryResult, QueryProfileResult> profile) {
+        List<QueryProfileResult> direct = values.stream()
+                .filter(ParentContextQueryResult::directSupport)
+                .map(profile)
+                .toList();
+        Map<Integer, Double> recall = new LinkedHashMap<>();
+        Map<Integer, Double> unit = new LinkedHashMap<>();
+        Map<Integer, Double> group = new LinkedHashMap<>();
+        Map<Integer, Double> parent = new LinkedHashMap<>();
+        for (int cutoff : CUTOFFS) {
+            recall.put(cutoff, direct.stream()
+                    .mapToDouble(value -> value.recallAtK().get(cutoff) ? 1.0d : 0.0d)
+                    .average().orElse(0.0d));
+            unit.put(cutoff, direct.stream().mapToDouble(value -> value.unitCoverageAtK().get(cutoff))
+                    .average().orElse(0.0d));
+            group.put(cutoff, direct.stream().mapToDouble(value -> value.groupCoverageAtK().get(cutoff))
+                    .average().orElse(0.0d));
+            parent.put(cutoff, direct.stream().mapToDouble(value -> value.parentCoverageAtK().get(cutoff))
+                    .average().orElse(0.0d));
+        }
+        return new AggregateMetrics(
+                direct.size(),
+                values.size() - direct.size(),
+                direct.size(),
+                direct.stream().mapToDouble(value -> value.top1() ? 1.0d : 0.0d).average().orElse(0.0d),
+                direct.stream().mapToDouble(QueryProfileResult::reciprocalRank).average().orElse(0.0d),
+                Map.copyOf(recall),
+                Map.copyOf(unit),
+                Map.copyOf(group),
+                Map.copyOf(parent));
+    }
+
     CandidateBuild buildFixedCandidates(DatasetSlice slice) {
         long started = System.nanoTime();
         List<CandidateSpec> candidates = new ArrayList<>();
@@ -203,10 +664,12 @@ final class SearchV3DenseAblationEngine {
                         document.documentId(),
                         document.versionId(),
                         chunk.content(),
+                        "",
                         chunk.content(),
                         "FIXED_CHUNK",
                         null,
                         List.of(range),
+                        List.of(),
                         List.of(),
                         List.of(),
                         List.of()));
@@ -276,12 +739,14 @@ final class SearchV3DenseAblationEngine {
                         provenance.documentId(),
                         provenance.versionId(),
                         child.sourceText(),
+                        "",
                         child.retrievalText(),
                         child.sourceBlockType().name(),
                         provenance.parentAnnotationCandidateId(),
                         List.of(childRange),
                         child.sourceBlockIds(),
                         child.contextSourceBlockIds(),
+                        List.of(),
                         List.of(new EvidenceChildRange(child.childId(), childRange))));
             }
         }
@@ -326,12 +791,14 @@ final class SearchV3DenseAblationEngine {
                         passage.documentId(),
                         passage.versionId(),
                         passage.passageSourceText(),
+                        "",
                         passage.retrievalText(),
                         "RETRIEVAL_PASSAGE",
                         passage.parentAnnotationCandidateId(),
                         evidenceChildren.stream().map(EvidenceChildRange::range).toList(),
                         passage.sourceBlockIds(),
                         passage.contextSourceBlockIds(),
+                        List.of(),
                         evidenceChildren));
             }
         }
@@ -345,7 +812,8 @@ final class SearchV3DenseAblationEngine {
                 corpusStats(PASSAGE_PROFILE, slice, candidates, constructionNanos, contextOnlyHeadings));
         return new PassageCandidateBuild(
                 candidateBuild,
-                passageStats(slice, structuralBuild.candidates(), candidates, passages));
+                passageStats(slice, structuralBuild.candidates(), candidates, passages),
+                List.copyOf(passages));
     }
 
     private void validatePassageMembership(
@@ -588,10 +1056,12 @@ final class SearchV3DenseAblationEngine {
                     value.spec().versionId(),
                     value.spec().sourceBlockType(),
                     value.spec().sourceText(),
+                    value.spec().contextText(),
                     value.spec().retrievalText(),
                     value.spec().parentAnnotationCandidateId(),
                     value.spec().sourceText().codePointCount(0, value.spec().sourceText().length()),
                     value.spec().evidenceChildren().stream().map(EvidenceChildRange::evidenceChildId).toList(),
+                    value.spec().addedContextBlockIds(),
                     List.copyOf(unitIds),
                     List.copyOf(groupIds),
                     List.copyOf(parentIds)));
@@ -1204,12 +1674,14 @@ final class SearchV3DenseAblationEngine {
             String documentId,
             String versionId,
             String sourceText,
+            String contextText,
             String retrievalText,
             String sourceBlockType,
             String parentAnnotationCandidateId,
             List<CandidateRange> ranges,
             List<String> sourceBlockIds,
             List<String> contextBlockIds,
+            List<String> addedContextBlockIds,
             List<EvidenceChildRange> evidenceChildren) {
     }
 
@@ -1224,7 +1696,16 @@ final class SearchV3DenseAblationEngine {
             ProfileCorpusStats corpusStats) {
     }
 
-    record PassageCandidateBuild(CandidateBuild candidateBuild, PassageCorpusStats passageStats) {
+    record PassageCandidateBuild(
+            CandidateBuild candidateBuild,
+            PassageCorpusStats passageStats,
+            List<RetrievalPassage> passages) {
+    }
+
+    record ContextCandidateBuild(
+            CandidateBuild candidateBuild,
+            ParentContextCorpusStats contextStats,
+            List<ContextualRetrievalPassage> passages) {
     }
 
     private record EmbeddedCandidate(CandidateSpec spec, float[] embedding) {
@@ -1249,10 +1730,12 @@ final class SearchV3DenseAblationEngine {
             String versionId,
             String sourceBlockType,
             String sourceText,
+            String contextText,
             String retrievalText,
             String parentAnnotationCandidateId,
             int sourceCodePointLength,
             List<String> evidenceChildIds,
+            List<String> contextSourceBlockIds,
             List<String> coveredUnitIds,
             List<String> coveredGroupIds,
             List<String> coveredParentIds) {
@@ -1306,6 +1789,11 @@ final class SearchV3DenseAblationEngine {
             AggregateMetrics passage) {
     }
 
+    record ParentContextAggregateComparison(
+            AggregateMetrics passage,
+            AggregateMetrics context) {
+    }
+
     record ProfileCorpusStats(
             String profile,
             long candidateCount,
@@ -1350,6 +1838,24 @@ final class SearchV3DenseAblationEngine {
             double directGoldEvidenceChildPreservationRate) {
     }
 
+    record ParentContextCorpusStats(
+            String policy,
+            long passageCount,
+            long contextPassageCount,
+            double contextPassageRatio,
+            int minimumContextCodePointLength,
+            double averageContextCodePointLength,
+            int maximumContextCodePointLength,
+            int minimumHeadingDepth,
+            double averageHeadingDepth,
+            int maximumHeadingDepth,
+            Map<String, Long> headingDepthDistribution,
+            long crossParentContextViolationCount,
+            long sourceParityViolationCount,
+            long evidenceChildParityViolationCount,
+            double contextConstructionLatencyMs) {
+    }
+
     record MappedTextChunk(TextChunk chunk, int exactStart, int exactEnd) {
     }
 
@@ -1388,6 +1894,21 @@ final class SearchV3DenseAblationEngine {
             String tableHeaderContextPolicy) {
     }
 
+    record ParentContextContract(
+            String baselineProfile,
+            String contextProfile,
+            String contextPolicy,
+            int maximumHeadingDepth,
+            int maximumContextCodePoints,
+            String embeddingModel,
+            int embeddingDimensions,
+            String similarity,
+            String ranking,
+            String queryVectorPolicy,
+            String goldPolicy,
+            String parentDenseStatus) {
+    }
+
     record ExperimentReport(
             int schemaVersion,
             String phase,
@@ -1421,6 +1942,68 @@ final class SearchV3DenseAblationEngine {
             String decision) {
     }
 
+    record ContextOnlyFalseHit(
+            String queryId,
+            String candidateId,
+            int passageRank,
+            int contextRank,
+            int firstDirectContextRank,
+            String contextText,
+            List<String> evidenceChildIds) {
+    }
+
+    enum RankOutcome {
+        WIN,
+        LOSS,
+        TIE,
+        NOT_APPLICABLE
+    }
+
+    record ParentContextQueryResult(
+            String queryId,
+            String userBundleId,
+            Split split,
+            String professionGroup,
+            String language,
+            String answerability,
+            List<String> categories,
+            boolean directSupport,
+            double queryEmbeddingLatencyMs,
+            String directRankOutcome,
+            int directRankDelta,
+            List<ContextOnlyFalseHit> contextOnlyFalseHits,
+            QueryProfileResult passage,
+            QueryProfileResult context) {
+    }
+
+    record ParentContextExperimentReport(
+            int schemaVersion,
+            String phase,
+            String executedAt,
+            String datasetVersion,
+            String inputFreezeCommit,
+            String dependency,
+            Map<String, String> splitManifestHashes,
+            OllamaBgeM3EmbeddingClient.ModelMetadata model,
+            ParentContextContract contract,
+            ProfileCorpusStats passageCorpus,
+            ProfileCorpusStats contextCorpus,
+            PassageCorpusStats passageStats,
+            ParentContextCorpusStats contextStats,
+            ProfileLatency passageLatency,
+            ProfileLatency contextLatency,
+            Map<String, Long> sharedQueryEmbeddingLatency,
+            ParentContextAggregateComparison queryMicro,
+            ParentContextAggregateComparison userMacro,
+            Map<String, ParentContextAggregateComparison> splitMetrics,
+            Map<String, ParentContextAggregateComparison> professionMetrics,
+            Map<String, ParentContextAggregateComparison> languageMetrics,
+            List<ParentContextQueryResult> queries,
+            boolean sealedFinalOpened,
+            boolean sealedFinalSearchExecuted,
+            String currentFreshBaseline) {
+    }
+
     private record SplitRun(
             DatasetSlice slice,
             PreparedProfile fixed,
@@ -1428,5 +2011,14 @@ final class SearchV3DenseAblationEngine {
             PreparedProfile passage,
             PassageCorpusStats passageStats,
             List<QueryResult> queryResults) {
+    }
+
+    private record ParentContextSplitRun(
+            DatasetSlice slice,
+            PreparedProfile passage,
+            PreparedProfile context,
+            PassageCorpusStats passageStats,
+            ParentContextCorpusStats contextStats,
+            List<ParentContextQueryResult> queryResults) {
     }
 }

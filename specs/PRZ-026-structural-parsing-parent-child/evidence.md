@@ -639,3 +639,40 @@ result/evidence commit 이후 post-commit 상태에서 최종 확인한다.
 result/evidence는 commit `b1949df15120e30f915101575919fadf9300b6a2`로 통합했다. 해당 commit 직후
 working tree는 clean이었고, lifecycle close는 결과 내용을 변경하지 않는 별도 문서 commit으로
 기록한다.
+
+## 33. C1 시작 상태와 실행 전 계약
+
+| 항목 | 값 |
+| --- | --- |
+| branch / 시작 HEAD | `PRZ-026-structural-parsing-parent-child` / `1bbc1d761bd314a17e8f3ed4e2bcceb23a2fc96a` |
+| 시작 worktree | clean |
+| `origin/main` | `2c8fd5c0d2f62b154642d703a0970389f8abed8e` |
+| B3 builder SHA-256 | `64c93a0ba50ec2785209a85abd339fa0e4d6de0dc6a99ac29dedfa3a93dc2c39` |
+| EvidenceChild builder SHA-256 | `6ff76f49df332319fac987a59be4ead11d7ecda90b44f0d11e0cb538acd6cb83` |
+| SEALED FINAL | tree `a129080861d7dafd32a9b3b3357b61aebb237e59`, combined `e5b3159798...`, flags false |
+| B3 robustness report | `f0bf5481a572ad5e21f91916e5cd0fc6c309c50ec59e2f75ac2386433133324d` |
+| dataset 변경 | 0; Original/Long-form/robustness DEV/CAL 재사용 |
+| C1 benchmark / Parent Dense | `NOT_RUN / NOT_RUN` |
+
+실행 전 C1 policy는 `STRUCTURAL_HEADING_PATH_V1`, 명시적 Markdown hierarchy와 일반 heading의
+nearest-only, depth 2, 120 code points로 한 번 고정했다. B3와 C1의 유일한 차이는 heading-derived
+`contextText`를 document embedding 입력 앞에 붙이는 것이다. candidate/source/evidence/provenance
+parity, source-range-only Gold, context-only false-hit와 판정 Gate는 spec 13절에 고정했다. 이 기록
+시점의 `CURRENT_FRESH_BASELINE = NOT_RUN`, SEALED FINAL search/prediction/result `NOT_RUN`이다.
+
+## 34. C1 input-freeze 전 검증
+
+`ContextualRetrievalPassage`는 B3 `sourceText`, ordered `evidenceChildIds`를 constructor에서 강제하고,
+`StructuralHeadingPathContextBuilder`는 source block과 B3 passage만 입력받는다. runner는 candidate ID,
+source range, source/table provenance, Parent ID와 Child mapping을 일대일 비교한 뒤 같은 query vector로
+B3/C1을 순서대로 rank한다. `ParentContextAblationGate`와 benchmark entry point는 결과를 보기 전에
+spec 13절 Gate를 코드로 고정했다. EvidenceChild/B3 builder SHA-256 상수도 entry point에서 검증한다.
+
+| 명령/검사 | 실제 결과 |
+| --- | --- |
+| `compileSearchEvaluationJava` | `PASS`; C1 source compile 성공 |
+| PRZ-026 비-benchmark evaluation tests | `PASS`; 8 suites / 71 tests, failure/error/skipped 0 |
+| `searchEvaluationTest` 최초 시도 | `NOT_RUN`; repository에 해당 task가 없어 command selection error, 실제 test는 `searchEvaluation`로 재실행 |
+| B3/EvidenceChild source hash | `PASS`; section 33의 SHA-256과 동일 |
+| C1 BGE-M3 benchmark | `NOT_RUN`; input-freeze commit 이후 한 번 실행 예정 |
+| Parent Dense / SEALED FINAL search | `NOT_RUN / NOT_RUN` |

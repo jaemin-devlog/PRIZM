@@ -122,3 +122,24 @@ dependency, migration, frontend, MCP, Parent Context와 push/PR/merge는 범위 
 wall time이 각각 30.56%, 31.14% 감소했다. 누적 충분 profession/language slice에
 `BLOCKING_REGRESSION`은 없었다. 누적 frontend와 EN의 interval은 `INCONCLUSIVE`이므로 Production
 근거로 사용하지 않되, 사전 계약에 따라 다음 evaluation-only Parent Context 실험은 진행 가능하다.
+
+## 8. C1 Structural Heading Path Parent Context plan
+
+1. 시작 HEAD와 B3/EvidenceChild builder SHA-256, SEALED tree/hash/flags를 기록한다.
+2. B3 객체를 수정하지 않는 contextual wrapper와 `STRUCTURAL_HEADING_PATH_V1` builder를 추가한다.
+3. source-order heading path, 명시적 Markdown level, 최대 depth 2/120 code points, heading 없는
+   fallback과 cross-parent fail-closed를 unit test로 먼저 고정한다.
+4. 기존 B3 passage candidate를 C1에 일대일 투영하고 source/evidence/provenance/candidate/embedding
+   parity 및 Gold가 context를 사용하지 않음을 검증한다.
+5. B3/C1 전용 raw Dense runner와 context 적용률/depth/길이, direct win/loss/tie,
+   context-only false-hit 및 profession/language metric을 추가한다.
+6. 코드·계약·test를 local input-freeze commit으로 결과 전에 고정한다.
+7. Original Seed, Long-form, robustness DEV/CAL을 각각 같은 `bge-m3` query vector로 한 번 실행하고
+   ignored raw report와 SHA-256만 남긴다. 결과를 보고 context policy를 조정하지 않는다.
+8. PRZ-025 validator, SEALED hash/flags, 관련 source-set test, `git diff --check`, OSS readiness와
+   forbidden scope를 검증하고 결과·실패 사례·판정을 evidence에 기록한다.
+
+Ollama/model이 없거나 parity/Safety가 실패하면 C1 결과는 `NOT_RUN` 또는 `NO_GO`로 기록하고
+Parent Dense로 진행하지 않는다. rollback 범위는 C1 evaluation-only source/test와 PRZ-026 문서뿐이다.
+Production, dependency, migration, frontend, MCP, Docker, dataset, SEALED FINAL, push/PR/merge는
+변경하지 않는다.

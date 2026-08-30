@@ -70,6 +70,7 @@ PRZ는 PRIZM의 기능 개발과 기술 검증을 작업 단위로 남기는 기
 | PRZ&#8209;023 | [PRIZM 프로젝트 최종 Closeout](PRZ-023-project-closeout/spec.md) | `VERIFIED` | [근거](PRZ-023-project-closeout/evidence.md) |
 | PRZ&#8209;024 | [PRIZM v1.0.0 소스 릴리스](PRZ-024-release-v1.0.0/spec.md) | `VERIFIED` | [근거](PRZ-024-release-v1.0.0/evidence.md) |
 | PRZ&#8209;025 | [Search V3 기반 계약](PRZ-025-search-v3-foundation/spec.md) | `IN_PROGRESS` | [근거](PRZ-025-search-v3-foundation/evidence.md) |
+| PRZ&#8209;026 | [Search V3 Structural Parsing과 Parent-Child Retrieval](PRZ-026-structural-parsing-parent-child/spec.md) | `IN_PROGRESS` | [근거](PRZ-026-structural-parsing-parent-child/evidence.md) |
 
 ## 연구·미채택 기록
 

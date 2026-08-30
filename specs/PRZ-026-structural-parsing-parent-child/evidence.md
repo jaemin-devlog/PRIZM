@@ -635,3 +635,7 @@ AUDIT lifecycle checkbox 불일치였다. 각각 integrity-only read를 명시�
 재감사했으며 blocking/nonblocking finding 0으로 `PASS`했다. 판정 수치와 Gate 계산 finding은 없었다.
 결과 commit 전 lifecycle 완료 선표기 finding은 `INTEGRATE_PENDING`으로 되돌려 해소하고, 실제
 result/evidence commit 이후 post-commit 상태에서 최종 확인한다.
+
+result/evidence는 commit `b1949df15120e30f915101575919fadf9300b6a2`로 통합했다. 해당 commit 직후
+working tree는 clean이었고, lifecycle close는 결과 내용을 변경하지 않는 별도 문서 commit으로
+기록한다.

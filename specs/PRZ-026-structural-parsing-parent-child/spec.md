@@ -1,7 +1,7 @@
 # PRZ-026 Structural Parsing and Parent-Child Retrieval
 
-- 상태: `IN_PROGRESS / PHASE_1_ADJUSTMENT_NEEDS_ADJUSTMENT`
-- 현재 Phase: `Phase 1 Adjustment — COMPLETED / NEEDS_ADJUSTMENT`
+- 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_NEEDS_ADJUSTMENT`
+- 현재 Phase: `Phase 1 Retrieval Passage — COMPLETED / NEEDS_ADJUSTMENT`
 - 선행 조건: `DEPENDS_ON_PRZ_025`
 - 기준 source: `PRZ-025-search-v3-foundation@5f8229f88251938dc5b34588676cc69edf409c99`
 - Production 적용: `NOT_RUN`
@@ -20,6 +20,7 @@ Recall을 개선한다는 것이다. 결과를 본 뒤 gold, split 또는 SEALED
 | A. Fixed Chunk + BGE-M3 Dense | `COMPLETED` |
 | B1. Structural Child v1 + BGE-M3 Dense | `COMPLETED — NEEDS_ADJUSTMENT` |
 | B2. Structural Child v2 + BGE-M3 Dense | `COMPLETED — NEEDS_ADJUSTMENT` |
+| B3. Structural Retrieval Passage + BGE-M3 Dense | `COMPLETED — NEEDS_ADJUSTMENT` |
 | C. Structural Child + Parent Context + BGE-M3 Dense | `NOT_RUN` |
 | D. Parent-Child Retrieval + BGE-M3 Dense | `NOT_RUN` |
 
@@ -147,3 +148,33 @@ Production으로 승격하지 않는다. Recall/Top1/MRR, contamination/fragment
   함께 기록한다.
 - PRZ-025 SEALED FINAL의 파일·hash·flags는 byte-level로 유지하고 검색하지 않는다.
 - Parent Context, Parent Dense, sparse, reranker와 Production 경로는 `NOT_RUN`이다.
+
+## 10. Phase 1 Retrieval Passage contract
+
+B3는 EvidenceChild를 source-grounded 최소 근거로 그대로 보존하고, embedding/search 후보만
+`RetrievalPassage`로 분리한다. 같은 document, version, page, structural Parent 안에서 source
+순서상 인접한 Child만 greedy grouping한다. query, gold, 직무, 언어, actor, negation 또는 completion
+state는 passage 생성 입력이 아니다.
+
+- 정책은 한 번 고정한 `minimum target 120 / target maximum 320 / absolute maximum 480`
+  code points를 Original과 Long-form 전체에 공통 적용한다.
+- 현재 passage가 120 미만일 때만 320을 넘어 480까지 다음 인접 Child를 받을 수 있다.
+- heading은 context-only boundary이고 retrieval text에 추가하지 않는다. overlap은 0이다.
+- 각 passage는 ordered `evidenceChildIds[]`와 각 Child의 exact provenance range를 보존한다.
+- Gold hit는 passage의 넓은 합성 span이 아니라, 포함된 하나의 atomic Child range가 Gold Unit의
+  모든 span을 덮을 때만 인정한다.
+- table row는 atomic Child ID를 유지하고 기존 source-table header context 예외만 중복 없이 유지한다.
+- 480을 넘는 atomic Child는 조용히 자르거나 oversized passage로 만들지 않고 fail-closed한다.
+
+B3 성공 Gate는 cross-parent/heading violation 0, fragmentation 비열화 0, Recall 비열화 0,
+DIRECT Gold-mapped Child 보존 100%, B2 대비 candidate 감소, query-micro Top1/MRR 비열화 0이다.
+profession/language 신규 회귀는 별도 blocking finding으로 판정한다. Parent Context, Parent Dense,
+reranker와 semantic policy는 계속 `NOT_RUN`이다.
+
+## 11. Phase 1 Retrieval Passage result
+
+고정 정책 1회 비교에서 Original B2/B3 후보는 `17→15`, Long-form은 `128→72`였다. Long-form
+indexing wall time은 최종 단일 local run에서 `1133.644ms→687.901ms`로 감소했다. 두 dataset 모두
+Recall@5/10/20/50, query-micro Top1/MRR, contamination 0, fragmentation 0과 Gold Child 보존 100%를
+유지했다. 그러나 Long-form `FRONTEND_MOBILE` Top1/MRR이 `1.0/1.0→0.6667/0.8333`으로 신규
+회귀해 B3 판정은 `NEEDS_ADJUSTMENT`다. 따라서 C는 계속 `NOT_RUN`이다.

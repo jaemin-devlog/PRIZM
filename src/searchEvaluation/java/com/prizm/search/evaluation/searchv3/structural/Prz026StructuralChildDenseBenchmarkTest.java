@@ -13,24 +13,26 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 
-/** Executes Original Seed and the separately frozen long-form DEV/CAL against A/B raw Dense. */
+/** Executes Original Seed and frozen long-form DEV/CAL against A/B2/B3 raw Dense. */
 class Prz026StructuralChildDenseBenchmarkTest {
 
     private static final Path DEFAULT_OUTPUT = Path.of(
-            "local/search-v3-evaluation/prz026/structural-child-dense-v2-adjustment.json");
+            "local/search-v3-evaluation/prz026/structural-retrieval-passage-b3.json");
     private static final String ADJUSTMENT_START_COMMIT =
-            "a9d093dd48e99a8d19675b3a8caa09c794d2888b";
+            "e5012fd4949b05f4b8a136186ddefb60046985f8";
     private static final List<String> EXECUTION_SOURCE_FILES = List.of(
             "scripts/evaluation/search-v3/materialize-prz026-devcal.mjs",
             "src/searchEvaluation/java/com/prizm/search/evaluation/searchv3/structural/StructuralBlockParser.java",
             "src/searchEvaluation/java/com/prizm/search/evaluation/searchv3/structural/StructuralEvidenceChildBuilder.java",
+            "src/searchEvaluation/java/com/prizm/search/evaluation/searchv3/structural/RetrievalPassage.java",
+            "src/searchEvaluation/java/com/prizm/search/evaluation/searchv3/structural/StructuralRetrievalPassageBuilder.java",
             "src/searchEvaluation/java/com/prizm/search/evaluation/searchv3/structural/SearchV3DenseAblationDataset.java",
             "src/searchEvaluation/java/com/prizm/search/evaluation/searchv3/structural/SearchV3DenseAblationEngine.java",
             "src/searchEvaluation/java/com/prizm/search/evaluation/searchv3/structural/OllamaBgeM3EmbeddingClient.java",
             "src/searchEvaluation/java/com/prizm/search/evaluation/searchv3/structural/Prz026StructuralChildDenseBenchmarkTest.java");
 
     @Test
-    void runsFixedVsStructuralV2OnOriginalAndLongFormDevCalibrationOnly() throws Exception {
+    void runsFixedVsStructuralV2VsPassageV3OnOriginalAndLongFormDevCalibrationOnly() throws Exception {
         SearchV3DenseAblationDataset loader = new SearchV3DenseAblationDataset();
         SearchV3DenseAblationDataset.SealedManifestMetadata sealedBefore =
                 loader.readSealedManifestMetadata();
@@ -68,12 +70,12 @@ class Prz026StructuralChildDenseBenchmarkTest {
                 originalSlices,
                 client,
                 model,
-                "PRZ-026-PHASE-1-ADJUSTMENT-ORIGINAL-SEED");
+                "PRZ-026-PHASE-1-RETRIEVAL-PASSAGE-ORIGINAL-SEED");
         SearchV3DenseAblationEngine.ExperimentReport longForm = engine.run(
                 longFormSlices,
                 client,
                 model,
-                "PRZ-026-PHASE-1-ADJUSTMENT-LONG-FORM");
+                "PRZ-026-PHASE-1-RETRIEVAL-PASSAGE-LONG-FORM");
         SearchV3DenseAblationDataset.SealedManifestMetadata sealedAfter =
                 loader.readSealedManifestMetadata();
         SearchV3DenseAblationDataset.LongFormManifestMetadata longFormAfter =
@@ -88,13 +90,22 @@ class Prz026StructuralChildDenseBenchmarkTest {
             assertThat(report.fixedCorpus().embeddingCount()).isEqualTo(report.fixedCorpus().candidateCount());
             assertThat(report.structuralCorpus().embeddingCount())
                     .isEqualTo(report.structuralCorpus().candidateCount());
+            assertThat(report.passageCorpus().embeddingCount())
+                    .isEqualTo(report.passageCorpus().candidateCount());
             assertThat(report.structuralCorpus().headingOnlyCandidateCount()).isZero();
+            assertThat(report.passageCorpus().headingOnlyCandidateCount()).isZero();
             assertThat(report.structuralHeadingOnlyRank1Count()).isZero();
+            assertThat(report.passageHeadingOnlyRank1Count()).isZero();
+            assertThat(report.passageStats().crossParentPassageViolationCount()).isZero();
+            assertThat(report.passageStats().directGoldEvidenceChildPreservationRate()).isEqualTo(1.0d);
+            assertThat(report.passageStats().maximumPassageCodePointLength()).isLessThanOrEqualTo(480);
         });
         assertThat(original.queryMicro().fixed().directQueryCount()).isEqualTo(14);
         assertThat(original.queryMicro().structural().directQueryCount()).isEqualTo(14);
+        assertThat(original.queryMicro().passage().directQueryCount()).isEqualTo(14);
         assertThat(longForm.queryMicro().fixed().directQueryCount()).isEqualTo(15);
         assertThat(longForm.queryMicro().structural().directQueryCount()).isEqualTo(15);
+        assertThat(longForm.queryMicro().passage().directQueryCount()).isEqualTo(15);
         assertThat(original.queries())
                 .filteredOn(result -> List.of(
                                 "SV3-U01-Q04", "SV3-U04-Q01", "SV3-U04-Q03", "SV3-U02-Q04")
@@ -102,22 +113,23 @@ class Prz026StructuralChildDenseBenchmarkTest {
                 .allSatisfy(result -> assertThat(result.structural().rawDenseRanking().get(0).sourceBlockType())
                         .isNotEqualTo(StructuralBlockType.HEADING.name()));
 
+        String finalDecision = finalDecision(original.decision(), longForm.decision());
+
         Path output = Path.of(System.getProperty("prizm.prz026.output", DEFAULT_OUTPUT.toString()))
                 .toAbsolutePath().normalize();
         Files.createDirectories(output.getParent());
         ObjectMapper mapper = new ObjectMapper();
         AdjustmentReport report = new AdjustmentReport(
-                2,
-                "PRZ-026-PHASE-1-ADJUSTMENT",
+                3,
+                "PRZ-026-PHASE-1-RETRIEVAL-PASSAGE",
                 "NEEDS_ADJUSTMENT",
-                "STANDALONE_HEADING",
                 "NEEDS_ADJUSTMENT",
+                finalDecision,
                 executionSourceSnapshot(),
                 original,
                 longForm,
                 sealedAfter,
                 longFormAfter,
-                "BLOCKED_FOR_LATER_LAYOUT_PHASE",
                 "EVIDENCE_PARENT_AND_HEADING_CONTEXT_NOT_RUN_TABLE_HEADER_EXCEPTION_ACTIVE");
         String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(report) + "\n";
         Files.writeString(output, json, StandardCharsets.UTF_8);
@@ -128,13 +140,28 @@ class Prz026StructuralChildDenseBenchmarkTest {
         System.out.println("PRZ026_REPORT_SHA256=" + reportSha256);
         System.out.println("PRZ026_ORIGINAL_FIXED_CANDIDATES=" + original.fixedCorpus().candidateCount());
         System.out.println("PRZ026_ORIGINAL_STRUCTURAL_CANDIDATES=" + original.structuralCorpus().candidateCount());
+        System.out.println("PRZ026_ORIGINAL_PASSAGE_CANDIDATES=" + original.passageCorpus().candidateCount());
         System.out.println("PRZ026_ORIGINAL_FIXED_TOP1=" + original.queryMicro().fixed().top1());
         System.out.println("PRZ026_ORIGINAL_STRUCTURAL_TOP1=" + original.queryMicro().structural().top1());
+        System.out.println("PRZ026_ORIGINAL_PASSAGE_TOP1=" + original.queryMicro().passage().top1());
         System.out.println("PRZ026_LONG_FIXED_CANDIDATES=" + longForm.fixedCorpus().candidateCount());
         System.out.println("PRZ026_LONG_STRUCTURAL_CANDIDATES=" + longForm.structuralCorpus().candidateCount());
+        System.out.println("PRZ026_LONG_PASSAGE_CANDIDATES=" + longForm.passageCorpus().candidateCount());
         System.out.println("PRZ026_LONG_FIXED_TOP1=" + longForm.queryMicro().fixed().top1());
         System.out.println("PRZ026_LONG_STRUCTURAL_TOP1=" + longForm.queryMicro().structural().top1());
+        System.out.println("PRZ026_LONG_PASSAGE_TOP1=" + longForm.queryMicro().passage().top1());
+        System.out.println("PRZ026_B3_FINAL_DECISION=" + finalDecision);
         System.out.println("PRZ026_SEALED_FINAL_SEARCH_EXECUTED=false");
+    }
+
+    private String finalDecision(String original, String longForm) {
+        if ("NO_GO".equals(original) || "NO_GO".equals(longForm)) {
+            return "NO_GO";
+        }
+        if ("NEEDS_ADJUSTMENT".equals(original) || "NEEDS_ADJUSTMENT".equals(longForm)) {
+            return "NEEDS_ADJUSTMENT";
+        }
+        return "PROMISING";
     }
 
     private ExecutionSourceSnapshot executionSourceSnapshot() throws Exception {
@@ -160,15 +187,14 @@ class Prz026StructuralChildDenseBenchmarkTest {
     record AdjustmentReport(
             int schemaVersion,
             String phase,
-            String previousDecision,
-            String previousCause,
+            String phaseOneDecision,
+            String phaseOneAdjustmentDecision,
             String finalDecision,
             ExecutionSourceSnapshot executionSource,
             SearchV3DenseAblationEngine.ExperimentReport originalSeed,
             SearchV3DenseAblationEngine.ExperimentReport longFormExpansion,
             SearchV3DenseAblationDataset.SealedManifestMetadata sealedFinal,
             SearchV3DenseAblationDataset.LongFormManifestMetadata longFormManifest,
-            String pdfStatus,
             String parentContextStatus) {
     }
 

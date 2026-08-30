@@ -1,6 +1,6 @@
 # PRZ-026 Phase 1 Tasks
 
-- 상태: `IN_PROGRESS / PHASE_1_ADJUSTMENT_NEEDS_ADJUSTMENT`
+- 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_NEEDS_ADJUSTMENT`
 - A/B 실행 결과: `COMPLETED — NEEDS_ADJUSTMENT`
 - C/D Parent 단계: `NOT_RUN`
 
@@ -33,4 +33,19 @@
 - [x] VERIFY: SEALED byte/hash/flags, diff scope, OSS readiness와 관련 test
 - [x] AUDIT: blocking finding 0 및 최종 `NEEDS_ADJUSTMENT`
 - [x] INTEGRATE: local branch commit only
+- [ ] Parent Context/Parent Dense/push/PR/merge — `NOT_RUN` (금지)
+
+## Phase 1 Retrieval Passage
+
+- [x] ORIENT: `e5012fd...`, clean tree, B2 evidence와 SEALED hash 확인
+- [x] SPEC/PLAN: same-parent adjacency와 `120/320/480`, overlap 0 정책을 실행 전에 고정
+- [x] TEST/IMPLEMENT: RetrievalPassage, ordered EvidenceChild ID/provenance와 table context 보존
+- [x] TEST/IMPLEMENT: cross-parent/heading/non-adjacent/max-bound/Gold-input 금지 검증
+- [x] IMPLEMENT: A/B2/B3 동일 corpus/query/model/query-vector runner
+- [x] VERIFY: Original Seed A/B2/B3 raw Dense 실행
+- [x] VERIFY: Long-form DEV/CAL A/B2/B3 raw Dense 실행
+- [x] VERIFY: passage/cost/ranking/user/profession/language/boundary 결과 기록
+- [x] VERIFY: SEALED hash/flags와 관련 evaluation test
+- [x] AUDIT: final diff/OSS/scope와 문서 정합성
+- [x] INTEGRATE: 허용 파일만 local branch commit
 - [ ] Parent Context/Parent Dense/push/PR/merge — `NOT_RUN` (금지)

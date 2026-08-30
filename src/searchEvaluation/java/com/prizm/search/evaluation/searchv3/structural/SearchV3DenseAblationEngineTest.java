@@ -14,12 +14,14 @@ class SearchV3DenseAblationEngineTest {
     private final SearchV3DenseAblationEngine engine = new SearchV3DenseAblationEngine();
 
     @Test
-    void fixedAndStructuralUseExactlyTheSameActiveCorpusVersions() {
+    void fixedStructuralAndPassageUseExactlyTheSameActiveCorpusVersions() {
         SearchV3DenseAblationDataset.DatasetSlice dev =
                 loader.load(SearchV3DenseAblationDataset.Split.DEV);
 
         SearchV3DenseAblationEngine.CandidateBuild fixed = engine.buildFixedCandidates(dev);
         SearchV3DenseAblationEngine.CandidateBuild structural = engine.buildStructuralCandidates(dev);
+        SearchV3DenseAblationEngine.PassageCandidateBuild passage =
+                engine.buildPassageCandidates(dev, structural);
         Set<String> active = dev.activeDocumentsByVersion().keySet();
 
         assertThat(fixed.candidates().stream()
@@ -28,7 +30,11 @@ class SearchV3DenseAblationEngineTest {
         assertThat(structural.candidates().stream()
                 .map(SearchV3DenseAblationEngine.CandidateSpec::versionId)
                 .collect(Collectors.toSet())).isEqualTo(active);
+        assertThat(passage.candidateBuild().candidates().stream()
+                .map(SearchV3DenseAblationEngine.CandidateSpec::versionId)
+                .collect(Collectors.toSet())).isEqualTo(active);
         assertThat(fixed.slice().queries()).containsExactlyElementsOf(structural.slice().queries());
+        assertThat(fixed.slice().queries()).containsExactlyElementsOf(passage.candidateBuild().slice().queries());
     }
 
     @Test
@@ -102,6 +108,8 @@ class SearchV3DenseAblationEngineTest {
 
         SearchV3DenseAblationEngine.CandidateBuild fixed = engine.buildFixedCandidates(dev);
         SearchV3DenseAblationEngine.CandidateBuild structural = engine.buildStructuralCandidates(dev);
+        SearchV3DenseAblationEngine.PassageCandidateBuild passage =
+                engine.buildPassageCandidates(dev, structural);
 
         assertThat(dev.parents().values())
                 .anySatisfy(parent -> assertThat(
@@ -116,6 +124,38 @@ class SearchV3DenseAblationEngineTest {
                 });
         assertThat(structural.corpusStats().contaminatedCandidateCount()).isZero();
         assertThat(structural.corpusStats().fragmentedGoldUnitCount()).isZero();
+        assertThat(passage.candidateBuild().corpusStats().contaminatedCandidateCount()).isZero();
+        assertThat(passage.candidateBuild().corpusStats().fragmentedGoldUnitCount()).isZero();
+        assertThat(passage.candidateBuild().candidates()).hasSizeLessThan(structural.candidates().size());
+        assertThat(passage.passageStats().crossParentPassageViolationCount()).isZero();
+        assertThat(passage.passageStats().directGoldEvidenceChildPreservationRate()).isEqualTo(1.0d);
+        assertThat(passage.passageStats().maximumPassageCodePointLength())
+                .isLessThanOrEqualTo(StructuralRetrievalPassageBuilder.DEFAULT_ABSOLUTE_MAX_CODE_POINTS);
+    }
+
+    @Test
+    void passageCandidatesRetainEveryAtomicEvidenceChildExactlyOnce() {
+        SearchV3DenseAblationDataset.DatasetSlice dev =
+                loader.loadLongForm(SearchV3DenseAblationDataset.Split.DEV);
+        SearchV3DenseAblationEngine.CandidateBuild structural = engine.buildStructuralCandidates(dev);
+
+        SearchV3DenseAblationEngine.PassageCandidateBuild passage =
+                engine.buildPassageCandidates(dev, structural);
+
+        List<String> atomicIds = structural.candidates().stream()
+                .flatMap(candidate -> candidate.evidenceChildren().stream())
+                .map(SearchV3DenseAblationEngine.EvidenceChildRange::evidenceChildId)
+                .toList();
+        List<String> passageIds = passage.candidateBuild().candidates().stream()
+                .flatMap(candidate -> candidate.evidenceChildren().stream())
+                .map(SearchV3DenseAblationEngine.EvidenceChildRange::evidenceChildId)
+                .toList();
+        assertThat(passageIds).containsExactlyElementsOf(atomicIds).doesNotHaveDuplicates();
+        assertThat(passage.candidateBuild().candidates()).allSatisfy(candidate -> {
+            assertThat(candidate.sourceBlockType()).isEqualTo("RETRIEVAL_PASSAGE");
+            assertThat(candidate.parentAnnotationCandidateId()).isNotBlank();
+            assertThat(candidate.evidenceChildren()).isNotEmpty();
+        });
     }
 
     @Test
@@ -125,6 +165,7 @@ class SearchV3DenseAblationEngineTest {
         assertThat(OllamaBgeM3EmbeddingClient.SIMILARITY).isEqualTo("COSINE");
         assertThat(SearchV3DenseAblationEngine.FIXED_PROFILE).contains("BGE_M3_DENSE");
         assertThat(SearchV3DenseAblationEngine.STRUCTURAL_PROFILE).contains("BGE_M3_DENSE");
+        assertThat(SearchV3DenseAblationEngine.PASSAGE_PROFILE).contains("BGE_M3_DENSE");
     }
 
     @Test

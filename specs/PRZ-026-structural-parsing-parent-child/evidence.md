@@ -1,11 +1,13 @@
 # PRZ-026 Phase 1 Evidence
 
-- 상태: `IN_PROGRESS / PHASE_1_ADJUSTMENT_NEEDS_ADJUSTMENT`
+- 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_NEEDS_ADJUSTMENT`
 - 기록일: 2026-08-30 (Asia/Seoul)
 - 선행 조건: `DEPENDS_ON_PRZ_025`
 - 최종 판정: `NEEDS_ADJUSTMENT`
 - Phase 1 역사 판정: `NEEDS_ADJUSTMENT` — standalone heading 회귀
 - Phase 1 Adjustment 판정: `NEEDS_ADJUSTMENT` — heading은 제거됐으나 장문 ranking 순증 없음
+- Phase 1 Retrieval Passage 판정: `NEEDS_ADJUSTMENT` — 비용과 전체 metric은 개선·유지했으나
+  `FRONTEND_MOBILE` 신규 회귀
 - Production 변경·적용: `0 / NOT_RUN`
 
 ## 1. 역사적 Phase 1 시작 상태
@@ -399,3 +401,111 @@ Original/Long-form 계약 충돌, lifecycle 표기, heading Gate 의미와 norma
 수정했다. Source/test, history/scope와 contract/lifecycle 최종 재감사는 모두 blocking finding
 0으로 끝났다. 첫 계약 재감사가 차단한 staging 전 lifecycle 표기 1건은 staged 31-path
 scope·OSS readiness·diff check 결과를 기록하고 tasks Gate를 닫은 뒤 해소됐다.
+
+## 22. Phase 1 Retrieval Passage 시작 상태와 고정 정책
+
+| 항목 | 값 |
+| --- | --- |
+| 시작 branch / HEAD | `PRZ-026-structural-parsing-parent-child` / `e5012fd4949b05f4b8a136186ddefb60046985f8` |
+| 시작 worktree | clean |
+| dataset | Original `search-v3-fresh-seed-1.0.1`, Long-form `search-v3-fresh-devcal-1.1.0`; 신규 fixture 0 |
+| SEALED FINAL | `e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383`, flags false |
+| B1 / B2 | `NEEDS_ADJUSTMENT` / `NEEDS_ADJUSTMENT`; 역사 판정 유지 |
+| B3 size policy | minimum target 120, target maximum 320, absolute maximum 480 code points |
+| grouping | same document/version/page/structural Parent, source-order adjacent, overlap 0 |
+| forbidden inputs | Gold, query, profession, language, actor, negation, completion state |
+| Parent Context / Parent Dense | `NOT_RUN / NOT_RUN` |
+
+정책은 benchmark 전에 한 번 고정했고 결과 확인 뒤 재튜닝하지 않았다. B2 EvidenceChild는 그대로
+유지하며 B3 passage는 ordered `evidenceChildIds[]`와 각 atomic provenance range를 갖는다. Gold hit는
+passage 합성 범위가 아니라 하나의 포함 Child range가 Gold Unit의 모든 span을 덮을 때만 인정했다.
+480을 넘는 atomic Child는 fail-closed하며 현재 frozen corpus에는 해당 Child가 없었다.
+
+## 23. B3 report와 동일 비교 조건
+
+- ignored report: `local/search-v3-evaluation/prz026/structural-retrieval-passage-b3.json`
+- report SHA-256: `acc4c7e7bdae9296e7ae543ded16dde2f92ad39911df90171c6b09606fca2918`
+- execution source snapshot: `3406e788698a4d90f240cdce63783b1ef5a046aaedda10c577964e05a822a2a0`
+- model: `bge-m3:latest`, digest
+  `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`, 1024 dimensions, cosine
+- A/B2/B3는 문항당 같은 query embedding을 공유했고 owner-bundle ACTIVE scope를 사용했다.
+- sparse, FTS, RRF, reranker, QueryPlanner, rewrite, rescue/fallback와 LLM은 사용하지 않았다.
+
+## 24. Original Seed A/B2/B3
+
+| Metric | A Fixed | B2 Atomic | B3 Passage |
+| --- | ---: | ---: | ---: |
+| candidate / embedding | 7 / 7 | 17 / 17 | 15 / 15 |
+| query-micro Top1 / MRR | 1.0000 / 1.0000 | 0.9286 / 0.9643 | 0.9286 / 0.9643 |
+| user-macro Top1 / MRR | 1.0000 / 1.0000 | 0.9333 / 0.9667 | 0.9333 / 0.9667 |
+| Recall@5/10/20/50 | 1/1/1/1 | 1/1/1/1 | 1/1/1/1 |
+| contamination / fragmentation | 57.14% / 0% | 0% / 0% | 0% / 0% |
+| indexing wall time | 204.871ms | 227.552ms | 164.280ms |
+| query p50 / p95 | 22.663 / 25.294ms | 22.650 / 25.124ms | 22.642 / 25.112ms |
+
+B3는 B2보다 candidate/embedding을 11.76%, 최종 단일-run indexing wall time을 27.81% 줄였고 모든
+quality/slice metric을 B2와 동일하게 유지했다. Original 내부 B3 판정은 `PROMISING`이다.
+
+Passage 통계는 Child 수 min/avg/max `1 / 1.1333 / 3`, retrieval length `32 / 91.07 / 176`,
+single `14/15 (93.33%)`, multi `1/15 (6.67%)`다. cross-parent violation 0, heading candidate/rank1 0,
+DIRECT Gold-mapped Child 보존은 100%다.
+
+## 25. Long-form A/B2/B3
+
+| Metric | A Fixed | B2 Atomic | B3 Passage |
+| --- | ---: | ---: | ---: |
+| candidate / embedding | 28 / 28 | 128 / 128 | 72 / 72 |
+| query-micro Top1 / MRR | 0.8000 / 0.8833 | 0.8000 / 0.8833 | 0.8000 / 0.8833 |
+| user-macro Top1 / MRR | 0.8056 / 0.8889 | 0.8056 / 0.8889 | 0.8333 / 0.9028 |
+| Recall@5/10/20/50 | 1/1/1/1 | 1/1/1/1 | 1/1/1/1 |
+| contamination / fragmentation | 71.43% / 0% | 0% / 0% | 0% / 0% |
+| indexing wall time | 321.833ms | 1133.644ms | 687.901ms |
+| query p50 / p95 | 24.863 / 34.603ms | 24.899 / 34.574ms | 24.840 / 34.554ms |
+
+B3는 B2보다 candidate/embedding을 43.75%, 최종 단일-run indexing wall time을 39.32% 줄였다.
+query-micro Top1/MRR과 Recall은 비열화가 없고 user-macro는 개선됐다. Passage Child 수 min/avg/max는
+`1 / 1.7778 / 5`, retrieval length는 `84 / 233.89 / 362`, single `39/72 (54.17%)`, multi
+`33/72 (45.83%)`다. cross-parent violation 0, heading candidate/rank1 0, DIRECT Gold-mapped Child
+보존은 100%다. wall time은 단일 local batch이며 Production 성능 근거가 아니다.
+
+## 26. B3 slice와 query 변화
+
+Original profession/language slice는 B2와 모두 동일했다. Long-form language slice도 모두 동일했다.
+Long-form profession에서는 다음 두 변화만 있었다.
+
+- `NON_DEVELOPMENT_GENERAL`: Top1/MRR `0.5/0.75→1.0/1.0`
+- `FRONTEND_MOBILE`: Top1/MRR `1.0/1.0→0.6667/0.8333`
+
+직접 query rank 변화도 두 건뿐이었다.
+
+- 개선 `SV3-LF-U106-Q02`: rank `2→1`. 완료된 emergency-response training Child가 같은 Parent의
+  인접 설명과 묶이며 direct passage가 rank 1이 됐다.
+- 회귀 `SV3-LF-U104-Q01`: rank `1→2`. offline-safe checkout direct Child에 같은 Parent의 두 bullet이
+  붙은 passage score가 단독 Child보다 낮아졌고, 관련 배경 paragraph가 rank 1이 됐다.
+
+actor, negation, completion 또는 language heuristic으로 이 회귀를 고치지 않았다. 첫 사례와 두 번째
+사례가 query-micro에서 상쇄되지만 `FRONTEND_MOBILE` 신규 회귀는 Adoption Gate에서 숨기지 않는다.
+
+## 27. B3 판정과 다음 Gate
+
+최종 판정은 `NEEDS_ADJUSTMENT`다. Evidence 경계, heading, Recall, aggregate ranking과 운영 비용 Gate는
+통과했지만 Long-form `FRONTEND_MOBILE` Top1 33.33pp 회귀가 남았다. 그러므로 전체 B3를
+`PROMISING`으로 승격하지 않는다. 또한 비용 감소와 contamination 0의 순증이 명확하므로 `NO_GO`도
+아니다. Parent Context와 Parent Dense는 계속 `NOT_RUN`이며, 이 결과만으로 C를 시작하지 않는다.
+
+## 28. B3 validation 상태
+
+| 명령/검사 | 실제 결과 |
+| --- | --- |
+| 관련 parser/child/passage/dataset/engine unit test | `PASS`; 5 suites, 48 tests, failure/error/skipped 0 |
+| A/B2/B3 BGE-M3 benchmark | `PASS`; 1 test, Original 21 queries, Long-form 24 queries, report `acc4c7...` |
+| SEALED FINAL | `PASS`; 9 files verified, hash 유지, `opened=false`, `searchExecuted=false` |
+| report/source snapshot | canonical 9-file 순서 재계산 `PASS`; combined `3406e788...` |
+| ad-hoc snapshot 첫 재계산 | `COMMAND_ERROR`; unordered JSON map 순서 사용으로 combined 불일치, 파일 변경 0; canonical 순서로 재실행해 해소 |
+| DEV/CAL 1.1.0 materializer `--check` | `PASS`; 17 files, 6 documents, 24 queries, combined `a1fcd76...` |
+| PRZ-025 frozen benchmark validator | `PASS`; status `FRESH_BENCHMARK_SEED_FROZEN`, overall `1f36c4...`, Final search false |
+| `git diff --cached --check` | `PASS`; 출력 0 |
+| OSS readiness | `PASS`; staged 포함 tracked 940, Markdown 186/links 764, verifier 16/16, external 97/97 |
+| staged scope / secret scan | `PASS`; 10/10 allowed, forbidden/SEALED/secret finding 0 |
+| full backend / frontend / Docker | `NOT_RUN`; evaluation-only scope |
+| Parent Context / Parent Dense / push / PR / merge | `NOT_RUN`; 금지 범위 |

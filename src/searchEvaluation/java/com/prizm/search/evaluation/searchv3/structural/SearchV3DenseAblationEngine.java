@@ -25,12 +25,14 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/** Runs the A/B raw Dense comparison without a database, threshold, reranking, or query policy. */
+/** Runs the A/B2/B3 raw Dense comparison without a database, reranking, or query policy. */
 final class SearchV3DenseAblationEngine {
 
     static final String FIXED_PROFILE = "A_FIXED_800_OVERLAP_120_BGE_M3_DENSE";
     static final String STRUCTURAL_PROFILE =
             "B2_STRUCTURAL_CHILD_CONTEXT_ONLY_HEADING_BGE_M3_DENSE";
+    static final String PASSAGE_PROFILE =
+            "B3_STRUCTURAL_RETRIEVAL_PASSAGE_BGE_M3_DENSE";
     private static final int FIXED_MAX_CHARACTERS = 800;
     private static final int FIXED_OVERLAP_CHARACTERS = 120;
     private static final List<Integer> CUTOFFS = List.of(5, 10, 20, 50);
@@ -38,6 +40,7 @@ final class SearchV3DenseAblationEngine {
 
     private final StructuralBlockParser parser = new StructuralBlockParser();
     private final StructuralEvidenceChildBuilder childBuilder = new StructuralEvidenceChildBuilder();
+    private final StructuralRetrievalPassageBuilder passageBuilder = new StructuralRetrievalPassageBuilder();
     private final TextChunker productionTextChunker;
 
     SearchV3DenseAblationEngine() {
@@ -51,7 +54,7 @@ final class SearchV3DenseAblationEngine {
             List<DatasetSlice> slices,
             OllamaBgeM3EmbeddingClient embeddingClient,
             OllamaBgeM3EmbeddingClient.ModelMetadata modelMetadata) {
-        return run(slices, embeddingClient, modelMetadata, "PRZ-026-PHASE-1-ADJUSTMENT");
+        return run(slices, embeddingClient, modelMetadata, "PRZ-026-PHASE-1-RETRIEVAL-PASSAGE");
     }
 
     ExperimentReport run(
@@ -71,12 +74,15 @@ final class SearchV3DenseAblationEngine {
         for (DatasetSlice slice : slices) {
             CandidateBuild fixedBuild = buildFixedCandidates(slice);
             CandidateBuild structuralBuild = buildStructuralCandidates(slice);
-            assertSameEvaluationInputs(slice, fixedBuild, structuralBuild);
+            PassageCandidateBuild passageBuild = buildPassageCandidates(slice, structuralBuild);
+            assertSameEvaluationInputs(slice, fixedBuild, structuralBuild, passageBuild.candidateBuild());
 
             PreparedProfile fixed = prepare(fixedBuild, embeddingClient);
             PreparedProfile structural = prepare(structuralBuild, embeddingClient);
-            List<QueryResult> queryResults = evaluateQueries(slice, fixed, structural, embeddingClient);
-            splitRuns.add(new SplitRun(slice, fixed, structural, queryResults));
+            PreparedProfile passage = prepare(passageBuild.candidateBuild(), embeddingClient);
+            List<QueryResult> queryResults = evaluateQueries(slice, fixed, structural, passage, embeddingClient);
+            splitRuns.add(new SplitRun(
+                    slice, fixed, structural, passage, passageBuild.passageStats(), queryResults));
         }
 
         List<QueryResult> allQueryResults = splitRuns.stream()
@@ -86,6 +92,10 @@ final class SearchV3DenseAblationEngine {
                 FIXED_PROFILE, splitRuns.stream().map(run -> run.fixed().corpusStats()).toList());
         ProfileCorpusStats structuralCorpus = combineCorpusStats(
                 STRUCTURAL_PROFILE, splitRuns.stream().map(run -> run.structural().corpusStats()).toList());
+        ProfileCorpusStats passageCorpus = combineCorpusStats(
+                PASSAGE_PROFILE, splitRuns.stream().map(run -> run.passage().corpusStats()).toList());
+        PassageCorpusStats passageStats = combinePassageStats(
+                splitRuns.stream().map(SplitRun::passageStats).toList());
         ProfileLatency fixedLatency = combineLatency(
                 FIXED_PROFILE, splitRuns.stream().map(run -> run.fixed().latency()).toList(),
                 allQueryResults.stream().map(result -> result.fixed().totalLatencyMs()).toList(),
@@ -94,12 +104,18 @@ final class SearchV3DenseAblationEngine {
                 STRUCTURAL_PROFILE, splitRuns.stream().map(run -> run.structural().latency()).toList(),
                 allQueryResults.stream().map(result -> result.structural().totalLatencyMs()).toList(),
                 allQueryResults.stream().map(result -> result.structural().rankingLatencyMs()).toList());
+        ProfileLatency passageLatency = combineLatency(
+                PASSAGE_PROFILE, splitRuns.stream().map(run -> run.passage().latency()).toList(),
+                allQueryResults.stream().map(result -> result.passage().totalLatencyMs()).toList(),
+                allQueryResults.stream().map(result -> result.passage().rankingLatencyMs()).toList());
 
-        AggregatePair queryMicro = aggregatePair(allQueryResults);
-        AggregatePair userMacro = macroPair(allQueryResults, QueryResult::userBundleId);
-        Map<String, AggregatePair> splitMetrics = grouped(allQueryResults, result -> result.split().manifestName());
-        Map<String, AggregatePair> professionMetrics = grouped(allQueryResults, QueryResult::professionGroup);
-        Map<String, AggregatePair> languageMetrics = grouped(allQueryResults, QueryResult::language);
+        AggregateComparison queryMicro = aggregateComparison(allQueryResults);
+        AggregateComparison userMacro = macroComparison(allQueryResults, QueryResult::userBundleId);
+        Map<String, AggregateComparison> splitMetrics = grouped(
+                allQueryResults, result -> result.split().manifestName());
+        Map<String, AggregateComparison> professionMetrics = grouped(
+                allQueryResults, QueryResult::professionGroup);
+        Map<String, AggregateComparison> languageMetrics = grouped(allQueryResults, QueryResult::language);
         Map<String, Long> queryEmbeddingLatency = latencySummary(
                 allQueryResults.stream().map(QueryResult::queryEmbeddingLatencyMs).toList());
         Map<String, LengthBucketStats> structuralLengthBuckets =
@@ -109,16 +125,28 @@ final class SearchV3DenseAblationEngine {
                 .filter(ranking -> !ranking.isEmpty())
                 .filter(ranking -> StructuralBlockType.HEADING.name().equals(ranking.get(0).sourceBlockType()))
                 .count();
+        long passageHeadingOnlyRank1 = allQueryResults.stream()
+                .map(result -> result.passage().rawDenseRanking())
+                .filter(ranking -> !ranking.isEmpty())
+                .filter(ranking -> StructuralBlockType.HEADING.name().equals(ranking.get(0).sourceBlockType()))
+                .count();
 
         Map<String, String> splitManifests = new LinkedHashMap<>();
         slices.forEach(slice -> splitManifests.put(
                 slice.split().manifestName(), slice.manifestCombinedSha256()));
+        String decision = decision(
+                structuralCorpus,
+                passageCorpus,
+                passageStats,
+                queryMicro,
+                professionMetrics,
+                languageMetrics);
         return new ExperimentReport(
-                2,
+                3,
                 phase,
                 Instant.now().toString(),
                 datasetVersions.iterator().next(),
-                "a9d093dd48e99a8d19675b3a8caa09c794d2888b",
+                "e5012fd4949b05f4b8a136186ddefb60046985f8",
                 "DEPENDS_ON_PRZ_025",
                 Map.copyOf(splitManifests),
                 modelMetadata,
@@ -126,18 +154,24 @@ final class SearchV3DenseAblationEngine {
                         800,
                         120,
                         StructuralEvidenceChildBuilder.DEFAULT_MAX_CHILD_CODE_POINTS,
+                        StructuralRetrievalPassageBuilder.DEFAULT_MIN_TARGET_CODE_POINTS,
+                        StructuralRetrievalPassageBuilder.DEFAULT_TARGET_MAX_CODE_POINTS,
+                        StructuralRetrievalPassageBuilder.DEFAULT_ABSOLUTE_MAX_CODE_POINTS,
                         OllamaBgeM3EmbeddingClient.MODEL,
                         OllamaBgeM3EmbeddingClient.DIMENSIONS,
                         OllamaBgeM3EmbeddingClient.SIMILARITY,
                         "RAW_DENSE_ONLY",
                         "USER_BUNDLE_ACTIVE_DOCUMENTS",
-                        "SAME_QUERY_VECTOR_PER_A_B",
+                        "SAME_QUERY_VECTOR_PER_A_B2_B3",
                         "EVIDENCE_PARENT_AND_HEADING_CONTEXT_NOT_RUN",
                         "SOURCE_TABLE_HEADER_CONTEXT_EXCEPTION_ACTIVE"),
                 fixedCorpus,
                 structuralCorpus,
+                passageCorpus,
+                passageStats,
                 fixedLatency,
                 structuralLatency,
+                passageLatency,
                 queryEmbeddingLatency,
                 queryMicro,
                 userMacro,
@@ -146,11 +180,12 @@ final class SearchV3DenseAblationEngine {
                 Map.copyOf(languageMetrics),
                 Map.copyOf(structuralLengthBuckets),
                 structuralHeadingOnlyRank1,
+                passageHeadingOnlyRank1,
                 List.copyOf(allQueryResults),
                 false,
                 false,
                 "NOT_RUN",
-                "NEEDS_ADJUSTMENT");
+                decision);
     }
 
     CandidateBuild buildFixedCandidates(DatasetSlice slice) {
@@ -172,6 +207,7 @@ final class SearchV3DenseAblationEngine {
                         "FIXED_CHUNK",
                         null,
                         List.of(range),
+                        List.of(),
                         List.of(),
                         List.of()));
             }
@@ -227,6 +263,12 @@ final class SearchV3DenseAblationEngine {
                     .count();
             for (EvidenceChild child : childBuilder.build(blocks)) {
                 SourceProvenance provenance = child.provenance();
+                CandidateRange childRange = new CandidateRange(
+                        provenance.page(),
+                        provenance.lineStart(),
+                        provenance.lineEnd(),
+                        provenance.codePointStart(),
+                        provenance.codePointEnd());
                 candidates.add(new CandidateSpec(
                         STRUCTURAL_PROFILE,
                         child.childId(),
@@ -237,14 +279,10 @@ final class SearchV3DenseAblationEngine {
                         child.retrievalText(),
                         child.sourceBlockType().name(),
                         provenance.parentAnnotationCandidateId(),
-                        List.of(new CandidateRange(
-                                provenance.page(),
-                                provenance.lineStart(),
-                                provenance.lineEnd(),
-                                provenance.codePointStart(),
-                                provenance.codePointEnd())),
+                        List.of(childRange),
                         child.sourceBlockIds(),
-                        child.contextSourceBlockIds()));
+                        child.contextSourceBlockIds(),
+                        List.of(new EvidenceChildRange(child.childId(), childRange))));
             }
         }
         long constructionNanos = System.nanoTime() - started;
@@ -255,6 +293,171 @@ final class SearchV3DenseAblationEngine {
                 constructionNanos,
                 corpusStats(
                         STRUCTURAL_PROFILE, slice, candidates, constructionNanos, contextOnlyHeadings));
+    }
+
+    PassageCandidateBuild buildPassageCandidates(DatasetSlice slice, CandidateBuild structuralBuild) {
+        long started = System.nanoTime();
+        List<CandidateSpec> candidates = new ArrayList<>();
+        List<RetrievalPassage> passages = new ArrayList<>();
+        long contextOnlyHeadings = 0;
+        for (SourceDocument document : activeDocuments(slice)) {
+            List<StructuralBlock> blocks = parser.parse(document.structuralDocument());
+            contextOnlyHeadings += blocks.stream()
+                    .filter(block -> block.type() == StructuralBlockType.HEADING)
+                    .count();
+            List<EvidenceChild> children = childBuilder.build(blocks);
+            List<RetrievalPassage> documentPassages = passageBuilder.build(children);
+            passages.addAll(documentPassages);
+            for (RetrievalPassage passage : documentPassages) {
+                List<EvidenceChildRange> evidenceChildren = passage.evidenceChildren().stream()
+                        .map(child -> new EvidenceChildRange(
+                                child.childId(),
+                                new CandidateRange(
+                                        child.provenance().page(),
+                                        child.provenance().lineStart(),
+                                        child.provenance().lineEnd(),
+                                        child.provenance().codePointStart(),
+                                        child.provenance().codePointEnd())))
+                        .toList();
+                candidates.add(new CandidateSpec(
+                        PASSAGE_PROFILE,
+                        passage.passageId(),
+                        document.userBundleId(),
+                        passage.documentId(),
+                        passage.versionId(),
+                        passage.passageSourceText(),
+                        passage.retrievalText(),
+                        "RETRIEVAL_PASSAGE",
+                        passage.parentAnnotationCandidateId(),
+                        evidenceChildren.stream().map(EvidenceChildRange::range).toList(),
+                        passage.sourceBlockIds(),
+                        passage.contextSourceBlockIds(),
+                        evidenceChildren));
+            }
+        }
+        validatePassageMembership(structuralBuild.candidates(), candidates);
+        long constructionNanos = System.nanoTime() - started;
+        CandidateBuild candidateBuild = new CandidateBuild(
+                PASSAGE_PROFILE,
+                slice,
+                List.copyOf(candidates),
+                constructionNanos,
+                corpusStats(PASSAGE_PROFILE, slice, candidates, constructionNanos, contextOnlyHeadings));
+        return new PassageCandidateBuild(
+                candidateBuild,
+                passageStats(slice, structuralBuild.candidates(), candidates, passages));
+    }
+
+    private void validatePassageMembership(
+            List<CandidateSpec> structuralCandidates,
+            List<CandidateSpec> passageCandidates) {
+        List<String> structuralChildIds = structuralCandidates.stream()
+                .flatMap(candidate -> candidate.evidenceChildren().stream())
+                .map(EvidenceChildRange::evidenceChildId)
+                .toList();
+        List<String> passageChildIds = passageCandidates.stream()
+                .flatMap(candidate -> candidate.evidenceChildren().stream())
+                .map(EvidenceChildRange::evidenceChildId)
+                .toList();
+        if (!structuralChildIds.equals(passageChildIds)
+                || new LinkedHashSet<>(passageChildIds).size() != passageChildIds.size()) {
+            throw new IllegalStateException("B3 must preserve every B2 EvidenceChild exactly once and in order");
+        }
+    }
+
+    private PassageCorpusStats passageStats(
+            DatasetSlice slice,
+            List<CandidateSpec> structuralCandidates,
+            List<CandidateSpec> passageCandidates,
+            List<RetrievalPassage> passages) {
+        List<Integer> childCounts = passages.stream().map(passage -> passage.evidenceChildIds().size()).toList();
+        List<Integer> lengths = passages.stream()
+                .map(passage -> passage.retrievalText().codePointCount(0, passage.retrievalText().length()))
+                .toList();
+        long single = childCounts.stream().filter(count -> count == 1).count();
+        long multi = childCounts.stream().filter(count -> count > 1).count();
+        long crossParentViolations = passages.stream()
+                .filter(passage -> passage.evidenceChildren().stream()
+                        .map(child -> child.provenance().parentAnnotationCandidateId())
+                        .distinct().count() > 1)
+                .count();
+        Set<String> directUnitIds = slice.queries().stream()
+                .flatMap(query -> query.allExpectedEvidence().stream())
+                .filter(expected -> "DIRECT_SUPPORT".equals(expected.supportRelation()))
+                .map(ExpectedEvidence::evidenceUnitId)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        List<GoldUnit> directUnits = directUnitIds.stream().map(slice.units()::get).toList();
+        long atomicDirectUnits = directUnits.stream()
+                .filter(unit -> structuralCandidates.stream().anyMatch(candidate -> covers(candidate, unit)))
+                .count();
+        long preservedDirectUnits = directUnits.stream()
+                .filter(unit -> structuralCandidates.stream().anyMatch(candidate -> covers(candidate, unit)))
+                .filter(unit -> passageCandidates.stream().anyMatch(candidate -> covers(candidate, unit)))
+                .count();
+        Set<String> directGoldChildIds = structuralCandidates.stream()
+                .filter(candidate -> directUnits.stream().anyMatch(unit -> covers(candidate, unit)))
+                .flatMap(candidate -> candidate.evidenceChildren().stream())
+                .map(EvidenceChildRange::evidenceChildId)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<String> passageChildIds = passageCandidates.stream()
+                .flatMap(candidate -> candidate.evidenceChildren().stream())
+                .map(EvidenceChildRange::evidenceChildId)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        long preservedDirectGoldChildren = directGoldChildIds.stream().filter(passageChildIds::contains).count();
+        if (crossParentViolations > 0 || atomicDirectUnits != preservedDirectUnits) {
+            throw new IllegalStateException("B3 violated parent isolation or lost a direct EvidenceChild");
+        }
+        return new PassageCorpusStats(
+                PASSAGE_PROFILE,
+                passages.size(),
+                childCounts.stream().mapToLong(Integer::longValue).sum(),
+                childCounts.stream().mapToInt(Integer::intValue).min().orElse(0),
+                childCounts.stream().mapToInt(Integer::intValue).average().orElse(0.0d),
+                childCounts.stream().mapToInt(Integer::intValue).max().orElse(0),
+                lengths.stream().mapToInt(Integer::intValue).min().orElse(0),
+                lengths.stream().mapToInt(Integer::intValue).average().orElse(0.0d),
+                lengths.stream().mapToInt(Integer::intValue).max().orElse(0),
+                single,
+                ratio(single, passages.size()),
+                multi,
+                ratio(multi, passages.size()),
+                crossParentViolations,
+                directGoldChildIds.size(),
+                preservedDirectGoldChildren,
+                ratio(preservedDirectGoldChildren, directGoldChildIds.size()));
+    }
+
+    private PassageCorpusStats combinePassageStats(List<PassageCorpusStats> values) {
+        long passageCount = values.stream().mapToLong(PassageCorpusStats::passageCount).sum();
+        long childMemberships = values.stream().mapToLong(PassageCorpusStats::evidenceChildMembershipCount).sum();
+        long single = values.stream().mapToLong(PassageCorpusStats::singleChildPassageCount).sum();
+        long multi = values.stream().mapToLong(PassageCorpusStats::multiChildPassageCount).sum();
+        long direct = values.stream().mapToLong(PassageCorpusStats::directGoldEvidenceChildCount).sum();
+        long preserved = values.stream().mapToLong(PassageCorpusStats::preservedDirectGoldEvidenceChildCount).sum();
+        double weightedChildCount = values.stream()
+                .mapToDouble(value -> value.averageChildrenPerPassage() * value.passageCount())
+                .sum();
+        double weightedLength = values.stream()
+                .mapToDouble(value -> value.averagePassageCodePointLength() * value.passageCount())
+                .sum();
+        return new PassageCorpusStats(
+                PASSAGE_PROFILE,
+                passageCount,
+                childMemberships,
+                values.stream().mapToInt(PassageCorpusStats::minimumChildrenPerPassage).min().orElse(0),
+                passageCount == 0 ? 0.0d : weightedChildCount / passageCount,
+                values.stream().mapToInt(PassageCorpusStats::maximumChildrenPerPassage).max().orElse(0),
+                values.stream().mapToInt(PassageCorpusStats::minimumPassageCodePointLength).min().orElse(0),
+                passageCount == 0 ? 0.0d : weightedLength / passageCount,
+                values.stream().mapToInt(PassageCorpusStats::maximumPassageCodePointLength).max().orElse(0),
+                single,
+                ratio(single, passageCount),
+                multi,
+                ratio(multi, passageCount),
+                values.stream().mapToLong(PassageCorpusStats::crossParentPassageViolationCount).sum(),
+                direct,
+                preserved,
+                ratio(preserved, direct));
     }
 
     private PreparedProfile prepare(CandidateBuild build, OllamaBgeM3EmbeddingClient embeddingClient) {
@@ -305,6 +508,7 @@ final class SearchV3DenseAblationEngine {
             DatasetSlice slice,
             PreparedProfile fixed,
             PreparedProfile structural,
+            PreparedProfile passage,
             OllamaBgeM3EmbeddingClient embeddingClient) {
         List<QueryResult> results = new ArrayList<>();
         for (Query query : slice.queries()) {
@@ -318,11 +522,17 @@ final class SearchV3DenseAblationEngine {
             List<RankedCandidate> structuralRanking =
                     rank(queryVector, query.userBundleId(), structural.candidates(), slice);
             long structuralRankNanos = System.nanoTime() - structuralStarted;
+            long passageStarted = System.nanoTime();
+            List<RankedCandidate> passageRanking =
+                    rank(queryVector, query.userBundleId(), passage.candidates(), slice);
+            long passageRankNanos = System.nanoTime() - passageStarted;
 
             QueryProfileResult fixedResult = queryResult(
                     query, fixedRanking, slice, queryBatch.elapsedNanos(), fixedRankNanos);
             QueryProfileResult structuralResult = queryResult(
                     query, structuralRanking, slice, queryBatch.elapsedNanos(), structuralRankNanos);
+            QueryProfileResult passageResult = queryResult(
+                    query, passageRanking, slice, queryBatch.elapsedNanos(), passageRankNanos);
             UserBundle bundle = slice.bundles().stream()
                     .filter(value -> value.userBundleId().equals(query.userBundleId()))
                     .findFirst()
@@ -338,7 +548,8 @@ final class SearchV3DenseAblationEngine {
                     query.hasDirectSupport(),
                     nanosToMillis(queryBatch.elapsedNanos()),
                     fixedResult,
-                    structuralResult));
+                    structuralResult,
+                    passageResult));
         }
         return List.copyOf(results);
     }
@@ -380,6 +591,7 @@ final class SearchV3DenseAblationEngine {
                     value.spec().retrievalText(),
                     value.spec().parentAnnotationCandidateId(),
                     value.spec().sourceText().codePointCount(0, value.spec().sourceText().length()),
+                    value.spec().evidenceChildren().stream().map(EvidenceChildRange::evidenceChildId).toList(),
                     List.copyOf(unitIds),
                     List.copyOf(groupIds),
                     List.copyOf(parentIds)));
@@ -600,11 +812,21 @@ final class SearchV3DenseAblationEngine {
                 || !candidate.versionId().equals(unit.versionId())) {
             return false;
         }
-        return !unit.sourceSpans().isEmpty()
-                && unit.sourceSpans().stream().allMatch(span -> candidate.ranges().stream().anyMatch(range ->
-                samePage(range.page(), span.page())
-                        && range.codePointStart() <= span.codePointStart()
-                        && range.codePointEnd() >= span.codePointEnd()));
+        if (unit.sourceSpans().isEmpty()) {
+            return false;
+        }
+        if (!candidate.evidenceChildren().isEmpty()) {
+            return candidate.evidenceChildren().stream().anyMatch(child ->
+                    unit.sourceSpans().stream().allMatch(span -> covers(child.range(), span)));
+        }
+        return unit.sourceSpans().stream().allMatch(span ->
+                candidate.ranges().stream().anyMatch(range -> covers(range, span)));
+    }
+
+    private boolean covers(CandidateRange range, GoldSpan span) {
+        return samePage(range.page(), span.page())
+                && range.codePointStart() <= span.codePointStart()
+                && range.codePointEnd() >= span.codePointEnd();
     }
 
     private boolean samePage(Integer left, Integer right) {
@@ -630,27 +852,33 @@ final class SearchV3DenseAblationEngine {
     private void assertSameEvaluationInputs(
             DatasetSlice slice,
             CandidateBuild fixed,
-            CandidateBuild structural) {
+            CandidateBuild structural,
+            CandidateBuild passage) {
         Set<String> expectedVersions = slice.activeDocumentsByVersion().keySet();
         Set<String> fixedVersions = fixed.candidates().stream()
                 .map(CandidateSpec::versionId).collect(Collectors.toSet());
         Set<String> structuralVersions = structural.candidates().stream()
                 .map(CandidateSpec::versionId).collect(Collectors.toSet());
-        if (!fixedVersions.equals(expectedVersions) || !structuralVersions.equals(expectedVersions)) {
-            throw new IllegalStateException("A/B did not use the same ACTIVE source versions");
+        Set<String> passageVersions = passage.candidates().stream()
+                .map(CandidateSpec::versionId).collect(Collectors.toSet());
+        if (!fixedVersions.equals(expectedVersions)
+                || !structuralVersions.equals(expectedVersions)
+                || !passageVersions.equals(expectedVersions)) {
+            throw new IllegalStateException("A/B2/B3 did not use the same ACTIVE source versions");
         }
         if (slice.queries().stream().anyMatch(query -> query.split() != slice.split())) {
-            throw new IllegalStateException("A/B query split mismatch");
+            throw new IllegalStateException("A/B2/B3 query split mismatch");
         }
     }
 
-    private AggregatePair aggregatePair(List<QueryResult> values) {
-        return new AggregatePair(
+    private AggregateComparison aggregateComparison(List<QueryResult> values) {
+        return new AggregateComparison(
                 aggregate(values, QueryResult::fixed),
-                aggregate(values, QueryResult::structural));
+                aggregate(values, QueryResult::structural),
+                aggregate(values, QueryResult::passage));
     }
 
-    private AggregatePair macroPair(List<QueryResult> values, Function<QueryResult, String> key) {
+    private AggregateComparison macroComparison(List<QueryResult> values, Function<QueryResult, String> key) {
         Map<String, List<QueryResult>> groups = values.stream().collect(Collectors.groupingBy(
                 key, LinkedHashMap::new, Collectors.toList()));
         List<AggregateMetrics> fixed = groups.values().stream()
@@ -661,17 +889,55 @@ final class SearchV3DenseAblationEngine {
                 .map(group -> aggregate(group, QueryResult::structural))
                 .filter(metric -> metric.directQueryCount() > 0)
                 .toList();
-        return new AggregatePair(averageAggregates(fixed), averageAggregates(structural));
+        List<AggregateMetrics> passage = groups.values().stream()
+                .map(group -> aggregate(group, QueryResult::passage))
+                .filter(metric -> metric.directQueryCount() > 0)
+                .toList();
+        return new AggregateComparison(
+                averageAggregates(fixed),
+                averageAggregates(structural),
+                averageAggregates(passage));
     }
 
-    private Map<String, AggregatePair> grouped(
+    private Map<String, AggregateComparison> grouped(
             List<QueryResult> values,
             Function<QueryResult, String> key) {
         Map<String, List<QueryResult>> groups = values.stream().collect(Collectors.groupingBy(
                 key, LinkedHashMap::new, Collectors.toList()));
-        Map<String, AggregatePair> result = new LinkedHashMap<>();
-        groups.forEach((name, group) -> result.put(name, aggregatePair(group)));
+        Map<String, AggregateComparison> result = new LinkedHashMap<>();
+        groups.forEach((name, group) -> result.put(name, aggregateComparison(group)));
         return result;
+    }
+
+    private String decision(
+            ProfileCorpusStats structural,
+            ProfileCorpusStats passage,
+            PassageCorpusStats passageStats,
+            AggregateComparison queryMicro,
+            Map<String, AggregateComparison> profession,
+            Map<String, AggregateComparison> language) {
+        boolean boundaryFailure = passage.contaminatedCandidateCount() > 0
+                || passage.fragmentationRate() > structural.fragmentationRate()
+                || passage.headingOnlyCandidateCount() > 0
+                || passageStats.crossParentPassageViolationCount() > 0
+                || passageStats.directGoldEvidenceChildPreservationRate() < 1.0d;
+        boolean costReduced = passage.candidateCount() < structural.candidateCount();
+        if (boundaryFailure || !costReduced) {
+            return "NO_GO";
+        }
+        boolean aggregateRegression = queryMicro.passage().top1() < queryMicro.structural().top1()
+                || queryMicro.passage().mrr() < queryMicro.structural().mrr()
+                || CUTOFFS.stream().anyMatch(cutoff ->
+                        queryMicro.passage().recallAtK().get(cutoff)
+                                < queryMicro.structural().recallAtK().get(cutoff));
+        boolean sliceRegression = hasSliceRegression(profession) || hasSliceRegression(language);
+        return aggregateRegression || sliceRegression ? "NEEDS_ADJUSTMENT" : "PROMISING";
+    }
+
+    private boolean hasSliceRegression(Map<String, AggregateComparison> slices) {
+        return slices.values().stream().anyMatch(value ->
+                value.passage().top1() < value.structural().top1()
+                        || value.passage().mrr() < value.structural().mrr());
     }
 
     private AggregateMetrics aggregate(
@@ -943,7 +1209,11 @@ final class SearchV3DenseAblationEngine {
             String parentAnnotationCandidateId,
             List<CandidateRange> ranges,
             List<String> sourceBlockIds,
-            List<String> contextBlockIds) {
+            List<String> contextBlockIds,
+            List<EvidenceChildRange> evidenceChildren) {
+    }
+
+    record EvidenceChildRange(String evidenceChildId, CandidateRange range) {
     }
 
     record CandidateBuild(
@@ -952,6 +1222,9 @@ final class SearchV3DenseAblationEngine {
             List<CandidateSpec> candidates,
             long constructionNanos,
             ProfileCorpusStats corpusStats) {
+    }
+
+    record PassageCandidateBuild(CandidateBuild candidateBuild, PassageCorpusStats passageStats) {
     }
 
     private record EmbeddedCandidate(CandidateSpec spec, float[] embedding) {
@@ -979,6 +1252,7 @@ final class SearchV3DenseAblationEngine {
             String retrievalText,
             String parentAnnotationCandidateId,
             int sourceCodePointLength,
+            List<String> evidenceChildIds,
             List<String> coveredUnitIds,
             List<String> coveredGroupIds,
             List<String> coveredParentIds) {
@@ -1010,7 +1284,8 @@ final class SearchV3DenseAblationEngine {
             boolean directSupport,
             double queryEmbeddingLatencyMs,
             QueryProfileResult fixed,
-            QueryProfileResult structural) {
+            QueryProfileResult structural,
+            QueryProfileResult passage) {
     }
 
     record AggregateMetrics(
@@ -1025,7 +1300,10 @@ final class SearchV3DenseAblationEngine {
             Map<Integer, Double> parentCoverageAtK) {
     }
 
-    record AggregatePair(AggregateMetrics fixed, AggregateMetrics structural) {
+    record AggregateComparison(
+            AggregateMetrics fixed,
+            AggregateMetrics structural,
+            AggregateMetrics passage) {
     }
 
     record ProfileCorpusStats(
@@ -1050,6 +1328,26 @@ final class SearchV3DenseAblationEngine {
             Map<String, Long> lengthBucketCandidateCount,
             Map<String, Long> goldParentCountPerCandidateDistribution,
             double constructionLatencyMs) {
+    }
+
+    record PassageCorpusStats(
+            String profile,
+            long passageCount,
+            long evidenceChildMembershipCount,
+            int minimumChildrenPerPassage,
+            double averageChildrenPerPassage,
+            int maximumChildrenPerPassage,
+            int minimumPassageCodePointLength,
+            double averagePassageCodePointLength,
+            int maximumPassageCodePointLength,
+            long singleChildPassageCount,
+            double singleChildPassageRatio,
+            long multiChildPassageCount,
+            double multiChildPassageRatio,
+            long crossParentPassageViolationCount,
+            long directGoldEvidenceChildCount,
+            long preservedDirectGoldEvidenceChildCount,
+            double directGoldEvidenceChildPreservationRate) {
     }
 
     record MappedTextChunk(TextChunk chunk, int exactStart, int exactEnd) {
@@ -1077,6 +1375,9 @@ final class SearchV3DenseAblationEngine {
             int fixedMaxCharacters,
             int fixedOverlapCharacters,
             int structuralMaxCodePoints,
+            int passageMinimumTargetCodePoints,
+            int passageTargetMaximumCodePoints,
+            int passageAbsoluteMaximumCodePoints,
             String embeddingModel,
             int embeddingDimensions,
             String similarity,
@@ -1099,16 +1400,20 @@ final class SearchV3DenseAblationEngine {
             ComparisonContract contract,
             ProfileCorpusStats fixedCorpus,
             ProfileCorpusStats structuralCorpus,
+            ProfileCorpusStats passageCorpus,
+            PassageCorpusStats passageStats,
             ProfileLatency fixedLatency,
             ProfileLatency structuralLatency,
+            ProfileLatency passageLatency,
             Map<String, Long> sharedQueryEmbeddingLatency,
-            AggregatePair queryMicro,
-            AggregatePair userMacro,
-            Map<String, AggregatePair> splitMetrics,
-            Map<String, AggregatePair> professionMetrics,
-            Map<String, AggregatePair> languageMetrics,
+            AggregateComparison queryMicro,
+            AggregateComparison userMacro,
+            Map<String, AggregateComparison> splitMetrics,
+            Map<String, AggregateComparison> professionMetrics,
+            Map<String, AggregateComparison> languageMetrics,
             Map<String, LengthBucketStats> structuralLengthBuckets,
             long structuralHeadingOnlyRank1Count,
+            long passageHeadingOnlyRank1Count,
             List<QueryResult> queries,
             boolean sealedFinalOpened,
             boolean sealedFinalSearchExecuted,
@@ -1120,6 +1425,8 @@ final class SearchV3DenseAblationEngine {
             DatasetSlice slice,
             PreparedProfile fixed,
             PreparedProfile structural,
+            PreparedProfile passage,
+            PassageCorpusStats passageStats,
             List<QueryResult> queryResults) {
     }
 }

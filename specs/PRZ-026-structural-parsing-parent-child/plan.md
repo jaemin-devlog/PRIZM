@@ -1,6 +1,6 @@
 # PRZ-026 Phase 1 Plan
 
-- 상태: `IN_PROGRESS / PHASE_1_ADJUSTMENT_NEEDS_ADJUSTMENT`
+- 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_NEEDS_ADJUSTMENT`
 - 허용 단계: `ORIENT → SPEC → PLAN → IMPLEMENT(evaluation-only) → VERIFY → AUDIT → INTEGRATE(commit only)`
 - 선행 조건: `DEPENDS_ON_PRZ_025`
 
@@ -78,3 +78,20 @@ rebase 또는 rewrite하지 않는다. push, PR, main merge는 금지한다.
 PDF는 page-local document model과 gold 좌표를 기존 TXT loader에 조용히 섞지 않는다. 기존
 PDFBox/Production extractor를 재사용한 evaluation-only fixture가 A/B 계약을 확장하지 않고
 구현 가능한지 검토하고, 그렇지 않으면 `BLOCKED_FOR_LATER_LAYOUT_PHASE`로 기록한다.
+
+## 6. Phase 1 Retrieval Passage plan
+
+1. B2 EvidenceChild는 변경하지 않고 `RetrievalPassage`와 evaluation-only builder를 추가한다.
+2. policy는 결과 확인 전에 `120 / 320 / 480 code points`, same-parent adjacency, overlap 0으로
+   한 번 고정한다. Gold/query/domain heuristic은 builder에 전달하지 않는다.
+3. passage는 ordered Child ID와 provenance를 보존하고, 모든 B2 Child가 정확히 한 passage에
+   존재하는지 fail-closed 검증한다.
+4. A Fixed, B2 atomic Child, B3 passage가 같은 ACTIVE corpus/query와 동일 query embedding을
+   공유하도록 기존 runner를 세 profile로 확장한다.
+5. Original Seed와 Long-form DEV/CAL을 별도 실행하고 candidate/embedding, latency, ranking,
+   user/profession/language, boundary와 passage 통계를 기록한다.
+6. SEALED hash/flags, 관련 source-set test, diff/OSS/scope Gate를 검증한 뒤 허용 파일만 commit한다.
+
+실제 결과는 B3가 비용과 전체 metric을 유지·개선했으나 Long-form `FRONTEND_MOBILE` 신규 회귀로
+`NEEDS_ADJUSTMENT`였다. 따라서 Parent Context로 진행하지 않고 B3 회귀를 후속 구조 실험에서
+분리 검증한다.

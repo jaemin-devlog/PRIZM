@@ -1,14 +1,15 @@
 # PRZ-026 Phase 1 Evidence
 
-- 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_PROMISING`
-- 기록일: 2026-08-30 (Asia/Seoul)
+- 상태: `IN_PROGRESS / PHASE_1_C1_NEEDS_ADJUSTMENT`
+- 기록일: 2026-08-31 (Asia/Seoul)
 - 선행 조건: `DEPENDS_ON_PRZ_025`
-- 최종 판정: `PROMISING` — 독립 robustness Gate 통과; Production 채택 근거 아님
+- 현재 판정: `NEEDS_ADJUSTMENT` — C1 heading-path context Search Quality Gate 미충족
 - Phase 1 역사 판정: `NEEDS_ADJUSTMENT` — standalone heading 회귀
 - Phase 1 Adjustment 판정: `NEEDS_ADJUSTMENT` — heading은 제거됐으나 장문 ranking 순증 없음
 - Phase 1 Retrieval Passage 판정: `NEEDS_ADJUSTMENT` — 비용과 전체 metric은 개선·유지했으나
   `FRONTEND_MOBILE` 신규 회귀
 - Phase 1 Retrieval Passage Robustness 판정: `PROMISING` — 결과 전 입력/Gate 봉인 후 독립 suite 통과
+- Phase 1 C1 Parent Context 판정: `NEEDS_ADJUSTMENT` — 구조 불변성 유지, rank loss 3/false hit 3
 - Production 변경·적용: `0 / NOT_RUN`
 
 ## 1. 역사적 Phase 1 시작 상태
@@ -676,3 +677,93 @@ spec 13절 Gate를 코드로 고정했다. EvidenceChild/B3 builder SHA-256 상�
 | B3/EvidenceChild source hash | `PASS`; section 33의 SHA-256과 동일 |
 | C1 BGE-M3 benchmark | `NOT_RUN`; input-freeze commit 이후 한 번 실행 예정 |
 | Parent Dense / SEALED FINAL search | `NOT_RUN / NOT_RUN` |
+
+## 35. C1 공식 실행과 report
+
+입력은 local commit `f752424520ffc84311c626ddeaea9f0f161702f7`로 결과 전에 봉인했다. 실제 실행은
+Original Seed, Long-form 1.1.0, robustness 1.0.0 DEV/CAL에 한 번 수행했다. model은
+`bge-m3:latest`, digest `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`,
+1024 dimensions, cosine raw Dense이며 B3/C1은 query embedding을 공유했다.
+
+ignored raw report는 `local/search-v3-evaluation/prz026/parent-context-c1.json`, 실행 source snapshot은
+`d8a5508e7269d1d84b1079daaacb4d0eee39405f453dbb3a38b4e557c0b8452c`다. 최초 console report
+SHA-256은 잘못 전달한 full input-freeze metadata를 포함해 공식 artifact로 사용하지 않는다. 실제
+checkout/source snapshot은 clean `f752424...`였고 short prefix도 일치했다. 검색을 재실행하지 않고
+report 내 4개의 `inputFreezeCommit` metadata만 실제 SHA로 교정했으며, source snapshot mismatch 0과
+JSON parse를 재검증했다. 교정 후 report SHA-256은
+`65033f88165e90081b699653eb4efafffe9ae76c37e5fc4bd193bda66e473a87`이다. metric/ranking/result
+payload는 변경하지 않았다.
+
+## 36. C1 B3 비교 결과
+
+| dataset | direct queries | candidates / embeddings B3=C1 | B3 Top1 / MRR | C1 Top1 / MRR | user-macro B3→C1 Top1 / MRR |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Original Seed | 14 | 15 / 15 | 0.9286 / 0.9643 | 1.0000 / 1.0000 | 0.9333→1.0000 / 0.9667→1.0000 |
+| Long-form 1.1.0 | 15 | 72 / 72 | 0.8000 / 0.8833 | 0.7333 / 0.8500 | 0.8333→0.7778 / 0.9028→0.8750 |
+| Robustness 1.0.0 | 24 | 50 / 50 | 1.0000 / 1.0000 | 0.9167 / 0.9583 | 1.0000→0.9167 / 1.0000→0.9583 |
+
+세 dataset의 B3/C1 Recall@5/10/20/50은 전부 `1.0000`이다. 총 candidate/embedding은
+`137/137`로 완전 parity다. context는 137 passage 모두에 적용됐고 depth는 모두 1이었다. context
+길이 min/avg/max는 Original `5/11.00/21`, Long-form `11/23.65/35`, robustness
+`8/21.62/30` code points였다. depth 2 경로는 현재 corpus에서 관찰되지 않았다.
+
+관찰된 indexing wall time 합계는 B3 `2383.68ms`, C1 `2172.32ms`, 별도 context construction은
+`25.13ms`였다. B3 다음 C1 순차 실행과 model cache 영향을 분리하지 않았으므로 이를 C1 운영 개선
+근거로 사용하지 않는다. candidate/embedding 비용은 동일하다.
+
+## 37. C1 rank 변화와 slice finding
+
+DIRECT query 전체 변화는 `1 win / 3 losses / 49 ties`다.
+
+- 개선 `SV3-U04-Q03`: 사용자 인터뷰와 A/B 테스트를 구분하는 multi-aspect query에서 `사용자 조사`
+  context가 본인 인터뷰 passage를 rank `2→1`로 올렸다.
+- 회귀 `SV3-LF-U104-Q04`: completed accessibility evidence가 `1→2`; 같은 heading의 관련 설명
+  passage가 `3→1`로 상승했다.
+- 회귀 `SV3-RB-U202-Q01`: field observation direct passage가 `1→2`; 같은 heading의 해석/합의
+  passage가 `2→1`로 상승했다.
+- 회귀 `SV3-RB-U203-Q04`: preventive-action completion direct passage가 `1→2`; `Batch recovery
+  practice` context를 가진 다른 복구 passage가 `2→1`로 상승했다.
+
+세 회귀는 모두 source range가 DIRECT가 아닌 passage가 heading 때문에 첫 DIRECT 앞에 온
+`context-only false hit`이며 총 3건이다. 신규 aggregate 회귀 slice는 Long-form
+`FRONTEND_MOBILE` Top1 `0.6667→0.3333`, MRR `0.8333→0.6667` 및 EN Top1
+`0.7500→0.6250`, MRR `0.8750→0.8125`; robustness `DESIGN_PRODUCT`와 `DATA_AI_INFRA`
+각 Top1 `1.0000→0.7500`, MRR `1.0000→0.8750`, EN/KO 각 Top1 `1.0000→0.9167`, MRR
+`1.0000→0.9583`이다. Original의 `DESIGN_PRODUCT`와 mixed는 개선됐다.
+
+## 38. C1 구조 불변성과 판정
+
+세 dataset 모두 contamination 0, fragmentation 0, cross-parent context violation 0,
+source/evidence parity violation 0, heading-only candidate 0, DIRECT Gold EvidenceChild 보존 100%다.
+boundary failure는 0이고 aggregate 개선도 한 dataset에서 관찰됐지만, Long-form/robustness의
+query-micro·user-macro·slice 회귀와 context-only false hit 3건 때문에 사전 Gate 판정은
+`NEEDS_ADJUSTMENT`다. 결과를 보고 context policy를 조정하지 않았다. Parent Dense 진입은
+`NOT_SAFE / NOT_RUN`이다.
+
+SEALED FINAL은 combined
+`e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383`, tree
+`a129080861d7dafd32a9b3b3357b61aebb237e59`, `opened=false`, `searchExecuted=false`이며
+`CURRENT_FRESH_BASELINE = NOT_RUN`이다.
+
+## 39. C1 validation과 audit
+
+| 명령/검사 | 실제 결과 |
+| --- | --- |
+| C1 BGE-M3 benchmark | `EXECUTED_ONCE`; 3 DEV/CAL suites, report `65033f88...`, decision `NEEDS_ADJUSTMENT` |
+| 관련 evaluation test | `PASS`; 8 suites / 71 tests, failure/error/skipped 0 |
+| Long-form materializer `--check` | `PASS`; 17 files, 6 documents, 24 queries, combined `a1fcd76...` |
+| robustness materializer `--check` | `PASS`; 17 files, 6 bundles, 24 queries, combined `cb43832d...` |
+| PRZ-025 benchmark validator | `PASS`; `FRESH_BENCHMARK_SEED_FROZEN`, combined `1f36c4...`, Final search false |
+| PRZ-025 validator unit test | `PASS`; 18/18 |
+| SEALED FINAL tree/hash/flags | `PASS`; tree `a129080...`, combined `e5b315...`, opened/search false |
+| report metadata/source snapshot | `PASS_AFTER_METADATA_CORRECTION`; input commit actual SHA 일치, source mismatch 0 |
+| `git diff --check` | `PASS`; 출력 0 |
+| OSS readiness | `PASS`; Markdown 187/links 764, tracked safety 967, verifier 16/16, external 97/97 |
+| start HEAD 대비 scope | `PASS`; 12 files, PRZ-026 docs/evaluation source only, forbidden 0 |
+| full backend unit/integration, frontend, Docker | `NOT_RUN`; evaluation-only scope, Production 변경 0 |
+| Parent Dense / SEALED FINAL search / push / PR / merge | `NOT_RUN`; 금지·진입 차단 유지 |
+
+최종 self-audit에서 구조·Gold·scope finding은 0이다. Search Quality finding은 사전 Gate가 의도대로
+탐지한 세 context-only false hit와 해당 dataset/user/profession/language 회귀다. input-freeze full SHA
+메타데이터 오류는 결과 해석 전에 발견해 검색 재실행 없이 metadata만 교정했고, 그 사실과 교정 후
+hash를 35절에 보존했다. 따라서 C1을 `PROMISING`으로 승격하거나 Parent Dense로 진행할 수 없다.

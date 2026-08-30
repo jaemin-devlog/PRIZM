@@ -1,6 +1,6 @@
 # PRZ-026 Phase 1 Plan
 
-- 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_PROMISING`
+- 상태: `IN_PROGRESS / PHASE_1_C1_NEEDS_ADJUSTMENT`
 - 허용 단계: `ORIENT → SPEC → PLAN → IMPLEMENT(evaluation-only) → VERIFY → AUDIT → INTEGRATE(commit only)`
 - 선행 조건: `DEPENDS_ON_PRZ_025`
 
@@ -143,3 +143,8 @@ Ollama/model이 없거나 parity/Safety가 실패하면 C1 결과는 `NOT_RUN` �
 Parent Dense로 진행하지 않는다. rollback 범위는 C1 evaluation-only source/test와 PRZ-026 문서뿐이다.
 Production, dependency, migration, frontend, MCP, Docker, dataset, SEALED FINAL, push/PR/merge는
 변경하지 않는다.
+
+공식 실행 결과 C1은 Original Seed 1건을 개선했지만 Long-form 1건과 robustness 2건을 rank 1에서
+rank 2로 내렸고, 모두 context-only false hit로 분류됐다. candidate/embedding과 구조 경계는
+보존됐으나 사전 Search Gate를 통과하지 못했으므로 판정은 `NEEDS_ADJUSTMENT`다. 결과를 본 뒤
+heading policy를 변경하지 않으며 Parent Dense 진입은 보류한다.

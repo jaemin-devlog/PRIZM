@@ -1,7 +1,7 @@
 # PRZ-026 Structural Parsing and Parent-Child Retrieval
 
-- 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_PROMISING`
-- 현재 Phase: `Phase 1 C1 Structural Heading Path Parent Context — INPUT_READY / BENCHMARK_NOT_RUN`
+- 상태: `IN_PROGRESS / PHASE_1_C1_NEEDS_ADJUSTMENT`
+- 현재 Phase: `Phase 1 C1 Structural Heading Path Parent Context — COMPLETED / NEEDS_ADJUSTMENT`
 - 선행 조건: `DEPENDS_ON_PRZ_025`
 - 기준 source: `PRZ-025-search-v3-foundation@5f8229f88251938dc5b34588676cc69edf409c99`
 - Production 적용: `NOT_RUN`
@@ -21,7 +21,7 @@ Recall을 개선한다는 것이다. 결과를 본 뒤 gold, split 또는 SEALED
 | B1. Structural Child v1 + BGE-M3 Dense | `COMPLETED — NEEDS_ADJUSTMENT` |
 | B2. Structural Child v2 + BGE-M3 Dense | `COMPLETED — NEEDS_ADJUSTMENT` |
 | B3. Structural Retrieval Passage + BGE-M3 Dense | `COMPLETED — PROMISING` (최초 판정 `NEEDS_ADJUSTMENT` 보존) |
-| C1. Structural Retrieval Passage + `STRUCTURAL_HEADING_PATH_V1` + BGE-M3 Dense | `IN_PROGRESS / NOT_RUN` |
+| C1. Structural Retrieval Passage + `STRUCTURAL_HEADING_PATH_V1` + BGE-M3 Dense | `COMPLETED — NEEDS_ADJUSTMENT` |
 | D. Parent-Child Retrieval + BGE-M3 Dense | `NOT_RUN` |
 
 ## 2. 범위와 보존 계약
@@ -70,8 +70,9 @@ supersede하여 같은 Original Seed를 그대로 재실행하고, 별도 versio
 
 `HEADING`은 source block과 parent boundary로 보존하지만 B2부터 기본적으로 독립 검색 Child가
 아니다. paragraph/list/table/key-value와 assertion-bearing `OTHER`만 검색 후보가 된다. heading
-문자열은 일반 Child의 `retrievalText`에 붙이지 않는다. 이 PRZ에서 C의 `Parent Context`는
-Evidence Parent/section/heading context를 child embedding에 추가하는 실험을 뜻하며 `NOT_RUN`이다.
+문자열은 일반 Child의 `retrievalText`에 붙이지 않는다. B2 시점의 C `Parent Context`는
+`NOT_RUN`이었다. 이후 C1은 Evidence Parent 본문이 아니라 source-derived heading path만 B3
+passage embedding에 추가해 별도 실행했으며 14절의 `NEEDS_ADJUSTMENT`로 종료됐다.
 단, B1부터 명시된 same-table header 보존 예외는 B2에서도 활성 상태다. 따라서 B2를
 "모든 cross-block context가 없는 sourceText-only"로 표현하지 않고,
 `SOURCE_TABLE_HEADER_CONTEXT_EXCEPTION_ACTIVE`로 report에 노출한다.
@@ -262,3 +263,18 @@ context-only false hit 0을 모두 요구한다. 그 위에서 aggregate Top1/MR
 이상 user bundles의 DIRECT rank 개선 중 하나가 있어야 한다. Safety 실패는 `NO_GO`; Safety는
 유지하지만 ranking/slice/false-hit 회귀가 있으면 `NEEDS_ADJUSTMENT`; 의미 있는 순증이 없으면
 `NO_GO`다. 이 Gate는 Parent Dense의 evaluation-only 진입 판단이며 Production 채택 Gate가 아니다.
+
+## 14. C1 result boundary
+
+봉인 commit `f752424520ffc84311c626ddeaea9f0f161702f7`에서 공식 DEV/CAL 실행은 한 번만 수행했다.
+Original Seed는 B3 대비 C1 Top1 `0.9286→1.0000`, MRR `0.9643→1.0000`으로 개선됐지만,
+Long-form은 `0.8000→0.7333` / `0.8833→0.8500`, robustness는 `1.0000→0.9167` /
+`1.0000→0.9583`으로 하락했다. 세 dataset 모두 Recall@5/10/20/50은 `1.0000`, candidate와
+embedding은 B3/C1 각각 137, contamination/fragmentation/cross-parent violation은 0, Gold Child
+보존은 100%였다.
+
+DIRECT rank 변화는 1 win / 3 losses / 49 ties였고, 세 loss 모두 heading이 관련 있지만 source span이
+직접 근거가 아닌 passage를 올린 `context-only false hit`이었다. 따라서 구조·provenance Safety는
+유지했으나 Search Quality Gate를 충족하지 못해 C1은 `NEEDS_ADJUSTMENT`다. 이 결과로 heading path를
+재튜닝하거나 Parent Dense를 시작하지 않는다. `Parent Dense = NOT_RUN`, Production과 SEALED FINAL
+search도 계속 `NOT_RUN`이다.

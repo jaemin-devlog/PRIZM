@@ -1,0 +1,226 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-seed-1.0.1",
+  "split": "ALL",
+  "status": "FRESH_BENCHMARK_SEED_FROZEN",
+  "mutable": false,
+  "opened": false,
+  "searchExecuted": false,
+  "sealedAt": "2026-08-30T18:42:16.0307918+09:00",
+  "generationSourceRevision": "14073dd1664fddb009a5bea8823a228e582abf51",
+  "counts": {
+    "userBundles": 7,
+    "logicalDocuments": 10,
+    "documentVersions": 11,
+    "activeDocumentVersions": 10,
+    "inactiveDocumentVersions": 1,
+    "queries": 29,
+    "evidenceParents": 20,
+    "evidenceGroups": 28,
+    "evidenceUnits": 28
+  },
+  "distributions": {
+    "split": {
+      "CALIBRATION": 2,
+      "DEV": 3,
+      "SEALED_FINAL_TEST": 2
+    },
+    "profession": {
+      "BACKEND": 1,
+      "DATA_AI_INFRA": 1,
+      "DESIGN_PRODUCT": 1,
+      "FRONTEND_MOBILE": 1,
+      "MARKETING_SALES": 1,
+      "NON_DEVELOPMENT_GENERAL": 1,
+      "PLANNING": 1
+    },
+    "documentLanguage": {
+      "EN": 1,
+      "KO": 7,
+      "KO_EN_MIXED": 3
+    },
+    "documentFileType": {
+      "TXT": 11
+    },
+    "documentStructure": {
+      "CAREER_DESCRIPTION": 2,
+      "CERTIFICATION_TRAINING": 2,
+      "LONG_PORTFOLIO": 2,
+      "NARRATIVE_SELF_INTRODUCTION": 1,
+      "SHORT_RESUME": 3,
+      "TABLE_LIKE": 1
+    },
+    "queryLanguage": {
+      "EN": 7,
+      "KO": 12,
+      "KO_EN_MIXED": 10
+    },
+    "answerability": {
+      "NOT_SUPPORTED": 10,
+      "PARTIALLY_SUPPORTED": 1,
+      "SUPPORTED": 18
+    },
+    "category": {
+      "abstract_competency": 4,
+      "attempted_prototype": 2,
+      "completed_production": 4,
+      "completion_state": 5,
+      "date_range": 4,
+      "english": 7,
+      "hard_negative": 10,
+      "job_requirement": 3,
+      "korean": 12,
+      "korean_english_mixed": 10,
+      "literal_identifier": 3,
+      "multi_aspect": 4,
+      "multi_evidence": 6,
+      "negation": 3,
+      "no_answer": 2,
+      "numeric_quantity": 6,
+      "numeric_range_comparison": 3,
+      "other_actor": 3,
+      "planned": 1,
+      "semantic_paraphrase": 6,
+      "typo_format_variation": 2
+    }
+  },
+  "files": [
+    {
+      "path": "calibration/corpus.json",
+      "bytes": 3845,
+      "sha256": "cc44798e258eb74b2f5f77fbf808ea132751b9e19ec660c5b50f0144e799ecd3"
+    },
+    {
+      "path": "calibration/documents/sv3-u02-interface-portfolio-v01.txt",
+      "bytes": 481,
+      "sha256": "e5f0edf4d2b9f3c55ddc5a55a4aa4e9f629034edffa74ca827e9afc782c130a5"
+    },
+    {
+      "path": "calibration/documents/sv3-u03-data-infra-table-v01.txt",
+      "bytes": 308,
+      "sha256": "4e55176184865c7dae225a7ed49b6b03fa771a45eb21d6d268eedddc798d14a8"
+    },
+    {
+      "path": "calibration/documents/sv3-u03-training-record-v01.txt",
+      "bytes": 183,
+      "sha256": "b2fecc0ac205c01b666d23c1ceafe26f96fe81d76d2b24350f6ac167644f2bf9"
+    },
+    {
+      "path": "calibration/gold-evidence.json",
+      "bytes": 20624,
+      "sha256": "6e6d5ac829f4b076e6d3d134711f7e05b27246ddfb23731a7b76bd5705f5af98"
+    },
+    {
+      "path": "calibration/manifest.json",
+      "bytes": 3259,
+      "sha256": "a9a956de60bf12e0e9047ad86a69c910ffa875164085fb5c761b43b9dde8f641"
+    },
+    {
+      "path": "calibration/questions.json",
+      "bytes": 13030,
+      "sha256": "57d2caaa22e371503e726bb7f4b0473552b0c788baab27c0f3a7c02e8a04622c"
+    },
+    {
+      "path": "dev/corpus.json",
+      "bytes": 6180,
+      "sha256": "1c1116fd4144e44a8bca8a120b1af1700f8c8f3301ed225ef61d050fd0f86d91"
+    },
+    {
+      "path": "dev/documents/sv3-u01-backend-career-v01.txt",
+      "bytes": 228,
+      "sha256": "b2f7df1cdc8b69462a690a8c213e7b0d3365000e6e626633ea75d5b362784edb"
+    },
+    {
+      "path": "dev/documents/sv3-u01-backend-resume-v00-inactive.txt",
+      "bytes": 113,
+      "sha256": "3f72da0b99f31a2312904f1966e450c748eede39442488fbc4a8139283e7ddec"
+    },
+    {
+      "path": "dev/documents/sv3-u01-backend-resume-v01.txt",
+      "bytes": 430,
+      "sha256": "62aae40fb932798f7125fc56d5649505dfcf831e48b575076f978b89a624d1c6"
+    },
+    {
+      "path": "dev/documents/sv3-u04-design-portfolio-v01.txt",
+      "bytes": 435,
+      "sha256": "b3fa5f0eb5a73fc6927e4e37fea88e2683d1ca68a6079cbde96a19632a4845b4"
+    },
+    {
+      "path": "dev/documents/sv3-u06-growth-career-v01.txt",
+      "bytes": 434,
+      "sha256": "20d2f006760b4429f71143e57d228a04f35976cd2f7aa70d5283577ee4af0d03"
+    },
+    {
+      "path": "dev/gold-evidence.json",
+      "bytes": 29796,
+      "sha256": "712f222f8b9f3164be7a1fb36d546de03eba9f88f03c459998a1978487c9d485"
+    },
+    {
+      "path": "dev/manifest.json",
+      "bytes": 3653,
+      "sha256": "4cc32c7d4b421f8296c23f00e8b85a581a72a99b308f028a0b4e8def467b9735"
+    },
+    {
+      "path": "dev/questions.json",
+      "bytes": 21832,
+      "sha256": "ce2315fcc4d8fc918697f6c5bcf593061efae65fe88d8981d3b414259e7dc654"
+    },
+    {
+      "path": "lineage.json",
+      "bytes": 10515,
+      "sha256": "789034fc96a511028b9c129fa4126d180ed6562390907efa2997bdcb5430f66b"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4340,
+      "sha256": "2bdee80e424be0b6699b166cdb3cf4fc430c41cf588f0f1b1706bb302491852c"
+    },
+    {
+      "path": "schema/search-v3-benchmark.schema.json",
+      "bytes": 19429,
+      "sha256": "c347f9ecb925b2f7d78817ae5bf5deb364b749eabb89359eb17d0bf0e24df465"
+    },
+    {
+      "path": "schema/search-v3-prediction.schema.json",
+      "bytes": 3182,
+      "sha256": "99d199ce3e4c65523c03755634e1853c86d6357a8c37d40aca108cc95da2cf84"
+    },
+    {
+      "path": "sealed-final/corpus.json",
+      "bytes": 3864,
+      "sha256": "513dcbcb41cf8b2cecedb289fc6f1889c77c7fc233c6e4f9b4557b0bdcebedd3"
+    },
+    {
+      "path": "sealed-final/documents/sv3-u05-planning-narrative-v01.txt",
+      "bytes": 395,
+      "sha256": "0983f80a8a863962de79f6ee9d5451641a7ae501c624b959fb318293d7ca6559"
+    },
+    {
+      "path": "sealed-final/documents/sv3-u07-operations-resume-v01.txt",
+      "bytes": 300,
+      "sha256": "68dcb6ad002252e692d3724fc22edb748b1d57fc7f9ffb8c058aae0db3432ffa"
+    },
+    {
+      "path": "sealed-final/documents/sv3-u07-operations-training-v01.txt",
+      "bytes": 193,
+      "sha256": "735d1bdf14ed9ed73d61b1498de1b869de9c258dc0cb77e0430f66c41d65cb3c"
+    },
+    {
+      "path": "sealed-final/gold-evidence.json",
+      "bytes": 16550,
+      "sha256": "b64556a367d1cc6c05a1120baecceadf505dc48adb0107f62c2d86e7e17cc819"
+    },
+    {
+      "path": "sealed-final/manifest.json",
+      "bytes": 3174,
+      "sha256": "d58165dc8609684e1bdd194457241abb2caeb860269caaba80761675fa7919aa"
+    },
+    {
+      "path": "sealed-final/questions.json",
+      "bytes": 12707,
+      "sha256": "0dbd539017ea13bbec0b16c8ddbc73eb6f02701c74f2ca581818346dee20541e"
+    }
+  ],
+  "combinedSha256": "1f36c4bbb6948b97c4321821cc3d6b8a9e38ab44b81adb1594614c6f7e97289e"
+}

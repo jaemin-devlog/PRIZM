@@ -1,0 +1,510 @@
+{
+  "artifactType": "GOLD_EVIDENCE",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-seed-1.0.1",
+  "split": "SEALED_FINAL_TEST",
+  "parents": [
+    {
+      "parentId": "SV3-U05-P01",
+      "userBundleId": "SV3-U05",
+      "documentId": "SV3-U05-D01",
+      "versionId": "SV3-U05-D01-V01",
+      "label": "2025년 1분기 실행",
+      "sourceSpan": {
+        "spanId": "SV3-U05-P01-PS01",
+        "parentId": "SV3-U05-P01",
+        "documentId": "SV3-U05-D01",
+        "versionId": "SV3-U05-D01-V01",
+        "sourcePath": "documents/sv3-u05-planning-narrative-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 13,
+        "charEnd": 118,
+        "lineStart": 3,
+        "lineEnd": 5,
+        "text": "2025년 1분기 실행\n본인은 2025년 1월부터 3월까지 고객 문의 분류 기준을 정리하고 운영 부서와 적용했다.\n주간 회고를 열어 누락 유형을 확인하고 다음 주 업무 우선순위에 반영했다.",
+        "textSha256": "f7e221387955738c7b7708b9127588c531a7c6af4ba9108e35f1e5434ff041bc"
+      }
+    },
+    {
+      "parentId": "SV3-U05-P02",
+      "userBundleId": "SV3-U05",
+      "documentId": "SV3-U05-D01",
+      "versionId": "SV3-U05-D01-V01",
+      "label": "향후 계획",
+      "sourceSpan": {
+        "spanId": "SV3-U05-P02-PS01",
+        "parentId": "SV3-U05-P02",
+        "documentId": "SV3-U05-D01",
+        "versionId": "SV3-U05-D01-V01",
+        "sourcePath": "documents/sv3-u05-planning-narrative-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 120,
+        "charEnd": 172,
+        "lineStart": 7,
+        "lineEnd": 8,
+        "text": "향후 계획\n2025년 3분기에는 파트너 교육 프로그램을 추진할 계획이며 아직 실행하지 않았다.",
+        "textSha256": "5d020a2e020a81c06ab4936190fadefc372ef68b19a19f43baf200ec0cc17f49"
+      }
+    },
+    {
+      "parentId": "SV3-U07-P01",
+      "userBundleId": "SV3-U07",
+      "documentId": "SV3-U07-D01",
+      "versionId": "SV3-U07-D01-V01",
+      "label": "고객 운영",
+      "sourceSpan": {
+        "spanId": "SV3-U07-P01-PS01",
+        "parentId": "SV3-U07-P01",
+        "documentId": "SV3-U07-D01",
+        "versionId": "SV3-U07-D01-V01",
+        "sourcePath": "documents/sv3-u07-operations-resume-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 14,
+        "charEnd": 105,
+        "lineStart": 3,
+        "lineEnd": 5,
+        "text": "고객 운영\n2022년 5월부터 2023년 11월까지 교대 근무 인수인계표를 관리했다.\n본인은 월 평균 문의 480건을 분류하고 긴급 건을 당일 담당자에게 전달했다.",
+        "textSha256": "dd5a72a07db58cfc6371926ce7627b3191d1c45640e8b7067f10ed7ec9878386"
+      }
+    },
+    {
+      "parentId": "SV3-U07-P02",
+      "userBundleId": "SV3-U07",
+      "documentId": "SV3-U07-D01",
+      "versionId": "SV3-U07-D01-V01",
+      "label": "자격 경계",
+      "sourceSpan": {
+        "spanId": "SV3-U07-P02-PS01",
+        "parentId": "SV3-U07-P02",
+        "documentId": "SV3-U07-D01",
+        "versionId": "SV3-U07-D01-V01",
+        "sourcePath": "documents/sv3-u07-operations-resume-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 107,
+        "charEnd": 133,
+        "lineStart": 7,
+        "lineEnd": 8,
+        "text": "자격 경계\n지게차 운전 자격은 보유하지 않았다.",
+        "textSha256": "7943a890e39d5b1e81ceb49462c4c1a1468c65cb5475f29de417d0a6f152c2df"
+      }
+    },
+    {
+      "parentId": "SV3-U07-P03",
+      "userBundleId": "SV3-U07",
+      "documentId": "SV3-U07-D02",
+      "versionId": "SV3-U07-D02-V01",
+      "label": "수료 내역",
+      "sourceSpan": {
+        "spanId": "SV3-U07-P03-PS01",
+        "parentId": "SV3-U07-P03",
+        "documentId": "SV3-U07-D02",
+        "versionId": "SV3-U07-D02-V01",
+        "sourcePath": "documents/sv3-u07-operations-training-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 15,
+        "charEnd": 86,
+        "lineStart": 3,
+        "lineEnd": 5,
+        "text": "수료 내역\n2023년 6월 응급 대응 기본 교육을 수료했다.\n현장 모의 훈련에서 신고, 대피 안내, 인원 확인 절차를 수행했다.",
+        "textSha256": "0afe087f11f1d51124f5bcb1362c72086a1cf83767db47540e4185b0b7bded63"
+      }
+    }
+  ],
+  "evidenceGroups": [
+    {
+      "groupId": "SV3-U05-G01",
+      "userBundleId": "SV3-U05",
+      "sourceFactId": "SV3-FACT-U05-CLASSIFICATION",
+      "description": "고객 문의 분류 기준 적용",
+      "evidenceUnitIds": [
+        "SV3-U05-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U05-G02",
+      "userBundleId": "SV3-U05",
+      "sourceFactId": "SV3-FACT-U05-RETROSPECTIVE",
+      "description": "주간 회고와 우선순위 반영",
+      "evidenceUnitIds": [
+        "SV3-U05-P01-E02"
+      ]
+    },
+    {
+      "groupId": "SV3-U05-G03",
+      "userBundleId": "SV3-U05",
+      "sourceFactId": "SV3-FACT-U05-PLANNED-TRAINING",
+      "description": "미실행 파트너 교육 계획",
+      "evidenceUnitIds": [
+        "SV3-U05-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U07-G01",
+      "userBundleId": "SV3-U07",
+      "sourceFactId": "SV3-FACT-U07-SHIFT-HANDOFF",
+      "description": "교대 인수인계표 관리",
+      "evidenceUnitIds": [
+        "SV3-U07-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U07-G02",
+      "userBundleId": "SV3-U07",
+      "sourceFactId": "SV3-FACT-U07-INQUIRIES",
+      "description": "월평균 문의 분류",
+      "evidenceUnitIds": [
+        "SV3-U07-P01-E02"
+      ]
+    },
+    {
+      "groupId": "SV3-U07-G03",
+      "userBundleId": "SV3-U07",
+      "sourceFactId": "SV3-FACT-U07-NO-FORKLIFT",
+      "description": "지게차 자격 미보유",
+      "evidenceUnitIds": [
+        "SV3-U07-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U07-G04",
+      "userBundleId": "SV3-U07",
+      "sourceFactId": "SV3-FACT-U07-EMERGENCY-TRAINING",
+      "description": "응급 대응 교육 수료와 실습",
+      "evidenceUnitIds": [
+        "SV3-U07-P03-E01"
+      ]
+    }
+  ],
+  "evidenceUnits": [
+    {
+      "evidenceUnitId": "SV3-U05-P01-E01",
+      "userBundleId": "SV3-U05",
+      "parentId": "SV3-U05-P01",
+      "groupId": "SV3-U05-G01",
+      "documentId": "SV3-U05-D01",
+      "versionId": "SV3-U05-D01-V01",
+      "sourceFactId": "SV3-FACT-U05-CLASSIFICATION",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U05-P01-E01-S01",
+          "parentId": "SV3-U05-P01",
+          "documentId": "SV3-U05-D01",
+          "versionId": "SV3-U05-D01-V01",
+          "sourcePath": "documents/sv3-u05-planning-narrative-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 26,
+          "charEnd": 76,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "본인은 2025년 1월부터 3월까지 고객 문의 분류 기준을 정리하고 운영 부서와 적용했다.",
+          "textSha256": "aa8711ce29fb08497c2f765028637d64ee53483d8a76d6576241310b61612a7a"
+        }
+      ],
+      "primarySpanId": "SV3-U05-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "planning_execution"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": [
+        {
+          "start": "2025-01-01",
+          "end": "2025-03-31",
+          "precision": "MONTH",
+          "sourceSurface": "2025년 1월부터 3월까지"
+        }
+      ]
+    },
+    {
+      "evidenceUnitId": "SV3-U05-P01-E02",
+      "userBundleId": "SV3-U05",
+      "parentId": "SV3-U05-P01",
+      "groupId": "SV3-U05-G02",
+      "documentId": "SV3-U05-D01",
+      "versionId": "SV3-U05-D01-V01",
+      "sourceFactId": "SV3-FACT-U05-RETROSPECTIVE",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U05-P01-E02-S01",
+          "parentId": "SV3-U05-P01",
+          "documentId": "SV3-U05-D01",
+          "versionId": "SV3-U05-D01-V01",
+          "sourcePath": "documents/sv3-u05-planning-narrative-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 77,
+          "charEnd": 118,
+          "lineStart": 5,
+          "lineEnd": 5,
+          "text": "주간 회고를 열어 누락 유형을 확인하고 다음 주 업무 우선순위에 반영했다.",
+          "textSha256": "5310234c67a856955539c92fc44c6af4543cbf92b24979d396ed13fa3c5dcb7a"
+        }
+      ],
+      "primarySpanId": "SV3-U05-P01-E02-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "planning_feedback_loop"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U05-P02-E01",
+      "userBundleId": "SV3-U05",
+      "parentId": "SV3-U05-P02",
+      "groupId": "SV3-U05-G03",
+      "documentId": "SV3-U05-D01",
+      "versionId": "SV3-U05-D01-V01",
+      "sourceFactId": "SV3-FACT-U05-PLANNED-TRAINING",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U05-P02-E01-S01",
+          "parentId": "SV3-U05-P02",
+          "documentId": "SV3-U05-D01",
+          "versionId": "SV3-U05-D01-V01",
+          "sourcePath": "documents/sv3-u05-planning-narrative-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 126,
+          "charEnd": 172,
+          "lineStart": 8,
+          "lineEnd": 8,
+          "text": "2025년 3분기에는 파트너 교육 프로그램을 추진할 계획이며 아직 실행하지 않았다.",
+          "textSha256": "ad534d6cee0d3175c5e4503dadde2cbe0eb39033b163a973c92e3586308620eb"
+        }
+      ],
+      "primarySpanId": "SV3-U05-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PLANNED",
+      "aspects": [
+        "partner_training"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": [
+        {
+          "start": "2025-07-01",
+          "end": "2025-09-30",
+          "precision": "QUARTER",
+          "sourceSurface": "2025년 3분기"
+        }
+      ]
+    },
+    {
+      "evidenceUnitId": "SV3-U07-P01-E01",
+      "userBundleId": "SV3-U07",
+      "parentId": "SV3-U07-P01",
+      "groupId": "SV3-U07-G01",
+      "documentId": "SV3-U07-D01",
+      "versionId": "SV3-U07-D01-V01",
+      "sourceFactId": "SV3-FACT-U07-SHIFT-HANDOFF",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U07-P01-E01-S01",
+          "parentId": "SV3-U07-P01",
+          "documentId": "SV3-U07-D01",
+          "versionId": "SV3-U07-D01-V01",
+          "sourcePath": "documents/sv3-u07-operations-resume-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 20,
+          "charEnd": 61,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "2022년 5월부터 2023년 11월까지 교대 근무 인수인계표를 관리했다.",
+          "textSha256": "53a674828d4bdcb0c7ccfedd4cb83a59044389e5e48fae22bda671a4bd11fffc"
+        }
+      ],
+      "primarySpanId": "SV3-U07-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "shift_handoff"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": [
+        {
+          "start": "2022-05-01",
+          "end": "2023-11-30",
+          "precision": "MONTH",
+          "sourceSurface": "2022년 5월부터 2023년 11월까지"
+        }
+      ]
+    },
+    {
+      "evidenceUnitId": "SV3-U07-P01-E02",
+      "userBundleId": "SV3-U07",
+      "parentId": "SV3-U07-P01",
+      "groupId": "SV3-U07-G02",
+      "documentId": "SV3-U07-D01",
+      "versionId": "SV3-U07-D01-V01",
+      "sourceFactId": "SV3-FACT-U07-INQUIRIES",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U07-P01-E02-S01",
+          "parentId": "SV3-U07-P01",
+          "documentId": "SV3-U07-D01",
+          "versionId": "SV3-U07-D01-V01",
+          "sourcePath": "documents/sv3-u07-operations-resume-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 62,
+          "charEnd": 105,
+          "lineStart": 5,
+          "lineEnd": 5,
+          "text": "본인은 월 평균 문의 480건을 분류하고 긴급 건을 당일 담당자에게 전달했다.",
+          "textSha256": "9c1167c030727ed35c3e7f6cf9c5e3387416b0abe6e06d53bd420d0aea879172"
+        }
+      ],
+      "primarySpanId": "SV3-U07-P01-E02-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PRODUCTION",
+      "aspects": [
+        "customer_operations"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 480,
+          "unit": "INQUIRY_PER_MONTH",
+          "semanticType": "CUSTOMER_INQUIRY_COUNT",
+          "sourceSurface": "480건",
+          "qualifierTokens": [
+            "월",
+            "평균",
+            "문의"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U07-P02-E01",
+      "userBundleId": "SV3-U07",
+      "parentId": "SV3-U07-P02",
+      "groupId": "SV3-U07-G03",
+      "documentId": "SV3-U07-D01",
+      "versionId": "SV3-U07-D01-V01",
+      "sourceFactId": "SV3-FACT-U07-NO-FORKLIFT",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U07-P02-E01-S01",
+          "parentId": "SV3-U07-P02",
+          "documentId": "SV3-U07-D01",
+          "versionId": "SV3-U07-D01-V01",
+          "sourcePath": "documents/sv3-u07-operations-resume-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 113,
+          "charEnd": 133,
+          "lineStart": 8,
+          "lineEnd": 8,
+          "text": "지게차 운전 자격은 보유하지 않았다.",
+          "textSha256": "24cccbcb8bce7979bcc8c16a494b20262644e67b23f2c012373d36569e9b9e72"
+        }
+      ],
+      "primarySpanId": "SV3-U07-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "NOT_APPLICABLE",
+      "aspects": [
+        "forklift_certificate"
+      ],
+      "entities": [
+        {
+          "entityType": "CERTIFICATION",
+          "canonicalValue": "FORKLIFT_LICENSE",
+          "surfaceForms": [
+            "지게차 운전 자격"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U07-P03-E01",
+      "userBundleId": "SV3-U07",
+      "parentId": "SV3-U07-P03",
+      "groupId": "SV3-U07-G04",
+      "documentId": "SV3-U07-D02",
+      "versionId": "SV3-U07-D02-V01",
+      "sourceFactId": "SV3-FACT-U07-EMERGENCY-TRAINING",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U07-P03-E01-S01",
+          "parentId": "SV3-U07-P03",
+          "documentId": "SV3-U07-D02",
+          "versionId": "SV3-U07-D02-V01",
+          "sourcePath": "documents/sv3-u07-operations-training-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 21,
+          "charEnd": 48,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "2023년 6월 응급 대응 기본 교육을 수료했다.",
+          "textSha256": "d0fc88172b78310296e2b744b1e972aa48bea13383aff33eb806f79e0a16f5ef"
+        },
+        {
+          "spanId": "SV3-U07-P03-E01-S02",
+          "parentId": "SV3-U07-P03",
+          "documentId": "SV3-U07-D02",
+          "versionId": "SV3-U07-D02-V01",
+          "sourcePath": "documents/sv3-u07-operations-training-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 49,
+          "charEnd": 86,
+          "lineStart": 5,
+          "lineEnd": 5,
+          "text": "현장 모의 훈련에서 신고, 대피 안내, 인원 확인 절차를 수행했다.",
+          "textSha256": "cce3d4c33e232ca2f33ffa21a5a50658f771e81201d0b06cfecbc0d7e9f99881"
+        }
+      ],
+      "primarySpanId": "SV3-U07-P03-E01-S01",
+      "contextSpanIds": [
+        "SV3-U07-P03-E01-S02"
+      ],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "emergency_training"
+      ],
+      "entities": [
+        {
+          "entityType": "COURSE",
+          "canonicalValue": "EMERGENCY_RESPONSE_BASIC",
+          "surfaceForms": [
+            "응급 대응 기본 교육"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": [
+        {
+          "start": "2023-06-01",
+          "end": "2023-06-30",
+          "precision": "MONTH",
+          "sourceSurface": "2023년 6월"
+        }
+      ]
+    }
+  ]
+}

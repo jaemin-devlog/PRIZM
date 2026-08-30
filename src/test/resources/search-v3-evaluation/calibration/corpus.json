@@ -1,0 +1,102 @@
+{
+  "artifactType": "CORPUS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-seed-1.0.1",
+  "split": "CALIBRATION",
+  "userBundles": [
+    {
+      "userBundleId": "SV3-U02",
+      "split": "CALIBRATION",
+      "professionGroup": "FRONTEND_MOBILE",
+      "profession": "frontend and mobile engineer",
+      "languageProfile": "EN",
+      "documentFamilyId": "SV3-U02-DOC-FAMILY",
+      "templateFamilyId": "SV3-TEMPLATE-FRONTEND-02",
+      "documents": [
+        {
+          "documentId": "SV3-U02-D01",
+          "logicalDocumentId": "SV3-U02-D01-LOGICAL",
+          "versionLineageId": "SV3-U02-D01-LINEAGE",
+          "versionId": "SV3-U02-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Synthetic Interface Portfolio",
+          "documentType": "PORTFOLIO",
+          "documentStructure": "LONG_PORTFOLIO",
+          "fileType": "TXT",
+          "language": "EN",
+          "contentPath": "documents/sv3-u02-interface-portfolio-v01.txt",
+          "contentSha256": "e5f0edf4d2b9f3c55ddc5a55a4aa4e9f629034edffa74ca827e9afc782c130a5",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-search-v3-seed-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-SEED-FRONTEND-2A7E"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-U03",
+      "split": "CALIBRATION",
+      "professionGroup": "DATA_AI_INFRA",
+      "profession": "data and infrastructure specialist",
+      "languageProfile": "KO_EN_MIXED",
+      "documentFamilyId": "SV3-U03-DOC-FAMILY",
+      "templateFamilyId": "SV3-TEMPLATE-DATA-03",
+      "documents": [
+        {
+          "documentId": "SV3-U03-D01",
+          "logicalDocumentId": "SV3-U03-D01-LOGICAL",
+          "versionLineageId": "SV3-U03-D01-LINEAGE",
+          "versionId": "SV3-U03-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Data & Infra 운영표",
+          "documentType": "PROJECT_REPORT",
+          "documentStructure": "TABLE_LIKE",
+          "fileType": "TXT",
+          "language": "KO_EN_MIXED",
+          "contentPath": "documents/sv3-u03-data-infra-table-v01.txt",
+          "contentSha256": "4e55176184865c7dae225a7ed49b6b03fa771a45eb21d6d268eedddc798d14a8",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-search-v3-seed-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-SEED-DATA-4D9B"
+          }
+        },
+        {
+          "documentId": "SV3-U03-D02",
+          "logicalDocumentId": "SV3-U03-D02-LOGICAL",
+          "versionLineageId": "SV3-U03-D02-LINEAGE",
+          "versionId": "SV3-U03-D02-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Synthetic Training Record",
+          "documentType": "COURSE_COMPLETION",
+          "documentStructure": "CERTIFICATION_TRAINING",
+          "fileType": "TXT",
+          "language": "KO_EN_MIXED",
+          "contentPath": "documents/sv3-u03-training-record-v01.txt",
+          "contentSha256": "b2fecc0ac205c01b666d23c1ceafe26f96fe81d76d2b24350f6ac167644f2bf9",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-search-v3-seed-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-SEED-DATA-4D9B"
+          }
+        }
+      ]
+    }
+  ]
+}

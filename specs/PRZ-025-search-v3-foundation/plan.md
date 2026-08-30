@@ -1,7 +1,7 @@
 # PRZ-025 Search V3 Foundation Plan
 
-- 상태: `IN_PROGRESS`
-- 이 Phase의 허용 단계: `ORIENT → SPEC → PLAN → IMPLEMENT(docs only) → VERIFY → AUDIT → INTEGRATE(commit only)`
+- 상태: `IN_PROGRESS / FRESH_BENCHMARK_SEED_FROZEN`
+- Phase 2 허용 단계: `ORIENT → SPEC → PLAN → IMPLEMENT(evaluation-only) → VERIFY → AUDIT → INTEGRATE(commit only)`
 - Production 구현·PR·main merge: `NOT_RUN`
 
 ## 1. 이번 Phase
@@ -39,8 +39,8 @@
 
 ### Gate D — final seal
 
-- corpus, source fixtures, query, gold, split manifest, schema, evaluator와 metric definition의
-  version/hash를 고정한다.
+- corpus, source fixtures, query, gold, split manifest, schema, prediction adapter와 metric
+  definition의 version/hash를 고정한다.
 - role/document/language 분포와 leakage audit 결과를 기록한다.
 - independent evaluator만 `SEALED_FINAL_TEST` content와 key에 접근한다.
 - 이 Gate가 끝날 때까지 주요 V3 algorithm implementation을 시작하지 않는다.
@@ -48,7 +48,7 @@
 ### Gate E — calibration과 숫자 Gate freeze
 
 - `DEV/CALIBRATION`에서만 runner, threshold, K, model, parser/chunk, fusion/reranker와 operational
-  profile을 조정한다.
+  profile을 조정한다. evaluator 의미와 sealed input/gold는 조정하지 않는다.
 - Current Search의 fresh final 결과를 미리 보지 않는다.
 - quality regression tolerance와 operational budget을 근거와 함께 `FROZEN_GATE`로 바꾼다.
 
@@ -68,6 +68,27 @@
 
 Final 결과를 본 뒤 어느 구현·설정·Gate라도 바꾸면 해당 run은 `HISTORICAL_RESULT`가 되고
 새로운 independent `SEALED_FINAL_TEST`가 필요하다.
+
+## 2.1 Phase 2 materialization 실행 순서
+
+1. Phase 1 계약과 PRZ-001/016 history를 다시 읽고 검색 결과를 실행하지 않은 상태에서
+   pre-seal ambiguity를 기록했다.
+2. `userBundleId`보다 작은 query 단위 split을 금지하고, template/generator lineage를 포함한
+   모든 blocking key를 bundle-first로 선할당했다.
+3. dependency 없는 JSON schema, prediction adapter, one-time materializer와 deterministic
+   validator를 먼저 작성했다.
+4. 7개 직무군의 synthetic source를 만든 뒤 원문에서 code-point/line span과 SHA-256을
+   materialize했다.
+5. `DEV 3 / CALIBRATION 2 / SEALED_FINAL_TEST 2` bundle을 만들고 split/overall manifest를
+   한 번 봉인했다.
+6. semantic-invalid mutation 16종과 sealed-file mutation을 포함한 support unit test로
+   validator failure behavior를 확인한다.
+7. PRZ 문서와 evidence를 실제 count/hash/command 결과로 갱신한 뒤 diff scope와 OSS readiness를
+   감사한다.
+
+Phase 2에서는 Current Search와 Search V3를 어느 split에도 실행하지 않는다. 다음 Structural
+Parsing Phase는 `DEV/CALIBRATION`만 사용할 수 있고 `SEALED_FINAL_TEST`는 finalist와 숫자 Gate가
+봉인될 때까지 열지 않는다.
 
 ## 3. 후보 ablation 원칙
 

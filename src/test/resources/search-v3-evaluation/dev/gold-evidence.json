@@ -1,0 +1,936 @@
+{
+  "artifactType": "GOLD_EVIDENCE",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-seed-1.0.1",
+  "split": "DEV",
+  "parents": [
+    {
+      "parentId": "SV3-U01-P01",
+      "userBundleId": "SV3-U01",
+      "documentId": "SV3-U01-D01",
+      "versionId": "SV3-U01-D01-V01",
+      "label": "서비스 운영",
+      "sourceSpan": {
+        "spanId": "SV3-U01-P01-PS01",
+        "parentId": "SV3-U01-P01",
+        "documentId": "SV3-U01-D01",
+        "versionId": "SV3-U01-D01-V01",
+        "sourcePath": "documents/sv3-u01-backend-resume-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 14,
+        "charEnd": 150,
+        "lineStart": 3,
+        "lineEnd": 6,
+        "text": "서비스 운영\n본인은 내부 결제 게이트웨이 PAY-GW를 설계하고 2024년 1월부터 2024년 12월까지 운영했다.\n일일 요청 1,300건을 안정적으로 처리했고 장애 대응 절차를 문서화했다.\nKafka는 검토했지만 운영 환경에 도입하지 않았다.",
+        "textSha256": "1d1c5c9da4dbb56182bb3e50dfe3289c9e2c997826f4f41a97c58840c0df4eda"
+      }
+    },
+    {
+      "parentId": "SV3-U01-P02",
+      "userBundleId": "SV3-U01",
+      "documentId": "SV3-U01-D02",
+      "versionId": "SV3-U01-D02-V01",
+      "label": "장애 재발 방지",
+      "sourceSpan": {
+        "spanId": "SV3-U01-P02-PS01",
+        "parentId": "SV3-U01-P02",
+        "documentId": "SV3-U01-D02",
+        "versionId": "SV3-U01-D02-V01",
+        "sourcePath": "documents/sv3-u01-backend-career-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 16,
+        "charEnd": 93,
+        "lineStart": 3,
+        "lineEnd": 5,
+        "text": "장애 재발 방지\n본인은 반복 장애의 로그와 배포 이력을 대조해 원인을 좁혔다.\n재발 방지 체크리스트를 작성하고 월별 복구 훈련을 운영했다.",
+        "textSha256": "9fca807b32f5323c6313863f8ad977889ee8cd4e79f10d171f7d9ad3d108738b"
+      }
+    },
+    {
+      "parentId": "SV3-U01-P03",
+      "userBundleId": "SV3-U01",
+      "documentId": "SV3-U01-D01",
+      "versionId": "SV3-U01-D01-V00",
+      "label": "과거 실험",
+      "sourceSpan": {
+        "spanId": "SV3-U01-P03-PS01",
+        "parentId": "SV3-U01-P03",
+        "documentId": "SV3-U01-D01",
+        "versionId": "SV3-U01-D01-V00",
+        "sourcePath": "documents/sv3-u01-backend-resume-v00-inactive.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 17,
+        "charEnd": 54,
+        "lineStart": 3,
+        "lineEnd": 4,
+        "text": "과거 실험\nDormantQueue를 사내 시험 환경에서만 사용했다.",
+        "textSha256": "45aedd4a67ab75f3f85d85af0e2f3476ae60ffed95bbd85b1321429d3def15e5"
+      }
+    },
+    {
+      "parentId": "SV3-U04-P01",
+      "userBundleId": "SV3-U04",
+      "documentId": "SV3-U04-D01",
+      "versionId": "SV3-U04-D01-V01",
+      "label": "사용자 조사",
+      "sourceSpan": {
+        "spanId": "SV3-U04-P01-PS01",
+        "parentId": "SV3-U04-P01",
+        "documentId": "SV3-U04-D01",
+        "versionId": "SV3-U04-D01-V01",
+        "sourcePath": "documents/sv3-u04-design-portfolio-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 18,
+        "charEnd": 103,
+        "lineStart": 3,
+        "lineEnd": 5,
+        "text": "사용자 조사\n본인은 소상공인 12명을 인터뷰해 주문 취소 과정의 혼란 지점을 분류했다.\n관찰 결과를 토대로 단계 명칭과 오류 안내 문구를 다시 설계했다.",
+        "textSha256": "40f2ecd5c4f1e29b63644ed88c2b3ba6b182a3cd2c9525d31a54c7f543e03efd"
+      }
+    },
+    {
+      "parentId": "SV3-U04-P02",
+      "userBundleId": "SV3-U04",
+      "documentId": "SV3-U04-D01",
+      "versionId": "SV3-U04-D01-V01",
+      "label": "검증 결과",
+      "sourceSpan": {
+        "spanId": "SV3-U04-P02-PS01",
+        "parentId": "SV3-U04-P02",
+        "documentId": "SV3-U04-D01",
+        "versionId": "SV3-U04-D01-V01",
+        "sourcePath": "documents/sv3-u04-design-portfolio-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 105,
+        "charEnd": 144,
+        "lineStart": 7,
+        "lineEnd": 8,
+        "text": "검증 결과\n사용성 평가에서 과업 완료율이 62%에서 84%로 높아졌다.",
+        "textSha256": "d7d0f3e3a3775306d71d6678186e5fbb3a7b3e9d637a0fdef6c02c0e2c5128f5"
+      }
+    },
+    {
+      "parentId": "SV3-U04-P03",
+      "userBundleId": "SV3-U04",
+      "documentId": "SV3-U04-D01",
+      "versionId": "SV3-U04-D01-V01",
+      "label": "타 조직 활동",
+      "sourceSpan": {
+        "spanId": "SV3-U04-P03-PS01",
+        "parentId": "SV3-U04-P03",
+        "documentId": "SV3-U04-D01",
+        "versionId": "SV3-U04-D01-V01",
+        "sourcePath": "documents/sv3-u04-design-portfolio-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 146,
+        "charEnd": 186,
+        "lineStart": 10,
+        "lineEnd": 11,
+        "text": "타 조직 활동\n마케팅팀은 별도 랜딩 페이지에서 A/B 테스트를 수행했다.",
+        "textSha256": "440a2154c14033337ec25ef205b065fdaff9b9cfb576b85bf703f4794845f44e"
+      }
+    },
+    {
+      "parentId": "SV3-U06-P01",
+      "userBundleId": "SV3-U06",
+      "documentId": "SV3-U06-D01",
+      "versionId": "SV3-U06-D01-V01",
+      "label": "Campaign execution",
+      "sourceSpan": {
+        "spanId": "SV3-U06-P01-PS01",
+        "parentId": "SV3-U06-P01",
+        "documentId": "SV3-U06-D01",
+        "versionId": "SV3-U06-D01-V01",
+        "sourcePath": "documents/sv3-u06-growth-career-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 45,
+        "charEnd": 218,
+        "lineStart": 3,
+        "lineEnd": 5,
+        "text": "Campaign execution\nI launched a Korean-English onboarding campaign across email and webinar channels.\nThe campaign generated 1,300 qualified leads, not 1,300 paid customers.",
+        "textSha256": "e8cca6c44c96f95aae0bbc5e217db03e5ad38b6b3fd5aca3601e4620aae12127"
+      }
+    },
+    {
+      "parentId": "SV3-U06-P02",
+      "userBundleId": "SV3-U06",
+      "documentId": "SV3-U06-D01",
+      "versionId": "SV3-U06-D01-V01",
+      "label": "Sales operations",
+      "sourceSpan": {
+        "spanId": "SV3-U06-P02-PS01",
+        "parentId": "SV3-U06-P02",
+        "documentId": "SV3-U06-D01",
+        "versionId": "SV3-U06-D01-V01",
+        "sourcePath": "documents/sv3-u06-growth-career-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 220,
+        "charEnd": 323,
+        "lineStart": 7,
+        "lineEnd": 8,
+        "text": "Sales operations\nI standardized CRM lead-stage definitions and trained the regional sales coordinators.",
+        "textSha256": "300a480e0a48ac881089e0a2b26d0c536de29b6cbc8d07f35483dd5904292f21"
+      }
+    },
+    {
+      "parentId": "SV3-U06-P03",
+      "userBundleId": "SV3-U06",
+      "documentId": "SV3-U06-D01",
+      "versionId": "SV3-U06-D01-V01",
+      "label": "Actor boundary",
+      "sourceSpan": {
+        "spanId": "SV3-U06-P03-PS01",
+        "parentId": "SV3-U06-P03",
+        "documentId": "SV3-U06-D01",
+        "versionId": "SV3-U06-D01-V01",
+        "sourcePath": "documents/sv3-u06-growth-career-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 325,
+        "charEnd": 433,
+        "lineStart": 10,
+        "lineEnd": 11,
+        "text": "Actor boundary\nThe partner sales team closed 40 enterprise accounts; I only prepared the briefing materials.",
+        "textSha256": "89dfbaba846224817f1ddc9b06f685122f3980911ff12756e9428173a7c7b31f"
+      }
+    }
+  ],
+  "evidenceGroups": [
+    {
+      "groupId": "SV3-U01-G01",
+      "userBundleId": "SV3-U01",
+      "sourceFactId": "SV3-FACT-U01-PAYGW",
+      "description": "PAY-GW 설계 및 운영",
+      "evidenceUnitIds": [
+        "SV3-U01-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U01-G02",
+      "userBundleId": "SV3-U01",
+      "sourceFactId": "SV3-FACT-U01-REQUESTS",
+      "description": "일일 요청 처리량",
+      "evidenceUnitIds": [
+        "SV3-U01-P01-E02"
+      ]
+    },
+    {
+      "groupId": "SV3-U01-G03",
+      "userBundleId": "SV3-U01",
+      "sourceFactId": "SV3-FACT-U01-KAFKA-NOT-ADOPTED",
+      "description": "Kafka 미도입",
+      "evidenceUnitIds": [
+        "SV3-U01-P01-E03"
+      ]
+    },
+    {
+      "groupId": "SV3-U01-G04",
+      "userBundleId": "SV3-U01",
+      "sourceFactId": "SV3-FACT-U01-INCIDENT-PREVENTION",
+      "description": "장애 재발 방지 절차",
+      "evidenceUnitIds": [
+        "SV3-U01-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U01-G05",
+      "userBundleId": "SV3-U01",
+      "sourceFactId": "SV3-FACT-U01-DORMANTQUEUE-INACTIVE",
+      "description": "비활성 버전의 DormantQueue 실험",
+      "evidenceUnitIds": [
+        "SV3-U01-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U04-G01",
+      "userBundleId": "SV3-U04",
+      "sourceFactId": "SV3-FACT-U04-INTERVIEWS",
+      "description": "소상공인 인터뷰",
+      "evidenceUnitIds": [
+        "SV3-U04-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U04-G02",
+      "userBundleId": "SV3-U04",
+      "sourceFactId": "SV3-FACT-U04-REDESIGN",
+      "description": "조사 기반 인터페이스 재설계",
+      "evidenceUnitIds": [
+        "SV3-U04-P01-E02"
+      ]
+    },
+    {
+      "groupId": "SV3-U04-G03",
+      "userBundleId": "SV3-U04",
+      "sourceFactId": "SV3-FACT-U04-USABILITY",
+      "description": "과업 완료율 개선",
+      "evidenceUnitIds": [
+        "SV3-U04-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U04-G04",
+      "userBundleId": "SV3-U04",
+      "sourceFactId": "SV3-FACT-U04-OTHER-ACTOR-AB",
+      "description": "마케팅팀의 A/B 테스트",
+      "evidenceUnitIds": [
+        "SV3-U04-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U06-G01",
+      "userBundleId": "SV3-U06",
+      "sourceFactId": "SV3-FACT-U06-CAMPAIGN",
+      "description": "email/webinar 캠페인 실행",
+      "evidenceUnitIds": [
+        "SV3-U06-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U06-G02",
+      "userBundleId": "SV3-U06",
+      "sourceFactId": "SV3-FACT-U06-LEADS",
+      "description": "qualified leads 1,300건",
+      "evidenceUnitIds": [
+        "SV3-U06-P01-E02"
+      ]
+    },
+    {
+      "groupId": "SV3-U06-G03",
+      "userBundleId": "SV3-U06",
+      "sourceFactId": "SV3-FACT-U06-CRM",
+      "description": "CRM 단계 표준화 및 교육",
+      "evidenceUnitIds": [
+        "SV3-U06-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U06-G04",
+      "userBundleId": "SV3-U06",
+      "sourceFactId": "SV3-FACT-U06-OTHER-ACTOR-SALES",
+      "description": "파트너 영업팀의 계약 성과",
+      "evidenceUnitIds": [
+        "SV3-U06-P03-E01"
+      ]
+    }
+  ],
+  "evidenceUnits": [
+    {
+      "evidenceUnitId": "SV3-U01-P01-E01",
+      "userBundleId": "SV3-U01",
+      "parentId": "SV3-U01-P01",
+      "groupId": "SV3-U01-G01",
+      "documentId": "SV3-U01-D01",
+      "versionId": "SV3-U01-D01-V01",
+      "sourceFactId": "SV3-FACT-U01-PAYGW",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U01-P01-E01-S01",
+          "parentId": "SV3-U01-P01",
+          "documentId": "SV3-U01-D01",
+          "versionId": "SV3-U01-D01-V01",
+          "sourcePath": "documents/sv3-u01-backend-resume-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 21,
+          "charEnd": 78,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "본인은 내부 결제 게이트웨이 PAY-GW를 설계하고 2024년 1월부터 2024년 12월까지 운영했다.",
+          "textSha256": "8a839708eadf7d53cc2ef247005652af466eca4e5912b56ffe0a33439d30dbd1"
+        }
+      ],
+      "primarySpanId": "SV3-U01-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PRODUCTION",
+      "aspects": [
+        "paygw_operation"
+      ],
+      "entities": [
+        {
+          "entityType": "PRODUCT_IDENTIFIER",
+          "canonicalValue": "PAY-GW",
+          "surfaceForms": [
+            "PAY-GW"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": [
+        {
+          "start": "2024-01-01",
+          "end": "2024-12-31",
+          "precision": "MONTH",
+          "sourceSurface": "2024년 1월부터 2024년 12월까지"
+        }
+      ]
+    },
+    {
+      "evidenceUnitId": "SV3-U01-P01-E02",
+      "userBundleId": "SV3-U01",
+      "parentId": "SV3-U01-P01",
+      "groupId": "SV3-U01-G02",
+      "documentId": "SV3-U01-D01",
+      "versionId": "SV3-U01-D01-V01",
+      "sourceFactId": "SV3-FACT-U01-REQUESTS",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U01-P01-E02-S01",
+          "parentId": "SV3-U01-P01",
+          "documentId": "SV3-U01-D01",
+          "versionId": "SV3-U01-D01-V01",
+          "sourcePath": "documents/sv3-u01-backend-resume-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 79,
+          "charEnd": 120,
+          "lineStart": 5,
+          "lineEnd": 5,
+          "text": "일일 요청 1,300건을 안정적으로 처리했고 장애 대응 절차를 문서화했다.",
+          "textSha256": "8e222647665d2f6763d8e8f3648341277fab6a73301de5ce03336f16722efd77"
+        }
+      ],
+      "primarySpanId": "SV3-U01-P01-E02-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PRODUCTION",
+      "aspects": [
+        "request_volume"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 1300,
+          "unit": "REQUEST_PER_DAY",
+          "semanticType": "REQUEST_COUNT",
+          "sourceSurface": "1,300건",
+          "qualifierTokens": [
+            "일일",
+            "요청"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U01-P01-E03",
+      "userBundleId": "SV3-U01",
+      "parentId": "SV3-U01-P01",
+      "groupId": "SV3-U01-G03",
+      "documentId": "SV3-U01-D01",
+      "versionId": "SV3-U01-D01-V01",
+      "sourceFactId": "SV3-FACT-U01-KAFKA-NOT-ADOPTED",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U01-P01-E03-S01",
+          "parentId": "SV3-U01-P01",
+          "documentId": "SV3-U01-D01",
+          "versionId": "SV3-U01-D01-V01",
+          "sourcePath": "documents/sv3-u01-backend-resume-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 121,
+          "charEnd": 150,
+          "lineStart": 6,
+          "lineEnd": 6,
+          "text": "Kafka는 검토했지만 운영 환경에 도입하지 않았다.",
+          "textSha256": "78529cc0553c8d106da4a1c429dfd8ca6ab6913b632aa684613eea06d507802d"
+        }
+      ],
+      "primarySpanId": "SV3-U01-P01-E03-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "ATTEMPTED",
+      "aspects": [
+        "kafka_production"
+      ],
+      "entities": [
+        {
+          "entityType": "TECHNOLOGY",
+          "canonicalValue": "KAFKA",
+          "surfaceForms": [
+            "Kafka"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U01-P02-E01",
+      "userBundleId": "SV3-U01",
+      "parentId": "SV3-U01-P02",
+      "groupId": "SV3-U01-G04",
+      "documentId": "SV3-U01-D02",
+      "versionId": "SV3-U01-D02-V01",
+      "sourceFactId": "SV3-FACT-U01-INCIDENT-PREVENTION",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U01-P02-E01-S01",
+          "parentId": "SV3-U01-P02",
+          "documentId": "SV3-U01-D02",
+          "versionId": "SV3-U01-D02-V01",
+          "sourcePath": "documents/sv3-u01-backend-career-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 25,
+          "charEnd": 59,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "본인은 반복 장애의 로그와 배포 이력을 대조해 원인을 좁혔다.",
+          "textSha256": "6b6726749a1f4370833abd6ef806115ee7c7e46d8de3127da0381df54eb6c17c"
+        },
+        {
+          "spanId": "SV3-U01-P02-E01-S02",
+          "parentId": "SV3-U01-P02",
+          "documentId": "SV3-U01-D02",
+          "versionId": "SV3-U01-D02-V01",
+          "sourcePath": "documents/sv3-u01-backend-career-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 60,
+          "charEnd": 93,
+          "lineStart": 5,
+          "lineEnd": 5,
+          "text": "재발 방지 체크리스트를 작성하고 월별 복구 훈련을 운영했다.",
+          "textSha256": "55952b7ae885ea02882e34b448942acc38c90efce17b277f265a28f8e8e8d02f"
+        }
+      ],
+      "primarySpanId": "SV3-U01-P02-E01-S01",
+      "contextSpanIds": [
+        "SV3-U01-P02-E01-S02"
+      ],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "incident_prevention"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U01-P03-E01",
+      "userBundleId": "SV3-U01",
+      "parentId": "SV3-U01-P03",
+      "groupId": "SV3-U01-G05",
+      "documentId": "SV3-U01-D01",
+      "versionId": "SV3-U01-D01-V00",
+      "sourceFactId": "SV3-FACT-U01-DORMANTQUEUE-INACTIVE",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U01-P03-E01-S01",
+          "parentId": "SV3-U01-P03",
+          "documentId": "SV3-U01-D01",
+          "versionId": "SV3-U01-D01-V00",
+          "sourcePath": "documents/sv3-u01-backend-resume-v00-inactive.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 23,
+          "charEnd": 54,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "DormantQueue를 사내 시험 환경에서만 사용했다.",
+          "textSha256": "bdcf6096d1a165cb9158571307f89bc102d99b07c326eee7cefe9afad5cb407c"
+        }
+      ],
+      "primarySpanId": "SV3-U01-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PROTOTYPE",
+      "aspects": [
+        "dormantqueue_experiment"
+      ],
+      "entities": [
+        {
+          "entityType": "TECHNOLOGY",
+          "canonicalValue": "DORMANTQUEUE",
+          "surfaceForms": [
+            "DormantQueue"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U04-P01-E01",
+      "userBundleId": "SV3-U04",
+      "parentId": "SV3-U04-P01",
+      "groupId": "SV3-U04-G01",
+      "documentId": "SV3-U04-D01",
+      "versionId": "SV3-U04-D01-V01",
+      "sourceFactId": "SV3-FACT-U04-INTERVIEWS",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U04-P01-E01-S01",
+          "parentId": "SV3-U04-P01",
+          "documentId": "SV3-U04-D01",
+          "versionId": "SV3-U04-D01-V01",
+          "sourcePath": "documents/sv3-u04-design-portfolio-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 25,
+          "charEnd": 66,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "본인은 소상공인 12명을 인터뷰해 주문 취소 과정의 혼란 지점을 분류했다.",
+          "textSha256": "458b460b687efdfcc5404b11f12050ea8fa89d803db0ef7131c48091b5f6a002"
+        }
+      ],
+      "primarySpanId": "SV3-U04-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "user_research"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 12,
+          "unit": "PERSON",
+          "semanticType": "INTERVIEW_PARTICIPANT_COUNT",
+          "sourceSurface": "12명",
+          "qualifierTokens": [
+            "소상공인",
+            "인터뷰"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U04-P01-E02",
+      "userBundleId": "SV3-U04",
+      "parentId": "SV3-U04-P01",
+      "groupId": "SV3-U04-G02",
+      "documentId": "SV3-U04-D01",
+      "versionId": "SV3-U04-D01-V01",
+      "sourceFactId": "SV3-FACT-U04-REDESIGN",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U04-P01-E02-S01",
+          "parentId": "SV3-U04-P01",
+          "documentId": "SV3-U04-D01",
+          "versionId": "SV3-U04-D01-V01",
+          "sourcePath": "documents/sv3-u04-design-portfolio-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 67,
+          "charEnd": 103,
+          "lineStart": 5,
+          "lineEnd": 5,
+          "text": "관찰 결과를 토대로 단계 명칭과 오류 안내 문구를 다시 설계했다.",
+          "textSha256": "3abcdae9eb969e9aaf1d30810c63c894e1e7f80489c7b62ef38e734283062fcf"
+        }
+      ],
+      "primarySpanId": "SV3-U04-P01-E02-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "design_decision"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U04-P02-E01",
+      "userBundleId": "SV3-U04",
+      "parentId": "SV3-U04-P02",
+      "groupId": "SV3-U04-G03",
+      "documentId": "SV3-U04-D01",
+      "versionId": "SV3-U04-D01-V01",
+      "sourceFactId": "SV3-FACT-U04-USABILITY",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U04-P02-E01-S01",
+          "parentId": "SV3-U04-P02",
+          "documentId": "SV3-U04-D01",
+          "versionId": "SV3-U04-D01-V01",
+          "sourcePath": "documents/sv3-u04-design-portfolio-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 111,
+          "charEnd": 144,
+          "lineStart": 8,
+          "lineEnd": 8,
+          "text": "사용성 평가에서 과업 완료율이 62%에서 84%로 높아졌다.",
+          "textSha256": "478898c33588009ce24a381a49ef1a0d42449ffc97aa5b0a660d7a6ba86f932d"
+        }
+      ],
+      "primarySpanId": "SV3-U04-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "usability_outcome"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 62,
+          "unit": "PERCENT",
+          "semanticType": "TASK_COMPLETION_RATE_BEFORE",
+          "sourceSurface": "62%",
+          "qualifierTokens": [
+            "과업",
+            "완료율"
+          ]
+        },
+        {
+          "normalizedValue": 84,
+          "unit": "PERCENT",
+          "semanticType": "TASK_COMPLETION_RATE_AFTER",
+          "sourceSurface": "84%",
+          "qualifierTokens": [
+            "과업",
+            "완료율"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U04-P03-E01",
+      "userBundleId": "SV3-U04",
+      "parentId": "SV3-U04-P03",
+      "groupId": "SV3-U04-G04",
+      "documentId": "SV3-U04-D01",
+      "versionId": "SV3-U04-D01-V01",
+      "sourceFactId": "SV3-FACT-U04-OTHER-ACTOR-AB",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U04-P03-E01-S01",
+          "parentId": "SV3-U04-P03",
+          "documentId": "SV3-U04-D01",
+          "versionId": "SV3-U04-D01-V01",
+          "sourcePath": "documents/sv3-u04-design-portfolio-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 154,
+          "charEnd": 186,
+          "lineStart": 11,
+          "lineEnd": 11,
+          "text": "마케팅팀은 별도 랜딩 페이지에서 A/B 테스트를 수행했다.",
+          "textSha256": "b34364469cbd553501b0121ac6c28701e40ea829461c2704dedc57be649f54ae"
+        }
+      ],
+      "primarySpanId": "SV3-U04-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "OTHER",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "ab_test"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U06-P01-E01",
+      "userBundleId": "SV3-U06",
+      "parentId": "SV3-U06-P01",
+      "groupId": "SV3-U06-G01",
+      "documentId": "SV3-U06-D01",
+      "versionId": "SV3-U06-D01-V01",
+      "sourceFactId": "SV3-FACT-U06-CAMPAIGN",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U06-P01-E01-S01",
+          "parentId": "SV3-U06-P01",
+          "documentId": "SV3-U06-D01",
+          "versionId": "SV3-U06-D01-V01",
+          "sourcePath": "documents/sv3-u06-growth-career-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 64,
+          "charEnd": 146,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "I launched a Korean-English onboarding campaign across email and webinar channels.",
+          "textSha256": "351ac39a335ff5d34892c79d9dff9b22ac32c0361da815708bda4f43b4370b35"
+        }
+      ],
+      "primarySpanId": "SV3-U06-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PRODUCTION",
+      "aspects": [
+        "campaign_execution"
+      ],
+      "entities": [
+        {
+          "entityType": "CHANNEL",
+          "canonicalValue": "EMAIL_WEBINAR",
+          "surfaceForms": [
+            "email",
+            "webinar"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U06-P01-E02",
+      "userBundleId": "SV3-U06",
+      "parentId": "SV3-U06-P01",
+      "groupId": "SV3-U06-G02",
+      "documentId": "SV3-U06-D01",
+      "versionId": "SV3-U06-D01-V01",
+      "sourceFactId": "SV3-FACT-U06-LEADS",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U06-P01-E02-S01",
+          "parentId": "SV3-U06-P01",
+          "documentId": "SV3-U06-D01",
+          "versionId": "SV3-U06-D01-V01",
+          "sourcePath": "documents/sv3-u06-growth-career-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 147,
+          "charEnd": 218,
+          "lineStart": 5,
+          "lineEnd": 5,
+          "text": "The campaign generated 1,300 qualified leads, not 1,300 paid customers.",
+          "textSha256": "473081711100c248df60d07b26f9c76725dc3d34be6952599695c17ab118b0e8"
+        }
+      ],
+      "primarySpanId": "SV3-U06-P01-E02-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "qualified_leads"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 1300,
+          "unit": "LEAD",
+          "semanticType": "QUALIFIED_LEAD_COUNT",
+          "sourceSurface": "1,300 qualified leads",
+          "qualifierTokens": [
+            "qualified",
+            "leads"
+          ]
+        },
+        {
+          "normalizedValue": 1300,
+          "unit": "CUSTOMER",
+          "semanticType": "PAID_CUSTOMER_COUNT_NEGATED",
+          "sourceSurface": "1,300 paid customers",
+          "qualifierTokens": [
+            "paid",
+            "customers"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U06-P02-E01",
+      "userBundleId": "SV3-U06",
+      "parentId": "SV3-U06-P02",
+      "groupId": "SV3-U06-G03",
+      "documentId": "SV3-U06-D01",
+      "versionId": "SV3-U06-D01-V01",
+      "sourceFactId": "SV3-FACT-U06-CRM",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U06-P02-E01-S01",
+          "parentId": "SV3-U06-P02",
+          "documentId": "SV3-U06-D01",
+          "versionId": "SV3-U06-D01-V01",
+          "sourcePath": "documents/sv3-u06-growth-career-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 237,
+          "charEnd": 323,
+          "lineStart": 8,
+          "lineEnd": 8,
+          "text": "I standardized CRM lead-stage definitions and trained the regional sales coordinators.",
+          "textSha256": "7e0f630eb2efa699cd67864c09742810a7c9a66a7c8d4320ea235766b15c9ced"
+        }
+      ],
+      "primarySpanId": "SV3-U06-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "sales_operations"
+      ],
+      "entities": [
+        {
+          "entityType": "SYSTEM",
+          "canonicalValue": "CRM",
+          "surfaceForms": [
+            "CRM"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U06-P03-E01",
+      "userBundleId": "SV3-U06",
+      "parentId": "SV3-U06-P03",
+      "groupId": "SV3-U06-G04",
+      "documentId": "SV3-U06-D01",
+      "versionId": "SV3-U06-D01-V01",
+      "sourceFactId": "SV3-FACT-U06-OTHER-ACTOR-SALES",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U06-P03-E01-S01",
+          "parentId": "SV3-U06-P03",
+          "documentId": "SV3-U06-D01",
+          "versionId": "SV3-U06-D01-V01",
+          "sourcePath": "documents/sv3-u06-growth-career-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 340,
+          "charEnd": 433,
+          "lineStart": 11,
+          "lineEnd": 11,
+          "text": "The partner sales team closed 40 enterprise accounts; I only prepared the briefing materials.",
+          "textSha256": "f297e4f03477086067fd52a46231ae281d6bb54342ee360a3bbaad1450c45e94"
+        }
+      ],
+      "primarySpanId": "SV3-U06-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "OTHER",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "enterprise_accounts"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 40,
+          "unit": "ACCOUNT",
+          "semanticType": "ENTERPRISE_ACCOUNT_COUNT",
+          "sourceSurface": "40 enterprise accounts",
+          "qualifierTokens": [
+            "partner",
+            "sales",
+            "team"
+          ]
+        }
+      ],
+      "dates": []
+    }
+  ]
+}

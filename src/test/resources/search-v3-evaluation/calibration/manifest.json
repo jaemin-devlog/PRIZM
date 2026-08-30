@@ -1,0 +1,118 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-seed-1.0.1",
+  "split": "CALIBRATION",
+  "status": "MATERIALIZED",
+  "mutable": true,
+  "opened": false,
+  "searchExecuted": false,
+  "sealedAt": null,
+  "generationSourceRevision": "14073dd1664fddb009a5bea8823a228e582abf51",
+  "counts": {
+    "userBundles": 2,
+    "logicalDocuments": 3,
+    "documentVersions": 3,
+    "activeDocumentVersions": 3,
+    "inactiveDocumentVersions": 0,
+    "queries": 8,
+    "evidenceParents": 6,
+    "evidenceGroups": 8,
+    "evidenceUnits": 8
+  },
+  "distributions": {
+    "split": {
+      "CALIBRATION": 2
+    },
+    "profession": {
+      "DATA_AI_INFRA": 1,
+      "FRONTEND_MOBILE": 1
+    },
+    "documentLanguage": {
+      "EN": 1,
+      "KO_EN_MIXED": 2
+    },
+    "documentFileType": {
+      "TXT": 3
+    },
+    "documentStructure": {
+      "CERTIFICATION_TRAINING": 1,
+      "LONG_PORTFOLIO": 1,
+      "TABLE_LIKE": 1
+    },
+    "queryLanguage": {
+      "EN": 4,
+      "KO_EN_MIXED": 4
+    },
+    "answerability": {
+      "NOT_SUPPORTED": 2,
+      "SUPPORTED": 6
+    },
+    "category": {
+      "abstract_competency": 1,
+      "attempted_prototype": 2,
+      "completed_production": 1,
+      "completion_state": 2,
+      "date_range": 1,
+      "english": 4,
+      "hard_negative": 2,
+      "job_requirement": 1,
+      "korean_english_mixed": 4,
+      "literal_identifier": 1,
+      "multi_aspect": 1,
+      "multi_evidence": 1,
+      "numeric_quantity": 1,
+      "numeric_range_comparison": 1,
+      "semantic_paraphrase": 2,
+      "typo_format_variation": 1
+    }
+  },
+  "files": [
+    {
+      "path": "calibration/corpus.json",
+      "bytes": 3845,
+      "sha256": "cc44798e258eb74b2f5f77fbf808ea132751b9e19ec660c5b50f0144e799ecd3"
+    },
+    {
+      "path": "calibration/documents/sv3-u02-interface-portfolio-v01.txt",
+      "bytes": 481,
+      "sha256": "e5f0edf4d2b9f3c55ddc5a55a4aa4e9f629034edffa74ca827e9afc782c130a5"
+    },
+    {
+      "path": "calibration/documents/sv3-u03-data-infra-table-v01.txt",
+      "bytes": 308,
+      "sha256": "4e55176184865c7dae225a7ed49b6b03fa771a45eb21d6d268eedddc798d14a8"
+    },
+    {
+      "path": "calibration/documents/sv3-u03-training-record-v01.txt",
+      "bytes": 183,
+      "sha256": "b2fecc0ac205c01b666d23c1ceafe26f96fe81d76d2b24350f6ac167644f2bf9"
+    },
+    {
+      "path": "calibration/gold-evidence.json",
+      "bytes": 20624,
+      "sha256": "6e6d5ac829f4b076e6d3d134711f7e05b27246ddfb23731a7b76bd5705f5af98"
+    },
+    {
+      "path": "calibration/questions.json",
+      "bytes": 13030,
+      "sha256": "57d2caaa22e371503e726bb7f4b0473552b0c788baab27c0f3a7c02e8a04622c"
+    },
+    {
+      "path": "lineage.json",
+      "bytes": 10515,
+      "sha256": "789034fc96a511028b9c129fa4126d180ed6562390907efa2997bdcb5430f66b"
+    },
+    {
+      "path": "schema/search-v3-benchmark.schema.json",
+      "bytes": 19429,
+      "sha256": "c347f9ecb925b2f7d78817ae5bf5deb364b749eabb89359eb17d0bf0e24df465"
+    },
+    {
+      "path": "schema/search-v3-prediction.schema.json",
+      "bytes": 3182,
+      "sha256": "99d199ce3e4c65523c03755634e1853c86d6357a8c37d40aca108cc95da2cf84"
+    }
+  ],
+  "combinedSha256": "92095ea10504063ebdd5c1284c34396155923a1639e6163322e341337cbf6598"
+}

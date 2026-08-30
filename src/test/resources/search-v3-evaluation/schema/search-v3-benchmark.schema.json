@@ -1,0 +1,452 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jaemin-devlog/PRIZM/search-v3-benchmark.schema.json",
+  "title": "PRIZM Search V3 Fresh Generalization Benchmark",
+  "schemaVersion": "1.0.0",
+  "description": "Source-grounded benchmark artifacts. Runtime database IDs are not gold identifiers.",
+  "oneOf": [
+    { "$ref": "#/$defs/corpusArtifact" },
+    { "$ref": "#/$defs/goldArtifact" },
+    { "$ref": "#/$defs/questionsArtifact" },
+    { "$ref": "#/$defs/lineageArtifact" },
+    { "$ref": "#/$defs/manifestArtifact" }
+  ],
+  "$defs": {
+    "split": {
+      "enum": ["DEV", "CALIBRATION", "SEALED_FINAL_TEST"]
+    },
+    "language": {
+      "enum": ["KO", "EN", "KO_EN_MIXED"]
+    },
+    "professionGroup": {
+      "enum": [
+        "BACKEND",
+        "FRONTEND_MOBILE",
+        "DATA_AI_INFRA",
+        "DESIGN_PRODUCT",
+        "PLANNING",
+        "MARKETING_SALES",
+        "NON_DEVELOPMENT_GENERAL"
+      ]
+    },
+    "supportScope": {
+      "enum": ["SUPPORTED_BY_CURRENT", "V3_TARGET", "FUTURE_OPTIONAL"]
+    },
+    "answerability": {
+      "enum": ["SUPPORTED", "PARTIALLY_SUPPORTED", "NOT_SUPPORTED"]
+    },
+    "supportRelation": {
+      "enum": ["DIRECT_SUPPORT", "RELATED", "CONTRADICTS", "INSUFFICIENT"]
+    },
+    "queryCategory": {
+      "enum": [
+        "literal_identifier",
+        "semantic_paraphrase",
+        "abstract_competency",
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "date_range",
+        "no_answer",
+        "hard_negative",
+        "negation",
+        "planned",
+        "attempted_prototype",
+        "completed_production",
+        "completion_state",
+        "other_actor",
+        "multi_evidence",
+        "multi_aspect",
+        "job_requirement",
+        "korean",
+        "english",
+        "korean_english_mixed",
+        "typo_format_variation"
+      ]
+    },
+    "sourceSpan": {
+      "type": "object",
+      "required": [
+        "spanId", "parentId", "documentId", "versionId", "sourcePath",
+        "sourceType", "charStart", "charEnd", "lineStart", "lineEnd",
+        "text", "textSha256"
+      ],
+      "properties": {
+        "spanId": { "type": "string", "pattern": "^SV3-U[0-9]{2}-P[0-9]{2}-(?:PS|E[0-9]{2}-S)[0-9]{2}$" },
+        "parentId": { "type": "string", "pattern": "^SV3-U[0-9]{2}-P[0-9]{2}$" },
+        "documentId": { "type": "string", "pattern": "^SV3-U[0-9]{2}-D[0-9]{2}$" },
+        "versionId": { "type": "string", "pattern": "^SV3-U[0-9]{2}-D[0-9]{2}-V[0-9]{2}$" },
+        "sourcePath": { "type": "string", "pattern": "^documents/.+\\.txt$" },
+        "sourceType": { "enum": ["TXT_TEXT", "PDF_PAGE", "LAYOUT_BLOCK"] },
+        "page": { "type": ["integer", "null"], "minimum": 1 },
+        "charStart": { "type": "integer", "minimum": 0 },
+        "charEnd": { "type": "integer", "minimum": 1 },
+        "lineStart": { "type": "integer", "minimum": 1 },
+        "lineEnd": { "type": "integer", "minimum": 1 },
+        "text": { "type": "string", "minLength": 1 },
+        "textSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "bbox": {
+          "type": "object",
+          "required": ["coordinateSystem", "x", "y", "width", "height"],
+          "properties": {
+            "coordinateSystem": { "enum": ["PDF_POINTS_TOP_LEFT", "PIXELS_TOP_LEFT"] },
+            "x": { "type": "number" },
+            "y": { "type": "number" },
+            "width": { "type": "number", "exclusiveMinimum": 0 },
+            "height": { "type": "number", "exclusiveMinimum": 0 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "document": {
+      "type": "object",
+      "required": [
+        "documentId", "logicalDocumentId", "versionLineageId", "versionId",
+        "versionNumber", "active", "title", "documentType", "documentStructure",
+        "fileType", "language", "contentPath", "contentSha256", "supportScope",
+        "visibility", "provenance"
+      ],
+      "properties": {
+        "documentId": { "type": "string" },
+        "logicalDocumentId": { "type": "string" },
+        "versionLineageId": { "type": "string" },
+        "versionId": { "type": "string" },
+        "versionNumber": { "type": "integer", "minimum": 0 },
+        "active": { "type": "boolean" },
+        "title": { "type": "string", "minLength": 1 },
+        "documentType": {
+          "enum": [
+            "RESUME", "COVER_LETTER", "PORTFOLIO", "PROJECT_REPORT",
+            "PRESENTATION", "CERTIFICATE", "COURSE_COMPLETION",
+            "SCHOOL_ASSIGNMENT", "CAREER_REVIEW", "JOB_POSTING",
+            "INTERVIEW_FEEDBACK", "OTHER"
+          ]
+        },
+        "documentStructure": {
+          "enum": [
+            "SHORT_RESUME", "LONG_PORTFOLIO", "CAREER_DESCRIPTION",
+            "NARRATIVE_SELF_INTRODUCTION", "TABLE_LIKE",
+            "CERTIFICATION_TRAINING", "PROJECT_DESCRIPTION"
+          ]
+        },
+        "fileType": { "enum": ["TXT", "PDF", "IMAGE_PDF", "DOCX"] },
+        "language": { "$ref": "#/$defs/language" },
+        "contentPath": { "type": "string" },
+        "contentSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "supportScope": { "$ref": "#/$defs/supportScope" },
+        "visibility": { "enum": ["OWNER_ONLY", "PUBLIC_FIXTURE"] },
+        "provenance": {
+          "type": "object",
+          "required": ["classification", "license", "generatorName", "generatorRevision", "generatorSeedId"],
+          "properties": {
+            "classification": { "enum": ["SYNTHETIC", "PUBLIC_REDISTRIBUTABLE", "CONSENTED_REAL_LOCAL_ONLY"] },
+            "license": { "type": "string", "minLength": 1 },
+            "generatorName": { "type": "string", "minLength": 1 },
+            "generatorRevision": { "type": "string", "minLength": 1 },
+            "generatorSeedId": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "userBundle": {
+      "type": "object",
+      "required": [
+        "userBundleId", "split", "professionGroup", "profession",
+        "languageProfile", "documentFamilyId", "templateFamilyId", "documents"
+      ],
+      "properties": {
+        "userBundleId": { "type": "string", "pattern": "^SV3-U[0-9]{2}$" },
+        "split": { "$ref": "#/$defs/split" },
+        "professionGroup": { "$ref": "#/$defs/professionGroup" },
+        "profession": { "type": "string", "minLength": 1 },
+        "languageProfile": { "$ref": "#/$defs/language" },
+        "documentFamilyId": { "type": "string", "minLength": 1 },
+        "templateFamilyId": { "type": "string", "minLength": 1 },
+        "documents": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/document" } }
+      },
+      "additionalProperties": false
+    },
+    "parent": {
+      "type": "object",
+      "required": ["parentId", "userBundleId", "documentId", "versionId", "label", "sourceSpan"],
+      "properties": {
+        "parentId": { "type": "string" },
+        "userBundleId": { "type": "string" },
+        "documentId": { "type": "string" },
+        "versionId": { "type": "string" },
+        "label": { "type": "string", "minLength": 1 },
+        "sourceSpan": { "$ref": "#/$defs/sourceSpan" }
+      },
+      "additionalProperties": false
+    },
+    "entityConstraint": {
+      "type": "object",
+      "required": ["entityType", "canonicalValue", "surfaceForms"],
+      "properties": {
+        "entityType": { "type": "string", "minLength": 1 },
+        "canonicalValue": { "type": "string", "minLength": 1 },
+        "surfaceForms": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      },
+      "additionalProperties": false
+    },
+    "numericObservation": {
+      "type": "object",
+      "required": ["normalizedValue", "unit", "semanticType", "sourceSurface", "qualifierTokens"],
+      "properties": {
+        "normalizedValue": { "type": "number" },
+        "unit": { "type": "string", "minLength": 1 },
+        "semanticType": { "type": "string", "minLength": 1 },
+        "sourceSurface": { "type": "string", "minLength": 1 },
+        "qualifierTokens": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      },
+      "additionalProperties": false
+    },
+    "dateObservation": {
+      "type": "object",
+      "required": ["start", "end", "precision", "sourceSurface"],
+      "properties": {
+        "start": { "type": "string", "format": "date" },
+        "end": { "type": "string", "format": "date" },
+        "precision": { "enum": ["DAY", "MONTH", "QUARTER", "YEAR"] },
+        "sourceSurface": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "evidenceUnit": {
+      "type": "object",
+      "required": [
+        "evidenceUnitId", "userBundleId", "parentId", "groupId", "documentId",
+        "versionId", "sourceFactId", "sourceSpans", "primarySpanId",
+        "contextSpanIds", "actor", "completionState", "aspects", "entities",
+        "numerics", "dates"
+      ],
+      "properties": {
+        "evidenceUnitId": { "type": "string", "pattern": "^SV3-U[0-9]{2}-P[0-9]{2}-E[0-9]{2}$" },
+        "userBundleId": { "type": "string" },
+        "parentId": { "type": "string" },
+        "groupId": { "type": "string", "pattern": "^SV3-U[0-9]{2}-G[0-9]{2}$" },
+        "documentId": { "type": "string" },
+        "versionId": { "type": "string" },
+        "sourceFactId": { "type": "string", "minLength": 1 },
+        "sourceSpans": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/sourceSpan" } },
+        "primarySpanId": { "type": "string" },
+        "contextSpanIds": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "actor": { "enum": ["SELF", "TEAM", "OTHER", "UNSPECIFIED"] },
+        "completionState": { "enum": ["PLANNED", "ATTEMPTED", "PROTOTYPE", "COMPLETED", "PRODUCTION", "NOT_APPLICABLE"] },
+        "aspects": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "entities": { "type": "array", "items": { "$ref": "#/$defs/entityConstraint" } },
+        "numerics": { "type": "array", "items": { "$ref": "#/$defs/numericObservation" } },
+        "dates": { "type": "array", "items": { "$ref": "#/$defs/dateObservation" } }
+      },
+      "additionalProperties": false
+    },
+    "evidenceGroup": {
+      "type": "object",
+      "required": ["groupId", "userBundleId", "sourceFactId", "description", "evidenceUnitIds"],
+      "properties": {
+        "groupId": { "type": "string" },
+        "userBundleId": { "type": "string" },
+        "sourceFactId": { "type": "string" },
+        "description": { "type": "string", "minLength": 1 },
+        "evidenceUnitIds": { "type": "array", "minItems": 1, "items": { "type": "string" }, "uniqueItems": true }
+      },
+      "additionalProperties": false
+    },
+    "requiredNumeric": {
+      "type": "object",
+      "required": ["operator", "value", "unit", "semanticType", "qualifierTokens"],
+      "properties": {
+        "operator": { "enum": ["EQ", "GTE", "LTE", "GT", "LT", "BETWEEN"] },
+        "value": { "type": "number" },
+        "upperValue": { "type": "number" },
+        "unit": { "type": "string" },
+        "semanticType": { "type": "string" },
+        "qualifierTokens": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "requiredDate": {
+      "type": "object",
+      "required": ["operator", "start", "end", "precision"],
+      "properties": {
+        "operator": { "enum": ["OVERLAPS", "CONTAINS", "WITHIN", "STARTS_ON", "ENDS_ON"] },
+        "start": { "type": "string", "format": "date" },
+        "end": { "type": "string", "format": "date" },
+        "precision": { "enum": ["DAY", "MONTH", "QUARTER", "YEAR"] }
+      },
+      "additionalProperties": false
+    },
+    "aspect": {
+      "type": "object",
+      "required": [
+        "aspectId", "required", "answerability", "expectedEvidence",
+        "requiredEvidenceGroupIds", "minEvidenceGroups", "constraints"
+      ],
+      "properties": {
+        "aspectId": { "type": "string", "minLength": 1 },
+        "required": { "type": "boolean" },
+        "answerability": { "$ref": "#/$defs/answerability" },
+        "expectedEvidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["evidenceUnitId", "supportRelation"],
+            "properties": {
+              "evidenceUnitId": { "type": "string" },
+              "supportRelation": { "$ref": "#/$defs/supportRelation" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "requiredEvidenceGroupIds": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "minEvidenceGroups": { "type": "integer", "minimum": 0 },
+        "constraints": {
+          "type": "object",
+          "required": ["entities", "numerics", "dates", "actors", "completionStates", "polarity"],
+          "properties": {
+            "entities": { "type": "array", "items": { "$ref": "#/$defs/entityConstraint" } },
+            "numerics": { "type": "array", "items": { "$ref": "#/$defs/requiredNumeric" } },
+            "dates": { "type": "array", "items": { "$ref": "#/$defs/requiredDate" } },
+            "actors": { "type": "array", "items": { "enum": ["SELF", "TEAM", "OTHER", "UNSPECIFIED"] }, "uniqueItems": true },
+            "completionStates": { "type": "array", "items": { "enum": ["PLANNED", "ATTEMPTED", "PROTOTYPE", "COMPLETED", "PRODUCTION", "NOT_APPLICABLE"] }, "uniqueItems": true },
+            "polarity": { "enum": ["POSITIVE", "NEGATIVE", "EITHER"] }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "query": {
+      "type": "object",
+      "required": [
+        "queryId", "userBundleId", "questionGroupId", "query", "normalizedQuery",
+        "categories", "language", "answerability", "aspectExpression", "aspects",
+        "safetyExclusions"
+      ],
+      "properties": {
+        "queryId": { "type": "string", "pattern": "^SV3-U[0-9]{2}-Q[0-9]{2}$" },
+        "userBundleId": { "type": "string" },
+        "questionGroupId": { "type": "string", "minLength": 1 },
+        "query": { "type": "string", "minLength": 1 },
+        "normalizedQuery": { "type": "string", "minLength": 1 },
+        "categories": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/queryCategory" }, "uniqueItems": true },
+        "language": { "$ref": "#/$defs/language" },
+        "answerability": { "$ref": "#/$defs/answerability" },
+        "aspectExpression": {
+          "type": "object",
+          "required": ["operator", "requiredAspectIds", "minShouldMatch"],
+          "properties": {
+            "operator": { "enum": ["ALL", "ANY", "AT_LEAST"] },
+            "requiredAspectIds": { "type": "array", "minItems": 1, "items": { "type": "string" }, "uniqueItems": true },
+            "minShouldMatch": { "type": "integer", "minimum": 1 }
+          },
+          "additionalProperties": false
+        },
+        "aspects": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/aspect" } },
+        "safetyExclusions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["evidenceUnitId", "reason"],
+            "properties": {
+              "evidenceUnitId": { "type": "string" },
+              "reason": { "enum": ["OWNER_LEAKAGE", "INACTIVE_VERSION_LEAKAGE", "WRONG_VERSION_LEAKAGE", "UNAUTHORIZED_SOURCE_EXPOSURE"] }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "corpusArtifact": {
+      "type": "object",
+      "required": ["artifactType", "schemaVersion", "datasetVersion", "split", "userBundles"],
+      "properties": {
+        "artifactType": { "const": "CORPUS" },
+        "schemaVersion": { "const": "1.0.0" },
+        "datasetVersion": { "type": "string" },
+        "split": { "$ref": "#/$defs/split" },
+        "userBundles": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/userBundle" } }
+      },
+      "additionalProperties": false
+    },
+    "goldArtifact": {
+      "type": "object",
+      "required": ["artifactType", "schemaVersion", "datasetVersion", "split", "parents", "evidenceGroups", "evidenceUnits"],
+      "properties": {
+        "artifactType": { "const": "GOLD_EVIDENCE" },
+        "schemaVersion": { "const": "1.0.0" },
+        "datasetVersion": { "type": "string" },
+        "split": { "$ref": "#/$defs/split" },
+        "parents": { "type": "array", "items": { "$ref": "#/$defs/parent" } },
+        "evidenceGroups": { "type": "array", "items": { "$ref": "#/$defs/evidenceGroup" } },
+        "evidenceUnits": { "type": "array", "items": { "$ref": "#/$defs/evidenceUnit" } }
+      },
+      "additionalProperties": false
+    },
+    "questionsArtifact": {
+      "type": "object",
+      "required": ["artifactType", "schemaVersion", "datasetVersion", "split", "queries"],
+      "properties": {
+        "artifactType": { "const": "QUESTIONS" },
+        "schemaVersion": { "const": "1.0.0" },
+        "datasetVersion": { "type": "string" },
+        "split": { "$ref": "#/$defs/split" },
+        "queries": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/query" } }
+      },
+      "additionalProperties": false
+    },
+    "lineageArtifact": {
+      "type": "object",
+      "required": ["artifactType", "schemaVersion", "datasetVersion", "bundles"],
+      "properties": {
+        "artifactType": { "const": "LINEAGE" },
+        "schemaVersion": { "const": "1.0.0" },
+        "datasetVersion": { "type": "string" },
+        "bundles": { "type": "array", "minItems": 1, "items": { "type": "object" } }
+      },
+      "additionalProperties": false
+    },
+    "manifestArtifact": {
+      "type": "object",
+      "required": [
+        "artifactType", "schemaVersion", "datasetVersion", "status", "opened",
+        "searchExecuted", "generationSourceRevision", "counts", "distributions",
+        "files", "combinedSha256"
+      ],
+      "properties": {
+        "artifactType": { "const": "MANIFEST" },
+        "schemaVersion": { "const": "1.0.0" },
+        "datasetVersion": { "type": "string" },
+        "split": { "oneOf": [{ "$ref": "#/$defs/split" }, { "const": "ALL" }] },
+        "status": { "enum": ["MATERIALIZED", "SEALED", "FRESH_BENCHMARK_SEED_FROZEN"] },
+        "mutable": { "type": "boolean" },
+        "opened": { "type": "boolean" },
+        "searchExecuted": { "type": "boolean" },
+        "sealedAt": { "type": ["string", "null"], "format": "date-time" },
+        "generationSourceRevision": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "counts": { "type": "object" },
+        "distributions": { "type": "object" },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["path", "bytes", "sha256"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "bytes": { "type": "integer", "minimum": 0 },
+              "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "combinedSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

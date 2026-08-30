@@ -1,0 +1,5 @@
+Synthetic Training Record
+
+수료 내역
+2024년 5월 Kubernetes Administration 과정을 32시간 이수했다.
+교육 실습에서 cluster backup과 restore 절차를 수행했다.

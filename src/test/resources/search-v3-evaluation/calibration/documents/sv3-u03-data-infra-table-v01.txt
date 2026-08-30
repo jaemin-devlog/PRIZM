@@ -1,0 +1,8 @@
+Data & Infra 운영표
+
+항목 | 기간 | 결과
+pipeline | 2023-03~2024-02 | 월 2,400,000 records 검증과 품질 경보 운영
+incident | 2024-01 | on-call runbook 작성 및 복구 훈련 완료
+
+모델 상태
+추천 모델은 offline prototype까지 검증했고 production 배포는 하지 않았다.

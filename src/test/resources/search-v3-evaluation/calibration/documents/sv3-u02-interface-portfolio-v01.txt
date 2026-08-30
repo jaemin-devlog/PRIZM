@@ -1,0 +1,12 @@
+Synthetic Interface Portfolio
+
+Accessibility release
+I led keyboard-navigation and screen-reader improvements for the account workflow.
+We shipped the workflow at WCAG 2.1 AA and reduced accessibility audit findings from 18 to 4.
+
+Prototype boundary
+I built a voice-navigation prototype for a mobile research session.
+The voice-navigation prototype was not released to production.
+
+Mobile delivery
+I coordinated the iOS and Android release checklist with design and quality teams.

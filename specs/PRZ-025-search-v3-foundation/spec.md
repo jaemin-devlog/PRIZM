@@ -1,10 +1,11 @@
 # PRZ-025 Search V3 Foundation Contract
 
-- 상태: `IN_PROGRESS`
-- Phase: Architecture Contract + Fresh Generalization Evaluation Contract
+- 상태: `IN_PROGRESS / FRESH_BENCHMARK_SEED_FROZEN`
+- Phase: Architecture Contract + Fresh Generalization Evaluation Contract + materialized seed freeze
 - 기준: `origin/main@2c8fd5c0d2f62b154642d703a0970389f8abed8e`
 - Search V3 구현: `NOT_RUN`
-- Fresh benchmark 실행: `NOT_RUN`
+- Fresh seed materialization/integrity validation: `COMPLETED`
+- Search benchmark 실행: `NOT_RUN`
 - Current Fresh Baseline: `NOT_RUN`
 
 ## 1. 목적과 우선순위
@@ -26,10 +27,11 @@
 
 ## 2. 범위와 불변 조건
 
-이번 Phase의 변경 범위는 이 PRZ 디렉터리와 `specs/README.md`뿐이다. Production 검색,
-DB schema와 migration, API, frontend, MCP, dependency, runtime configuration, 평가 runner,
-benchmark corpus는 변경하거나 추가하지 않는다. `v1.0.0` tag와 Release, 기존 PRZ의 상태와
-판정도 변경하지 않는다.
+Phase 1의 변경 범위는 이 PRZ 디렉터리와 `specs/README.md`뿐이었다. Phase 2는 별도
+Search V3 evaluation resource와 dependency 없는 validator/support script만 추가한다.
+두 Phase 모두 Production 검색, DB schema와 migration, API, frontend, MCP, dependency와
+runtime configuration을 변경하지 않는다. `v1.0.0` tag와 Release, 기존 PRZ의 상태와 판정도
+변경하지 않는다.
 
 Search V3는 다음 불변 조건을 보존해야 한다.
 
@@ -50,7 +52,7 @@ Search V3는 다음 불변 조건을 보존해야 한다.
 | --- | --- |
 | Profile | 기본 `source-dedup-evidence-signals-v1`; rollback `legacy-dense-v1` |
 | Embedding | Spring AI Ollama `bge-m3` 기본값은 model override 가능; Production schema는 1024차원 고정 |
-| Ingestion | strict UTF-8 TXT 또는 text-layer PDF를 기본 800자/120자 overlap 고정 character chunk로 분할 |
+| Ingestion | strict UTF-8 TXT 또는 text-layer PDF를 기본 800자/120자 overlap 고정 character chunk로 분할; PDF는 blank page를 건너뛰고 page마다 overlap을 다시 시작 |
 | Candidate retrieval | PostgreSQL pgvector exact cosine `<=>`, score=`1-distance`, default Top20 |
 | Final limit | Career Evidence 최대 5; legacy 최대 5; `/api/search` nearest 1 |
 | Isolation | SQL에서 document/version/chunk owner, `active_version_id`, version `ACTIVE`를 모두 확인 |
@@ -58,9 +60,9 @@ Search V3는 다음 불변 조건을 보존해야 한다.
 | Numeric | exact normalized number와 제한된 unit context; comparator/range 의미 계산 없음 |
 | Eligibility | GENERAL dense floor 0.50; exact identifier(+required number) 또는 dense Top5 core-term의 bounded 예외 |
 | Consolidation | source-location overlap과 query anchor 기반 representative 선택; DB gold가 아님 |
-| Ranking | GENERAL에서 dense + bounded identifier/core/number boost + reranker로 순서를 정하되 응답 score는 원래 `1-distance` |
-| Fallback | GENERAL 또는 experience-request의 초기 결과가 없을 때 anchor를 보존하는 variant 최대 2개 |
-| Rescue | 2~4자 exact token의 score `[0.49, 0.50)` 좁은 rescue, exact numeric+unit rescue |
+| Ranking | GENERAL에서 dense + bounded identifier/core/number boost + reranker로 순서를 정하되 응답 score는 선택된 query variant candidate의 raw `1-distance` |
+| Fallback | GENERAL 또는 experience-request의 초기 결과가 없을 때 anchor를 보존하는 variant 최대 2개; fallback이 선택되면 score는 original query가 아니라 그 variant의 값일 수 있음 |
+| Rescue | initially rejected GENERAL이고 모든 candidate가 0.50 미만일 때의 단일 2~4 code-point exact token score `[0.49, 0.50)` 좁은 rescue, exact numeric+unit rescue |
 | Localization | 선택 chunk 우선; 부족할 때 같은 owner/document/current ACTIVE version만 확장 |
 | Snippet | 생성형 요약이 아닌 원문 연속 최대 3문장; 실패 시 선택 chunk 원문 |
 | Source | TXT `TEXT_CHUNK`, PDF 원래 1-based `PAGE`; persisted/exposed source char/line span·bbox 없음 |
@@ -68,7 +70,7 @@ Search V3는 다음 불변 조건을 보존해야 한다.
 | `/api/search` | exact nearest 1건; searchable chunk가 없으면 기존 not-found error |
 | Career Evidence API | USER 인증; browser의 `POST /api/career-evidence/search`는 최대 5개 raw list로 빈 state 구분을 소실; `POST /api/v2/career-evidence/search`는 `{state, results}` |
 | V2 states | `EVIDENCE_FOUND`, `NO_RELEVANT_RESULTS`, `NO_EVIDENCE`, `NO_SEARCHABLE_DOCUMENTS` |
-| MCP | read-only `search_career_evidence`가 인증 사용자로 V2 service를 재사용; snippet/provenance/IDs만 옮기고 raw content/score/distance와 별도 ranking은 없음 |
+| MCP | read-only `search_career_evidence`가 인증 사용자로 V2 service를 재사용; evidence/provenance/IDs와 state를 옮기고 별도 ranking과 raw score/distance field는 없음. snippet fallback이면 evidence text가 선택 chunk 전체일 수 있음 |
 
 현재 제한도 기준선 일부로 동결한다.
 
@@ -266,7 +268,8 @@ split assignment의 최소 단위는 query가 아니라 `userBundleId`다. 한 b
 다음 leakage 방지 규칙은 강제한다.
 
 - 같은 사용자와 그 사용자의 모든 resume/version은 split을 넘지 않는다.
-- 같은 template family의 단순 복제는 하나의 leakage group으로 묶어 가능한 한 split을 넘기지 않는다.
+- 같은 template family 또는 generator name/revision/seed의 복제는 하나의 leakage group으로
+  묶고 materialized benchmark에서는 split을 넘으면 validator가 실패한다.
 - 같은 source fact의 paraphrase query, question/evidence group은 split을 넘지 않는다.
 - 같은 프로젝트·회사·고유 식별자를 공유하는 사실은 leakage key로 기록하고 과도한 교차를 막는다.
 - 같은 synthetic generator seed, source template, fact template의 변형을 독립 사용자로 세지 않는다.
@@ -473,7 +476,89 @@ Default/Quality 두 profile도 실제로 독립적인 gain/cost 근거가 있을
 
 ## 16. 다음 Phase 진입 조건
 
-이 Phase의 문서 정합성·scope 검증과 audit가 끝나면 benchmark materialization과 독립 봉인
-절차를 시작할 수 있다. 이는 PRZ-026 구현 승인이나 Production 변경 승인이 아니다. 주요
-알고리즘 구현은 fresh split/gold/final manifest와 Search Quality·Operational 숫자 Gate가
-final 결과를 보기 전에 봉인된 뒤에만 시작한다.
+Phase 1의 문서 정합성·scope 검증과 audit가 끝나면 benchmark materialization과 독립 봉인
+절차를 시작할 수 있다. Phase 2의 seed freeze가 검증되면 Structural Parsing 후보는
+`DEV/CALIBRATION`에서만 구현·비교할 수 있다. 이는 Production 변경, release-grade final
+실행 또는 adoption 승인이 아니다.
+
+평가 schema, gold 의미, split/lineage와 sealed input은 구현 전에 봉인한다. 품질·운영의
+숫자 Gate는 실제 `DEV/CALIBRATION` 측정 근거가 생긴 뒤 finalist 선택 전에 정하고,
+반드시 `SEALED_FINAL_TEST`를 실행하거나 결과를 보기 전에 `FROZEN_GATE`로 봉인한다.
+Final을 본 뒤 evaluator 의미나 Gate를 바꾸는 것은 허용하지 않는다.
+
+## 17. Phase 2 — materialized Fresh Seed Contract
+
+### 17.1 저장·상태
+
+- versioned root: `src/test/resources/search-v3-evaluation/`
+- dataset version: `search-v3-fresh-seed-1.0.1`
+- schema version: `1.0.0`
+- state: `FRESH_BENCHMARK_SEED_FROZEN`
+- Current Search / V3 검색 실행: `NOT_RUN`
+- `CURRENT_FRESH_BASELINE = NOT_RUN`
+
+기존 `search-evaluation/v2*`는 포함·복사·재라벨하지 않았다. tracked seed는 Apache-2.0으로
+배포하는 완전 synthetic TXT만 포함한다. 공개 자료는 fixture별 license 검토 뒤에만 넣고,
+동의 기반 실제 데이터는 익명화·동의·접근·retention·삭제 계약을 승인한 뒤 Git에서 제외된
+`local/search-v3-evaluation/`에만 둔다.
+
+### 17.2 좌표와 ID
+
+Gold ID는 `SV3-U07-P03-E02` 같은 annotation ID이며 runtime DB ID가 아니다. source는
+UTF-8 no-BOM/LF로 정규화한다. `charStart`는 Unicode code-point 기준 0-based inclusive,
+`charEnd`는 0-based exclusive이고 line은 1-based inclusive다. exact span text와 UTF-8
+SHA-256이 실제 document version과 일치해야 한다. Parent, Unit의 모든 constituent span과
+document/version/user가 일치하지 않으면 실패한다.
+
+### 17.3 Answerability expression과 result adapter
+
+Query는 `ALL`, `ANY`, `AT_LEAST`와 `minShouldMatch`로 required aspect 조합을 표현한다.
+`SUPPORTED`는 expression 전체, `PARTIALLY_SUPPORTED`는 엄격한 일부, `NOT_SUPPORTED`는
+required aspect의 direct support 0개를 뜻한다. relation은 Phase 1의 네 enum을 그대로 쓴다.
+
+future prediction adapter는 Current Search와 모든 V3 후보가 stable document/version/source
+locator를 같은 형태로 제출하게 한다. direct hit는 같은 Parent 안에서 Unit의 모든 required
+span을 반환한 경우에만 성립한다. mapping되지 않은 returned evidence는 Precision에서
+non-direct로 계산하며 누락하지 않는다. runtime chunk/parent ID는 diagnostic일 뿐 gold가 아니다.
+
+### 17.4 materialized leakage와 safety
+
+다음 key가 둘 이상의 split에 나타나면 blocking failure다.
+
+- `userBundleId`, logical document와 version lineage
+- `sourceFactId`와 normalized source-fact signature
+- normalized query와 `questionGroupId`
+- document/template family
+- generator name/revision/seed lineage
+
+Seed에는 서로 다른 owner bundle, inactive/wrong version과 unauthorized-source exclusion을
+명시한다. 후속 safety runner는 여러 owner와 inactive version을 같은 run에 실제 적재하고
+owner/inactive/wrong-version/unauthorized exposure를 각각 0건으로 확인해야 한다. safety decoy가
+없는 run으로 Hard Safety Gate를 통과시킬 수 없다.
+
+### 17.5 freeze와 Gate 순서
+
+split manifest는 corpus metadata, question, gold, lineage와 두 schema의 SHA-256을 포함한다.
+overall manifest는 이 자산과 split manifest, tracked source fixture를 모두 봉인한다.
+`sealed-final`은 `opened=false`, `searchExecuted=false`이고 result/prediction file을 허용하지 않는다.
+여기서 `opened`는 source/gold integrity validation이 아니라 검색 결과가 개발자에게 노출됐는지를
+뜻한다.
+
+schema, gold/evaluator 의미, sealed input 또는 query policy를 바꾸면 같은 version을 수정하지
+않고 새 dataset version과 새 seal을 만든다. 이미 개봉한 결과는 `HISTORICAL_RESULT`로만
+보존한다. 미래 `FROZEN_GATE` record는 primary endpoint, query-micro/user-macro denominator,
+worst-group non-regression tolerance, no-answer/localization/direct-support 기준, uncertainty와
+failed-query policy, hardware와 operational budget을 명시해야 한다. 현재 숫자 Gate는 여전히
+`PROPOSED_TARGET`이며 PASS가 아니다.
+
+### 17.6 seed와 release-grade 경계
+
+materialized seed는 user bundle 7개로 schema/integrity/generalization coverage를 확인하는
+자산이다. Release-grade `PROPOSED_TARGET >= 50 user bundles`를 대체하지 않고 Search V3의
+성능 또는 adoption 근거가 아니다. OCR/image PDF와 DOCX는 schema의 `V3_TARGET` 또는
+`FUTURE_OPTIONAL` capability로 표현할 수 있지만 이번 comparable seed와 Production ingest에는
+포함하지 않는다.
+
+Current `/api/search` 단일 결과, Career Evidence 최대 5개, owner/current `ACTIVE` filtering,
+V2 state와 MCP reuse boundary는 frozen baseline의 normative invariants다. 별도 Product/API
+workflow 없이 Structural Parsing 실험이 이 계약을 바꿀 수 없다.

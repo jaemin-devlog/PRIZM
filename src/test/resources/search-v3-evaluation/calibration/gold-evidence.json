@@ -1,0 +1,657 @@
+{
+  "artifactType": "GOLD_EVIDENCE",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-seed-1.0.1",
+  "split": "CALIBRATION",
+  "parents": [
+    {
+      "parentId": "SV3-U02-P01",
+      "userBundleId": "SV3-U02",
+      "documentId": "SV3-U02-D01",
+      "versionId": "SV3-U02-D01-V01",
+      "label": "Accessibility release",
+      "sourceSpan": {
+        "spanId": "SV3-U02-P01-PS01",
+        "parentId": "SV3-U02-P01",
+        "documentId": "SV3-U02-D01",
+        "versionId": "SV3-U02-D01-V01",
+        "sourcePath": "documents/sv3-u02-interface-portfolio-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 31,
+        "charEnd": 229,
+        "lineStart": 3,
+        "lineEnd": 5,
+        "text": "Accessibility release\nI led keyboard-navigation and screen-reader improvements for the account workflow.\nWe shipped the workflow at WCAG 2.1 AA and reduced accessibility audit findings from 18 to 4.",
+        "textSha256": "73d4c08d8c6effb8833d31754b724347894663e877fff4d0efd622ed732cefb1"
+      }
+    },
+    {
+      "parentId": "SV3-U02-P02",
+      "userBundleId": "SV3-U02",
+      "documentId": "SV3-U02-D01",
+      "versionId": "SV3-U02-D01-V01",
+      "label": "Prototype boundary",
+      "sourceSpan": {
+        "spanId": "SV3-U02-P02-PS01",
+        "parentId": "SV3-U02-P02",
+        "documentId": "SV3-U02-D01",
+        "versionId": "SV3-U02-D01-V01",
+        "sourcePath": "documents/sv3-u02-interface-portfolio-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 231,
+        "charEnd": 380,
+        "lineStart": 7,
+        "lineEnd": 9,
+        "text": "Prototype boundary\nI built a voice-navigation prototype for a mobile research session.\nThe voice-navigation prototype was not released to production.",
+        "textSha256": "917df516cbeae384425d60eefc31bd554035a36c9d94795495e006ced61fcc65"
+      }
+    },
+    {
+      "parentId": "SV3-U02-P03",
+      "userBundleId": "SV3-U02",
+      "documentId": "SV3-U02-D01",
+      "versionId": "SV3-U02-D01-V01",
+      "label": "Mobile delivery",
+      "sourceSpan": {
+        "spanId": "SV3-U02-P03-PS01",
+        "parentId": "SV3-U02-P03",
+        "documentId": "SV3-U02-D01",
+        "versionId": "SV3-U02-D01-V01",
+        "sourcePath": "documents/sv3-u02-interface-portfolio-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 382,
+        "charEnd": 480,
+        "lineStart": 11,
+        "lineEnd": 12,
+        "text": "Mobile delivery\nI coordinated the iOS and Android release checklist with design and quality teams.",
+        "textSha256": "37d6f061831ddd9e5cef700964a54448a7f7ea64292bdcdee32a16c73ae41676"
+      }
+    },
+    {
+      "parentId": "SV3-U03-P01",
+      "userBundleId": "SV3-U03",
+      "documentId": "SV3-U03-D01",
+      "versionId": "SV3-U03-D01-V01",
+      "label": "운영표",
+      "sourceSpan": {
+        "spanId": "SV3-U03-P01-PS01",
+        "parentId": "SV3-U03-P01",
+        "documentId": "SV3-U03-D01",
+        "versionId": "SV3-U03-D01-V01",
+        "sourcePath": "documents/sv3-u03-data-infra-table-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 18,
+        "charEnd": 143,
+        "lineStart": 3,
+        "lineEnd": 5,
+        "text": "항목 | 기간 | 결과\npipeline | 2023-03~2024-02 | 월 2,400,000 records 검증과 품질 경보 운영\nincident | 2024-01 | on-call runbook 작성 및 복구 훈련 완료",
+        "textSha256": "cdbfe7e4caaa5a1cbd23dcb8e8d9bf45300e73f0b10a1eeb94031909bc00423d"
+      }
+    },
+    {
+      "parentId": "SV3-U03-P02",
+      "userBundleId": "SV3-U03",
+      "documentId": "SV3-U03-D01",
+      "versionId": "SV3-U03-D01-V01",
+      "label": "모델 상태",
+      "sourceSpan": {
+        "spanId": "SV3-U03-P02-PS01",
+        "parentId": "SV3-U03-P02",
+        "documentId": "SV3-U03-D01",
+        "versionId": "SV3-U03-D01-V01",
+        "sourcePath": "documents/sv3-u03-data-infra-table-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 145,
+        "charEnd": 205,
+        "lineStart": 7,
+        "lineEnd": 8,
+        "text": "모델 상태\n추천 모델은 offline prototype까지 검증했고 production 배포는 하지 않았다.",
+        "textSha256": "02d86acb3552a4d037daef7ba3a3c9e7f723c512242809c374dc5d116916311e"
+      }
+    },
+    {
+      "parentId": "SV3-U03-P03",
+      "userBundleId": "SV3-U03",
+      "documentId": "SV3-U03-D02",
+      "versionId": "SV3-U03-D02-V01",
+      "label": "수료 내역",
+      "sourceSpan": {
+        "spanId": "SV3-U03-P03-PS01",
+        "parentId": "SV3-U03-P03",
+        "documentId": "SV3-U03-D02",
+        "versionId": "SV3-U03-D02-V01",
+        "sourcePath": "documents/sv3-u03-training-record-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 27,
+        "charEnd": 124,
+        "lineStart": 3,
+        "lineEnd": 5,
+        "text": "수료 내역\n2024년 5월 Kubernetes Administration 과정을 32시간 이수했다.\n교육 실습에서 cluster backup과 restore 절차를 수행했다.",
+        "textSha256": "8a62ace4de717d6a2fd7f6f4bff445fbb7f00143de7f32ca04968f8b3d0335c3"
+      }
+    }
+  ],
+  "evidenceGroups": [
+    {
+      "groupId": "SV3-U02-G01",
+      "userBundleId": "SV3-U02",
+      "sourceFactId": "SV3-FACT-U02-A11Y",
+      "description": "접근성 개선 출시",
+      "evidenceUnitIds": [
+        "SV3-U02-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U02-G02",
+      "userBundleId": "SV3-U02",
+      "sourceFactId": "SV3-FACT-U02-VOICE-PROTOTYPE",
+      "description": "음성 탐색 prototype",
+      "evidenceUnitIds": [
+        "SV3-U02-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U02-G03",
+      "userBundleId": "SV3-U02",
+      "sourceFactId": "SV3-FACT-U02-VOICE-NOT-PROD",
+      "description": "음성 탐색 production 미출시",
+      "evidenceUnitIds": [
+        "SV3-U02-P02-E02"
+      ]
+    },
+    {
+      "groupId": "SV3-U02-G04",
+      "userBundleId": "SV3-U02",
+      "sourceFactId": "SV3-FACT-U02-MOBILE-RELEASE",
+      "description": "iOS/Android 출시 조율",
+      "evidenceUnitIds": [
+        "SV3-U02-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U03-G01",
+      "userBundleId": "SV3-U03",
+      "sourceFactId": "SV3-FACT-U03-PIPELINE",
+      "description": "pipeline 운영 기간과 처리량",
+      "evidenceUnitIds": [
+        "SV3-U03-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U03-G02",
+      "userBundleId": "SV3-U03",
+      "sourceFactId": "SV3-FACT-U03-INCIDENT",
+      "description": "on-call 복구 훈련",
+      "evidenceUnitIds": [
+        "SV3-U03-P01-E02"
+      ]
+    },
+    {
+      "groupId": "SV3-U03-G03",
+      "userBundleId": "SV3-U03",
+      "sourceFactId": "SV3-FACT-U03-MODEL-NOT-PROD",
+      "description": "추천 모델 prototype 및 미배포",
+      "evidenceUnitIds": [
+        "SV3-U03-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U03-G04",
+      "userBundleId": "SV3-U03",
+      "sourceFactId": "SV3-FACT-U03-K8S-TRAINING",
+      "description": "Kubernetes 과정 수료",
+      "evidenceUnitIds": [
+        "SV3-U03-P03-E01"
+      ]
+    }
+  ],
+  "evidenceUnits": [
+    {
+      "evidenceUnitId": "SV3-U02-P01-E01",
+      "userBundleId": "SV3-U02",
+      "parentId": "SV3-U02-P01",
+      "groupId": "SV3-U02-G01",
+      "documentId": "SV3-U02-D01",
+      "versionId": "SV3-U02-D01-V01",
+      "sourceFactId": "SV3-FACT-U02-A11Y",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U02-P01-E01-S01",
+          "parentId": "SV3-U02-P01",
+          "documentId": "SV3-U02-D01",
+          "versionId": "SV3-U02-D01-V01",
+          "sourcePath": "documents/sv3-u02-interface-portfolio-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 53,
+          "charEnd": 135,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "I led keyboard-navigation and screen-reader improvements for the account workflow.",
+          "textSha256": "b6bd06e0d9cedc5141652e210f45677c42f2d24eb2d4860a111b085339bddd6e"
+        },
+        {
+          "spanId": "SV3-U02-P01-E01-S02",
+          "parentId": "SV3-U02-P01",
+          "documentId": "SV3-U02-D01",
+          "versionId": "SV3-U02-D01-V01",
+          "sourcePath": "documents/sv3-u02-interface-portfolio-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 136,
+          "charEnd": 229,
+          "lineStart": 5,
+          "lineEnd": 5,
+          "text": "We shipped the workflow at WCAG 2.1 AA and reduced accessibility audit findings from 18 to 4.",
+          "textSha256": "267a31706aed2ce0cbf6003201ab7cda441940755c2da745ec5bb43ca7556a3e"
+        }
+      ],
+      "primarySpanId": "SV3-U02-P01-E01-S01",
+      "contextSpanIds": [
+        "SV3-U02-P01-E01-S02"
+      ],
+      "actor": "SELF",
+      "completionState": "PRODUCTION",
+      "aspects": [
+        "accessibility_release"
+      ],
+      "entities": [
+        {
+          "entityType": "STANDARD",
+          "canonicalValue": "WCAG_2_1_AA",
+          "surfaceForms": [
+            "WCAG 2.1 AA"
+          ]
+        }
+      ],
+      "numerics": [
+        {
+          "normalizedValue": 18,
+          "unit": "FINDING",
+          "semanticType": "AUDIT_FINDING_BEFORE",
+          "sourceSurface": "18",
+          "qualifierTokens": [
+            "findings"
+          ]
+        },
+        {
+          "normalizedValue": 4,
+          "unit": "FINDING",
+          "semanticType": "AUDIT_FINDING_AFTER",
+          "sourceSurface": "4",
+          "qualifierTokens": [
+            "findings"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U02-P02-E01",
+      "userBundleId": "SV3-U02",
+      "parentId": "SV3-U02-P02",
+      "groupId": "SV3-U02-G02",
+      "documentId": "SV3-U02-D01",
+      "versionId": "SV3-U02-D01-V01",
+      "sourceFactId": "SV3-FACT-U02-VOICE-PROTOTYPE",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U02-P02-E01-S01",
+          "parentId": "SV3-U02-P02",
+          "documentId": "SV3-U02-D01",
+          "versionId": "SV3-U02-D01-V01",
+          "sourcePath": "documents/sv3-u02-interface-portfolio-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 250,
+          "charEnd": 317,
+          "lineStart": 8,
+          "lineEnd": 8,
+          "text": "I built a voice-navigation prototype for a mobile research session.",
+          "textSha256": "1d8855d31649d37ad061ef7592ffc309f4266cc9f464547fa77ae42f83547dce"
+        }
+      ],
+      "primarySpanId": "SV3-U02-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PROTOTYPE",
+      "aspects": [
+        "voice_navigation_prototype"
+      ],
+      "entities": [
+        {
+          "entityType": "FEATURE",
+          "canonicalValue": "VOICE_NAVIGATION",
+          "surfaceForms": [
+            "voice-navigation"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U02-P02-E02",
+      "userBundleId": "SV3-U02",
+      "parentId": "SV3-U02-P02",
+      "groupId": "SV3-U02-G03",
+      "documentId": "SV3-U02-D01",
+      "versionId": "SV3-U02-D01-V01",
+      "sourceFactId": "SV3-FACT-U02-VOICE-NOT-PROD",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U02-P02-E02-S01",
+          "parentId": "SV3-U02-P02",
+          "documentId": "SV3-U02-D01",
+          "versionId": "SV3-U02-D01-V01",
+          "sourcePath": "documents/sv3-u02-interface-portfolio-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 318,
+          "charEnd": 380,
+          "lineStart": 9,
+          "lineEnd": 9,
+          "text": "The voice-navigation prototype was not released to production.",
+          "textSha256": "66429634000fe8ef6edd001b12577583461475f57c7e52b473599720d35f04c8"
+        }
+      ],
+      "primarySpanId": "SV3-U02-P02-E02-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PROTOTYPE",
+      "aspects": [
+        "voice_navigation_production"
+      ],
+      "entities": [
+        {
+          "entityType": "FEATURE",
+          "canonicalValue": "VOICE_NAVIGATION",
+          "surfaceForms": [
+            "voice-navigation"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U02-P03-E01",
+      "userBundleId": "SV3-U02",
+      "parentId": "SV3-U02-P03",
+      "groupId": "SV3-U02-G04",
+      "documentId": "SV3-U02-D01",
+      "versionId": "SV3-U02-D01-V01",
+      "sourceFactId": "SV3-FACT-U02-MOBILE-RELEASE",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U02-P03-E01-S01",
+          "parentId": "SV3-U02-P03",
+          "documentId": "SV3-U02-D01",
+          "versionId": "SV3-U02-D01-V01",
+          "sourcePath": "documents/sv3-u02-interface-portfolio-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 398,
+          "charEnd": 480,
+          "lineStart": 12,
+          "lineEnd": 12,
+          "text": "I coordinated the iOS and Android release checklist with design and quality teams.",
+          "textSha256": "b30950889f3102164f963ecbc78105bf5ae0646ebdab592d05675afa82d0ba80"
+        }
+      ],
+      "primarySpanId": "SV3-U02-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "mobile_release"
+      ],
+      "entities": [
+        {
+          "entityType": "PLATFORM",
+          "canonicalValue": "IOS_ANDROID",
+          "surfaceForms": [
+            "iOS",
+            "Android"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U03-P01-E01",
+      "userBundleId": "SV3-U03",
+      "parentId": "SV3-U03-P01",
+      "groupId": "SV3-U03-G01",
+      "documentId": "SV3-U03-D01",
+      "versionId": "SV3-U03-D01-V01",
+      "sourceFactId": "SV3-FACT-U03-PIPELINE",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U03-P01-E01-S01",
+          "parentId": "SV3-U03-P01",
+          "documentId": "SV3-U03-D01",
+          "versionId": "SV3-U03-D01-V01",
+          "sourcePath": "documents/sv3-u03-data-infra-table-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 31,
+          "charEnd": 92,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "pipeline | 2023-03~2024-02 | 월 2,400,000 records 검증과 품질 경보 운영",
+          "textSha256": "d501f03f7a1f3a5edb098c1bff2158e59f372ae61185848825e63853c9c459ec"
+        }
+      ],
+      "primarySpanId": "SV3-U03-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PRODUCTION",
+      "aspects": [
+        "pipeline_operation"
+      ],
+      "entities": [
+        {
+          "entityType": "SYSTEM",
+          "canonicalValue": "PIPELINE",
+          "surfaceForms": [
+            "pipeline"
+          ]
+        }
+      ],
+      "numerics": [
+        {
+          "normalizedValue": 2400000,
+          "unit": "RECORD_PER_MONTH",
+          "semanticType": "DATA_RECORD_COUNT",
+          "sourceSurface": "2,400,000",
+          "qualifierTokens": [
+            "월",
+            "records"
+          ]
+        }
+      ],
+      "dates": [
+        {
+          "start": "2023-03-01",
+          "end": "2024-02-29",
+          "precision": "MONTH",
+          "sourceSurface": "2023-03~2024-02"
+        }
+      ]
+    },
+    {
+      "evidenceUnitId": "SV3-U03-P01-E02",
+      "userBundleId": "SV3-U03",
+      "parentId": "SV3-U03-P01",
+      "groupId": "SV3-U03-G02",
+      "documentId": "SV3-U03-D01",
+      "versionId": "SV3-U03-D01-V01",
+      "sourceFactId": "SV3-FACT-U03-INCIDENT",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U03-P01-E02-S01",
+          "parentId": "SV3-U03-P01",
+          "documentId": "SV3-U03-D01",
+          "versionId": "SV3-U03-D01-V01",
+          "sourcePath": "documents/sv3-u03-data-infra-table-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 93,
+          "charEnd": 143,
+          "lineStart": 5,
+          "lineEnd": 5,
+          "text": "incident | 2024-01 | on-call runbook 작성 및 복구 훈련 완료",
+          "textSha256": "41228bd691945edf0abb707cbd3f004ff3d02eb49bad2562465cd9ce1c85aab9"
+        }
+      ],
+      "primarySpanId": "SV3-U03-P01-E02-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "incident_response"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": [
+        {
+          "start": "2024-01-01",
+          "end": "2024-01-31",
+          "precision": "MONTH",
+          "sourceSurface": "2024-01"
+        }
+      ]
+    },
+    {
+      "evidenceUnitId": "SV3-U03-P02-E01",
+      "userBundleId": "SV3-U03",
+      "parentId": "SV3-U03-P02",
+      "groupId": "SV3-U03-G03",
+      "documentId": "SV3-U03-D01",
+      "versionId": "SV3-U03-D01-V01",
+      "sourceFactId": "SV3-FACT-U03-MODEL-NOT-PROD",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U03-P02-E01-S01",
+          "parentId": "SV3-U03-P02",
+          "documentId": "SV3-U03-D01",
+          "versionId": "SV3-U03-D01-V01",
+          "sourcePath": "documents/sv3-u03-data-infra-table-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 151,
+          "charEnd": 205,
+          "lineStart": 8,
+          "lineEnd": 8,
+          "text": "추천 모델은 offline prototype까지 검증했고 production 배포는 하지 않았다.",
+          "textSha256": "8d37f737b4817d75afdaf2d449f1b2c737662e5c9722d9273d43df661d28623b"
+        }
+      ],
+      "primarySpanId": "SV3-U03-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PROTOTYPE",
+      "aspects": [
+        "model_production"
+      ],
+      "entities": [
+        {
+          "entityType": "ARTIFACT",
+          "canonicalValue": "RECOMMENDATION_MODEL",
+          "surfaceForms": [
+            "추천 모델"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U03-P03-E01",
+      "userBundleId": "SV3-U03",
+      "parentId": "SV3-U03-P03",
+      "groupId": "SV3-U03-G04",
+      "documentId": "SV3-U03-D02",
+      "versionId": "SV3-U03-D02-V01",
+      "sourceFactId": "SV3-FACT-U03-K8S-TRAINING",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U03-P03-E01-S01",
+          "parentId": "SV3-U03-P03",
+          "documentId": "SV3-U03-D02",
+          "versionId": "SV3-U03-D02-V01",
+          "sourcePath": "documents/sv3-u03-training-record-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 33,
+          "charEnd": 82,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "2024년 5월 Kubernetes Administration 과정을 32시간 이수했다.",
+          "textSha256": "df9219b073eabb1aa18743363bdeba0e08dbec665a69896ef5be0438cceceab4"
+        },
+        {
+          "spanId": "SV3-U03-P03-E01-S02",
+          "parentId": "SV3-U03-P03",
+          "documentId": "SV3-U03-D02",
+          "versionId": "SV3-U03-D02-V01",
+          "sourcePath": "documents/sv3-u03-training-record-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 83,
+          "charEnd": 124,
+          "lineStart": 5,
+          "lineEnd": 5,
+          "text": "교육 실습에서 cluster backup과 restore 절차를 수행했다.",
+          "textSha256": "38d61d9d0b2317fa0748649bb3ec92abe387be28bdcbf53b822fadf504249b14"
+        }
+      ],
+      "primarySpanId": "SV3-U03-P03-E01-S01",
+      "contextSpanIds": [
+        "SV3-U03-P03-E01-S02"
+      ],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "kubernetes_training"
+      ],
+      "entities": [
+        {
+          "entityType": "COURSE",
+          "canonicalValue": "KUBERNETES_ADMINISTRATION",
+          "surfaceForms": [
+            "Kubernetes Administration"
+          ]
+        }
+      ],
+      "numerics": [
+        {
+          "normalizedValue": 32,
+          "unit": "HOUR",
+          "semanticType": "TRAINING_DURATION",
+          "sourceSurface": "32시간",
+          "qualifierTokens": [
+            "과정",
+            "이수"
+          ]
+        }
+      ],
+      "dates": [
+        {
+          "start": "2024-05-01",
+          "end": "2024-05-31",
+          "precision": "MONTH",
+          "sourceSurface": "2024년 5월"
+        }
+      ]
+    }
+  ]
+}

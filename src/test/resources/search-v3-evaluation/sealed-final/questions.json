@@ -1,0 +1,459 @@
+{
+  "artifactType": "QUESTIONS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-seed-1.0.1",
+  "split": "SEALED_FINAL_TEST",
+  "queries": [
+    {
+      "queryId": "SV3-U05-Q01",
+      "userBundleId": "SV3-U05",
+      "questionGroupId": "SV3-U05-Q01-FAMILY",
+      "query": "2025년 1분기에 실제로 적용한 기획 업무가 있나요?",
+      "normalizedQuery": "2025년 1분기에 실제로 적용한 기획 업무가 있나요",
+      "categories": [
+        "date_range",
+        "completed_production",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "planning_execution"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "planning_execution",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U05-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U05-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [
+              {
+                "operator": "CONTAINS",
+                "start": "2025-01-01",
+                "end": "2025-03-31",
+                "precision": "QUARTER"
+              }
+            ],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [
+              "COMPLETED"
+            ],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U05-Q02",
+      "userBundleId": "SV3-U05",
+      "questionGroupId": "SV3-U05-Q02-FAMILY",
+      "query": "파트너 교육 프로그램을 이미 운영했나요?",
+      "normalizedQuery": "파트너 교육 프로그램을 이미 운영했나요",
+      "categories": [
+        "hard_negative",
+        "planned",
+        "completion_state",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "partner_training_completed"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "partner_training_completed",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U05-P02-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [
+              "COMPLETED",
+              "PRODUCTION"
+            ],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U05-Q03",
+      "userBundleId": "SV3-U05",
+      "questionGroupId": "SV3-U05-Q03-FAMILY",
+      "query": "계획을 실행하고 피드백으로 우선순위를 조정한 경험은?",
+      "normalizedQuery": "계획을 실행하고 피드백으로 우선순위를 조정한 경험은",
+      "categories": [
+        "semantic_paraphrase",
+        "abstract_competency",
+        "multi_evidence",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "planning_cycle"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "planning_cycle",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U05-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            },
+            {
+              "evidenceUnitId": "SV3-U05-P01-E02",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U05-G01",
+            "SV3-U05-G02"
+          ],
+          "minEvidenceGroups": 2,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U05-Q04",
+      "userBundleId": "SV3-U05",
+      "questionGroupId": "SV3-U05-Q04-FAMILY",
+      "query": "2024년에 해외 법인 설립을 완료했나요?",
+      "normalizedQuery": "2024년에 해외 법인 설립을 완료했나요",
+      "categories": [
+        "no_answer",
+        "hard_negative",
+        "date_range",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "foreign_entity_2024"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "foreign_entity_2024",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U07-Q01",
+      "userBundleId": "SV3-U07",
+      "questionGroupId": "SV3-U07-Q01-FAMILY",
+      "query": "응급 대응 기본 교육을 수료했나요?",
+      "normalizedQuery": "응급 대응 기본 교육을 수료했나요",
+      "categories": [
+        "literal_identifier",
+        "completed_production",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "emergency_training"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "emergency_training",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U07-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U07-G04"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "COURSE",
+                "canonicalValue": "EMERGENCY_RESPONSE_BASIC",
+                "surfaceForms": [
+                  "응급 대응 기본 교육"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [
+              "COMPLETED"
+            ],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U07-Q02",
+      "userBundleId": "SV3-U07",
+      "questionGroupId": "SV3-U07-Q02-FAMILY",
+      "query": "2022년 5월부터 2023년 11월까지 교대 운영을 맡았나요?",
+      "normalizedQuery": "2022년 5월부터 2023년 11월까지 교대 운영을 맡았나요",
+      "categories": [
+        "date_range",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "shift_handoff"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "shift_handoff",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U07-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U07-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [
+              {
+                "operator": "CONTAINS",
+                "start": "2022-05-01",
+                "end": "2023-11-30",
+                "precision": "MONTH"
+              }
+            ],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U07-Q03",
+      "userBundleId": "SV3-U07",
+      "questionGroupId": "SV3-U07-Q03-FAMILY",
+      "query": "지게차 운전 자격증을 보유했나요?",
+      "normalizedQuery": "지게차 운전 자격증을 보유했나요",
+      "categories": [
+        "hard_negative",
+        "negation",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "forklift_certificate"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "forklift_certificate",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U07-P02-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "CERTIFICATION",
+                "canonicalValue": "FORKLIFT_LICENSE",
+                "surfaceForms": [
+                  "지게차 운전 자격"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U07-Q04",
+      "userBundleId": "SV3-U07",
+      "questionGroupId": "SV3-U07-Q04-FAMILY",
+      "query": "고객 문의 운영과 현장 응급 대응을 모두 수행할 수 있는 근거는?",
+      "normalizedQuery": "고객 문의 운영과 현장 응급 대응을 모두 수행할 수 있는 근거는",
+      "categories": [
+        "multi_evidence",
+        "multi_aspect",
+        "job_requirement",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "customer_operations",
+          "emergency_training"
+        ],
+        "minShouldMatch": 2
+      },
+      "aspects": [
+        {
+          "aspectId": "customer_operations",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U07-P01-E02",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U07-G02"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        },
+        {
+          "aspectId": "emergency_training",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U07-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U07-G04"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": [
+        {
+          "evidenceUnitId": "SV3-U06-P02-E01",
+          "reason": "UNAUTHORIZED_SOURCE_EXPOSURE"
+        }
+      ]
+    }
+  ]
+}

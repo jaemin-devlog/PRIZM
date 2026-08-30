@@ -1069,7 +1069,7 @@ final class SearchV3DenseAblationEngine {
         return List.copyOf(result);
     }
 
-    private QueryProfileResult queryResult(
+    QueryProfileResult queryResult(
             Query query,
             List<RankedCandidate> ranking,
             DatasetSlice slice,

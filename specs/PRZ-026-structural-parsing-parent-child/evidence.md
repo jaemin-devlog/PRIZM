@@ -1,13 +1,14 @@
 # PRZ-026 Phase 1 Evidence
 
-- 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_NEEDS_ADJUSTMENT`
+- 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_PROMISING`
 - 기록일: 2026-08-30 (Asia/Seoul)
 - 선행 조건: `DEPENDS_ON_PRZ_025`
-- 최종 판정: `NEEDS_ADJUSTMENT`
+- 최종 판정: `PROMISING` — 독립 robustness Gate 통과; Production 채택 근거 아님
 - Phase 1 역사 판정: `NEEDS_ADJUSTMENT` — standalone heading 회귀
 - Phase 1 Adjustment 판정: `NEEDS_ADJUSTMENT` — heading은 제거됐으나 장문 ranking 순증 없음
 - Phase 1 Retrieval Passage 판정: `NEEDS_ADJUSTMENT` — 비용과 전체 metric은 개선·유지했으나
   `FRONTEND_MOBILE` 신규 회귀
+- Phase 1 Retrieval Passage Robustness 판정: `PROMISING` — 결과 전 입력/Gate 봉인 후 독립 suite 통과
 - Production 변경·적용: `0 / NOT_RUN`
 
 ## 1. 역사적 Phase 1 시작 상태
@@ -516,7 +517,7 @@ actor, negation, completion 또는 language heuristic으로 이 회귀를 고치
 - 상태: `INPUT_READY / BENCHMARK_NOT_RUN`
 - B3 policy 변경: 0; `120/320/480`, same-parent adjacency, heading context-only, overlap 0 유지
 - dataset: `search-v3-fresh-devcal-robustness-1.0.0`
-- manifest SHA-256: `cb43832d48bb1f88e5a24abc520154b8562950ecc973295fdb16936aae08ab54`
+- combined SHA-256: `cb43832d48bb1f88e5a24abc520154b8562950ecc973295fdb16936aae08ab54`
 - 규모: DEV 3 / CALIBRATION 3 bundles, synthetic TXT 6 documents, DIRECT-support 24 queries
 - 직무: `FRONTEND_MOBILE` 2, `DATA_AI_INFRA` 1, `DESIGN_PRODUCT` 1,
   `MARKETING_SALES` 1, `NON_DEVELOPMENT_GENERAL` 1
@@ -542,3 +543,95 @@ Parent Context, Parent Dense와 SEALED FINAL search는 모두 `NOT_RUN`; `CURREN
 SHA/count와 16개 실제 file hash/size/combined hash를 fail-closed 검증하고 mutation test를 포함한다.
 수정 후 계약 재감사의 마지막 evidence count finding도 이 기록으로 해소했으며, 결과 실행 전
 input-freeze 감사의 blocking finding은 0이다.
+
+## 30. B3 robustness 실행 결과
+
+- input-freeze commit: `0fe0b3c54d86016a5d2b5c4fe8f1d26216ee3105`
+- 실행 dataset: `search-v3-fresh-devcal-robustness-1.0.0`
+- combined SHA-256: `cb43832d48bb1f88e5a24abc520154b8562950ecc973295fdb16936aae08ab54`
+- ignored raw report SHA-256: `f0bf5481a572ad5e21f91916e5cd0fc6c309c50ec59e2f75ac2386433133324d`
+- model: `bge-m3:latest`, digest `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`,
+  1024 dimensions, cosine, raw Dense only
+- 실행: DEV/CAL 6 bundles, 6 documents, DIRECT-support 24 queries; SEALED FINAL 평가 dataset
+  load/search 0. manifest와 9개 파일은 byte/hash/flags 무결성 검증 목적으로만 읽음
+
+두 최초 실행 시도는 검색 전에 input-freeze SHA 전달 guard에서 종료됐다. 첫 시도는 PowerShell의
+`-D` 해석 오류, 두 번째는 Gradle test JVM으로 property가 전달되지 않은 오류였다. 파일·prediction·
+benchmark result는 생성되지 않았다. 동일 SHA를 test JVM에 전달한 세 번째 시도만 실제 평가로
+기록한다.
+
+### Fresh independent suite
+
+| Metric | A Fixed | B2 Atomic | B3 Passage |
+| --- | ---: | ---: | ---: |
+| candidate / embedding | 19 / 19 | 72 / 72 | 50 / 50 |
+| Recall@5/10/20/50 | 1 / 1 / 1 / 1 | 1 / 1 / 1 / 1 | 1 / 1 / 1 / 1 |
+| query-micro Top1 / MRR | 0.8333 / 0.9097 | 1 / 1 | 1 / 1 |
+| user-macro Top1 / MRR | 0.8333 / 0.9097 | 1 / 1 | 1 / 1 |
+| indexing wall time | 410.2399ms | 979.7674ms | 674.6776ms |
+| query p50 / p95 | 33.6726 / 41.4352ms | 33.6537 / 41.3427ms | 33.6383 / 41.3282ms |
+| contamination / fragmentation | 73.68% / 0 | 0 / 0 | 0 / 0 |
+
+B3는 B2보다 candidate/embedding을 `72→50`(30.56%), 단일-run indexing wall time을
+`979.7674ms→674.6776ms`(31.14%) 줄였다. B2/B3 query 24건은 Top1과 reciprocal rank가 모두
+tie였다. passage는 50개, child membership은 72개였고 passage당 child min/avg/max는
+`1/1.44/3`, 길이는 `109/220.36/312` code points였다. single/multi-child 비율은 72%/28%,
+cross-parent violation 0, heading-only candidate/rank1 0, DIRECT Gold Child 보존 24/24(100%)다.
+
+### Historical Long-form 재현과 paired 변화
+
+기존 `search-v3-fresh-devcal-1.1.0`도 같은 실행에서 재현했다. B2/B3 candidate는 `128→72`
+(43.75%), 단일-run indexing wall time은 `1898.2931ms→1106.9957ms`(41.69%)였다. query-micro
+Top1/MRR은 양쪽 `0.8/0.8833`, Recall@5/10/20/50은 모두 1, contamination/fragmentation은
+0/0, Gold Child 보존은 100%였다. user-macro Top1/MRR은 `0.8056/0.8889→0.8333/0.9028`이다.
+
+paired rank 변화는 두 건뿐이다.
+
+- 개선 `SV3-LF-U106-Q02`: direct 완료 교육 근거 rank `2→1`; 같은 Parent의 설명과 묶였다.
+- 회귀 `SV3-LF-U104-Q01`: offline-safe checkout direct 근거 rank `1→2`; 관련 배경 paragraph가
+  rank 1이 됐다. query-specific heuristic으로 수정하지 않았다.
+
+누적 충분 slice 판정에서 KO는 `NON_INFERIOR`(17 queries, interval `[0,0]`)였다. EN은 20 queries에서
+1 win/1 loss로 Top1 interval `[-0.1364,0.1765]`, MRR interval `[-0.0682,0.0882]`인
+`INCONCLUSIVE`였다. `FRONTEND_MOBILE`은 3 bundles/11 queries에서 0 win/1 loss, Top1 delta
+`-0.0909`와 interval `[-0.3333,0]`, MRR delta `-0.0455`와 interval `[-0.1667,0]`로
+`INCONCLUSIVE`다. 나머지 profession과 mixed language는 사전 기준 미달 `INSUFFICIENT_SAMPLE`이다.
+충분 slice의 `BLOCKING_REGRESSION`은 0이다. 이 불확실성을 비회귀 증명이나 Production 채택
+근거로 사용하지 않는다.
+
+## 31. B3 robustness 판정과 경계
+
+사전 동결 Gate의 실제 판정은 `PROMISING`이다. fresh 전체 B2/B3 point delta는 0이고 95% interval도
+`[0,0]`인 `NON_INFERIOR`; fresh frontend는 2 bundles/8 queries로 point delta 0이지만
+`INSUFFICIENT_SAMPLE`; 누적 충분 slice의 blocking regression은 0이다. 구조 경계·Recall·Gold 보존
+Gate와 최소 25% 비용 감소 Gate도 모두 충족했다.
+
+이 판정은 `Structural Child + Parent Context`의 evaluation-only 실험을 시작해도 된다는 뜻에만
+한정한다. Parent Context/Parent Dense/Production 적용은 아직 `NOT_RUN`이며 별도 입력·단일 변경점·
+Gate를 먼저 고정해야 한다. SEALED FINAL combined SHA-256
+`e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383`, tree
+`a129080861d7dafd32a9b3b3357b61aebb237e59`, `opened=false`, `searchExecuted=false`,
+`CURRENT_FRESH_BASELINE = NOT_RUN`은 유지됐다.
+
+## 32. B3 robustness validation
+
+| 명령/검사 | 실제 결과 |
+| --- | --- |
+| BGE-M3 robustness benchmark | `PASS`; 실제 평가 1회, report `f0bf5481...`, decision `PROMISING` |
+| 관련 evaluation unit test | `PASS`; 6 suites / 58 tests, failure/error/skipped 0 |
+| robustness materializer `--check` | `PASS`; 17 files, 6 bundles, 24 queries, combined `cb43832d...` |
+| PRZ-025 benchmark validator | `PASS`; `FRESH_BENCHMARK_SEED_FROZEN`, combined `1f36c4...`, Final search false |
+| PRZ-025 validator unit test | `PASS`; 18/18 |
+| SEALED FINAL byte/tree/flags | `PASS`; tree `a129080...`, combined `e5b315...`, flags false |
+| `git diff --check` | `PASS`; 출력 0 |
+| OSS readiness | `PASS`; Markdown 187/links 764, tracked safety 961, verifier 16/16, external 97/97 |
+| result diff scope | `PASS`; input-freeze 이후 변경은 PRZ-026 문서 4개, forbidden 경로 0 |
+| full backend/frontend/Docker | `NOT_RUN`; evaluation-only 범위, Production 변경 0 |
+| Parent Context/Parent Dense/push/PR/merge | `NOT_RUN`; 이번 범위 밖 |
+
+최종 자동 scope/history 감사는 blocking 0, 해소된 체크리스트 상태 finding 외 0이었다. 최초 결과
+계약 감사의 두 finding은 (1) SEALED integrity read를 `접근 0`으로 잘못 축약한 표현과 (2) VERIFY/
+AUDIT lifecycle checkbox 불일치였다. 각각 integrity-only read를 명시하고 lifecycle 순서를 맞춘 뒤
+재감사했으며 blocking/nonblocking finding 0으로 `PASS`했다. 판정 수치와 Gate 계산 finding은 없었다.
+결과 commit 전 lifecycle 완료 선표기 finding은 `INTEGRATE_PENDING`으로 되돌려 해소하고, 실제
+result/evidence commit 이후 post-commit 상태에서 최종 확인한다.

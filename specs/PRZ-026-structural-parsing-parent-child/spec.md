@@ -1,7 +1,7 @@
 # PRZ-026 Structural Parsing and Parent-Child Retrieval
 
-- 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_NEEDS_ADJUSTMENT`
-- 현재 Phase: `Phase 1 Retrieval Passage Robustness — INPUT_READY / BENCHMARK_NOT_RUN`
+- 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_PROMISING`
+- 현재 Phase: `Phase 1 Retrieval Passage Robustness — INTEGRATE_PENDING / PROMISING`
 - 선행 조건: `DEPENDS_ON_PRZ_025`
 - 기준 source: `PRZ-025-search-v3-foundation@5f8229f88251938dc5b34588676cc69edf409c99`
 - Production 적용: `NOT_RUN`
@@ -20,7 +20,7 @@ Recall을 개선한다는 것이다. 결과를 본 뒤 gold, split 또는 SEALED
 | A. Fixed Chunk + BGE-M3 Dense | `COMPLETED` |
 | B1. Structural Child v1 + BGE-M3 Dense | `COMPLETED — NEEDS_ADJUSTMENT` |
 | B2. Structural Child v2 + BGE-M3 Dense | `COMPLETED — NEEDS_ADJUSTMENT` |
-| B3. Structural Retrieval Passage + BGE-M3 Dense | `COMPLETED — NEEDS_ADJUSTMENT` |
+| B3. Structural Retrieval Passage + BGE-M3 Dense | `COMPLETED — PROMISING` (최초 판정 `NEEDS_ADJUSTMENT` 보존) |
 | C. Structural Child + Parent Context + BGE-M3 Dense | `NOT_RUN` |
 | D. Parent-Child Retrieval + BGE-M3 Dense | `NOT_RUN` |
 
@@ -212,3 +212,12 @@ Child 보존 100%, Recall 비열화 0, 새 suite의 B3 candidate/embedding 수�
 새 suite 전체 및 새 `FRONTEND_MOBILE` Top1/MRR point delta 비음수, 누적 충분 profession/language
 slice의 blocking regression 0이다. 이 Gate는 Parent Context 실험 진입 판단일 뿐 Search V3 채택
 Gate가 아니다. Parent Context, Parent Dense, reranker와 SEALED FINAL search는 계속 `NOT_RUN`이다.
+
+입력·Gate를 commit `0fe0b3c54d86016a5d2b5c4fe8f1d26216ee3105`에서 결과 확인 전에
+봉인하고 독립 suite를 한 번 실행했다. B3는 B2 대비 후보·embedding을 `72→50`(30.56%),
+단일-run indexing wall time을 `979.7674ms→674.6776ms`(31.14%) 줄였으며 Recall@5/10/20/50,
+Top1, MRR을 모두 `1.0`으로 유지했다. contamination/fragmentation/heading violation은 0,
+DIRECT Gold Child 보존은 100%였다. fresh 전체는 `NON_INFERIOR`; 새 frontend 표본은
+`INSUFFICIENT_SAMPLE`, 누적 frontend와 EN은 `INCONCLUSIVE`이며 blocking regression은 0이다.
+따라서 evaluation-only Parent Context 실험 진입 판정은 `PROMISING`이다. 이는 Production 채택이나
+Fresh Final 검증을 뜻하지 않는다.

@@ -1,6 +1,6 @@
 # PRZ-026 Phase 1 Plan
 
-- 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_NEEDS_ADJUSTMENT`
+- 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_PROMISING`
 - 허용 단계: `ORIENT → SPEC → PLAN → IMPLEMENT(evaluation-only) → VERIFY → AUDIT → INTEGRATE(commit only)`
 - 선행 조건: `DEPENDS_ON_PRZ_025`
 
@@ -117,3 +117,8 @@ PDFBox/Production extractor를 재사용한 evaluation-only fixture가 A/B 계�
 실패 시 fixture·B3 policy를 결과에 맞춰 재튜닝하지 않는다. runtime이 없으면 benchmark와 품질
 판정은 `NOT_RUN`; blocking regression이면 B3는 기존 `NEEDS_ADJUSTMENT`를 유지한다. Production,
 dependency, migration, frontend, MCP, Parent Context와 push/PR/merge는 범위 밖이다.
+
+실제 실행에서는 fresh 전체 B2/B3 ranking이 완전히 같았고 후보·embedding과 단일-run indexing
+wall time이 각각 30.56%, 31.14% 감소했다. 누적 충분 profession/language slice에
+`BLOCKING_REGRESSION`은 없었다. 누적 frontend와 EN의 interval은 `INCONCLUSIVE`이므로 Production
+근거로 사용하지 않되, 사전 계약에 따라 다음 evaluation-only Parent Context 실험은 진행 가능하다.

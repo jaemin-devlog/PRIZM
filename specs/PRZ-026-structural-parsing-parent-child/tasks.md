@@ -1,7 +1,7 @@
 # PRZ-026 Phase 1 Tasks
 
-- 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_NEEDS_ADJUSTMENT`
-- A/B 실행 결과: `COMPLETED — NEEDS_ADJUSTMENT`
+- 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_PROMISING`
+- A/B 실행 결과: `COMPLETED — PROMISING` (B1/B2 및 최초 B3 `NEEDS_ADJUSTMENT` 기록 유지)
 - C/D Parent 단계: `NOT_RUN`
 
 - [x] ORIENT: `origin/main`, PRZ-025 HEAD/merge 관계와 격리 branch/worktree 확인
@@ -57,10 +57,10 @@
 - [x] PLAN: fixture freeze commit 후 benchmark 실행, rollback/금지 범위 고정
 - [x] DATA: 독립 DEV/CAL 6 bundles, 24 DIRECT queries와 lineage/manifest materialize
 - [x] TEST/IMPLEMENT: robustness loader, leakage/hash validation과 paired clustered-bootstrap Gate
-- [ ] INTEGRATE-INPUT: benchmark 전 fixture·계약 local commit
-- [ ] VERIFY: 동일 BGE-M3 A/B2/B3 robustness benchmark 1회 실행
-- [ ] VERIFY: fresh/cumulative profession-language 표본·paired delta·uncertainty 기록
-- [ ] VERIFY: SEALED hash/flags, PRZ-025 validator, diff/OSS/scope와 관련 test
-- [ ] AUDIT: blocking finding과 다음 Parent Context experiment 진입 여부 독립 검토
-- [ ] INTEGRATE: result/evidence local commit only
+- [x] INTEGRATE-INPUT: benchmark 전 fixture·계약 local commit `0fe0b3c...`
+- [x] VERIFY: 동일 BGE-M3 A/B2/B3 robustness benchmark 1회 실행
+- [x] VERIFY: fresh/cumulative profession-language 표본·paired delta·uncertainty 기록
+- [x] VERIFY: SEALED hash/flags, PRZ-025 validator, diff/OSS/scope와 관련 test
+- [x] AUDIT: blocking finding 0, 다음 Parent Context experiment 진입 가능 독립 검토
+- [ ] INTEGRATE: result/evidence local commit only — `PENDING`
 - [ ] Parent Context/Parent Dense/push/PR/merge — `NOT_RUN` (금지)

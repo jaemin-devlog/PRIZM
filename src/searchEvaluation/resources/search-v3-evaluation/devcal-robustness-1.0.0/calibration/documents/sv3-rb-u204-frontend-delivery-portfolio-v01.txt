@@ -1,0 +1,33 @@
+Synthetic Multi-Region Web Delivery Portfolio
+
+Resilient form submission
+
+Applicants in shared facilities often lost connectivity near the final attachment step. The previous form restarted the session after an error and did not explain whether information had reached the server, creating duplicate attempts.
+
+I shipped a resumable application form that retained encrypted local drafts through intermittent connectivity and successfully recovered 96% of interrupted submissions during the staged rollout.
+
+The implementation separated local draft state, uploaded attachments, and confirmed server state. Recovery tests covered browser restarts, expired sessions, attachment retries, and switching networks.
+
+Internationalization release
+
+Mirroring individual pages had produced inconsistent icon direction, truncated labels, and controls whose visual order did not match keyboard order. I classified shared component behavior instead of applying one global transform.
+
+The team released right-to-left layout support for Arabic and Hebrew across 34 shared components, with visual regression and keyboard-navigation checks passing in both language modes.
+
+Review fixtures included long translations, mixed numerals, embedded English product names, validation errors, and narrow viewports. Release notes identified content constraints that layout code could not enforce.
+
+Checkout performance budget
+
+The checkout accumulated third-party scripts, repeated state conversion, and synchronous price recalculation. Measurements used field data and a controlled device profile tagged by route, connection class, and promotions.
+
+I introduced a checkout performance budget and reduced p75 interaction latency from 310 milliseconds to 170 milliseconds on mid-range devices without removing validation or analytics.
+
+Work was divided into scheduling, component updates, and script ownership. The budget ran in pull requests and release monitoring, and exceptions required an owner, measured impact, and expiry date.
+
+Frontend incident containment
+
+A global rollback would have removed unrelated fixes and interrupted unaffected regions. The playbook identified feature and asset boundaries that could be disabled independently and required cache and origin version checks.
+
+During a localization release incident, I disabled only the affected locale bundle, preserved checkout for other regions, and restored the corrected bundle within 43 minutes after source-map verification.
+
+The review linked the malformed build to a missing validation step and added fixture compilation before publication. It recorded containment, communication, cache purge order, and evidence used to reopen the locale.

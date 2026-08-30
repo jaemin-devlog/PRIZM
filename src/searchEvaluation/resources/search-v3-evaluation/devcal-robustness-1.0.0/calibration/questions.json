@@ -1,0 +1,572 @@
+{
+  "artifactType": "QUESTIONS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+  "split": "CALIBRATION",
+  "queries": [
+    {
+      "queryId": "SV3-RB-U204-Q01",
+      "userBundleId": "SV3-RB-U204",
+      "questionGroupId": "SV3-RB-U204-Q01-FAMILY",
+      "query": "What evidence shows that interrupted web applications could resume without losing submitted work?",
+      "normalizedQuery": "what evidence shows that interrupted web applications could resume without losing submitted work",
+      "categories": [
+        "semantic_paraphrase",
+        "completed_production",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "resumable_form_delivery"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "resumable_form_delivery",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U204-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U204-G-P01-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U204-Q02",
+      "userBundleId": "SV3-RB-U204",
+      "questionGroupId": "SV3-RB-U204-Q02-FAMILY",
+      "query": "Was bidirectional layout support released and verified across the shared component library?",
+      "normalizedQuery": "was bidirectional layout support released and verified across the shared component library",
+      "categories": [
+        "completed_production",
+        "job_requirement",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "bidirectional_component_release"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "bidirectional_component_release",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U204-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U204-G-P02-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U204-Q03",
+      "userBundleId": "SV3-RB-U204",
+      "questionGroupId": "SV3-RB-U204-Q03-FAMILY",
+      "query": "Did the candidate bring typical checkout interaction latency below two hundred milliseconds?",
+      "normalizedQuery": "did the candidate bring typical checkout interaction latency below two hundred milliseconds",
+      "categories": [
+        "numeric_quantity",
+        "semantic_paraphrase",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "checkout_interaction_performance"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "checkout_interaction_performance",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U204-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U204-G-P03-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U204-Q04",
+      "userBundleId": "SV3-RB-U204",
+      "questionGroupId": "SV3-RB-U204-Q04-FAMILY",
+      "query": "Is there evidence of limiting a frontend incident to one locale while keeping other regions available?",
+      "normalizedQuery": "is there evidence of limiting a frontend incident to one locale while keeping other regions available",
+      "categories": [
+        "abstract_competency",
+        "semantic_paraphrase",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "frontend_incident_containment"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "frontend_incident_containment",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U204-P04-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U204-G-P04-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U205-Q01",
+      "userBundleId": "SV3-RB-U205",
+      "questionGroupId": "SV3-RB-U205-Q01-FAMILY",
+      "query": "공동 파트너 캠페인으로 천 건 이상의 유효 상담 요청을 만든 근거가 있나요?",
+      "normalizedQuery": "공동 파트너 캠페인으로 천 건 이상의 유효 상담 요청을 만든 근거가 있나요",
+      "categories": [
+        "numeric_quantity",
+        "semantic_paraphrase",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "partner_demand_program"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "partner_demand_program",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U205-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U205-G-P01-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U205-Q02",
+      "userBundleId": "SV3-RB-U205",
+      "questionGroupId": "SV3-RB-U205-Q02-FAMILY",
+      "query": "여러 지역의 실제 고객 언어를 근거로 마케팅 메시지를 표준화했나요?",
+      "normalizedQuery": "여러 지역의 실제 고객 언어를 근거로 마케팅 메시지를 표준화했나요",
+      "categories": [
+        "abstract_competency",
+        "job_requirement",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "evidence_based_localization"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "evidence_based_localization",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U205-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U205-G-P02-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U205-Q03",
+      "userBundleId": "SV3-RB-U205",
+      "questionGroupId": "SV3-RB-U205-Q03-FAMILY",
+      "query": "실험 결과를 근거로 낮은 성과 채널의 예산을 실제 재배치한 경험이 있나요?",
+      "normalizedQuery": "실험 결과를 근거로 낮은 성과 채널의 예산을 실제 재배치한 경험이 있나요",
+      "categories": [
+        "completed_production",
+        "semantic_paraphrase",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "evidence_based_budget_shift"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "evidence_based_budget_shift",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U205-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U205-G-P03-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U205-Q04",
+      "userBundleId": "SV3-RB-U205",
+      "questionGroupId": "SV3-RB-U205-Q04-FAMILY",
+      "query": "영업 인계에 필요한 맥락 누락을 10% 아래로 낮춘 근거가 있나요?",
+      "normalizedQuery": "영업 인계에 필요한 맥락 누락을 10 아래로 낮춘 근거가 있나요",
+      "categories": [
+        "numeric_quantity",
+        "abstract_competency",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "handoff_quality"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "handoff_quality",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U205-P04-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U205-G-P04-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U206-Q01",
+      "userBundleId": "SV3-RB-U206",
+      "questionGroupId": "SV3-RB-U206-Q01-FAMILY",
+      "query": "실제 상황 연습과 관찰을 포함해 수십 명의 진행자를 준비시킨 근거가 있나요?",
+      "normalizedQuery": "실제 상황 연습과 관찰을 포함해 수십 명의 진행자를 준비시킨 근거가 있나요",
+      "categories": [
+        "abstract_competency",
+        "numeric_quantity",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "facilitator_onboarding"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "facilitator_onboarding",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U206-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U206-G-P01-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U206-Q02",
+      "userBundleId": "SV3-RB-U206",
+      "questionGroupId": "SV3-RB-U206-Q02-FAMILY",
+      "query": "Did the revised class follow-up process reduce missed attendance while retaining schedule-change cases?",
+      "normalizedQuery": "did the revised class follow up process reduce missed attendance while retaining schedule change cases",
+      "categories": [
+        "numeric_quantity",
+        "semantic_paraphrase",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "attendance_recovery"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "attendance_recovery",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U206-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U206-G-P02-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U206-Q03",
+      "userBundleId": "SV3-RB-U206",
+      "questionGroupId": "SV3-RB-U206-Q03-FAMILY",
+      "query": "여러 교육장에서 보호 우려를 같은 절차로 기록하고 담당자에게 인계했나요?",
+      "normalizedQuery": "여러 교육장에서 보호 우려를 같은 절차로 기록하고 담당자에게 인계했나요",
+      "categories": [
+        "completed_production",
+        "abstract_competency",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "safeguarding_escalation"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "safeguarding_escalation",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U206-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U206-G-P03-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U206-Q04",
+      "userBundleId": "SV3-RB-U206",
+      "questionGroupId": "SV3-RB-U206-Q04-FAMILY",
+      "query": "What evidence shows that accountable transfers sharply reduced missing learning kits?",
+      "normalizedQuery": "what evidence shows that accountable transfers sharply reduced missing learning kits",
+      "categories": [
+        "semantic_paraphrase",
+        "numeric_quantity",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "inventory_accountability"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "inventory_accountability",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U206-P04-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U206-G-P04-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    }
+  ]
+}

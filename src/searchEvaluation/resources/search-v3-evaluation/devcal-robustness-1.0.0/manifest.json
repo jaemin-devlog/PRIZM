@@ -1,0 +1,154 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+  "split": "DEV_CAL_ONLY",
+  "status": "DEV_CAL_ROBUSTNESS_FROZEN",
+  "mutable": false,
+  "opened": true,
+  "executionPolicy": "DEV_CAL_EVALUATION_ALLOWED",
+  "executionStateRecord": "ignored report plus PRZ-026 evidence.md",
+  "frozenAt": "2026-08-30T22:26:53.1683097+09:00",
+  "previousVersion": "search-v3-fresh-devcal-1.1.0",
+  "materializationBaseRevision": "01d9ae2f90eff691d96041579e42a02aa04a3486",
+  "b3PolicyRevision": "01d9ae2f90eff691d96041579e42a02aa04a3486",
+  "splitCombinedSha256": {
+    "DEV": "aa28c35bcc3d3e021c3c483f1c270bf174c330bfcb38fd40d9e8170936124f4d",
+    "CALIBRATION": "7daf613be385915a2895b3d2215fc0e616407cf25953c520b1e951476a784a19"
+  },
+  "counts": {
+    "userBundles": 6,
+    "documents": 6,
+    "queries": 24,
+    "directQueries": 24,
+    "evidenceParents": 24,
+    "evidenceGroups": 24,
+    "evidenceUnits": 24
+  },
+  "distributions": {
+    "split": {
+      "CALIBRATION": 3,
+      "DEV": 3
+    },
+    "profession": {
+      "DATA_AI_INFRA": 1,
+      "DESIGN_PRODUCT": 1,
+      "FRONTEND_MOBILE": 2,
+      "MARKETING_SALES": 1,
+      "NON_DEVELOPMENT_GENERAL": 1
+    },
+    "documentLanguage": {
+      "EN": 2,
+      "KO": 2,
+      "KO_EN_MIXED": 2
+    },
+    "documentCodePointLength": {
+      "SV3-RB-U201-D01": 1387,
+      "SV3-RB-U202-D01": 2951,
+      "SV3-RB-U203-D01": 1682,
+      "SV3-RB-U204-D01": 2686,
+      "SV3-RB-U205-D01": 1229,
+      "SV3-RB-U206-D01": 1917
+    },
+    "queryLanguage": {
+      "EN": 12,
+      "KO": 12
+    },
+    "answerability": {
+      "SUPPORTED": 24
+    },
+    "category": {
+      "abstract_competency": 11,
+      "completed_production": 9,
+      "completion_state": 1,
+      "english": 12,
+      "job_requirement": 3,
+      "korean": 12,
+      "numeric_quantity": 10,
+      "semantic_paraphrase": 14
+    }
+  },
+  "files": [
+    {
+      "path": "calibration/corpus.json",
+      "bytes": 4465,
+      "sha256": "c77c3fdaba521aa144677f9f06cb64eab333feb0f8002c86608ea274be589690"
+    },
+    {
+      "path": "calibration/documents/sv3-rb-u204-frontend-delivery-portfolio-v01.txt",
+      "bytes": 2686,
+      "sha256": "b868b4d19822b51bd35360a5367b921004355294823fbac992be8a903a200d6b"
+    },
+    {
+      "path": "calibration/documents/sv3-rb-u205-partner-marketing-review-v01.txt",
+      "bytes": 2939,
+      "sha256": "8712d61c82d9c21e9b27d783319f9fdd98959a14650a63d71137022dde6bee2c"
+    },
+    {
+      "path": "calibration/documents/sv3-rb-u206-learning-operations-portfolio-v01.txt",
+      "bytes": 2617,
+      "sha256": "ed677f263e681b5d9e8fd934abe1eedf95aa2998b0ef03cb684c0e22bb25e0db"
+    },
+    {
+      "path": "calibration/gold-evidence.json",
+      "bytes": 36785,
+      "sha256": "4c8852973ee2434caa27a0986ddc28cace0d429f76f4aea87286bbcf2a4e17f0"
+    },
+    {
+      "path": "calibration/manifest.json",
+      "bytes": 2236,
+      "sha256": "6a4de5ddb0402bfbf9dd0f0e997bff961f129500d92d382fd7b7ab2bcde2292f"
+    },
+    {
+      "path": "calibration/questions.json",
+      "bytes": 17335,
+      "sha256": "8205d19a68702c35e3cc1f9f2967cdbe48959e5cb695265ed5aef22b3ecf7ee5"
+    },
+    {
+      "path": "dev/corpus.json",
+      "bytes": 4367,
+      "sha256": "ede90bae5e421abddb852d5dd5ad4df4f79be3c60a1e15c7fb11342a674712da"
+    },
+    {
+      "path": "dev/documents/sv3-rb-u201-mobile-field-portfolio-v01.txt",
+      "bytes": 3311,
+      "sha256": "4f2f86ffe77e592743256cc3afa675f30a372884be319a934707197e97aba21f"
+    },
+    {
+      "path": "dev/documents/sv3-rb-u202-service-design-casebook-v01.txt",
+      "bytes": 2951,
+      "sha256": "a9c971d9b4224b7276388640776d88232b2d433aa2012121fce54d4c08db5c75"
+    },
+    {
+      "path": "dev/documents/sv3-rb-u203-data-platform-record-v01.txt",
+      "bytes": 2808,
+      "sha256": "0bee98667beaf5dcaa047d3f8f6c24360358f1b0b2c5660a7f0ce23abff87317"
+    },
+    {
+      "path": "dev/gold-evidence.json",
+      "bytes": 37645,
+      "sha256": "34a5a749a2a326154f1f4415f8bccdf075a0fd7d115267a5673934d5a060355c"
+    },
+    {
+      "path": "dev/manifest.json",
+      "bytes": 2231,
+      "sha256": "838d4be74b6eb92ba3fc327393cdb75b559b6a4bce49776c0529cfe04e128212"
+    },
+    {
+      "path": "dev/questions.json",
+      "bytes": 17362,
+      "sha256": "1139e49ce2a4be8553b11badee1217af3ab2380748f08d8f237de85d611cad83"
+    },
+    {
+      "path": "lineage.json",
+      "bytes": 9928,
+      "sha256": "0788a3062b02f62ee89814058f9dc897482c1a842c68337b5fbc389b69eccb45"
+    },
+    {
+      "path": "README.md",
+      "bytes": 502,
+      "sha256": "98b575fd914256b7446ffc08a9702f0e73b25a2688fdc191be17c9e5c9cb1d2a"
+    }
+  ],
+  "combinedSha256": "cb43832d48bb1f88e5a24abc520154b8562950ecc973295fdb16936aae08ab54"
+}

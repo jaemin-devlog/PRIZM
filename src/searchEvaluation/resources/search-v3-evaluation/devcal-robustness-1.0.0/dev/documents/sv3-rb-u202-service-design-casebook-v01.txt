@@ -1,0 +1,33 @@
+Synthetic Public Service Design Casebook
+
+Appointment recovery research
+
+The service team had separate reports for call volume, office queues, and missed visits, but those reports did not explain why residents repeated information. I prepared a neutral observation guide and recorded where people paused, changed channels, or asked another person for help.
+
+I observed 27 residents as they tried to reschedule missed appointments, mapped the handoffs between the call center and local offices, and turned five recurring breakdowns into a shared recovery journey.
+
+The journey map separated evidence from interpretation and linked each breakdown to its source session. Policy, operations, and support staff corrected two assumptions and agreed on the moments that required one consistent recovery message.
+
+Prototype decision record
+
+Three concepts used different combinations of reminders, confirmation language, and contact choices. Sessions used the same tasks and success definition so the team compared observed behavior rather than presentation preference.
+
+A moderated prototype with 16 participants raised successful rescheduling from 56% to 81%, and I documented the evidence, open risks, and rationale before the service owner approved the revised flow.
+
+The decision record included concepts that were not selected and why. It also named unresolved translation and assisted-service questions, preventing the prototype result from being presented as proof that every resident could complete the service unaided.
+
+Policy and operation alignment
+
+Earlier workshops produced long idea lists but left ownership unclear. For each decision session I circulated the disputed question, relevant evidence, legal constraints, and decision maker, then captured alternatives and consequences.
+
+I facilitated four decision sessions where policy, call-center, accessibility, and local-office representatives resolved ownership conflicts and agreed on one escalation rule for urgent appointment recovery.
+
+The resulting rule specified when the call center could resolve a case, when a local office intervened, and what information followed the resident. A six-week review checked whether teams used the same rule and recorded exceptions explicitly.
+
+Measured service rollout
+
+The rollout paired each office with a support contact and recorded training, local constraints, and activation date. A comparison period was selected before launch, and offices labeled repeat contacts with the same rule used in the baseline.
+
+The revised recovery service launched in six offices, and the team tracked repeat contacts for eight weeks before confirming a 22% reduction without changing the original measurement definition.
+
+Weekly reviews looked for demand moving to another channel rather than celebrating a single lower number. The final note separated observed reduction, seasonal uncertainty, and qualitative feedback and retained office-level counts for audit.

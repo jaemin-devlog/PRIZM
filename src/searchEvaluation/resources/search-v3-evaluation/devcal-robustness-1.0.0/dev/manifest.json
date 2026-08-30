@@ -1,0 +1,81 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+  "split": "DEV",
+  "status": "DEV_CAL_ROBUSTNESS_FROZEN",
+  "mutable": false,
+  "frozenAt": "2026-08-30T22:26:53.1683097+09:00",
+  "previousVersion": "search-v3-fresh-devcal-1.1.0",
+  "materializationBaseRevision": "01d9ae2f90eff691d96041579e42a02aa04a3486",
+  "counts": {
+    "userBundles": 3,
+    "documents": 3,
+    "queries": 12,
+    "evidenceParents": 12,
+    "evidenceGroups": 12,
+    "evidenceUnits": 12
+  },
+  "distributions": {
+    "profession": {
+      "DATA_AI_INFRA": 1,
+      "DESIGN_PRODUCT": 1,
+      "FRONTEND_MOBILE": 1
+    },
+    "documentLanguage": {
+      "EN": 1,
+      "KO": 1,
+      "KO_EN_MIXED": 1
+    },
+    "queryLanguage": {
+      "EN": 6,
+      "KO": 6
+    },
+    "answerability": {
+      "SUPPORTED": 12
+    },
+    "category": {
+      "abstract_competency": 6,
+      "completed_production": 5,
+      "completion_state": 1,
+      "english": 6,
+      "job_requirement": 1,
+      "korean": 6,
+      "numeric_quantity": 4,
+      "semantic_paraphrase": 7
+    }
+  },
+  "files": [
+    {
+      "path": "corpus.json",
+      "bytes": 4367,
+      "sha256": "ede90bae5e421abddb852d5dd5ad4df4f79be3c60a1e15c7fb11342a674712da"
+    },
+    {
+      "path": "documents/sv3-rb-u201-mobile-field-portfolio-v01.txt",
+      "bytes": 3311,
+      "sha256": "4f2f86ffe77e592743256cc3afa675f30a372884be319a934707197e97aba21f"
+    },
+    {
+      "path": "documents/sv3-rb-u202-service-design-casebook-v01.txt",
+      "bytes": 2951,
+      "sha256": "a9c971d9b4224b7276388640776d88232b2d433aa2012121fce54d4c08db5c75"
+    },
+    {
+      "path": "documents/sv3-rb-u203-data-platform-record-v01.txt",
+      "bytes": 2808,
+      "sha256": "0bee98667beaf5dcaa047d3f8f6c24360358f1b0b2c5660a7f0ce23abff87317"
+    },
+    {
+      "path": "gold-evidence.json",
+      "bytes": 37645,
+      "sha256": "34a5a749a2a326154f1f4415f8bccdf075a0fd7d115267a5673934d5a060355c"
+    },
+    {
+      "path": "questions.json",
+      "bytes": 17362,
+      "sha256": "1139e49ce2a4be8553b11badee1217af3ab2380748f08d8f237de85d611cad83"
+    }
+  ],
+  "combinedSha256": "aa28c35bcc3d3e021c3c483f1c270bf174c330bfcb38fd40d9e8170936124f4d"
+}

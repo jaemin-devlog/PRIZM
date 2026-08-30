@@ -24,8 +24,12 @@ final class SearchV3DenseAblationDataset {
     static final Path BENCHMARK_ROOT = Path.of("src/test/resources/search-v3-evaluation");
     static final Path LONG_FORM_BENCHMARK_ROOT = Path.of(
             "src/searchEvaluation/resources/search-v3-evaluation/devcal-1.1.0");
+    static final Path ROBUSTNESS_BENCHMARK_ROOT = Path.of(
+            "src/searchEvaluation/resources/search-v3-evaluation/devcal-robustness-1.0.0");
     static final String ORIGINAL_DATASET_VERSION = "search-v3-fresh-seed-1.0.1";
     static final String LONG_FORM_DATASET_VERSION = "search-v3-fresh-devcal-1.1.0";
+    static final String ROBUSTNESS_DATASET_VERSION = "search-v3-fresh-devcal-robustness-1.0.0";
+    static final String ROBUSTNESS_SHA256 = "cb43832d48bb1f88e5a24abc520154b8562950ecc973295fdb16936aae08ab54";
     static final String OVERALL_SHA256 = "1f36c4bbb6948b97c4321821cc3d6b8a9e38ab44b81adb1594614c6f7e97289e";
     static final String SEALED_FINAL_SHA256 = "e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383";
 
@@ -42,6 +46,10 @@ final class SearchV3DenseAblationDataset {
 
     DatasetSlice loadLongForm(Split split) {
         return load(LONG_FORM_BENCHMARK_ROOT.resolve(split.directory()), split, LONG_FORM_DATASET_VERSION);
+    }
+
+    DatasetSlice loadRobustness(Split split) {
+        return load(ROBUSTNESS_BENCHMARK_ROOT.resolve(split.directory()), split, ROBUSTNESS_DATASET_VERSION);
     }
 
     DatasetSlice load(Path splitDirectory, Split expectedSplit) {
@@ -151,6 +159,42 @@ final class SearchV3DenseAblationDataset {
                 manifest.path("counts").path("documents").asInt(),
                 manifest.path("counts").path("queries").asInt(),
                 executionPolicy);
+    }
+
+    RobustnessManifestMetadata readRobustnessManifestMetadata() {
+        return readRobustnessManifestMetadata(ROBUSTNESS_BENCHMARK_ROOT, ROBUSTNESS_SHA256);
+    }
+
+    RobustnessManifestMetadata readRobustnessManifestMetadata(Path root, String expectedCombinedSha256) {
+        JsonNode manifest = read(root.resolve("manifest.json"));
+        String datasetVersion = required(manifest, "datasetVersion");
+        String previousVersion = required(manifest, "previousVersion");
+        String executionPolicy = required(manifest, "executionPolicy");
+        String policyRevision = required(manifest, "b3PolicyRevision");
+        String combinedSha256 = required(manifest, "combinedSha256");
+        if (!ROBUSTNESS_DATASET_VERSION.equals(datasetVersion)
+                || !LONG_FORM_DATASET_VERSION.equals(previousVersion)
+                || !"DEV_CAL_EVALUATION_ALLOWED".equals(executionPolicy)
+                || !"01d9ae2f90eff691d96041579e42a02aa04a3486".equals(policyRevision)
+                || !expectedCombinedSha256.equals(combinedSha256)
+                || manifest.path("counts").path("userBundles").asInt() != 6
+                || manifest.path("counts").path("documents").asInt() != 6
+                || manifest.path("counts").path("queries").asInt() != 24
+                || manifest.path("counts").path("directQueries").asInt() != 24) {
+            throw new IllegalStateException("Robustness DEV/CAL manifest contract changed");
+        }
+        int verifiedFileCount = verifyRobustnessManifestFiles(root, manifest, expectedCombinedSha256);
+        return new RobustnessManifestMetadata(
+                datasetVersion,
+                previousVersion,
+                combinedSha256,
+                manifest.path("counts").path("userBundles").asInt(),
+                manifest.path("counts").path("documents").asInt(),
+                manifest.path("counts").path("queries").asInt(),
+                manifest.path("counts").path("directQueries").asInt(),
+                executionPolicy,
+                policyRevision,
+                verifiedFileCount);
     }
 
     private void requireArtifact(JsonNode artifact, Split split, String expectedDatasetVersion) {
@@ -573,6 +617,36 @@ final class SearchV3DenseAblationDataset {
         return count;
     }
 
+    private int verifyRobustnessManifestFiles(Path root, JsonNode manifest, String expectedCombinedSha256) {
+        List<String> combinedEntries = new ArrayList<>();
+        int count = 0;
+        root = root.normalize();
+        for (JsonNode entry : manifest.path("files")) {
+            String relative = required(entry, "path");
+            Path file = root.resolve(relative).normalize();
+            if (!file.startsWith(root) || !Files.isRegularFile(file)) {
+                throw new IllegalStateException("Robustness manifest path is invalid: " + relative);
+            }
+            String expectedHash = required(entry, "sha256");
+            long expectedBytes = entry.path("bytes").asLong(-1);
+            try {
+                if (Files.size(file) != expectedBytes || !expectedHash.equals(sha256(file))) {
+                    throw new IllegalStateException("Robustness file hash/size mismatch: " + relative);
+                }
+            }
+            catch (IOException exception) {
+                throw new IllegalStateException("Cannot inspect robustness fixture: " + relative, exception);
+            }
+            combinedEntries.add(relative + ":" + expectedHash);
+            count++;
+        }
+        String actualCombined = StructuralBlockParser.sha256(String.join("\n", combinedEntries));
+        if (!expectedCombinedSha256.equals(actualCombined) || count != 16) {
+            throw new IllegalStateException("Robustness combined hash or file count mismatch");
+        }
+        return count;
+    }
+
     enum Split {
         DEV("dev", "DEV"),
         CALIBRATION("calibration", "CALIBRATION");
@@ -729,5 +803,18 @@ final class SearchV3DenseAblationDataset {
             int documentCount,
             int queryCount,
             String executionPolicy) {
+    }
+
+    record RobustnessManifestMetadata(
+            String datasetVersion,
+            String previousVersion,
+            String combinedSha256,
+            int userBundleCount,
+            int documentCount,
+            int queryCount,
+            int directQueryCount,
+            String executionPolicy,
+            String b3PolicyRevision,
+            int verifiedFileCount) {
     }
 }

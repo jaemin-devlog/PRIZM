@@ -95,3 +95,25 @@ PDFBox/Production extractor를 재사용한 evaluation-only fixture가 A/B 계�
 실제 결과는 B3가 비용과 전체 metric을 유지·개선했으나 Long-form `FRONTEND_MOBILE` 신규 회귀로
 `NEEDS_ADJUSTMENT`였다. 따라서 Parent Context로 진행하지 않고 B3 회귀를 후속 구조 실험에서
 분리 검증한다.
+
+## 7. Phase 1 Retrieval Passage robustness plan
+
+1. B3 builder와 EvidenceChild를 수정하지 않고 현재 policy/source hash를 robustness report에 넣는다.
+2. 별도 `devcal-robustness-1.0.0` generator와 fixture를 추가한다. source fact, normalized query,
+   template/seed/document lineage가 Original Seed와 DEV/CAL 1.1.0에 충돌하면 materialization을
+   fail-closed한다.
+3. loader는 새 root의 DEV/CAL만 허용하고 manifest hash/count를 검증한다. SEALED FINAL 경로 guard와
+   기존 dataset loader는 유지한다.
+4. 기존 A/B2/B3 engine으로 새 suite를 한 번 실행한다. B3 policy를 결과에 맞춰 조정하지 않는다.
+5. 별도 robustness Gate는 fresh suite와 기존 Long-form report의 paired B2/B3 query 결과를 받아
+   표본 충분성, query/user delta, clustered bootstrap interval과 누적 profession/language slice를
+   계산한다.
+6. 입력 fixture·계약·validator를 먼저 commit하여 benchmark 결과 이전 freeze revision을 남긴다.
+7. 그 commit에서 local Ollama `bge-m3` benchmark를 실행하고 ignored raw report SHA-256, aggregate,
+   신규 회귀와 판정을 evidence에 기록한다.
+8. 관련 source-set test, materializer `--check`, PRZ-025 validator, SEALED hash/flags,
+   `git diff --check`, OSS readiness와 forbidden scope를 검증한다.
+
+실패 시 fixture·B3 policy를 결과에 맞춰 재튜닝하지 않는다. runtime이 없으면 benchmark와 품질
+판정은 `NOT_RUN`; blocking regression이면 B3는 기존 `NEEDS_ADJUSTMENT`를 유지한다. Production,
+dependency, migration, frontend, MCP, Parent Context와 push/PR/merge는 범위 밖이다.

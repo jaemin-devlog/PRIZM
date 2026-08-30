@@ -49,3 +49,18 @@
 - [x] AUDIT: final diff/OSS/scope와 문서 정합성
 - [x] INTEGRATE: 허용 파일만 local branch commit
 - [ ] Parent Context/Parent Dense/push/PR/merge — `NOT_RUN` (금지)
+
+## Phase 1 Retrieval Passage Robustness
+
+- [x] ORIENT: 요청 worktree 격리, clean HEAD `01d9ae2...`, B3 역사 판정과 Final guard 확인
+- [x] SPEC: B3 policy freeze, 별도 robustness suite와 sample-sufficiency/paired Gate 고정
+- [x] PLAN: fixture freeze commit 후 benchmark 실행, rollback/금지 범위 고정
+- [x] DATA: 독립 DEV/CAL 6 bundles, 24 DIRECT queries와 lineage/manifest materialize
+- [x] TEST/IMPLEMENT: robustness loader, leakage/hash validation과 paired clustered-bootstrap Gate
+- [ ] INTEGRATE-INPUT: benchmark 전 fixture·계약 local commit
+- [ ] VERIFY: 동일 BGE-M3 A/B2/B3 robustness benchmark 1회 실행
+- [ ] VERIFY: fresh/cumulative profession-language 표본·paired delta·uncertainty 기록
+- [ ] VERIFY: SEALED hash/flags, PRZ-025 validator, diff/OSS/scope와 관련 test
+- [ ] AUDIT: blocking finding과 다음 Parent Context experiment 진입 여부 독립 검토
+- [ ] INTEGRATE: result/evidence local commit only
+- [ ] Parent Context/Parent Dense/push/PR/merge — `NOT_RUN` (금지)

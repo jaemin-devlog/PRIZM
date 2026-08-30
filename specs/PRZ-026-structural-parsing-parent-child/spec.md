@@ -1,7 +1,7 @@
 # PRZ-026 Structural Parsing and Parent-Child Retrieval
 
 - 상태: `IN_PROGRESS / PHASE_1_RETRIEVAL_PASSAGE_NEEDS_ADJUSTMENT`
-- 현재 Phase: `Phase 1 Retrieval Passage — COMPLETED / NEEDS_ADJUSTMENT`
+- 현재 Phase: `Phase 1 Retrieval Passage Robustness — INPUT_READY / BENCHMARK_NOT_RUN`
 - 선행 조건: `DEPENDS_ON_PRZ_025`
 - 기준 source: `PRZ-025-search-v3-foundation@5f8229f88251938dc5b34588676cc69edf409c99`
 - Production 적용: `NOT_RUN`
@@ -178,3 +178,37 @@ indexing wall time은 최종 단일 local run에서 `1133.644ms→687.901ms`로 
 Recall@5/10/20/50, query-micro Top1/MRR, contamination 0, fragmentation 0과 Gold Child 보존 100%를
 유지했다. 그러나 Long-form `FRONTEND_MOBILE` Top1/MRR이 `1.0/1.0→0.6667/0.8333`으로 신규
 회귀해 B3 판정은 `NEEDS_ADJUSTMENT`다. 따라서 C는 계속 `NOT_RUN`이다.
+
+## 12. Phase 1 Retrieval Passage robustness contract
+
+B3의 구조·크기 정책은 `01d9ae2f90eff691d96041579e42a02aa04a3486`에서 동결한다. 기존
+`SV3-LF-U104-Q01`이나 다른 관측 결과에 맞춰 passage eligibility, `120/320/480`, heading 또는
+retrieval text를 변경하지 않는다. 후속 판정은 별도 synthetic DEV/CAL suite
+`search-v3-fresh-devcal-robustness-1.0.0`에서 B2와 B3를 재현해 수행한다.
+
+새 suite는 기존 Original Seed, DEV/CAL 1.1.0과 source fact, query, template, generator seed,
+document/version lineage를 공유하지 않는다. DEV/CAL 각 3 user bundles, 전체 6 documents와
+24 DIRECT-support queries를 목표로 하며 KO/EN/mixed와 개발·비개발 직무를 모두 포함한다.
+`FRONTEND_MOBILE`은 독립 bundle 2개와 direct query 8개를 추가하여 기존 1.1.0과 합친 누적
+slice가 3 bundles, 10 queries 이상이 되게 한다. 이 분포는 관측된 query 문자열이나 Gold rank를
+passage builder에 전달하지 않는다.
+
+표본과 paired 판정은 실행 전에 다음처럼 고정한다.
+
+- profession/language slice는 distinct user bundles 3개 이상이면서 DIRECT-support query 10개
+  이상일 때만 `SUFFICIENT`; 그 미만은 `INSUFFICIENT_SAMPLE`이며 백분율을 blocking proof로 쓰지
+  않는다.
+- B3-B2의 query별 Top1과 reciprocal-rank delta, win/loss/tie, query-micro와 user-macro를 기록한다.
+- uncertainty는 user bundle을 cluster로 10,000회 복원 추출하는 deterministic bootstrap
+  (`seed=260830026`)의 percentile 95% interval로 기록한다.
+- 충분한 slice에서 Top1 또는 reciprocal-rank delta의 interval 상한이 0보다 작을 때만
+  `BLOCKING_REGRESSION`; interval 하한이 0 이상이면 `NON_INFERIOR`; 그 사이는 `INCONCLUSIVE`다.
+- `INCONCLUSIVE`는 Production 채택 근거가 아니다. 다만 독립 robustness suite의 전체 및 새
+  `FRONTEND_MOBILE` point delta가 음수가 아니고, 누적 충분 slice에 `BLOCKING_REGRESSION`이
+  없으면 다음 evaluation-only ablation을 막지 않는다.
+
+B3 robustness의 `PROMISING` Gate는 contamination/fragmentation/heading violation 0, DIRECT Gold
+Child 보존 100%, Recall 비열화 0, 새 suite의 B3 candidate/embedding 수가 B2보다 최소 25% 감소,
+새 suite 전체 및 새 `FRONTEND_MOBILE` Top1/MRR point delta 비음수, 누적 충분 profession/language
+slice의 blocking regression 0이다. 이 Gate는 Parent Context 실험 진입 판단일 뿐 Search V3 채택
+Gate가 아니다. Parent Context, Parent Dense, reranker와 SEALED FINAL search는 계속 `NOT_RUN`이다.

@@ -509,3 +509,36 @@ actor, negation, completion 또는 language heuristic으로 이 회귀를 고치
 | staged scope / secret scan | `PASS`; 10/10 allowed, forbidden/SEALED/secret finding 0 |
 | full backend / frontend / Docker | `NOT_RUN`; evaluation-only scope |
 | Parent Context / Parent Dense / push / PR / merge | `NOT_RUN`; 금지 범위 |
+
+## 29. B3 robustness 입력 봉인 전 기록
+
+- 기준 B3 HEAD: `01d9ae2f90eff691d96041579e42a02aa04a3486`
+- 상태: `INPUT_READY / BENCHMARK_NOT_RUN`
+- B3 policy 변경: 0; `120/320/480`, same-parent adjacency, heading context-only, overlap 0 유지
+- dataset: `search-v3-fresh-devcal-robustness-1.0.0`
+- manifest SHA-256: `cb43832d48bb1f88e5a24abc520154b8562950ecc973295fdb16936aae08ab54`
+- 규모: DEV 3 / CALIBRATION 3 bundles, synthetic TXT 6 documents, DIRECT-support 24 queries
+- 직무: `FRONTEND_MOBILE` 2, `DATA_AI_INFRA` 1, `DESIGN_PRODUCT` 1,
+  `MARKETING_SALES` 1, `NON_DEVELOPMENT_GENERAL` 1
+- 문서 언어: KO 2 / EN 2 / KO_EN_MIXED 2
+- 새 `FRONTEND_MOBILE`: 2 bundles / 8 direct queries; 기존 1.1.0과 누적 3 bundles / 11 direct queries
+- lineage: Original Seed와 DEV/CAL 1.1.0의 user/document/version/template/generator/source-fact/query
+  lineage 충돌 0
+
+실행 전 Gate는 profession/language slice `3 bundles + 10 direct queries`, clustered user bootstrap
+10,000회, seed `260830026`, candidate 감소 최소 25%로 고정했다. 충분 slice에서 Top1 또는 MRR
+paired delta의 95% interval 상한이 0 미만일 때만 `BLOCKING_REGRESSION`으로 정의했다. 새 suite
+전체와 새 frontend point delta가 음수면 bootstrap과 무관하게 robustness `PROMISING`을 허용하지
+않는다. 이 규칙은 다음 evaluation-only 실험 진입 판단이며 Production Adoption Gate가 아니다.
+
+입력 봉인 전 실제 검증은 materializer byte check `PASS`(17 files), 관련 searchEvaluation
+6 suites / 58 tests `PASS`(failure/error/skipped 0), PRZ-025 validator `PASS`와 validator unit
+18/18 `PASS`다. 최초 Gradle sandbox 실행은 wrapper download network 차단으로 `COMMAND_ERROR`였고
+파일 변경은 없었다. 허용된 외부 실행에서 compile과 test가 성공했다. BGE-M3 robustness benchmark,
+Parent Context, Parent Dense와 SEALED FINAL search는 모두 `NOT_RUN`; `CURRENT_FRESH_BASELINE = NOT_RUN`이다.
+
+첫 자동 계약 감사의 5개 finding(fragmentation/Recall predicate, bootstrap seed, manifest 실제 검증,
+최종 decision test)을 수정한 뒤 현재 source에서 58 tests를 재실행했다. robustness loader는 고정
+SHA/count와 16개 실제 file hash/size/combined hash를 fail-closed 검증하고 mutation test를 포함한다.
+수정 후 계약 재감사의 마지막 evidence count finding도 이 기록으로 해소했으며, 결과 실행 전
+input-freeze 감사의 blocking finding은 0이다.

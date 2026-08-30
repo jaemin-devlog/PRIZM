@@ -767,3 +767,9 @@ SEALED FINAL은 combined
 탐지한 세 context-only false hit와 해당 dataset/user/profession/language 회귀다. input-freeze full SHA
 메타데이터 오류는 결과 해석 전에 발견해 검색 재실행 없이 metadata만 교정했고, 그 사실과 교정 후
 hash를 35절에 보존했다. 따라서 C1을 `PROMISING`으로 승격하거나 Parent Dense로 진행할 수 없다.
+
+## 40. C1 lifecycle close
+
+result/evidence는 local commit `6b51dbd55ded064e43dfb6fc2010a047d9668115`로 통합했고 해당 commit
+직후 working tree는 clean이었다. 이 절과 task checkbox는 결과·metric·판정을 바꾸지 않는 lifecycle
+close 기록이다. Parent Dense, push, PR, merge는 실행하지 않았다.

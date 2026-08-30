@@ -48,7 +48,7 @@
 - [x] VERIFY: aggregate/user/profession/language와 direct win/loss/tie 기록
 - [x] VERIFY: SEALED hash/flags, PRZ-025 validator, diff/OSS/scope와 관련 test
 - [x] AUDIT: C1 Search Quality finding 확인, `NEEDS_ADJUSTMENT`, Parent Dense `NOT_SAFE`
-- [ ] INTEGRATE: result/evidence local commit only
+- [x] INTEGRATE: result/evidence local commit `6b51dbd...` only
 - [ ] Parent Dense/push/PR/merge — `NOT_RUN` (금지)
 
 ## Phase 1 Retrieval Passage

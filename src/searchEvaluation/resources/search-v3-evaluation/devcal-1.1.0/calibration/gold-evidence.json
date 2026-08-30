@@ -1,0 +1,813 @@
+{
+  "artifactType": "GOLD_EVIDENCE",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+  "split": "CALIBRATION",
+  "parents": [
+    {
+      "parentId": "SV3-LF-U104-P01",
+      "userBundleId": "SV3-LF-U104",
+      "documentId": "SV3-LF-U104-D01",
+      "versionId": "SV3-LF-U104-D01-V01",
+      "label": "Offline checkout release",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U104-P01-PS01",
+        "parentId": "SV3-LF-U104-P01",
+        "documentId": "SV3-LF-U104-D01",
+        "versionId": "SV3-LF-U104-D01-V01",
+        "sourcePath": "documents/sv3-lf-u104-mobile-portfolio-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 55,
+        "charEnd": 1412,
+        "lineStart": 3,
+        "lineEnd": 16,
+        "text": "Offline checkout release\n\nField staff used the checkout flow in buildings with unreliable connectivity. Earlier clients retried every request independently, which could show a success message before the server confirmed the order. I mapped the local states, server acknowledgements, and recovery paths before changing the interface.\n\nI shipped an offline-safe checkout queue on iOS and Android and reduced duplicate-order crash sessions by 37% over the following eight weeks.\n\n- Pending orders stayed visible until the server acknowledgement arrived.\n- A retry reused the same operation identifier instead of creating a new order.\n- The UI distinguished a queued action from a completed purchase.\n- Support diagnostics recorded state transitions without including customer-entered notes.\n\nThe first release was limited to one workflow and had a remote disable switch. During rollout I reviewed failed acknowledgements with backend and support owners, then expanded only after the reconciliation report matched the order ledger. The evidence does not claim that every offline interaction was solved.\n\nA later operating review showed that users sometimes closed the app while an order was pending. I added a resume notice and a recovery test for that path. The change was documented as a follow-up release rather than silently folded into the original result.",
+        "textSha256": "ee5815804d586494db57213c36de34ef576fc9e8270bde9e462bc10c3d67afa0"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U104-P02",
+      "userBundleId": "SV3-LF-U104",
+      "documentId": "SV3-LF-U104-D01",
+      "versionId": "SV3-LF-U104-D01-V01",
+      "label": "Accessibility audit and remediation",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U104-P02-PS01",
+        "parentId": "SV3-LF-U104-P02",
+        "documentId": "SV3-LF-U104-D01",
+        "versionId": "SV3-LF-U104-D01-V01",
+        "sourcePath": "documents/sv3-lf-u104-mobile-portfolio-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 1414,
+        "charEnd": 2566,
+        "lineStart": 18,
+        "lineEnd": 28,
+        "text": "Accessibility audit and remediation\n\nThe account workflow had labels that visually looked complete but did not expose a consistent accessible name. I paired automated checks with keyboard and screen-reader walkthroughs because either method alone missed important states.\n\nI completed screen-reader and keyboard remediation for the account workflow, reducing verified accessibility audit findings from 12 to 3.\n\nThe remediation covered focus order, error announcement, button names, and the return path from a modal. I wrote acceptance examples using observable behavior rather than a particular assistive-technology vendor, then checked the examples on both mobile platforms.\n\nThree findings remained: a third-party date picker, a complex chart description, and an operating-system focus defect. They stayed visible in the release note with owners and workarounds; the reduction metric does not imply zero accessibility issues.\n\nA design review also changed component guidance so that new forms inherited the tested label and error patterns. I did not count documentation changes as remediated findings until the product screen passed the same checks.",
+        "textSha256": "8e7ca5695faedc8a5816c0a2b41735a917699e15eb6345a92e19974f6065fc95"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U104-P03",
+      "userBundleId": "SV3-LF-U104",
+      "documentId": "SV3-LF-U104-D01",
+      "versionId": "SV3-LF-U104-D01-V01",
+      "label": "Voice navigation experiment",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U104-P03-PS01",
+        "parentId": "SV3-LF-U104-P03",
+        "documentId": "SV3-LF-U104-D01",
+        "versionId": "SV3-LF-U104-D01-V01",
+        "sourcePath": "documents/sv3-lf-u104-mobile-portfolio-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 2568,
+        "charEnd": 3459,
+        "lineStart": 30,
+        "lineEnd": 38,
+        "text": "Voice navigation experiment\n\nA research session explored whether voice commands could help hands-busy users move through a checklist. I created a narrow prototype with scripted intents and local sample data. The prototype was evaluated in moderated sessions and was never connected to a production account.\n\nVoice navigation remained a moderated prototype and was not released in either mobile application.\n\nParticipants liked a short confirmation but struggled when commands contained two actions. The finding changed the research question, not the shipped product. Any future work would need privacy review, recovery for misunderstood commands, and clear visual parity.\n\nThe prototype code was archived after the session so it could not be mistaken for an enabled feature. Screenshots in the research note carry a prototype label and the release matrix lists the capability as unavailable.",
+        "textSha256": "f60c95d265c2b3cc2c711d9da08ea37c423cca11c988d28182f6fdc338847ae8"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U104-P04",
+      "userBundleId": "SV3-LF-U104",
+      "documentId": "SV3-LF-U104-D01",
+      "versionId": "SV3-LF-U104-D01-V01",
+      "label": "Component migration record",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U104-P04-PS01",
+        "parentId": "SV3-LF-U104-P04",
+        "documentId": "SV3-LF-U104-D01",
+        "versionId": "SV3-LF-U104-D01-V01",
+        "sourcePath": "documents/sv3-lf-u104-mobile-portfolio-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 3461,
+        "charEnd": 4306,
+        "lineStart": 40,
+        "lineEnd": 51,
+        "text": "Component migration record\n\nComponent | Platform | State\nCheckout status banner | iOS and Android | production\nAccessible account form | iOS and Android | production\nVoice command control | research build | prototype\n\nThe migration table summarizes state but does not merge the prototype with production components. Each row points back to its own source section and release boundary.\n\nDuring migration I removed duplicated local styles only after visual and accessibility checks passed. Shared code was not treated as a goal by itself; platform-specific behavior remained where it produced clearer focus or navigation.\n\nThis portfolio includes several similar words such as release, workflow, test, and mobile. A useful retrieval method must still return the exact source state instead of treating every experiment as completed production work.",
+        "textSha256": "782c1dc57c7112eaba08166ae5b834352113d7c818703fabfdd12045d580cf8a"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U105-P01",
+      "userBundleId": "SV3-LF-U105",
+      "documentId": "SV3-LF-U105-D01",
+      "versionId": "SV3-LF-U105-D01-V01",
+      "label": "문의 분류 정책 적용",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U105-P01-PS01",
+        "parentId": "SV3-LF-U105-P01",
+        "documentId": "SV3-LF-U105-D01",
+        "versionId": "SV3-LF-U105-D01-V01",
+        "sourcePath": "documents/sv3-lf-u105-planning-narrative-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 23,
+        "charEnd": 650,
+        "lineStart": 3,
+        "lineEnd": 13,
+        "text": "문의 분류 정책 적용\n\n고객 문의를 처리하는 여러 조직이 같은 표현을 다르게 해석해 우선순위가 자주 바뀌었다. 나는 기존 분류표를 새 이름으로 바꾸는 것보다 어떤 관찰 사실이 어떤 대응으로 이어지는지 먼저 정리했다. 상담 기록, 환불 처리, 운영 장애를 표본으로 읽고 분류가 겹치는 조건을 표시했다.\n\n본인은 2025년 1분기에 480건의 문의 표본을 검토해 공통 분류 정책을 적용하고 운영 회의의 우선순위 기준으로 사용했다.\n\n정책은 긴급도, 고객 영향, 복구 가능성, 담당 조직을 서로 다른 축으로 유지했다. 한 문의가 여러 축을 가질 수 있도록 해 단일 label이 원인을 숨기지 않게 했고, 상담사가 판단을 보류할 수 있는 escalation 항목도 남겼다.\n\n적용 첫 달에는 기존 분류와 새 분류를 함께 기록했다. 나는 불일치 사례를 매주 검토해 정의가 모호한 부분을 고쳤지만, 지표를 좋아 보이게 만들기 위해 과거 분류를 소급 변경하지 않았다. 분기 보고서에는 기준 변경일과 비교할 수 없는 구간을 표시했다.\n\n분류 정책은 회의 자료에만 머물지 않았다. 운영 담당자가 새로운 문의를 등록할 때 선택 가능한 값과 설명을 갱신했고, 담당 조직이 바뀌면 기록이 사라지지 않도록 handoff note를 남기게 했다.",
+        "textSha256": "934aedf71bd64a87a7397de43c60520c4689839dda07e74ebd51e0f33d3b2e49"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U105-P02",
+      "userBundleId": "SV3-LF-U105",
+      "documentId": "SV3-LF-U105-D01",
+      "versionId": "SV3-LF-U105-D01-V01",
+      "label": "부서 간 우선순위 워크숍",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U105-P02-PS01",
+        "parentId": "SV3-LF-U105-P02",
+        "documentId": "SV3-LF-U105-D01",
+        "versionId": "SV3-LF-U105-D01-V01",
+        "sourcePath": "documents/sv3-lf-u105-planning-narrative-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 652,
+        "charEnd": 1152,
+        "lineStart": 15,
+        "lineEnd": 26,
+        "text": "부서 간 우선순위 워크숍\n\n정책만 배포하면 각 조직이 자기 사례를 예외로 둘 가능성이 있었다. 나는 실제 사례를 익명화한 카드와 제한된 자원 시나리오를 준비해 참가자가 같은 기준으로 순서를 정하도록 했다. 답을 맞히는 교육이 아니라 판단 근거의 차이를 드러내는 워크숍이었다.\n\n9개 부서가 참여한 우선순위 워크숍을 운영하고, 합의되지 않은 사례 14건을 후속 정책 검토 목록으로 전환했다.\n\n- 참가자는 첫 판단과 근거를 개별로 기록했다.\n- 소그룹은 고객 영향과 복구 가능성을 분리해 다시 정렬했다.\n- 전체 토론은 다수결보다 합의되지 않은 조건을 남기는 데 집중했다.\n- 회고에서는 진행자의 설명이 특정 답을 유도한 사례도 기록했다.\n\n워크숍 뒤에는 높은 순위를 받은 모든 요청을 즉시 실행하지 않았다. 비용, 법적 검토, 다른 제품 일정과의 관계를 담당자가 확인하도록 했고, 기획 문서에는 결정과 보류 사유를 함께 남겼다. 이 방식은 우선순위가 바뀌었을 때 이전 판단을 숨기지 않게 했다.",
+        "textSha256": "65dbe1f2fba3773a798e4e67509123ae1dacfac6ecca5c0a9680e20e4113e0b5"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U105-P03",
+      "userBundleId": "SV3-LF-U105",
+      "documentId": "SV3-LF-U105-D01",
+      "versionId": "SV3-LF-U105-D01-V01",
+      "label": "해외 운영 확대 제안",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U105-P03-PS01",
+        "parentId": "SV3-LF-U105-P03",
+        "documentId": "SV3-LF-U105-D01",
+        "versionId": "SV3-LF-U105-D01-V01",
+        "sourcePath": "documents/sv3-lf-u105-planning-narrative-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 1154,
+        "charEnd": 1566,
+        "lineStart": 28,
+        "lineEnd": 36,
+        "text": "해외 운영 확대 제안\n\n해외 운영 확대를 검토하면서 언어, 시간대, 환불 정책, 데이터 보관 위치를 조사했다. 제안서에는 단계별 선택지와 중단 조건을 넣었고 기존 국내 운영의 숫자를 새로운 지역의 예상 성과로 복사하지 않았다.\n\n해외 법인 연계 운영은 2026년 하반기 계획 단계이며 아직 승인, 개시, production 전환이 이루어지지 않았다.\n\n계획을 준비하는 동안 법무와 재무 담당자에게 검토 질문을 전달했지만 그 활동은 서비스 개시가 아니다. 파트너 후보와의 초기 대화도 계약 체결이나 운영 실적으로 기록하지 않는다.\n\n향후 승인된다면 작은 지역에서 support hour와 환불 흐름을 먼저 검증하고, 기준을 바꾼 경우 새 baseline을 만들 예정이다. 현재 문서는 실행 전 가정과 필요한 의사결정을 남기는 역할만 한다.",
+        "textSha256": "2c5a80a8a80a892e861e44a5d5814a07be072e38fc8fa5ef99f428791cb81297"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U105-P04",
+      "userBundleId": "SV3-LF-U105",
+      "documentId": "SV3-LF-U105-D01",
+      "versionId": "SV3-LF-U105-D01-V01",
+      "label": "교육 운영의 actor 경계",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U105-P04-PS01",
+        "parentId": "SV3-LF-U105-P04",
+        "documentId": "SV3-LF-U105-D01",
+        "versionId": "SV3-LF-U105-D01-V01",
+        "sourcePath": "documents/sv3-lf-u105-planning-narrative-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 1568,
+        "charEnd": 1950,
+        "lineStart": 38,
+        "lineEnd": 46,
+        "text": "교육 운영의 actor 경계\n\n새 분류 정책을 설명하는 자료는 내가 작성했지만 전사 교육 일정과 참석 관리는 인재개발팀이 담당했다. 두 활동은 같은 정책 rollout에 포함되지만 담당 actor와 직접 성과가 다르다.\n\n인재개발팀은 전사 교육 12회를 진행했고, 본인은 정책 사례와 질의응답 문서를 제공했지만 교육 세션을 직접 진행하지 않았다.\n\n나는 교육 뒤 수집된 질문을 분류해 정책 문서의 모호한 예시를 보완했다. 교육 횟수는 인재개발팀의 실행 결과이고, 내가 직접 수행한 evidence는 자료 작성과 질문 분석이다.\n\n이 경력기술서는 여러 부서가 참여한 활동을 한 사람의 성과로 합치지 않는다. 검색 결과도 actor가 다른 문장을 직접 근거로 잘못 반환하지 않아야 한다.",
+        "textSha256": "e793c6fcb3cf466f1c44dd1a9841fbc8e342829bb6ad01b71253602e18156ec1"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U106-P01",
+      "userBundleId": "SV3-LF-U106",
+      "documentId": "SV3-LF-U106-D01",
+      "versionId": "SV3-LF-U106-D01-V01",
+      "label": "Shift handoff across three sites",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U106-P01-PS01",
+        "parentId": "SV3-LF-U106-P01",
+        "documentId": "SV3-LF-U106-D01",
+        "versionId": "SV3-LF-U106-D01-V01",
+        "sourcePath": "documents/sv3-lf-u106-operations-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 52,
+        "charEnd": 690,
+        "lineStart": 3,
+        "lineEnd": 16,
+        "text": "Shift handoff across three sites\n\n세 개 운영 현장은 같은 고객 요청을 서로 다른 spreadsheet와 구두 메모로 넘겼다. 교대가 바뀌면 완료 여부와 다음 행동을 다시 확인해야 했고, 긴급하지 않은 요청이 여러 번 미뤄졌다. 나는 각 현장의 실제 handoff를 관찰하고 공통으로 필요한 상태를 정리했다.\n\n본인은 3개 현장에 공통 shift handoff checklist를 적용해 인수인계 누락 작업을 12주 동안 27% 줄였다.\n\n- 요청의 현재 상태와 다음 행동을 분리했다.\n- 완료라고 표시하려면 확인한 사람과 시간을 남기게 했다.\n- 다음 교대가 판단해야 하는 항목은 질문 형태로 전달했다.\n- 고객의 민감한 내용은 checklist에 복사하지 않고 권한 있는 원문 위치만 연결했다.\n\n도입 첫 주에는 작성 시간이 늘었다는 의견이 있었다. 나는 모든 메모를 요구하지 않고 교대 뒤 다시 물어본 항목을 분석해 필수 field를 줄였다. 주간 review에서는 누락률과 함께 checklist 사용 시간을 살펴 비용을 숨기지 않았다.\n\n현장별 예외는 별도 note로 유지했지만 공통 상태 이름은 바꾸지 않았다. 덕분에 다른 현장을 지원하는 직원도 완료, 대기, 확인 필요를 같은 의미로 읽을 수 있었다.",
+        "textSha256": "7f3028af94c7f844db2d991520c0a028435e17cb45f6acb83db94efc1a66b546"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U106-P02",
+      "userBundleId": "SV3-LF-U106",
+      "documentId": "SV3-LF-U106-D01",
+      "versionId": "SV3-LF-U106-D01-V01",
+      "label": "Emergency response training",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U106-P02-PS01",
+        "parentId": "SV3-LF-U106-P02",
+        "documentId": "SV3-LF-U106-D01",
+        "versionId": "SV3-LF-U106-D01-V01",
+        "sourcePath": "documents/sv3-lf-u106-operations-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 692,
+        "charEnd": 1051,
+        "lineStart": 18,
+        "lineEnd": 26,
+        "text": "Emergency response training\n\n운영 업무에는 경미한 부상, 시설 경보, 대피 안내가 포함됐다. 나는 현장 책임자의 절차를 대신 만들지 않고 실제 상황에서 누구에게 연락하고 어떤 구역을 비워야 하는지 학습했다.\n\nEmergency response fundamentals — completed in 2024-09.\n\n교육은 이론 설명, 역할별 연락, 대피 경로 확인, 모의 상황 회고로 구성됐다. 수료 뒤에는 현장별 연락처와 집결지 변경을 확인하는 월간 점검에 참여했다.\n\n수료 기록은 전문 의료 자격이나 소방 지휘 권한을 뜻하지 않는다. 문서에는 실제 교육 범위와 완료 날짜만 남기며 확인하지 않은 능력을 확대하지 않는다.",
+        "textSha256": "ba42a6e54ea4a16de338c1eb8084e3889ff3e181079cd8ee097497fd65d00d10"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U106-P03",
+      "userBundleId": "SV3-LF-U106",
+      "documentId": "SV3-LF-U106-D01",
+      "versionId": "SV3-LF-U106-D01-V01",
+      "label": "Equipment qualification boundary",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U106-P03-PS01",
+        "parentId": "SV3-LF-U106-P03",
+        "documentId": "SV3-LF-U106-D01",
+        "versionId": "SV3-LF-U106-D01-V01",
+        "sourcePath": "documents/sv3-lf-u106-operations-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 1053,
+        "charEnd": 1416,
+        "lineStart": 28,
+        "lineEnd": 36,
+        "text": "Equipment qualification boundary\n\n일부 현장에는 지게차와 적재 장비가 있었지만 내 역할은 작업 순서와 요청 상태를 조정하는 것이었다. 장비 운전은 별도의 승인과 교육을 받은 담당자가 수행했다.\n\nForklift operator certificate: not held.\n\n장비 작업이 필요한 요청은 자격이 있는 담당자에게 전달했고 완료 확인을 handoff 기록에 연결했다. 내가 일정 조정에 참여했다는 이유로 장비 운전 경험이나 자격을 보유한 것으로 표시하지 않는다.\n\n안전 관련 부정 근거는 단순히 검색에서 사라지면 안 된다. 자격 보유 질문에는 관련 장비가 등장하는 문장보다 명시적인 미보유 상태가 올바른 판단 근거다.",
+        "textSha256": "447754b6561089e5d144a7481fdb2edac28455e64a16dff0fae768097c7574fe"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U106-P04",
+      "userBundleId": "SV3-LF-U106",
+      "documentId": "SV3-LF-U106-D01",
+      "versionId": "SV3-LF-U106-D01-V01",
+      "label": "Warehouse automation actor boundary",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U106-P04-PS01",
+        "parentId": "SV3-LF-U106-P04",
+        "documentId": "SV3-LF-U106-D01",
+        "versionId": "SV3-LF-U106-D01-V01",
+        "sourcePath": "documents/sv3-lf-u106-operations-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 1418,
+        "charEnd": 1928,
+        "lineStart": 38,
+        "lineEnd": 46,
+        "text": "Warehouse automation actor boundary\n\n창고 동선 변경 프로젝트에서 vendor는 barcode automation을 설계하고 설치했다. 나는 운영 중단 시간을 조정하고 현장 직원이 변경된 절차를 이해할 수 있도록 작업 순서를 문서화했다.\n\nThe automation vendor built the barcode routing system; I documented the operating SOP and did not develop the routing software.\n\n설치 뒤에는 barcode를 읽지 못한 물품, 수동 처리, 재작업 요청을 별도 상태로 기록했다. vendor의 결함 수정과 내 운영 문서 변경은 같은 issue에서 시작했더라도 서로 다른 actor의 작업으로 남겼다.\n\n프로젝트 결과 보고서는 처리 흐름과 예외를 설명하지만 software 개발 경험을 주장하지 않는다. 운영 evidence는 SOP 작성, handoff, 안전한 escalation에 한정한다.",
+        "textSha256": "fa32cb8ed8f0399c0d601e53ed43ae1454b80ee85016abec79158da781247c1b"
+      }
+    }
+  ],
+  "evidenceGroups": [
+    {
+      "groupId": "SV3-LF-U104-G-P01-E01",
+      "userBundleId": "SV3-LF-U104",
+      "sourceFactId": "SV3-LF-FACT-U104-P01-E01",
+      "description": "offline_checkout",
+      "evidenceUnitIds": [
+        "SV3-LF-U104-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U104-G-P02-E01",
+      "userBundleId": "SV3-LF-U104",
+      "sourceFactId": "SV3-LF-FACT-U104-P02-E01",
+      "description": "accessibility_remediation",
+      "evidenceUnitIds": [
+        "SV3-LF-U104-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U104-G-P03-E01",
+      "userBundleId": "SV3-LF-U104",
+      "sourceFactId": "SV3-LF-FACT-U104-P03-E01",
+      "description": "voice_not_shipped",
+      "evidenceUnitIds": [
+        "SV3-LF-U104-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U105-G-P01-E01",
+      "userBundleId": "SV3-LF-U105",
+      "sourceFactId": "SV3-LF-FACT-U105-P01-E01",
+      "description": "classification_policy",
+      "evidenceUnitIds": [
+        "SV3-LF-U105-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U105-G-P02-E01",
+      "userBundleId": "SV3-LF-U105",
+      "sourceFactId": "SV3-LF-FACT-U105-P02-E01",
+      "description": "cross_functional_prioritization",
+      "evidenceUnitIds": [
+        "SV3-LF-U105-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U105-G-P03-E01",
+      "userBundleId": "SV3-LF-U105",
+      "sourceFactId": "SV3-LF-FACT-U105-P03-E01",
+      "description": "international_plan",
+      "evidenceUnitIds": [
+        "SV3-LF-U105-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U105-G-P04-E01",
+      "userBundleId": "SV3-LF-U105",
+      "sourceFactId": "SV3-LF-FACT-U105-P04-E01",
+      "description": "other_actor_training",
+      "evidenceUnitIds": [
+        "SV3-LF-U105-P04-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U106-G-P01-E01",
+      "userBundleId": "SV3-LF-U106",
+      "sourceFactId": "SV3-LF-FACT-U106-P01-E01",
+      "description": "shift_handoff",
+      "evidenceUnitIds": [
+        "SV3-LF-U106-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U106-G-P02-E01",
+      "userBundleId": "SV3-LF-U106",
+      "sourceFactId": "SV3-LF-FACT-U106-P02-E01",
+      "description": "emergency_training",
+      "evidenceUnitIds": [
+        "SV3-LF-U106-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U106-G-P03-E01",
+      "userBundleId": "SV3-LF-U106",
+      "sourceFactId": "SV3-LF-FACT-U106-P03-E01",
+      "description": "forklift_not_held",
+      "evidenceUnitIds": [
+        "SV3-LF-U106-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U106-G-P04-E01",
+      "userBundleId": "SV3-LF-U106",
+      "sourceFactId": "SV3-LF-FACT-U106-P04-E01",
+      "description": "vendor_automation",
+      "evidenceUnitIds": [
+        "SV3-LF-U106-P04-E01"
+      ]
+    }
+  ],
+  "evidenceUnits": [
+    {
+      "evidenceUnitId": "SV3-LF-U104-P01-E01",
+      "userBundleId": "SV3-LF-U104",
+      "parentId": "SV3-LF-U104-P01",
+      "groupId": "SV3-LF-U104-G-P01-E01",
+      "documentId": "SV3-LF-U104-D01",
+      "versionId": "SV3-LF-U104-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U104-P01-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U104-P01-E01-S01",
+          "parentId": "SV3-LF-U104-P01",
+          "documentId": "SV3-LF-U104-D01",
+          "versionId": "SV3-LF-U104-D01-V01",
+          "sourcePath": "documents/sv3-lf-u104-mobile-portfolio-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 389,
+          "charEnd": 530,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "I shipped an offline-safe checkout queue on iOS and Android and reduced duplicate-order crash sessions by 37% over the following eight weeks.",
+          "textSha256": "74655811605cb6caccf676af48d3eab5a74c86f2e060b345bcc60f7f8187102c"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U104-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PRODUCTION",
+      "aspects": [
+        "offline_checkout"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 37,
+          "unit": "PERCENT",
+          "semanticType": "CRASH_SESSION_REDUCTION",
+          "sourceSurface": "37%"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U104-P02-E01",
+      "userBundleId": "SV3-LF-U104",
+      "parentId": "SV3-LF-U104-P02",
+      "groupId": "SV3-LF-U104-G-P02-E01",
+      "documentId": "SV3-LF-U104-D01",
+      "versionId": "SV3-LF-U104-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U104-P02-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U104-P02-E01-S01",
+          "parentId": "SV3-LF-U104-P02",
+          "documentId": "SV3-LF-U104-D01",
+          "versionId": "SV3-LF-U104-D01-V01",
+          "sourcePath": "documents/sv3-lf-u104-mobile-portfolio-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 1687,
+          "charEnd": 1824,
+          "lineStart": 22,
+          "lineEnd": 22,
+          "text": "I completed screen-reader and keyboard remediation for the account workflow, reducing verified accessibility audit findings from 12 to 3.",
+          "textSha256": "ec322d9ae69399cd454efd8a346edfd1eae58fd02bf87b9cd27fae3f8fcbdc2c"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U104-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PRODUCTION",
+      "aspects": [
+        "accessibility_remediation"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 3,
+          "unit": "FINDING_COUNT",
+          "semanticType": "REMAINING_FINDINGS",
+          "sourceSurface": "3"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U104-P03-E01",
+      "userBundleId": "SV3-LF-U104",
+      "parentId": "SV3-LF-U104-P03",
+      "groupId": "SV3-LF-U104-G-P03-E01",
+      "documentId": "SV3-LF-U104-D01",
+      "versionId": "SV3-LF-U104-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U104-P03-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U104-P03-E01-S01",
+          "parentId": "SV3-LF-U104-P03",
+          "documentId": "SV3-LF-U104-D01",
+          "versionId": "SV3-LF-U104-D01-V01",
+          "sourcePath": "documents/sv3-lf-u104-mobile-portfolio-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 2876,
+          "charEnd": 2974,
+          "lineStart": 34,
+          "lineEnd": 34,
+          "text": "Voice navigation remained a moderated prototype and was not released in either mobile application.",
+          "textSha256": "58f1b9b68a2941500aaac4d9b9280f58b240dbfb006178ba79160cd76eaf4eda"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U104-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PROTOTYPE",
+      "aspects": [
+        "voice_not_shipped"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U105-P01-E01",
+      "userBundleId": "SV3-LF-U105",
+      "parentId": "SV3-LF-U105-P01",
+      "groupId": "SV3-LF-U105-G-P01-E01",
+      "documentId": "SV3-LF-U105-D01",
+      "versionId": "SV3-LF-U105-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U105-P01-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U105-P01-E01-S01",
+          "parentId": "SV3-LF-U105-P01",
+          "documentId": "SV3-LF-U105-D01",
+          "versionId": "SV3-LF-U105-D01-V01",
+          "sourcePath": "documents/sv3-lf-u105-planning-narrative-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 192,
+          "charEnd": 261,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "본인은 2025년 1분기에 480건의 문의 표본을 검토해 공통 분류 정책을 적용하고 운영 회의의 우선순위 기준으로 사용했다.",
+          "textSha256": "210c8ff8c0c9fd0eb51e5abce55234d6dacc0cc08a8f2001dd6e81252e86b541"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U105-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PRODUCTION",
+      "aspects": [
+        "classification_policy"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 480,
+          "unit": "CASE_COUNT",
+          "semanticType": "REVIEW_SAMPLE_COUNT",
+          "sourceSurface": "480건"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U105-P02-E01",
+      "userBundleId": "SV3-LF-U105",
+      "parentId": "SV3-LF-U105-P02",
+      "groupId": "SV3-LF-U105-G-P02-E01",
+      "documentId": "SV3-LF-U105-D01",
+      "versionId": "SV3-LF-U105-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U105-P02-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U105-P02-E01-S01",
+          "parentId": "SV3-LF-U105-P02",
+          "documentId": "SV3-LF-U105-D01",
+          "versionId": "SV3-LF-U105-D01-V01",
+          "sourcePath": "documents/sv3-lf-u105-planning-narrative-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 807,
+          "charEnd": 869,
+          "lineStart": 19,
+          "lineEnd": 19,
+          "text": "9개 부서가 참여한 우선순위 워크숍을 운영하고, 합의되지 않은 사례 14건을 후속 정책 검토 목록으로 전환했다.",
+          "textSha256": "22bfbe21e943338686ad7ad06e0a1609a0f70ecd0231615fa0404b960d536ea5"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U105-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "cross_functional_prioritization"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 9,
+          "unit": "DEPARTMENT_COUNT",
+          "semanticType": "PARTICIPATING_GROUP_COUNT",
+          "sourceSurface": "9개 부서"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U105-P03-E01",
+      "userBundleId": "SV3-LF-U105",
+      "parentId": "SV3-LF-U105-P03",
+      "groupId": "SV3-LF-U105-G-P03-E01",
+      "documentId": "SV3-LF-U105-D01",
+      "versionId": "SV3-LF-U105-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U105-P03-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U105-P03-E01-S01",
+          "parentId": "SV3-LF-U105-P03",
+          "documentId": "SV3-LF-U105-D01",
+          "versionId": "SV3-LF-U105-D01-V01",
+          "sourcePath": "documents/sv3-lf-u105-planning-narrative-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 1282,
+          "charEnd": 1349,
+          "lineStart": 32,
+          "lineEnd": 32,
+          "text": "해외 법인 연계 운영은 2026년 하반기 계획 단계이며 아직 승인, 개시, production 전환이 이루어지지 않았다.",
+          "textSha256": "ce36431b3126b8c825d5be8397ff5a4b916b95f60b64b506e34895eb443c1909"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U105-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PLANNED",
+      "aspects": [
+        "international_plan"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U105-P04-E01",
+      "userBundleId": "SV3-LF-U105",
+      "parentId": "SV3-LF-U105-P04",
+      "groupId": "SV3-LF-U105-G-P04-E01",
+      "documentId": "SV3-LF-U105-D01",
+      "versionId": "SV3-LF-U105-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U105-P04-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U105-P04-E01-S01",
+          "parentId": "SV3-LF-U105-P04",
+          "documentId": "SV3-LF-U105-D01",
+          "versionId": "SV3-LF-U105-D01-V01",
+          "sourcePath": "documents/sv3-lf-u105-planning-narrative-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 1692,
+          "charEnd": 1761,
+          "lineStart": 42,
+          "lineEnd": 42,
+          "text": "인재개발팀은 전사 교육 12회를 진행했고, 본인은 정책 사례와 질의응답 문서를 제공했지만 교육 세션을 직접 진행하지 않았다.",
+          "textSha256": "b7b0d523f628959380ee2a7e581f00bef7bba61c615c721352028c9cbe9955dc"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U105-P04-E01-S01",
+      "contextSpanIds": [],
+      "actor": "OTHER",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "other_actor_training"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 12,
+          "unit": "SESSION_COUNT",
+          "semanticType": "TRAINING_SESSION_COUNT",
+          "sourceSurface": "12회"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U106-P01-E01",
+      "userBundleId": "SV3-LF-U106",
+      "parentId": "SV3-LF-U106-P01",
+      "groupId": "SV3-LF-U106-G-P01-E01",
+      "documentId": "SV3-LF-U106-D01",
+      "versionId": "SV3-LF-U106-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U106-P01-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U106-P01-E01-S01",
+          "parentId": "SV3-LF-U106-P01",
+          "documentId": "SV3-LF-U106-D01",
+          "versionId": "SV3-LF-U106-D01-V01",
+          "sourcePath": "documents/sv3-lf-u106-operations-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 241,
+          "charEnd": 311,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "본인은 3개 현장에 공통 shift handoff checklist를 적용해 인수인계 누락 작업을 12주 동안 27% 줄였다.",
+          "textSha256": "144775ed6763b84b1647ec0748cc22ceeb812ec53c5a19bdca76f5f804bfcd9f"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U106-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PRODUCTION",
+      "aspects": [
+        "shift_handoff"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 27,
+          "unit": "PERCENT",
+          "semanticType": "MISSED_TASK_REDUCTION",
+          "sourceSurface": "27%"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U106-P02-E01",
+      "userBundleId": "SV3-LF-U106",
+      "parentId": "SV3-LF-U106-P02",
+      "groupId": "SV3-LF-U106-G-P02-E01",
+      "documentId": "SV3-LF-U106-D01",
+      "versionId": "SV3-LF-U106-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U106-P02-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U106-P02-E01-S01",
+          "parentId": "SV3-LF-U106-P02",
+          "documentId": "SV3-LF-U106-D01",
+          "versionId": "SV3-LF-U106-D01-V01",
+          "sourcePath": "documents/sv3-lf-u106-operations-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 822,
+          "charEnd": 877,
+          "lineStart": 22,
+          "lineEnd": 22,
+          "text": "Emergency response fundamentals — completed in 2024-09.",
+          "textSha256": "66a465e8186eb8782a241300c01419260bbb7fd04c1eb1808d4a0a12d0c41c59"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U106-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "emergency_training"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U106-P03-E01",
+      "userBundleId": "SV3-LF-U106",
+      "parentId": "SV3-LF-U106-P03",
+      "groupId": "SV3-LF-U106-G-P03-E01",
+      "documentId": "SV3-LF-U106-D01",
+      "versionId": "SV3-LF-U106-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U106-P03-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U106-P03-E01-S01",
+          "parentId": "SV3-LF-U106-P03",
+          "documentId": "SV3-LF-U106-D01",
+          "versionId": "SV3-LF-U106-D01-V01",
+          "sourcePath": "documents/sv3-lf-u106-operations-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 1177,
+          "charEnd": 1217,
+          "lineStart": 32,
+          "lineEnd": 32,
+          "text": "Forklift operator certificate: not held.",
+          "textSha256": "c0b869dc617002ef56679c6ba86f220feb7675807693d8b15506e8824a51272e"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U106-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "NOT_APPLICABLE",
+      "aspects": [
+        "forklift_not_held"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U106-P04-E01",
+      "userBundleId": "SV3-LF-U106",
+      "parentId": "SV3-LF-U106-P04",
+      "groupId": "SV3-LF-U106-G-P04-E01",
+      "documentId": "SV3-LF-U106-D01",
+      "versionId": "SV3-LF-U106-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U106-P04-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U106-P04-E01-S01",
+          "parentId": "SV3-LF-U106-P04",
+          "documentId": "SV3-LF-U106-D01",
+          "versionId": "SV3-LF-U106-D01-V01",
+          "sourcePath": "documents/sv3-lf-u106-operations-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 1568,
+          "charEnd": 1696,
+          "lineStart": 42,
+          "lineEnd": 42,
+          "text": "The automation vendor built the barcode routing system; I documented the operating SOP and did not develop the routing software.",
+          "textSha256": "d52908e8a127820854e562243ec8aec551ca686407d9a91ae92c0a2ee83c1c20"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U106-P04-E01-S01",
+      "contextSpanIds": [],
+      "actor": "OTHER",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "vendor_automation"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": []
+    }
+  ]
+}

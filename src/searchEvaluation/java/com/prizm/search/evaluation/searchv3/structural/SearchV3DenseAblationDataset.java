@@ -22,7 +22,10 @@ import tools.jackson.databind.ObjectMapper;
 final class SearchV3DenseAblationDataset {
 
     static final Path BENCHMARK_ROOT = Path.of("src/test/resources/search-v3-evaluation");
-    static final String DATASET_VERSION = "search-v3-fresh-seed-1.0.1";
+    static final Path LONG_FORM_BENCHMARK_ROOT = Path.of(
+            "src/searchEvaluation/resources/search-v3-evaluation/devcal-1.1.0");
+    static final String ORIGINAL_DATASET_VERSION = "search-v3-fresh-seed-1.0.1";
+    static final String LONG_FORM_DATASET_VERSION = "search-v3-fresh-devcal-1.1.0";
     static final String OVERALL_SHA256 = "1f36c4bbb6948b97c4321821cc3d6b8a9e38ab44b81adb1594614c6f7e97289e";
     static final String SEALED_FINAL_SHA256 = "e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383";
 
@@ -34,10 +37,18 @@ final class SearchV3DenseAblationDataset {
     private final ObjectMapper mapper = new ObjectMapper();
 
     DatasetSlice load(Split split) {
-        return load(BENCHMARK_ROOT.resolve(split.directory()), split);
+        return load(BENCHMARK_ROOT.resolve(split.directory()), split, ORIGINAL_DATASET_VERSION);
+    }
+
+    DatasetSlice loadLongForm(Split split) {
+        return load(LONG_FORM_BENCHMARK_ROOT.resolve(split.directory()), split, LONG_FORM_DATASET_VERSION);
     }
 
     DatasetSlice load(Path splitDirectory, Split expectedSplit) {
+        return load(splitDirectory, expectedSplit, ORIGINAL_DATASET_VERSION);
+    }
+
+    private DatasetSlice load(Path splitDirectory, Split expectedSplit, String expectedDatasetVersion) {
         Path normalized = splitDirectory.toAbsolutePath().normalize();
         String portablePath = normalized.toString().replace('\\', '/').toLowerCase(Locale.ROOT);
         if (portablePath.contains("/sealed-final") || portablePath.contains("sealed_final")) {
@@ -51,10 +62,10 @@ final class SearchV3DenseAblationDataset {
         JsonNode corpus = read(normalized.resolve("corpus.json"));
         JsonNode questions = read(normalized.resolve("questions.json"));
         JsonNode gold = read(normalized.resolve("gold-evidence.json"));
-        requireArtifact(manifest, expectedSplit);
-        requireArtifact(corpus, expectedSplit);
-        requireArtifact(questions, expectedSplit);
-        requireArtifact(gold, expectedSplit);
+        requireArtifact(manifest, expectedSplit, expectedDatasetVersion);
+        requireArtifact(corpus, expectedSplit, expectedDatasetVersion);
+        requireArtifact(questions, expectedSplit, expectedDatasetVersion);
+        requireArtifact(gold, expectedSplit, expectedDatasetVersion);
 
         Map<String, GoldUnit> units = loadUnits(gold.path("evidenceUnits"));
         Map<String, GoldParent> parents = loadParents(gold.path("parents"));
@@ -78,8 +89,29 @@ final class SearchV3DenseAblationDataset {
             if (bundles.stream().noneMatch(bundle -> bundle.userBundleId().equals(query.userBundleId()))) {
                 throw new IllegalArgumentException("Query references a missing user bundle: " + query.queryId());
             }
+            query.allExpectedEvidence().stream()
+                    .map(expected -> units.get(expected.evidenceUnitId()))
+                    .filter(unit -> !unit.userBundleId().equals(query.userBundleId()))
+                    .findFirst()
+                    .ifPresent(unit -> {
+                        throw new IllegalArgumentException(
+                                "Query references evidence from another user bundle: " + query.queryId());
+                    });
+            query.allExpectedEvidence().stream()
+                    .filter(expected -> "DIRECT_SUPPORT".equals(expected.supportRelation()))
+                    .map(expected -> units.get(expected.evidenceUnitId()))
+                    .filter(unit -> !activeDocuments.containsKey(unit.versionId())
+                            || !unit.userBundleId().equals(activeDocuments.get(unit.versionId()).userBundleId()))
+                    .findFirst()
+                    .ifPresent(unit -> {
+                        throw new IllegalArgumentException(
+                                "Query references evidence outside the ACTIVE corpus: " + query.queryId());
+                    });
         }
+        validateGoldGraph(units, parents, groups);
+        validateGrounding(activeDocuments, units, parents);
         return new DatasetSlice(
+                expectedDatasetVersion,
                 expectedSplit,
                 manifest.path("combinedSha256").asText(),
                 List.copyOf(bundles),
@@ -98,11 +130,31 @@ final class SearchV3DenseAblationDataset {
         if (!SEALED_FINAL_SHA256.equals(combined) || opened || searchExecuted) {
             throw new IllegalStateException("SEALED FINAL metadata changed or was opened");
         }
-        return new SealedManifestMetadata(combined, opened, searchExecuted);
+        int verifiedFileCount = verifySealedManifestFiles(manifest);
+        return new SealedManifestMetadata(combined, opened, searchExecuted, verifiedFileCount);
     }
 
-    private void requireArtifact(JsonNode artifact, Split split) {
-        if (!DATASET_VERSION.equals(artifact.path("datasetVersion").asText())) {
+    LongFormManifestMetadata readLongFormManifestMetadata() {
+        JsonNode manifest = read(LONG_FORM_BENCHMARK_ROOT.resolve("manifest.json"));
+        String datasetVersion = required(manifest, "datasetVersion");
+        String previousVersion = required(manifest, "previousVersion");
+        String executionPolicy = required(manifest, "executionPolicy");
+        if (!LONG_FORM_DATASET_VERSION.equals(datasetVersion)
+                || !ORIGINAL_DATASET_VERSION.equals(previousVersion)
+                || !"DEV_CAL_EVALUATION_ALLOWED".equals(executionPolicy)) {
+            throw new IllegalStateException("Long-form DEV/CAL manifest contract changed");
+        }
+        return new LongFormManifestMetadata(
+                datasetVersion,
+                previousVersion,
+                required(manifest, "combinedSha256"),
+                manifest.path("counts").path("documents").asInt(),
+                manifest.path("counts").path("queries").asInt(),
+                executionPolicy);
+    }
+
+    private void requireArtifact(JsonNode artifact, Split split, String expectedDatasetVersion) {
+        if (!expectedDatasetVersion.equals(artifact.path("datasetVersion").asText())) {
             throw new IllegalArgumentException("Unexpected Search V3 dataset version");
         }
         if (!split.manifestName().equals(artifact.path("split").asText())) {
@@ -167,6 +219,9 @@ final class SearchV3DenseAblationDataset {
             for (JsonNode span : node.path("sourceSpans")) {
                 spans.add(span(span));
             }
+            if (spans.isEmpty()) {
+                throw new IllegalArgumentException("Evidence unit has no source span: " + id);
+            }
             GoldUnit value = new GoldUnit(
                     id,
                     required(node, "userBundleId"),
@@ -205,7 +260,11 @@ final class SearchV3DenseAblationDataset {
         Map<String, GoldGroup> result = new LinkedHashMap<>();
         for (JsonNode node : nodes) {
             String id = required(node, "groupId");
+            rejectRuntimeId(id);
             List<String> unitIds = strings(node.path("evidenceUnitIds"));
+            if (unitIds.isEmpty()) {
+                throw new IllegalArgumentException("Evidence group has no units: " + id);
+            }
             GoldGroup value = new GoldGroup(
                     id,
                     required(node, "userBundleId"),
@@ -216,6 +275,53 @@ final class SearchV3DenseAblationDataset {
             }
         }
         return result;
+    }
+
+    private void validateGoldGraph(
+            Map<String, GoldUnit> units,
+            Map<String, GoldParent> parents,
+            Map<String, GoldGroup> groups) {
+        for (GoldUnit unit : units.values()) {
+            GoldParent parent = parents.get(unit.parentId());
+            GoldGroup group = groups.get(unit.groupId());
+            if (parent == null || group == null) {
+                throw new IllegalArgumentException("Gold unit references a missing parent/group: "
+                        + unit.evidenceUnitId());
+            }
+            if (!unit.userBundleId().equals(parent.userBundleId())
+                    || !unit.userBundleId().equals(group.userBundleId())
+                    || !unit.documentId().equals(parent.documentId())
+                    || !unit.versionId().equals(parent.versionId())
+                    || !unit.sourceFactId().equals(group.sourceFactId())
+                    || !group.evidenceUnitIds().contains(unit.evidenceUnitId())) {
+                throw new IllegalArgumentException("Gold unit parent/group lineage mismatch: "
+                        + unit.evidenceUnitId());
+            }
+            for (GoldSpan span : unit.sourceSpans()) {
+                if (!unit.documentId().equals(span.documentId())
+                        || !unit.versionId().equals(span.versionId())) {
+                    throw new IllegalArgumentException("Gold unit span lineage mismatch: " + span.spanId());
+                }
+                GoldSpan parentSpan = parent.sourceSpan();
+                if (!java.util.Objects.equals(parentSpan.page(), span.page())
+                        || parentSpan.codePointStart() > span.codePointStart()
+                        || parentSpan.codePointEnd() < span.codePointEnd()) {
+                    throw new IllegalArgumentException("Gold unit escapes its parent span: "
+                            + unit.evidenceUnitId());
+                }
+            }
+        }
+        for (GoldGroup group : groups.values()) {
+            for (String unitId : group.evidenceUnitIds()) {
+                GoldUnit unit = units.get(unitId);
+                if (unit == null
+                        || !group.groupId().equals(unit.groupId())
+                        || !group.userBundleId().equals(unit.userBundleId())) {
+                    throw new IllegalArgumentException("Gold group unit lineage mismatch: "
+                            + group.groupId());
+                }
+            }
+        }
     }
 
     private List<Query> loadQueries(JsonNode nodes, Map<String, GoldUnit> units, Split split) {
@@ -248,8 +354,19 @@ final class SearchV3DenseAblationDataset {
                         required(aspect, "aspectId"),
                         aspect.path("required").asBoolean(),
                         aspect.path("minEvidenceGroups").asInt(),
+                        strings(aspect.path("requiredEvidenceGroupIds")),
                         List.copyOf(expected)));
             }
+            JsonNode expression = node.path("aspectExpression");
+            String operator = required(expression, "operator");
+            if (!Set.of("ALL", "ANY").contains(operator)) {
+                throw new IllegalArgumentException("Unknown aspect expression operator: " + operator);
+            }
+            AspectExpression aspectExpression = new AspectExpression(
+                    operator,
+                    strings(expression.path("requiredAspectIds")),
+                    expression.path("minShouldMatch").asInt());
+            validateQueryRequirements(id, aspects, aspectExpression, units);
             result.add(new Query(
                     id,
                     required(node, "userBundleId"),
@@ -258,10 +375,44 @@ final class SearchV3DenseAblationDataset {
                     required(node, "answerability"),
                     required(node, "language"),
                     strings(node.path("categories")),
+                    aspectExpression,
                     List.copyOf(aspects),
                     List.copyOf(allExpected)));
         }
         return result;
+    }
+
+    private void validateQueryRequirements(
+            String queryId,
+            List<AspectRequirement> aspects,
+            AspectExpression expression,
+            Map<String, GoldUnit> units) {
+        Map<String, AspectRequirement> byId = new LinkedHashMap<>();
+        for (AspectRequirement aspect : aspects) {
+            if (byId.put(aspect.aspectId(), aspect) != null) {
+                throw new IllegalArgumentException("Duplicate query aspect ID: " + queryId);
+            }
+            Set<String> directGroups = aspect.expectedEvidence().stream()
+                    .filter(expected -> "DIRECT_SUPPORT".equals(expected.supportRelation()))
+                    .map(expected -> units.get(expected.evidenceUnitId()).groupId())
+                    .collect(java.util.stream.Collectors.toSet());
+            if (!directGroups.containsAll(aspect.requiredEvidenceGroupIds())) {
+                throw new IllegalArgumentException("Required evidence group is not DIRECT_SUPPORT: " + queryId);
+            }
+            if (aspect.minEvidenceGroups() < 0
+                    || aspect.minEvidenceGroups() > directGroups.size()) {
+                throw new IllegalArgumentException("Invalid minEvidenceGroups: " + queryId);
+            }
+        }
+        if (expression.requiredAspectIds().isEmpty()
+                || expression.requiredAspectIds().stream().anyMatch(id -> !byId.containsKey(id))
+                || expression.minShouldMatch() < 1
+                || expression.minShouldMatch() > expression.requiredAspectIds().size()
+                || ("ALL".equals(expression.operator())
+                        && expression.minShouldMatch() != expression.requiredAspectIds().size())
+                || ("ANY".equals(expression.operator()) && expression.minShouldMatch() != 1)) {
+            throw new IllegalArgumentException("Invalid aspect expression: " + queryId);
+        }
     }
 
     private GoldSpan span(JsonNode node) {
@@ -273,7 +424,71 @@ final class SearchV3DenseAblationDataset {
                 node.path("charStart").asInt(),
                 node.path("charEnd").asInt(),
                 node.path("lineStart").asInt(),
-                node.path("lineEnd").asInt());
+                node.path("lineEnd").asInt(),
+                required(node, "text"),
+                required(node, "textSha256"));
+    }
+
+    private void validateGrounding(
+            Map<String, SourceDocument> activeDocuments,
+            Map<String, GoldUnit> units,
+            Map<String, GoldParent> parents) {
+        units.values().stream()
+                .filter(unit -> activeDocuments.containsKey(unit.versionId()))
+                .forEach(unit -> {
+                    SourceDocument document = activeDocuments.get(unit.versionId());
+                    if (!unit.userBundleId().equals(document.userBundleId())) {
+                        throw new IllegalArgumentException("Gold unit owner/document mismatch: "
+                                + unit.evidenceUnitId());
+                    }
+                    unit.sourceSpans().forEach(span -> validateSpan(document, span));
+                });
+        parents.values().stream()
+                .filter(parent -> activeDocuments.containsKey(parent.versionId()))
+                .forEach(parent -> {
+                    SourceDocument document = activeDocuments.get(parent.versionId());
+                    if (!parent.userBundleId().equals(document.userBundleId())) {
+                        throw new IllegalArgumentException("Gold parent owner/document mismatch: "
+                                + parent.parentId());
+                    }
+                    validateSpan(document, parent.sourceSpan());
+                });
+    }
+
+    private void validateSpan(SourceDocument document, GoldSpan span) {
+        if (!document.documentId().equals(span.documentId())
+                || !document.versionId().equals(span.versionId())
+                || !java.util.Objects.equals(document.structuralDocument().page(), span.page())) {
+            throw new IllegalArgumentException("Gold span document/version/page mismatch: " + span.spanId());
+        }
+        String source = document.structuralDocument().sourceText();
+        int codePointLength = source.codePointCount(0, source.length());
+        if (span.codePointStart() < 0
+                || span.codePointEnd() <= span.codePointStart()
+                || span.codePointEnd() > codePointLength) {
+            throw new IllegalArgumentException("Gold span range is outside its source: " + span.spanId());
+        }
+        int charStart = source.offsetByCodePoints(0, span.codePointStart());
+        int charEnd = source.offsetByCodePoints(0, span.codePointEnd());
+        String actual = source.substring(charStart, charEnd);
+        int lineStart = 1 + countNewlines(source, 0, charStart);
+        int lineEnd = lineStart + countNewlines(source, charStart, Math.max(charStart, charEnd - 1));
+        if (!actual.equals(span.text())
+                || !StructuralBlockParser.sha256(actual).equals(span.textSha256())
+                || lineStart != span.lineStart()
+                || lineEnd != span.lineEnd()) {
+            throw new IllegalArgumentException("Gold span text/hash/line mismatch: " + span.spanId());
+        }
+    }
+
+    private int countNewlines(String value, int start, int end) {
+        int count = 0;
+        for (int index = start; index < end; index++) {
+            if (value.charAt(index) == '\n') {
+                count++;
+            }
+        }
+        return count;
     }
 
     private void rejectRuntimeId(String id) {
@@ -328,6 +543,36 @@ final class SearchV3DenseAblationDataset {
         }
     }
 
+    private int verifySealedManifestFiles(JsonNode manifest) {
+        List<String> combinedEntries = new ArrayList<>();
+        int count = 0;
+        for (JsonNode entry : manifest.path("files")) {
+            String relative = required(entry, "path");
+            Path file = BENCHMARK_ROOT.resolve(relative).normalize();
+            if (!file.startsWith(BENCHMARK_ROOT.normalize()) || !Files.isRegularFile(file)) {
+                throw new IllegalStateException("SEALED FINAL manifest path is invalid: " + relative);
+            }
+            String expectedHash = required(entry, "sha256");
+            long expectedBytes = entry.path("bytes").asLong(-1);
+            try {
+                if (Files.size(file) != expectedBytes || !expectedHash.equals(sha256(file))) {
+                    throw new IllegalStateException("SEALED FINAL file hash/size mismatch: " + relative);
+                }
+            }
+            catch (IOException exception) {
+                throw new IllegalStateException("Cannot inspect SEALED FINAL fixture: " + relative, exception);
+            }
+            combinedEntries.add(relative + "\0" + expectedHash + "\n");
+            count++;
+        }
+        combinedEntries.sort(String::compareTo);
+        String actualCombined = StructuralBlockParser.sha256(String.join("", combinedEntries));
+        if (!required(manifest, "combinedSha256").equals(actualCombined)) {
+            throw new IllegalStateException("SEALED FINAL combined hash mismatch");
+        }
+        return count;
+    }
+
     enum Split {
         DEV("dev", "DEV"),
         CALIBRATION("calibration", "CALIBRATION");
@@ -359,6 +604,7 @@ final class SearchV3DenseAblationDataset {
     }
 
     record DatasetSlice(
+            String datasetVersion,
             Split split,
             String manifestCombinedSha256,
             List<UserBundle> bundles,
@@ -372,7 +618,8 @@ final class SearchV3DenseAblationDataset {
             queries = queries.stream()
                     .map(query -> new Query(
                             query.queryId(), query.userBundleId(), split, query.text(), query.answerability(),
-                            query.language(), query.categories(), query.aspects(), query.allExpectedEvidence()))
+                            query.language(), query.categories(), query.aspectExpression(), query.aspects(),
+                            query.allExpectedEvidence()))
                     .toList();
         }
     }
@@ -409,6 +656,7 @@ final class SearchV3DenseAblationDataset {
             String answerability,
             String language,
             List<String> categories,
+            AspectExpression aspectExpression,
             List<AspectRequirement> aspects,
             List<ExpectedEvidence> allExpectedEvidence) {
 
@@ -418,10 +666,14 @@ final class SearchV3DenseAblationDataset {
         }
     }
 
+    record AspectExpression(String operator, List<String> requiredAspectIds, int minShouldMatch) {
+    }
+
     record AspectRequirement(
             String aspectId,
             boolean required,
             int minEvidenceGroups,
+            List<String> requiredEvidenceGroupIds,
             List<ExpectedEvidence> expectedEvidence) {
     }
 
@@ -458,9 +710,24 @@ final class SearchV3DenseAblationDataset {
             int codePointStart,
             int codePointEnd,
             int lineStart,
-            int lineEnd) {
+            int lineEnd,
+            String text,
+            String textSha256) {
     }
 
-    record SealedManifestMetadata(String combinedSha256, boolean opened, boolean searchExecuted) {
+    record SealedManifestMetadata(
+            String combinedSha256,
+            boolean opened,
+            boolean searchExecuted,
+            int verifiedFileCount) {
+    }
+
+    record LongFormManifestMetadata(
+            String datasetVersion,
+            String previousVersion,
+            String combinedSha256,
+            int documentCount,
+            int queryCount,
+            String executionPolicy) {
     }
 }

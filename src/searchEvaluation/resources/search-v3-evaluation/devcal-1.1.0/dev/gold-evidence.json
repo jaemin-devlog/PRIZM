@@ -1,0 +1,821 @@
+{
+  "artifactType": "GOLD_EVIDENCE",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+  "split": "DEV",
+  "parents": [
+    {
+      "parentId": "SV3-LF-U101-P01",
+      "userBundleId": "SV3-LF-U101",
+      "documentId": "SV3-LF-U101-D01",
+      "versionId": "SV3-LF-U101-D01-V01",
+      "label": "현장 조사와 문제 구조화",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U101-P01-PS01",
+        "parentId": "SV3-LF-U101-P01",
+        "documentId": "SV3-LF-U101-D01",
+        "versionId": "SV3-LF-U101-D01-V01",
+        "sourcePath": "documents/sv3-lf-u101-design-portfolio-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 27,
+        "charEnd": 664,
+        "lineStart": 3,
+        "lineEnd": 13,
+        "text": "현장 조사와 문제 구조화\n\n지역 교통 예약 서비스는 전화, 키오스크, 모바일 화면을 함께 운영하고 있었고 채널마다 취소 규칙을 다르게 안내했다. 나는 프로젝트를 시작할 때 고객 문의 기록과 현장 운영 일지를 함께 읽어 반복적으로 등장하는 혼란을 조사 질문으로 바꾸었다. 인터뷰 전에 참여 동의와 기록 보관 범위를 안내했으며, 결과를 특정 개인의 진술로 일반화하지 않도록 관찰 메모와 행동 로그를 분리했다.\n\n본인은 이동 제약이 있는 이용자 18명과 현장 직원 6명을 인터뷰하고 예약 변경 과정의 단절 지점을 여섯 가지 행동 패턴으로 분류했다.\n\n- 전화 상담을 먼저 찾는 이용자의 이유를 채널 선호가 아니라 실패 복구 경험으로 기록했다.\n- 현장 직원이 임시 메모로 보완하던 규칙을 서비스 정책과 화면 정보의 차이로 표시했다.\n- 영어 안내를 이용한 참여자에게 같은 질문을 반복해 번역 표현이 응답을 유도하지 않는지 확인했다.\n\n조사 자료를 정리할 때 빈도가 높은 문제만 남기지 않았다. 낮은 빈도라도 이동 보조가 필요한 참여자에게 큰 비용을 만드는 문제는 별도 위험으로 표시했고, 제품팀과 운영팀이 같은 근거를 보도록 source note를 연결했다. 이 과정은 솔루션을 먼저 정하지 않고 문제의 행위 조건을 설명하는 데 목적이 있었다.",
+        "textSha256": "42d29f784794fdf236233062335db2527b05b1cadc0ffd8b35a3fe6aaa7fa87f"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U101-P02",
+      "userBundleId": "SV3-LF-U101",
+      "documentId": "SV3-LF-U101-D01",
+      "versionId": "SV3-LF-U101-D01-V01",
+      "label": "예약 변경 흐름 재설계",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U101-P02-PS01",
+        "parentId": "SV3-LF-U101-P02",
+        "documentId": "SV3-LF-U101-D01",
+        "versionId": "SV3-LF-U101-D01-V01",
+        "sourcePath": "documents/sv3-lf-u101-design-portfolio-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 666,
+        "charEnd": 1276,
+        "lineStart": 15,
+        "lineEnd": 23,
+        "text": "예약 변경 흐름 재설계\n\n나는 조사에서 확인한 문제를 예약 상태, 가능한 행동, 복구 안내의 세 층으로 나누었다. 기존 화면은 정책 문장을 길게 보여 주었지만 사용자는 현재 무엇을 할 수 있는지 먼저 찾았다. 그래서 상태 이름을 일상 언어로 바꾸고 변경 가능 시간과 수수료를 행동 버튼 가까이에 배치한 두 가지 prototype을 만들었다.\n\n첫 prototype은 정보량을 줄이는 데 집중했지만 현장 직원이 예외 상황을 설명하기 어려웠다. 두 번째 prototype은 예외를 숨기지 않고 사용자가 선택한 행동에 필요한 규칙만 단계적으로 보여 주었다. 나는 두 안을 동일한 과업과 순서로 평가해 시각적 선호가 아니라 오류 복구 여부를 비교했다.\n\n재설계한 흐름은 비감독 사용성 평가에서 예약 변경 과업 완료율을 58%에서 86%로 높였고, 잘못된 취소 선택은 세션당 평균 1.7회에서 0.4회로 줄였다.\n\n평가 뒤에는 성공한 화면만 전달하지 않았다. 실패가 남은 보조기기 탐색, 긴 역 이름의 줄바꿈, 환불 지연 안내를 backlog와 research note에 함께 남겼다. 운영 담당자가 정책을 바꿀 때 화면 문구와 도움말이 동시에 갱신되도록 content checklist도 작성했다.",
+        "textSha256": "e06628c4cdeb3bb66c973f9881bb986dee922b66ac40f703c427119c8d1674fc"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U101-P03",
+      "userBundleId": "SV3-LF-U101",
+      "documentId": "SV3-LF-U101-D01",
+      "versionId": "SV3-LF-U101-D01-V01",
+      "label": "출시 협업과 역할 경계",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U101-P03-PS01",
+        "parentId": "SV3-LF-U101-P03",
+        "documentId": "SV3-LF-U101-D01",
+        "versionId": "SV3-LF-U101-D01-V01",
+        "sourcePath": "documents/sv3-lf-u101-design-portfolio-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 1278,
+        "charEnd": 1808,
+        "lineStart": 25,
+        "lineEnd": 33,
+        "text": "출시 협업과 역할 경계\n\n제품팀은 재설계안을 작은 지역부터 적용했고 나는 release note, 상담 스크립트, 오류 관찰 항목을 연결했다. 배포 당일에는 현장 직원에게 답을 대신 주기보다 어떤 화면과 규칙이 충돌했는지 기록하도록 안내했다. 일주일 동안 수집된 사례는 디자인 수정과 정책 설명 보완으로 나누어 처리했다.\n\n마케팅 조직은 새 예약 화면을 소개하는 광고 문구의 A/B test를 별도로 수행했으며, 본인은 그 실험을 설계하거나 집행하지 않고 화면 사실 확인만 지원했다.\n\n역할 경계를 기록한 이유는 같은 출시 안에서 수행된 모든 활동을 개인의 성과로 합치지 않기 위해서였다. 광고 전환율은 마케팅 조직의 지표였고, 나는 예약 과정의 과업 성공과 오류 복구 자료만 디자인 의사결정 근거로 사용했다.\n\n프로젝트 종료 회고에서는 연구 질문, prototype 변경, 운영 정책 수정이 어떤 source note에서 시작됐는지 추적했다. 후속 담당자가 결과 숫자만 보고 원래 문제를 오해하지 않도록 반례와 미해결 조건도 같은 문서에 남겼다.",
+        "textSha256": "2bdc405eb3d7067a9f2162e450d36271604726e93a1e5d6758213dc5c5017f1b"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U101-P04",
+      "userBundleId": "SV3-LF-U101",
+      "documentId": "SV3-LF-U101-D01",
+      "versionId": "SV3-LF-U101-D01-V01",
+      "label": "후속 접근성 연구 계획",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U101-P04-PS01",
+        "parentId": "SV3-LF-U101-P04",
+        "documentId": "SV3-LF-U101-D01",
+        "versionId": "SV3-LF-U101-D01-V01",
+        "sourcePath": "documents/sv3-lf-u101-design-portfolio-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 1810,
+        "charEnd": 2252,
+        "lineStart": 35,
+        "lineEnd": 43,
+        "text": "후속 접근성 연구 계획\n\n다음 연구에서는 화면 확대와 switch control을 사용하는 참여자를 별도로 모집할 계획을 세웠다. 모집 문안, 보조기기 확인 질문, 원격 세션의 지원 절차까지 초안을 만들었지만 현재 포트폴리오 시점에는 참여자 모집과 본조사를 시작하지 않았다.\n\n접근성 연구는 2027년 상반기 제안 단계이며 production 적용이나 완료 성과로 기록하지 않는다.\n\n계획을 남길 때는 예상 효과를 측정 결과처럼 쓰지 않았다. 필요한 동의 절차와 지원 인력, 연구 환경, 삭제 정책을 먼저 검토해야 하며 실제 참여자 자료가 생기면 별도의 접근 권한과 보관 계약을 적용할 예정이다.\n\n이 문서는 완전한 디자인 시스템이나 모든 교통 상황을 다루는 결과 보고서가 아니다. 확인한 범위와 아직 확인하지 않은 범위를 구분해 다음 실험이 이전 결과를 독립적으로 검증할 수 있도록 한다.",
+        "textSha256": "28d75bd003e7d1d1b921e8532b841a7267850c8fe7cbcc88d0d0ba93f4d95fb9"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U102-P01",
+      "userBundleId": "SV3-LF-U102",
+      "documentId": "SV3-LF-U102-D01",
+      "versionId": "SV3-LF-U102-D01-V01",
+      "label": "Production batch reliability",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U102-P01-PS01",
+        "parentId": "SV3-LF-U102-P01",
+        "documentId": "SV3-LF-U102-D01",
+        "versionId": "SV3-LF-U102-D01-V01",
+        "sourcePath": "documents/sv3-lf-u102-data-reliability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 53,
+        "charEnd": 1619,
+        "lineStart": 3,
+        "lineEnd": 16,
+        "text": "Production batch reliability\n\nThe reporting platform received files from billing, support, and regional operations. Each source used a different delivery window and correction policy, so a late file could look identical to an empty day. I mapped those states before changing the pipeline and retained the original arrival record beside every normalized batch.\n\nI operated a production validation pipeline that checked 2.4 million records per day and reduced the median late-data detection time from 47 minutes to 11 minutes.\n\n- Freshness checks compared the source delivery promise with actual arrival time.\n- Completeness checks retained the expected partition count and the observed count.\n- Recovery notes identified whether a rerun replaced or supplemented an earlier batch.\n- Consumer notices described which dashboards were affected without claiming that unaffected products were delayed.\n\nThe rollout was staged by source family. During the first week I kept the old alert and the new state model side by side, reviewed disagreements each morning, and only retired the old path after the data owners agreed on the meaning of late, missing, and corrected. This reduced ambiguity rather than merely lowering the number of alerts.\n\nA later review found that one regional source legitimately delivered after midnight. I changed the expectation for that source instead of widening the global threshold, then added a test fixture for the boundary. The decision and its owner were recorded so that a future schedule change would not silently restore the false alarm.",
+        "textSha256": "455430d3f711c6eccab5e17c5eaff9a283ea64412ff6ab5e9db5ed433c0d7d24"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U102-P02",
+      "userBundleId": "SV3-LF-U102",
+      "documentId": "SV3-LF-U102-D01",
+      "versionId": "SV3-LF-U102-D01-V01",
+      "label": "Recommendation prototype boundary",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U102-P02-PS01",
+        "parentId": "SV3-LF-U102-P02",
+        "documentId": "SV3-LF-U102-D01",
+        "versionId": "SV3-LF-U102-D01-V01",
+        "sourcePath": "documents/sv3-lf-u102-data-reliability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 1621,
+        "charEnd": 2602,
+        "lineStart": 18,
+        "lineEnd": 26,
+        "text": "Recommendation prototype boundary\n\nA product team asked whether support history could help order knowledge-base suggestions. I built an offline prototype using de-identified topic labels and a fixed evaluation snapshot. The objective was to measure whether ranking changed, not to send recommendations to customers.\n\nThe recommendation model remained an offline prototype; it was not deployed to production and never served live customer traffic.\n\nThe offline review compared the prototype with a frequency baseline, inspected queries where the two systems disagreed, and documented cases in which sparse history produced unstable suggestions. I did not convert that experiment into a claim about business impact because no customer-facing exposure occurred.\n\nBefore any future deployment, the proposal would require data-retention review, an owner-scoped serving path, online safety monitoring, and a rollback plan. Those items are open requirements, not completed implementation.",
+        "textSha256": "7423f9adcf65223088719491bc4a95f3454c008d69825500b3024b254aadeaca"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U102-P03",
+      "userBundleId": "SV3-LF-U102",
+      "documentId": "SV3-LF-U102-D01",
+      "versionId": "SV3-LF-U102-D01-V01",
+      "label": "Incident prevention and ownership",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U102-P03-PS01",
+        "parentId": "SV3-LF-U102-P03",
+        "documentId": "SV3-LF-U102-D01",
+        "versionId": "SV3-LF-U102-D01-V01",
+        "sourcePath": "documents/sv3-lf-u102-data-reliability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 2604,
+        "charEnd": 3898,
+        "lineStart": 28,
+        "lineEnd": 38,
+        "text": "Incident prevention and ownership\n\nAn upstream schema change once caused a field to be parsed as text rather than a decimal. The batch completed, but a downstream aggregate was wrong. I led the review with the source owner, added type expectations at the ingestion boundary, and made corrected runs distinguishable from the first publication.\n\nI introduced a release checklist that paired schema compatibility, sample reconciliation, consumer notification, and recovery rehearsal before a high-risk source change.\n\nThe checklist did not eliminate judgment. A source owner could accept a known difference, but the decision needed a time limit and named consumer. On-call notes linked the alert, the accepted exception, and the replay command so a responder would not have to reconstruct the context from chat history.\n\nAfter three months the team removed two redundant alerts, kept the boundary validation, and moved a costly full comparison to a daily audit. The change reduced unnecessary pages while preserving the signal that had prevented a repeat of the incident.\n\nThis work was shared with analysts and platform engineers in a blameless review. I owned the validation and recovery changes; the source team owned its publishing contract. The evidence keeps those actor boundaries explicit.",
+        "textSha256": "a93508648873264fc9a4e9afe47367dd47a6e032040f73003da1342a40cfc81b"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U102-P04",
+      "userBundleId": "SV3-LF-U102",
+      "documentId": "SV3-LF-U102-D01",
+      "versionId": "SV3-LF-U102-D01-V01",
+      "label": "Operating record",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U102-P04-PS01",
+        "parentId": "SV3-LF-U102-P04",
+        "documentId": "SV3-LF-U102-D01",
+        "versionId": "SV3-LF-U102-D01-V01",
+        "sourcePath": "documents/sv3-lf-u102-data-reliability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 3900,
+        "charEnd": 4822,
+        "lineStart": 40,
+        "lineEnd": 51,
+        "text": "Operating record\n\nCapability | Period | State\nBatch validation | 2024-01 to 2025-06 | production\nRecommendation ranking | 2025-03 | offline prototype\nRecovery rehearsal | quarterly | completed\n\nThe table summarizes states already described in the source narrative. It is not a substitute for the evidence above, and the prototype row must not be combined with the production batch row to imply a production recommendation service.\n\nI also maintained a short runbook for checking source availability before escalating to consumers. It listed observable conditions rather than vendor-specific assumptions, which allowed the same process to be used when one source moved to a different delivery mechanism.\n\nThe portfolio intentionally includes successful changes, rejected assumptions, and boundaries. Retrieval quality should preserve those distinctions when several semantically similar records appear in one long document.",
+        "textSha256": "65b6f8e5be9a63352d0b4270125e65be5b9bb590163e6fbfe707a07bafecefd4"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U103-P01",
+      "userBundleId": "SV3-LF-U103",
+      "documentId": "SV3-LF-U103-D01",
+      "versionId": "SV3-LF-U103-D01-V01",
+      "label": "Webinar onboarding campaign",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U103-P01-PS01",
+        "parentId": "SV3-LF-U103-P01",
+        "documentId": "SV3-LF-U103-D01",
+        "versionId": "SV3-LF-U103-D01-V01",
+        "sourcePath": "documents/sv3-lf-u103-growth-sales-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 61,
+        "charEnd": 884,
+        "lineStart": 3,
+        "lineEnd": 14,
+        "text": "Webinar onboarding campaign\n\n신규 고객이 제품 설명을 요청한 뒤 실제 상담으로 이어지는 과정이 지역마다 달랐다. 나는 email, webinar, sales handoff의 단계를 하나의 funnel로 정의하고 각 단계에서 필요한 동의와 후속 연락 기준을 정리했다. 단순 발송량보다 누구에게 어떤 약속을 했는지 추적하는 것이 우선이었다.\n\nI launched a bilingual webinar onboarding campaign that generated 820 qualified leads; the number was not a count of paid customers.\n\n- Korean invitation copy explained the practical agenda before registration.\n- English follow-up summarized the recording and a clear unsubscribe path.\n- Sales handoff included the question asked, the region, and the consented contact channel.\n- Weekly review separated registration volume from qualified interest and completed contracts.\n\n캠페인 회고에서는 webinar 참석 여부만으로 관심도를 판단하지 않았다. 질문 내용, 후속 자료 열람, 상담 요청을 함께 보고 lead stage를 수정했다. 또한 지역별 작은 표본을 전체 시장의 선호처럼 해석하지 않도록 confidence note를 남겼다.",
+        "textSha256": "85d1135b60ef57345edfebd96ad5e80c1de287ab333143f62c6a196e41e6667d"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U103-P02",
+      "userBundleId": "SV3-LF-U103",
+      "documentId": "SV3-LF-U103-D01",
+      "versionId": "SV3-LF-U103-D01-V01",
+      "label": "CRM stage rollout",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U103-P02-PS01",
+        "parentId": "SV3-LF-U103-P02",
+        "documentId": "SV3-LF-U103-D01",
+        "versionId": "SV3-LF-U103-D01-V01",
+        "sourcePath": "documents/sv3-lf-u103-growth-sales-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 886,
+        "charEnd": 1538,
+        "lineStart": 16,
+        "lineEnd": 27,
+        "text": "CRM stage rollout\n\n기존 CRM은 같은 상태 이름을 지역마다 다르게 사용했다. 어떤 팀은 첫 연락만으로 opportunity를 만들었고 다른 팀은 예산 확인 뒤에 만들었다. 나는 과거 보고서를 다시 쓰기보다 새 기준의 시작일과 변환 규칙을 문서화했다.\n\n본인은 5개 지역의 lead-stage 정의를 표준화하고 coordinator 교육을 마친 뒤 2025년 2분기에 공통 CRM workflow를 운영 상태로 전환했다.\n\nStage | Required evidence | Owner\nQualified | confirmed problem and contact consent | marketing operations\nOpportunity | budget owner and next meeting | regional sales\nClosed | signed agreement recorded | sales operations\n\n운영 전환 첫 달에는 stage 변경 이유가 비어 있는 기록을 매주 검토했다. 숫자를 맞추기 위해 임의로 stage를 올리지 않았고, 불명확한 record는 원래 상태를 유지한 채 담당자에게 확인했다. 그 결과 dashboard 비교가 가능해졌지만 이전 분기의 수치와 직접 연결할 때는 definition change를 표시했다.",
+        "textSha256": "a7314a3ada3032e4ae3d289d4854570ae6e7a83fccaf1d95146346a6074dc352"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U103-P03",
+      "userBundleId": "SV3-LF-U103",
+      "documentId": "SV3-LF-U103-D01",
+      "versionId": "SV3-LF-U103-D01-V01",
+      "label": "Partner sales actor boundary",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U103-P03-PS01",
+        "parentId": "SV3-LF-U103-P03",
+        "documentId": "SV3-LF-U103-D01",
+        "versionId": "SV3-LF-U103-D01-V01",
+        "sourcePath": "documents/sv3-lf-u103-growth-sales-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 1540,
+        "charEnd": 2112,
+        "lineStart": 29,
+        "lineEnd": 37,
+        "text": "Partner sales actor boundary\n\n파트너 프로그램에서는 enablement 자료, demo checklist, objection note를 제공했다. 나는 파트너가 고객에게 과장된 약속을 하지 않도록 지원 범위와 escalation path를 반복해 설명했고, 제품팀이 확인하지 않은 roadmap 항목은 자료에서 제외했다.\n\nThe partner sales team closed 32 enterprise accounts, while I prepared enablement material and did not negotiate or sign those contracts.\n\n계약 수는 파트너 영업 조직의 결과다. 내가 수행한 업무는 자료 작성과 운영 피드백 수집이며, 계약 체결을 본인의 직접 성과로 표시하지 않는다. 다만 반복되는 objection을 분류해 다음 교육의 예시로 반영한 과정은 내 활동으로 남긴다.\n\n분기 말 review에서는 파트너별 질문 유형과 지원 요청 시간을 살폈다. 규모가 큰 파트너만 우선하지 않고 새 파트너가 처음 막히는 단계도 기록해 onboarding 자료를 보완했다.",
+        "textSha256": "72468dff8e92a5b652417121df58ddb7b21875e13b67b634263cd964fa119203"
+      }
+    },
+    {
+      "parentId": "SV3-LF-U103-P04",
+      "userBundleId": "SV3-LF-U103",
+      "documentId": "SV3-LF-U103-D01",
+      "versionId": "SV3-LF-U103-D01-V01",
+      "label": "Budget experiment status",
+      "sourceSpan": {
+        "spanId": "SV3-LF-U103-P04-PS01",
+        "parentId": "SV3-LF-U103-P04",
+        "documentId": "SV3-LF-U103-D01",
+        "versionId": "SV3-LF-U103-D01-V01",
+        "sourcePath": "documents/sv3-lf-u103-growth-sales-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 2114,
+        "charEnd": 2572,
+        "lineStart": 39,
+        "lineEnd": 47,
+        "text": "Budget experiment status\n\n다음 반기에는 channel별 incremental lift를 보기 위한 geo experiment를 제안했다. 실험 지역 격리, 예산 상한, 중단 기준과 기존 영업 활동의 영향을 검토했지만 재무 승인 전에는 campaign을 시작하지 않기로 했다.\n\nGeo budget experiment — planned for 2026 Q4, not launched.\n\n제안서의 forecast는 실제 성과가 아니다. 예상 lead 수와 비용 범위는 의사결정을 위한 가정으로 표시했고, 실행 후에는 pre-registered metric과 실제 데이터를 따로 비교하도록 계획했다.\n\n현재 기록에서 완료된 활동은 webinar campaign과 CRM rollout이다. geo experiment는 후속 후보이며 completed production evidence로 합치지 않는다.",
+        "textSha256": "cf190e2fd76caa7397633150819c83e856fc88f943520998a05f38c09fec6c6f"
+      }
+    }
+  ],
+  "evidenceGroups": [
+    {
+      "groupId": "SV3-LF-U101-G-P01-E01",
+      "userBundleId": "SV3-LF-U101",
+      "sourceFactId": "SV3-LF-FACT-U101-P01-E01",
+      "description": "field_research, problem_structuring",
+      "evidenceUnitIds": [
+        "SV3-LF-U101-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U101-G-P02-E01",
+      "userBundleId": "SV3-LF-U101",
+      "sourceFactId": "SV3-LF-FACT-U101-P02-E01",
+      "description": "usability_outcome",
+      "evidenceUnitIds": [
+        "SV3-LF-U101-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U101-G-P03-E01",
+      "userBundleId": "SV3-LF-U101",
+      "sourceFactId": "SV3-LF-FACT-U101-P03-E01",
+      "description": "other_actor_ab_test",
+      "evidenceUnitIds": [
+        "SV3-LF-U101-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U101-G-P04-E01",
+      "userBundleId": "SV3-LF-U101",
+      "sourceFactId": "SV3-LF-FACT-U101-P04-E01",
+      "description": "planned_accessibility_research",
+      "evidenceUnitIds": [
+        "SV3-LF-U101-P04-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U102-G-P01-E01",
+      "userBundleId": "SV3-LF-U102",
+      "sourceFactId": "SV3-LF-FACT-U102-P01-E01",
+      "description": "pipeline_scale, detection_latency",
+      "evidenceUnitIds": [
+        "SV3-LF-U102-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U102-G-P02-E01",
+      "userBundleId": "SV3-LF-U102",
+      "sourceFactId": "SV3-LF-FACT-U102-P02-E01",
+      "description": "model_not_production",
+      "evidenceUnitIds": [
+        "SV3-LF-U102-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U102-G-P03-E01",
+      "userBundleId": "SV3-LF-U102",
+      "sourceFactId": "SV3-LF-FACT-U102-P03-E01",
+      "description": "incident_prevention",
+      "evidenceUnitIds": [
+        "SV3-LF-U102-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U103-G-P01-E01",
+      "userBundleId": "SV3-LF-U103",
+      "sourceFactId": "SV3-LF-FACT-U103-P01-E01",
+      "description": "campaign_leads",
+      "evidenceUnitIds": [
+        "SV3-LF-U103-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U103-G-P02-E01",
+      "userBundleId": "SV3-LF-U103",
+      "sourceFactId": "SV3-LF-FACT-U103-P02-E01",
+      "description": "crm_rollout",
+      "evidenceUnitIds": [
+        "SV3-LF-U103-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U103-G-P03-E01",
+      "userBundleId": "SV3-LF-U103",
+      "sourceFactId": "SV3-LF-FACT-U103-P03-E01",
+      "description": "other_actor_contracts",
+      "evidenceUnitIds": [
+        "SV3-LF-U103-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-LF-U103-G-P04-E01",
+      "userBundleId": "SV3-LF-U103",
+      "sourceFactId": "SV3-LF-FACT-U103-P04-E01",
+      "description": "planned_budget_experiment",
+      "evidenceUnitIds": [
+        "SV3-LF-U103-P04-E01"
+      ]
+    }
+  ],
+  "evidenceUnits": [
+    {
+      "evidenceUnitId": "SV3-LF-U101-P01-E01",
+      "userBundleId": "SV3-LF-U101",
+      "parentId": "SV3-LF-U101-P01",
+      "groupId": "SV3-LF-U101-G-P01-E01",
+      "documentId": "SV3-LF-U101-D01",
+      "versionId": "SV3-LF-U101-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U101-P01-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U101-P01-E01-S01",
+          "parentId": "SV3-LF-U101-P01",
+          "documentId": "SV3-LF-U101-D01",
+          "versionId": "SV3-LF-U101-D01-V01",
+          "sourcePath": "documents/sv3-lf-u101-design-portfolio-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 255,
+          "charEnd": 330,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "본인은 이동 제약이 있는 이용자 18명과 현장 직원 6명을 인터뷰하고 예약 변경 과정의 단절 지점을 여섯 가지 행동 패턴으로 분류했다.",
+          "textSha256": "46de16c42e4c87bc522ac7f6d3f1934b50aa8c2cf1dab59604d881dc4a2f6c34"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U101-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "field_research",
+        "problem_structuring"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 18,
+          "unit": "USER_COUNT",
+          "semanticType": "INTERVIEW_COUNT",
+          "sourceSurface": "이용자 18명"
+        },
+        {
+          "normalizedValue": 6,
+          "unit": "STAFF_COUNT",
+          "semanticType": "INTERVIEW_COUNT",
+          "sourceSurface": "현장 직원 6명"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U101-P02-E01",
+      "userBundleId": "SV3-LF-U101",
+      "parentId": "SV3-LF-U101-P02",
+      "groupId": "SV3-LF-U101-G-P02-E01",
+      "documentId": "SV3-LF-U101-D01",
+      "versionId": "SV3-LF-U101-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U101-P02-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U101-P02-E01-S01",
+          "parentId": "SV3-LF-U101-P02",
+          "documentId": "SV3-LF-U101-D01",
+          "versionId": "SV3-LF-U101-D01-V01",
+          "sourcePath": "documents/sv3-lf-u101-design-portfolio-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 1028,
+          "charEnd": 1115,
+          "lineStart": 21,
+          "lineEnd": 21,
+          "text": "재설계한 흐름은 비감독 사용성 평가에서 예약 변경 과업 완료율을 58%에서 86%로 높였고, 잘못된 취소 선택은 세션당 평균 1.7회에서 0.4회로 줄였다.",
+          "textSha256": "51c8a4986346ccd2c216588aa94d8ff3f154caf8f033b37352b7b8df49e093c6"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U101-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "usability_outcome"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 86,
+          "unit": "PERCENT",
+          "semanticType": "TASK_COMPLETION_RATE",
+          "sourceSurface": "86%"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U101-P03-E01",
+      "userBundleId": "SV3-LF-U101",
+      "parentId": "SV3-LF-U101-P03",
+      "groupId": "SV3-LF-U101-G-P03-E01",
+      "documentId": "SV3-LF-U101-D01",
+      "versionId": "SV3-LF-U101-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U101-P03-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U101-P03-E01-S01",
+          "parentId": "SV3-LF-U101-P03",
+          "documentId": "SV3-LF-U101-D01",
+          "versionId": "SV3-LF-U101-D01-V01",
+          "sourcePath": "documents/sv3-lf-u101-design-portfolio-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 1459,
+          "charEnd": 1548,
+          "lineStart": 29,
+          "lineEnd": 29,
+          "text": "마케팅 조직은 새 예약 화면을 소개하는 광고 문구의 A/B test를 별도로 수행했으며, 본인은 그 실험을 설계하거나 집행하지 않고 화면 사실 확인만 지원했다.",
+          "textSha256": "42401a2890bd0e48197f19207e497b8c92fef72a6d33b74e123084e8255ecec8"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U101-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "OTHER",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "other_actor_ab_test"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U101-P04-E01",
+      "userBundleId": "SV3-LF-U101",
+      "parentId": "SV3-LF-U101-P04",
+      "groupId": "SV3-LF-U101-G-P04-E01",
+      "documentId": "SV3-LF-U101-D01",
+      "versionId": "SV3-LF-U101-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U101-P04-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U101-P04-E01-S01",
+          "parentId": "SV3-LF-U101-P04",
+          "documentId": "SV3-LF-U101-D01",
+          "versionId": "SV3-LF-U101-D01-V01",
+          "sourcePath": "documents/sv3-lf-u101-design-portfolio-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 1965,
+          "charEnd": 2023,
+          "lineStart": 39,
+          "lineEnd": 39,
+          "text": "접근성 연구는 2027년 상반기 제안 단계이며 production 적용이나 완료 성과로 기록하지 않는다.",
+          "textSha256": "b384d2c8e49b263c358b6cff97b5f455541b4d3e14131fa065ae7a54d37cb86e"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U101-P04-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PLANNED",
+      "aspects": [
+        "planned_accessibility_research"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U102-P01-E01",
+      "userBundleId": "SV3-LF-U102",
+      "parentId": "SV3-LF-U102-P01",
+      "groupId": "SV3-LF-U102-G-P01-E01",
+      "documentId": "SV3-LF-U102-D01",
+      "versionId": "SV3-LF-U102-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U102-P01-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U102-P01-E01-S01",
+          "parentId": "SV3-LF-U102-P01",
+          "documentId": "SV3-LF-U102-D01",
+          "versionId": "SV3-LF-U102-D01-V01",
+          "sourcePath": "documents/sv3-lf-u102-data-reliability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 414,
+          "charEnd": 577,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "I operated a production validation pipeline that checked 2.4 million records per day and reduced the median late-data detection time from 47 minutes to 11 minutes.",
+          "textSha256": "79cfa5c7dea3e75179490577cf08280c8a7f749afa30ead089e18048107e9a99"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U102-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PRODUCTION",
+      "aspects": [
+        "pipeline_scale",
+        "detection_latency"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 2400000,
+          "unit": "RECORD_PER_DAY",
+          "semanticType": "RECORD_COUNT",
+          "sourceSurface": "2.4 million records per day"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U102-P02-E01",
+      "userBundleId": "SV3-LF-U102",
+      "parentId": "SV3-LF-U102-P02",
+      "groupId": "SV3-LF-U102-G-P02-E01",
+      "documentId": "SV3-LF-U102-D01",
+      "versionId": "SV3-LF-U102-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U102-P02-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U102-P02-E01-S01",
+          "parentId": "SV3-LF-U102-P02",
+          "documentId": "SV3-LF-U102-D01",
+          "versionId": "SV3-LF-U102-D01-V01",
+          "sourcePath": "documents/sv3-lf-u102-data-reliability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 1938,
+          "charEnd": 2067,
+          "lineStart": 22,
+          "lineEnd": 22,
+          "text": "The recommendation model remained an offline prototype; it was not deployed to production and never served live customer traffic.",
+          "textSha256": "49688645059dd704a79084006ec9b537c8f417d481452bd76e62e4635caafedb"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U102-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PROTOTYPE",
+      "aspects": [
+        "model_not_production"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U102-P03-E01",
+      "userBundleId": "SV3-LF-U102",
+      "parentId": "SV3-LF-U102-P03",
+      "groupId": "SV3-LF-U102-G-P03-E01",
+      "documentId": "SV3-LF-U102-D01",
+      "versionId": "SV3-LF-U102-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U102-P03-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U102-P03-E01-S01",
+          "parentId": "SV3-LF-U102-P03",
+          "documentId": "SV3-LF-U102-D01",
+          "versionId": "SV3-LF-U102-D01-V01",
+          "sourcePath": "documents/sv3-lf-u102-data-reliability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 2948,
+          "charEnd": 3117,
+          "lineStart": 32,
+          "lineEnd": 32,
+          "text": "I introduced a release checklist that paired schema compatibility, sample reconciliation, consumer notification, and recovery rehearsal before a high-risk source change.",
+          "textSha256": "a18bc698ef081b4476ce903741f498c8a10ee276090367da0b048890adc70015"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U102-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PRODUCTION",
+      "aspects": [
+        "incident_prevention"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U103-P01-E01",
+      "userBundleId": "SV3-LF-U103",
+      "parentId": "SV3-LF-U103-P01",
+      "groupId": "SV3-LF-U103-G-P01-E01",
+      "documentId": "SV3-LF-U103-D01",
+      "versionId": "SV3-LF-U103-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U103-P01-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U103-P01-E01-S01",
+          "parentId": "SV3-LF-U103-P01",
+          "documentId": "SV3-LF-U103-D01",
+          "versionId": "SV3-LF-U103-D01-V01",
+          "sourcePath": "documents/sv3-lf-u103-growth-sales-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 264,
+          "charEnd": 396,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "I launched a bilingual webinar onboarding campaign that generated 820 qualified leads; the number was not a count of paid customers.",
+          "textSha256": "7ed36fa8301d139656132c152b019286669af8a9b671b2b6c8c0952e3a0cc088"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U103-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "campaign_leads"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 820,
+          "unit": "QUALIFIED_LEAD_COUNT",
+          "semanticType": "LEAD_COUNT",
+          "sourceSurface": "820 qualified leads"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U103-P02-E01",
+      "userBundleId": "SV3-LF-U103",
+      "parentId": "SV3-LF-U103-P02",
+      "groupId": "SV3-LF-U103-G-P02-E01",
+      "documentId": "SV3-LF-U103-D01",
+      "versionId": "SV3-LF-U103-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U103-P02-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U103-P02-E01-S01",
+          "parentId": "SV3-LF-U103-P02",
+          "documentId": "SV3-LF-U103-D01",
+          "versionId": "SV3-LF-U103-D01-V01",
+          "sourcePath": "documents/sv3-lf-u103-growth-sales-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 1036,
+          "charEnd": 1129,
+          "lineStart": 20,
+          "lineEnd": 20,
+          "text": "본인은 5개 지역의 lead-stage 정의를 표준화하고 coordinator 교육을 마친 뒤 2025년 2분기에 공통 CRM workflow를 운영 상태로 전환했다.",
+          "textSha256": "09f54d4d3459bf8ae6bfb7374400136dbce85d67eabcdacafea2036a620bcece"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U103-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PRODUCTION",
+      "aspects": [
+        "crm_rollout"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 5,
+          "unit": "REGION_COUNT",
+          "semanticType": "ROLLOUT_SCOPE",
+          "sourceSurface": "5개 지역"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U103-P03-E01",
+      "userBundleId": "SV3-LF-U103",
+      "parentId": "SV3-LF-U103-P03",
+      "groupId": "SV3-LF-U103-G-P03-E01",
+      "documentId": "SV3-LF-U103-D01",
+      "versionId": "SV3-LF-U103-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U103-P03-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U103-P03-E01-S01",
+          "parentId": "SV3-LF-U103-P03",
+          "documentId": "SV3-LF-U103-D01",
+          "versionId": "SV3-LF-U103-D01-V01",
+          "sourcePath": "documents/sv3-lf-u103-growth-sales-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 1734,
+          "charEnd": 1871,
+          "lineStart": 33,
+          "lineEnd": 33,
+          "text": "The partner sales team closed 32 enterprise accounts, while I prepared enablement material and did not negotiate or sign those contracts.",
+          "textSha256": "cfc7d7f47132f158ca2d3d367e6884882bc424e69f8ac526beca9e18e9a9c2a5"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U103-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "OTHER",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "other_actor_contracts"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 32,
+          "unit": "ACCOUNT_COUNT",
+          "semanticType": "CLOSED_ACCOUNT_COUNT",
+          "sourceSurface": "32 enterprise accounts"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-LF-U103-P04-E01",
+      "userBundleId": "SV3-LF-U103",
+      "parentId": "SV3-LF-U103-P04",
+      "groupId": "SV3-LF-U103-G-P04-E01",
+      "documentId": "SV3-LF-U103-D01",
+      "versionId": "SV3-LF-U103-D01-V01",
+      "sourceFactId": "SV3-LF-FACT-U103-P04-E01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-LF-U103-P04-E01-S01",
+          "parentId": "SV3-LF-U103-P04",
+          "documentId": "SV3-LF-U103-D01",
+          "versionId": "SV3-LF-U103-D01-V01",
+          "sourcePath": "documents/sv3-lf-u103-growth-sales-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 2281,
+          "charEnd": 2339,
+          "lineStart": 43,
+          "lineEnd": 43,
+          "text": "Geo budget experiment — planned for 2026 Q4, not launched.",
+          "textSha256": "df682a54453b19cc21dcf517328c00997fecf0acdb20dd1b92917a79144a5e81"
+        }
+      ],
+      "primarySpanId": "SV3-LF-U103-P04-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "PLANNED",
+      "aspects": [
+        "planned_budget_experiment"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": []
+    }
+  ]
+}

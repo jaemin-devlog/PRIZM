@@ -1,7 +1,7 @@
 # PRZ-026 Structural Parsing and Parent-Child Retrieval
 
-- 상태: `IN_PROGRESS / PHASE_1_NEEDS_ADJUSTMENT`
-- 현재 Phase: `Phase 1 — Structural Child Dense Baseline`
+- 상태: `IN_PROGRESS / PHASE_1_ADJUSTMENT_NEEDS_ADJUSTMENT`
+- 현재 Phase: `Phase 1 Adjustment — COMPLETED / NEEDS_ADJUSTMENT`
 - 선행 조건: `DEPENDS_ON_PRZ_025`
 - 기준 source: `PRZ-025-search-v3-foundation@5f8229f88251938dc5b34588676cc69edf409c99`
 - Production 적용: `NOT_RUN`
@@ -18,7 +18,8 @@ Recall을 개선한다는 것이다. 결과를 본 뒤 gold, split 또는 SEALED
 | Ablation | 상태 |
 | --- | --- |
 | A. Fixed Chunk + BGE-M3 Dense | `COMPLETED` |
-| B. Structural Child + BGE-M3 Dense | `COMPLETED — NEEDS_ADJUSTMENT` |
+| B1. Structural Child v1 + BGE-M3 Dense | `COMPLETED — NEEDS_ADJUSTMENT` |
+| B2. Structural Child v2 + BGE-M3 Dense | `COMPLETED — NEEDS_ADJUSTMENT` |
 | C. Structural Child + Parent Context + BGE-M3 Dense | `NOT_RUN` |
 | D. Parent-Child Retrieval + BGE-M3 Dense | `NOT_RUN` |
 
@@ -29,7 +30,9 @@ Production `TextChunker`와 기본 `IngestionProperties(max=800, overlap=120)`�
 B는 evaluation-only parser/builder다. Production Search, ingestion/parser, schema/migration,
 API, MCP, frontend, dependency, Docker runtime과 `v1.0.0`은 변경하지 않는다.
 
-비교 조건은 두 경로 모두 다음과 같다.
+아래 비교 조건은 역사적 Phase 1(B1)에 적용됐다. Adjustment(B2)는 이 입력 제한을
+supersede하여 같은 Original Seed를 그대로 재실행하고, 별도 version의 Long-form DEV/CAL도
+독립 실행한다. 두 dataset의 metric은 합치지 않는다.
 
 - PRZ-025 `search-v3-fresh-seed-1.0.1`의 `DEV`와 `CALIBRATION` ACTIVE source/query
 - query별 `userBundleId` scope
@@ -64,8 +67,25 @@ API, MCP, frontend, dependency, Docker runtime과 `v1.0.0`은 변경하지 않�
   `contextSourceBlockIds`에 기록한다.
 - LLM 생성·요약·원문 밖 정보는 금지한다.
 
-Heading도 독립 source block/child로 유지한다. 이는 Phase C의 Parent Context를 미리 구현하지
-않고 heading 자체가 직접 근거일 수 있는 가능성을 보존하기 위한 선택이다.
+`HEADING`은 source block과 parent boundary로 보존하지만 B2부터 기본적으로 독립 검색 Child가
+아니다. paragraph/list/table/key-value와 assertion-bearing `OTHER`만 검색 후보가 된다. heading
+문자열은 일반 Child의 `retrievalText`에 붙이지 않는다. 이 PRZ에서 C의 `Parent Context`는
+Evidence Parent/section/heading context를 child embedding에 추가하는 실험을 뜻하며 `NOT_RUN`이다.
+단, B1부터 명시된 same-table header 보존 예외는 B2에서도 활성 상태다. 따라서 B2를
+"모든 cross-block context가 없는 sourceText-only"로 표현하지 않고,
+`SOURCE_TABLE_HEADER_CONTEXT_EXCEPTION_ACTIVE`로 report에 노출한다.
+
+Table header 판정은 B1과 동일하게 연속 table 영역의 첫 row를 header로 취급한다. 명시적 Markdown
+divider는 evidence candidate가 아니며, blank/heading boundary를 넘겨 header를 전달하지 않는다.
+Header가 없는 plain table도 첫 row를 header로 간주할 수 있다는 모호성은 B2에서 새로 튜닝하지
+않고 `OPEN_LIMITATION`으로 남긴다. 이를 바꾸면 heading eligibility 외 두 번째 treatment change가
+되므로 별도 ablation 없이 이번 결과에 섞지 않는다.
+
+짧은 독립 행에 날짜·수치·명시적 값이 함께 있거나 바로 뒤의 값 행과 하나의 사실을 이루면
+일반 구조 신호로 evidence-bearing block을 구성한다. 특정 자격증·직무·기술명 사전이나 Phase 1
+실패 문자열 예외는 사용하지 않는다. 길이만으로 후보를 탈락시키거나 인접 block을 병합하지
+않으며, 병합이 필요하다는 별도 근거가 생기기 전까지 B2의 유일한 eligibility 변경은
+context-only heading이다.
 
 ## 5. Provenance 계약
 
@@ -108,3 +128,22 @@ raw rank 진단에는 남기지만 이 Phase는 answerability selector가 아니
 Production으로 승격하지 않는다. Recall/Top1/MRR, contamination/fragmentation, user/profession
 회귀와 embedding/latency 비용을 함께 보고 판단한다. seed의 candidate ceiling이나 표본 부족으로
 순증을 입증하지 못하면 좋은 구조 metric만으로 `PROMISING`을 선언하지 않는다.
+
+## 9. Phase 1 Adjustment acceptance contract
+
+수정 전에 Phase 1의 네 heading 회귀를 같은 source/model 조건으로 재현한다. 그 뒤 기존
+`search-v3-fresh-seed-1.0.1`은 Original Seed로 그대로 재평가하고, 별도
+`search-v3-fresh-devcal-1.1.0` 장문 DEV/CAL expansion을 추가한다. expansion은 split별 장문
+문서 3개 이상, 전체 신규 query 24개 이상, 개발 직무 문서 비율 50% 이하와 KO/EN/mixed를
+충족해야 한다. Original과 Long-form 수치를 하나의 aggregate로만 보고하지 않는다.
+
+완료 Gate는 다음과 같다.
+
+- Original Seed의 네 query 모두에서 원인이었던 `HEADING` rank 1이 사라지고,
+  heading-only candidate/rank1이 0이다. 네 query가 모두 DIRECT_SUPPORT rank 1로 회복하는지는
+  별도 ranking Gate이며, 하나라도 남으면 그 회귀를 숨기지 않고 판정에 반영한다.
+- Long-form에서 Fixed 대비 retrieval/ranking 순증 또는 그 부재를 실제 BGE-M3 결과로 기록한다.
+- contamination, fragmentation, fixed chunk별 Gold Parent 분포, 길이 구간, 후보·embedding 비용을
+  함께 기록한다.
+- PRZ-025 SEALED FINAL의 파일·hash·flags는 byte-level로 유지하고 검색하지 않는다.
+- Parent Context, Parent Dense, sparse, reranker와 Production 경로는 `NOT_RUN`이다.

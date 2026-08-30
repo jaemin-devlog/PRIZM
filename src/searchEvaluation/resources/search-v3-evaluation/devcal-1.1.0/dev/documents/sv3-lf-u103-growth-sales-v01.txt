@@ -1,0 +1,47 @@
+Synthetic Growth Marketing & Sales Operations Career Review
+
+Webinar onboarding campaign
+
+신규 고객이 제품 설명을 요청한 뒤 실제 상담으로 이어지는 과정이 지역마다 달랐다. 나는 email, webinar, sales handoff의 단계를 하나의 funnel로 정의하고 각 단계에서 필요한 동의와 후속 연락 기준을 정리했다. 단순 발송량보다 누구에게 어떤 약속을 했는지 추적하는 것이 우선이었다.
+
+I launched a bilingual webinar onboarding campaign that generated 820 qualified leads; the number was not a count of paid customers.
+
+- Korean invitation copy explained the practical agenda before registration.
+- English follow-up summarized the recording and a clear unsubscribe path.
+- Sales handoff included the question asked, the region, and the consented contact channel.
+- Weekly review separated registration volume from qualified interest and completed contracts.
+
+캠페인 회고에서는 webinar 참석 여부만으로 관심도를 판단하지 않았다. 질문 내용, 후속 자료 열람, 상담 요청을 함께 보고 lead stage를 수정했다. 또한 지역별 작은 표본을 전체 시장의 선호처럼 해석하지 않도록 confidence note를 남겼다.
+
+CRM stage rollout
+
+기존 CRM은 같은 상태 이름을 지역마다 다르게 사용했다. 어떤 팀은 첫 연락만으로 opportunity를 만들었고 다른 팀은 예산 확인 뒤에 만들었다. 나는 과거 보고서를 다시 쓰기보다 새 기준의 시작일과 변환 규칙을 문서화했다.
+
+본인은 5개 지역의 lead-stage 정의를 표준화하고 coordinator 교육을 마친 뒤 2025년 2분기에 공통 CRM workflow를 운영 상태로 전환했다.
+
+Stage | Required evidence | Owner
+Qualified | confirmed problem and contact consent | marketing operations
+Opportunity | budget owner and next meeting | regional sales
+Closed | signed agreement recorded | sales operations
+
+운영 전환 첫 달에는 stage 변경 이유가 비어 있는 기록을 매주 검토했다. 숫자를 맞추기 위해 임의로 stage를 올리지 않았고, 불명확한 record는 원래 상태를 유지한 채 담당자에게 확인했다. 그 결과 dashboard 비교가 가능해졌지만 이전 분기의 수치와 직접 연결할 때는 definition change를 표시했다.
+
+Partner sales actor boundary
+
+파트너 프로그램에서는 enablement 자료, demo checklist, objection note를 제공했다. 나는 파트너가 고객에게 과장된 약속을 하지 않도록 지원 범위와 escalation path를 반복해 설명했고, 제품팀이 확인하지 않은 roadmap 항목은 자료에서 제외했다.
+
+The partner sales team closed 32 enterprise accounts, while I prepared enablement material and did not negotiate or sign those contracts.
+
+계약 수는 파트너 영업 조직의 결과다. 내가 수행한 업무는 자료 작성과 운영 피드백 수집이며, 계약 체결을 본인의 직접 성과로 표시하지 않는다. 다만 반복되는 objection을 분류해 다음 교육의 예시로 반영한 과정은 내 활동으로 남긴다.
+
+분기 말 review에서는 파트너별 질문 유형과 지원 요청 시간을 살폈다. 규모가 큰 파트너만 우선하지 않고 새 파트너가 처음 막히는 단계도 기록해 onboarding 자료를 보완했다.
+
+Budget experiment status
+
+다음 반기에는 channel별 incremental lift를 보기 위한 geo experiment를 제안했다. 실험 지역 격리, 예산 상한, 중단 기준과 기존 영업 활동의 영향을 검토했지만 재무 승인 전에는 campaign을 시작하지 않기로 했다.
+
+Geo budget experiment — planned for 2026 Q4, not launched.
+
+제안서의 forecast는 실제 성과가 아니다. 예상 lead 수와 비용 범위는 의사결정을 위한 가정으로 표시했고, 실행 후에는 pre-registered metric과 실제 데이터를 따로 비교하도록 계획했다.
+
+현재 기록에서 완료된 활동은 webinar campaign과 CRM rollout이다. geo experiment는 후속 후보이며 completed production evidence로 합치지 않는다.

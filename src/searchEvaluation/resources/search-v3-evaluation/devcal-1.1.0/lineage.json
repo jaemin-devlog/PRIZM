@@ -1,0 +1,230 @@
+{
+  "artifactType": "LINEAGE",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+  "previousVersion": "search-v3-fresh-seed-1.0.1",
+  "changeReason": "Remove the short-document ceiling for PRZ-026 Structural Child evaluation without changing SEALED_FINAL_TEST.",
+  "sealedFinalPolicy": "PRZ-025 search-v3-fresh-seed-1.0.1 SEALED_FINAL_TEST remains byte-identical and unopened.",
+  "generator": "scripts/evaluation/search-v3/materialize-prz026-devcal.mjs",
+  "materializationBaseRevision": "a9d093dd48e99a8d19675b3a8caa09c794d2888b",
+  "bundles": [
+    {
+      "userBundleId": "SV3-LF-U101",
+      "split": "DEV",
+      "documentFamilyId": "SV3-LF-U101-DOC-FAMILY",
+      "templateFamilyId": "SV3-LF-TEMPLATE-DESIGN-101",
+      "generatorSeedId": "SV3-LF-SEED-DESIGN-101-A7C2",
+      "logicalDocumentIds": [
+        "SV3-LF-U101-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-LF-U101-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-LF-FACT-U101-P01-E01",
+        "SV3-LF-FACT-U101-P02-E01",
+        "SV3-LF-FACT-U101-P03-E01",
+        "SV3-LF-FACT-U101-P04-E01"
+      ],
+      "sourceFactSignatures": [
+        "72a7c15c0b34093212105b609017ca9b1682f0494d4de84f65d220b666f5b931",
+        "84ee029f3eaa6a506c37f826222c502e26ded982c07879c8a55de8c798bdf744",
+        "350b8c3eee9055994761c88adbc1e1f2a24fcb7671dc87c68c89f60555c0c0d7",
+        "ffea72e4252b01bb6a615b4ece7f9978951f3d8cf581dfc0e634fa4b5d16ec01"
+      ],
+      "questionGroupIds": [
+        "SV3-LF-U101-Q01-FAMILY",
+        "SV3-LF-U101-Q02-FAMILY",
+        "SV3-LF-U101-Q03-FAMILY",
+        "SV3-LF-U101-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "현장 관찰을 사용자 흐름 문제로 구조화한 근거가 있나요",
+        "예약 변경 과업 완료율을 80 이상으로 개선했나요",
+        "본인이 광고 문구 a b 테스트를 직접 수행했나요",
+        "접근성 연구를 이미 production에 적용해 완료했나요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-LF-U102",
+      "split": "DEV",
+      "documentFamilyId": "SV3-LF-U102-DOC-FAMILY",
+      "templateFamilyId": "SV3-LF-TEMPLATE-DATA-102",
+      "generatorSeedId": "SV3-LF-SEED-DATA-102-C4E8",
+      "logicalDocumentIds": [
+        "SV3-LF-U102-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-LF-U102-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-LF-FACT-U102-P01-E01",
+        "SV3-LF-FACT-U102-P02-E01",
+        "SV3-LF-FACT-U102-P03-E01"
+      ],
+      "sourceFactSignatures": [
+        "4b5697966d302ba434630e18e8ea3f8eeb02851a666bd60fdf24a10c5713a9bd",
+        "4266c2158bb50b6b8f6c3df11a452d6832988b09798193b5539c94a5fd126ca8",
+        "aff400c4630c0b58dba7ca559986b2e1079ad0cb083dcd63ef1e3118c28c23fa"
+      ],
+      "questionGroupIds": [
+        "SV3-LF-U102-Q01-FAMILY",
+        "SV3-LF-U102-Q02-FAMILY",
+        "SV3-LF-U102-Q03-FAMILY",
+        "SV3-LF-U102-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "did the candidate validate at least two million records each day in production",
+        "was the recommendation model serving live customers in production",
+        "what evidence shows preventive ownership after a data incident",
+        "show both high volume pipeline operation and a concrete prevention process"
+      ]
+    },
+    {
+      "userBundleId": "SV3-LF-U103",
+      "split": "DEV",
+      "documentFamilyId": "SV3-LF-U103-DOC-FAMILY",
+      "templateFamilyId": "SV3-LF-TEMPLATE-GROWTH-103",
+      "generatorSeedId": "SV3-LF-SEED-GROWTH-103-D5B1",
+      "logicalDocumentIds": [
+        "SV3-LF-U103-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-LF-U103-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-LF-FACT-U103-P01-E01",
+        "SV3-LF-FACT-U103-P02-E01",
+        "SV3-LF-FACT-U103-P03-E01",
+        "SV3-LF-FACT-U103-P04-E01"
+      ],
+      "sourceFactSignatures": [
+        "15c492dce6bc1518308709b311c65a6a110823670dcc9982925eb41d834964bb",
+        "8f30531f4fd4d3d58cda69dd11cb88a9000064f46d2fe280af467a9cb6dcf5fa",
+        "d5438f6a6e93a93867d5a8570c83a4a144d66f079e61153a7f7f7aaaef11abf1",
+        "1c875eb6bf0bd519e98bebb0540a09ce2109e388d6ac8bc8e49d360070c16d24"
+      ],
+      "questionGroupIds": [
+        "SV3-LF-U103-Q01-FAMILY",
+        "SV3-LF-U103-Q02-FAMILY",
+        "SV3-LF-U103-Q03-FAMILY",
+        "SV3-LF-U103-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "did the bilingual campaign produce at least 800 qualified leads",
+        "5개 지역에서 crm stage 기준을 실제 운영으로 전환했나요",
+        "did this person personally close 32 enterprise accounts",
+        "webinar campaign과 geo budget experiment를 모두 이미 실행했나요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-LF-U104",
+      "split": "CALIBRATION",
+      "documentFamilyId": "SV3-LF-U104-DOC-FAMILY",
+      "templateFamilyId": "SV3-LF-TEMPLATE-MOBILE-104",
+      "generatorSeedId": "SV3-LF-SEED-MOBILE-104-B9F0",
+      "logicalDocumentIds": [
+        "SV3-LF-U104-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-LF-U104-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-LF-FACT-U104-P01-E01",
+        "SV3-LF-FACT-U104-P02-E01",
+        "SV3-LF-FACT-U104-P03-E01"
+      ],
+      "sourceFactSignatures": [
+        "7fbb638867b7d771cd81b411901acc0bd5b3d9c0561c20012c7c9f59a6dfad8a",
+        "b1c94d6a6040c978d356c63942b4b3e0687cc5d777caee799b4e32ee4cae774b",
+        "b184224732f8957ccdbc32476a6e2355e40abab5042a8931833e2c32190e317f"
+      ],
+      "questionGroupIds": [
+        "SV3-LF-U104-Q01-FAMILY",
+        "SV3-LF-U104-Q02-FAMILY",
+        "SV3-LF-U104-Q03-FAMILY",
+        "SV3-LF-U104-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "what evidence shows resilient mobile checkout under unreliable connectivity",
+        "were verified accessibility findings reduced to five or fewer",
+        "was voice navigation released to production on mobile",
+        "show both shipped offline reliability and completed accessibility remediation"
+      ]
+    },
+    {
+      "userBundleId": "SV3-LF-U105",
+      "split": "CALIBRATION",
+      "documentFamilyId": "SV3-LF-U105-DOC-FAMILY",
+      "templateFamilyId": "SV3-LF-TEMPLATE-PLANNING-105",
+      "generatorSeedId": "SV3-LF-SEED-PLANNING-105-E2A6",
+      "logicalDocumentIds": [
+        "SV3-LF-U105-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-LF-U105-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-LF-FACT-U105-P01-E01",
+        "SV3-LF-FACT-U105-P02-E01",
+        "SV3-LF-FACT-U105-P03-E01",
+        "SV3-LF-FACT-U105-P04-E01"
+      ],
+      "sourceFactSignatures": [
+        "ba0e8ac5d1c418c9e3582e533e6d043741bee4ce7b58f91fb36956c45714f5ea",
+        "74bdaa8457623f69854a21eb0d653c4a6de7b38cd82c33a05c704228b3186420",
+        "e9b13ef7d9784737bc01cf416d6141b9c1a8c87befaf0ea7cfd7e9ebc79ef261",
+        "5ebb88844f8fc7ca45ce581656219d827ff2fb4e776a38398d09143df94221b7"
+      ],
+      "questionGroupIds": [
+        "SV3-LF-U105-Q01-FAMILY",
+        "SV3-LF-U105-Q02-FAMILY",
+        "SV3-LF-U105-Q03-FAMILY",
+        "SV3-LF-U105-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "문의 표본 400건 이상을 검토해 실제 정책에 반영했나요",
+        "여러 부서의 판단 차이를 구조화해 우선순위를 조정한 경험이 있나요",
+        "해외 법인 연계 운영을 이미 production으로 전환했나요",
+        "본인이 전사 교육 12회를 직접 진행했나요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-LF-U106",
+      "split": "CALIBRATION",
+      "documentFamilyId": "SV3-LF-U106-DOC-FAMILY",
+      "templateFamilyId": "SV3-LF-TEMPLATE-OPERATIONS-106",
+      "generatorSeedId": "SV3-LF-SEED-OPERATIONS-106-F1D4",
+      "logicalDocumentIds": [
+        "SV3-LF-U106-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-LF-U106-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-LF-FACT-U106-P01-E01",
+        "SV3-LF-FACT-U106-P02-E01",
+        "SV3-LF-FACT-U106-P03-E01",
+        "SV3-LF-FACT-U106-P04-E01"
+      ],
+      "sourceFactSignatures": [
+        "4d637ee0b43dbdc43807eefd0631d145a9874e8ab6fa59127fce32e7b82883f1",
+        "8760b534eab379b3cdf368b9f701db63eed223e26f9dd5f38c122f9e5f607825",
+        "1f319abb21c2b2e0994a11dfb295e85fcedc73502fd8407ab6f5c54c08573f30",
+        "bc4fc6a7ed820d3e013b07fd0b25b71d1cee713f4191906d168cd48c56e55259"
+      ],
+      "questionGroupIds": [
+        "SV3-LF-U106-Q01-FAMILY",
+        "SV3-LF-U106-Q02-FAMILY",
+        "SV3-LF-U106-Q03-FAMILY",
+        "SV3-LF-U106-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "여러 현장의 인수인계 누락을 20 이상 줄인 경험이 있나요",
+        "did the candidate complete emergency response training",
+        "지게차 운전 자격증을 보유하고 있나요",
+        "did this person develop the warehouse barcode routing software"
+      ]
+    }
+  ]
+}

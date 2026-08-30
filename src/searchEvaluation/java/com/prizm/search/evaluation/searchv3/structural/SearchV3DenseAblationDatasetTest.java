@@ -46,6 +46,46 @@ class SearchV3DenseAblationDatasetTest {
                 .isEqualTo(SearchV3DenseAblationDataset.SEALED_FINAL_SHA256);
         assertThat(metadata.opened()).isFalse();
         assertThat(metadata.searchExecuted()).isFalse();
+        assertThat(metadata.verifiedFileCount()).isPositive();
+    }
+
+    @Test
+    void loadsSeparateLongFormDevAndCalibrationWithoutReplacingOriginalSeed() {
+        SearchV3DenseAblationDataset.DatasetSlice dev =
+                loader.loadLongForm(SearchV3DenseAblationDataset.Split.DEV);
+        SearchV3DenseAblationDataset.DatasetSlice calibration =
+                loader.loadLongForm(SearchV3DenseAblationDataset.Split.CALIBRATION);
+
+        assertThat(dev.datasetVersion()).isEqualTo(SearchV3DenseAblationDataset.LONG_FORM_DATASET_VERSION);
+        assertThat(calibration.datasetVersion()).isEqualTo(SearchV3DenseAblationDataset.LONG_FORM_DATASET_VERSION);
+        assertThat(dev.bundles()).hasSize(3);
+        assertThat(calibration.bundles()).hasSize(3);
+        assertThat(dev.activeDocumentsByVersion()).hasSize(3);
+        assertThat(calibration.activeDocumentsByVersion()).hasSize(3);
+        assertThat(dev.queries()).hasSize(12);
+        assertThat(calibration.queries()).hasSize(12);
+        assertThat(dev.bundles()).allSatisfy(bundle -> assertThat(bundle.activeDocuments())
+                .allSatisfy(document -> assertThat(document.structuralDocument().sourceText()
+                        .codePointCount(0, document.structuralDocument().sourceText().length()))
+                        .isGreaterThanOrEqualTo(1_500)));
+        assertThat(calibration.bundles()).allSatisfy(bundle -> assertThat(bundle.activeDocuments())
+                .allSatisfy(document -> assertThat(document.structuralDocument().sourceText()
+                        .codePointCount(0, document.structuralDocument().sourceText().length()))
+                        .isGreaterThanOrEqualTo(1_500)));
+    }
+
+    @Test
+    void longFormManifestIsFrozenDevCalOnlyAndAllowsEvaluationWithoutClaimingRunState() {
+        SearchV3DenseAblationDataset.LongFormManifestMetadata metadata =
+                loader.readLongFormManifestMetadata();
+
+        assertThat(metadata.datasetVersion())
+                .isEqualTo(SearchV3DenseAblationDataset.LONG_FORM_DATASET_VERSION);
+        assertThat(metadata.previousVersion())
+                .isEqualTo(SearchV3DenseAblationDataset.ORIGINAL_DATASET_VERSION);
+        assertThat(metadata.documentCount()).isEqualTo(6);
+        assertThat(metadata.queryCount()).isEqualTo(24);
+        assertThat(metadata.executionPolicy()).isEqualTo("DEV_CAL_EVALUATION_ALLOWED");
     }
 
     @Test

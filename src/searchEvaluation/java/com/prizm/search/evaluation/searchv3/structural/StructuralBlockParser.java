@@ -20,6 +20,15 @@ public final class StructuralBlockParser {
     private static final Pattern KEY_VALUE = Pattern.compile("^\\s*[^:：\\n]{1,40}[:：]\\s*\\S.*$");
     private static final Pattern TERMINAL_PUNCTUATION = Pattern.compile(".*[.!?。！？;；:]$");
     private static final Pattern OTHER_STRUCTURE = Pattern.compile("^\\s*(?:[-=_]{3,}|[─━]{3,})\\s*$");
+    private static final Pattern MARKDOWN_TABLE_DIVIDER = Pattern.compile(
+            "^\\s*\\|?\\s*:?-{3,}:?\\s*(?:\\|\\s*:?-{3,}:?\\s*)+\\|?\\s*$");
+    private static final Pattern URI_ONLY = Pattern.compile(
+            "^\\s*[A-Za-z][A-Za-z0-9+.-]*://\\S+\\s*$");
+    private static final Pattern DATE_VALUE = Pattern.compile(
+            ".*(?<!\\d)(?:19|20)\\d{2}(?:[./-]\\d{1,2}(?:[./-]\\d{1,2})?)?(?!\\d).*");
+    private static final Pattern QUANTITY_VALUE = Pattern.compile(
+            ".*(?:[<>≤≥]=?\\s*)?\\d[\\d,.]*\\s*(?:%|[a-z]{2,}|[A-Z]{2,}|[가-힣]{1,8}).*");
+    private static final Pattern INLINE_VALUE_SEPARATOR = Pattern.compile(".*\\s[—–]\\s*\\S.*");
     private static final int MAX_HEADING_CODE_POINTS = 80;
 
     public List<StructuralBlock> parse(StructuralDocument document) {
@@ -88,7 +97,8 @@ public final class StructuralBlockParser {
 
     private StructuralBlockType classifySpecial(List<LineSlice> lines, int index) {
         String stripped = lines.get(index).text().strip();
-        if (OTHER_STRUCTURE.matcher(stripped).matches()) {
+        if (OTHER_STRUCTURE.matcher(stripped).matches()
+                || MARKDOWN_TABLE_DIVIDER.matcher(stripped).matches()) {
             return StructuralBlockType.OTHER;
         }
         if (MARKDOWN_HEADING.matcher(stripped).matches()) {
@@ -100,8 +110,14 @@ public final class StructuralBlockParser {
         if (looksLikeTableRow(stripped)) {
             return StructuralBlockType.TABLE_ROW;
         }
-        if (KEY_VALUE.matcher(stripped).matches() && !stripped.contains("://")) {
+        if (KEY_VALUE.matcher(stripped).matches() && !URI_ONLY.matcher(stripped).matches()) {
             return StructuralBlockType.KEY_VALUE;
+        }
+        if (URI_ONLY.matcher(stripped).matches()) {
+            return StructuralBlockType.PARAGRAPH;
+        }
+        if (looksLikeEvidenceAssertion(stripped)) {
+            return StructuralBlockType.PARAGRAPH;
         }
         if (looksLikeHeading(lines, index, stripped)) {
             return StructuralBlockType.HEADING;
@@ -116,8 +132,26 @@ public final class StructuralBlockParser {
         }
         boolean previousBoundary = index == 0 || lines.get(index - 1).blank();
         boolean nextBoundary = index + 1 == lines.size() || lines.get(index + 1).blank();
+        if (previousBoundary && index + 1 < lines.size()
+                && looksLikeCompactValueRow(lines.get(index + 1).text().strip())) {
+            return false;
+        }
         int tokenCount = stripped.split("\\s+").length;
         return previousBoundary && (nextBoundary || tokenCount <= 8);
+    }
+
+    private boolean looksLikeCompactValueRow(String value) {
+        return !value.isBlank()
+                && value.codePointCount(0, value.length()) <= 48
+                && value.split("\\s+").length <= 6
+                && !TERMINAL_PUNCTUATION.matcher(value).matches()
+                && looksLikeEvidenceAssertion(value);
+    }
+
+    private boolean looksLikeEvidenceAssertion(String value) {
+        return DATE_VALUE.matcher(value).matches()
+                || QUANTITY_VALUE.matcher(value).matches()
+                || INLINE_VALUE_SEPARATOR.matcher(value).matches();
     }
 
     private boolean looksLikeTableRow(String stripped) {

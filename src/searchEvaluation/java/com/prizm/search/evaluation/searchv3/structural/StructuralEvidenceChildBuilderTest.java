@@ -14,7 +14,7 @@ class StructuralEvidenceChildBuilderTest {
         String source = "한국어 제목\nEvidence with English와 숫자 1,300건.";
         List<EvidenceChild> children = build(source, 800);
 
-        assertThat(children).hasSize(2);
+        assertThat(children).hasSize(1);
         for (EvidenceChild child : children) {
             SourceProvenance provenance = child.provenance();
             assertThat(substringByCodePoints(source, provenance.codePointStart(), provenance.codePointEnd()))
@@ -42,7 +42,7 @@ class StructuralEvidenceChildBuilderTest {
 
     @Test
     void addsOnlyTraceableTableHeaderContextToDataRows() {
-        String source = "항목 | 기간 | 결과\npipeline | 2024 | completed\nincident | 2025 | recovered";
+        String source = "항목 | 기간 | 결과\n| --- | --- | --- |\npipeline | 2024 | completed\nincident | 2025 | recovered";
         List<EvidenceChild> children = build(source, 800);
 
         assertThat(children).hasSize(3);
@@ -53,6 +53,66 @@ class StructuralEvidenceChildBuilderTest {
         assertThat(firstRow.retrievalText()).isEqualTo(
                 "항목 | 기간 | 결과\npipeline | 2024 | completed");
         assertThat(firstRow.contextSourceBlockIds()).containsExactly(header.sourceBlockIds().get(0));
+    }
+
+    @Test
+    void retainsPhaseOneFirstRowHeaderConventionForPlainTables() {
+        String source = "alice | 2024 | done\nbob | 2025 | done";
+        List<EvidenceChild> children = build(source, 800);
+
+        assertThat(children).hasSize(2);
+        assertThat(children.get(0).contextSourceBlockIds()).isEmpty();
+        assertThat(children.get(1).retrievalText()).isEqualTo(
+                "alice | 2024 | done\nbob | 2025 | done");
+        assertThat(children.get(1).contextSourceBlockIds())
+                .containsExactly(children.get(0).sourceBlockIds().get(0));
+    }
+
+    @Test
+    void doesNotCarryTableHeaderAcrossBlankSeparatedTables() {
+        String source = "Section\nFirst | Value | State\n| --- | --- | --- |\na | 1 | done\n\nSecond | Amount | State\n| --- | --- | --- |\nb | 2 | ready";
+        List<EvidenceChild> children = build(source, 800);
+
+        EvidenceChild secondDataRow = children.stream()
+                .filter(child -> child.sourceText().equals("b | 2 | ready"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(secondDataRow.retrievalText()).isEqualTo("Second | Amount | State\nb | 2 | ready");
+        assertThat(secondDataRow.retrievalText()).doesNotContain("First | Value | State");
+    }
+
+    @Test
+    void structuralSeparatorsAreContextOnlyNotEvidenceCandidates() {
+        List<EvidenceChild> children = build("---\nDirect evidence sentence.", 800);
+
+        assertThat(children).singleElement().satisfies(child -> {
+            assertThat(child.sourceBlockType()).isEqualTo(StructuralBlockType.PARAGRAPH);
+            assertThat(child.sourceText()).isEqualTo("Direct evidence sentence.");
+        });
+    }
+
+    @Test
+    void treatsPureHeadingAsContextOnlyAndNeverAsIndependentEvidenceCandidate() {
+        List<EvidenceChild> children = build("장애 재발 방지\n직접 근거가 되는 본문 문장입니다.", 800);
+
+        assertThat(children).singleElement().satisfies(child -> {
+            assertThat(child.sourceBlockType()).isEqualTo(StructuralBlockType.PARAGRAPH);
+            assertThat(child.sourceText()).isEqualTo("직접 근거가 되는 본문 문장입니다.");
+            assertThat(child.retrievalText()).isEqualTo(child.sourceText());
+            assertThat(child.provenance().parentAnnotationCandidateId())
+                    .isNotEqualTo(child.provenance().sourceBlockId());
+        });
+    }
+
+    @Test
+    void doesNotDiscardEvidenceBearingDatedAssertionOrKeyValue() {
+        List<EvidenceChild> children = build(
+                "AWS Certified Developer — 2026\n\nTraining status: completed", 800);
+
+        assertThat(children).extracting(EvidenceChild::sourceBlockType)
+                .containsExactly(StructuralBlockType.PARAGRAPH, StructuralBlockType.KEY_VALUE);
+        assertThat(children).extracting(EvidenceChild::sourceText)
+                .containsExactly("AWS Certified Developer — 2026", "Training status: completed");
     }
 
     @Test

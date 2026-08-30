@@ -10,6 +10,8 @@ public final class StructuralEvidenceChildBuilder {
 
     public static final int DEFAULT_MAX_CHILD_CODE_POINTS = 800;
     private static final Pattern SENTENCE_BOUNDARY = Pattern.compile("[.!?。！？](?:\\s+|$)");
+    private static final Pattern MARKDOWN_TABLE_DIVIDER = Pattern.compile(
+            "^\\s*\\|?\\s*:?-{3,}:?\\s*(?:\\|\\s*:?-{3,}:?\\s*)+\\|?\\s*$");
 
     private final int maxChildCodePoints;
 
@@ -30,12 +32,32 @@ public final class StructuralEvidenceChildBuilder {
         StructuralBlock previous = null;
 
         for (StructuralBlock block : blocks) {
-            if (block.type() == StructuralBlockType.TABLE_ROW) {
-                boolean beginsTable = previous == null
-                        || previous.type() != StructuralBlockType.TABLE_ROW
-                        || !previous.provenance().parentAnnotationCandidateId()
+            if (block.type() == StructuralBlockType.HEADING) {
+                tableHeader = null;
+                previous = block;
+                continue;
+            }
+            if (block.type() == StructuralBlockType.OTHER) {
+                boolean explicitTableHeader = MARKDOWN_TABLE_DIVIDER.matcher(block.sourceText()).matches()
+                        && previous != null
+                        && previous.type() == StructuralBlockType.TABLE_ROW
+                        && previous.provenance().lineEnd() + 1 == block.provenance().lineStart()
+                        && previous.provenance().parentAnnotationCandidateId()
                                 .equals(block.provenance().parentAnnotationCandidateId());
-                if (beginsTable) {
+                tableHeader = explicitTableHeader ? previous : null;
+                previous = block;
+                continue;
+            }
+            if (block.type() == StructuralBlockType.TABLE_ROW) {
+                boolean continuesTable = previous != null
+                        && previous.provenance().lineEnd() + 1 == block.provenance().lineStart()
+                        && previous.provenance().parentAnnotationCandidateId()
+                                .equals(block.provenance().parentAnnotationCandidateId())
+                        && (previous.type() == StructuralBlockType.TABLE_ROW
+                                || (previous.type() == StructuralBlockType.OTHER
+                                        && MARKDOWN_TABLE_DIVIDER.matcher(previous.sourceText()).matches()
+                                        && tableHeader != null));
+                if (!continuesTable) {
                     tableHeader = block;
                 }
             }

@@ -1,0 +1,113 @@
+{
+  "artifactType": "CORPUS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+  "split": "CALIBRATION",
+  "userBundles": [
+    {
+      "userBundleId": "SV3-LF-U104",
+      "split": "CALIBRATION",
+      "professionGroup": "FRONTEND_MOBILE",
+      "profession": "mobile product engineer",
+      "languageProfile": "EN",
+      "documentFamilyId": "SV3-LF-U104-DOC-FAMILY",
+      "templateFamilyId": "SV3-LF-TEMPLATE-MOBILE-104",
+      "documents": [
+        {
+          "documentId": "SV3-LF-U104-D01",
+          "logicalDocumentId": "SV3-LF-U104-D01-LOGICAL",
+          "versionLineageId": "SV3-LF-U104-D01-LINEAGE",
+          "versionId": "SV3-LF-U104-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Synthetic Mobile Delivery and Accessibility Portfolio",
+          "documentType": "PORTFOLIO",
+          "documentStructure": "LONG_PORTFOLIO",
+          "fileType": "TXT",
+          "language": "EN",
+          "contentPath": "documents/sv3-lf-u104-mobile-portfolio-v01.txt",
+          "contentSha256": "b016714928a2c841ddaca9c368b999d3f3714e9fde2ad1ec423168feb9f768ed",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-prz026-long-form-materializer",
+            "generatorRevision": "1.1.0",
+            "generatorSeedId": "SV3-LF-SEED-MOBILE-104-B9F0"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-LF-U105",
+      "split": "CALIBRATION",
+      "professionGroup": "PLANNING",
+      "profession": "service planning manager",
+      "languageProfile": "KO",
+      "documentFamilyId": "SV3-LF-U105-DOC-FAMILY",
+      "templateFamilyId": "SV3-LF-TEMPLATE-PLANNING-105",
+      "documents": [
+        {
+          "documentId": "SV3-LF-U105-D01",
+          "logicalDocumentId": "SV3-LF-U105-D01-LOGICAL",
+          "versionLineageId": "SV3-LF-U105-D01-LINEAGE",
+          "versionId": "SV3-LF-U105-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "합성 서비스 운영 정책 기획 경력기술서",
+          "documentType": "CAREER_REVIEW",
+          "documentStructure": "NARRATIVE_SELF_INTRODUCTION",
+          "fileType": "TXT",
+          "language": "KO",
+          "contentPath": "documents/sv3-lf-u105-planning-narrative-v01.txt",
+          "contentSha256": "bce017a5873ba64de43daa682aaec2861ce33d532e415c7fdff5684a3b63b0b5",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-prz026-long-form-materializer",
+            "generatorRevision": "1.1.0",
+            "generatorSeedId": "SV3-LF-SEED-PLANNING-105-E2A6"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-LF-U106",
+      "split": "CALIBRATION",
+      "professionGroup": "NON_DEVELOPMENT_GENERAL",
+      "profession": "multi-site operations coordinator",
+      "languageProfile": "KO_EN_MIXED",
+      "documentFamilyId": "SV3-LF-U106-DOC-FAMILY",
+      "templateFamilyId": "SV3-LF-TEMPLATE-OPERATIONS-106",
+      "documents": [
+        {
+          "documentId": "SV3-LF-U106-D01",
+          "logicalDocumentId": "SV3-LF-U106-D01-LOGICAL",
+          "versionLineageId": "SV3-LF-U106-D01-LINEAGE",
+          "versionId": "SV3-LF-U106-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Synthetic Multi-site Operations Career Description",
+          "documentType": "CAREER_REVIEW",
+          "documentStructure": "CAREER_DESCRIPTION",
+          "fileType": "TXT",
+          "language": "KO_EN_MIXED",
+          "contentPath": "documents/sv3-lf-u106-operations-v01.txt",
+          "contentSha256": "70e58fa8cbff6e8b794536d0de9e99ba8f4df489c642b43067c5adeb68ac1621",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-prz026-long-form-materializer",
+            "generatorRevision": "1.1.0",
+            "generatorSeedId": "SV3-LF-SEED-OPERATIONS-106-F1D4"
+          }
+        }
+      ]
+    }
+  ]
+}

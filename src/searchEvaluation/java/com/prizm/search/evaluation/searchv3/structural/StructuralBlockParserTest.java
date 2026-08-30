@@ -66,6 +66,72 @@ class StructuralBlockParserTest {
     }
 
     @Test
+    void preservesLabelledAndBareUrlsWithoutTreatingTheirSchemeAsAHeading() {
+        List<StructuralBlock> blocks = parse(
+                "Portfolio: https://example.invalid/work\n\nhttps://example.invalid/profile");
+
+        assertThat(blocks).extracting(StructuralBlock::type)
+                .containsExactly(StructuralBlockType.KEY_VALUE, StructuralBlockType.PARAGRAPH);
+    }
+
+    @Test
+    void classifiesMarkdownTableDividerAsContextOnlyStructure() {
+        List<StructuralBlock> blocks = parse(
+                "Name | Year | State\n| --- | --- | --- |\nAlice | 2025 | active");
+
+        assertThat(blocks).extracting(StructuralBlock::type)
+                .containsExactly(
+                        StructuralBlockType.TABLE_ROW,
+                        StructuralBlockType.OTHER,
+                        StructuralBlockType.TABLE_ROW);
+    }
+
+    @Test
+    void keepsPureSectionTitleAsHeadingButClassifiesInlineDatedAssertionAsEvidence() {
+        List<StructuralBlock> blocks = parse(
+                "Credentials\n\nAWS Certified Developer — 2026\n\nTraining status: completed");
+
+        assertThat(blocks).extracting(StructuralBlock::type)
+                .containsExactly(
+                        StructuralBlockType.HEADING,
+                        StructuralBlockType.PARAGRAPH,
+                        StructuralBlockType.KEY_VALUE);
+    }
+
+    @Test
+    void keepsExplicitOrOrdinalNumericSectionTitlesAsHeadings() {
+        List<StructuralBlock> blocks = parse(
+                "# 2025 Highlights\nBody evidence sentence.\n\nPhase 1 Results\nAnother body sentence.");
+
+        assertThat(blocks).extracting(StructuralBlock::type)
+                .containsExactly(
+                        StructuralBlockType.HEADING,
+                        StructuralBlockType.PARAGRAPH,
+                        StructuralBlockType.HEADING,
+                        StructuralBlockType.PARAGRAPH);
+    }
+
+    @Test
+    void preservesStandaloneAssertionsWithUppercaseMeasurementUnits() {
+        List<StructuralBlock> blocks = parse("Processed 10 TB\n\nThroughput 20 TPS");
+
+        assertThat(blocks).extracting(StructuralBlock::type)
+                .containsExactly(StructuralBlockType.PARAGRAPH, StructuralBlockType.PARAGRAPH);
+    }
+
+    @Test
+    void preservesCertificationLabelWithFollowingDateValueAsOneEvidenceBearingBlock() {
+        List<StructuralBlock> blocks = parse("정보처리기사\n2026.08 취득\n\n다음 섹션\n설명 문장입니다.");
+
+        assertThat(blocks).extracting(StructuralBlock::type)
+                .containsExactly(
+                        StructuralBlockType.PARAGRAPH,
+                        StructuralBlockType.HEADING,
+                        StructuralBlockType.PARAGRAPH);
+        assertThat(blocks.get(0).sourceText()).isEqualTo("정보처리기사\n2026.08 취득");
+    }
+
+    @Test
     void keepsOtherStructuralSeparatorAsOther() {
         List<StructuralBlock> blocks = parse("---\nA normal sentence follows.");
 

@@ -1,0 +1,51 @@
+Synthetic Mobile Delivery and Accessibility Portfolio
+
+Offline checkout release
+
+Field staff used the checkout flow in buildings with unreliable connectivity. Earlier clients retried every request independently, which could show a success message before the server confirmed the order. I mapped the local states, server acknowledgements, and recovery paths before changing the interface.
+
+I shipped an offline-safe checkout queue on iOS and Android and reduced duplicate-order crash sessions by 37% over the following eight weeks.
+
+- Pending orders stayed visible until the server acknowledgement arrived.
+- A retry reused the same operation identifier instead of creating a new order.
+- The UI distinguished a queued action from a completed purchase.
+- Support diagnostics recorded state transitions without including customer-entered notes.
+
+The first release was limited to one workflow and had a remote disable switch. During rollout I reviewed failed acknowledgements with backend and support owners, then expanded only after the reconciliation report matched the order ledger. The evidence does not claim that every offline interaction was solved.
+
+A later operating review showed that users sometimes closed the app while an order was pending. I added a resume notice and a recovery test for that path. The change was documented as a follow-up release rather than silently folded into the original result.
+
+Accessibility audit and remediation
+
+The account workflow had labels that visually looked complete but did not expose a consistent accessible name. I paired automated checks with keyboard and screen-reader walkthroughs because either method alone missed important states.
+
+I completed screen-reader and keyboard remediation for the account workflow, reducing verified accessibility audit findings from 12 to 3.
+
+The remediation covered focus order, error announcement, button names, and the return path from a modal. I wrote acceptance examples using observable behavior rather than a particular assistive-technology vendor, then checked the examples on both mobile platforms.
+
+Three findings remained: a third-party date picker, a complex chart description, and an operating-system focus defect. They stayed visible in the release note with owners and workarounds; the reduction metric does not imply zero accessibility issues.
+
+A design review also changed component guidance so that new forms inherited the tested label and error patterns. I did not count documentation changes as remediated findings until the product screen passed the same checks.
+
+Voice navigation experiment
+
+A research session explored whether voice commands could help hands-busy users move through a checklist. I created a narrow prototype with scripted intents and local sample data. The prototype was evaluated in moderated sessions and was never connected to a production account.
+
+Voice navigation remained a moderated prototype and was not released in either mobile application.
+
+Participants liked a short confirmation but struggled when commands contained two actions. The finding changed the research question, not the shipped product. Any future work would need privacy review, recovery for misunderstood commands, and clear visual parity.
+
+The prototype code was archived after the session so it could not be mistaken for an enabled feature. Screenshots in the research note carry a prototype label and the release matrix lists the capability as unavailable.
+
+Component migration record
+
+Component | Platform | State
+Checkout status banner | iOS and Android | production
+Accessible account form | iOS and Android | production
+Voice command control | research build | prototype
+
+The migration table summarizes state but does not merge the prototype with production components. Each row points back to its own source section and release boundary.
+
+During migration I removed duplicated local styles only after visual and accessibility checks passed. Shared code was not treated as a goal by itself; platform-specific behavior remained where it produced clearer focus or navigation.
+
+This portfolio includes several similar words such as release, workflow, test, and mobile. A useful retrieval method must still return the exact source state instead of treating every experiment as completed production work.

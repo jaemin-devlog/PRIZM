@@ -1,9 +1,9 @@
 # PRZ-027 Search V3 Cross Encoder Reranking
 
-- 상태: `IN_PROGRESS / INPUT_CONTRACT_FROZEN / BENCHMARK_NOT_RUN`
+- 상태: `VERIFIED / NO_GO / PRODUCTION_NOT_ADOPTED`
 - 시작 source: `PRZ-026-structural-parsing-parent-child@a7dbb12ea7c0a3f4a502c1ae0252177d9c78a8b9`
 - 선행 조건: `DEPENDS_ON_PRZ_025`, `DEPENDS_ON_PRZ_026_B3`
-- Production 적용: `NOT_RUN`
+- Production 적용: `NOT_ADOPTED`
 
 ## 1. 단일 가설과 비교
 
@@ -70,3 +70,10 @@ Safety/identity 실패는 모델 판정 전 `INVALID`. Safety가 유효해도 ag
 loss가 win보다 많거나 rank1 loss 비율이 10%를 넘으면 `NO_GO`다. 그 외 quality/slice/3~10초 CPU
 latency 문제는 `NEEDS_ADJUSTMENT`; 10초 초과 또는 RSS 8GiB 초과는 `NO_GO`다. 결과를 본 뒤 model,
 input, TopK나 threshold를 바꾸지 않는다. QueryPlanner 진입은 `PROMISING`일 때만 가능하다.
+
+## 6. Result
+
+동결된 69 DEV/CAL queries에서 R1은 candidate/provenance와 Recall@20을 보존했지만 combined Top1은
+동일했고 MRR·nDCG@5·Recall@5·user-macro가 하락했다. win/loss/tie는 `2/2/49`다. 따라서 이
+`gte-multilingual-reranker-base` R1 baseline은 `NO_GO`이며 QueryPlanner 진입 조건을 충족하지 못했다.
+이 판정은 모델 일반이나 다른 revision에 대한 판정으로 확장하지 않는다.

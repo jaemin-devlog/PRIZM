@@ -1,6 +1,6 @@
 # PRZ-027 Tasks
 
-- 상태: `IN_PROGRESS / BENCHMARK_NOT_RUN`
+- 상태: `VERIFIED / NO_GO`
 
 - [x] ORIENT: PRZ-026 `a7dbb12...`, origin/main, dependency와 clean tree 확인
 - [x] SPEC: R0/R1 단일 변수, Top20, identity/Gold/Safety와 판정 Gate 고정
@@ -9,9 +9,9 @@
 - [x] TEST/IMPLEMENT: fixed model/code revision CPU scorer
 - [x] TEST/IMPLEMENT: strict score import, Top20-only rerank, deterministic tie-break
 - [x] TEST/IMPLEMENT: Top1/MRR/nDCG/Recall, macro/slice/category/operation Gate
-- [ ] VERIFY: 관련 PRZ-025/026 integrity, SEALED guard, scope/OSS
-- [ ] INTEGRATE-INPUT: result 전 local commit
-- [ ] VERIFY: 공식 R0/R1 세 dataset 실행 1회
-- [ ] AUDIT: 모든 loss와 QueryPlanner 진입 판정
-- [ ] INTEGRATE: result/evidence local commit only
-- [ ] QueryPlanner/Production/PR/push/merge — `NOT_RUN`
+- [x] VERIFY: 관련 PRZ-025/026 integrity, SEALED guard, scope/OSS
+- [x] INTEGRATE-INPUT: result 전 local commit `69a4b1e1b924c81423717324b62fd8b0c155fd8c`
+- [x] VERIFY: 공식 R0/R1 세 dataset 실행 1회
+- [x] AUDIT: 모든 loss와 QueryPlanner 진입 판정 `NO_GO`
+- [x] INTEGRATE: aggregate result/evidence local commit only
+- [x] QueryPlanner/Production/PR/push/merge — 의도대로 `NOT_RUN`

@@ -2,6 +2,7 @@
 
 - 허용 단계: `ORIENT → SPEC → PLAN → IMPLEMENT(evaluation-only) → VERIFY → AUDIT → INTEGRATE(local only)`
 - Production, dataset, SEALED FINAL, PR/push/merge: 변경·실행 금지
+- 결과: 모든 허용 단계 완료, `NO_GO`, QueryPlanner `NOT_RUN`
 
 1. PRZ-026 B3 HEAD와 parser/child/passage SHA-256, model/code metadata와 Gate를 결과 전에 고정한다.
 2. Java가 기존 B3 run에서 full baseline report와 Gold 없는 Dense Top20 pair input을 분리 export한다.

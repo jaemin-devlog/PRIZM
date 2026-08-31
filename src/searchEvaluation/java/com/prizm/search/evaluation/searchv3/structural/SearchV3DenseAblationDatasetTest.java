@@ -129,6 +129,28 @@ class SearchV3DenseAblationDatasetTest {
     }
 
     @Test
+    void loadsFrozenTypedStressThroughTheSameB3CorpusBoundary() {
+        SearchV3DenseAblationDataset.DatasetSlice dev =
+                loader.loadTypedStress(SearchV3DenseAblationDataset.Split.DEV);
+        SearchV3DenseAblationDataset.DatasetSlice calibration =
+                loader.loadTypedStress(SearchV3DenseAblationDataset.Split.CALIBRATION);
+
+        assertThat(List.of(dev, calibration)).allSatisfy(slice -> {
+            assertThat(slice.datasetVersion())
+                    .isEqualTo(SearchV3DenseAblationDataset.TYPED_STRESS_DATASET_VERSION);
+            assertThat(slice.bundles()).hasSize(3);
+            assertThat(slice.activeDocumentsByVersion()).hasSize(3);
+            assertThat(slice.queries()).hasSize(12);
+            assertThat(slice.activeDocumentsByVersion().keySet())
+                    .noneMatch(id -> id.toLowerCase().contains("chunk"));
+        });
+        assertThat(dev.manifestCombinedSha256())
+                .isEqualTo("35c6e84b85302aad5f1499bc5f8a96fdeeb3a635a3d2da3595f4473654e17350");
+        assertThat(calibration.manifestCombinedSha256())
+                .isEqualTo("b754d92e49246aec955c3bef252eeb09a6978272b7b7ba869059bf5a536e606e");
+    }
+
+    @Test
     void rejectsMutatedRobustnessFixtureThroughFrozenManifestHash() throws Exception {
         Path copiedRoot = temporaryDirectory.resolve("robustness");
         try (var paths = Files.walk(SearchV3DenseAblationDataset.ROBUSTNESS_BENCHMARK_ROOT)) {

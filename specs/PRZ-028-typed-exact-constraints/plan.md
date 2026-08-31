@@ -1,6 +1,6 @@
 # PRZ-028 Plan
 
-- 상태: `IN_PROGRESS / INPUT_FROZEN / IMPLEMENTATION_NOT_STARTED`
+- 상태: `IN_PROGRESS / INPUT_FROZEN / IMPLEMENTATION_VERIFIED / OFFICIAL_T0_T1_NOT_RUN`
 - 허용 단계: `ORIENT → SPEC → PLAN → IMPLEMENT(evaluation-only) → VERIFY → AUDIT → INTEGRATE(commit only)`
 - baseline: PRZ-026 B3; PRZ-027 Cross Encoder `NO_GO` 제외
 
@@ -20,6 +20,8 @@
    candidate-preserving stable partition을 적용한다.
 5. gold를 runtime 입력과 분리한 metric/report calculator와 DEV/CAL-only runner를 만든다.
 6. raw report는 ignored `local/search-v3-evaluation/prz028/`에만 저장한다.
+7. official runner와 판정 Gate를 source와 함께 local code-freeze commit으로 고정한다. Runner는 실제
+   clean `HEAD`가 전달된 freeze SHA와 같은 경우에만 실행한다.
 
 ## 3. 검증
 
@@ -30,6 +32,8 @@
 - integrity: stress materializer `--check`, PRZ-025 validator와 관련 PRZ-025/026 tests
 - official evaluation: 입력 freeze commit 이후 T0/T1 한 번 실행, query/type/user aggregate와 latency 기록
 - operation: query/candidate parsing 및 전체 T1 추가 latency, heap 관찰값, persistent index/storage 0 기록
+- verdict: predicted hard-negative state는 안전성, Gold-expected `CONTRADICTED@1` 감소는 개선으로 분리하고
+  qualifier/date/identifier-number family와 distinct winning user/kind를 확인
 - audit: `git diff --check`, OSS readiness, forbidden scope/secret/SEALED hash 검사
 
 Full backend integration, frontend와 Docker 검증은 evaluation-only 변경에 필요하지 않으면

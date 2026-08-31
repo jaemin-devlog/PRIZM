@@ -62,6 +62,82 @@ final class SearchV3DenseAblationEngine {
         return run(slices, embeddingClient, modelMetadata, "PRZ-026-PHASE-1-RETRIEVAL-PASSAGE");
     }
 
+    /**
+     * Produces complete B3 Dense rankings for a downstream shadow evaluator.
+     * Candidate construction and ranking are identical to B3; no top-k truncation is applied.
+     */
+    PassageDenseRun runPassageDenseOnly(
+            List<DatasetSlice> slices,
+            OllamaBgeM3EmbeddingClient embeddingClient,
+            OllamaBgeM3EmbeddingClient.ModelMetadata modelMetadata,
+            String phase) {
+        Set<String> datasetVersions = slices.stream()
+                .map(DatasetSlice::datasetVersion)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        if (datasetVersions.size() != 1) {
+            throw new IllegalArgumentException("One B3 run cannot mix Search V3 dataset versions");
+        }
+        embeddingClient.embedOne("PRIZM Search V3 typed-constraint evaluation warmup");
+
+        List<PassageDenseSliceRun> splitRuns = new ArrayList<>();
+        for (DatasetSlice slice : slices) {
+            CandidateBuild structuralBuild = buildStructuralCandidates(slice);
+            PassageCandidateBuild passageBuild = buildPassageCandidates(slice, structuralBuild);
+            PreparedProfile passage = prepare(passageBuild.candidateBuild(), embeddingClient);
+            Map<String, RetrievalPassage> passageById = passageBuild.passages().stream()
+                    .collect(Collectors.toMap(
+                            RetrievalPassage::passageId,
+                            Function.identity(),
+                            (left, right) -> {
+                                throw new IllegalStateException("Duplicate B3 passage ID: " + left.passageId());
+                            },
+                            LinkedHashMap::new));
+            if (passageById.size() != passage.candidates().size()) {
+                throw new IllegalStateException("B3 passage/candidate identity parity failed");
+            }
+
+            List<PassageDenseQueryRanking> queryRankings = new ArrayList<>();
+            for (Query query : slice.queries()) {
+                OllamaBgeM3EmbeddingClient.EmbeddingBatch queryBatch = embeddingClient.embedOne(query.text());
+                float[] queryVector = queryBatch.embeddings().get(0);
+                long rankStarted = System.nanoTime();
+                List<RankedCandidate> fullRanking = rank(
+                        queryVector, query.userBundleId(), passage.candidates(), slice);
+                long rankNanos = System.nanoTime() - rankStarted;
+                long scopedCandidates = passage.candidates().stream()
+                        .filter(candidate -> candidate.spec().userBundleId().equals(query.userBundleId()))
+                        .count();
+                if (fullRanking.size() != scopedCandidates
+                        || fullRanking.stream().map(RankedCandidate::candidateId).distinct().count()
+                                != scopedCandidates) {
+                    throw new IllegalStateException("B3 full-ranking candidate identity parity failed");
+                }
+                UserBundle bundle = slice.bundles().stream()
+                        .filter(value -> value.userBundleId().equals(query.userBundleId()))
+                        .findFirst()
+                        .orElseThrow();
+                queryRankings.add(new PassageDenseQueryRanking(
+                        query,
+                        bundle.professionGroup(),
+                        nanosToMillis(queryBatch.elapsedNanos()),
+                        nanosToMillis(rankNanos),
+                        List.copyOf(fullRanking)));
+            }
+            splitRuns.add(new PassageDenseSliceRun(
+                    slice,
+                    Map.copyOf(passageById),
+                    passage.corpusStats(),
+                    passage.latency(),
+                    List.copyOf(queryRankings)));
+        }
+        return new PassageDenseRun(
+                1,
+                phase,
+                datasetVersions.iterator().next(),
+                modelMetadata,
+                List.copyOf(splitRuns));
+    }
+
     ExperimentReport run(
             List<DatasetSlice> slices,
             OllamaBgeM3EmbeddingClient embeddingClient,
@@ -1069,6 +1145,13 @@ final class SearchV3DenseAblationEngine {
         return List.copyOf(result);
     }
 
+    QueryProfileResult scoreRanking(
+            Query query,
+            List<RankedCandidate> ranking,
+            DatasetSlice slice) {
+        return queryResult(query, ranking, slice, 0L, 0L);
+    }
+
     private QueryProfileResult queryResult(
             Query query,
             List<RankedCandidate> ranking,
@@ -1739,6 +1822,30 @@ final class SearchV3DenseAblationEngine {
             List<String> coveredUnitIds,
             List<String> coveredGroupIds,
             List<String> coveredParentIds) {
+    }
+
+    record PassageDenseRun(
+            int schemaVersion,
+            String phase,
+            String datasetVersion,
+            OllamaBgeM3EmbeddingClient.ModelMetadata model,
+            List<PassageDenseSliceRun> slices) {
+    }
+
+    record PassageDenseSliceRun(
+            DatasetSlice dataset,
+            Map<String, RetrievalPassage> passageById,
+            ProfileCorpusStats corpusStats,
+            ProfileLatency corpusLatency,
+            List<PassageDenseQueryRanking> queries) {
+    }
+
+    record PassageDenseQueryRanking(
+            Query query,
+            String professionGroup,
+            double queryEmbeddingLatencyMs,
+            double denseRankingLatencyMs,
+            List<RankedCandidate> fullRanking) {
     }
 
     record QueryProfileResult(

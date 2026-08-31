@@ -1,6 +1,6 @@
 # PRZ-028 Tasks
 
-- 상태: `IN_PROGRESS / INPUT_FROZEN / IMPLEMENTATION_NOT_STARTED`
+- 상태: `IN_PROGRESS / INPUT_FROZEN / IMPLEMENTATION_VERIFIED / OFFICIAL_T0_T1_NOT_RUN`
 
 - [x] ORIENT: branch/HEAD/origin/main, PRZ-025/026 dependency와 clean worktree 확인
 - [x] ORIENT: PRZ-027 `NO_GO`를 제외한 B3 baseline 계보 확인
@@ -14,10 +14,13 @@
 - [x] AUDIT-DATA: 구현 전 qualifier/span/date operator/language consistency finding 확인
 - [x] DATA-CORRECTION: v1.0.0 보존, corrected v1.0.1 별도 materialize
 - [x] VERIFY-DATA-CORRECTION: v1.0.0/v1.0.1 byte/hash/lineage/SEALED guard 검증
-- [ ] INTEGRATE-DATA-CORRECTION: corrected v1.0.1 local input-freeze commit
-- [ ] IMPLEMENT: deterministic query constraint parser와 candidate observation extractor
-- [ ] IMPLEMENT: three-state evaluator와 full-ranking candidate-preserving stable partition
-- [ ] TEST: parser/evaluator/provenance/parity/stable order/SEALED guard
+- [x] INTEGRATE-DATA-CORRECTION: corrected v1.0.1 local input-freeze commit `3e3bf65`
+- [x] IMPLEMENT: deterministic query constraint parser와 candidate observation extractor
+- [x] IMPLEMENT: three-state evaluator와 full-ranking candidate-preserving stable partition
+- [x] IMPLEMENT: Gold-free runtime projection, exact top-5 nDCG, unit-state/hard-negative/latency metric
+- [x] TEST: parser/evaluator/provenance/parity/stable order/SEALED guard
+- [x] TEST: candidate identity, split 1:1, stale-rank, exact IDCG와 pre-registered verdict policy
+- [ ] INTEGRATE-CODE-FREEZE: 구현·runner·판정 계약 local commit
 - [ ] VERIFY: Original/Long-form/Robustness/Stress DEV/CAL T0/T1 공식 실행
 - [ ] VERIFY: extraction/match/ranking/type/user/hard-negative와 latency 기록
 - [ ] AUDIT: diff scope, sensitive data, SEALED hash/flags, OSS readiness

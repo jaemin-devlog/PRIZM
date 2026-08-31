@@ -1,6 +1,6 @@
 # PRZ-028 Search V3 Typed Exact Constraints
 
-- 상태: `IN_PROGRESS / STRESS_INPUT_FROZEN / IMPLEMENTATION_NOT_STARTED`
+- 상태: `IN_PROGRESS / STRESS_INPUT_FROZEN / IMPLEMENTATION_VERIFIED / OFFICIAL_T0_T1_NOT_RUN`
 - 기준 branch: `PRZ-028-typed-exact-constraints`
 - 기준 source: `PRZ-026-structural-parsing-parent-child@a7dbb12ea7c0a3f4a502c1ae0252177d9c78a8b9`
 - 선행 조건: `DEPENDS_ON_PRZ_025@5f8229f88251938dc5b34588676cc69edf409c99`, `DEPENDS_ON_PRZ_026_B3`
@@ -97,16 +97,20 @@ Runtime passage/DB ID는 허용하지 않는다. 기존 Original/Long-form/Robus
 ## 6. 평가와 acceptance criteria
 
 전체는 Recall@5/10/20, Top1, MRR, nDCG@5와 user-macro를 기록한다. nDCG relevance는 candidate가
-포함한 required `DIRECT_SUPPORT` Evidence Unit의 distinct count이고, 같은 query candidate set에서
-만든 ideal ordering으로 정규화한다. Typed subset은 constraint 및
+포함한 required `DIRECT_SUPPORT` Evidence Unit의 distinct count이며, 이미 상위 candidate에서 credit한
+Evidence Group은 이후 0 gain이다. gain은 `2^relevance-1`, discount는 `log2(rank+1)`을 사용한다. IDCG는
+candidate ID tie-break를 가진 exact top-5 dynamic search로 계산하며 greedy 근사치를 사용하지 않는다.
+Typed subset은 constraint 및
 observation extraction accuracy, `SATISFIED`/`CONTRADICTED` precision·recall, `UNKNOWN` rate,
 Top1/MRR/nDCG@5, direct rank win/loss/tie와 유형별·hard-negative 결과를 기록한다.
 Extraction exact match는 type, operator, normalized value/range, normalized unit, ordered normalized
 qualifier, precision/identifier와 `[start,end)`가 모두 같은 annotation item 단위로 계산한다. Precision과
 recall은 predicted item set과 frozen expected item set을 기준으로 하며 누락과 추가 추출을 모두 센다.
-Direct rank win/loss/tie 분모는 DIRECT_SUPPORT query다. NOT_SUPPORTED typed query는
-`SATISFIED@1` false-positive rate, top1 expected-state transition과 `CONTRADICTED` top1 count를 별도
-분모로 보고하며 no-answer threshold 성능으로 표현하지 않는다.
+Direct rank win/loss/tie 분모는 DIRECT_SUPPORT query다. NOT_SUPPORTED typed query는 runtime predicted
+`SATISFIED@1` 안전성, Gold-expected rank-1 state transition과 expected/predicted `CONTRADICTED@1`을
+분리해 기록한다. Stable partition 구조상 predicted `SATISFIED@1` 감소는 개선 metric이 될 수 없으므로,
+hard-negative 개선은 Gold-expected `CONTRADICTED@1` 감소로 판단하며 no-answer threshold 성능으로
+표현하지 않는다.
 
 필수 Gate:
 
@@ -119,7 +123,8 @@ Direct rank win/loss/tie 분모는 DIRECT_SUPPORT query다. NOT_SUPPORTED typed 
 - observation provenance와 gold/runtime 입력 분리; gold annotation은 partition 완료 뒤 metric
   계산에만 사용
 - typed query rank 품질의 실제 순증 또는 정직한 비채택 판정
-- query parsing, candidate parsing과 T1 추가 latency 측정; 별도 index/storage 0
+- query parsing, candidate별 observation parsing과 T1 추가 latency 측정; 별도 index/storage 0. 운영 Gate는
+  T1 added p95가 같은 실행의 shared B3 query-embedding p95와 Dense-ranking p95 합을 넘지 않아야 한다.
 - SEALED FINAL combined `e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383`,
   `opened=false`, `searchExecuted=false`, `CURRENT_FRESH_BASELINE=NOT_RUN`
 - Production·dependency·migration 변경 0
@@ -137,3 +142,24 @@ result와 semantic evaluation은 0건이어야 한다.
 
 판정은 `PROMISING`, `NEEDS_ADJUSTMENT`, `NO_GO` 중 하나다. 결과를 본 뒤 stress input, parser
 policy, ranking policy 또는 gold를 수정하지 않는다.
+
+## 7. Implementation freeze 계약
+
+구현은 evaluation-only `QUANTITY`, `DATE`, `IDENTIFIER_NUMBER`, `LITERAL_IDENTIFIER` parser,
+atomic `sourceText` observation extractor, three-state evaluator와 candidate-preserving stable partition이다.
+Parser/evaluator 입력에는 Gold·answerability·category·runtime DB ID가 없으며 Gold는 ranking 완료 뒤 metric에만
+결합한다. Query constraint extraction의 pure conformance는 24/24이며 observation은 25개 중 24 exact다.
+유일한 observation mismatch는 frozen U33 `community operations pilot` source와 annotation의
+`community operations` qualifier 차이로, input을 다시 바꾸거나 `pilot` 예외를 넣지 않는다. 그 영향으로
+104 unit-state 중 U33 두 label은 `CONTRADICTED→UNKNOWN`, 나머지 102개는 일치한다.
+
+Candidate quantity range observation은 v1에서 false exact match를 막기 위해 전체 span을 reserve하고
+`UNKNOWN`으로 둔다. 사전 없는 TitleCase-number 구조는 `Java 17`뿐 아니라 `Top 10`, `Phase 2`,
+`May 2025`도 typed로 볼 수 있는 공개 한계이며 결과를 본 뒤 blacklist를 추가하지 않는다.
+
+공식 판정의 hard gate는 candidate identity, parser-empty semantic order, suite별 Recall@5/10/20과 nDCG@5
+비열화 없음, predicted hard-negative `SATISFIED@1` 비증가, 운영 Gate와 persistent index/storage 0이다.
+`PROMISING`은 추가로 Stress Top1 또는 MRR 개선, direct win 최소 2건·loss 0, 최소 2 user와 2 typed kind의
+win, qualifier/date/identifier-number mismatch 각 family의 Gold-expected `CONTRADICTED@1` 감소를 모두
+요구한다. 일부 순증만 있으면 `NEEDS_ADJUSTMENT`, 순증이 없거나 hard gate가 깨지면 `NO_GO`다.
+공식 runner는 전달받은 code-freeze SHA와 실제 clean `HEAD`를 비교한 뒤에만 BGE를 실행한다.

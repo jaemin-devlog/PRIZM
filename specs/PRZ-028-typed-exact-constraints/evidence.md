@@ -1,6 +1,6 @@
 # PRZ-028 Evidence
 
-- 상태: `IN_PROGRESS / INPUT_FROZEN / BENCHMARK_NOT_RUN`
+- 상태: `IN_PROGRESS / INPUT_FROZEN / IMPLEMENTATION_VERIFIED / BENCHMARK_NOT_RUN`
 - 시작 branch / HEAD: `PRZ-027-cross-encoder-reranking@7271654b80ba7db3bc9cec89cba8ba1000660132`
 - 현재 branch base: `PRZ-028-typed-exact-constraints@a7dbb12ea7c0a3f4a502c1ae0252177d9c78a8b9`
 - `origin/main`: `2c8fd5c0d2f62b154642d703a0970389f8abed8e`
@@ -117,7 +117,45 @@ operator 의미를 분리했고 U36 Java query를 실제 mixed 문장으로 바�
 
 v1.0.1이 PRZ-028 구현과 공식 T0/T1의 유일한 stress input이다.
 
-## 5. 아직 생성되지 않은 근거
+## 5. Evaluation-only 구현 freeze 전 근거
+
+- 지원 kind: `QUANTITY`, `DATE`, `IDENTIFIER_NUMBER`, `LITERAL_IDENTIFIER`
+- runtime 입력: query text와 atomic EvidenceChild `sourceText`/provenance만 사용; Gold·category·answerability·
+  retrievalText·heading context·runtime DB ID 입력 0
+- ranking: 같은 full B3 후보를 `SATISFIED → UNKNOWN → CONTRADICTED`로 stable partition; 추가·삭제 0
+- semantic guard: parser-empty query는 원래 list object/order 그대로 보존
+- storage: persistent index/write 0; in-memory observation cache의 candidate/observation/payload count만 측정
+- nDCG: repeated group 0 gain, exponential gain, exact top-5 ideal search
+- code-freeze guard: 전달 SHA 형식뿐 아니라 실제 clean Git `HEAD` 일치 필수
+
+Pure DEV/CAL stress conformance는 query constraint `24/24 exact`, candidate observation `24/25 exact`
+(`precision=recall=F1=0.96`)이다. 남은 1건은 U33 source qualifier `community operations pilot`과
+frozen annotation `community operations`의 exact mismatch다. 이를 고치기 위해 fixture/gold를 재봉인하거나
+문자열 예외를 추가하지 않았다. Unit-state는 104개 중 102개 일치하며 남은 두 mismatch는
+`SV3-U33-Q01/Q02 × SV3-U33-P02-E01`의 expected `CONTRADICTED`, predicted `UNKNOWN`이다.
+
+Pre-freeze 독립 감사에서 발견해 수정한 항목:
+
+- query-dependent cosine score가 candidate Gold identity를 깨던 official 실행 차단
+- DEV/CAL strict stress 일부만 조용히 집계할 수 있던 split coverage gap
+- passage state를 104 unit label에 복제하던 state metric 오염
+- stale Dense rank, evaluator 이중 실행과 slice-total latency 표기
+- greedy IDCG가 nDCG를 1보다 크게 만들 수 있던 문제
+- predicted state를 hard-negative 개선으로 잘못 쓰던 metric과 단일-user PROMISING 가능성
+
+실제 검증:
+
+| 명령/검사 | 실제 결과 |
+| --- | --- |
+| 관련 typed/structural evaluation tests | `PASS`; 97 tests, failures/errors/skipped 0 |
+| corrected stress DEV/CAL inventory | `PASS`; 24 query / 25 observation / 104 state label |
+| query extraction pure conformance | `PASS`; 24/24 exact |
+| observation extraction pure conformance | `KNOWN_LIMITATION`; 24/25 exact, U33 1 mismatch |
+| unit-state pure conformance | `KNOWN_LIMITATION`; 102/104, U33 2 `CONTRADICTED→UNKNOWN` |
+| official BGE T0/T1 | `NOT_RUN` |
+| SEALED FINAL search/prediction/result | `NOT_RUN`; metadata/hash verification only |
+
+## 6. 아직 생성되지 않은 근거
 
 Extraction accuracy, observation accuracy, match precision/recall, T0/T1 ranking metric, latency와
 최종 판정은 모두 `NOT_RUN / NOT_VERIFIED`다. 실제 실행 전에는 이 절을 PASS로 바꾸지 않는다.

@@ -1,6 +1,6 @@
 # PRZ-028 Tasks
 
-- 상태: `IN_PROGRESS / INPUT_FROZEN / IMPLEMENTATION_VERIFIED / OFFICIAL_T0_T1_NOT_RUN`
+- 상태: `IN_PROGRESS / INPUT_FROZEN / OFFICIAL_T0_T1_RUN / NEEDS_ADJUSTMENT`
 
 - [x] ORIENT: branch/HEAD/origin/main, PRZ-025/026 dependency와 clean worktree 확인
 - [x] ORIENT: PRZ-027 `NO_GO`를 제외한 B3 baseline 계보 확인
@@ -20,10 +20,10 @@
 - [x] IMPLEMENT: Gold-free runtime projection, exact top-5 nDCG, unit-state/hard-negative/latency metric
 - [x] TEST: parser/evaluator/provenance/parity/stable order/SEALED guard
 - [x] TEST: candidate identity, split 1:1, stale-rank, exact IDCG와 pre-registered verdict policy
-- [ ] INTEGRATE-CODE-FREEZE: 구현·runner·판정 계약 local commit
-- [ ] VERIFY: Original/Long-form/Robustness/Stress DEV/CAL T0/T1 공식 실행
-- [ ] VERIFY: extraction/match/ranking/type/user/hard-negative와 latency 기록
-- [ ] AUDIT: diff scope, sensitive data, SEALED hash/flags, OSS readiness
-- [ ] INTEGRATE: 검증 결과와 판정 local commit
+- [x] INTEGRATE-CODE-FREEZE: 구현·runner·판정 계약 local commit `2e9c9ff`
+- [x] VERIFY: Original/Long-form/Robustness/Stress DEV/CAL T0/T1 공식 1회 실행
+- [x] VERIFY: extraction/match/ranking/type/user/hard-negative와 latency 기록
+- [x] AUDIT: result 문서 반영 후 diff scope, sensitive data, SEALED hash/flags, OSS readiness
+- [x] INTEGRATE: 검증 결과와 `NEEDS_ADJUSTMENT` 판정 local commit
 - [ ] INTEGRATE: push·PR·main merge — `NOT_RUN` (금지)
 - [ ] Sparse 실험 — `NOT_RUN` (후속 Gate)

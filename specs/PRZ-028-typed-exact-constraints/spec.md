@@ -1,6 +1,6 @@
 # PRZ-028 Search V3 Typed Exact Constraints
 
-- 상태: `IN_PROGRESS / STRESS_INPUT_FROZEN / IMPLEMENTATION_VERIFIED / OFFICIAL_T0_T1_NOT_RUN`
+- 상태: `IN_PROGRESS / STRESS_INPUT_FROZEN / OFFICIAL_T0_T1_RUN / NEEDS_ADJUSTMENT`
 - 기준 branch: `PRZ-028-typed-exact-constraints`
 - 기준 source: `PRZ-026-structural-parsing-parent-child@a7dbb12ea7c0a3f4a502c1ae0252177d9c78a8b9`
 - 선행 조건: `DEPENDS_ON_PRZ_025@5f8229f88251938dc5b34588676cc69edf409c99`, `DEPENDS_ON_PRZ_026_B3`
@@ -94,6 +94,10 @@ constraint core span에 선택적으로 포함하지 않는다.
 Runtime passage/DB ID는 허용하지 않는다. 기존 Original/Long-form/Robustness와 SEALED FINAL을
 덮어쓰지 않는다.
 
+최초 freeze `1.0.0`은 검색 전 독립 annotation 감사에서 qualifier/span 계약 결함이 발견되어
+`INVALID_INPUT_HISTORICAL`로 보존했다. 이를 덮어쓰지 않고 교정·재봉인한 `1.0.1`만 PRZ-028의
+공식 stress input으로 사용한다. 두 version의 변경 이유, lineage와 hash는 evidence에 고정한다.
+
 ## 6. 평가와 acceptance criteria
 
 전체는 Recall@5/10/20, Top1, MRR, nDCG@5와 user-macro를 기록한다. nDCG relevance는 candidate가
@@ -163,3 +167,17 @@ Candidate quantity range observation은 v1에서 false exact match를 막기 위
 win, qualifier/date/identifier-number mismatch 각 family의 Gold-expected `CONTRADICTED@1` 감소를 모두
 요구한다. 일부 순증만 있으면 `NEEDS_ADJUSTMENT`, 순증이 없거나 hard gate가 깨지면 `NO_GO`다.
 공식 runner는 전달받은 code-freeze SHA와 실제 clean `HEAD`를 비교한 뒤에만 BGE를 실행한다.
+
+## 8. 공식 DEV/CAL 판정
+
+Code freeze `2e9c9ff2fb21744a6fea9b8bcf03962e392c84f8`에서 공식 T0/T1을 한 번 실행했다.
+Candidate identity `93/93`, parser-empty semantic order `57/57`, 모든 suite의 Recall@5/10/20과
+nDCG@5 비열화 없음, persistent index/storage 0으로 hard gate는 통과했다. 그러나 Typed Stress의
+DIRECT_SUPPORT 13문항은 T0부터 Top1/MRR이 1.0이어서 T1 direct win/loss/tie가 `0/0/13`이었고,
+qualifier mismatch family도 Gold-expected rank-1 contradiction `0→0`으로 개선을 입증하지 못했다.
+
+NOT_SUPPORTED typed hard negative 11문항에서는 Gold-expected `CONTRADICTED@1`이 `7→1`로 줄었다.
+이는 잘못된 명시값을 Top1에서 뒤로 보내는 제한된 순증이지만 직접 순위 Gate와 세 mismatch family
+Gate를 모두 충족하지 못하므로 판정은 `NEEDS_ADJUSTMENT`다. Production 채택과 Sparse 후속 실험은
+승인하지 않는다. 현재 input·code freeze 결과는 `HISTORICAL_RESULT`로 보존하며 parser, gold 또는
+판정 정책을 바꾸는 후속 조정은 새 dataset version과 새 freeze가 필요하다.

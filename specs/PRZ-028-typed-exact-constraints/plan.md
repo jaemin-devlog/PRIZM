@@ -1,6 +1,6 @@
 # PRZ-028 Plan
 
-- 상태: `IN_PROGRESS / INPUT_FROZEN / IMPLEMENTATION_VERIFIED / OFFICIAL_T0_T1_NOT_RUN`
+- 상태: `IN_PROGRESS / INPUT_FROZEN / OFFICIAL_T0_T1_RUN / NEEDS_ADJUSTMENT`
 - 허용 단계: `ORIENT → SPEC → PLAN → IMPLEMENT(evaluation-only) → VERIFY → AUDIT → INTEGRATE(commit only)`
 - baseline: PRZ-026 B3; PRZ-027 Cross Encoder `NO_GO` 제외
 
@@ -46,3 +46,16 @@ Stress Set 봉인 뒤 fixture/gold 또는 parser/ranking policy 의미 변경이
 source provenance, Production/SEALED 불변 중 하나라도 실패하면 결과 판정 전에 중단한다.
 
 PR, push, merge와 Sparse 실험은 실행하지 않는다.
+
+## 5. 공식 결과와 다음 조정 Gate
+
+- code freeze: `2e9c9ff2fb21744a6fea9b8bcf03962e392c84f8`
+- official T0/T1: DEV/CAL 4 suite, 1회 실행, `NEEDS_ADJUSTMENT`
+- 유지된 Gate: candidate/semantic parity, Recall, nDCG, latency envelope, persistent storage 0
+- 미측정: exact additional heap (`NOT_MEASURED`)
+- 관찰된 순증: typed hard-negative Gold-expected `CONTRADICTED@1` `7→1`
+- 미충족 Gate: direct rank improvement, distinct winning users/kinds, qualifier mismatch improvement
+
+따라서 현재 freeze에서 추가 튜닝이나 공식 재실행을 하지 않는다. 다음 작업이 parser·gold·stress 구성의
+의미를 바꾸면 기존 결과를 historical로 유지하고 새 version/input/code freeze를 만든다. PRZ-028의
+조정 또는 비채택 결정을 먼저 끝내며 Sparse 실험은 `NOT_RUN`을 유지한다.

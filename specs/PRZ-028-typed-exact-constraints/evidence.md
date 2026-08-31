@@ -1,6 +1,6 @@
 # PRZ-028 Evidence
 
-- 상태: `IN_PROGRESS / INPUT_FROZEN / IMPLEMENTATION_VERIFIED / BENCHMARK_NOT_RUN`
+- 상태: `IN_PROGRESS / INPUT_FROZEN / OFFICIAL_T0_T1_RUN / NEEDS_ADJUSTMENT`
 - 시작 branch / HEAD: `PRZ-027-cross-encoder-reranking@7271654b80ba7db3bc9cec89cba8ba1000660132`
 - 현재 branch base: `PRZ-028-typed-exact-constraints@a7dbb12ea7c0a3f4a502c1ae0252177d9c78a8b9`
 - `origin/main`: `2c8fd5c0d2f62b154642d703a0970389f8abed8e`
@@ -37,7 +37,7 @@ Parent Context, Parent Dense, Cross Encoder와 QueryPlanner는 사용하지 않�
   `e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383`
 - flags: `opened=false`, `searchExecuted=false`
 - `CURRENT_FRESH_BASELINE=NOT_RUN`
-- T0/T1/Stress benchmark: `NOT_RUN`
+- DEV/CAL T0/T1: code freeze에서 공식 1회 실행
 - Production/dependency/migration/frontend/MCP/Docker 변경: `0`
 
 ## 3. 최초 Typed Stress input freeze — INVALID_INPUT_HISTORICAL
@@ -117,7 +117,7 @@ operator 의미를 분리했고 U36 Java query를 실제 mixed 문장으로 바�
 
 v1.0.1이 PRZ-028 구현과 공식 T0/T1의 유일한 stress input이다.
 
-## 5. Evaluation-only 구현 freeze 전 근거
+## 5. Evaluation-only 구현과 code freeze 근거
 
 - 지원 kind: `QUANTITY`, `DATE`, `IDENTIFIER_NUMBER`, `LITERAL_IDENTIFIER`
 - runtime 입력: query text와 atomic EvidenceChild `sourceText`/provenance만 사용; Gold·category·answerability·
@@ -152,10 +152,139 @@ Pre-freeze 독립 감사에서 발견해 수정한 항목:
 | query extraction pure conformance | `PASS`; 24/24 exact |
 | observation extraction pure conformance | `KNOWN_LIMITATION`; 24/25 exact, U33 1 mismatch |
 | unit-state pure conformance | `KNOWN_LIMITATION`; 102/104, U33 2 `CONTRADICTED→UNKNOWN` |
-| official BGE T0/T1 | `NOT_RUN` |
+| official BGE T0/T1 | code freeze 전 당시 `NOT_RUN` |
 | SEALED FINAL search/prediction/result | `NOT_RUN`; metadata/hash verification only |
 
-## 6. 아직 생성되지 않은 근거
+## 6. 공식 T0/T1 실행
 
-Extraction accuracy, observation accuracy, match precision/recall, T0/T1 ranking metric, latency와
-최종 판정은 모두 `NOT_RUN / NOT_VERIFIED`다. 실제 실행 전에는 이 절을 PASS로 바꾸지 않는다.
+- code freeze commit: `2e9c9ff2fb21744a6fea9b8bcf03962e392c84f8`
+- official input freeze: `3e3bf652c5661a5bab34eb68e174dcea7459d6b5`
+- official stress: `search-v3-typed-constraints-stress-1.0.1`, combined
+  `96c1ddc6cbdd6722619d7806cbe418babc414c0d5179af84d4694a94c8ed015b`
+- model: `bge-m3:latest`, digest
+  `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`, 1024 dimensions, cosine
+- raw local report: `local/search-v3-evaluation/prz028/typed-constraint-t1.json`
+- report SHA-256: `5bc0016a4807af099b0aff3e1fff76c63a1271a82c8f52b56dd660b2cae50d9e`
+- 실행 횟수: 공식 BGE T0/T1 `1`
+
+공식 실행은 ignored local init script로 test JVM에 freeze SHA를 전달했고, runner가 실제 clean `HEAD`와
+SHA 일치를 검증한 뒤에만 시작했다. T0/T1은 query embedding과 full B3 Dense ranking을 공유했다.
+실행 명령은 `gradlew.bat --init-script local/search-v3-evaluation/prz028/code-freeze.init.gradle
+searchEvaluation --tests com.prizm.search.evaluation.searchv3.structural.Prz028TypedConstraintBenchmarkTest
+--rerun-tasks`였고 `1/1 PASS`였다.
+
+### 6.1 Candidate·semantic·retrieval parity
+
+| suite | query | candidate identity | parser-empty semantic order | Recall@5/10/20 T0→T1 |
+| --- | ---: | ---: | ---: | --- |
+| Original Seed | 21 | 21/21 | 15/15 | `1/1/1 → 1/1/1` |
+| Long-form | 24 | 24/24 | 19/19 | `1/1/1 → 1/1/1` |
+| Robustness | 24 | 24/24 | 23/23 | `1/1/1 → 1/1/1` |
+| Typed Stress | 24 | 24/24 | 0/0 | `1/1/1 → 1/1/1` |
+| 합계 | 93 | 93/93 | 57/57 | 비열화 0 |
+
+후보 추가·삭제·중복은 0이며 parser-empty query는 candidate ID와 순서가 완전히 같았다. 모든 suite의
+nDCG@5도 비열화하지 않았다.
+
+### 6.2 Ranking과 user-macro
+
+| suite | direct query | query-micro Top1 T0→T1 | MRR T0→T1 | nDCG@5 T0→T1 | direct W/L/T |
+| --- | ---: | --- | --- | --- | --- |
+| Original Seed | 14 | `0.9286→0.9286` | `0.9643→0.9643` | `0.9736→0.9736` | `0/0/14` |
+| Long-form | 15 | `0.8000→0.8000` | `0.8833→0.8833` | `0.9128→0.9128` | `0/0/15` |
+| Robustness | 24 | `1.0000→1.0000` | `1.0000→1.0000` | `1.0000→1.0000` | `0/0/24` |
+| Typed Stress | 13 | `1.0000→1.0000` | `1.0000→1.0000` | `1.0000→1.0000` | `0/0/13` |
+
+User-macro도 Original `Top1 0.9333 / MRR 0.9667 / nDCG 0.9754`, Long-form
+`0.8333 / 0.9028 / 0.9274`, Robustness와 Stress `1/1/1`로 T0/T1이 같았다. Stress의 6 profession과
+KO/EN/KO_EN_MIXED slice 모두 Top1/MRR `1→1`, 신규 direct regression 0이었다. Direct win도 0이라
+winning user와 typed kind는 각각 0이다.
+
+### 6.3 Extraction과 three-state 판정
+
+| 항목 | 실제 결과 |
+| --- | --- |
+| query constraint extraction | `24/24 exact`; precision/recall/F1 `1/1/1` |
+| candidate observation extraction | `24/25 exact`; precision/recall/F1 `0.96/0.96/0.96` |
+| unit-state accuracy | `102/104 = 0.9808` |
+| SATISFIED | expected 13 / predicted 13 / correct 13; precision/recall `1/1` |
+| CONTRADICTED | expected 19 / predicted 17 / correct 17; precision/recall `1/0.8947` |
+| UNKNOWN | expected 72 / predicted 74 / correct 72; precision/recall `0.9730/1` |
+
+두 state mismatch는 모두 U33 `community operations pilot` source와 frozen annotation
+`community operations` qualifier 차이에서 발생한 expected `CONTRADICTED`, predicted `UNKNOWN`이다.
+결과를 본 뒤 qualifier 예외, ontology 또는 gold 수정은 하지 않았다.
+
+Typed kind별 direct Top1/MRR은 모두 `1→1`이었다: QUANTITY 6, DATE 3, IDENTIFIER_NUMBER 2,
+LITERAL_IDENTIFIER 2 direct query. Numeric qualifier mismatch family는 Gold-expected
+`CONTRADICTED@1 0→0`으로 비열화는 없지만 개선 기회도 입증하지 못했다. Date mismatch는 `2→0`,
+identifier-number mismatch는 `2→0`으로 개선됐다.
+
+### 6.4 Hard negative
+
+Typed `NOT_SUPPORTED` 11문항에서 predicted `SATISFIED@1`은 `0→0`으로 안전성 비열화를 만들지
+않았다. Predicted `CONTRADICTED@1`은 `7→0`, Gold-expected `CONTRADICTED@1`은 `7→1`이었다.
+여섯 개선은 wrong quantity, date-before 2건, range/wrong-value, HTTP/3 mismatch, Java 21 mismatch다.
+남은 1건은 U33 qualifier mismatch 때문에 runtime은 `UNKNOWN`이지만 frozen Gold는
+`CONTRADICTED`인 제한 사항이다. 이는 no-answer threshold 성능으로 표현하지 않는다.
+
+### 6.5 운영 관찰
+
+Stress에서 query parse p95 `0.1673 ms`, one-time candidate observation parse p95 `0.3340 ms`,
+match/partition p95 `0.0567 ms`, online added p95 `0.1885 ms`였다. 같은 실행의 shared query embedding
+p95 `36.5127 ms`와 Dense ranking p95 `0.1671 ms` 합보다 작아 사전 latency envelope Gate를 통과했다.
+Persistent index/storage 0 Gate도 통과했지만 exact additional heap은 측정하지 않았다. T0/T1
+end-to-end p95는 `36.6063→36.7628 ms`였다. Suite별 online added p95는 Original `2.5701 ms`,
+Long-form `0.2664 ms`, Robustness `0.2002 ms`, Stress `0.1885 ms`이며 모두 각 shared B3 envelope 안이다.
+
+Stress observation cache는 24 candidate / 25 observation / canonical payload 2,854 UTF-8 bytes였고
+persistent index/storage write는 `0/0`이다. JVM heap point observation은
+`22,800,480→47,307,296 bytes`였지만 실행 전체를 포함한 비격리 관찰이므로 Typed Exact 메모리
+증가로 해석하지 않는다. Exact additional heap은 `NOT_MEASURED`다.
+
+### 6.6 판정
+
+Candidate/semantic parity, Recall, nDCG, predicted SATISFIED@1 안전성, latency envelope와 persistent
+storage 0 hard gate는 모두 통과했다. Exact additional heap은 `NOT_MEASURED`다. 하지만 Typed Stress
+direct Top1/MRR 순증, 최소 2 direct win, 복수 winning user/kind와
+qualifier/date/identifier-number 세 family 전부의 개선 조건은 충족하지 못했다. Hard-negative의
+Gold-expected contradiction `7→1`은 제한된 순증이므로 사전 정책에 따른 최종 판정은
+`NEEDS_ADJUSTMENT`다.
+
+현재 T1은 Production 채택 대상이 아니며 Sparse 단계 진입 근거도 아니다. 후속 조정은 direct ranking
+개선 기회가 있는 새 stress version과 qualifier observation 계약을 먼저 재동결해야 한다. 현재 input,
+code와 결과는 `HISTORICAL_RESULT`로 보존한다.
+
+## 7. SEALED FINAL과 금지 범위 확인
+
+- SEALED FINAL combined:
+  `e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383`
+- `opened=false`, `searchExecuted=false`; PRZ-028 official evaluator의 semantic
+  access/prediction/result `false/false/false`
+- `CURRENT_FRESH_BASELINE=NOT_RUN`
+- Production/dependency/migration/frontend/MCP/Docker 변경: `0`
+- Sparse, PR, push, merge: `NOT_RUN`
+
+PRZ-025 integrity validator는 요청된 기존 integrity test로서 SEALED fixture를 schema/source/hash
+검증 목적으로 읽었지만 embedding, retrieval, ranking, prediction과 result는 생성하지 않았다. 이는
+PRZ-028 official evaluator의 SEALED semantic access가 아니며 manifest flags와 tracked bytes를 바꾸지
+않았다.
+
+## 8. 최종 검증
+
+| 명령/검사 | 실제 결과 |
+| --- | --- |
+| official T0/T1 benchmark | `PASS`; code freeze에서 1/1, 이후 재실행 0 |
+| 관련 non-BGE searchEvaluation unit/regression | `PASS`; 14 suites / 116 tests, failure/error/skipped 0 |
+| PRZ-025 validator unit | `PASS`; 18/18 |
+| PRZ-025 validator CLI | `PASS`; `FRESH_BENCHMARK_SEED_FROZEN`, Final search false |
+| v1.0.0 / v1.0.1 stress materializer `--check` | `PASS`; `693331c...` / `96c1ddc...` |
+| `node scripts/verify-oss-readiness.mjs` | `PASS`; Markdown 193, local links 766, verifier 16/16, external 97/97 |
+| `git diff --check` | `PASS` |
+| code-freeze 대비 forbidden scope audit | `PASS`; PRZ-028 문서 4개 외 변경 0 |
+| SEALED manifest blob/hash/flags | `PASS`; 기준 HEAD와 동일, `e5b315...`, false/false |
+| full backend/integration/frontend/Docker | `NOT_RUN`; evaluation-only 변경에 불필요 |
+
+독립 read-only audit에서 metric 수치, 문서 상태, Production/SEALED 경계와 금지 경로 diff를 다시
+대조했다. 이 검증은 공식 BGE benchmark를 재실행하거나 결과를 보고 parser/gold/policy를 수정하지
+않았다.

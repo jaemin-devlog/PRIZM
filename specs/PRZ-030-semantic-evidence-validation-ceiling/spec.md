@@ -11,8 +11,10 @@
 
 동결된 B3 owner-scoped Dense Top20에 완벽한 semantic Evidence Validator가 있다고
 가정했을 때의 품질 상한만 측정한다. S0는 B3 Dense 순서, O1은 같은 후보를
-`DIRECT_SUPPORT → RELATED → CONTRADICTS → INSUFFICIENT`로 stable partition한 Gold
-Oracle이다. O1은 평가 전용이며 runtime/Production 구현이 아니다.
+`DIRECT_SUPPORT → RELATED → CONTRADICTS → INSUFFICIENT → UNJUDGED`로 stable
+partition한 Gold Oracle이다. 마지막 bucket은 expectedEvidence에 없는 candidate를
+근거 없이 `INSUFFICIENT`로 단정하지 않기 위한 평가 무결성 경계다. O1은 평가 전용이며
+runtime/Production 구현이 아니다.
 
 일반 semantic validator, NLI/LLM/Cross Encoder, Sparse, FTS/BM25, RRF, Parent Dense,
 QueryPlanner/rewrite, MMR, Grounded Answer와 신규 모델은 `NOT_RUN`이다. PRZ-029 Typed
@@ -20,8 +22,9 @@ Validation/Selection은 변경하지 않고 핵심 집계에서 제외한다.
 
 ## 2. 입력과 coverage
 
-Original Seed, Long-form 1.1.0, Robustness 1.0.0 DEV/CAL의 69 semantic query를 그대로
-사용한다. 사전 감사에서 `RELATED` 2건, `PARTIALLY_SUPPORTED` 2건,
+Original Seed, Long-form 1.1.0, Robustness 1.0.0 DEV/CAL의 기존 69 query를 그대로
+감사한다. 검색 전 typed parser 기준으로 이 중 semantic core 55건과 typed-overlap 14건을
+분리한다. 사전 Gold coverage 감사에서 `RELATED` 2건, `PARTIALLY_SUPPORTED` 2건,
 semantic paraphrase/abstract negative 0건, other-actor/negation positive 0건이 확인돼
 `semantic-support-stress-1.0.1`을 추가한다. 기존 Robustness의 여섯 synthetic
 문서와 bundle/split을 재사용하고, 신규 문서는 만들지 않는다.
@@ -31,6 +34,11 @@ Stress는 DEV 12 / CALIBRATION 12 query, 6 bundles, KO/EN 및 여러 직무를
 relation, other actor, negation, completion state, related mention, abstract competency, semantic
 paraphrase를 교차한다. source span·owner·version·split·lineage·SHA-256 검증 후
 `INPUT_FROZEN`으로 봉인하며 검색 결과로 수정하지 않는다.
+
+기존 세 suite의 B3 후보는 동결 raw ranking을 exact replay하므로 model call은 0이다.
+신규 Stress만 `INPUT_FROZEN` 이후 동일한 BGE-M3로 B3 후보를 한 번 export한다. 이는 새
+semantic validator/model inference가 아니라 고정 baseline 후보 생성이며, Gold는 네 suite의
+candidate freeze가 모두 검증된 뒤에만 연다.
 
 초기 `1.0.0`은 retrieval/model 실행 전에 PARTIALLY_SUPPORTED가 required aspect의
 DIRECT_SUPPORT를 포함하지 않는 계약 오류가 발견돼 철회했다. `1.0.1`은 일부 required
@@ -57,9 +65,10 @@ source-grounded DIRECT inventory로 계산하지만, graded relation과 false-po
 
 PRZ-025의 multi-aspect 계약을 적용한다. `PARTIALLY_SUPPORTED`는 required aspect 중
 일부에 DIRECT가 있고 다른 required aspect는 직접 입증되지 않은 상태다. 따라서 ceiling
-state는 supported의 모든 required aspect를 Top20 DIRECT가 충족하면 `FOUND`, partial의
-DIRECT aspect가 Top20에 있으면 `PARTIAL`, Gold가 not-supported이면 `NONE`, 나머지는
-`UNRESOLVED`다. 요청서의 "DIRECT 없이 RELATED가 있는 partial" 정의는 PRZ-025 계약과
+state는 supported의 모든 required aspect/group을 Top20 DIRECT가 충족하면 `FOUND`, partial의
+모든 direct-bearing required aspect/group을 Top20이 충족하면 `PARTIAL`, Gold가
+not-supported이면 `NONE`, 나머지는 `UNRESOLVED`다. 요청서의 "DIRECT 없이 RELATED가 있는
+partial" 정의는 PRZ-025 계약과
 충돌해 retrieval 실행 전에 이 문구로 바로잡았으며, 그런 입력은 validator가 거부한다.
 - direct-positive query: expected relation에 DIRECT_SUPPORT가 하나라도 있는 query.
 - failure stage: supported와 valid partial을 포함한 direct-positive는
@@ -78,6 +87,15 @@ suite를 합치지 않고 Original, Long-form, Robustness, Stress를 각각 보�
 query-micro/user-macro와 profession, language, other-actor, negation, completion, abstract,
 paraphrase slice를 함께 보고한다. S0/O1에서 Direct Recall@5/20, Top1, MRR, nDCG@5,
 ceiling state accuracy, no-support risk, failure stage를 측정한다.
+
+Direct Recall@5/20은 단순 DIRECT 한 건이 아니라 Gold aspect/group 요구가 해당 cutoff에서
+충족되는지를 뜻한다. multi-aspect required evidence 일부만 후보에 있으면
+`RETRIEVAL_MISS`다. Top1/MRR은 이와 별개로 첫 DIRECT Evidence의 ranking 위치를 측정한다.
+
+공식 실행 전에 `DeterministicTypedQueryParser`가 빈 결과를 내는 query만 semantic core로
+동결했다. 전체 93건 중 semantic core 79건을 Gate·전체 핵심 집계에 사용하고, typed-overlap
+14건은 별도 diagnostic(`decision weight=0`)으로만 남긴다. ordered query ID/track inventory의
+SHA-256은 `6eb8db7e2cbbb4c4821e857dc3c72f70526c0014abf99fcc596951588cdd02c4`다.
 
 다음 중 하나라도 만족하면 `CAPABILITY_GATE=PASS`다.
 

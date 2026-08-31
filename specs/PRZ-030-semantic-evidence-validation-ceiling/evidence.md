@@ -12,8 +12,9 @@
 
 ## 1. 검색 전 coverage audit
 
-Typed Stress를 제외한 Gold metadata만 읽었고 retrieval/model/SEALED semantic artifact는
-실행하지 않았다.
+Typed Stress를 제외한 기존 69 query의 Gold metadata만 읽었고 retrieval/model/SEALED
+semantic artifact는 실행하지 않았다. 이후 Gold-free typed parser inventory에서 기존
+69건은 semantic core 55건 / typed-overlap 14건으로 분리됐다.
 
 | dataset | query / bundles | answerability S/P/N | DIRECT / RELATED / CONTRADICTS / INSUFFICIENT query |
 | --- | ---: | ---: | ---: |
@@ -49,6 +50,10 @@ compound query 2건뿐이다. 따라서 기존 자산은 ranking smoke/positive 
 - runtime question schema: `queryId / userBundleId / query / language` only
 - freeze 시점 execution: retrieval `false`, embedding `false`, SEALED access `false`
 
+공식 실행 정책은 기존 Original/Long-form/Robustness B3 ranking의 exact replay(model call 0)와
+Stress의 freeze 후 동일 BGE-M3 B3 candidate export 1회만 허용한다. semantic validator,
+추가 모델, Gold 선행 접근은 허용하지 않는다.
+
 독립 input-freeze audit에서 root manifest가 Gold 분포와 Gold payload hash를 포함한 채
 pre-freeze runtime loader에 노출되는 문제를 발견했다. 결과 실행 전에 Gold-free
 `runtime-manifest.json`을 분리했고, candidate freeze는 runtime SHA만 사용한다. full input
@@ -59,6 +64,24 @@ stress loader를 evaluation-only 신규 파일로 격리했다. ExpectedEvidence
 `INSUFFICIENT`로 추정하지 않고 `UNJUDGED`로 보존한다. Focused 검사 26건은
 `PASS 25 / SKIPPED 1`이며 skipped 1건은 opt-in 공식 benchmark다. 이 검증은
 모델/benchmark 실행이 아니다.
+
+독립 input audit는 runtime/full manifest canonical bytes와 SHA, 24개 source span/anchor,
+owner/document/version, query identity, aspect/relation 합집합, partial 8건의 multi-aspect 계약,
+split·generator lineage를 다시 계산했고 finding 0이었다. 이후 Gold join/runner 통합 검사는
+최종 강제 재실행 기준 `PASS 36 / SKIPPED 1 / FAIL 0`이었다. skipped 1건은 여전히 opt-in 공식 benchmark이며 raw
+report는 생성되지 않았다.
+
+공식 실행 전 query track도 고정했다. 전체 93건 중 `DeterministicTypedQueryParser`가 비어 있는
+semantic core는 79건, typed-overlap은 14건이다. Gate, user-macro, profession/language/focus
+slice는 semantic core만 사용하고 typed-overlap은 `DIAGNOSTIC_ONLY_DECISION_WEIGHT_0`이다.
+ordered ID/track inventory SHA-256은
+`6eb8db7e2cbbb4c4821e857dc3c72f70526c0014abf99fcc596951588cdd02c4`다. 이 분류는 candidate
+생성/BGE/Gold load 전에 검증된다.
+
+코드 동결 전 교차 검토에서 multi-aspect query가 일부 DIRECT aspect만 Top20에 있어도
+recoverable로 분류될 수 있는 오류를 발견했다. 실행 전에 Recall@5/20과 failure stage를
+required aspect/group completeness 기준으로 교정했다. Top1/MRR은 첫 DIRECT Evidence
+ranking이라는 별도 의미를 유지한다.
 
 ## 3. 시작 무결성
 

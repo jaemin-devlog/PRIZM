@@ -55,9 +55,10 @@ final class SearchV3OracleCeilingEvaluator {
             boolean relatedCandidate = s0.stream()
                     .anyMatch(value -> value.relation() == OracleRelation.RELATED);
             CeilingState ceilingState = ceilingState(gold, s0);
-            FailureStage failureStage = failureStage(
-                    gold.answerability(), directPositive, directCandidate, relatedCandidate, s0);
             CeilingState expectedState = expectedState(gold.answerability());
+            FailureStage failureStage = failureStage(
+                    gold.answerability(), directPositive, directCandidate, relatedCandidate,
+                    ceilingState, expectedState, s0);
             results.add(new QueryResult(
                     query.queryId(),
                     query.userBundleId(),
@@ -70,8 +71,8 @@ final class SearchV3OracleCeilingEvaluator {
                     expectedState,
                     ceilingState == expectedState,
                     failureStage,
-                    rankingMetrics(s0, directPositive),
-                    rankingMetrics(o1, directPositive),
+                    rankingMetrics(s0, gold),
+                    rankingMetrics(o1, gold),
                     s0,
                     o1));
         }
@@ -216,9 +217,16 @@ final class SearchV3OracleCeilingEvaluator {
                     throw new IllegalArgumentException("duplicate Gold aspect: " + left.aspectId());
                 },
                 LinkedHashMap::new));
+        Set<String> expressionRequiredIds = new LinkedHashSet<>(expression.requiredAspectIds());
+        Set<String> declaredRequiredIds = gold.aspects().stream()
+                .filter(GoldAspect::required)
+                .map(GoldAspect::aspectId)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
         if (aspectById.isEmpty()
                 || expression.requiredAspectIds().isEmpty()
                 || !aspectById.keySet().containsAll(expression.requiredAspectIds())
+                || expressionRequiredIds.size() != expression.requiredAspectIds().size()
+                || !expressionRequiredIds.equals(declaredRequiredIds)
                 || expression.minShouldMatch() < 1
                 || expression.minShouldMatch() > expression.requiredAspectIds().size()) {
             throw new IllegalArgumentException("Gold aspect expression is invalid");
@@ -316,15 +324,48 @@ final class SearchV3OracleCeilingEvaluator {
         if (gold.answerability() == GoldAnswerability.NOT_SUPPORTED) {
             return CeilingState.NONE;
         }
-        Set<String> hitDirectUnits = ranking.stream()
+        Set<String> hitDirectUnits = hitDirectUnits(gold, ranking, ranking.size());
+        if (gold.answerability() == GoldAnswerability.PARTIALLY_SUPPORTED) {
+            return directRequirementsMet(gold, hitDirectUnits)
+                    ? CeilingState.PARTIAL : CeilingState.UNRESOLVED;
+        }
+        return requirementsMet(gold, hitDirectUnits) ? CeilingState.FOUND : CeilingState.UNRESOLVED;
+    }
+
+    private Set<String> hitDirectUnits(
+            QueryGold gold,
+            List<OracleCandidate> ranking,
+            int cutoff) {
+        return ranking.stream()
+                .limit(cutoff)
                 .flatMap(candidate -> gold.coveredEvidenceUnitIdsByCandidateId()
                         .getOrDefault(candidate.candidate().candidateId(), List.of()).stream())
                 .filter(unitId -> expectedRelation(gold, unitId) == OracleRelation.DIRECT_SUPPORT)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
-        if (gold.answerability() == GoldAnswerability.PARTIALLY_SUPPORTED) {
-            return hitDirectUnits.isEmpty() ? CeilingState.UNRESOLVED : CeilingState.PARTIAL;
+    }
+
+    private boolean directRequirementsMet(QueryGold gold, Set<String> hitDirectUnits) {
+        if (gold.answerability() != GoldAnswerability.PARTIALLY_SUPPORTED) {
+            return requirementsMet(gold, hitDirectUnits);
         }
-        return requirementsMet(gold, hitDirectUnits) ? CeilingState.FOUND : CeilingState.UNRESOLVED;
+        List<GoldAspect> directRequiredAspects = gold.aspects().stream()
+                .filter(GoldAspect::required)
+                .filter(aspect -> aspect.expectedEvidence().stream()
+                        .anyMatch(expected -> expected.relation() == OracleRelation.DIRECT_SUPPORT))
+                .toList();
+        return !directRequiredAspects.isEmpty()
+                && directRequiredAspects.stream()
+                        .allMatch(aspect -> aspectRequirementsMet(aspect, hitDirectUnits));
+    }
+
+    private boolean aspectRequirementsMet(GoldAspect aspect, Set<String> hitDirectUnits) {
+        Set<String> directGroups = aspect.expectedEvidence().stream()
+                .filter(expected -> expected.relation() == OracleRelation.DIRECT_SUPPORT)
+                .filter(expected -> hitDirectUnits.contains(expected.evidenceUnitId()))
+                .map(ExpectedGoldEvidence::evidenceGroupId)
+                .collect(Collectors.toSet());
+        return directGroups.containsAll(aspect.requiredEvidenceGroupIds())
+                && directGroups.size() >= aspect.minEvidenceGroups();
     }
 
     private OracleRelation expectedRelation(QueryGold gold, String evidenceUnitId) {
@@ -339,15 +380,7 @@ final class SearchV3OracleCeilingEvaluator {
     private boolean requirementsMet(QueryGold gold, Set<String> hitDirectUnits) {
         Map<String, Boolean> satisfied = new LinkedHashMap<>();
         for (GoldAspect aspect : gold.aspects()) {
-            Set<String> directGroups = aspect.expectedEvidence().stream()
-                    .filter(expected -> expected.relation() == OracleRelation.DIRECT_SUPPORT)
-                    .filter(expected -> hitDirectUnits.contains(expected.evidenceUnitId()))
-                    .map(ExpectedGoldEvidence::evidenceGroupId)
-                    .collect(Collectors.toSet());
-            satisfied.put(
-                    aspect.aspectId(),
-                    directGroups.containsAll(aspect.requiredEvidenceGroupIds())
-                            && directGroups.size() >= aspect.minEvidenceGroups());
+            satisfied.put(aspect.aspectId(), aspectRequirementsMet(aspect, hitDirectUnits));
         }
         long hit = gold.aspectExpression().requiredAspectIds().stream()
                 .filter(id -> Boolean.TRUE.equals(satisfied.get(id)))
@@ -362,8 +395,13 @@ final class SearchV3OracleCeilingEvaluator {
             boolean directPositive,
             boolean directCandidate,
             boolean relatedCandidate,
+            CeilingState ceilingState,
+            CeilingState expectedState,
             List<OracleCandidate> s0) {
         if (directPositive) {
+            if (ceilingState != expectedState) {
+                return FailureStage.RETRIEVAL_MISS;
+            }
             if (s0.get(0).relation() == OracleRelation.DIRECT_SUPPORT) {
                 return FailureStage.ALREADY_CORRECT;
             }
@@ -388,15 +426,16 @@ final class SearchV3OracleCeilingEvaluator {
         };
     }
 
-    private RankingMetrics rankingMetrics(List<OracleCandidate> ranking, boolean directPositive) {
+    private RankingMetrics rankingMetrics(List<OracleCandidate> ranking, QueryGold gold) {
+        boolean directPositive = gold.goldDirectPositive();
         Integer firstDirect = ranking.stream()
                 .filter(value -> value.relation() == OracleRelation.DIRECT_SUPPORT)
                 .map(OracleCandidate::oracleRank)
                 .findFirst()
                 .orElse(null);
         return new RankingMetrics(
-                directPositive && firstDirect != null && firstDirect <= 5,
-                directPositive && firstDirect != null && firstDirect <= 20,
+                directPositive && directRequirementsMet(gold, hitDirectUnits(gold, ranking, 5)),
+                directPositive && directRequirementsMet(gold, hitDirectUnits(gold, ranking, 20)),
                 directPositive && firstDirect != null && firstDirect == 1,
                 !directPositive || firstDirect == null ? 0.0d : 1.0d / firstDirect,
                 ndcgAt5(ranking));
@@ -555,6 +594,7 @@ final class SearchV3OracleCeilingEvaluator {
         }
     }
 
+    /** Recall requires Gold aspect/group completeness; Top1 and MRR rank the first DIRECT evidence. */
     record RankingMetrics(
             boolean directRecallAt5,
             boolean directRecallAt20,

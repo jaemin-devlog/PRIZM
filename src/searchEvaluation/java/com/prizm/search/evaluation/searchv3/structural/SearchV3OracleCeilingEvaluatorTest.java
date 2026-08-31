@@ -180,6 +180,49 @@ class SearchV3OracleCeilingEvaluatorTest {
     }
 
     @Test
+    void supportedRequiresEveryRequiredAspectBeforeRankingCanBeRecoverable() {
+        QueryProjection query = query(
+                "Q1", "U1", EvaluationTrack.SEMANTIC,
+                candidate(1, "P1", "U1", 0.9d, "UNIT-A"));
+        QueryGold gold = multiAspectGold(
+                "Q1", SUPPORTED,
+                List.of(directAspect("A", "UNIT-A"), directAspect("B", "UNIT-B")));
+
+        QueryResult result = run(
+                EvaluationTrack.SEMANTIC, List.of(query), List.of(gold)).queries().get(0);
+
+        assertThat(result.ceilingState()).isEqualTo(UNRESOLVED);
+        assertThat(result.failureStage()).isEqualTo(RETRIEVAL_MISS);
+        assertThat(result.s0().directRecallAt5()).isFalse();
+        assertThat(result.s0().directRecallAt20()).isFalse();
+        assertThat(result.s0().top1()).isTrue();
+        assertThat(result.s0().mrr()).isEqualTo(1.0d);
+    }
+
+    @Test
+    void partialRequiresEveryDirectBearingAspectWhileLeavingUnresolvedAspectNonDirect() {
+        QueryProjection query = query(
+                "Q1", "U1", EvaluationTrack.SEMANTIC,
+                candidate(1, "P1", "U1", 0.9d, "UNIT-A"),
+                candidate(2, "P2", "U1", 0.8d, "UNIT-UNRESOLVED"));
+        GoldAspect unresolved = new GoldAspect(
+                "UNRESOLVED", true, 0, List.of(),
+                List.of(new ExpectedGoldEvidence("UNIT-UNRESOLVED", "G-UNRESOLVED", RELATED)));
+        QueryGold gold = multiAspectGold(
+                "Q1", PARTIALLY_SUPPORTED,
+                List.of(directAspect("A", "UNIT-A"), directAspect("B", "UNIT-B"), unresolved));
+
+        QueryResult result = run(
+                EvaluationTrack.SEMANTIC, List.of(query), List.of(gold)).queries().get(0);
+
+        assertThat(result.ceilingState()).isEqualTo(UNRESOLVED);
+        assertThat(result.failureStage()).isEqualTo(RETRIEVAL_MISS);
+        assertThat(result.s0().directRecallAt20()).isFalse();
+        assertThat(result.s0().top1()).isTrue();
+        assertThat(result.s0().mrr()).isEqualTo(1.0d);
+    }
+
+    @Test
     void groupingHelpersPreserveUserProfessionLanguageAndMultiCategoryMembership() {
         List<QueryProjection> queries = List.of(
                 query("Q1", "U1", EvaluationTrack.SEMANTIC,
@@ -247,6 +290,23 @@ class SearchV3OracleCeilingEvaluatorTest {
                 EvaluationTrack.SEMANTIC, List.of(query), List.of(malformed)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("SUPPORTED Gold requires");
+    }
+
+    @Test
+    void aspectExpressionCannotOmitAnAspectDeclaredRequired() {
+        QueryProjection query = query(
+                "Q1", "U1", EvaluationTrack.SEMANTIC,
+                candidate(1, "P1", "U1", 0.9d, "UNIT-A", "UNIT-B"));
+        QueryGold malformed = new QueryGold(
+                "Q1", "U1", "profession", "ko", List.of("multi_aspect"), SUPPORTED,
+                new GoldAspectExpression("ALL", List.of("A"), 1),
+                List.of(directAspect("A", "UNIT-A"), directAspect("B", "UNIT-B")),
+                Map.of());
+
+        assertThatThrownBy(() -> run(
+                EvaluationTrack.SEMANTIC, List.of(query), List.of(malformed)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("aspect expression is invalid");
     }
 
     private OracleRun run(
@@ -344,6 +404,25 @@ class SearchV3OracleCeilingEvaluatorTest {
         return new QueryGold(
                 queryId, user, profession, language, categories, answerability,
                 expression, aspects, Map.of());
+    }
+
+    private QueryGold multiAspectGold(
+            String queryId,
+            SearchV3OracleCeilingEvaluator.GoldAnswerability answerability,
+            List<GoldAspect> aspects) {
+        List<String> requiredAspectIds = aspects.stream().map(GoldAspect::aspectId).toList();
+        return new QueryGold(
+                queryId, "U1", "profession", "ko", List.of("multi_aspect"), answerability,
+                new GoldAspectExpression("ALL", requiredAspectIds, requiredAspectIds.size()),
+                aspects,
+                Map.of());
+    }
+
+    private GoldAspect directAspect(String aspectId, String unitId) {
+        String groupId = "G-" + unitId;
+        return new GoldAspect(
+                aspectId, true, 1, List.of(groupId),
+                List.of(new ExpectedGoldEvidence(unitId, groupId, DIRECT_SUPPORT)));
     }
 
     private CandidateProjection candidate(

@@ -1,0 +1,643 @@
+{
+  "artifactType": "QUESTIONS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.0.0",
+  "split": "CALIBRATION",
+  "queries": [
+    {
+      "queryId": "SV3-U34-Q01",
+      "userBundleId": "SV3-U34",
+      "questionGroupId": "SV3-U34-Q01-FAMILY",
+      "query": "Did the production gateway use HTTP/2?",
+      "normalizedQuery": "did the production gateway use http 2",
+      "categories": [
+        "literal_identifier",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q01"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q01",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U34-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U34-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "IDENTIFIER_NUMBER",
+                "canonicalValue": "HTTP_2",
+                "surfaceForms": [
+                  "HTTP/2"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U34-Q02",
+      "userBundleId": "SV3-U34",
+      "questionGroupId": "SV3-U34-Q02-FAMILY",
+      "query": "Did the production gateway use HTTP/3?",
+      "normalizedQuery": "did the production gateway use http 3",
+      "categories": [
+        "literal_identifier",
+        "hard_negative",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q02"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q02",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U34-P01-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "IDENTIFIER_NUMBER",
+                "canonicalValue": "HTTP_3",
+                "surfaceForms": [
+                  "HTTP/3"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U34-Q03",
+      "userBundleId": "SV3-U34",
+      "questionGroupId": "SV3-U34-Q03-FAMILY",
+      "query": "Did the offline queue use NimbusCache?",
+      "normalizedQuery": "did the offline queue use nimbuscache",
+      "categories": [
+        "literal_identifier",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q03"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q03",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U34-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U34-G03"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "LITERAL_IDENTIFIER",
+                "canonicalValue": "NIMBUSCACHE",
+                "surfaceForms": [
+                  "NimbusCache"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U34-Q04",
+      "userBundleId": "SV3-U34",
+      "questionGroupId": "SV3-U34-Q04-FAMILY",
+      "query": "Did the mobile gateway use ZephyrDB?",
+      "normalizedQuery": "did the mobile gateway use zephyrdb",
+      "categories": [
+        "literal_identifier",
+        "hard_negative",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q04"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q04",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U34-P04-E01",
+              "supportRelation": "INSUFFICIENT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "LITERAL_IDENTIFIER",
+                "canonicalValue": "ZEPHYRDB",
+                "surfaceForms": [
+                  "ZephyrDB"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U35-Q01",
+      "userBundleId": "SV3-U35",
+      "questionGroupId": "SV3-U35-Q01-FAMILY",
+      "query": "정책 조사를 2024-03-01부터 2025-02-28까지 진행했나요?",
+      "normalizedQuery": "정책 조사를 2024 03 01부터 2025 02 28까지 진행했나요",
+      "categories": [
+        "date_range",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q01"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q01",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U35-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U35-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [
+              {
+                "operator": "OVERLAPS",
+                "start": "2024-03-01",
+                "end": "2025-02-28",
+                "precision": "DAY"
+              }
+            ],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U35-Q02",
+      "userBundleId": "SV3-U35",
+      "questionGroupId": "SV3-U35-Q02-FAMILY",
+      "query": "전국 rollout이 2025-06-30 이후에 시작됐나요?",
+      "normalizedQuery": "전국 rollout이 2025 06 30 이후에 시작됐나요",
+      "categories": [
+        "date_range",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q02"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q02",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U35-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U35-G02"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U35-Q03",
+      "userBundleId": "SV3-U35",
+      "questionGroupId": "SV3-U35-Q03-FAMILY",
+      "query": "전국 rollout이 2024-12-31 이전에 시작됐나요?",
+      "normalizedQuery": "전국 rollout이 2024 12 31 이전에 시작됐나요",
+      "categories": [
+        "date_range",
+        "hard_negative",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q03"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q03",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U35-P02-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U35-Q04",
+      "userBundleId": "SV3-U35",
+      "questionGroupId": "SV3-U35-Q04-FAMILY",
+      "query": "NorthStar를 실제 계획 관리 도구로 사용했나요?",
+      "normalizedQuery": "northstar를 실제 계획 관리 도구로 사용했나요",
+      "categories": [
+        "literal_identifier",
+        "hard_negative",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q04"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q04",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U35-P04-E01",
+              "supportRelation": "INSUFFICIENT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "LITERAL_IDENTIFIER",
+                "canonicalValue": "NORTHSTAR",
+                "surfaceForms": [
+                  "NorthStar"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U36-Q01",
+      "userBundleId": "SV3-U36",
+      "questionGroupId": "SV3-U36-Q01-FAMILY",
+      "query": "Does the production batch service run on Java 17?",
+      "normalizedQuery": "does the production batch service run on java 17",
+      "categories": [
+        "literal_identifier",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q01"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q01",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U36-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U36-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "IDENTIFIER_NUMBER",
+                "canonicalValue": "JAVA_17",
+                "surfaceForms": [
+                  "Java 17"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U36-Q02",
+      "userBundleId": "SV3-U36",
+      "questionGroupId": "SV3-U36-Q02-FAMILY",
+      "query": "Does the production batch service run on Java 21?",
+      "normalizedQuery": "does the production batch service run on java 21",
+      "categories": [
+        "literal_identifier",
+        "hard_negative",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q02"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q02",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U36-P01-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "IDENTIFIER_NUMBER",
+                "canonicalValue": "JAVA_21",
+                "surfaceForms": [
+                  "Java 21"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U36-Q03",
+      "userBundleId": "SV3-U36",
+      "questionGroupId": "SV3-U36-Q03-FAMILY",
+      "query": "재처리 오류율을 50% 이상 감소시켰나요?",
+      "normalizedQuery": "재처리 오류율을 50 이상 감소시켰나요",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q03"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q03",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U36-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U36-G03"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GTE",
+                "value": 50,
+                "unit": "%",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "재처리",
+                  "오류율"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U36-Q04",
+      "userBundleId": "SV3-U36",
+      "questionGroupId": "SV3-U36-Q04-FAMILY",
+      "query": "사용자 2,329명이 이용한 서비스인가요?",
+      "normalizedQuery": "사용자 2 329명이 이용한 서비스인가요",
+      "categories": [
+        "numeric_quantity",
+        "hard_negative",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q04"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q04",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U36-P04-E01",
+              "supportRelation": "INSUFFICIENT"
+            },
+            {
+              "evidenceUnitId": "SV3-U36-P05-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "EQ",
+                "value": 2329,
+                "unit": "명",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "사용자"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    }
+  ]
+}

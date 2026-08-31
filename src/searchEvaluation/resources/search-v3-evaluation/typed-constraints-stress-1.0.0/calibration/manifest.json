@@ -1,0 +1,118 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.0.0",
+  "split": "CALIBRATION",
+  "status": "FRESH_BENCHMARK_SEED_FROZEN",
+  "mutable": false,
+  "opened": true,
+  "searchExecuted": false,
+  "sealedAt": null,
+  "frozenAt": "2026-08-31T18:45:00+09:00",
+  "generationSourceRevision": "a7dbb12ea7c0a3f4a502c1ae0252177d9c78a8b9",
+  "generatorRevision": "prz028-typed-stress-v1",
+  "counts": {
+    "userBundles": 3,
+    "documents": 3,
+    "queries": 12,
+    "typedQueryAnnotations": 12,
+    "evidenceParents": 13,
+    "evidenceGroups": 13,
+    "evidenceUnits": 13,
+    "typedObservations": 13
+  },
+  "distributions": {
+    "profession": {
+      "DATA_AI_INFRA": 1,
+      "FRONTEND_MOBILE": 1,
+      "PLANNING": 1
+    },
+    "documentLanguage": {
+      "EN": 1,
+      "KO": 1,
+      "KO_EN_MIXED": 1
+    },
+    "queryLanguage": {
+      "EN": 4,
+      "KO": 4,
+      "KO_EN_MIXED": 4
+    },
+    "answerability": {
+      "NOT_SUPPORTED": 6,
+      "SUPPORTED": 6
+    },
+    "category": {
+      "date_range": 3,
+      "english": 4,
+      "hard_negative": 6,
+      "korean": 4,
+      "korean_english_mixed": 4,
+      "literal_identifier": 7,
+      "numeric_quantity": 2,
+      "numeric_range_comparison": 1
+    },
+    "typedKind": {
+      "DATE": 3,
+      "IDENTIFIER_NUMBER": 4,
+      "LITERAL_IDENTIFIER": 3,
+      "QUANTITY": 2
+    },
+    "stressFamily": {
+      "date_after": 1,
+      "date_before": 1,
+      "date_range": 1,
+      "identifier_number_exact": 2,
+      "identifier_number_mismatch": 2,
+      "literal_exact": 1,
+      "literal_near_match": 2,
+      "not_supported_hard_negative": 6,
+      "percentage_direction": 1,
+      "qualifier_mismatch": 1,
+      "quantity_boundary": 1,
+      "wrong_value": 1
+    },
+    "expectedState": {
+      "CONTRADICTED": 8,
+      "SATISFIED": 6,
+      "UNKNOWN": 38
+    }
+  },
+  "files": [
+    {
+      "path": "corpus.json",
+      "bytes": 4238,
+      "sha256": "7c1f2b8749497382beee3a16225a501235597457b4a68f2f83a44595a55a6d45"
+    },
+    {
+      "path": "documents/sv3-u34-typed-stress-v01.txt",
+      "bytes": 440,
+      "sha256": "89e69bc52b222cabf466a68c4ddea61defde3c1edafba0e7b029f52e6ee8d4e3"
+    },
+    {
+      "path": "documents/sv3-u35-typed-stress-v01.txt",
+      "bytes": 471,
+      "sha256": "d8ff5a696c5f8e5e209c42af5d6b74e37166eef1d6058c573bf2c9a54d9e944b"
+    },
+    {
+      "path": "documents/sv3-u36-typed-stress-v01.txt",
+      "bytes": 560,
+      "sha256": "0f8d7f988d8949381c3941c49ee0cab4999e66678863540e46a64b2f2f7041e0"
+    },
+    {
+      "path": "gold-evidence.json",
+      "bytes": 30938,
+      "sha256": "48c909e58827c43ad2f0faf903d7251c761fe43a5d2db56d9b5d5e6b89e10752"
+    },
+    {
+      "path": "questions.json",
+      "bytes": 17664,
+      "sha256": "e86ff831741b866dcbf2007cdeede8bbeee1c2ca13a90d1b4169523c96799435"
+    },
+    {
+      "path": "typed-annotations.json",
+      "bytes": 16085,
+      "sha256": "ded39b09895cd99983ba8880ea1e3581a953714dd6776e54e03d48ba64c5c33a"
+    }
+  ],
+  "combinedSha256": "603ae2cc0f2b283f464d75b564eea57d756004972bdb29de1634e62ed1a50d22"
+}

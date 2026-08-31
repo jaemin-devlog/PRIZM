@@ -1,0 +1,16 @@
+Data reliability 운영 기록
+
+Current batch runtime
+The production batch service runs on Java 17 and records its runtime version at startup.
+
+Retired utility
+A retired import utility remained on Java 11 and was excluded from active processing.
+
+재처리 오류 개선
+검증 단계를 분리한 뒤 재처리 오류율을 정확히 50% 감소시켰다.
+
+데이터 검증량
+The import job validated 데이터 2,329건 before publishing the daily report.
+
+사용자 preview
+A small preview involved 사용자 300명 and did not proceed to a general release.

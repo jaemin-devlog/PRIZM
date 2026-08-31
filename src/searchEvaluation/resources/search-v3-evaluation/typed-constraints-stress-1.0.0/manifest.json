@@ -1,0 +1,192 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.0.0",
+  "split": "ALL",
+  "status": "FRESH_BENCHMARK_SEED_FROZEN",
+  "mutable": false,
+  "opened": true,
+  "searchExecuted": false,
+  "sealedAt": null,
+  "frozenAt": "2026-08-31T18:45:00+09:00",
+  "generationSourceRevision": "a7dbb12ea7c0a3f4a502c1ae0252177d9c78a8b9",
+  "generatorRevision": "prz028-typed-stress-v1",
+  "previousDatasets": [
+    "search-v3-fresh-seed-1.0.1",
+    "search-v3-fresh-devcal-1.1.0",
+    "search-v3-fresh-devcal-robustness-1.0.0"
+  ],
+  "splitCombinedSha256": {
+    "DEV": "5a1902e416e9414d5c9345b87ec9138a066839eb0eb285b261588b346bf02b00",
+    "CALIBRATION": "603ae2cc0f2b283f464d75b564eea57d756004972bdb29de1634e62ed1a50d22"
+  },
+  "counts": {
+    "userBundles": 6,
+    "documents": 6,
+    "queries": 24,
+    "typedQueryAnnotations": 24,
+    "evidenceParents": 26,
+    "evidenceGroups": 26,
+    "evidenceUnits": 26,
+    "typedObservations": 25
+  },
+  "distributions": {
+    "split": {
+      "CALIBRATION": 3,
+      "DEV": 3
+    },
+    "profession": {
+      "DATA_AI_INFRA": 1,
+      "DESIGN_PRODUCT": 1,
+      "FRONTEND_MOBILE": 1,
+      "MARKETING_SALES": 1,
+      "NON_DEVELOPMENT_GENERAL": 1,
+      "PLANNING": 1
+    },
+    "documentLanguage": {
+      "EN": 2,
+      "KO": 2,
+      "KO_EN_MIXED": 2
+    },
+    "queryLanguage": {
+      "EN": 8,
+      "KO": 8,
+      "KO_EN_MIXED": 8
+    },
+    "answerability": {
+      "NOT_SUPPORTED": 11,
+      "SUPPORTED": 13
+    },
+    "category": {
+      "date_range": 5,
+      "english": 8,
+      "hard_negative": 11,
+      "korean": 8,
+      "korean_english_mixed": 8,
+      "literal_identifier": 8,
+      "numeric_quantity": 11,
+      "numeric_range_comparison": 9
+    },
+    "typedKind": {
+      "DATE": 5,
+      "IDENTIFIER_NUMBER": 4,
+      "LITERAL_IDENTIFIER": 4,
+      "QUANTITY": 11
+    },
+    "stressFamily": {
+      "date_after": 2,
+      "date_before": 2,
+      "date_range": 1,
+      "duration": 2,
+      "identifier_number_exact": 2,
+      "identifier_number_mismatch": 2,
+      "literal_exact": 2,
+      "literal_near_match": 2,
+      "not_supported_hard_negative": 11,
+      "percentage_direction": 2,
+      "qualifier_mismatch": 2,
+      "quantity_boundary": 2,
+      "quantity_positive": 3,
+      "range": 2,
+      "wrong_value": 4
+    },
+    "expectedState": {
+      "CONTRADICTED": 19,
+      "SATISFIED": 13,
+      "UNKNOWN": 72
+    }
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 714,
+      "sha256": "3f8421a560418784c343414e5f8c2a2e2ee8212c11a880cf8c0291953812d416"
+    },
+    {
+      "path": "calibration/corpus.json",
+      "bytes": 4238,
+      "sha256": "7c1f2b8749497382beee3a16225a501235597457b4a68f2f83a44595a55a6d45"
+    },
+    {
+      "path": "calibration/documents/sv3-u34-typed-stress-v01.txt",
+      "bytes": 440,
+      "sha256": "89e69bc52b222cabf466a68c4ddea61defde3c1edafba0e7b029f52e6ee8d4e3"
+    },
+    {
+      "path": "calibration/documents/sv3-u35-typed-stress-v01.txt",
+      "bytes": 471,
+      "sha256": "d8ff5a696c5f8e5e209c42af5d6b74e37166eef1d6058c573bf2c9a54d9e944b"
+    },
+    {
+      "path": "calibration/documents/sv3-u36-typed-stress-v01.txt",
+      "bytes": 560,
+      "sha256": "0f8d7f988d8949381c3941c49ee0cab4999e66678863540e46a64b2f2f7041e0"
+    },
+    {
+      "path": "calibration/gold-evidence.json",
+      "bytes": 30938,
+      "sha256": "48c909e58827c43ad2f0faf903d7251c761fe43a5d2db56d9b5d5e6b89e10752"
+    },
+    {
+      "path": "calibration/manifest.json",
+      "bytes": 3116,
+      "sha256": "4bc707d3014372db4e8f4557de271b40468f0b80b35fae396afcc93fce13283b"
+    },
+    {
+      "path": "calibration/questions.json",
+      "bytes": 17664,
+      "sha256": "e86ff831741b866dcbf2007cdeede8bbeee1c2ca13a90d1b4169523c96799435"
+    },
+    {
+      "path": "calibration/typed-annotations.json",
+      "bytes": 16085,
+      "sha256": "ded39b09895cd99983ba8880ea1e3581a953714dd6776e54e03d48ba64c5c33a"
+    },
+    {
+      "path": "dev/corpus.json",
+      "bytes": 4243,
+      "sha256": "9efa013f3dd52568ee0da99896d3ca696f628db6ed61531590084d2117c3865d"
+    },
+    {
+      "path": "dev/documents/sv3-u31-typed-stress-v01.txt",
+      "bytes": 579,
+      "sha256": "051eb13d978499e7dd804c77b84a7b760004c1ec8b3f727d8bb0952520d58d30"
+    },
+    {
+      "path": "dev/documents/sv3-u32-typed-stress-v01.txt",
+      "bytes": 428,
+      "sha256": "01c25fc63504d98bdc5f66b6ec60970254d4e016a15e2676feb75820f6c31a4b"
+    },
+    {
+      "path": "dev/documents/sv3-u33-typed-stress-v01.txt",
+      "bytes": 472,
+      "sha256": "694a874d8820b0724dca024786d91d45082109182dbcf05eafdafa547c3cce85"
+    },
+    {
+      "path": "dev/gold-evidence.json",
+      "bytes": 31369,
+      "sha256": "00305894f72175c1db5a4c591a5ad8f8146977305b2efc2ab0c023764b554322"
+    },
+    {
+      "path": "dev/manifest.json",
+      "bytes": 3035,
+      "sha256": "e5823df8f3ff9a5384337b69bcf1952261bfbc864b38634ef13976f308cd6e01"
+    },
+    {
+      "path": "dev/questions.json",
+      "bytes": 18662,
+      "sha256": "51b4ee8bfd880dc97b70edc2748199995d5c0256e9254063e9bfdf46c6fd770e"
+    },
+    {
+      "path": "dev/typed-annotations.json",
+      "bytes": 16176,
+      "sha256": "aa2cdb35cd0be3fb82cde27e977007d12853874aefdb3bd5b825bb0696449e26"
+    },
+    {
+      "path": "lineage.json",
+      "bytes": 8688,
+      "sha256": "8fc35b17d97a1385fca66cb2a1833c8c48669079c6557a8e84f64c7545c70fa0"
+    }
+  ],
+  "combinedSha256": "693331c20cd483a8e90696be8e8a39e845475d4e330505c45804b91b80614aae"
+}

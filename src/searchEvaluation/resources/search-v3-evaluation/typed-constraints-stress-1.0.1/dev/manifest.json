@@ -1,0 +1,126 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.0.1",
+  "split": "DEV",
+  "status": "FRESH_BENCHMARK_SEED_FROZEN",
+  "mutable": false,
+  "opened": true,
+  "searchExecuted": false,
+  "sealedAt": null,
+  "frozenAt": "2026-08-31T19:00:00+09:00",
+  "generationSourceRevision": "4bbbc5de040aa3c84fcb9869ece2fce85d983c0c",
+  "generatorRevision": "prz028-typed-stress-correction-v1",
+  "previousVersion": "search-v3-typed-constraints-stress-1.0.0",
+  "previousVersionStatus": "INVALID_INPUT_HISTORICAL",
+  "counts": {
+    "userBundles": 3,
+    "documents": 3,
+    "queries": 12,
+    "typedQueryAnnotations": 12,
+    "evidenceParents": 13,
+    "evidenceGroups": 13,
+    "evidenceUnits": 13,
+    "typedObservations": 12
+  },
+  "distributions": {
+    "profession": {
+      "DESIGN_PRODUCT": 1,
+      "MARKETING_SALES": 1,
+      "NON_DEVELOPMENT_GENERAL": 1
+    },
+    "documentLanguage": {
+      "EN": 1,
+      "KO": 1,
+      "KO_EN_MIXED": 1
+    },
+    "queryLanguage": {
+      "EN": 4,
+      "KO": 4,
+      "KO_EN_MIXED": 4
+    },
+    "answerability": {
+      "NOT_SUPPORTED": 5,
+      "SUPPORTED": 7
+    },
+    "category": {
+      "date_range": 2,
+      "english": 4,
+      "hard_negative": 5,
+      "korean": 4,
+      "korean_english_mixed": 4,
+      "literal_identifier": 1,
+      "numeric_quantity": 9,
+      "numeric_range_comparison": 8
+    },
+    "typedKind": {
+      "DATE": 2,
+      "LITERAL_IDENTIFIER": 1,
+      "QUANTITY": 9
+    },
+    "typedOperator": {
+      "EQ": 1,
+      "EXACT": 1,
+      "GT": 1,
+      "GTE": 6,
+      "LT": 1,
+      "RANGE": 2
+    },
+    "stressFamily": {
+      "date_after": 1,
+      "date_before": 1,
+      "duration": 2,
+      "literal_exact": 1,
+      "not_supported_hard_negative": 5,
+      "percentage_direction": 1,
+      "qualifier_mismatch": 1,
+      "quantity_boundary": 1,
+      "quantity_positive": 3,
+      "range": 2,
+      "wrong_value": 3
+    },
+    "expectedState": {
+      "CONTRADICTED": 11,
+      "SATISFIED": 7,
+      "UNKNOWN": 34
+    }
+  },
+  "files": [
+    {
+      "path": "corpus.json",
+      "bytes": 4276,
+      "sha256": "190b13b96368a4245d2b14ff64972d711232ec589b654c3ffe9c4aa0febaca57"
+    },
+    {
+      "path": "documents/sv3-u31-typed-stress-v01.txt",
+      "bytes": 579,
+      "sha256": "051eb13d978499e7dd804c77b84a7b760004c1ec8b3f727d8bb0952520d58d30"
+    },
+    {
+      "path": "documents/sv3-u32-typed-stress-v01.txt",
+      "bytes": 432,
+      "sha256": "cc11e23b39874e246e9bafe54257dcd5eb3e9b06fe34c24852ea2801ccc43847"
+    },
+    {
+      "path": "documents/sv3-u33-typed-stress-v01.txt",
+      "bytes": 472,
+      "sha256": "694a874d8820b0724dca024786d91d45082109182dbcf05eafdafa547c3cce85"
+    },
+    {
+      "path": "gold-evidence.json",
+      "bytes": 31377,
+      "sha256": "0805f84bca86d929538b883569788cf2502e7016fe7630070a6bd5b363eaa728"
+    },
+    {
+      "path": "questions.json",
+      "bytes": 18722,
+      "sha256": "1028c33ad44e13bfacc133ace7bd69f4019e04c2d0b9aa034ddc80fd2903628a"
+    },
+    {
+      "path": "typed-annotations.json",
+      "bytes": 17798,
+      "sha256": "14dcf8b2ec97621745ce41984734372a747c9e34fe65407b0178ceee6d760d39"
+    }
+  ],
+  "combinedSha256": "35c6e84b85302aad5f1499bc5f8a96fdeeb3a635a3d2da3595f4473654e17350"
+}

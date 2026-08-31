@@ -1,0 +1,242 @@
+{
+  "artifactType": "LINEAGE",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.0.1",
+  "changeReason": "Freeze independent DEV/CAL typed-constraint inputs before PRZ-028 implementation.",
+  "generator": "scripts/evaluation/search-v3/materialize-prz028-typed-stress-1.0.1.mjs",
+  "generatorRevision": "prz028-typed-stress-correction-v1",
+  "materializationBaseRevision": "4bbbc5de040aa3c84fcb9869ece2fce85d983c0c",
+  "sealedFinalPolicy": "SEALED_FINAL_TEST is not copied, opened, or searched; only manifest metadata is checked.",
+  "bundles": [
+    {
+      "userBundleId": "SV3-U31",
+      "split": "DEV",
+      "documentFamilyId": "SV3-U31-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC-TEMPLATE-MARKETING-31",
+      "generatorSeedId": "SV3-TC-SEED-MARKETING-31-A7E1",
+      "logicalDocumentIds": [
+        "SV3-U31-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U31-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-TC-FACT-U31-P01",
+        "SV3-TC-FACT-U31-P02",
+        "SV3-TC-FACT-U31-P03",
+        "SV3-TC-FACT-U31-P04",
+        "SV3-TC-FACT-U31-P05"
+      ],
+      "sourceFactSignatures": [
+        "d98932285a0f5ddf4364f7b22d0544039ae714ed53a16f887747c35267f7935e",
+        "785ad71030d7dbc7ba615634caa14ece6ad80da410b7d74dc5151e7f1d79f380",
+        "3b5b25e0ef47421d2782358c1baad2cd8469494c31ed5cbe46708516d88f7bcc",
+        "575d432a3f130481fdf4ff9fd75b966f95a21f239269222b2651dc517343e3b7",
+        "12a30ee06bd1caf5e958bf4272bffb1cda37217bd2d1c078b1dca9089142e83e"
+      ],
+      "questionGroupIds": [
+        "SV3-U31-Q01-FAMILY",
+        "SV3-U31-Q02-FAMILY",
+        "SV3-U31-Q03-FAMILY",
+        "SV3-U31-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "유효 상담 요청 1 000건 이상을 만든 경험이 있나요",
+        "사용자 1 300명이 이용한 캠페인인가요",
+        "미응답 비율을 50 이상 감소시킨 경험이 있나요",
+        "orbitcrm을 사용해 상담 단계를 관리했나요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-U32",
+      "split": "DEV",
+      "documentFamilyId": "SV3-U32-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC-TEMPLATE-DESIGN-32",
+      "generatorSeedId": "SV3-TC-SEED-DESIGN-32-B4D2",
+      "logicalDocumentIds": [
+        "SV3-U32-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U32-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-TC-FACT-U32-P01",
+        "SV3-TC-FACT-U32-P02",
+        "SV3-TC-FACT-U32-P03",
+        "SV3-TC-FACT-U32-P04"
+      ],
+      "sourceFactSignatures": [
+        "2013ff993e73bb3d84a1c6be65a5fb0c0a55d056bf4e439591eeeb2906e10b91",
+        "016e4bd12b091d6290b5572e99bf116b2b18546f6e467e815f06827c44bf4272",
+        "7019991a3eed7f3476e868609daf590c214c4aa75a89cd8a2cbec69fc89426fb",
+        "c3ebf312baa894ce7aa4dcf8120010cd370e7204999389c50e58413d7e323e8c"
+      ],
+      "questionGroupIds": [
+        "SV3-U32-Q01-FAMILY",
+        "SV3-U32-Q02-FAMILY",
+        "SV3-U32-Q03-FAMILY",
+        "SV3-U32-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "did the approved flow reach a task completion rate of at least 80",
+        "did the approved flow reach a task completion rate of at least 90",
+        "was the approved service launch date after 2025 06 30",
+        "was the approved service launch date before 2025 01 01"
+      ]
+    },
+    {
+      "userBundleId": "SV3-U33",
+      "split": "DEV",
+      "documentFamilyId": "SV3-U33-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC-TEMPLATE-COMMUNITY-33",
+      "generatorSeedId": "SV3-TC-SEED-COMMUNITY-33-C9F3",
+      "logicalDocumentIds": [
+        "SV3-U33-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U33-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-TC-FACT-U33-P01",
+        "SV3-TC-FACT-U33-P02",
+        "SV3-TC-FACT-U33-P03",
+        "SV3-TC-FACT-U33-P04"
+      ],
+      "sourceFactSignatures": [
+        "96e63e9597e75a56c5d775981326be947558ebce002a98616ac63e24c91bd06d",
+        "a74379ae7f2ecd0fc63276cb5f77a1fe665bbce9618b19be34cb4eaefcdaf61e",
+        "9e79108938ffc3d5e314f00acc33d41f2921496cc3c4fa26b41b2f8dbd78a5a8",
+        "dac5b7f14fb2cba2061f1cc2f9beab0ed43bed3fb35177a16e3063830dfdb3d4"
+      ],
+      "questionGroupIds": [
+        "SV3-U33-Q01-FAMILY",
+        "SV3-U33-Q02-FAMILY",
+        "SV3-U33-Q03-FAMILY",
+        "SV3-U33-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "community operations를 3년 이상 운영한 경험이 있나요",
+        "community operations를 5년 이상 운영했나요",
+        "한 분기에 교육 키트 50 100건을 점검했나요",
+        "한 분기에 교육 키트 130 150건을 점검했나요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-U34",
+      "split": "CALIBRATION",
+      "documentFamilyId": "SV3-U34-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC-TEMPLATE-MOBILE-34",
+      "generatorSeedId": "SV3-TC-SEED-MOBILE-34-D2A4",
+      "logicalDocumentIds": [
+        "SV3-U34-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U34-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-TC-FACT-U34-P01",
+        "SV3-TC-FACT-U34-P02",
+        "SV3-TC-FACT-U34-P03",
+        "SV3-TC-FACT-U34-P04"
+      ],
+      "sourceFactSignatures": [
+        "b55e04b1fed9150431ed2cba99c9033e5bd6c6b5c187356be3e2a7a7b5cf4bfa",
+        "8e30c028f5c4952b63ffffa2f988f0691cf9888da1510e78484c8a50620f0ec0",
+        "b8c2126555fcc7b7d93b626a1d3037d6a76450b36587f1270f752f0c89a2fa3c",
+        "1b21e52ef0191abcd5728f9557f0bd5610d7b4207431632373439acac082595f"
+      ],
+      "questionGroupIds": [
+        "SV3-U34-Q01-FAMILY",
+        "SV3-U34-Q02-FAMILY",
+        "SV3-U34-Q03-FAMILY",
+        "SV3-U34-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "did the production gateway use http 2",
+        "did the production gateway use http 3",
+        "did the offline queue use nimbuscache",
+        "did the mobile gateway use zephyrdb"
+      ]
+    },
+    {
+      "userBundleId": "SV3-U35",
+      "split": "CALIBRATION",
+      "documentFamilyId": "SV3-U35-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC-TEMPLATE-PLANNING-35",
+      "generatorSeedId": "SV3-TC-SEED-PLANNING-35-E8B5",
+      "logicalDocumentIds": [
+        "SV3-U35-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U35-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-TC-FACT-U35-P01",
+        "SV3-TC-FACT-U35-P02",
+        "SV3-TC-FACT-U35-P03",
+        "SV3-TC-FACT-U35-P04"
+      ],
+      "sourceFactSignatures": [
+        "1763a77ab6cf7f47467d5a504df986ae80a10ac8c743f70830040b3745c09e41",
+        "f871e85906d427dab132376cf8f492d195d4e9a35c51e12cb46d4b5599af223f",
+        "4bc12661badae050b83b12fa69a0d7c1147f1d57cec05413844a8e67a137f12d",
+        "a5e45c93e3c816a6f7dd0b30011020e2bb5d5f62ad85dc453159aabcd3ab66a8"
+      ],
+      "questionGroupIds": [
+        "SV3-U35-Q01-FAMILY",
+        "SV3-U35-Q02-FAMILY",
+        "SV3-U35-Q03-FAMILY",
+        "SV3-U35-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "정책 조사 기간이 2024 03 01부터 2025 02 28까지였나요",
+        "전국 rollout 시작일이 2025 06 30 이후인가요",
+        "전국 rollout 시작일이 2024 12 31 이전인가요",
+        "northstar를 실제 계획 관리 도구로 사용했나요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-U36",
+      "split": "CALIBRATION",
+      "documentFamilyId": "SV3-U36-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC-TEMPLATE-DATA-36",
+      "generatorSeedId": "SV3-TC-SEED-DATA-36-F6C6",
+      "logicalDocumentIds": [
+        "SV3-U36-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U36-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-TC-FACT-U36-P01",
+        "SV3-TC-FACT-U36-P02",
+        "SV3-TC-FACT-U36-P03",
+        "SV3-TC-FACT-U36-P04",
+        "SV3-TC-FACT-U36-P05"
+      ],
+      "sourceFactSignatures": [
+        "d9033ab721d93920a9f8009d94167b784efe6fbf996a735df4a7763534f55c9a",
+        "65760ca80c8eff17f43748ba491dd172b53a2c4d5cadf7358dce95dac3cbaae5",
+        "03782d36540f493a9e990cf6ac56259c546e23e8d1cdce47a08dc70b858758ed",
+        "4cf94b7cacd019909077e5522eb6ea5bec64200e1bf7e2bfd436668a66597402",
+        "1e91283a6e81924196150577572ca16eb73ff86727fbec5b9621e15ff77472c6"
+      ],
+      "questionGroupIds": [
+        "SV3-U36-Q01-FAMILY",
+        "SV3-U36-Q02-FAMILY",
+        "SV3-U36-Q03-FAMILY",
+        "SV3-U36-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "production batch service가 java 17에서 실행되나요",
+        "production batch service가 java 21에서 실행되나요",
+        "재처리 오류율을 50 이상 감소시켰나요",
+        "사용자 2 329명이 이용한 서비스인가요"
+      ]
+    }
+  ],
+  "previousVersion": "search-v3-typed-constraints-stress-1.0.0",
+  "previousVersionStatus": "INVALID_INPUT_HISTORICAL",
+  "previousVersionBenchmarkExecuted": false,
+  "correctionReason": "Pre-implementation extraction-feasibility audit found ungrounded qualifier wording and ambiguous date operators."
+}

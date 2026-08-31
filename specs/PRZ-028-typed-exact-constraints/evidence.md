@@ -40,7 +40,7 @@ Parent Context, Parent Dense, Cross Encoder와 QueryPlanner는 사용하지 않�
 - T0/T1/Stress benchmark: `NOT_RUN`
 - Production/dependency/migration/frontend/MCP/Docker 변경: `0`
 
-## 3. Typed Stress input freeze
+## 3. 최초 Typed Stress input freeze — INVALID_INPUT_HISTORICAL
 
 - dataset: `search-v3-typed-constraints-stress-1.0.0`
 - generator: `scripts/evaluation/search-v3/materialize-prz028-typed-stress.mjs`
@@ -75,10 +75,49 @@ user/document/version/template/generator/source-fact/query lineage 충돌은 0�
 | PRZ-025 benchmark validator | `PASS`; combined `1f36c4...`, Final search false |
 | SEALED manifest metadata | `PASS`; combined `e5b315...`, opened/search false |
 
-Stress input 생성·검증 중 BGE-M3, Dense ranking, T0/T1, prediction/result는 실행하지 않았다. 이
-input과 계약을 local commit으로 고정한 뒤에만 deterministic parser 구현을 시작한다.
+Stress input 생성·검증 중 BGE-M3, Dense ranking, T0/T1, prediction/result는 실행하지 않았다. 최초
+input과 계약은 local commit `4bbbc5de040aa3c84fcb9869ece2fce85d983c0c`로 고정했다.
 
-## 4. 아직 생성되지 않은 근거
+커밋 직후 parser 코드 작성 전에 독립 설계 감사를 수행했다. v1.0.0에는 허용 normalization만으로
+gold 없이 exact qualifier를 복원할 수 없는 U32/U35 문장, 일부 quantity core span의 qualifier 포함,
+English `after`와 Korean `이후`를 하나의 operator로 표현한 모호성, 실제 English인 U36 query의
+mixed label이 있었다. 검색·prediction·result 0인 상태에서 발견했으므로 v1.0.0 파일과 generator를
+변경하지 않고 `INVALID_INPUT_HISTORICAL`로 보존했다. 이 hash와 materializer `--check`는 계속
+통과하며 성능 결과로 사용하지 않는다.
+
+## 4. Corrected Typed Stress input freeze
+
+- dataset: `search-v3-typed-constraints-stress-1.0.1`
+- generator: `scripts/evaluation/search-v3/materialize-prz028-typed-stress-1.0.1.mjs`
+- generation source revision: `4bbbc5de040aa3c84fcb9869ece2fce85d983c0c`
+- root combined SHA-256:
+  `96c1ddc6cbdd6722619d7806cbe418babc414c0d5179af84d4694a94c8ed015b`
+- split SHA-256: DEV `35c6e84b85302aad5f1499bc5f8a96fdeeb3a635a3d2da3595f4473654e17350`,
+  CALIBRATION `b754d92e49246aec955c3bef252eeb09a6978272b7b7ba869059bf5a536e606e`
+- 규모와 distribution: v1.0.0과 동일한 synthetic 6 bundles / 6 documents / 24 queries /
+  26 Evidence Units / 25 observations, DEV/CAL 12/12, KO/EN/mixed 8/8/8
+- operator: `EQ 2 / EXACT 8 / GT 1 / GTE 8 / LT 2 / RANGE 3`
+- expected states: SATISFIED 13 / CONTRADICTED 19 / UNKNOWN 72
+
+교정 사항은 query/source에 exact nominal qualifier를 사용하고, quantity constraint span을 numeric
+core로 통일하며, query/observation qualifier code-point span 16/16과 percentage direction span 3/3을
+추가한 것이다. English `after=GT`, Korean `이후=GTE`, `before/이전=LT`, range inclusive로
+operator 의미를 분리했고 U36 Java query를 실제 mixed 문장으로 바꿨다. 모든 변경은 구현·검색 전에
+수행됐으며 query/gold 의미나 expected match state count는 바꾸지 않았다.
+
+| 명령/검사 | 실제 결과 |
+| --- | --- |
+| v1.0.1 generator `node --check` | `PASS` |
+| v1.0.1 최초 생성 / `--check` | `PASS`; 19 files, combined `96c1ddc...` |
+| v1.0.0 materializer `--check` | `PASS`; old tree diff 0, combined `693331c...` |
+| qualifier/direction/code-point grounding | `PASS`; query qualifier 16, observation qualifier 16, direction 3 |
+| v1.0.1 frozen overwrite 재실행 | `EXPECTED_FAIL`; exit 1, 변경 0 |
+| external lineage separation | `PASS`; Original/Long-form/Robustness 충돌 0, v1.0.0 continuity 명시 |
+| SEALED manifest metadata | `PASS`; combined `e5b315...`, opened/search false |
+
+v1.0.1이 PRZ-028 구현과 공식 T0/T1의 유일한 stress input이다.
+
+## 5. 아직 생성되지 않은 근거
 
 Extraction accuracy, observation accuracy, match precision/recall, T0/T1 ranking metric, latency와
 최종 판정은 모두 `NOT_RUN / NOT_VERIFIED`다. 실제 실행 전에는 이 절을 PASS로 바꾸지 않는다.

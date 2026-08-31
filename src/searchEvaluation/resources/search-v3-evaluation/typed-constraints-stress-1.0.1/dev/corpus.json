@@ -1,0 +1,113 @@
+{
+  "artifactType": "CORPUS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.0.1",
+  "split": "DEV",
+  "userBundles": [
+    {
+      "userBundleId": "SV3-U31",
+      "split": "DEV",
+      "professionGroup": "MARKETING_SALES",
+      "profession": "Partner marketing manager",
+      "languageProfile": "KO",
+      "documentFamilyId": "SV3-U31-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC-TEMPLATE-MARKETING-31",
+      "documents": [
+        {
+          "documentId": "SV3-U31-D01",
+          "logicalDocumentId": "SV3-U31-D01-LOGICAL",
+          "versionLineageId": "SV3-U31-D01-LINEAGE",
+          "versionId": "SV3-U31-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "파트너 마케팅 성과 기록",
+          "documentType": "CAREER_REVIEW",
+          "documentStructure": "CAREER_DESCRIPTION",
+          "fileType": "TXT",
+          "language": "KO",
+          "contentPath": "documents/sv3-u31-typed-stress-v01.txt",
+          "contentSha256": "051eb13d978499e7dd804c77b84a7b760004c1ec8b3f727d8bb0952520d58d30",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "PUBLIC_FIXTURE",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "materialize-prz028-typed-stress",
+            "generatorRevision": "prz028-typed-stress-correction-v1",
+            "generatorSeedId": "SV3-TC-SEED-MARKETING-31-A7E1"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-U32",
+      "split": "DEV",
+      "professionGroup": "DESIGN_PRODUCT",
+      "profession": "Service designer",
+      "languageProfile": "EN",
+      "documentFamilyId": "SV3-U32-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC-TEMPLATE-DESIGN-32",
+      "documents": [
+        {
+          "documentId": "SV3-U32-D01",
+          "logicalDocumentId": "SV3-U32-D01-LOGICAL",
+          "versionLineageId": "SV3-U32-D01-LINEAGE",
+          "versionId": "SV3-U32-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Booking service case study",
+          "documentType": "PORTFOLIO",
+          "documentStructure": "LONG_PORTFOLIO",
+          "fileType": "TXT",
+          "language": "EN",
+          "contentPath": "documents/sv3-u32-typed-stress-v01.txt",
+          "contentSha256": "cc11e23b39874e246e9bafe54257dcd5eb3e9b06fe34c24852ea2801ccc43847",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "PUBLIC_FIXTURE",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "materialize-prz028-typed-stress",
+            "generatorRevision": "prz028-typed-stress-correction-v1",
+            "generatorSeedId": "SV3-TC-SEED-DESIGN-32-B4D2"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-U33",
+      "split": "DEV",
+      "professionGroup": "NON_DEVELOPMENT_GENERAL",
+      "profession": "Community operations coordinator",
+      "languageProfile": "KO_EN_MIXED",
+      "documentFamilyId": "SV3-U33-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC-TEMPLATE-COMMUNITY-33",
+      "documents": [
+        {
+          "documentId": "SV3-U33-D01",
+          "logicalDocumentId": "SV3-U33-D01-LOGICAL",
+          "versionLineageId": "SV3-U33-D01-LINEAGE",
+          "versionId": "SV3-U33-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Community operations 기록",
+          "documentType": "CAREER_REVIEW",
+          "documentStructure": "NARRATIVE_SELF_INTRODUCTION",
+          "fileType": "TXT",
+          "language": "KO_EN_MIXED",
+          "contentPath": "documents/sv3-u33-typed-stress-v01.txt",
+          "contentSha256": "694a874d8820b0724dca024786d91d45082109182dbcf05eafdafa547c3cce85",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "PUBLIC_FIXTURE",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "materialize-prz028-typed-stress",
+            "generatorRevision": "prz028-typed-stress-correction-v1",
+            "generatorSeedId": "SV3-TC-SEED-COMMUNITY-33-C9F3"
+          }
+        }
+      ]
+    }
+  ]
+}

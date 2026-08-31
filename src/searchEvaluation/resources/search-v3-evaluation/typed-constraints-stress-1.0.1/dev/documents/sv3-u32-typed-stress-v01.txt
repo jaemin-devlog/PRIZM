@@ -1,0 +1,13 @@
+Booking service case study
+
+Approved booking flow
+The redesigned booking flow achieved an 80% task completion rate in the controlled rollout.
+
+Earlier concept test
+An earlier concept test reached a 72% task completion rate and was not approved.
+
+Service launch
+The approved service launch date was 2025-07-15 after the accessibility review.
+
+Research archive
+Research notes were archived without a release date or deployment claim.

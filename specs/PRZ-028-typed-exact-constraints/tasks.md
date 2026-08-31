@@ -9,7 +9,12 @@
 - [x] PLAN: stress input freeze, implementation, verification과 rollback 계획
 - [x] DATA: DEV/CAL Typed Constraint Stress Set 24문항 materialize
 - [x] VERIFY-DATA: schema/source span/lineage/hash/SEALED guard 검증
-- [ ] INTEGRATE-DATA: 결과 실행 전 input-freeze local commit
+- [x] INTEGRATE-DATA: 최초 input-freeze local commit `4bbbc5d` — annotation feasibility finding으로
+  `INVALID_INPUT_HISTORICAL`, benchmark 0
+- [x] AUDIT-DATA: 구현 전 qualifier/span/date operator/language consistency finding 확인
+- [x] DATA-CORRECTION: v1.0.0 보존, corrected v1.0.1 별도 materialize
+- [x] VERIFY-DATA-CORRECTION: v1.0.0/v1.0.1 byte/hash/lineage/SEALED guard 검증
+- [ ] INTEGRATE-DATA-CORRECTION: corrected v1.0.1 local input-freeze commit
 - [ ] IMPLEMENT: deterministic query constraint parser와 candidate observation extractor
 - [ ] IMPLEMENT: three-state evaluator와 full-ranking candidate-preserving stable partition
 - [ ] TEST: parser/evaluator/provenance/parity/stable order/SEALED guard

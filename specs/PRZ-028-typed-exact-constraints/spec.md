@@ -44,8 +44,8 @@ Candidate observation은 `sourceText`에서만 추출하고 `retrievalText`, hea
 
 일반 normalization은 NFKC, Locale-independent case fold, 숫자 comma 제거, `%`와 ASCII unit의
 case/space 정리이며 한국어 count unit surface는 보존한다. `semanticType`, 직무별 unit alias나
-ontology label은 runtime match에 사용하지 않는다. Date는 `이후/부터=GTE`(동일 연도보다 정밀한
-후속 날짜 포함), `이전=LT`, range 양끝 inclusive다. precision은 `YEAR`, `YEAR_MONTH`,
+ontology label은 runtime match에 사용하지 않는다. Date는 English `after=GT`, `before=LT`, Korean
+`이후/부터=GTE`, `이전=LT`, range 양끝 inclusive다. precision은 `YEAR`, `YEAR_MONTH`,
 `FULL_DATE`로 보존한다.
 
 Parser precedence는 date range/date → explicit quantity(number+unit/comparator) →
@@ -89,6 +89,8 @@ Stress Set은 synthetic·비개인 fixture, 독립 user/document/template/genera
 lineage만 사용한다. materializer의 per-file/combined SHA-256과 count를 구현 전에 freeze하고 이후
 수정하지 않는다. typed annotation은 expected query constraint와 query offset, evidence-unit별 expected
 observation과 absolute document provenance, query/evidence-unit expected match state를 포함한다.
+Constraint core와 qualifier/direction은 각각 source-grounded code-point span을 가져야 하며 qualifier를
+constraint core span에 선택적으로 포함하지 않는다.
 Runtime passage/DB ID는 허용하지 않는다. 기존 Original/Long-form/Robustness와 SEALED FINAL을
 덮어쓰지 않는다.
 

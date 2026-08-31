@@ -21,14 +21,17 @@ import tools.jackson.databind.ObjectMapper;
 /** Gold-free corpus loader plus post-freeze semantic-stress Gold loader for PRZ-030. */
 final class SearchV3SemanticOracleDataset {
 
-    static final String STRESS_VERSION = "semantic-support-stress-1.0.0";
+    static final String STRESS_VERSION = "semantic-support-stress-1.0.1";
+    static final String STRESS_PREVIOUS_VERSION = "semantic-support-stress-1.0.0";
+    static final String STRESS_CHANGE_REASON =
+            "PRE_RETRIEVAL_FIX_PRZ025_ASPECT_CONTRACT_AND_OTHER_ACTOR_COVERAGE";
     static final String STRESS_SUITE = "PRZ030_SEMANTIC_SUPPORT_STRESS";
     static final String STRESS_SHA256 =
-            "449c36af0ac3cf36211eba5a2e6491a54f1ab1553a91d3d264152765e3dea61c";
+            "b541a570eb304970d165ce25e835f15576381d29670c7439bd60c25f3e46f75d";
     static final String STRESS_RUNTIME_SHA256 =
-            "4e6c6f719f32e11b9039a2f6679c91ff19f1b130675a8afe6d20e024d3748907";
+            "c20d42920ee4cc509981de5e50dd70cfa6f5ebf9a5c3fdfad229c1ae546528af";
     static final Path STRESS_ROOT = Path.of(
-            "src/searchEvaluation/resources/search-v3-evaluation/semantic-support-stress-1.0.0");
+            "src/searchEvaluation/resources/search-v3-evaluation/semantic-support-stress-1.0.1");
     private static final Path ORIGINAL_ROOT = Path.of("src/test/resources/search-v3-evaluation");
     private static final Path LONG_FORM_ROOT = Path.of(
             "src/searchEvaluation/resources/search-v3-evaluation/devcal-1.1.0");
@@ -175,17 +178,24 @@ final class SearchV3SemanticOracleDataset {
             if (categories.isEmpty()) {
                 throw new IllegalStateException("semantic stress query requires categories");
             }
-            List<ExpectedRelation> expected = new ArrayList<>();
-            for (JsonNode relationNode : node.path("expectedEvidence")) {
-                String unitId = required(relationNode, "evidenceUnitId");
-                String relation = required(relationNode, "supportRelation");
-                StressGoldUnit unit = units.get(unitId);
-                if (unit == null || !owner.equals(unit.userBundleId()) || !RELATIONS.contains(relation)) {
-                    throw new IllegalStateException("semantic stress query relation is invalid");
-                }
-                expected.add(new ExpectedRelation(unitId, relation));
+            List<ExpectedRelation> expected = parseExpectedRelations(
+                    node.path("expectedEvidence"), owner, units);
+            JsonNode expressionNode = node.path("aspectExpression");
+            StressAspectExpression expression = new StressAspectExpression(
+                    required(expressionNode, "operator"),
+                    strings(expressionNode.path("requiredAspectIds")),
+                    expressionNode.path("minShouldMatch").asInt(-1));
+            List<StressAspect> aspects = new ArrayList<>();
+            for (JsonNode aspectNode : node.path("aspects")) {
+                aspects.add(new StressAspect(
+                        required(aspectNode, "aspectId"),
+                        aspectNode.path("required").asBoolean(false),
+                        required(aspectNode, "answerability"),
+                        aspectNode.path("minEvidenceGroups").asInt(-1),
+                        strings(aspectNode.path("requiredEvidenceGroupIds")),
+                        parseExpectedRelations(aspectNode.path("expectedEvidence"), owner, units)));
             }
-            validateAnswerability(answerability, expected);
+            validateAnswerability(answerability, expression, aspects, expected);
             questions.add(new StressGoldQuery(
                     queryId,
                     owner,
@@ -193,6 +203,8 @@ final class SearchV3SemanticOracleDataset {
                     runtimeQuestion.language(),
                     categories,
                     answerability,
+                    expression,
+                    List.copyOf(aspects),
                     List.copyOf(expected)));
         }
         if (questions.size() != 12 || !ids.equals(runtimeById.keySet())) {
@@ -205,6 +217,8 @@ final class SearchV3SemanticOracleDataset {
         JsonNode manifest = read(STRESS_ROOT.resolve("runtime-manifest.json"));
         if (!"SEARCH_V3_SEMANTIC_SUPPORT_STRESS_RUNTIME_MANIFEST".equals(required(manifest, "artifactType"))
                 || !STRESS_VERSION.equals(required(manifest, "datasetVersion"))
+                || !STRESS_PREVIOUS_VERSION.equals(required(manifest, "previousVersion"))
+                || !STRESS_CHANGE_REASON.equals(required(manifest, "changeReason"))
                 || !"1.0.0".equals(required(manifest, "schemaVersion"))
                 || !ROBUSTNESS_VERSION.equals(required(manifest, "baseDatasetVersion"))
                 || !strings(manifest.path("splits")).equals(List.of("DEV", "CALIBRATION"))
@@ -238,6 +252,8 @@ final class SearchV3SemanticOracleDataset {
         JsonNode manifest = read(STRESS_ROOT.resolve("manifest.json"));
         if (!"SEARCH_V3_SEMANTIC_SUPPORT_STRESS_OVERLAY_MANIFEST".equals(required(manifest, "artifactType"))
                 || !STRESS_VERSION.equals(required(manifest, "datasetVersion"))
+                || !STRESS_PREVIOUS_VERSION.equals(required(manifest, "previousVersion"))
+                || !STRESS_CHANGE_REASON.equals(required(manifest, "changeReason"))
                 || !"1.0.0".equals(required(manifest, "schemaVersion"))
                 || !ROBUSTNESS_VERSION.equals(required(manifest, "baseDatasetVersion"))
                 || !"INPUT_FROZEN".equals(required(manifest, "status"))
@@ -388,6 +404,8 @@ final class SearchV3SemanticOracleDataset {
         if (!"SEARCH_V3_SEMANTIC_SUPPORT_STRESS_LINEAGE".equals(required(lineage, "artifactType"))
                 || !"1.0.0".equals(required(lineage, "schemaVersion"))
                 || !STRESS_VERSION.equals(required(lineage, "datasetVersion"))
+                || !STRESS_PREVIOUS_VERSION.equals(required(lineage, "previousVersion"))
+                || !STRESS_CHANGE_REASON.equals(required(lineage, "changeReason"))
                 || !ROBUSTNESS_VERSION.equals(required(lineage, "baseDatasetVersion"))
                 || lineage.path("baseAssetsModified").asBoolean(true)
                 || lineage.path("documentCopies").asInt(-1) != 0
@@ -585,15 +603,93 @@ final class SearchV3SemanticOracleDataset {
         }
     }
 
-    private void validateAnswerability(String answerability, List<ExpectedRelation> expected) {
-        boolean direct = expected.stream().anyMatch(value -> "DIRECT_SUPPORT".equals(value.relation()));
-        boolean related = expected.stream().anyMatch(value -> "RELATED".equals(value.relation()));
-        boolean insufficient = expected.stream().anyMatch(value -> "INSUFFICIENT".equals(value.relation()));
-        if (expected.isEmpty()
-                || ("SUPPORTED".equals(answerability) && !direct)
-                || ("PARTIALLY_SUPPORTED".equals(answerability) && (direct || (!related && !insufficient)))
-                || ("NOT_SUPPORTED".equals(answerability) && direct)) {
-            throw new IllegalStateException("semantic stress answerability/relation mismatch");
+    private List<ExpectedRelation> parseExpectedRelations(
+            JsonNode relationNodes,
+            String owner,
+            Map<String, StressGoldUnit> units) {
+        List<ExpectedRelation> result = new ArrayList<>();
+        Set<String> unitIds = new LinkedHashSet<>();
+        for (JsonNode relationNode : relationNodes) {
+            String unitId = required(relationNode, "evidenceUnitId");
+            String groupId = required(relationNode, "evidenceGroupId");
+            String relation = required(relationNode, "supportRelation");
+            StressGoldUnit unit = units.get(unitId);
+            if (!unitIds.add(unitId) || unit == null || !owner.equals(unit.userBundleId())
+                    || !groupId.equals(unit.evidenceGroupId()) || !RELATIONS.contains(relation)) {
+                throw new IllegalStateException("semantic stress query relation is invalid");
+            }
+            result.add(new ExpectedRelation(unitId, groupId, relation));
+        }
+        if (result.isEmpty()) {
+            throw new IllegalStateException("semantic stress query requires expected evidence");
+        }
+        return List.copyOf(result);
+    }
+
+    private void validateAnswerability(
+            String answerability,
+            StressAspectExpression expression,
+            List<StressAspect> aspects,
+            List<ExpectedRelation> expected) {
+        if (!("ALL".equals(expression.operator()) || "ANY".equals(expression.operator()))
+                || expression.requiredAspectIds().isEmpty()
+                || expression.minShouldMatch() < 1
+                || expression.minShouldMatch() > expression.requiredAspectIds().size()
+                || aspects.isEmpty()) {
+            throw new IllegalStateException("semantic stress aspect expression is invalid");
+        }
+        Map<String, StressAspect> aspectById = new LinkedHashMap<>();
+        Set<ExpectedRelation> flattened = new LinkedHashSet<>();
+        for (StressAspect aspect : aspects) {
+            if (aspectById.put(aspect.aspectId(), aspect) != null
+                    || !ANSWERABILITY.contains(aspect.answerability())) {
+                throw new IllegalStateException("semantic stress aspect identity is invalid");
+            }
+            Set<String> directGroups = new LinkedHashSet<>();
+            for (ExpectedRelation relation : aspect.expectedRelations()) {
+                if (!flattened.add(relation)) {
+                    throw new IllegalStateException("semantic stress evidence cannot cross aspects");
+                }
+                if ("DIRECT_SUPPORT".equals(relation.relation())) {
+                    directGroups.add(relation.evidenceGroupId());
+                }
+            }
+            if (directGroups.isEmpty()) {
+                if (!"NOT_SUPPORTED".equals(aspect.answerability())
+                        || aspect.minEvidenceGroups() != 0
+                        || !aspect.requiredEvidenceGroupIds().isEmpty()) {
+                    throw new IllegalStateException("semantic stress non-direct aspect is invalid");
+                }
+            }
+            else if (!"SUPPORTED".equals(aspect.answerability())
+                    || aspect.minEvidenceGroups() < 1
+                    || aspect.minEvidenceGroups() > directGroups.size()
+                    || aspect.requiredEvidenceGroupIds().isEmpty()
+                    || !directGroups.containsAll(aspect.requiredEvidenceGroupIds())) {
+                throw new IllegalStateException("semantic stress direct aspect is invalid");
+            }
+        }
+        Set<String> requiredAspectIds = aspects.stream()
+                .filter(StressAspect::required)
+                .map(StressAspect::aspectId)
+                .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+        if (!requiredAspectIds.equals(new LinkedHashSet<>(expression.requiredAspectIds()))
+                || expected.size() != new LinkedHashSet<>(expected).size()
+                || !flattened.equals(new LinkedHashSet<>(expected))) {
+            throw new IllegalStateException("semantic stress flat/aspect Gold mismatch");
+        }
+        long directRequired = expression.requiredAspectIds().stream()
+                .map(aspectById::get)
+                .filter(Objects::nonNull)
+                .filter(aspect -> aspect.expectedRelations().stream()
+                        .anyMatch(value -> "DIRECT_SUPPORT".equals(value.relation())))
+                .count();
+        int requiredCount = expression.requiredAspectIds().size();
+        if (directRequired == 0 && !"NOT_SUPPORTED".equals(answerability)
+                || directRequired == requiredCount && !"SUPPORTED".equals(answerability)
+                || directRequired > 0 && directRequired < requiredCount
+                        && !"PARTIALLY_SUPPORTED".equals(answerability)) {
+            throw new IllegalStateException("semantic stress answerability/aspect mismatch");
         }
     }
 
@@ -735,7 +831,31 @@ final class SearchV3SemanticOracleDataset {
         }
     }
 
-    record ExpectedRelation(String evidenceUnitId, String relation) {
+    record ExpectedRelation(String evidenceUnitId, String evidenceGroupId, String relation) {
+    }
+
+    record StressAspectExpression(
+            String operator,
+            List<String> requiredAspectIds,
+            int minShouldMatch) {
+
+        StressAspectExpression {
+            requiredAspectIds = List.copyOf(requiredAspectIds);
+        }
+    }
+
+    record StressAspect(
+            String aspectId,
+            boolean required,
+            String answerability,
+            int minEvidenceGroups,
+            List<String> requiredEvidenceGroupIds,
+            List<ExpectedRelation> expectedRelations) {
+
+        StressAspect {
+            requiredEvidenceGroupIds = List.copyOf(requiredEvidenceGroupIds);
+            expectedRelations = List.copyOf(expectedRelations);
+        }
     }
 
     record StressGoldUnit(
@@ -763,10 +883,13 @@ final class SearchV3SemanticOracleDataset {
             String language,
             List<String> categories,
             String answerability,
+            StressAspectExpression aspectExpression,
+            List<StressAspect> aspects,
             List<ExpectedRelation> expectedRelations) {
 
         StressGoldQuery {
             categories = List.copyOf(categories);
+            aspects = List.copyOf(aspects);
             expectedRelations = List.copyOf(expectedRelations);
         }
     }

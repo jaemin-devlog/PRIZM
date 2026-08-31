@@ -1,4 +1,4 @@
-# Semantic Support Stress 1.0.0
+# Semantic Support Stress 1.0.1
 
 This tracked overlay adds semantic evidence-selection stress cases to the existing
 `devcal-robustness-1.0.0` DEV and CALIBRATION corpus. It contains no document
@@ -6,7 +6,12 @@ copies: every gold span points to one of the six existing synthetic TXT fixtures
 
 - Scope: 24 new queries, 12 DEV and 12 CALIBRATION, four per referenced bundle.
 - State balance: 8 `SUPPORTED`, 8 `PARTIALLY_SUPPORTED`, 8 `NOT_SUPPORTED`.
-- Relation balance: 8 `DIRECT_SUPPORT`, 4 `RELATED`, 4 `INSUFFICIENT`,
+- Every partial query has two required aspects: one source-grounded
+  `DIRECT_SUPPORT` aspect and one `RELATED` or `INSUFFICIENT` aspect.
+- Every query explicitly declares its aspect expression and aspect-level
+  answerability. A source-grounded `TEAM` assertion supplies one supported
+  other-actor case; the paired self-attribution question remains partial.
+- Relation balance: 16 `DIRECT_SUPPORT`, 4 `RELATED`, 4 `INSUFFICIENT`,
   8 `CONTRADICTS`.
 - Intended use: semantic selection/ranking development on DEV/CALIBRATION only.
 - Prohibited use: SEALED FINAL access, tuning from SEALED results, or treating

@@ -1,19 +1,19 @@
 {
   "artifactType": "SEARCH_V3_RUNTIME_QUESTIONS_OVERLAY",
   "schemaVersion": "1.0.0",
-  "datasetVersion": "semantic-support-stress-1.0.0",
+  "datasetVersion": "semantic-support-stress-1.0.1",
   "split": "DEV",
   "queries": [
     {"queryId": "SV3-SS-U201-Q01", "userBundleId": "SV3-RB-U201", "query": "연결이 끊겨도 점검 기록의 무결성을 지키는 기능을 실제 현장 앱에 배포했나요?", "language": "KO"},
-    {"queryId": "SV3-SS-U201-Q02", "userBundleId": "SV3-RB-U201", "query": "모바일 성능 측정 기준을 기기 공급업체 표준으로 확장할 수 있다는 근거가 있나요?", "language": "KO"},
+    {"queryId": "SV3-SS-U201-Q02", "userBundleId": "SV3-RB-U201", "query": "연결 중단 뒤 기록 무결성 보호 기능을 현장 앱에 배포했고, 성능 측정 기준도 기기 공급업체 표준으로 확장했나요?", "language": "KO"},
     {"queryId": "SV3-SS-U201-Q03", "userBundleId": "SV3-RB-U201", "query": "위험 신호가 있었지만 전체 롤아웃을 중단하지 않았나요?", "language": "KO"},
     {"queryId": "SV3-SS-U201-Q04", "userBundleId": "SV3-RB-U201", "query": "스크린 리더만으로 핵심 점검 과업을 끝낼 수 있도록 검증했나요?", "language": "KO"},
     {"queryId": "SV3-SS-U202-Q01", "userBundleId": "SV3-RB-U202", "query": "Did the candidate turn observed handoff failures into a shared recovery model?", "language": "EN"},
-    {"queryId": "SV3-SS-U202-Q02", "userBundleId": "SV3-RB-U202", "query": "Did the service owner personally run all sixteen prototype sessions?", "language": "EN"},
+    {"queryId": "SV3-SS-U202-Q02", "userBundleId": "SV3-RB-U202", "query": "Did the candidate create the shared recovery model, and did the service owner personally run all sixteen prototype sessions?", "language": "EN"},
     {"queryId": "SV3-SS-U202-Q03", "userBundleId": "SV3-RB-U202", "query": "Were ownership conflicts left unresolved after the decision sessions?", "language": "EN"},
-    {"queryId": "SV3-SS-U202-Q04", "userBundleId": "SV3-RB-U202", "query": "What evidence suggests the six-office recovery rollout could generalize to every office nationwide?", "language": "EN"},
+    {"queryId": "SV3-SS-U202-Q04", "userBundleId": "SV3-RB-U202", "query": "Did the candidate create a shared recovery model, and was it proven to generalize to every office nationwide?", "language": "EN"},
     {"queryId": "SV3-SS-U203-Q01", "userBundleId": "SV3-RB-U203", "query": "production에 incompatible schema 변경이 들어가지 않도록 어떤 검증 절차를 운영했나요?", "language": "KO_EN_MIXED"},
-    {"queryId": "SV3-SS-U203-Q02", "userBundleId": "SV3-RB-U203", "query": "model owner가 segment drift monitor를 직접 설계하고 배포했다는 근거가 있나요?", "language": "KO_EN_MIXED"},
+    {"queryId": "SV3-SS-U203-Q02", "userBundleId": "SV3-RB-U203", "query": "incompatible schema 차단 절차를 운영했고, model owner가 segment drift monitor도 직접 설계·배포했나요?", "language": "KO_EN_MIXED"},
     {"queryId": "SV3-SS-U203-Q03", "userBundleId": "SV3-RB-U203", "query": "배치 복구 뒤 duplicate key와 missing partition 검사를 하지 않았나요?", "language": "KO_EN_MIXED"},
     {"queryId": "SV3-SS-U203-Q04", "userBundleId": "SV3-RB-U203", "query": "preventive action에는 owner와 due date만 붙였고 실제로 complete하지 않았나요?", "language": "KO_EN_MIXED"}
   ]

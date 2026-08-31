@@ -17,6 +17,7 @@ import static com.prizm.search.evaluation.searchv3.structural.SearchV3OracleCeil
 import static com.prizm.search.evaluation.searchv3.structural.SearchV3OracleCeilingEvaluator.OracleRelation.DIRECT_SUPPORT;
 import static com.prizm.search.evaluation.searchv3.structural.SearchV3OracleCeilingEvaluator.OracleRelation.INSUFFICIENT;
 import static com.prizm.search.evaluation.searchv3.structural.SearchV3OracleCeilingEvaluator.OracleRelation.RELATED;
+import static com.prizm.search.evaluation.searchv3.structural.SearchV3OracleCeilingEvaluator.OracleRelation.UNJUDGED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -30,11 +31,15 @@ import com.prizm.search.evaluation.searchv3.structural.SearchV3CandidateFreeze.Q
 import com.prizm.search.evaluation.searchv3.structural.SearchV3OracleCeilingEvaluator.OracleCandidate;
 import com.prizm.search.evaluation.searchv3.structural.SearchV3OracleCeilingEvaluator.OracleRelation;
 import com.prizm.search.evaluation.searchv3.structural.SearchV3OracleCeilingEvaluator.OracleRun;
+import com.prizm.search.evaluation.searchv3.structural.SearchV3OracleCeilingEvaluator.ExpectedGoldEvidence;
+import com.prizm.search.evaluation.searchv3.structural.SearchV3OracleCeilingEvaluator.GoldAspect;
+import com.prizm.search.evaluation.searchv3.structural.SearchV3OracleCeilingEvaluator.GoldAspectExpression;
 import com.prizm.search.evaluation.searchv3.structural.SearchV3OracleCeilingEvaluator.QueryGold;
 import com.prizm.search.evaluation.searchv3.structural.SearchV3OracleCeilingEvaluator.QueryResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -64,7 +69,7 @@ class SearchV3OracleCeilingEvaluatorTest {
         assertThat(result.o1Ranking()).extracting(value -> value.candidate().candidateId())
                 .containsExactly("P2", "P1", "P3", "P4", "P5");
         assertThat(result.o1Ranking()).extracting(OracleCandidate::relation)
-                .containsExactly(DIRECT_SUPPORT, RELATED, RELATED, CONTRADICTS, INSUFFICIENT);
+                .containsExactly(DIRECT_SUPPORT, RELATED, RELATED, CONTRADICTS, UNJUDGED);
         assertThat(result.o1Ranking().stream()
                 .filter(value -> value.relation() == RELATED)
                 .map(value -> value.candidate().candidateId()))
@@ -110,7 +115,7 @@ class SearchV3OracleCeilingEvaluatorTest {
                 .extracting(value -> value.evidenceChildId())
                 .containsExactly("RELATED-CHILD", "DIRECT-CHILD");
         assertThat(OracleRelation.values())
-                .containsExactly(DIRECT_SUPPORT, RELATED, CONTRADICTS, INSUFFICIENT);
+                .containsExactly(DIRECT_SUPPORT, RELATED, CONTRADICTS, INSUFFICIENT, UNJUDGED);
     }
 
     @Test
@@ -124,7 +129,8 @@ class SearchV3OracleCeilingEvaluatorTest {
                 query("Q3", "U2", EvaluationTrack.SEMANTIC,
                         candidate(1, "Q3-P1", "U2", 0.9d, "Q3-I")),
                 query("Q4", "U2", EvaluationTrack.SEMANTIC,
-                        candidate(1, "Q4-P1", "U2", 0.9d, "Q4-R")),
+                        candidate(1, "Q4-P1", "U2", 0.9d, "Q4-R"),
+                        candidate(2, "Q4-P2", "U2", 0.8d, "Q4-D")),
                 query("Q5", "U3", EvaluationTrack.SEMANTIC,
                         candidate(1, "Q5-P1", "U3", 0.9d, "Q5-C")),
                 query("Q6", "U3", EvaluationTrack.SEMANTIC,
@@ -140,8 +146,8 @@ class SearchV3OracleCeilingEvaluatorTest {
                         true,
                         Map.of()),
                 gold("Q4", "U2", "design", "en", List.of("multi_aspect"), PARTIALLY_SUPPORTED,
-                        false,
-                        Map.of("Q4-R", RELATED)),
+                        true,
+                        Map.of("Q4-R", RELATED, "Q4-D", DIRECT_SUPPORT)),
                 gold("Q5", "U3", "marketing", "ko", List.of("negation"), NOT_SUPPORTED,
                         false,
                         Map.of("Q5-C", CONTRADICTS)),
@@ -159,7 +165,7 @@ class SearchV3OracleCeilingEvaluatorTest {
         assertThat(byId.get("Q3").directPositive()).isTrue();
         assertThat(byId.get("Q3").s0().directRecallAt20()).isFalse();
         assertThat(byId.get("Q3").o1().directRecallAt20()).isFalse();
-        assertThat(byId.get("Q4").failureStage()).isEqualTo(PARTIAL_ONLY);
+        assertThat(byId.get("Q4").failureStage()).isEqualTo(RANKING_RECOVERABLE);
         assertThat(byId.get("Q5").failureStage()).isEqualTo(FALSE_POSITIVE_RISK);
         assertThat(byId.get("Q6").failureStage()).isEqualTo(NO_SUPPORT);
         assertThat(byId.get("Q1").ceilingState()).isEqualTo(FOUND);
@@ -168,9 +174,9 @@ class SearchV3OracleCeilingEvaluatorTest {
         assertThat(byId.get("Q4").ceilingState()).isEqualTo(PARTIAL);
         assertThat(byId.get("Q5").ceilingState()).isEqualTo(NONE);
         assertThat(byId.get("Q6").ceilingState()).isEqualTo(NONE);
-        assertThat(run.aggregate().directPositiveQueryCount()).isEqualTo(3);
-        assertThat(run.aggregate().s0DirectRecallAt20()).isEqualTo(2.0d / 3.0d);
-        assertThat(run.aggregate().o1Top1()).isEqualTo(2.0d / 3.0d);
+        assertThat(run.aggregate().directPositiveQueryCount()).isEqualTo(4);
+        assertThat(run.aggregate().s0DirectRecallAt20()).isEqualTo(3.0d / 4.0d);
+        assertThat(run.aggregate().o1Top1()).isEqualTo(3.0d / 4.0d);
     }
 
     @Test
@@ -182,7 +188,8 @@ class SearchV3OracleCeilingEvaluatorTest {
                         candidate(1, "Q2-P1", "U1", 0.8d, "Q2-R"),
                         candidate(2, "Q2-P2", "U1", 0.7d, "Q2-D")),
                 query("Q3", "U2", EvaluationTrack.SEMANTIC,
-                        candidate(1, "Q3-P1", "U2", 0.9d, "Q3-R")));
+                        candidate(1, "Q3-P1", "U2", 0.9d, "Q3-R"),
+                        candidate(2, "Q3-P2", "U2", 0.8d, "Q3-D")));
         List<QueryGold> gold = List.of(
                 gold("Q1", "U1", "backend", "ko", List.of("semantic", "korean"), SUPPORTED,
                         true,
@@ -191,8 +198,8 @@ class SearchV3OracleCeilingEvaluatorTest {
                         true,
                         Map.of("Q2-R", RELATED, "Q2-D", DIRECT_SUPPORT)),
                 gold("Q3", "U2", "design", "en", List.of("abstract"), PARTIALLY_SUPPORTED,
-                        false,
-                        Map.of("Q3-R", RELATED)));
+                        true,
+                        Map.of("Q3-R", RELATED, "Q3-D", DIRECT_SUPPORT)));
 
         OracleRun run = run(EvaluationTrack.SEMANTIC, queries, gold);
 
@@ -230,7 +237,11 @@ class SearchV3OracleCeilingEvaluatorTest {
                 candidate(1, "P1", "U1", 0.9d, "C1"));
         QueryGold malformed = new QueryGold(
                 "Q1", "U1", "backend", "ko", List.of("semantic"), SUPPORTED,
-                List.of(RELATED), Map.of("C1", RELATED));
+                new GoldAspectExpression("ALL", List.of("only"), 1),
+                List.of(new GoldAspect(
+                        "only", true, 0, List.of(),
+                        List.of(new ExpectedGoldEvidence("C1", "G-C1", RELATED)))),
+                Map.of("P1", List.of("C1")));
 
         assertThatThrownBy(() -> run(
                 EvaluationTrack.SEMANTIC, List.of(query), List.of(malformed)))
@@ -258,7 +269,29 @@ class SearchV3OracleCeilingEvaluatorTest {
                 track,
                 queries));
         guard.verifyFreeze();
-        return guard.joinGold(() -> gold);
+        Map<String, QueryProjection> queryById = queries.stream().collect(Collectors.toMap(
+                QueryProjection::queryId, Function.identity()));
+        List<QueryGold> bound = gold.stream().map(value -> bindCoverage(
+                value, queryById.get(value.queryId()))).toList();
+        return guard.joinGold(() -> bound);
+    }
+
+    private QueryGold bindCoverage(QueryGold gold, QueryProjection query) {
+        Set<String> expectedUnitIds = gold.aspects().stream()
+                .flatMap(aspect -> aspect.expectedEvidence().stream())
+                .map(ExpectedGoldEvidence::evidenceUnitId)
+                .collect(Collectors.toSet());
+        Map<String, List<String>> coverage = new java.util.LinkedHashMap<>();
+        for (CandidateProjection candidate : query.rankedCandidates()) {
+            List<String> covered = candidate.evidenceChildren().stream()
+                    .map(value -> value.evidenceChildId())
+                    .filter(expectedUnitIds::contains)
+                    .toList();
+            if (!covered.isEmpty()) coverage.put(candidate.candidateId(), covered);
+        }
+        return new QueryGold(
+                gold.queryId(), gold.userBundleId(), gold.professionGroup(), gold.language(),
+                gold.categories(), gold.answerability(), gold.aspectExpression(), gold.aspects(), coverage);
     }
 
     private QueryProjection query(
@@ -278,10 +311,39 @@ class SearchV3OracleCeilingEvaluatorTest {
             SearchV3OracleCeilingEvaluator.GoldAnswerability answerability,
             boolean goldDirectPositive,
             Map<String, OracleRelation> relations) {
+        List<ExpectedGoldEvidence> direct = new ArrayList<>();
+        List<ExpectedGoldEvidence> nonDirect = new ArrayList<>();
+        relations.forEach((unitId, relation) -> {
+            ExpectedGoldEvidence expected = new ExpectedGoldEvidence(unitId, "G-" + unitId, relation);
+            (relation == DIRECT_SUPPORT ? direct : nonDirect).add(expected);
+        });
+        if (goldDirectPositive && direct.isEmpty()) {
+            direct.add(new ExpectedGoldEvidence(
+                    "OFF-CANDIDATE-DIRECT", "G-OFF-CANDIDATE-DIRECT", DIRECT_SUPPORT));
+        }
+        List<GoldAspect> aspects = new ArrayList<>();
+        List<String> requiredAspectIds = new ArrayList<>();
+        if (!direct.isEmpty()) {
+            aspects.add(new GoldAspect(
+                    "direct", true, 1,
+                    direct.stream().map(ExpectedGoldEvidence::evidenceGroupId).toList(), direct));
+            requiredAspectIds.add("direct");
+        }
+        if (!nonDirect.isEmpty()) {
+            boolean required = answerability != SUPPORTED;
+            aspects.add(new GoldAspect(
+                    "non_direct", required, 0, List.of(), nonDirect));
+            if (required) requiredAspectIds.add("non_direct");
+        }
+        if (aspects.isEmpty()) {
+            aspects.add(new GoldAspect("no_evidence", true, 0, List.of(), List.of()));
+            requiredAspectIds.add("no_evidence");
+        }
+        GoldAspectExpression expression = new GoldAspectExpression(
+                "ALL", requiredAspectIds, requiredAspectIds.size());
         return new QueryGold(
                 queryId, user, profession, language, categories, answerability,
-                goldDirectPositive ? List.of(DIRECT_SUPPORT) : relations.values().stream().distinct().toList(),
-                relations);
+                expression, aspects, Map.of());
     }
 
     private CandidateProjection candidate(

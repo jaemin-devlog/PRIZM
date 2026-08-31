@@ -23,7 +23,7 @@ Validation/Selection은 변경하지 않고 핵심 집계에서 제외한다.
 Original Seed, Long-form 1.1.0, Robustness 1.0.0 DEV/CAL의 69 semantic query를 그대로
 사용한다. 사전 감사에서 `RELATED` 2건, `PARTIALLY_SUPPORTED` 2건,
 semantic paraphrase/abstract negative 0건, other-actor/negation positive 0건이 확인돼
-`semantic-support-stress-1.0.0`을 추가한다. 기존 Robustness의 여섯 synthetic
+`semantic-support-stress-1.0.1`을 추가한다. 기존 Robustness의 여섯 synthetic
 문서와 bundle/split을 재사용하고, 신규 문서는 만들지 않는다.
 
 Stress는 DEV 12 / CALIBRATION 12 query, 6 bundles, KO/EN 및 여러 직무를
@@ -31,6 +31,10 @@ Stress는 DEV 12 / CALIBRATION 12 query, 6 bundles, KO/EN 및 여러 직무를
 relation, other actor, negation, completion state, related mention, abstract competency, semantic
 paraphrase를 교차한다. source span·owner·version·split·lineage·SHA-256 검증 후
 `INPUT_FROZEN`으로 봉인하며 검색 결과로 수정하지 않는다.
+
+초기 `1.0.0`은 retrieval/model 실행 전에 PARTIALLY_SUPPORTED가 required aspect의
+DIRECT_SUPPORT를 포함하지 않는 계약 오류가 발견돼 철회했다. `1.0.1`은 일부 required
+aspect의 DIRECT와 나머지 미충족 relation을 함께 보존하며 `1.0.0` 결과는 존재하지 않는다.
 
 ## 3. Gold 경계와 Oracle
 
@@ -42,21 +46,31 @@ document/version, ordered EvidenceChild ID만 가지며 Gold relation·answerabi
 Gold join은 runtime ID가 아닌 source-grounded Evidence Unit span을 passage의 ordered
 EvidenceChild provenance에 대조한다. 한 candidate에 relation이 여럿이면 Oracle 순서의
 가장 강한 relation을 적용한다. 같은 relation 내 candidate의 Dense 순서와 candidate
-set/identity는 변경하지 않는다. nDCG gain은 DIRECT/RELATED/CONTRADICTS/
-INSUFFICIENT에 `3/2/1/0`을 사전 고정한다.
+set/identity는 변경하지 않는다. Gold expectedEvidence가 exhaustive candidate judgment가
+아니므로 일치하는 source-grounded unit이 없는 candidate를 `INSUFFICIENT`로 꾸미지 않고
+`UNJUDGED`로 보존한다. O1은 `DIRECT/RELATED/CONTRADICTS/INSUFFICIENT/UNJUDGED` 순이며,
+nDCG gain `3/2/1/0/0`은 judged relation 기준의 보수적 ceiling이다. Direct Recall/Top1/MRR은
+source-grounded DIRECT inventory로 계산하지만, graded relation과 false-positive risk는
+명시적으로 판단된 unit에 한정한 lower bound로 보고한다.
 
 ## 4. 상태와 failure stage
 
-- ceiling state: Top20 DIRECT가 있으면 `FOUND`; DIRECT가 없고 Gold answerability가
-  partial이며 RELATED가 있으면 `PARTIAL`; Gold가 not-supported이고 DIRECT가 없으면
-  `NONE`; 나머지는 `UNRESOLVED`.
+PRZ-025의 multi-aspect 계약을 적용한다. `PARTIALLY_SUPPORTED`는 required aspect 중
+일부에 DIRECT가 있고 다른 required aspect는 직접 입증되지 않은 상태다. 따라서 ceiling
+state는 supported의 모든 required aspect를 Top20 DIRECT가 충족하면 `FOUND`, partial의
+DIRECT aspect가 Top20에 있으면 `PARTIAL`, Gold가 not-supported이면 `NONE`, 나머지는
+`UNRESOLVED`다. 요청서의 "DIRECT 없이 RELATED가 있는 partial" 정의는 PRZ-025 계약과
+충돌해 retrieval 실행 전에 이 문구로 바로잡았으며, 그런 입력은 validator가 거부한다.
 - direct-positive query: expected relation에 DIRECT_SUPPORT가 하나라도 있는 query.
-- failure stage: direct-positive는 `ALREADY_CORRECT / RANKING_RECOVERABLE / RETRIEVAL_MISS`;
-  DIRECT 없는 partial+RELATED는 `PARTIAL_ONLY`; not-supported의 Dense rank 1이 RELATED 또는
-  CONTRADICTS면 `FALSE_POSITIVE_RISK`; 나머지 DIRECT 없는 query는 `NO_SUPPORT`.
+- failure stage: supported와 valid partial을 포함한 direct-positive는
+  `ALREADY_CORRECT / RANKING_RECOVERABLE / RETRIEVAL_MISS`; not-supported의 Dense rank 1이
+  RELATED 또는 CONTRADICTS면 `FALSE_POSITIVE_RISK`; 나머지 DIRECT 없는 query는
+  `NO_SUPPORT`다. 요청된 `PARTIAL_ONLY` 집계 필드는 호환 목적으로 유지하지만 PRZ-025에
+  유효한 partial은 DIRECT aspect를 반드시 가지므로 이 계약에서는 항상 0이어야 한다.
 
-`FALSE_POSITIVE_RISK`는 Dense score threshold 추정이 아니라 상위 비직접 근거를 직접 근거로
-선택할 수 있는 구조적 risk count다.
+`FALSE_POSITIVE_RISK`는 Dense score threshold 추정이 아니라 Gold에 명시된 상위 비직접
+근거를 직접 근거로 선택할 수 있는 구조적 risk lower bound다. `UNJUDGED`는 risk로
+재라벨링하지 않는다.
 
 ## 5. 측정과 `CAPABILITY_GATE`
 

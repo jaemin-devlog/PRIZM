@@ -1,7 +1,7 @@
 {
   "artifactType": "SEARCH_V3_SEMANTIC_SUPPORT_GOLD_OVERLAY",
   "schemaVersion": "1.0.0",
-  "datasetVersion": "semantic-support-stress-1.0.0",
+  "datasetVersion": "semantic-support-stress-1.0.1",
   "split": "DEV",
   "idPolicy": "OVERLAY_ANNOTATION_IDS_ONLY_NO_RUNTIME_IDS",
   "evidenceUnits": [

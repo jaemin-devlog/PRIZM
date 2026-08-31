@@ -1,7 +1,9 @@
 {
   "artifactType": "SEARCH_V3_SEMANTIC_SUPPORT_STRESS_LINEAGE",
   "schemaVersion": "1.0.0",
-  "datasetVersion": "semantic-support-stress-1.0.0",
+  "datasetVersion": "semantic-support-stress-1.0.1",
+  "previousVersion": "semantic-support-stress-1.0.0",
+  "changeReason": "PRE_RETRIEVAL_FIX_PRZ025_ASPECT_CONTRACT_AND_OTHER_ACTOR_COVERAGE",
   "baseDatasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
   "derivation": "MANUAL_SOURCE_GROUNDED_QUERY_AND_GOLD_OVERLAY",
   "baseAssetsModified": false,

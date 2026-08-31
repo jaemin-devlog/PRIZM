@@ -54,7 +54,7 @@ final class SearchV3OracleCeilingEvaluator {
                     .anyMatch(value -> value.relation() == OracleRelation.DIRECT_SUPPORT);
             boolean relatedCandidate = s0.stream()
                     .anyMatch(value -> value.relation() == OracleRelation.RELATED);
-            CeilingState ceilingState = ceilingState(gold.answerability(), directCandidate, relatedCandidate);
+            CeilingState ceilingState = ceilingState(gold, s0);
             FailureStage failureStage = failureStage(
                     gold.answerability(), directPositive, directCandidate, relatedCandidate, s0);
             CeilingState expectedState = expectedState(gold.answerability());
@@ -164,42 +164,117 @@ final class SearchV3OracleCeilingEvaluator {
         requireNonBlank(gold.language(), "language");
         Objects.requireNonNull(gold.answerability(), "answerability");
         gold.categories().forEach(value -> requireNonBlank(value, "category"));
-        Set<String> candidateChildIds = query.rankedCandidates().stream()
-                .flatMap(candidate -> candidate.evidenceChildren().stream())
-                .map(value -> value.evidenceChildId())
+        validateAspectGold(gold);
+        Set<String> candidateIds = query.rankedCandidates().stream()
+                .map(CandidateProjection::candidateId)
                 .collect(Collectors.toSet());
-        gold.relationByEvidenceChildId().forEach((childId, relation) -> {
-            requireNonBlank(childId, "Gold EvidenceChild ID");
-            Objects.requireNonNull(relation, "Oracle relation");
-            if (!candidateChildIds.contains(childId)) {
+        Set<String> expectedUnitIds = gold.aspects().stream()
+                .flatMap(aspect -> aspect.expectedEvidence().stream())
+                .map(ExpectedGoldEvidence::evidenceUnitId)
+                .collect(Collectors.toSet());
+        gold.coveredEvidenceUnitIdsByCandidateId().forEach((candidateId, unitIds) -> {
+            requireNonBlank(candidateId, "Gold candidate ID");
+            if (!candidateIds.contains(candidateId)) {
                 throw new IllegalArgumentException(
-                        "Oracle relation references a child outside frozen candidates: " + childId);
+                        "Oracle coverage references a candidate outside frozen candidates: " + candidateId);
+            }
+            if (unitIds.isEmpty() || !expectedUnitIds.containsAll(unitIds)) {
+                throw new IllegalArgumentException(
+                        "Oracle coverage references a non-expected Gold unit: " + candidateId);
             }
         });
         boolean directPositive = gold.goldDirectPositive();
-        if (gold.answerability() == GoldAnswerability.SUPPORTED && !directPositive) {
-            throw new IllegalArgumentException("SUPPORTED Gold requires expected DIRECT_SUPPORT");
+        boolean nonDirectRequiredAspect = gold.aspects().stream()
+                .filter(GoldAspect::required)
+                .anyMatch(aspect -> aspect.expectedEvidence().stream()
+                        .noneMatch(value -> value.relation() == OracleRelation.DIRECT_SUPPORT));
+        if (gold.answerability() == GoldAnswerability.SUPPORTED
+                && (!directPositive || nonDirectRequiredAspect)) {
+            throw new IllegalArgumentException(
+                    "SUPPORTED Gold requires DIRECT_SUPPORT for every required aspect");
+        }
+        if (gold.answerability() == GoldAnswerability.PARTIALLY_SUPPORTED
+                && (!directPositive || !nonDirectRequiredAspect)) {
+            throw new IllegalArgumentException(
+                    "PARTIALLY_SUPPORTED Gold requires direct and unresolved required aspects");
         }
         if (gold.answerability() == GoldAnswerability.NOT_SUPPORTED && directPositive) {
             throw new IllegalArgumentException("NOT_SUPPORTED Gold cannot expect DIRECT_SUPPORT");
         }
-        if (!directPositive && gold.relationByEvidenceChildId().containsValue(
-                OracleRelation.DIRECT_SUPPORT)) {
-            throw new IllegalArgumentException("DIRECT candidate requires goldDirectPositive");
+    }
+
+    private void validateAspectGold(QueryGold gold) {
+        GoldAspectExpression expression = Objects.requireNonNull(
+                gold.aspectExpression(), "Gold aspectExpression");
+        if (!("ALL".equals(expression.operator()) || "ANY".equals(expression.operator()))) {
+            throw new IllegalArgumentException("Gold aspect operator must be ALL or ANY");
+        }
+        Map<String, GoldAspect> aspectById = gold.aspects().stream().collect(Collectors.toMap(
+                GoldAspect::aspectId,
+                Function.identity(),
+                (left, right) -> {
+                    throw new IllegalArgumentException("duplicate Gold aspect: " + left.aspectId());
+                },
+                LinkedHashMap::new));
+        if (aspectById.isEmpty()
+                || expression.requiredAspectIds().isEmpty()
+                || !aspectById.keySet().containsAll(expression.requiredAspectIds())
+                || expression.minShouldMatch() < 1
+                || expression.minShouldMatch() > expression.requiredAspectIds().size()) {
+            throw new IllegalArgumentException("Gold aspect expression is invalid");
+        }
+        Set<String> unitIds = new LinkedHashSet<>();
+        for (GoldAspect aspect : gold.aspects()) {
+            requireNonBlank(aspect.aspectId(), "Gold aspectId");
+            if (aspect.minEvidenceGroups() < 0) {
+                throw new IllegalArgumentException("Gold aspect evidence requirement is invalid");
+            }
+            Set<String> directGroups = aspect.expectedEvidence().stream()
+                    .filter(expected -> expected.relation() == OracleRelation.DIRECT_SUPPORT)
+                    .map(ExpectedGoldEvidence::evidenceGroupId)
+                    .collect(Collectors.toSet());
+            if (directGroups.isEmpty()) {
+                if (aspect.minEvidenceGroups() != 0 || !aspect.requiredEvidenceGroupIds().isEmpty()) {
+                    throw new IllegalArgumentException(
+                            "Gold non-direct aspect cannot require direct evidence groups");
+                }
+            }
+            else if (aspect.minEvidenceGroups() < 1
+                    || aspect.minEvidenceGroups() > directGroups.size()
+                    || aspect.requiredEvidenceGroupIds().isEmpty()
+                    || !directGroups.containsAll(aspect.requiredEvidenceGroupIds())) {
+                throw new IllegalArgumentException("Gold direct aspect requirement is invalid");
+            }
+            for (ExpectedGoldEvidence expected : aspect.expectedEvidence()) {
+                requireNonBlank(expected.evidenceUnitId(), "Gold Evidence Unit ID");
+                requireNonBlank(expected.evidenceGroupId(), "Gold Evidence Group ID");
+                Objects.requireNonNull(expected.relation(), "Gold expected relation");
+                if (!unitIds.add(expected.evidenceUnitId())) {
+                    throw new IllegalArgumentException(
+                            "Gold Evidence Unit cannot cross aspects: " + expected.evidenceUnitId());
+                }
+            }
         }
     }
 
     private List<OracleCandidate> sourceRanking(QueryProjection query, QueryGold gold) {
         List<OracleCandidate> result = new ArrayList<>();
         for (CandidateProjection candidate : query.rankedCandidates()) {
-            OracleRelation relation = candidate.evidenceChildren().stream()
-                    .map(value -> gold.relationByEvidenceChildId().getOrDefault(
-                            value.evidenceChildId(), OracleRelation.INSUFFICIENT))
-                    .min(Enum::compareTo)
-                    .orElse(OracleRelation.INSUFFICIENT);
+            OracleRelation relation = relationForCandidate(gold, candidate.candidateId());
             result.add(new OracleCandidate(candidate.rank(), candidate.rank(), candidate, relation));
         }
         return List.copyOf(result);
+    }
+
+    private OracleRelation relationForCandidate(QueryGold gold, String candidateId) {
+        Set<String> covered = Set.copyOf(
+                gold.coveredEvidenceUnitIdsByCandidateId().getOrDefault(candidateId, List.of()));
+        return gold.aspects().stream()
+                .flatMap(aspect -> aspect.expectedEvidence().stream())
+                .filter(expected -> covered.contains(expected.evidenceUnitId()))
+                .map(ExpectedGoldEvidence::relation)
+                .min(Enum::compareTo)
+                .orElse(OracleRelation.UNJUDGED);
     }
 
     private List<OracleCandidate> stableOraclePartition(List<OracleCandidate> source) {
@@ -237,20 +312,49 @@ final class SearchV3OracleCeilingEvaluator {
         }
     }
 
-    private CeilingState ceilingState(
-            GoldAnswerability answerability,
-            boolean directCandidate,
-            boolean relatedCandidate) {
-        if (directCandidate) {
-            return CeilingState.FOUND;
-        }
-        if (answerability == GoldAnswerability.PARTIALLY_SUPPORTED && relatedCandidate) {
-            return CeilingState.PARTIAL;
-        }
-        if (answerability == GoldAnswerability.NOT_SUPPORTED) {
+    private CeilingState ceilingState(QueryGold gold, List<OracleCandidate> ranking) {
+        if (gold.answerability() == GoldAnswerability.NOT_SUPPORTED) {
             return CeilingState.NONE;
         }
-        return CeilingState.UNRESOLVED;
+        Set<String> hitDirectUnits = ranking.stream()
+                .flatMap(candidate -> gold.coveredEvidenceUnitIdsByCandidateId()
+                        .getOrDefault(candidate.candidate().candidateId(), List.of()).stream())
+                .filter(unitId -> expectedRelation(gold, unitId) == OracleRelation.DIRECT_SUPPORT)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        if (gold.answerability() == GoldAnswerability.PARTIALLY_SUPPORTED) {
+            return hitDirectUnits.isEmpty() ? CeilingState.UNRESOLVED : CeilingState.PARTIAL;
+        }
+        return requirementsMet(gold, hitDirectUnits) ? CeilingState.FOUND : CeilingState.UNRESOLVED;
+    }
+
+    private OracleRelation expectedRelation(QueryGold gold, String evidenceUnitId) {
+        return gold.aspects().stream()
+                .flatMap(aspect -> aspect.expectedEvidence().stream())
+                .filter(expected -> expected.evidenceUnitId().equals(evidenceUnitId))
+                .map(ExpectedGoldEvidence::relation)
+                .findFirst()
+                .orElse(OracleRelation.INSUFFICIENT);
+    }
+
+    private boolean requirementsMet(QueryGold gold, Set<String> hitDirectUnits) {
+        Map<String, Boolean> satisfied = new LinkedHashMap<>();
+        for (GoldAspect aspect : gold.aspects()) {
+            Set<String> directGroups = aspect.expectedEvidence().stream()
+                    .filter(expected -> expected.relation() == OracleRelation.DIRECT_SUPPORT)
+                    .filter(expected -> hitDirectUnits.contains(expected.evidenceUnitId()))
+                    .map(ExpectedGoldEvidence::evidenceGroupId)
+                    .collect(Collectors.toSet());
+            satisfied.put(
+                    aspect.aspectId(),
+                    directGroups.containsAll(aspect.requiredEvidenceGroupIds())
+                            && directGroups.size() >= aspect.minEvidenceGroups());
+        }
+        long hit = gold.aspectExpression().requiredAspectIds().stream()
+                .filter(id -> Boolean.TRUE.equals(satisfied.get(id)))
+                .count();
+        return "ALL".equals(gold.aspectExpression().operator())
+                ? hit == gold.aspectExpression().requiredAspectIds().size()
+                : hit >= gold.aspectExpression().minShouldMatch();
     }
 
     private FailureStage failureStage(
@@ -335,7 +439,8 @@ final class SearchV3OracleCeilingEvaluator {
         DIRECT_SUPPORT(3),
         RELATED(2),
         CONTRADICTS(1),
-        INSUFFICIENT(0);
+        INSUFFICIENT(0),
+        UNJUDGED(0);
 
         private final int gain;
 
@@ -370,6 +475,37 @@ final class SearchV3OracleCeilingEvaluator {
         NO_SUPPORT
     }
 
+    record GoldAspectExpression(
+            String operator,
+            List<String> requiredAspectIds,
+            int minShouldMatch) {
+
+        GoldAspectExpression {
+            requireNonBlank(operator, "Gold aspect operator");
+            requiredAspectIds = requiredAspectIds == null ? List.of() : List.copyOf(requiredAspectIds);
+        }
+    }
+
+    record ExpectedGoldEvidence(
+            String evidenceUnitId,
+            String evidenceGroupId,
+            OracleRelation relation) {
+    }
+
+    record GoldAspect(
+            String aspectId,
+            boolean required,
+            int minEvidenceGroups,
+            List<String> requiredEvidenceGroupIds,
+            List<ExpectedGoldEvidence> expectedEvidence) {
+
+        GoldAspect {
+            requiredEvidenceGroupIds = requiredEvidenceGroupIds == null
+                    ? List.of() : List.copyOf(requiredEvidenceGroupIds);
+            expectedEvidence = expectedEvidence == null ? List.of() : List.copyOf(expectedEvidence);
+        }
+    }
+
     record QueryGold(
             String queryId,
             String userBundleId,
@@ -377,22 +513,30 @@ final class SearchV3OracleCeilingEvaluator {
             String language,
             List<String> categories,
             GoldAnswerability answerability,
-            List<OracleRelation> expectedGoldRelations,
-            Map<String, OracleRelation> relationByEvidenceChildId) {
+            GoldAspectExpression aspectExpression,
+            List<GoldAspect> aspects,
+            Map<String, List<String>> coveredEvidenceUnitIdsByCandidateId) {
 
         QueryGold {
             requireNonBlank(queryId, "Gold queryId");
             requireNonBlank(userBundleId, "Gold userBundleId");
             categories = categories == null ? List.of() : List.copyOf(categories);
-            expectedGoldRelations = expectedGoldRelations == null
-                    ? List.of() : List.copyOf(expectedGoldRelations);
-            expectedGoldRelations.forEach(value -> Objects.requireNonNull(value, "expected Gold relation"));
-            relationByEvidenceChildId = relationByEvidenceChildId == null
-                    ? Map.of() : Map.copyOf(relationByEvidenceChildId);
+            aspects = aspects == null ? List.of() : List.copyOf(aspects);
+            if (coveredEvidenceUnitIdsByCandidateId == null) {
+                coveredEvidenceUnitIdsByCandidateId = Map.of();
+            }
+            else {
+                Map<String, List<String>> immutable = new LinkedHashMap<>();
+                coveredEvidenceUnitIdsByCandidateId.forEach(
+                        (key, value) -> immutable.put(key, List.copyOf(value)));
+                coveredEvidenceUnitIdsByCandidateId = Map.copyOf(immutable);
+            }
         }
 
         boolean goldDirectPositive() {
-            return expectedGoldRelations.contains(OracleRelation.DIRECT_SUPPORT);
+            return aspects.stream()
+                    .flatMap(aspect -> aspect.expectedEvidence().stream())
+                    .anyMatch(expected -> expected.relation() == OracleRelation.DIRECT_SUPPORT);
         }
     }
 

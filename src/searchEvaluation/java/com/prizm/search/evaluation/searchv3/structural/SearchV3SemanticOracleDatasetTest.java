@@ -23,7 +23,7 @@ class SearchV3SemanticOracleDatasetTest {
                 loader.loadStressRuntime(SearchV3DenseAblationDataset.Split.CALIBRATION);
 
         assertThat(manifest.combinedSha256())
-                .isEqualTo("4e6c6f719f32e11b9039a2f6679c91ff19f1b130675a8afe6d20e024d3748907");
+                .isEqualTo("c20d42920ee4cc509981de5e50dd70cfa6f5ebf9a5c3fdfad229c1ae546528af");
         assertThat(dev.questions()).hasSize(12);
         assertThat(calibration.questions()).hasSize(12);
         assertThat(dev.bundles()).hasSize(3);
@@ -68,10 +68,31 @@ class SearchV3SemanticOracleDatasetTest {
                 "PARTIALLY_SUPPORTED", 8L,
                 "NOT_SUPPORTED", 8L));
         assertThat(relationCounts).containsExactlyInAnyOrderEntriesOf(Map.of(
-                "DIRECT_SUPPORT", 8L,
+                "DIRECT_SUPPORT", 16L,
                 "RELATED", 4L,
                 "INSUFFICIENT", 4L,
                 "CONTRADICTS", 8L));
+        assertThat(queries).allSatisfy(query -> {
+            assertThat(query.aspectExpression()).isNotNull();
+            assertThat(query.aspects()).isNotEmpty();
+        });
+        assertThat(queries.stream()
+                .filter(query -> "PARTIALLY_SUPPORTED".equals(query.answerability())))
+                .allSatisfy(query -> {
+                    assertThat(query.aspects()).anySatisfy(aspect -> assertThat(
+                            aspect.expectedRelations().stream()
+                                    .anyMatch(value -> "DIRECT_SUPPORT".equals(value.relation())))
+                            .isTrue());
+                    assertThat(query.aspects()).anySatisfy(aspect -> {
+                        assertThat(aspect.answerability()).isEqualTo("NOT_SUPPORTED");
+                        assertThat(aspect.minEvidenceGroups()).isZero();
+                        assertThat(aspect.requiredEvidenceGroupIds()).isEmpty();
+                    });
+                });
+        assertThat(queries.stream()
+                .filter(query -> query.categories().contains("other_actor"))
+                .filter(query -> "SUPPORTED".equals(query.answerability())))
+                .hasSize(1);
     }
 
     @Test

@@ -3,7 +3,7 @@
 - [x] ORIENT 기준 SHA·dependency·clean working tree를 확인했다.
 - [x] Gold metadata-only semantic coverage audit를 실행했다.
 - [x] coverage 결손과 Stress 필요성, `CAPABILITY_GATE`를 결과 전에 문서화했다.
-- [x] semantic-support-stress-1.0.0의 span/split/lineage/hash를 검증하고 `INPUT_FROZEN`으로 봉인했다.
+- [x] semantic-support-stress-1.0.1의 partial/aspect/span/split/lineage/hash를 검증하고 재봉인한다.
 - [x] Gold-free candidate export/hash 경계와 Oracle evaluator 핵심을 구현했다.
 - [x] input-freeze 전 focused unit/integrity test를 실행했다.
 - [ ] DEV/CAL Oracle ceiling을 실행하고 raw report를 ignored local에 보존한다.

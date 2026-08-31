@@ -27,19 +27,24 @@ other-actor 7건은 positive 0, negation 7건은 positive 0이었다. partial은
 compound query 2건뿐이다. 따라서 기존 자산은 ranking smoke/positive funnel에는
 유용하지만 일반 semantic state ceiling을 독립적으로 판정하기엔 부족하다.
 
-`semantic-support-stress-1.0.0`을 기존 Robustness 문서 재사용 overlay로 추가했다.
+`semantic-support-stress-1.0.1`을 기존 Robustness 문서 재사용 overlay로 추가했다.
 신규 문서/Production 변경은 0이며 검색 전 `INPUT_FROZEN`이다.
 
 ## 2. Semantic Stress input freeze
 
 - 계약 revision: `c5297f2` (Oracle 결과 전 `CAPABILITY_GATE` 동결)
-- dataset: `semantic-support-stress-1.0.0`
-- Gold-free runtime SHA-256: `4e6c6f719f32e11b9039a2f6679c91ff19f1b130675a8afe6d20e024d3748907`
-- full input SHA-256: `449c36af0ac3cf36211eba5a2e6491a54f1ab1553a91d3d264152765e3dea61c`
+- dataset: `semantic-support-stress-1.0.1`
+- 이전 `1.0.0`: retrieval/model 실행 전에 partial의 required DIRECT aspect 누락을 발견해
+  `INVALID_INPUT_HISTORICAL`로 철회; 결과·candidate·embedding 0
+- Gold-free runtime SHA-256: `c20d42920ee4cc509981de5e50dd70cfa6f5ebf9a5c3fdfad229c1ae546528af`
+- full input SHA-256: `b541a570eb304970d165ce25e835f15576381d29670c7439bd60c25f3e46f75d`
 - payload: 11 files; DEV/CAL 12/12 query, 6 bundles, base TXT 6개 참조, 문서 복사 0
 - answerability: `SUPPORTED 8 / PARTIALLY_SUPPORTED 8 / NOT_SUPPORTED 8`
-- relation: `DIRECT 8 / RELATED 4 / INSUFFICIENT 4 / CONTRADICTS 8`
+- relation: `DIRECT 16 / RELATED 4 / INSUFFICIENT 4 / CONTRADICTS 8`
 - language: `KO 8 / EN 10 / KO_EN_MIXED 6`
+- aspect: 24/24 explicit; partial 8/8이 required `SUPPORTED DIRECT` aspect와 required
+  `NOT_SUPPORTED RELATED/INSUFFICIENT` aspect를 함께 보존
+- other-actor: 7 query 중 source-grounded `TEAM` positive 1건 포함
 - Gold span/anchor SHA 24/24, base document SHA 6/6, runtime/Gold question identity 24/24
 - runtime question schema: `queryId / userBundleId / query / language` only
 - freeze 시점 execution: retrieval `false`, embedding `false`, SEALED access `false`
@@ -50,8 +55,10 @@ pre-freeze runtime loader에 노출되는 문제를 발견했다. 결과 실행 
 manifest와 Gold는 verified candidate freeze 후에만 접근한다.
 
 Gold-free B3 replay, candidate canonical hash/phase guard, Oracle stable partition/failure stage/metric과
-stress loader를 evaluation-only 신규 파일로 격리했다. Focused 4 suites는 22 tests,
-failure/error/skipped `0/0/0`으로 통과했다. 이 검증은 모델/benchmark 실행이 아니다.
+stress loader를 evaluation-only 신규 파일로 격리했다. ExpectedEvidence가 판단하지 않은 candidate는
+`INSUFFICIENT`로 추정하지 않고 `UNJUDGED`로 보존한다. Focused 검사 26건은
+`PASS 25 / SKIPPED 1`이며 skipped 1건은 opt-in 공식 benchmark다. 이 검증은
+모델/benchmark 실행이 아니다.
 
 ## 3. 시작 무결성
 

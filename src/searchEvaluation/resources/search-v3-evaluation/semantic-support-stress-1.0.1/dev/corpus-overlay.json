@@ -1,7 +1,7 @@
 {
   "artifactType": "SEARCH_V3_CORPUS_REFERENCE_OVERLAY",
   "schemaVersion": "1.0.0",
-  "datasetVersion": "semantic-support-stress-1.0.0",
+  "datasetVersion": "semantic-support-stress-1.0.1",
   "baseDatasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
   "split": "DEV",
   "baseCorpus": "../../devcal-robustness-1.0.0/dev/corpus.json",

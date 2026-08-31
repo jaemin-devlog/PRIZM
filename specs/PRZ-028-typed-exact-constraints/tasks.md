@@ -1,6 +1,6 @@
 # PRZ-028 Tasks
 
-- 상태: `IN_PROGRESS / INPUT_FROZEN / OFFICIAL_T0_T1_RUN / NEEDS_ADJUSTMENT`
+- 상태: `IN_PROGRESS / STRESS_1.1.0_INPUT_FROZEN`
 
 - [x] ORIENT: branch/HEAD/origin/main, PRZ-025/026 dependency와 clean worktree 확인
 - [x] ORIENT: PRZ-027 `NO_GO`를 제외한 B3 baseline 계보 확인
@@ -27,3 +27,20 @@
 - [x] INTEGRATE: 검증 결과와 `NEEDS_ADJUSTMENT` 판정 local commit
 - [ ] INTEGRATE: push·PR·main merge — `NOT_RUN` (금지)
 - [ ] Sparse 실험 — `NOT_RUN` (후속 Gate)
+
+## Final adjustment
+
+- [x] ORIENT: `d195f3b` clean HEAD, Stress 1.0.1 historical freeze와 SEALED metadata 경계 확인
+- [x] SPEC: Stress 1.1.0 분포, qualifier status/reason 계약과 최종 역할 Gate를 결과 전에 고정
+- [x] PLAN: input freeze → implementation → code freeze → official BGE 1회 → role audit 순서 고정
+- [x] DATA: synthetic DEV/CAL Stress 1.1.0 6 bundles / 24 queries materialize
+- [x] VERIFY-DATA: schema-contract/Gold/span/lineage/inventory/SHA/overwrite/SEALED guard
+- [ ] INTEGRATE-DATA: Typed 구현 변경 전 input-only local commit
+- [ ] IMPLEMENT: qualifier compatibility와 diagnostic reason; ranking은 state-only stable partition 유지
+- [ ] IMPLEMENT: dual stress loader, five-suite report, once-only claim/output와 final role policy
+- [ ] VERIFY-CODE: non-BGE related tests, regression, materializer, forbidden scope/SEALED audit
+- [ ] INTEGRATE-CODE-FREEZE: source/input/model/K/policy local commit
+- [ ] VERIFY-OFFICIAL: Stress 1.1.0 T0/T1 BGE 공식 1회와 기존 네 suite regression
+- [ ] AUDIT: 사전 Gate 기반 역할 판정, aggregate evidence, scope/final/OSS 검증
+- [ ] INTEGRATE: PRZ-028 최종 역할·종료 판단 local commit
+- [ ] PR/push/merge/Sparse — `NOT_RUN` (금지)

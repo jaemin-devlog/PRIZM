@@ -1,0 +1,113 @@
+{
+  "artifactType": "CORPUS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+  "split": "CALIBRATION",
+  "userBundles": [
+    {
+      "userBundleId": "SV3-U44",
+      "split": "CALIBRATION",
+      "professionGroup": "MARKETING_SALES",
+      "profession": "Membership operations manager",
+      "languageProfile": "EN",
+      "documentFamilyId": "SV3-U44-TC11-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC11-TEMPLATE-RENEWAL-44",
+      "documents": [
+        {
+          "documentId": "SV3-U44-D01",
+          "logicalDocumentId": "SV3-U44-D01-TC11-LOGICAL",
+          "versionLineageId": "SV3-U44-D01-TC11-LINEAGE",
+          "versionId": "SV3-U44-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Membership renewal operations record",
+          "documentType": "CAREER_REVIEW",
+          "documentStructure": "CAREER_DESCRIPTION",
+          "fileType": "TXT",
+          "language": "EN",
+          "contentPath": "documents/sv3-u44-typed-capability-v01.txt",
+          "contentSha256": "2e50bfb07eaf46307043820200f478b37d293ea28418f9232e086263192dce0a",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "PUBLIC_FIXTURE",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "materialize-prz028-typed-capability-stress",
+            "generatorRevision": "prz028-typed-capability-stress-v1",
+            "generatorSeedId": "SV3-TC11-SEED-RENEWAL-44-N3R9"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-U45",
+      "split": "CALIBRATION",
+      "professionGroup": "DATA_AI_INFRA",
+      "profession": "Facilities energy analyst",
+      "languageProfile": "KO",
+      "documentFamilyId": "SV3-U45-TC11-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC11-TEMPLATE-ENERGY-45",
+      "documents": [
+        {
+          "documentId": "SV3-U45-D01",
+          "logicalDocumentId": "SV3-U45-D01-TC11-LOGICAL",
+          "versionLineageId": "SV3-U45-D01-TC11-LINEAGE",
+          "versionId": "SV3-U45-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "시설 에너지 검증 기록",
+          "documentType": "PROJECT_REPORT",
+          "documentStructure": "TABLE_LIKE",
+          "fileType": "TXT",
+          "language": "KO",
+          "contentPath": "documents/sv3-u45-typed-capability-v01.txt",
+          "contentSha256": "847596865279a867e2e39138e4b5ab9a7308fd8d5e018f8b2d25fabfbd0bbb81",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "PUBLIC_FIXTURE",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "materialize-prz028-typed-capability-stress",
+            "generatorRevision": "prz028-typed-capability-stress-v1",
+            "generatorSeedId": "SV3-TC11-SEED-ENERGY-45-P6S2"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-U46",
+      "split": "CALIBRATION",
+      "professionGroup": "FRONTEND_MOBILE",
+      "profession": "Kiosk platform engineer",
+      "languageProfile": "KO_EN_MIXED",
+      "documentFamilyId": "SV3-U46-TC11-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC11-TEMPLATE-KIOSK-46",
+      "documents": [
+        {
+          "documentId": "SV3-U46-D01",
+          "logicalDocumentId": "SV3-U46-D01-TC11-LOGICAL",
+          "versionLineageId": "SV3-U46-D01-TC11-LINEAGE",
+          "versionId": "SV3-U46-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Kiosk client 운영 기록",
+          "documentType": "PROJECT_REPORT",
+          "documentStructure": "PROJECT_DESCRIPTION",
+          "fileType": "TXT",
+          "language": "KO_EN_MIXED",
+          "contentPath": "documents/sv3-u46-typed-capability-v01.txt",
+          "contentSha256": "e47373bed1ebff592422e816d08536daf49ad45c851972b4733afc06adaa2f5f",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "PUBLIC_FIXTURE",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "materialize-prz028-typed-capability-stress",
+            "generatorRevision": "prz028-typed-capability-stress-v1",
+            "generatorSeedId": "SV3-TC11-SEED-KIOSK-46-T4V7"
+          }
+        }
+      ]
+    }
+  ]
+}

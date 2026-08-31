@@ -1,0 +1,129 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+  "split": "DEV",
+  "status": "INPUT_FROZEN",
+  "mutable": false,
+  "opened": true,
+  "searchExecuted": false,
+  "sealedAt": null,
+  "frozenAt": "2026-08-31T20:41:06+09:00",
+  "generationSourceRevision": "d195f3bd8645bef88964ecf033a5815626d1004c",
+  "generatorRevision": "prz028-typed-capability-stress-v1",
+  "validationMode": "DETERMINISTIC_CONTRACT_VALIDATOR_NO_EXTERNAL_JSON_SCHEMA_ENGINE",
+  "counts": {
+    "userBundles": 3,
+    "documents": 3,
+    "queries": 12,
+    "typedQueryAnnotations": 12,
+    "evidenceParents": 12,
+    "evidenceGroups": 12,
+    "evidenceUnits": 12,
+    "typedObservations": 12
+  },
+  "distributions": {
+    "profession": {
+      "DESIGN_PRODUCT": 1,
+      "NON_DEVELOPMENT_GENERAL": 1,
+      "PLANNING": 1
+    },
+    "documentLanguage": {
+      "EN": 1,
+      "KO": 1,
+      "KO_EN_MIXED": 1
+    },
+    "queryLanguage": {
+      "EN": 4,
+      "KO": 4,
+      "KO_EN_MIXED": 4
+    },
+    "answerability": {
+      "NOT_SUPPORTED": 4,
+      "SUPPORTED": 8
+    },
+    "category": {
+      "date_range": 2,
+      "english": 4,
+      "hard_negative": 4,
+      "korean": 4,
+      "korean_english_mixed": 4,
+      "literal_identifier": 2,
+      "numeric_quantity": 8,
+      "numeric_range_comparison": 6
+    },
+    "typedKind": {
+      "DATE": 2,
+      "IDENTIFIER_NUMBER": 2,
+      "QUANTITY": 8
+    },
+    "typedOperator": {
+      "EQ": 2,
+      "EXACT": 2,
+      "GT": 2,
+      "GTE": 3,
+      "LT": 1,
+      "LTE": 1,
+      "RANGE": 1
+    },
+    "primaryFamily": {
+      "date": 2,
+      "identifier_number": 2,
+      "percentage_direction": 2,
+      "qualifier_mismatch": 2,
+      "quantity_wrong_value": 2,
+      "range_boundary": 2
+    },
+    "expectedState": {
+      "CONTRADICTED": 14,
+      "SATISFIED": 8,
+      "UNKNOWN": 26
+    },
+    "expectedReason": {
+      "DIRECTION_MISMATCH": 2,
+      "MATCHED": 8,
+      "NO_MATCHING_OBSERVATION": 8,
+      "QUALIFIER_MISMATCH": 9,
+      "UNIT_MISMATCH": 9,
+      "VALUE_MISMATCH": 12
+    }
+  },
+  "files": [
+    {
+      "path": "corpus.json",
+      "bytes": 4359,
+      "sha256": "e59508a463b307376f9d974194256092e9c0467ae76a50e7f88ec0acd2441141"
+    },
+    {
+      "path": "documents/sv3-u41-typed-capability-v01.txt",
+      "bytes": 383,
+      "sha256": "7fec8af323f02a1bba2e5fb170074e9bb61af0a698ea7e468ec0e34b9407da65"
+    },
+    {
+      "path": "documents/sv3-u42-typed-capability-v01.txt",
+      "bytes": 656,
+      "sha256": "a4efc60e54faa25363985086a88495c4a2fbf0edde8272db425a4b4f236565d0"
+    },
+    {
+      "path": "documents/sv3-u43-typed-capability-v01.txt",
+      "bytes": 531,
+      "sha256": "6bdb5386af9dcffd57be69a0d7f4aae88048660ae47cd333a7a55eecf1929144"
+    },
+    {
+      "path": "gold-evidence.json",
+      "bytes": 29768,
+      "sha256": "88146c2a622a5fbcb44fed52298476433b82acb14941f84824517fd9320b0501"
+    },
+    {
+      "path": "questions.json",
+      "bytes": 19341,
+      "sha256": "eac28d2f760966b628b28497d69ef3666e63ae360e2279e138f2a8e191518166"
+    },
+    {
+      "path": "typed-annotations.json",
+      "bytes": 19638,
+      "sha256": "f3e1470e1bbb6954555c1d382d0aa6c611901d292d078abbdfd710643c07cd50"
+    }
+  ],
+  "combinedSha256": "84fc74b7d44008b90a6a23bdaf5ea3dbebebc00eeaeb683281ef10ceb57f6a36"
+}

@@ -1,0 +1,700 @@
+{
+  "artifactType": "TYPED_ANNOTATIONS",
+  "schemaVersion": "1.1.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+  "split": "CALIBRATION",
+  "observations": [
+    {
+      "observationId": "SV3-TC11-U44-P01-O01",
+      "evidenceUnitId": "SV3-U44-P01-E01",
+      "sourceSpanId": "SV3-U44-P01-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "1,850",
+      "charStart": 96,
+      "charEnd": 101,
+      "value": 1850,
+      "normalizedUnit": "count",
+      "qualifier": "paid member renewals",
+      "direction": "NONE",
+      "qualifierCharStart": 102,
+      "qualifierCharEnd": 122
+    },
+    {
+      "observationId": "SV3-TC11-U44-P02-O01",
+      "evidenceUnitId": "SV3-U44-P02-E01",
+      "sourceSpanId": "SV3-U44-P02-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "1,240",
+      "charStart": 210,
+      "charEnd": 215,
+      "value": 1240,
+      "normalizedUnit": "count",
+      "qualifier": "paid member renewals",
+      "direction": "NONE",
+      "qualifierCharStart": 216,
+      "qualifierCharEnd": 236
+    },
+    {
+      "observationId": "SV3-TC11-U44-P03-O01",
+      "evidenceUnitId": "SV3-U44-P03-E01",
+      "sourceSpanId": "SV3-U44-P03-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "1,850",
+      "charStart": 333,
+      "charEnd": 338,
+      "value": 1850,
+      "normalizedUnit": "count",
+      "qualifier": "event registrations",
+      "direction": "NONE",
+      "qualifierCharStart": 339,
+      "qualifierCharEnd": 358
+    },
+    {
+      "observationId": "SV3-TC11-U45-P01-O01",
+      "evidenceUnitId": "SV3-U45-P01-E01",
+      "sourceSpanId": "SV3-U45-P01-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "27%",
+      "charStart": 43,
+      "charEnd": 46,
+      "value": 27,
+      "normalizedUnit": "%",
+      "qualifier": "냉각 에너지 사용량",
+      "direction": "DECREASE",
+      "qualifierCharStart": 31,
+      "qualifierCharEnd": 41,
+      "directionSourceSurface": "감소",
+      "directionCharStart": 47,
+      "directionCharEnd": 49
+    },
+    {
+      "observationId": "SV3-TC11-U45-P02-O01",
+      "evidenceUnitId": "SV3-U45-P02-E01",
+      "sourceSpanId": "SV3-U45-P02-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "27%",
+      "charStart": 103,
+      "charEnd": 106,
+      "value": 27,
+      "normalizedUnit": "%",
+      "qualifier": "냉각 에너지 사용량",
+      "direction": "INCREASE",
+      "qualifierCharStart": 91,
+      "qualifierCharEnd": 101,
+      "directionSourceSurface": "증가",
+      "directionCharStart": 107,
+      "directionCharEnd": 109
+    },
+    {
+      "observationId": "SV3-TC11-U45-P03-O01",
+      "evidenceUnitId": "SV3-U45-P03-E01",
+      "sourceSpanId": "SV3-U45-P03-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "27%",
+      "charStart": 158,
+      "charEnd": 161,
+      "value": 27,
+      "normalizedUnit": "%",
+      "qualifier": "정비 알림 누락률",
+      "direction": "DECREASE",
+      "qualifierCharStart": 147,
+      "qualifierCharEnd": 156,
+      "directionSourceSurface": "감소",
+      "directionCharStart": 162,
+      "directionCharEnd": 164
+    },
+    {
+      "observationId": "SV3-TC11-U45-P04-O01",
+      "evidenceUnitId": "SV3-U45-P04-E01",
+      "sourceSpanId": "SV3-U45-P04-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "18개월",
+      "charStart": 192,
+      "charEnd": 196,
+      "value": 18,
+      "normalizedUnit": "개월",
+      "qualifier": "냉각 최적화 검증",
+      "direction": "NONE",
+      "qualifierCharStart": 181,
+      "qualifierCharEnd": 190
+    },
+    {
+      "observationId": "SV3-TC11-U45-P05-O01",
+      "evidenceUnitId": "SV3-U45-P05-E01",
+      "sourceSpanId": "SV3-U45-P05-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "12개월",
+      "charStart": 246,
+      "charEnd": 250,
+      "value": 12,
+      "normalizedUnit": "개월",
+      "qualifier": "냉각 최적화 검증",
+      "direction": "NONE",
+      "qualifierCharStart": 235,
+      "qualifierCharEnd": 244
+    },
+    {
+      "observationId": "SV3-TC11-U46-P01-O01",
+      "evidenceUnitId": "SV3-U46-P01-E01",
+      "sourceSpanId": "SV3-U46-P01-E01-S01",
+      "kind": "IDENTIFIER_NUMBER",
+      "sourceSurface": "KioskLink 8.4",
+      "charStart": 69,
+      "charEnd": 82,
+      "identifier": "KioskLink",
+      "numberSurface": "8.4",
+      "normalizedSegments": [
+        8,
+        4
+      ]
+    },
+    {
+      "observationId": "SV3-TC11-U46-P02-O01",
+      "evidenceUnitId": "SV3-U46-P02-E01",
+      "sourceSpanId": "SV3-U46-P02-E01-S01",
+      "kind": "IDENTIFIER_NUMBER",
+      "sourceSurface": "KioskLink 8.1",
+      "charStart": 165,
+      "charEnd": 178,
+      "identifier": "KioskLink",
+      "numberSurface": "8.1",
+      "normalizedSegments": [
+        8,
+        1
+      ]
+    },
+    {
+      "observationId": "SV3-TC11-U46-P03-O01",
+      "evidenceUnitId": "SV3-U46-P03-E01",
+      "sourceSpanId": "SV3-U46-P03-E01-S01",
+      "kind": "DATE",
+      "sourceSurface": "2026-09-10",
+      "charStart": 258,
+      "charEnd": 268,
+      "start": "2026-09-10",
+      "end": "2026-09-10",
+      "precision": "FULL_DATE",
+      "qualifier": "maintenance window 시작일",
+      "qualifierCharStart": 234,
+      "qualifierCharEnd": 256
+    },
+    {
+      "observationId": "SV3-TC11-U46-P04-O01",
+      "evidenceUnitId": "SV3-U46-P04-E01",
+      "sourceSpanId": "SV3-U46-P04-E01-S01",
+      "kind": "DATE",
+      "sourceSurface": "2025-12-15",
+      "charStart": 352,
+      "charEnd": 362,
+      "start": "2025-12-15",
+      "end": "2025-12-15",
+      "precision": "FULL_DATE",
+      "qualifier": "이전 승인 주기의 maintenance window 시작일",
+      "qualifierCharStart": 318,
+      "qualifierCharEnd": 350
+    }
+  ],
+  "queryAnnotations": [
+    {
+      "queryId": "SV3-U44-Q01",
+      "userBundleId": "SV3-U44",
+      "primaryFamily": "quantity_wrong_value",
+      "constraint": {
+        "constraintId": "SV3-U44-Q01-C01",
+        "kind": "QUANTITY",
+        "surface": "at least 1,800",
+        "operator": "GTE",
+        "value": 1800,
+        "normalizedUnit": "count",
+        "qualifier": "member renewals",
+        "direction": "NONE",
+        "queryCharStart": 32,
+        "queryCharEnd": 46,
+        "qualifierCharStart": 47,
+        "qualifierCharEnd": 62
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U44-P01-E01",
+          "state": "SATISFIED",
+          "reason": "MATCHED"
+        },
+        {
+          "evidenceUnitId": "SV3-U44-P02-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U44-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U44-Q02",
+      "userBundleId": "SV3-U44",
+      "primaryFamily": "qualifier_mismatch",
+      "constraint": {
+        "constraintId": "SV3-U44-Q02-C01",
+        "kind": "QUANTITY",
+        "surface": "exactly 1,850",
+        "operator": "EQ",
+        "value": 1850,
+        "normalizedUnit": "count",
+        "qualifier": "member renewals",
+        "direction": "NONE",
+        "queryCharStart": 21,
+        "queryCharEnd": 34,
+        "qualifierCharStart": 35,
+        "qualifierCharEnd": 50
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U44-P01-E01",
+          "state": "SATISFIED",
+          "reason": "MATCHED"
+        },
+        {
+          "evidenceUnitId": "SV3-U44-P02-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U44-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U44-Q03",
+      "userBundleId": "SV3-U44",
+      "primaryFamily": "range_boundary",
+      "constraint": {
+        "constraintId": "SV3-U44-Q03-C01",
+        "kind": "QUANTITY",
+        "surface": "no more than 1,240",
+        "operator": "LTE",
+        "value": 1240,
+        "normalizedUnit": "count",
+        "qualifier": "member renewals",
+        "direction": "NONE",
+        "queryCharStart": 23,
+        "queryCharEnd": 41,
+        "qualifierCharStart": 42,
+        "qualifierCharEnd": 57
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U44-P01-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U44-P02-E01",
+          "state": "SATISFIED",
+          "reason": "MATCHED"
+        },
+        {
+          "evidenceUnitId": "SV3-U44-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U44-Q04",
+      "userBundleId": "SV3-U44",
+      "primaryFamily": "quantity_wrong_value",
+      "constraint": {
+        "constraintId": "SV3-U44-Q04-C01",
+        "kind": "QUANTITY",
+        "surface": "exceed 2,000",
+        "operator": "GT",
+        "value": 2000,
+        "normalizedUnit": "count",
+        "qualifier": "member renewals",
+        "direction": "NONE",
+        "queryCharStart": 12,
+        "queryCharEnd": 24,
+        "qualifierCharStart": 25,
+        "qualifierCharEnd": 40
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U44-P01-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U44-P02-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U44-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U45-Q01",
+      "userBundleId": "SV3-U45",
+      "primaryFamily": "percentage_direction",
+      "constraint": {
+        "constraintId": "SV3-U45-Q01-C01",
+        "kind": "QUANTITY",
+        "surface": "27% 이상 감소",
+        "operator": "GTE",
+        "value": 27,
+        "normalizedUnit": "%",
+        "qualifier": "냉각 에너지 사용량",
+        "direction": "DECREASE",
+        "directionSurface": "감소",
+        "queryCharStart": 12,
+        "queryCharEnd": 21,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 10,
+        "directionSourceSurface": "감소",
+        "directionCharStart": 19,
+        "directionCharEnd": 21
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U45-P01-E01",
+          "state": "SATISFIED",
+          "reason": "MATCHED"
+        },
+        {
+          "evidenceUnitId": "SV3-U45-P02-E01",
+          "state": "CONTRADICTED",
+          "reason": "DIRECTION_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U45-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U45-P04-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U45-P05-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U45-Q02",
+      "userBundleId": "SV3-U45",
+      "primaryFamily": "percentage_direction",
+      "constraint": {
+        "constraintId": "SV3-U45-Q02-C01",
+        "kind": "QUANTITY",
+        "surface": "20% 초과 증가",
+        "operator": "GT",
+        "value": 20,
+        "normalizedUnit": "%",
+        "qualifier": "냉각 에너지 사용량",
+        "direction": "INCREASE",
+        "directionSurface": "증가",
+        "queryCharStart": 12,
+        "queryCharEnd": 21,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 10,
+        "directionSourceSurface": "증가",
+        "directionCharStart": 19,
+        "directionCharEnd": 21
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U45-P01-E01",
+          "state": "CONTRADICTED",
+          "reason": "DIRECTION_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U45-P02-E01",
+          "state": "SATISFIED",
+          "reason": "MATCHED"
+        },
+        {
+          "evidenceUnitId": "SV3-U45-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U45-P04-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U45-P05-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U45-Q03",
+      "userBundleId": "SV3-U45",
+      "primaryFamily": "range_boundary",
+      "constraint": {
+        "constraintId": "SV3-U45-Q03-C01",
+        "kind": "QUANTITY",
+        "surface": "15~20개월",
+        "operator": "RANGE",
+        "value": 15,
+        "upperValue": 20,
+        "normalizedUnit": "개월",
+        "qualifier": "냉각 최적화 검증",
+        "direction": "NONE",
+        "queryCharStart": 11,
+        "queryCharEnd": 18,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 9
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U45-P01-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U45-P02-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U45-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U45-P04-E01",
+          "state": "SATISFIED",
+          "reason": "MATCHED"
+        },
+        {
+          "evidenceUnitId": "SV3-U45-P05-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U45-Q04",
+      "userBundleId": "SV3-U45",
+      "primaryFamily": "qualifier_mismatch",
+      "constraint": {
+        "constraintId": "SV3-U45-Q04-C01",
+        "kind": "QUANTITY",
+        "surface": "27% 감소",
+        "operator": "EQ",
+        "value": 27,
+        "normalizedUnit": "%",
+        "qualifier": "냉각수 누수율",
+        "direction": "DECREASE",
+        "directionSurface": "감소",
+        "queryCharStart": 9,
+        "queryCharEnd": 15,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 7,
+        "directionSourceSurface": "감소",
+        "directionCharStart": 13,
+        "directionCharEnd": 15
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U45-P01-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U45-P02-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U45-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U45-P04-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U45-P05-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U46-Q01",
+      "userBundleId": "SV3-U46",
+      "primaryFamily": "identifier_number",
+      "constraint": {
+        "constraintId": "SV3-U46-Q01-C01",
+        "kind": "IDENTIFIER_NUMBER",
+        "surface": "KioskLink 8.4",
+        "identifier": "KioskLink",
+        "numberSurface": "8.4",
+        "normalizedSegments": [
+          8,
+          4
+        ],
+        "queryCharStart": 25,
+        "queryCharEnd": 38
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U46-P01-E01",
+          "state": "SATISFIED",
+          "reason": "MATCHED"
+        },
+        {
+          "evidenceUnitId": "SV3-U46-P02-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U46-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "NO_MATCHING_OBSERVATION"
+        },
+        {
+          "evidenceUnitId": "SV3-U46-P04-E01",
+          "state": "UNKNOWN",
+          "reason": "NO_MATCHING_OBSERVATION"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U46-Q02",
+      "userBundleId": "SV3-U46",
+      "primaryFamily": "identifier_number",
+      "constraint": {
+        "constraintId": "SV3-U46-Q02-C01",
+        "kind": "IDENTIFIER_NUMBER",
+        "surface": "KioskLink 8.7",
+        "identifier": "KioskLink",
+        "numberSurface": "8.7",
+        "normalizedSegments": [
+          8,
+          7
+        ],
+        "queryCharStart": 25,
+        "queryCharEnd": 38
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U46-P01-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U46-P02-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U46-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "NO_MATCHING_OBSERVATION"
+        },
+        {
+          "evidenceUnitId": "SV3-U46-P04-E01",
+          "state": "UNKNOWN",
+          "reason": "NO_MATCHING_OBSERVATION"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U46-Q03",
+      "userBundleId": "SV3-U46",
+      "primaryFamily": "date",
+      "constraint": {
+        "constraintId": "SV3-U46-Q03-C01",
+        "kind": "DATE",
+        "surface": "2026-06-30 이후",
+        "operator": "GTE",
+        "value": "2026-06-30",
+        "precision": "FULL_DATE",
+        "qualifier": "maintenance window 시작일",
+        "queryCharStart": 24,
+        "queryCharEnd": 37,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 22
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U46-P01-E01",
+          "state": "UNKNOWN",
+          "reason": "NO_MATCHING_OBSERVATION"
+        },
+        {
+          "evidenceUnitId": "SV3-U46-P02-E01",
+          "state": "UNKNOWN",
+          "reason": "NO_MATCHING_OBSERVATION"
+        },
+        {
+          "evidenceUnitId": "SV3-U46-P03-E01",
+          "state": "SATISFIED",
+          "reason": "MATCHED"
+        },
+        {
+          "evidenceUnitId": "SV3-U46-P04-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U46-Q04",
+      "userBundleId": "SV3-U46",
+      "primaryFamily": "date",
+      "constraint": {
+        "constraintId": "SV3-U46-Q04-C01",
+        "kind": "DATE",
+        "surface": "2025-01-01 이전",
+        "operator": "LT",
+        "value": "2025-01-01",
+        "precision": "FULL_DATE",
+        "qualifier": "maintenance window 시작일",
+        "queryCharStart": 24,
+        "queryCharEnd": 37,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 22
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U46-P01-E01",
+          "state": "UNKNOWN",
+          "reason": "NO_MATCHING_OBSERVATION"
+        },
+        {
+          "evidenceUnitId": "SV3-U46-P02-E01",
+          "state": "UNKNOWN",
+          "reason": "NO_MATCHING_OBSERVATION"
+        },
+        {
+          "evidenceUnitId": "SV3-U46-P03-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U46-P04-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        }
+      ]
+    }
+  ]
+}

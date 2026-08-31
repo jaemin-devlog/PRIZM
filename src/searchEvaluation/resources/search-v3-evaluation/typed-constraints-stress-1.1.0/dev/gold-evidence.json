@@ -1,0 +1,943 @@
+{
+  "artifactType": "GOLD_EVIDENCE",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+  "split": "DEV",
+  "parents": [
+    {
+      "parentId": "SV3-U41-P01",
+      "userBundleId": "SV3-U41",
+      "documentId": "SV3-U41-D01",
+      "versionId": "SV3-U41-D01-V01",
+      "label": "1분기 보상 처리",
+      "sourceSpan": {
+        "spanId": "SV3-U41-P01-PS01",
+        "parentId": "SV3-U41-P01",
+        "documentId": "SV3-U41-D01",
+        "versionId": "SV3-U41-D01-V01",
+        "sourcePath": "documents/sv3-u41-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 23,
+        "charEnd": 64,
+        "lineStart": 4,
+        "lineEnd": 4,
+        "text": "1분기에는 파손 소포 보상 요청 420건을 종결하고 처리 사유를 기록했다.",
+        "textSha256": "bb7ae82bd707d829a584dc23892eb15ecb1a95ffdd458741a48ee274858c81d1"
+      }
+    },
+    {
+      "parentId": "SV3-U41-P02",
+      "userBundleId": "SV3-U41",
+      "documentId": "SV3-U41-D01",
+      "versionId": "SV3-U41-D01-V01",
+      "label": "2분기 보상 처리",
+      "sourceSpan": {
+        "spanId": "SV3-U41-P02-PS01",
+        "parentId": "SV3-U41-P02",
+        "documentId": "SV3-U41-D01",
+        "versionId": "SV3-U41-D01-V01",
+        "sourcePath": "documents/sv3-u41-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 76,
+        "charEnd": 117,
+        "lineStart": 7,
+        "lineEnd": 7,
+        "text": "2분기에는 파손 소포 보상 요청 680건을 종결하고 회수 절차를 안내했다.",
+        "textSha256": "420179668936df4b477e040373cfa9d4f891273c3f2c3229dc7c1a3ab2f3b4a7"
+      }
+    },
+    {
+      "parentId": "SV3-U41-P03",
+      "userBundleId": "SV3-U41",
+      "documentId": "SV3-U41-D01",
+      "versionId": "SV3-U41-D01-V01",
+      "label": "배송 라벨 정정",
+      "sourceSpan": {
+        "spanId": "SV3-U41-P03-PS01",
+        "parentId": "SV3-U41-P03",
+        "documentId": "SV3-U41-D01",
+        "versionId": "SV3-U41-D01-V01",
+        "sourcePath": "documents/sv3-u41-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 128,
+        "charEnd": 168,
+        "lineStart": 10,
+        "lineEnd": 10,
+        "text": "같은 분기에는 배송 라벨 680건을 재발행해 주소 정정 요청을 반영했다.",
+        "textSha256": "4f8df94fc4bc65b4cf17cb92b264be71b6daff889ad864e17c5540a39879b950"
+      }
+    },
+    {
+      "parentId": "SV3-U42-P01",
+      "userBundleId": "SV3-U42",
+      "documentId": "SV3-U42-D01",
+      "versionId": "SV3-U42-D01-V01",
+      "label": "Permanent exhibit outcome",
+      "sourceSpan": {
+        "spanId": "SV3-U42-P01-PS01",
+        "parentId": "SV3-U42-P01",
+        "documentId": "SV3-U42-D01",
+        "versionId": "SV3-U42-D01-V01",
+        "sourcePath": "documents/sv3-u42-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 60,
+        "charEnd": 167,
+        "lineStart": 4,
+        "lineEnd": 4,
+        "text": "For the permanent exhibit, the wayfinding error rate decreased by 38% after the floor markers were revised.",
+        "textSha256": "25eec1f657c573ad096bf76ff4f5756d4cc970470b244962123342d1e92c02dc"
+      }
+    },
+    {
+      "parentId": "SV3-U42-P02",
+      "userBundleId": "SV3-U42",
+      "documentId": "SV3-U42-D01",
+      "versionId": "SV3-U42-D01-V01",
+      "label": "Temporary installation outcome",
+      "sourceSpan": {
+        "spanId": "SV3-U42-P02-PS01",
+        "parentId": "SV3-U42-P02",
+        "documentId": "SV3-U42-D01",
+        "versionId": "SV3-U42-D01-V01",
+        "sourcePath": "documents/sv3-u42-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 200,
+        "charEnd": 312,
+        "lineStart": 7,
+        "lineEnd": 7,
+        "text": "During a temporary installation, the wayfinding error rate increased by 38% when directional signs were removed.",
+        "textSha256": "59375045321085780d80d52dfb56a2550e1a40234479596753bd641950f95349"
+      }
+    },
+    {
+      "parentId": "SV3-U42-P03",
+      "userBundleId": "SV3-U42",
+      "documentId": "SV3-U42-D01",
+      "versionId": "SV3-U42-D01-V01",
+      "label": "Fabrication review",
+      "sourceSpan": {
+        "spanId": "SV3-U42-P03-PS01",
+        "parentId": "SV3-U42-P03",
+        "documentId": "SV3-U42-D01",
+        "versionId": "SV3-U42-D01-V01",
+        "sourcePath": "documents/sv3-u42-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 333,
+        "charEnd": 431,
+        "lineStart": 10,
+        "lineEnd": 10,
+        "text": "In the fabrication review, the installation defect rate decreased by 38% after a checklist change.",
+        "textSha256": "b96f41a92d77fa0e3da9481da5ddc49acdfe3342db42ee579998d46dfa094369"
+      }
+    },
+    {
+      "parentId": "SV3-U42-P04",
+      "userBundleId": "SV3-U42",
+      "documentId": "SV3-U42-D01",
+      "versionId": "SV3-U42-D01-V01",
+      "label": "Primary gallery timeline",
+      "sourceSpan": {
+        "spanId": "SV3-U42-P04-PS01",
+        "parentId": "SV3-U42-P04",
+        "documentId": "SV3-U42-D01",
+        "versionId": "SV3-U42-D01-V01",
+        "sourcePath": "documents/sv3-u42-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 458,
+        "charEnd": 541,
+        "lineStart": 13,
+        "lineEnd": 13,
+        "text": "The primary gallery redesign continued for 10 months from research through handoff.",
+        "textSha256": "a30fa230d6c52f9aec69f632fca9875a1dd2b9d5fcdd532a2c57bf2d9225c6af"
+      }
+    },
+    {
+      "parentId": "SV3-U42-P05",
+      "userBundleId": "SV3-U42",
+      "documentId": "SV3-U42-D01",
+      "versionId": "SV3-U42-D01-V01",
+      "label": "Earlier gallery concept",
+      "sourceSpan": {
+        "spanId": "SV3-U42-P05-PS01",
+        "parentId": "SV3-U42-P05",
+        "documentId": "SV3-U42-D01",
+        "versionId": "SV3-U42-D01-V01",
+        "sourcePath": "documents/sv3-u42-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 567,
+        "charEnd": 655,
+        "lineStart": 16,
+        "lineEnd": 16,
+        "text": "An earlier primary gallery redesign concept ran for 6 months before it was discontinued.",
+        "textSha256": "302c0b5701aec2ce1f75d80684b0b95383cf2025944223a1ca94f177579e1dd4"
+      }
+    },
+    {
+      "parentId": "SV3-U43-P01",
+      "userBundleId": "SV3-U43",
+      "documentId": "SV3-U43-D01",
+      "versionId": "SV3-U43-D01-V01",
+      "label": "Current permit review",
+      "sourceSpan": {
+        "spanId": "SV3-U43-P01-PS01",
+        "parentId": "SV3-U43-P01",
+        "documentId": "SV3-U43-D01",
+        "versionId": "SV3-U43-D01-V01",
+        "sourcePath": "documents/sv3-u43-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 44,
+        "charEnd": 98,
+        "lineStart": 4,
+        "lineEnd": 4,
+        "text": "승인된 permit review 시작일은 2026-02-15이며 이후 주민 공지 절차로 이어졌다.",
+        "textSha256": "ff32c60a1f939b77a9f26e9151f00218a250bd70bf5b3b03821e852ecb751093"
+      }
+    },
+    {
+      "parentId": "SV3-U43-P02",
+      "userBundleId": "SV3-U43",
+      "documentId": "SV3-U43-D01",
+      "versionId": "SV3-U43-D01-V01",
+      "label": "Earlier approved cycle",
+      "sourceSpan": {
+        "spanId": "SV3-U43-P02-PS01",
+        "parentId": "SV3-U43-P02",
+        "documentId": "SV3-U43-D01",
+        "versionId": "SV3-U43-D01-V01",
+        "sourcePath": "documents/sv3-u43-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 123,
+        "charEnd": 182,
+        "lineStart": 7,
+        "lineEnd": 7,
+        "text": "이전 승인 주기의 permit review 시작일은 2025-11-20이었고 해당 주기는 연말에 종료됐다.",
+        "textSha256": "2540c75a78ffd838ad065cddfcb0993ac0aeb2765d5c60f42398b20538f7ef17"
+      }
+    },
+    {
+      "parentId": "SV3-U43-P03",
+      "userBundleId": "SV3-U43",
+      "documentId": "SV3-U43-D01",
+      "versionId": "SV3-U43-D01-V01",
+      "label": "Signed specification",
+      "sourceSpan": {
+        "spanId": "SV3-U43-P03-PS01",
+        "parentId": "SV3-U43-P03",
+        "documentId": "SV3-U43-D01",
+        "versionId": "SV3-U43-D01-V01",
+        "sourcePath": "documents/sv3-u43-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 205,
+        "charEnd": 258,
+        "lineStart": 10,
+        "lineEnd": 10,
+        "text": "서명된 운영 명세는 TransitForm 4.2를 제출 양식의 기준 version으로 지정했다.",
+        "textSha256": "e096e6abc5c7f34e3935049e740b92f33d283901aac44935668b5ded9a826920"
+      }
+    },
+    {
+      "parentId": "SV3-U43-P04",
+      "userBundleId": "SV3-U43",
+      "documentId": "SV3-U43-D01",
+      "versionId": "SV3-U43-D01-V01",
+      "label": "Superseded draft",
+      "sourceSpan": {
+        "spanId": "SV3-U43-P04-PS01",
+        "parentId": "SV3-U43-P04",
+        "documentId": "SV3-U43-D01",
+        "versionId": "SV3-U43-D01-V01",
+        "sourcePath": "documents/sv3-u43-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 277,
+        "charEnd": 328,
+        "lineStart": 13,
+        "lineEnd": 13,
+        "text": "폐기된 초안에는 TransitForm 4.0이 남아 있었지만 승인 명세에는 반영되지 않았다.",
+        "textSha256": "2a00f0d868a80aaef1307736abda30724f1b717bcccfcfc68428932a8ed40972"
+      }
+    }
+  ],
+  "evidenceGroups": [
+    {
+      "groupId": "SV3-U41-G01",
+      "userBundleId": "SV3-U41",
+      "sourceFactId": "SV3-TC11-FACT-U41-P01",
+      "description": "1분기 보상 처리",
+      "evidenceUnitIds": [
+        "SV3-U41-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U41-G02",
+      "userBundleId": "SV3-U41",
+      "sourceFactId": "SV3-TC11-FACT-U41-P02",
+      "description": "2분기 보상 처리",
+      "evidenceUnitIds": [
+        "SV3-U41-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U41-G03",
+      "userBundleId": "SV3-U41",
+      "sourceFactId": "SV3-TC11-FACT-U41-P03",
+      "description": "배송 라벨 정정",
+      "evidenceUnitIds": [
+        "SV3-U41-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U42-G01",
+      "userBundleId": "SV3-U42",
+      "sourceFactId": "SV3-TC11-FACT-U42-P01",
+      "description": "Permanent exhibit outcome",
+      "evidenceUnitIds": [
+        "SV3-U42-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U42-G02",
+      "userBundleId": "SV3-U42",
+      "sourceFactId": "SV3-TC11-FACT-U42-P02",
+      "description": "Temporary installation outcome",
+      "evidenceUnitIds": [
+        "SV3-U42-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U42-G03",
+      "userBundleId": "SV3-U42",
+      "sourceFactId": "SV3-TC11-FACT-U42-P03",
+      "description": "Fabrication review",
+      "evidenceUnitIds": [
+        "SV3-U42-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U42-G04",
+      "userBundleId": "SV3-U42",
+      "sourceFactId": "SV3-TC11-FACT-U42-P04",
+      "description": "Primary gallery timeline",
+      "evidenceUnitIds": [
+        "SV3-U42-P04-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U42-G05",
+      "userBundleId": "SV3-U42",
+      "sourceFactId": "SV3-TC11-FACT-U42-P05",
+      "description": "Earlier gallery concept",
+      "evidenceUnitIds": [
+        "SV3-U42-P05-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U43-G01",
+      "userBundleId": "SV3-U43",
+      "sourceFactId": "SV3-TC11-FACT-U43-P01",
+      "description": "Current permit review",
+      "evidenceUnitIds": [
+        "SV3-U43-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U43-G02",
+      "userBundleId": "SV3-U43",
+      "sourceFactId": "SV3-TC11-FACT-U43-P02",
+      "description": "Earlier approved cycle",
+      "evidenceUnitIds": [
+        "SV3-U43-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U43-G03",
+      "userBundleId": "SV3-U43",
+      "sourceFactId": "SV3-TC11-FACT-U43-P03",
+      "description": "Signed specification",
+      "evidenceUnitIds": [
+        "SV3-U43-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U43-G04",
+      "userBundleId": "SV3-U43",
+      "sourceFactId": "SV3-TC11-FACT-U43-P04",
+      "description": "Superseded draft",
+      "evidenceUnitIds": [
+        "SV3-U43-P04-E01"
+      ]
+    }
+  ],
+  "evidenceUnits": [
+    {
+      "evidenceUnitId": "SV3-U41-P01-E01",
+      "userBundleId": "SV3-U41",
+      "parentId": "SV3-U41-P01",
+      "groupId": "SV3-U41-G01",
+      "documentId": "SV3-U41-D01",
+      "versionId": "SV3-U41-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U41-P01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U41-P01-E01-S01",
+          "parentId": "SV3-U41-P01",
+          "documentId": "SV3-U41-D01",
+          "versionId": "SV3-U41-D01-V01",
+          "sourcePath": "documents/sv3-u41-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 23,
+          "charEnd": 64,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "1분기에는 파손 소포 보상 요청 420건을 종결하고 처리 사유를 기록했다.",
+          "textSha256": "bb7ae82bd707d829a584dc23892eb15ecb1a95ffdd458741a48ee274858c81d1"
+        }
+      ],
+      "primarySpanId": "SV3-U41-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p01"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 420,
+          "unit": "건",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "420건",
+          "qualifierTokens": [
+            "파손",
+            "소포",
+            "보상",
+            "요청"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U41-P02-E01",
+      "userBundleId": "SV3-U41",
+      "parentId": "SV3-U41-P02",
+      "groupId": "SV3-U41-G02",
+      "documentId": "SV3-U41-D01",
+      "versionId": "SV3-U41-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U41-P02",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U41-P02-E01-S01",
+          "parentId": "SV3-U41-P02",
+          "documentId": "SV3-U41-D01",
+          "versionId": "SV3-U41-D01-V01",
+          "sourcePath": "documents/sv3-u41-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 76,
+          "charEnd": 117,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "2분기에는 파손 소포 보상 요청 680건을 종결하고 회수 절차를 안내했다.",
+          "textSha256": "420179668936df4b477e040373cfa9d4f891273c3f2c3229dc7c1a3ab2f3b4a7"
+        }
+      ],
+      "primarySpanId": "SV3-U41-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p02"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 680,
+          "unit": "건",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "680건",
+          "qualifierTokens": [
+            "파손",
+            "소포",
+            "보상",
+            "요청"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U41-P03-E01",
+      "userBundleId": "SV3-U41",
+      "parentId": "SV3-U41-P03",
+      "groupId": "SV3-U41-G03",
+      "documentId": "SV3-U41-D01",
+      "versionId": "SV3-U41-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U41-P03",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U41-P03-E01-S01",
+          "parentId": "SV3-U41-P03",
+          "documentId": "SV3-U41-D01",
+          "versionId": "SV3-U41-D01-V01",
+          "sourcePath": "documents/sv3-u41-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 128,
+          "charEnd": 168,
+          "lineStart": 10,
+          "lineEnd": 10,
+          "text": "같은 분기에는 배송 라벨 680건을 재발행해 주소 정정 요청을 반영했다.",
+          "textSha256": "4f8df94fc4bc65b4cf17cb92b264be71b6daff889ad864e17c5540a39879b950"
+        }
+      ],
+      "primarySpanId": "SV3-U41-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p03"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 680,
+          "unit": "건",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "680건",
+          "qualifierTokens": [
+            "배송",
+            "라벨"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U42-P01-E01",
+      "userBundleId": "SV3-U42",
+      "parentId": "SV3-U42-P01",
+      "groupId": "SV3-U42-G01",
+      "documentId": "SV3-U42-D01",
+      "versionId": "SV3-U42-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U42-P01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U42-P01-E01-S01",
+          "parentId": "SV3-U42-P01",
+          "documentId": "SV3-U42-D01",
+          "versionId": "SV3-U42-D01-V01",
+          "sourcePath": "documents/sv3-u42-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 60,
+          "charEnd": 167,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "For the permanent exhibit, the wayfinding error rate decreased by 38% after the floor markers were revised.",
+          "textSha256": "25eec1f657c573ad096bf76ff4f5756d4cc970470b244962123342d1e92c02dc"
+        }
+      ],
+      "primarySpanId": "SV3-U42-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p01"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 38,
+          "unit": "%",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "38%",
+          "qualifierTokens": [
+            "wayfinding",
+            "error",
+            "rate"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U42-P02-E01",
+      "userBundleId": "SV3-U42",
+      "parentId": "SV3-U42-P02",
+      "groupId": "SV3-U42-G02",
+      "documentId": "SV3-U42-D01",
+      "versionId": "SV3-U42-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U42-P02",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U42-P02-E01-S01",
+          "parentId": "SV3-U42-P02",
+          "documentId": "SV3-U42-D01",
+          "versionId": "SV3-U42-D01-V01",
+          "sourcePath": "documents/sv3-u42-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 200,
+          "charEnd": 312,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "During a temporary installation, the wayfinding error rate increased by 38% when directional signs were removed.",
+          "textSha256": "59375045321085780d80d52dfb56a2550e1a40234479596753bd641950f95349"
+        }
+      ],
+      "primarySpanId": "SV3-U42-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p02"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 38,
+          "unit": "%",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "38%",
+          "qualifierTokens": [
+            "wayfinding",
+            "error",
+            "rate"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U42-P03-E01",
+      "userBundleId": "SV3-U42",
+      "parentId": "SV3-U42-P03",
+      "groupId": "SV3-U42-G03",
+      "documentId": "SV3-U42-D01",
+      "versionId": "SV3-U42-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U42-P03",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U42-P03-E01-S01",
+          "parentId": "SV3-U42-P03",
+          "documentId": "SV3-U42-D01",
+          "versionId": "SV3-U42-D01-V01",
+          "sourcePath": "documents/sv3-u42-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 333,
+          "charEnd": 431,
+          "lineStart": 10,
+          "lineEnd": 10,
+          "text": "In the fabrication review, the installation defect rate decreased by 38% after a checklist change.",
+          "textSha256": "b96f41a92d77fa0e3da9481da5ddc49acdfe3342db42ee579998d46dfa094369"
+        }
+      ],
+      "primarySpanId": "SV3-U42-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p03"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 38,
+          "unit": "%",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "38%",
+          "qualifierTokens": [
+            "installation",
+            "defect",
+            "rate"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U42-P04-E01",
+      "userBundleId": "SV3-U42",
+      "parentId": "SV3-U42-P04",
+      "groupId": "SV3-U42-G04",
+      "documentId": "SV3-U42-D01",
+      "versionId": "SV3-U42-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U42-P04",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U42-P04-E01-S01",
+          "parentId": "SV3-U42-P04",
+          "documentId": "SV3-U42-D01",
+          "versionId": "SV3-U42-D01-V01",
+          "sourcePath": "documents/sv3-u42-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 458,
+          "charEnd": 541,
+          "lineStart": 13,
+          "lineEnd": 13,
+          "text": "The primary gallery redesign continued for 10 months from research through handoff.",
+          "textSha256": "a30fa230d6c52f9aec69f632fca9875a1dd2b9d5fcdd532a2c57bf2d9225c6af"
+        }
+      ],
+      "primarySpanId": "SV3-U42-P04-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p04"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 10,
+          "unit": "months",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "10 months",
+          "qualifierTokens": [
+            "primary",
+            "gallery",
+            "redesign"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U42-P05-E01",
+      "userBundleId": "SV3-U42",
+      "parentId": "SV3-U42-P05",
+      "groupId": "SV3-U42-G05",
+      "documentId": "SV3-U42-D01",
+      "versionId": "SV3-U42-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U42-P05",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U42-P05-E01-S01",
+          "parentId": "SV3-U42-P05",
+          "documentId": "SV3-U42-D01",
+          "versionId": "SV3-U42-D01-V01",
+          "sourcePath": "documents/sv3-u42-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 567,
+          "charEnd": 655,
+          "lineStart": 16,
+          "lineEnd": 16,
+          "text": "An earlier primary gallery redesign concept ran for 6 months before it was discontinued.",
+          "textSha256": "302c0b5701aec2ce1f75d80684b0b95383cf2025944223a1ca94f177579e1dd4"
+        }
+      ],
+      "primarySpanId": "SV3-U42-P05-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p05"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 6,
+          "unit": "months",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "6 months",
+          "qualifierTokens": [
+            "primary",
+            "gallery",
+            "redesign"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U43-P01-E01",
+      "userBundleId": "SV3-U43",
+      "parentId": "SV3-U43-P01",
+      "groupId": "SV3-U43-G01",
+      "documentId": "SV3-U43-D01",
+      "versionId": "SV3-U43-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U43-P01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U43-P01-E01-S01",
+          "parentId": "SV3-U43-P01",
+          "documentId": "SV3-U43-D01",
+          "versionId": "SV3-U43-D01-V01",
+          "sourcePath": "documents/sv3-u43-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 44,
+          "charEnd": 98,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "승인된 permit review 시작일은 2026-02-15이며 이후 주민 공지 절차로 이어졌다.",
+          "textSha256": "ff32c60a1f939b77a9f26e9151f00218a250bd70bf5b3b03821e852ecb751093"
+        }
+      ],
+      "primarySpanId": "SV3-U43-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p01"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": [
+        {
+          "start": "2026-02-15",
+          "end": "2026-02-15",
+          "precision": "DAY",
+          "sourceSurface": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "evidenceUnitId": "SV3-U43-P02-E01",
+      "userBundleId": "SV3-U43",
+      "parentId": "SV3-U43-P02",
+      "groupId": "SV3-U43-G02",
+      "documentId": "SV3-U43-D01",
+      "versionId": "SV3-U43-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U43-P02",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U43-P02-E01-S01",
+          "parentId": "SV3-U43-P02",
+          "documentId": "SV3-U43-D01",
+          "versionId": "SV3-U43-D01-V01",
+          "sourcePath": "documents/sv3-u43-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 123,
+          "charEnd": 182,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "이전 승인 주기의 permit review 시작일은 2025-11-20이었고 해당 주기는 연말에 종료됐다.",
+          "textSha256": "2540c75a78ffd838ad065cddfcb0993ac0aeb2765d5c60f42398b20538f7ef17"
+        }
+      ],
+      "primarySpanId": "SV3-U43-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p02"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": [
+        {
+          "start": "2025-11-20",
+          "end": "2025-11-20",
+          "precision": "DAY",
+          "sourceSurface": "2025-11-20"
+        }
+      ]
+    },
+    {
+      "evidenceUnitId": "SV3-U43-P03-E01",
+      "userBundleId": "SV3-U43",
+      "parentId": "SV3-U43-P03",
+      "groupId": "SV3-U43-G03",
+      "documentId": "SV3-U43-D01",
+      "versionId": "SV3-U43-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U43-P03",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U43-P03-E01-S01",
+          "parentId": "SV3-U43-P03",
+          "documentId": "SV3-U43-D01",
+          "versionId": "SV3-U43-D01-V01",
+          "sourcePath": "documents/sv3-u43-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 205,
+          "charEnd": 258,
+          "lineStart": 10,
+          "lineEnd": 10,
+          "text": "서명된 운영 명세는 TransitForm 4.2를 제출 양식의 기준 version으로 지정했다.",
+          "textSha256": "e096e6abc5c7f34e3935049e740b92f33d283901aac44935668b5ded9a826920"
+        }
+      ],
+      "primarySpanId": "SV3-U43-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p03"
+      ],
+      "entities": [
+        {
+          "entityType": "IDENTIFIER_NUMBER",
+          "canonicalValue": "TRANSITFORM_4_2",
+          "surfaceForms": [
+            "TransitForm 4.2"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U43-P04-E01",
+      "userBundleId": "SV3-U43",
+      "parentId": "SV3-U43-P04",
+      "groupId": "SV3-U43-G04",
+      "documentId": "SV3-U43-D01",
+      "versionId": "SV3-U43-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U43-P04",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U43-P04-E01-S01",
+          "parentId": "SV3-U43-P04",
+          "documentId": "SV3-U43-D01",
+          "versionId": "SV3-U43-D01-V01",
+          "sourcePath": "documents/sv3-u43-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 277,
+          "charEnd": 328,
+          "lineStart": 13,
+          "lineEnd": 13,
+          "text": "폐기된 초안에는 TransitForm 4.0이 남아 있었지만 승인 명세에는 반영되지 않았다.",
+          "textSha256": "2a00f0d868a80aaef1307736abda30724f1b717bcccfcfc68428932a8ed40972"
+        }
+      ],
+      "primarySpanId": "SV3-U43-P04-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p04"
+      ],
+      "entities": [
+        {
+          "entityType": "IDENTIFIER_NUMBER",
+          "canonicalValue": "TRANSITFORM_4_0",
+          "surfaceForms": [
+            "TransitForm 4.0"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    }
+  ]
+}

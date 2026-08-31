@@ -1,0 +1,670 @@
+{
+  "artifactType": "QUESTIONS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+  "split": "CALIBRATION",
+  "queries": [
+    {
+      "queryId": "SV3-U44-Q01",
+      "userBundleId": "SV3-U44",
+      "questionGroupId": "SV3-U44-Q01-TC11-FAMILY",
+      "query": "Did the membership cycle record at least 1,800 member renewals?",
+      "normalizedQuery": "did the membership cycle record at least 1 800 member renewals",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q01"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q01",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U44-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U44-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GTE",
+                "value": 1800,
+                "unit": "count",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "member",
+                  "renewals"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U44-Q02",
+      "userBundleId": "SV3-U44",
+      "questionGroupId": "SV3-U44-Q02-TC11-FAMILY",
+      "query": "Did the cycle record exactly 1,850 member renewals?",
+      "normalizedQuery": "did the cycle record exactly 1 850 member renewals",
+      "categories": [
+        "numeric_quantity",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q02"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q02",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U44-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U44-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "EQ",
+                "value": 1850,
+                "unit": "count",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "member",
+                  "renewals"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U44-Q03",
+      "userBundleId": "SV3-U44",
+      "questionGroupId": "SV3-U44-Q03-TC11-FAMILY",
+      "query": "Was there a cycle with no more than 1,240 member renewals?",
+      "normalizedQuery": "was there a cycle with no more than 1 240 member renewals",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q03"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q03",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U44-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U44-G02"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "LTE",
+                "value": 1240,
+                "unit": "count",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "member",
+                  "renewals"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U44-Q04",
+      "userBundleId": "SV3-U44",
+      "questionGroupId": "SV3-U44-Q04-TC11-FAMILY",
+      "query": "Did a cycle exceed 2,000 member renewals?",
+      "normalizedQuery": "did a cycle exceed 2 000 member renewals",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "hard_negative",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q04"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q04",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U44-P01-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GT",
+                "value": 2000,
+                "unit": "count",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "member",
+                  "renewals"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U45-Q01",
+      "userBundleId": "SV3-U45",
+      "questionGroupId": "SV3-U45-Q01-TC11-FAMILY",
+      "query": "냉각 에너지 사용량을 27% 이상 감소시킨 사례가 있나요?",
+      "normalizedQuery": "냉각 에너지 사용량을 27 이상 감소시킨 사례가 있나요",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q01"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q01",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U45-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U45-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GTE",
+                "value": 27,
+                "unit": "%",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "냉각",
+                  "에너지",
+                  "사용량"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U45-Q02",
+      "userBundleId": "SV3-U45",
+      "questionGroupId": "SV3-U45-Q02-TC11-FAMILY",
+      "query": "냉각 에너지 사용량이 20% 초과 증가한 사례가 있나요?",
+      "normalizedQuery": "냉각 에너지 사용량이 20 초과 증가한 사례가 있나요",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q02"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q02",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U45-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U45-G02"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GT",
+                "value": 20,
+                "unit": "%",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "냉각",
+                  "에너지",
+                  "사용량"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U45-Q03",
+      "userBundleId": "SV3-U45",
+      "questionGroupId": "SV3-U45-Q03-TC11-FAMILY",
+      "query": "냉각 최적화 검증을 15~20개월 동안 진행했나요?",
+      "normalizedQuery": "냉각 최적화 검증을 15 20개월 동안 진행했나요",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q03"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q03",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U45-P04-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U45-G04"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "BETWEEN",
+                "value": 15,
+                "upperValue": 20,
+                "unit": "개월",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "냉각",
+                  "최적화",
+                  "검증"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U45-Q04",
+      "userBundleId": "SV3-U45",
+      "questionGroupId": "SV3-U45-Q04-TC11-FAMILY",
+      "query": "냉각수 누수율을 27% 감소시킨 기록이 있나요?",
+      "normalizedQuery": "냉각수 누수율을 27 감소시킨 기록이 있나요",
+      "categories": [
+        "numeric_quantity",
+        "hard_negative",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q04"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q04",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U45-P03-E01",
+              "supportRelation": "INSUFFICIENT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "EQ",
+                "value": 27,
+                "unit": "%",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "냉각수",
+                  "누수율"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U46-Q01",
+      "userBundleId": "SV3-U46",
+      "questionGroupId": "SV3-U46-Q01-TC11-FAMILY",
+      "query": "production kiosk client가 KioskLink 8.4를 사용하나요?",
+      "normalizedQuery": "production kiosk client가 kiosklink 8 4를 사용하나요",
+      "categories": [
+        "literal_identifier",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q01"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q01",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U46-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U46-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "IDENTIFIER_NUMBER",
+                "canonicalValue": "KIOSKLINK_8_4",
+                "surfaceForms": [
+                  "KioskLink 8.4"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U46-Q02",
+      "userBundleId": "SV3-U46",
+      "questionGroupId": "SV3-U46-Q02-TC11-FAMILY",
+      "query": "production kiosk client가 KioskLink 8.7을 사용하나요?",
+      "normalizedQuery": "production kiosk client가 kiosklink 8 7을 사용하나요",
+      "categories": [
+        "literal_identifier",
+        "hard_negative",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q02"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q02",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U46-P01-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "IDENTIFIER_NUMBER",
+                "canonicalValue": "KIOSKLINK_8_7",
+                "surfaceForms": [
+                  "KioskLink 8.7"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U46-Q03",
+      "userBundleId": "SV3-U46",
+      "questionGroupId": "SV3-U46-Q03-TC11-FAMILY",
+      "query": "maintenance window 시작일이 2026-06-30 이후였나요?",
+      "normalizedQuery": "maintenance window 시작일이 2026 06 30 이후였나요",
+      "categories": [
+        "date_range",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q03"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q03",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U46-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U46-G03"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U46-Q04",
+      "userBundleId": "SV3-U46",
+      "questionGroupId": "SV3-U46-Q04-TC11-FAMILY",
+      "query": "maintenance window 시작일이 2025-01-01 이전이었나요?",
+      "normalizedQuery": "maintenance window 시작일이 2025 01 01 이전이었나요",
+      "categories": [
+        "date_range",
+        "hard_negative",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q04"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q04",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U46-P04-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    }
+  ]
+}

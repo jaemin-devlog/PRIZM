@@ -1,0 +1,218 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+  "split": "ALL",
+  "status": "INPUT_FROZEN",
+  "mutable": false,
+  "opened": true,
+  "searchExecuted": false,
+  "sealedAt": null,
+  "frozenAt": "2026-08-31T20:41:06+09:00",
+  "generationSourceRevision": "d195f3bd8645bef88964ecf033a5815626d1004c",
+  "generatorRevision": "prz028-typed-capability-stress-v1",
+  "validationMode": "DETERMINISTIC_CONTRACT_VALIDATOR_NO_EXTERNAL_JSON_SCHEMA_ENGINE",
+  "previousDatasets": [
+    {
+      "datasetVersion": "search-v3-typed-constraints-stress-1.0.0",
+      "status": "INVALID_INPUT_HISTORICAL"
+    },
+    {
+      "datasetVersion": "search-v3-typed-constraints-stress-1.0.1",
+      "status": "HISTORICAL_FROZEN",
+      "benchmarkExecuted": true
+    },
+    {
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "status": "FROZEN_INPUT"
+    },
+    {
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "status": "FROZEN_INPUT"
+    },
+    {
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "status": "FROZEN_INPUT"
+    }
+  ],
+  "splitCombinedSha256": {
+    "DEV": "84fc74b7d44008b90a6a23bdaf5ea3dbebebc00eeaeb683281ef10ceb57f6a36",
+    "CALIBRATION": "184daa39aafada65b6d7165559c02ce5dd1e7a3e1813544392bf6932a75db408"
+  },
+  "counts": {
+    "userBundles": 6,
+    "documents": 6,
+    "queries": 24,
+    "typedQueryAnnotations": 24,
+    "evidenceParents": 24,
+    "evidenceGroups": 24,
+    "evidenceUnits": 24,
+    "typedObservations": 24
+  },
+  "distributions": {
+    "split": {
+      "CALIBRATION": 3,
+      "DEV": 3
+    },
+    "profession": {
+      "DATA_AI_INFRA": 1,
+      "DESIGN_PRODUCT": 1,
+      "FRONTEND_MOBILE": 1,
+      "MARKETING_SALES": 1,
+      "NON_DEVELOPMENT_GENERAL": 1,
+      "PLANNING": 1
+    },
+    "documentLanguage": {
+      "EN": 2,
+      "KO": 2,
+      "KO_EN_MIXED": 2
+    },
+    "queryLanguage": {
+      "EN": 8,
+      "KO": 8,
+      "KO_EN_MIXED": 8
+    },
+    "answerability": {
+      "NOT_SUPPORTED": 8,
+      "SUPPORTED": 16
+    },
+    "category": {
+      "date_range": 4,
+      "english": 8,
+      "hard_negative": 8,
+      "korean": 8,
+      "korean_english_mixed": 8,
+      "literal_identifier": 4,
+      "numeric_quantity": 16,
+      "numeric_range_comparison": 12
+    },
+    "typedKind": {
+      "DATE": 4,
+      "IDENTIFIER_NUMBER": 4,
+      "QUANTITY": 16
+    },
+    "typedOperator": {
+      "EQ": 4,
+      "EXACT": 4,
+      "GT": 4,
+      "GTE": 6,
+      "LT": 2,
+      "LTE": 2,
+      "RANGE": 2
+    },
+    "primaryFamily": {
+      "date": 4,
+      "identifier_number": 4,
+      "percentage_direction": 4,
+      "qualifier_mismatch": 4,
+      "quantity_wrong_value": 4,
+      "range_boundary": 4
+    },
+    "expectedState": {
+      "CONTRADICTED": 28,
+      "SATISFIED": 16,
+      "UNKNOWN": 52
+    },
+    "expectedReason": {
+      "DIRECTION_MISMATCH": 4,
+      "MATCHED": 16,
+      "NO_MATCHING_OBSERVATION": 16,
+      "QUALIFIER_MISMATCH": 18,
+      "UNIT_MISMATCH": 18,
+      "VALUE_MISMATCH": 24
+    }
+  },
+  "files": [
+    {
+      "path": "calibration/corpus.json",
+      "bytes": 4393,
+      "sha256": "a3b492eb7696f09d6a499e6c5ccee234a8067acc2ff9e949cf35e435288c82ce"
+    },
+    {
+      "path": "calibration/documents/sv3-u44-typed-capability-v01.txt",
+      "bytes": 389,
+      "sha256": "2e50bfb07eaf46307043820200f478b37d293ea28418f9232e086263192dce0a"
+    },
+    {
+      "path": "calibration/documents/sv3-u45-typed-capability-v01.txt",
+      "bytes": 620,
+      "sha256": "847596865279a867e2e39138e4b5ab9a7308fd8d5e018f8b2d25fabfbd0bbb81"
+    },
+    {
+      "path": "calibration/documents/sv3-u46-typed-capability-v01.txt",
+      "bytes": 520,
+      "sha256": "e47373bed1ebff592422e816d08536daf49ad45c851972b4733afc06adaa2f5f"
+    },
+    {
+      "path": "calibration/gold-evidence.json",
+      "bytes": 29653,
+      "sha256": "3b179e52be893b7acf227280a806d13d982097909e85ef2f164e0e16afa89a59"
+    },
+    {
+      "path": "calibration/manifest.json",
+      "bytes": 3344,
+      "sha256": "94d9d62024cdeec74bf869b3ea0bf355326b69c29a936890a5e96276e2b5ce5b"
+    },
+    {
+      "path": "calibration/questions.json",
+      "bytes": 18965,
+      "sha256": "33a92ff84da81b265c1a39da8347159862727feb21e335a328a0dfe79831a526"
+    },
+    {
+      "path": "calibration/typed-annotations.json",
+      "bytes": 19618,
+      "sha256": "b7b3b1a473e1c88abfc7c4cb5875e738d67b20dede22527bdaa12b23ccad598b"
+    },
+    {
+      "path": "dev/corpus.json",
+      "bytes": 4359,
+      "sha256": "e59508a463b307376f9d974194256092e9c0467ae76a50e7f88ec0acd2441141"
+    },
+    {
+      "path": "dev/documents/sv3-u41-typed-capability-v01.txt",
+      "bytes": 383,
+      "sha256": "7fec8af323f02a1bba2e5fb170074e9bb61af0a698ea7e468ec0e34b9407da65"
+    },
+    {
+      "path": "dev/documents/sv3-u42-typed-capability-v01.txt",
+      "bytes": 656,
+      "sha256": "a4efc60e54faa25363985086a88495c4a2fbf0edde8272db425a4b4f236565d0"
+    },
+    {
+      "path": "dev/documents/sv3-u43-typed-capability-v01.txt",
+      "bytes": 531,
+      "sha256": "6bdb5386af9dcffd57be69a0d7f4aae88048660ae47cd333a7a55eecf1929144"
+    },
+    {
+      "path": "dev/gold-evidence.json",
+      "bytes": 29768,
+      "sha256": "88146c2a622a5fbcb44fed52298476433b82acb14941f84824517fd9320b0501"
+    },
+    {
+      "path": "dev/manifest.json",
+      "bytes": 3338,
+      "sha256": "0fe12f5b96f1e7a3767d0efae42e62ab0dad3a7482bcf0c0d0c9ba66f2711a73"
+    },
+    {
+      "path": "dev/questions.json",
+      "bytes": 19341,
+      "sha256": "eac28d2f760966b628b28497d69ef3666e63ae360e2279e138f2a8e191518166"
+    },
+    {
+      "path": "dev/typed-annotations.json",
+      "bytes": 19638,
+      "sha256": "f3e1470e1bbb6954555c1d382d0aa6c611901d292d078abbdfd710643c07cd50"
+    },
+    {
+      "path": "lineage.json",
+      "bytes": 9112,
+      "sha256": "eeaf985b8cdf722c07d57b32b351b204a5dc830108829c5103e36f3afed6e556"
+    },
+    {
+      "path": "typed-stress.schema.json",
+      "bytes": 13383,
+      "sha256": "b839c73fa74cfc2fde457c59f1eb31d56691743520e72ceb86bef8d9c9e540bd"
+    }
+  ],
+  "combinedSha256": "dec33f2c222f5b159166572aed807b1a50e656dccc7cf728dc19019b9ddcee77"
+}

@@ -1,0 +1,129 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+  "split": "CALIBRATION",
+  "status": "INPUT_FROZEN",
+  "mutable": false,
+  "opened": true,
+  "searchExecuted": false,
+  "sealedAt": null,
+  "frozenAt": "2026-08-31T20:41:06+09:00",
+  "generationSourceRevision": "d195f3bd8645bef88964ecf033a5815626d1004c",
+  "generatorRevision": "prz028-typed-capability-stress-v1",
+  "validationMode": "DETERMINISTIC_CONTRACT_VALIDATOR_NO_EXTERNAL_JSON_SCHEMA_ENGINE",
+  "counts": {
+    "userBundles": 3,
+    "documents": 3,
+    "queries": 12,
+    "typedQueryAnnotations": 12,
+    "evidenceParents": 12,
+    "evidenceGroups": 12,
+    "evidenceUnits": 12,
+    "typedObservations": 12
+  },
+  "distributions": {
+    "profession": {
+      "DATA_AI_INFRA": 1,
+      "FRONTEND_MOBILE": 1,
+      "MARKETING_SALES": 1
+    },
+    "documentLanguage": {
+      "EN": 1,
+      "KO": 1,
+      "KO_EN_MIXED": 1
+    },
+    "queryLanguage": {
+      "EN": 4,
+      "KO": 4,
+      "KO_EN_MIXED": 4
+    },
+    "answerability": {
+      "NOT_SUPPORTED": 4,
+      "SUPPORTED": 8
+    },
+    "category": {
+      "date_range": 2,
+      "english": 4,
+      "hard_negative": 4,
+      "korean": 4,
+      "korean_english_mixed": 4,
+      "literal_identifier": 2,
+      "numeric_quantity": 8,
+      "numeric_range_comparison": 6
+    },
+    "typedKind": {
+      "DATE": 2,
+      "IDENTIFIER_NUMBER": 2,
+      "QUANTITY": 8
+    },
+    "typedOperator": {
+      "EQ": 2,
+      "EXACT": 2,
+      "GT": 2,
+      "GTE": 3,
+      "LT": 1,
+      "LTE": 1,
+      "RANGE": 1
+    },
+    "primaryFamily": {
+      "date": 2,
+      "identifier_number": 2,
+      "percentage_direction": 2,
+      "qualifier_mismatch": 2,
+      "quantity_wrong_value": 2,
+      "range_boundary": 2
+    },
+    "expectedState": {
+      "CONTRADICTED": 14,
+      "SATISFIED": 8,
+      "UNKNOWN": 26
+    },
+    "expectedReason": {
+      "DIRECTION_MISMATCH": 2,
+      "MATCHED": 8,
+      "NO_MATCHING_OBSERVATION": 8,
+      "QUALIFIER_MISMATCH": 9,
+      "UNIT_MISMATCH": 9,
+      "VALUE_MISMATCH": 12
+    }
+  },
+  "files": [
+    {
+      "path": "corpus.json",
+      "bytes": 4393,
+      "sha256": "a3b492eb7696f09d6a499e6c5ccee234a8067acc2ff9e949cf35e435288c82ce"
+    },
+    {
+      "path": "documents/sv3-u44-typed-capability-v01.txt",
+      "bytes": 389,
+      "sha256": "2e50bfb07eaf46307043820200f478b37d293ea28418f9232e086263192dce0a"
+    },
+    {
+      "path": "documents/sv3-u45-typed-capability-v01.txt",
+      "bytes": 620,
+      "sha256": "847596865279a867e2e39138e4b5ab9a7308fd8d5e018f8b2d25fabfbd0bbb81"
+    },
+    {
+      "path": "documents/sv3-u46-typed-capability-v01.txt",
+      "bytes": 520,
+      "sha256": "e47373bed1ebff592422e816d08536daf49ad45c851972b4733afc06adaa2f5f"
+    },
+    {
+      "path": "gold-evidence.json",
+      "bytes": 29653,
+      "sha256": "3b179e52be893b7acf227280a806d13d982097909e85ef2f164e0e16afa89a59"
+    },
+    {
+      "path": "questions.json",
+      "bytes": 18965,
+      "sha256": "33a92ff84da81b265c1a39da8347159862727feb21e335a328a0dfe79831a526"
+    },
+    {
+      "path": "typed-annotations.json",
+      "bytes": 19618,
+      "sha256": "b7b3b1a473e1c88abfc7c4cb5875e738d67b20dede22527bdaa12b23ccad598b"
+    }
+  ],
+  "combinedSha256": "184daa39aafada65b6d7165559c02ce5dd1e7a3e1813544392bf6932a75db408"
+}

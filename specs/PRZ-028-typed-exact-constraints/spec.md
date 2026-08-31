@@ -1,6 +1,6 @@
 # PRZ-028 Search V3 Typed Exact Constraints
 
-- 상태: `IN_PROGRESS / STRESS_INPUT_FROZEN / OFFICIAL_T0_T1_RUN / NEEDS_ADJUSTMENT`
+- 상태: `IN_PROGRESS / STRESS_1.0.1_HISTORICAL_FROZEN / STRESS_1.1.0_INPUT_FROZEN`
 - 기준 branch: `PRZ-028-typed-exact-constraints`
 - 기준 source: `PRZ-026-structural-parsing-parent-child@a7dbb12ea7c0a3f4a502c1ae0252177d9c78a8b9`
 - 선행 조건: `DEPENDS_ON_PRZ_025@5f8229f88251938dc5b34588676cc69edf409c99`, `DEPENDS_ON_PRZ_026_B3`
@@ -181,3 +181,74 @@ NOT_SUPPORTED typed hard negative 11문항에서는 Gold-expected `CONTRADICTED@
 Gate를 모두 충족하지 못하므로 판정은 `NEEDS_ADJUSTMENT`다. Production 채택과 Sparse 후속 실험은
 승인하지 않는다. 현재 input·code freeze 결과는 `HISTORICAL_RESULT`로 보존하며 parser, gold 또는
 판정 정책을 바꾸는 후속 조정은 새 dataset version과 새 freeze가 필요하다.
+
+## 9. Final adjustment의 입력 우선 계약
+
+Stress `1.0.1`과 code freeze `2e9c9ff`의 결과는 `HISTORICAL_FROZEN`이며 수정하거나 재평가
+입력으로 다시 봉인하지 않는다. Final adjustment는 evaluator 변경 전에 별도
+`search-v3-typed-constraints-stress-1.1.0`을 materialize하고 `INPUT_FROZEN`으로 커밋한다. 그 뒤
+qualifier/evaluator, runner와 판정 정책을 구현·검증하고 별도 `CODE_FROZEN` commit을 만든다.
+공식 Stress 1.1.0 T0/T1 BGE 실행은 두 freeze가 일치할 때 단 한 번만 허용한다. 결과를 본 뒤
+입력·gold·코드·정책을 바꾸면 이 결과는 historical이며 새 stress version이 필요하다.
+
+Stress 1.1.0은 synthetic DEV/CAL 전용 6 user bundles, 6 documents, 24 queries다. 각 split은
+3 bundles, 12 queries, `SUPPORTED 8 / NOT_SUPPORTED 4`, Korean/English/mixed 각 4 query다.
+Primary capability family는 `quantity_wrong_value`, `qualifier_mismatch`, `date`,
+`identifier_number`, `percentage_direction`, `range_boundary`이며 각 family를 split마다 2 query,
+전체 4 query로 고정한다. 같은 대상의 wrong/correct value, 같은 숫자의 다른/correct qualifier,
+날짜, identifier-number, percentage 방향과 range/duration/boundary를 검색 결과를 보지 않고
+자연스러운 문서 문맥에 배치한다.
+
+1.1.0은 Original, Long-form, Robustness, Stress 1.0.0/1.0.1과 user/document/version/template/
+generator/source-fact/question lineage 또는 normalized query를 공유하지 않는다. SEALED FINAL은
+manifest hash/flags와 unified lineage identifier의 collision metadata만 확인하며 document/question/gold
+semantic fixture는 읽지 않는다. Per-evidence annotation은 상태와 diagnostic reason을 함께 봉인한다.
+Schema-contract, Gold/answerability, source와
+query code-point span, qualifier/direction span, ID·lineage, inventory, per-file/combined SHA-256을
+deterministic validator로 검증한다. Materializer는 overwrite를 거부하고 `--check`에서 byte-for-byte
+재생성을 검증한다.
+
+## 10. Final qualifier와 diagnostic 계약
+
+Qualifier 비교는 grounded surface/span을 바꾸지 않는 별도 comparison token에만 NFKC, lowercase,
+punctuation/space boundary normalization과 최소 한국어 조사 제거를 적용한다. 두 qualifier가 exact이거나
+required qualifier의 whole-token sequence가 observed qualifier 안에 **연속된 동일 순서**로 포함될
+때만 `EXACT` 또는 `REQUIRED_SUBSET` 호환이다. Empty는 empty와만 호환한다. Unordered set 포함,
+부분 문자열 포함, synonym/ontology/직무·기술 사전, embedding과 LLM은 금지하며 애매하면 mismatch다.
+
+- `SATISFIED`: qualifier/unit/identifier target이 호환되고 값·범위·방향 조건도 충족
+- `CONTRADICTED`: 같은 target이 확인되고 값·범위·방향이 조건을 명시적으로 위반
+- `UNKNOWN`: 다른 target이거나 같은 target인지 입증되지 않거나 관찰이 불충분
+
+Qualifier mismatch는 값이 같아도 반드시 `UNKNOWN + QUALIFIER_MISMATCH`이며 `SATISFIED`가 될 수
+없다. 같은 qualifier의 wrong value/direction은 `CONTRADICTED`다. Diagnostic reason은
+`MATCHED`, `VALUE_MISMATCH`, `DIRECTION_MISMATCH`, `QUALIFIER_MISMATCH`, `UNIT_MISMATCH`,
+`NO_MATCHING_OBSERVATION`, `AMBIGUOUS_OBSERVATION`의 generic 집합이다. Reason은 report/검증에만
+쓰고 ranking에는 쓰지 않는다. Stable partition은 계속 상태만으로
+`SATISFIED → UNKNOWN → CONTRADICTED`이며 동일 상태의 Dense 순서를 보존한다.
+
+## 11. Final role Gate — 결과 전 동결
+
+무결성, input/code/model SHA, candidate identity 또는 semantic parity가 실패하면 official run은
+`INVALID_RESULT / ROLE_NOT_ASSESSED`이며 `DROP`으로 위장하지 않는다. 유효한 run은 다섯 suite를
+Original, Long-form, Robustness, Stress 1.0.1 regression과 Stress 1.1.0 official capability로 분리한다.
+역할은 Stress 1.1.0으로 판정하고 기존 네 suite는 신규 회귀 0 Gate로 사용한다.
+
+공통 validation/operation Gate:
+
+- query extraction F1 `= 1.0`, observation extraction F1 `>= 0.95`, status accuracy `>= 0.95`
+- SAT precision `= 1.0`, CONTR precision `>= 0.95`, CONTR recall `>= 0.90`
+- qualifier-mismatch SAT false positive `= 0`
+- same-qualifier wrong-value expected `CONTRADICTED` recall `= 1.0`
+- candidate identity와 parser-empty semantic ordering exact parity
+- 모든 suite Recall@5/20과 nDCG@5 비열화 0, direct rank-1 loss 0
+- persistent index/storage 0, online-added p95가 같은 run의 shared embedding p95 + Dense p95 이하
+
+`RANKING_COMPONENT`는 공통 Gate에 더해 Stress 1.1.0 Top1 또는 MRR의 strict improvement,
+direct win `>= 2`, loss `= 0`, winning user `>= 2`, winning primary family `>= 2`, 그리고 최소 한
+Gold-expected wrong-condition rank-1 demotion과 predicted `SATISFIED@1` 비증가를 모두 요구한다.
+
+공통 Gate는 통과하지만 Ranking Gate가 미달하면 `EVIDENCE_VALIDATION_ONLY`다. 이 경우 parser와
+evaluator는 evidence selection 뒤 `FOUND/PARTIAL/NONE` 검증 후보로만 보존하고 Dense ranking에서는
+제거한다. 공통 validation Gate가 실패하면 `DROP`이다. Sparse는 역할 판정과 PRZ-028 종료 전까지
+`NOT_RUN`이다.

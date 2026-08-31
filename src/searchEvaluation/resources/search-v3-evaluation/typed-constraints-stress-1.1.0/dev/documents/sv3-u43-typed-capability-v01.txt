@@ -1,0 +1,13 @@
+Transit permit 승인 기록
+
+Current permit review
+승인된 permit review 시작일은 2026-02-15이며 이후 주민 공지 절차로 이어졌다.
+
+Earlier approved cycle
+이전 승인 주기의 permit review 시작일은 2025-11-20이었고 해당 주기는 연말에 종료됐다.
+
+Signed specification
+서명된 운영 명세는 TransitForm 4.2를 제출 양식의 기준 version으로 지정했다.
+
+Superseded draft
+폐기된 초안에는 TransitForm 4.0이 남아 있었지만 승인 명세에는 반영되지 않았다.

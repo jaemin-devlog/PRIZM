@@ -1,0 +1,113 @@
+{
+  "artifactType": "CORPUS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+  "split": "DEV",
+  "userBundles": [
+    {
+      "userBundleId": "SV3-U41",
+      "split": "DEV",
+      "professionGroup": "NON_DEVELOPMENT_GENERAL",
+      "profession": "Parcel claims coordinator",
+      "languageProfile": "KO",
+      "documentFamilyId": "SV3-U41-TC11-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC11-TEMPLATE-PARCEL-41",
+      "documents": [
+        {
+          "documentId": "SV3-U41-D01",
+          "logicalDocumentId": "SV3-U41-D01-TC11-LOGICAL",
+          "versionLineageId": "SV3-U41-D01-TC11-LINEAGE",
+          "versionId": "SV3-U41-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "소포 보상 처리 기록",
+          "documentType": "CAREER_REVIEW",
+          "documentStructure": "CAREER_DESCRIPTION",
+          "fileType": "TXT",
+          "language": "KO",
+          "contentPath": "documents/sv3-u41-typed-capability-v01.txt",
+          "contentSha256": "7fec8af323f02a1bba2e5fb170074e9bb61af0a698ea7e468ec0e34b9407da65",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "PUBLIC_FIXTURE",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "materialize-prz028-typed-capability-stress",
+            "generatorRevision": "prz028-typed-capability-stress-v1",
+            "generatorSeedId": "SV3-TC11-SEED-PARCEL-41-H2K7"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-U42",
+      "split": "DEV",
+      "professionGroup": "DESIGN_PRODUCT",
+      "profession": "Exhibition experience designer",
+      "languageProfile": "EN",
+      "documentFamilyId": "SV3-U42-TC11-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC11-TEMPLATE-EXHIBIT-42",
+      "documents": [
+        {
+          "documentId": "SV3-U42-D01",
+          "logicalDocumentId": "SV3-U42-D01-TC11-LOGICAL",
+          "versionLineageId": "SV3-U42-D01-TC11-LINEAGE",
+          "versionId": "SV3-U42-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Exhibition wayfinding case notes",
+          "documentType": "PORTFOLIO",
+          "documentStructure": "LONG_PORTFOLIO",
+          "fileType": "TXT",
+          "language": "EN",
+          "contentPath": "documents/sv3-u42-typed-capability-v01.txt",
+          "contentSha256": "a4efc60e54faa25363985086a88495c4a2fbf0edde8272db425a4b4f236565d0",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "PUBLIC_FIXTURE",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "materialize-prz028-typed-capability-stress",
+            "generatorRevision": "prz028-typed-capability-stress-v1",
+            "generatorSeedId": "SV3-TC11-SEED-EXHIBIT-42-J5M8"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-U43",
+      "split": "DEV",
+      "professionGroup": "PLANNING",
+      "profession": "Transit permit planner",
+      "languageProfile": "KO_EN_MIXED",
+      "documentFamilyId": "SV3-U43-TC11-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC11-TEMPLATE-PERMIT-43",
+      "documents": [
+        {
+          "documentId": "SV3-U43-D01",
+          "logicalDocumentId": "SV3-U43-D01-TC11-LOGICAL",
+          "versionLineageId": "SV3-U43-D01-TC11-LINEAGE",
+          "versionId": "SV3-U43-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Transit permit 승인 기록",
+          "documentType": "PROJECT_REPORT",
+          "documentStructure": "PROJECT_DESCRIPTION",
+          "fileType": "TXT",
+          "language": "KO_EN_MIXED",
+          "contentPath": "documents/sv3-u43-typed-capability-v01.txt",
+          "contentSha256": "6bdb5386af9dcffd57be69a0d7f4aae88048660ae47cd333a7a55eecf1929144",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "PUBLIC_FIXTURE",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "materialize-prz028-typed-capability-stress",
+            "generatorRevision": "prz028-typed-capability-stress-v1",
+            "generatorSeedId": "SV3-TC11-SEED-PERMIT-43-L8Q4"
+          }
+        }
+      ]
+    }
+  ]
+}

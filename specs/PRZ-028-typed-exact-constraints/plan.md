@@ -1,6 +1,6 @@
 # PRZ-028 Plan
 
-- 상태: `IN_PROGRESS / INPUT_FROZEN / OFFICIAL_T0_T1_RUN / NEEDS_ADJUSTMENT`
+- 상태: `IN_PROGRESS / STRESS_1.1.0_INPUT_FROZEN`
 - 허용 단계: `ORIENT → SPEC → PLAN → IMPLEMENT(evaluation-only) → VERIFY → AUDIT → INTEGRATE(commit only)`
 - baseline: PRZ-026 B3; PRZ-027 Cross Encoder `NO_GO` 제외
 
@@ -59,3 +59,20 @@ PR, push, merge와 Sparse 실험은 실행하지 않는다.
 따라서 현재 freeze에서 추가 튜닝이나 공식 재실행을 하지 않는다. 다음 작업이 parser·gold·stress 구성의
 의미를 바꾸면 기존 결과를 historical로 유지하고 새 version/input/code freeze를 만든다. PRZ-028의
 조정 또는 비채택 결정을 먼저 끝내며 Sparse 실험은 `NOT_RUN`을 유지한다.
+
+## 6. Final adjustment 실행 순서
+
+1. 결과를 보지 않고 Stress 1.1.0의 6 bundles/24 queries, distribution, reason label과 역할 Gate를
+   spec에 사전 등록한다.
+2. Stress 1.1.0 materializer와 입력만 작성하고 schema-contract/Gold/span/lineage/inventory/hash,
+   overwrite guard와 SEALED metadata 불변을 검증한 뒤 input-only commit으로 봉인한다.
+3. Grounded qualifier를 바꾸지 않는 comparison-token compatibility와 status/reason 분리 API를
+   evaluation-only 코드에 구현한다.
+4. Stress 1.0.1과 1.1.0을 독립 hash로 함께 읽는 loader, 다섯 suite 분리 report, 역할 Gate와
+   `CREATE_NEW` official-run claim/output guard를 구현한다.
+5. 모든 non-BGE unit/regression, materializer, scope와 Final guard를 통과한 source/config/model/K/policy를
+   code-freeze commit으로 봉인한다.
+6. Input/code freeze가 일치하는 Stress 1.1.0 T0/T1 BGE를 단 한 번 실행한다. 기존 네 suite는
+   regression으로만 별도 보고한다.
+7. 사전 Gate를 기계적으로 적용해 `RANKING_COMPONENT`, `EVIDENCE_VALIDATION_ONLY`, `DROP` 중 하나를
+   결정하고 문서·scope를 감사해 local commit한다. PR/push/merge와 Sparse는 실행하지 않는다.

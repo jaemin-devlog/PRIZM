@@ -1,0 +1,700 @@
+{
+  "artifactType": "TYPED_ANNOTATIONS",
+  "schemaVersion": "1.1.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+  "split": "DEV",
+  "observations": [
+    {
+      "observationId": "SV3-TC11-U41-P01-O01",
+      "evidenceUnitId": "SV3-U41-P01-E01",
+      "sourceSpanId": "SV3-U41-P01-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "420건",
+      "charStart": 41,
+      "charEnd": 45,
+      "value": 420,
+      "normalizedUnit": "건",
+      "qualifier": "파손 소포 보상 요청",
+      "direction": "NONE",
+      "qualifierCharStart": 29,
+      "qualifierCharEnd": 40
+    },
+    {
+      "observationId": "SV3-TC11-U41-P02-O01",
+      "evidenceUnitId": "SV3-U41-P02-E01",
+      "sourceSpanId": "SV3-U41-P02-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "680건",
+      "charStart": 94,
+      "charEnd": 98,
+      "value": 680,
+      "normalizedUnit": "건",
+      "qualifier": "파손 소포 보상 요청",
+      "direction": "NONE",
+      "qualifierCharStart": 82,
+      "qualifierCharEnd": 93
+    },
+    {
+      "observationId": "SV3-TC11-U41-P03-O01",
+      "evidenceUnitId": "SV3-U41-P03-E01",
+      "sourceSpanId": "SV3-U41-P03-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "680건",
+      "charStart": 142,
+      "charEnd": 146,
+      "value": 680,
+      "normalizedUnit": "건",
+      "qualifier": "배송 라벨",
+      "direction": "NONE",
+      "qualifierCharStart": 136,
+      "qualifierCharEnd": 141
+    },
+    {
+      "observationId": "SV3-TC11-U42-P01-O01",
+      "evidenceUnitId": "SV3-U42-P01-E01",
+      "sourceSpanId": "SV3-U42-P01-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "38%",
+      "charStart": 126,
+      "charEnd": 129,
+      "value": 38,
+      "normalizedUnit": "%",
+      "qualifier": "wayfinding error rate",
+      "direction": "DECREASE",
+      "qualifierCharStart": 91,
+      "qualifierCharEnd": 112,
+      "directionSourceSurface": "decreased",
+      "directionCharStart": 113,
+      "directionCharEnd": 122
+    },
+    {
+      "observationId": "SV3-TC11-U42-P02-O01",
+      "evidenceUnitId": "SV3-U42-P02-E01",
+      "sourceSpanId": "SV3-U42-P02-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "38%",
+      "charStart": 272,
+      "charEnd": 275,
+      "value": 38,
+      "normalizedUnit": "%",
+      "qualifier": "wayfinding error rate",
+      "direction": "INCREASE",
+      "qualifierCharStart": 237,
+      "qualifierCharEnd": 258,
+      "directionSourceSurface": "increased",
+      "directionCharStart": 259,
+      "directionCharEnd": 268
+    },
+    {
+      "observationId": "SV3-TC11-U42-P03-O01",
+      "evidenceUnitId": "SV3-U42-P03-E01",
+      "sourceSpanId": "SV3-U42-P03-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "38%",
+      "charStart": 402,
+      "charEnd": 405,
+      "value": 38,
+      "normalizedUnit": "%",
+      "qualifier": "installation defect rate",
+      "direction": "DECREASE",
+      "qualifierCharStart": 364,
+      "qualifierCharEnd": 388,
+      "directionSourceSurface": "decreased",
+      "directionCharStart": 389,
+      "directionCharEnd": 398
+    },
+    {
+      "observationId": "SV3-TC11-U42-P04-O01",
+      "evidenceUnitId": "SV3-U42-P04-E01",
+      "sourceSpanId": "SV3-U42-P04-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "10 months",
+      "charStart": 501,
+      "charEnd": 510,
+      "value": 10,
+      "normalizedUnit": "months",
+      "qualifier": "primary gallery redesign",
+      "direction": "NONE",
+      "qualifierCharStart": 462,
+      "qualifierCharEnd": 486
+    },
+    {
+      "observationId": "SV3-TC11-U42-P05-O01",
+      "evidenceUnitId": "SV3-U42-P05-E01",
+      "sourceSpanId": "SV3-U42-P05-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "6 months",
+      "charStart": 619,
+      "charEnd": 627,
+      "value": 6,
+      "normalizedUnit": "months",
+      "qualifier": "primary gallery redesign",
+      "direction": "NONE",
+      "qualifierCharStart": 578,
+      "qualifierCharEnd": 602
+    },
+    {
+      "observationId": "SV3-TC11-U43-P01-O01",
+      "evidenceUnitId": "SV3-U43-P01-E01",
+      "sourceSpanId": "SV3-U43-P01-E01-S01",
+      "kind": "DATE",
+      "sourceSurface": "2026-02-15",
+      "charStart": 67,
+      "charEnd": 77,
+      "start": "2026-02-15",
+      "end": "2026-02-15",
+      "precision": "FULL_DATE",
+      "qualifier": "permit review 시작일",
+      "qualifierCharStart": 48,
+      "qualifierCharEnd": 65
+    },
+    {
+      "observationId": "SV3-TC11-U43-P02-O01",
+      "evidenceUnitId": "SV3-U43-P02-E01",
+      "sourceSpanId": "SV3-U43-P02-E01-S01",
+      "kind": "DATE",
+      "sourceSurface": "2025-11-20",
+      "charStart": 152,
+      "charEnd": 162,
+      "start": "2025-11-20",
+      "end": "2025-11-20",
+      "precision": "FULL_DATE",
+      "qualifier": "이전 승인 주기의 permit review 시작일",
+      "qualifierCharStart": 123,
+      "qualifierCharEnd": 150
+    },
+    {
+      "observationId": "SV3-TC11-U43-P03-O01",
+      "evidenceUnitId": "SV3-U43-P03-E01",
+      "sourceSpanId": "SV3-U43-P03-E01-S01",
+      "kind": "IDENTIFIER_NUMBER",
+      "sourceSurface": "TransitForm 4.2",
+      "charStart": 216,
+      "charEnd": 231,
+      "identifier": "TransitForm",
+      "numberSurface": "4.2",
+      "normalizedSegments": [
+        4,
+        2
+      ]
+    },
+    {
+      "observationId": "SV3-TC11-U43-P04-O01",
+      "evidenceUnitId": "SV3-U43-P04-E01",
+      "sourceSpanId": "SV3-U43-P04-E01-S01",
+      "kind": "IDENTIFIER_NUMBER",
+      "sourceSurface": "TransitForm 4.0",
+      "charStart": 286,
+      "charEnd": 301,
+      "identifier": "TransitForm",
+      "numberSurface": "4.0",
+      "normalizedSegments": [
+        4,
+        0
+      ]
+    }
+  ],
+  "queryAnnotations": [
+    {
+      "queryId": "SV3-U41-Q01",
+      "userBundleId": "SV3-U41",
+      "primaryFamily": "quantity_wrong_value",
+      "constraint": {
+        "constraintId": "SV3-U41-Q01-C01",
+        "kind": "QUANTITY",
+        "surface": "600건 이상",
+        "operator": "GTE",
+        "value": 600,
+        "normalizedUnit": "건",
+        "qualifier": "파손 소포 보상 요청",
+        "direction": "NONE",
+        "queryCharStart": 13,
+        "queryCharEnd": 20,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 11
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U41-P01-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U41-P02-E01",
+          "state": "SATISFIED",
+          "reason": "MATCHED"
+        },
+        {
+          "evidenceUnitId": "SV3-U41-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U41-Q02",
+      "userBundleId": "SV3-U41",
+      "primaryFamily": "qualifier_mismatch",
+      "constraint": {
+        "constraintId": "SV3-U41-Q02-C01",
+        "kind": "QUANTITY",
+        "surface": "680건",
+        "operator": "EQ",
+        "value": 680,
+        "normalizedUnit": "건",
+        "qualifier": "파손 소포 보상 요청",
+        "direction": "NONE",
+        "queryCharStart": 17,
+        "queryCharEnd": 21,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 11
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U41-P01-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U41-P02-E01",
+          "state": "SATISFIED",
+          "reason": "MATCHED"
+        },
+        {
+          "evidenceUnitId": "SV3-U41-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U41-Q03",
+      "userBundleId": "SV3-U41",
+      "primaryFamily": "range_boundary",
+      "constraint": {
+        "constraintId": "SV3-U41-Q03-C01",
+        "kind": "QUANTITY",
+        "surface": "420건 이하",
+        "operator": "LTE",
+        "value": 420,
+        "normalizedUnit": "건",
+        "qualifier": "파손 소포 보상 요청",
+        "direction": "NONE",
+        "queryCharStart": 13,
+        "queryCharEnd": 20,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 11
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U41-P01-E01",
+          "state": "SATISFIED",
+          "reason": "MATCHED"
+        },
+        {
+          "evidenceUnitId": "SV3-U41-P02-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U41-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U41-Q04",
+      "userBundleId": "SV3-U41",
+      "primaryFamily": "quantity_wrong_value",
+      "constraint": {
+        "constraintId": "SV3-U41-Q04-C01",
+        "kind": "QUANTITY",
+        "surface": "700건 초과",
+        "operator": "GT",
+        "value": 700,
+        "normalizedUnit": "건",
+        "qualifier": "파손 소포 보상 요청",
+        "direction": "NONE",
+        "queryCharStart": 13,
+        "queryCharEnd": 20,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 11
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U41-P01-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U41-P02-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U41-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U42-Q01",
+      "userBundleId": "SV3-U42",
+      "primaryFamily": "percentage_direction",
+      "constraint": {
+        "constraintId": "SV3-U42-Q01-C01",
+        "kind": "QUANTITY",
+        "surface": "at least 38%",
+        "operator": "GTE",
+        "value": 38,
+        "normalizedUnit": "%",
+        "qualifier": "wayfinding error rate",
+        "direction": "DECREASE",
+        "directionSurface": "decrease",
+        "queryCharStart": 64,
+        "queryCharEnd": 76,
+        "qualifierCharStart": 39,
+        "qualifierCharEnd": 60,
+        "directionSourceSurface": "decrease",
+        "directionCharStart": 26,
+        "directionCharEnd": 34
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U42-P01-E01",
+          "state": "SATISFIED",
+          "reason": "MATCHED"
+        },
+        {
+          "evidenceUnitId": "SV3-U42-P02-E01",
+          "state": "CONTRADICTED",
+          "reason": "DIRECTION_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U42-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U42-P04-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U42-P05-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U42-Q02",
+      "userBundleId": "SV3-U42",
+      "primaryFamily": "percentage_direction",
+      "constraint": {
+        "constraintId": "SV3-U42-Q02-C01",
+        "kind": "QUANTITY",
+        "surface": "more than 30%",
+        "operator": "GT",
+        "value": 30,
+        "normalizedUnit": "%",
+        "qualifier": "wayfinding error rate",
+        "direction": "INCREASE",
+        "directionSurface": "increase",
+        "queryCharStart": 59,
+        "queryCharEnd": 72,
+        "qualifierCharStart": 34,
+        "qualifierCharEnd": 55,
+        "directionSourceSurface": "increase",
+        "directionCharStart": 21,
+        "directionCharEnd": 29
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U42-P01-E01",
+          "state": "CONTRADICTED",
+          "reason": "DIRECTION_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U42-P02-E01",
+          "state": "SATISFIED",
+          "reason": "MATCHED"
+        },
+        {
+          "evidenceUnitId": "SV3-U42-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U42-P04-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U42-P05-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U42-Q03",
+      "userBundleId": "SV3-U42",
+      "primaryFamily": "range_boundary",
+      "constraint": {
+        "constraintId": "SV3-U42-Q03-C01",
+        "kind": "QUANTITY",
+        "surface": "between 9 and 11 months",
+        "operator": "RANGE",
+        "value": 9,
+        "upperValue": 11,
+        "normalizedUnit": "months",
+        "qualifier": "primary gallery redesign",
+        "direction": "NONE",
+        "queryCharStart": 38,
+        "queryCharEnd": 61,
+        "qualifierCharStart": 8,
+        "qualifierCharEnd": 32
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U42-P01-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U42-P02-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U42-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U42-P04-E01",
+          "state": "SATISFIED",
+          "reason": "MATCHED"
+        },
+        {
+          "evidenceUnitId": "SV3-U42-P05-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U42-Q04",
+      "userBundleId": "SV3-U42",
+      "primaryFamily": "qualifier_mismatch",
+      "constraint": {
+        "constraintId": "SV3-U42-Q04-C01",
+        "kind": "QUANTITY",
+        "surface": "38% decrease",
+        "operator": "EQ",
+        "value": 38,
+        "normalizedUnit": "%",
+        "qualifier": "fabrication scrap",
+        "direction": "DECREASE",
+        "directionSurface": "decrease",
+        "queryCharStart": 29,
+        "queryCharEnd": 41,
+        "qualifierCharStart": 45,
+        "qualifierCharEnd": 62,
+        "directionSourceSurface": "decrease",
+        "directionCharStart": 33,
+        "directionCharEnd": 41
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U42-P01-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U42-P02-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U42-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "QUALIFIER_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U42-P04-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U42-P05-E01",
+          "state": "UNKNOWN",
+          "reason": "UNIT_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U43-Q01",
+      "userBundleId": "SV3-U43",
+      "primaryFamily": "date",
+      "constraint": {
+        "constraintId": "SV3-U43-Q01-C01",
+        "kind": "DATE",
+        "surface": "2026-01-31 이후",
+        "operator": "GTE",
+        "value": "2026-01-31",
+        "precision": "FULL_DATE",
+        "qualifier": "permit review 시작일",
+        "queryCharStart": 19,
+        "queryCharEnd": 32,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 17
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U43-P01-E01",
+          "state": "SATISFIED",
+          "reason": "MATCHED"
+        },
+        {
+          "evidenceUnitId": "SV3-U43-P02-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U43-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "NO_MATCHING_OBSERVATION"
+        },
+        {
+          "evidenceUnitId": "SV3-U43-P04-E01",
+          "state": "UNKNOWN",
+          "reason": "NO_MATCHING_OBSERVATION"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U43-Q02",
+      "userBundleId": "SV3-U43",
+      "primaryFamily": "date",
+      "constraint": {
+        "constraintId": "SV3-U43-Q02-C01",
+        "kind": "DATE",
+        "surface": "2025-01-01 이전",
+        "operator": "LT",
+        "value": "2025-01-01",
+        "precision": "FULL_DATE",
+        "qualifier": "permit review 시작일",
+        "queryCharStart": 19,
+        "queryCharEnd": 32,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 17
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U43-P01-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U43-P02-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U43-P03-E01",
+          "state": "UNKNOWN",
+          "reason": "NO_MATCHING_OBSERVATION"
+        },
+        {
+          "evidenceUnitId": "SV3-U43-P04-E01",
+          "state": "UNKNOWN",
+          "reason": "NO_MATCHING_OBSERVATION"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U43-Q03",
+      "userBundleId": "SV3-U43",
+      "primaryFamily": "identifier_number",
+      "constraint": {
+        "constraintId": "SV3-U43-Q03-C01",
+        "kind": "IDENTIFIER_NUMBER",
+        "surface": "TransitForm 4.2",
+        "identifier": "TransitForm",
+        "numberSurface": "4.2",
+        "normalizedSegments": [
+          4,
+          2
+        ],
+        "queryCharStart": 11,
+        "queryCharEnd": 26
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U43-P01-E01",
+          "state": "UNKNOWN",
+          "reason": "NO_MATCHING_OBSERVATION"
+        },
+        {
+          "evidenceUnitId": "SV3-U43-P02-E01",
+          "state": "UNKNOWN",
+          "reason": "NO_MATCHING_OBSERVATION"
+        },
+        {
+          "evidenceUnitId": "SV3-U43-P03-E01",
+          "state": "SATISFIED",
+          "reason": "MATCHED"
+        },
+        {
+          "evidenceUnitId": "SV3-U43-P04-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U43-Q04",
+      "userBundleId": "SV3-U43",
+      "primaryFamily": "identifier_number",
+      "constraint": {
+        "constraintId": "SV3-U43-Q04-C01",
+        "kind": "IDENTIFIER_NUMBER",
+        "surface": "TransitForm 4.5",
+        "identifier": "TransitForm",
+        "numberSurface": "4.5",
+        "normalizedSegments": [
+          4,
+          5
+        ],
+        "queryCharStart": 11,
+        "queryCharEnd": 26
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U43-P01-E01",
+          "state": "UNKNOWN",
+          "reason": "NO_MATCHING_OBSERVATION"
+        },
+        {
+          "evidenceUnitId": "SV3-U43-P02-E01",
+          "state": "UNKNOWN",
+          "reason": "NO_MATCHING_OBSERVATION"
+        },
+        {
+          "evidenceUnitId": "SV3-U43-P03-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        },
+        {
+          "evidenceUnitId": "SV3-U43-P04-E01",
+          "state": "CONTRADICTED",
+          "reason": "VALUE_MISMATCH"
+        }
+      ]
+    }
+  ]
+}

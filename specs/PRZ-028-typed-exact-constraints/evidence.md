@@ -1,6 +1,6 @@
 # PRZ-028 Evidence
 
-- 상태: `IN_PROGRESS / INPUT_FROZEN / OFFICIAL_T0_T1_RUN / NEEDS_ADJUSTMENT`
+- 상태: `IN_PROGRESS / STRESS_1.0.1_HISTORICAL_FROZEN / STRESS_1.1.0_INPUT_FROZEN`
 - 시작 branch / HEAD: `PRZ-027-cross-encoder-reranking@7271654b80ba7db3bc9cec89cba8ba1000660132`
 - 현재 branch base: `PRZ-028-typed-exact-constraints@a7dbb12ea7c0a3f4a502c1ae0252177d9c78a8b9`
 - `origin/main`: `2c8fd5c0d2f62b154642d703a0970389f8abed8e`
@@ -288,3 +288,66 @@ PRZ-028 official evaluator의 SEALED semantic access가 아니며 manifest flags
 독립 read-only audit에서 metric 수치, 문서 상태, Production/SEALED 경계와 금지 경로 diff를 다시
 대조했다. 이 검증은 공식 BGE benchmark를 재실행하거나 결과를 보고 parser/gold/policy를 수정하지
 않았다.
+
+## 9. Final adjustment 시작 기록과 사전 결정
+
+- 시작 HEAD: `d195f3bd8645bef88964ecf033a5815626d1004c`
+- 시작 branch/worktree: `PRZ-028-typed-exact-constraints` / `CLEAN`
+- `origin/main`: `2c8fd5c0d2f62b154642d703a0970389f8abed8e`
+- Stress 1.0.1: combined `96c1ddc6cbdd6722619d7806cbe418babc414c0d5179af84d4694a94c8ed015b`,
+  `HISTORICAL_FROZEN`, 파일/질문/Gold 수정 0
+- prior official result: report `5bc0016a...`, `HISTORICAL_RESULT`, 공식 재실행 0
+- SEALED FINAL: combined `e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383`,
+  `opened=false`, `searchExecuted=false`, `CURRENT_FRESH_BASELINE=NOT_RUN`
+- Production/dependency/migration/frontend/MCP/Docker 변경: 시작 시 `0`
+
+코드 변경 전 독립 read-only 설계 감사 세 건에서 다음을 확인했다. 기존 exact-only qualifier 비교는
+required qualifier가 더 구체적인 observed qualifier 안에 source-local whole token으로 포함되는 경우를
+놓치며, runner는 결과 파일 overwrite와 동일 freeze 재실행을 차단하지 못한다. Stress 1.1.0은
+qualifier mismatch reason을 Gold에 미리 넣어야 SAT false positive를 사후 추론 없이 측정할 수 있다.
+
+이에 spec §9~11에서 입력 분포, comparison-token subset 계약, status/reason 분리, 공통 validation Gate와
+세 최종 역할을 Stress 1.1.0 materialize 및 evaluator 변경 전에 고정했다. `INPUT_FROZEN`,
+`CODE_FROZEN`, official T0/T1과 최종 역할은 아직 각각 `NOT_RUN / NOT_RUN / NOT_RUN / OPEN`이다.
+공식 1.1.0 결과가 나오기 전까지 이 Gate의 의미를 변경하지 않는다.
+
+## 10. Stress 1.1.0 pre-code input freeze
+
+- dataset/status: `search-v3-typed-constraints-stress-1.1.0 / INPUT_FROZEN`
+- input baseline: `d195f3bd8645bef88964ecf033a5815626d1004c`
+- generator: `scripts/evaluation/search-v3/materialize-prz028-typed-stress-1.1.0.mjs`
+- generator SHA-256: `b6c6a678ea30a0d605a55ca1d80953ffc6c055b6e2dcf006cba1eab1f2452d92`
+- root combined SHA-256: `dec33f2c222f5b159166572aed807b1a50e656dccc7cf728dc19019b9ddcee77`
+- split SHA-256: DEV `84fc74b7d44008b90a6a23bdaf5ea3dbebebc00eeaeb683281ef10ceb57f6a36`,
+  CALIBRATION `184daa39aafada65b6d7165559c02ce5dd1e7a3e1813544392bf6932a75db408`
+- frozenAt: `2026-08-31T20:41:06+09:00`; `mutable=false`, `opened=true`, `searchExecuted=false`
+- 규모: synthetic 6 bundles / 6 TXT documents / 24 queries / 24 Evidence Units / 24 observations
+- split: DEV/CAL 각각 3 bundles·12 queries, `SUPPORTED 8 / NOT_SUPPORTED 4`,
+  Korean/English/mixed 각 4 query
+- primary family: quantity wrong value, qualifier mismatch, date, identifier-number,
+  percentage direction, range/boundary 각 split 2 / 전체 4
+- typed kind: `QUANTITY 16 / DATE 4 / IDENTIFIER_NUMBER 4`
+- expected state: `SATISFIED 16 / CONTRADICTED 28 / UNKNOWN 52`
+- expected reason: `MATCHED 16 / VALUE_MISMATCH 24 / DIRECTION_MISMATCH 4 /
+  QUALIFIER_MISMATCH 18 / UNIT_MISMATCH 18 / NO_MATCHING_OBSERVATION 16`
+
+독립 pre-freeze 감사에서 최초 materialization의 generic `CONDITION_MISMATCH`, date `AFTER/BEFORE`,
+미래 시각 표기와 SEALED lineage collision 미검증을 발견했다. BGE, Dense ranking, prediction과 Typed
+구현을 실행하기 전에 각각 `VALUE_MISMATCH/DIRECTION_MISMATCH`, Korean `이후=GTE/이전=LT`, 실제
+최초 생성 시각, unified SEALED lineage identifier metadata collision 검사로 교정했다. 교정 전 tree는
+commit하거나 benchmark하지 않았으며 최종 hash만 input freeze다.
+
+| 검사 | 실제 결과 |
+| --- | --- |
+| generator `node --check` / deterministic `--check` | `PASS / PASS`; 19 dataset files |
+| deterministic schema-contract/Gold/answerability/span/reason validation | `PASS`; external JSON Schema engine `NOT_RUN` |
+| user/document/version/template/generator/fact/query lineage | `PASS`; nonsealed 및 SEALED metadata collision 0 |
+| per-file bytes/SHA와 독립 combined hash 재계산 | `PASS`; mismatch 0, `dec33f2c...` 일치 |
+| frozen tree normal 재실행 | `EXPECTED_FAIL`; exit 1, overwrite 거부 |
+| 금지 reason/date operator | `PASS`; `CONDITION_MISMATCH`, `AFTER/BEFORE` 0 |
+| Stress 1.0.1 / SEALED / Production forbidden diff | `PASS`; 변경 0 |
+| BGE/Dense/T0/T1/prediction/result | `NOT_RUN` |
+
+SEALED 접근은 manifest hash/flags와 unified lineage identifier metadata 검사에 한정했다. SEALED
+document/question/gold, embedding, retrieval, ranking, prediction과 result 접근은 0이다. 이 input과
+사전 역할 Gate를 먼저 local commit한 뒤에만 qualifier/evaluator 구현을 변경한다.

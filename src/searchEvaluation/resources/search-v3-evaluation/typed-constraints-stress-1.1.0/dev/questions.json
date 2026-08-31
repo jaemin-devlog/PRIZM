@@ -1,0 +1,678 @@
+{
+  "artifactType": "QUESTIONS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+  "split": "DEV",
+  "queries": [
+    {
+      "queryId": "SV3-U41-Q01",
+      "userBundleId": "SV3-U41",
+      "questionGroupId": "SV3-U41-Q01-TC11-FAMILY",
+      "query": "파손 소포 보상 요청을 600건 이상 종결한 경험이 있나요?",
+      "normalizedQuery": "파손 소포 보상 요청을 600건 이상 종결한 경험이 있나요",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q01"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q01",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U41-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U41-G02"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GTE",
+                "value": 600,
+                "unit": "건",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "파손",
+                  "소포",
+                  "보상",
+                  "요청"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U41-Q02",
+      "userBundleId": "SV3-U41",
+      "questionGroupId": "SV3-U41-Q02-TC11-FAMILY",
+      "query": "파손 소포 보상 요청을 정확히 680건 종결한 기간이 있나요?",
+      "normalizedQuery": "파손 소포 보상 요청을 정확히 680건 종결한 기간이 있나요",
+      "categories": [
+        "numeric_quantity",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q02"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q02",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U41-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U41-G02"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "EQ",
+                "value": 680,
+                "unit": "건",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "파손",
+                  "소포",
+                  "보상",
+                  "요청"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U41-Q03",
+      "userBundleId": "SV3-U41",
+      "questionGroupId": "SV3-U41-Q03-TC11-FAMILY",
+      "query": "파손 소포 보상 요청을 420건 이하 종결한 기간이 있나요?",
+      "normalizedQuery": "파손 소포 보상 요청을 420건 이하 종결한 기간이 있나요",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q03"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q03",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U41-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U41-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "LTE",
+                "value": 420,
+                "unit": "건",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "파손",
+                  "소포",
+                  "보상",
+                  "요청"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U41-Q04",
+      "userBundleId": "SV3-U41",
+      "questionGroupId": "SV3-U41-Q04-TC11-FAMILY",
+      "query": "파손 소포 보상 요청을 700건 초과 종결한 기간이 있나요?",
+      "normalizedQuery": "파손 소포 보상 요청을 700건 초과 종결한 기간이 있나요",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "hard_negative",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q04"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q04",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U41-P02-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GT",
+                "value": 700,
+                "unit": "건",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "파손",
+                  "소포",
+                  "보상",
+                  "요청"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U42-Q01",
+      "userBundleId": "SV3-U42",
+      "questionGroupId": "SV3-U42-Q01-TC11-FAMILY",
+      "query": "Did the permanent exhibit decrease the wayfinding error rate by at least 38%?",
+      "normalizedQuery": "did the permanent exhibit decrease the wayfinding error rate by at least 38",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q01"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q01",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U42-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U42-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GTE",
+                "value": 38,
+                "unit": "%",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "wayfinding",
+                  "error",
+                  "rate"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U42-Q02",
+      "userBundleId": "SV3-U42",
+      "questionGroupId": "SV3-U42-Q02-TC11-FAMILY",
+      "query": "Did any installation increase the wayfinding error rate by more than 30%?",
+      "normalizedQuery": "did any installation increase the wayfinding error rate by more than 30",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q02"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q02",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U42-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U42-G02"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GT",
+                "value": 30,
+                "unit": "%",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "wayfinding",
+                  "error",
+                  "rate"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U42-Q03",
+      "userBundleId": "SV3-U42",
+      "questionGroupId": "SV3-U42-Q03-TC11-FAMILY",
+      "query": "Did the primary gallery redesign last between 9 and 11 months?",
+      "normalizedQuery": "did the primary gallery redesign last between 9 and 11 months",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q03"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q03",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U42-P04-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U42-G04"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "BETWEEN",
+                "value": 9,
+                "upperValue": 11,
+                "unit": "months",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "primary",
+                  "gallery",
+                  "redesign"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U42-Q04",
+      "userBundleId": "SV3-U42",
+      "questionGroupId": "SV3-U42-Q04-TC11-FAMILY",
+      "query": "Did the portfolio document a 38% decrease in fabrication scrap?",
+      "normalizedQuery": "did the portfolio document a 38 decrease in fabrication scrap",
+      "categories": [
+        "numeric_quantity",
+        "hard_negative",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q04"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q04",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U42-P03-E01",
+              "supportRelation": "INSUFFICIENT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "EQ",
+                "value": 38,
+                "unit": "%",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "fabrication",
+                  "scrap"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U43-Q01",
+      "userBundleId": "SV3-U43",
+      "questionGroupId": "SV3-U43-Q01-TC11-FAMILY",
+      "query": "permit review 시작일이 2026-01-31 이후였나요?",
+      "normalizedQuery": "permit review 시작일이 2026 01 31 이후였나요",
+      "categories": [
+        "date_range",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q01"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q01",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U43-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U43-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U43-Q02",
+      "userBundleId": "SV3-U43",
+      "questionGroupId": "SV3-U43-Q02-TC11-FAMILY",
+      "query": "permit review 시작일이 2025-01-01 이전이었나요?",
+      "normalizedQuery": "permit review 시작일이 2025 01 01 이전이었나요",
+      "categories": [
+        "date_range",
+        "hard_negative",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q02"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q02",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U43-P02-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U43-Q03",
+      "userBundleId": "SV3-U43",
+      "questionGroupId": "SV3-U43-Q03-TC11-FAMILY",
+      "query": "승인된 운영 명세가 TransitForm 4.2를 요구했나요?",
+      "normalizedQuery": "승인된 운영 명세가 transitform 4 2를 요구했나요",
+      "categories": [
+        "literal_identifier",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q03"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q03",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U43-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U43-G03"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "IDENTIFIER_NUMBER",
+                "canonicalValue": "TRANSITFORM_4_2",
+                "surfaceForms": [
+                  "TransitForm 4.2"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U43-Q04",
+      "userBundleId": "SV3-U43",
+      "questionGroupId": "SV3-U43-Q04-TC11-FAMILY",
+      "query": "승인된 운영 명세가 TransitForm 4.5를 요구했나요?",
+      "normalizedQuery": "승인된 운영 명세가 transitform 4 5를 요구했나요",
+      "categories": [
+        "literal_identifier",
+        "hard_negative",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_capability_q04"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_capability_q04",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U43-P03-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "IDENTIFIER_NUMBER",
+                "canonicalValue": "TRANSITFORM_4_5",
+                "surfaceForms": [
+                  "TransitForm 4.5"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    }
+  ]
+}

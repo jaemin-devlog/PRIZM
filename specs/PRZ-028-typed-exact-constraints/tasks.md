@@ -42,5 +42,5 @@
 - [x] INTEGRATE-CODE-FREEZE: source/input/model/K/policy local commit `194bf80`
 - [x] VERIFY-OFFICIAL: Stress 1.1.0 T0/T1 BGE 공식 1회와 기존 네 suite regression
 - [x] AUDIT: 사전 Gate 기반 역할 판정, aggregate evidence, scope/final/OSS 최종 재감사
-- [ ] INTEGRATE: PRZ-028 최종 역할·종료 판단 local closeout commit
+- [x] INTEGRATE: PRZ-028 최종 역할·종료 판단 local closeout commit `bef9d10`
 - [ ] PR/push/merge/Sparse — `NOT_RUN` (금지)

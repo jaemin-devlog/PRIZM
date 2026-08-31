@@ -510,4 +510,5 @@ benchmark는 이 과정에서 재실행하지 않았다.
 
 독립 closeout 감사가 찾은 Stress 1.0.1/1.1.0 official input 범위와 실행 횟수 표현은 과거 결과를
 바꾸지 않고 `HISTORICAL_RESULT` 범위로 교정했다. 재감사 결과 내용·수치·금지 경계 finding은
-P0/P1/P2 모두 0이며, 남은 temporal Gate는 이 문서의 local closeout commit뿐이다.
+P0/P1/P2 모두 0이었다. 최종 역할·aggregate evidence·Registry를 담은 local closeout commit은
+`bef9d1055afa0e750e4b97ffdee25e45c6b78332`이며 이 commit으로 남아 있던 temporal Gate도 해소했다.

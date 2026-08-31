@@ -1,0 +1,152 @@
+{
+  "artifactType": "SEARCH_V3_SEMANTIC_SUPPORT_QUESTIONS_OVERLAY",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "semantic-support-stress-1.0.0",
+  "split": "DEV",
+  "queries": [
+    {
+      "queryId": "SV3-SS-U201-Q01",
+      "questionGroupId": "SV3-SS-QG-U201-01",
+      "userBundleId": "SV3-RB-U201",
+      "query": "연결이 끊겨도 점검 기록의 무결성을 지키는 기능을 실제 현장 앱에 배포했나요?",
+      "normalizedQuery": "연결이 끊겨도 점검 기록의 무결성을 지키는 기능을 실제 현장 앱에 배포했나요",
+      "categories": ["semantic_paraphrase", "abstract_competency", "completion_state", "korean"],
+      "language": "KO",
+      "polarity": "POSITIVE",
+      "answerability": "SUPPORTED",
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U201-P01-E01", "evidenceGroupId": "SV3-SS-U201-G01", "supportRelation": "DIRECT_SUPPORT"}]
+    },
+    {
+      "queryId": "SV3-SS-U201-Q02",
+      "questionGroupId": "SV3-SS-QG-U201-02",
+      "userBundleId": "SV3-RB-U201",
+      "query": "모바일 성능 측정 기준을 기기 공급업체 표준으로 확장할 수 있다는 근거가 있나요?",
+      "normalizedQuery": "모바일 성능 측정 기준을 기기 공급업체 표준으로 확장할 수 있다는 근거가 있나요",
+      "categories": ["semantic_paraphrase", "abstract_competency", "other_actor", "korean"],
+      "language": "KO",
+      "polarity": "POSITIVE",
+      "answerability": "PARTIALLY_SUPPORTED",
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U201-P03-E01", "evidenceGroupId": "SV3-SS-U201-G03", "supportRelation": "RELATED"}]
+    },
+    {
+      "queryId": "SV3-SS-U201-Q03",
+      "questionGroupId": "SV3-SS-QG-U201-03",
+      "userBundleId": "SV3-RB-U201",
+      "query": "위험 신호가 있었지만 전체 롤아웃을 중단하지 않았나요?",
+      "normalizedQuery": "위험 신호가 있었지만 전체 롤아웃을 중단하지 않았나요",
+      "categories": ["semantic_paraphrase", "negation", "completion_state", "korean"],
+      "language": "KO",
+      "polarity": "NEGATIVE",
+      "answerability": "NOT_SUPPORTED",
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U201-P04-E01", "evidenceGroupId": "SV3-SS-U201-G04", "supportRelation": "CONTRADICTS"}]
+    },
+    {
+      "queryId": "SV3-SS-U201-Q04",
+      "questionGroupId": "SV3-SS-QG-U201-04",
+      "userBundleId": "SV3-RB-U201",
+      "query": "스크린 리더만으로 핵심 점검 과업을 끝낼 수 있도록 검증했나요?",
+      "normalizedQuery": "스크린 리더만으로 핵심 점검 과업을 끝낼 수 있도록 검증했나요",
+      "categories": ["semantic_paraphrase", "abstract_competency", "korean"],
+      "language": "KO",
+      "polarity": "POSITIVE",
+      "answerability": "SUPPORTED",
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U201-P02-E01", "evidenceGroupId": "SV3-SS-U201-G02", "supportRelation": "DIRECT_SUPPORT"}]
+    },
+    {
+      "queryId": "SV3-SS-U202-Q01",
+      "questionGroupId": "SV3-SS-QG-U202-01",
+      "userBundleId": "SV3-RB-U202",
+      "query": "Did the candidate turn observed handoff failures into a shared recovery model?",
+      "normalizedQuery": "did the candidate turn observed handoff failures into a shared recovery model",
+      "categories": ["semantic_paraphrase", "abstract_competency", "english"],
+      "language": "EN",
+      "polarity": "POSITIVE",
+      "answerability": "SUPPORTED",
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U202-P01-E01", "evidenceGroupId": "SV3-SS-U202-G01", "supportRelation": "DIRECT_SUPPORT"}]
+    },
+    {
+      "queryId": "SV3-SS-U202-Q02",
+      "questionGroupId": "SV3-SS-QG-U202-02",
+      "userBundleId": "SV3-RB-U202",
+      "query": "Did the service owner personally run all sixteen prototype sessions?",
+      "normalizedQuery": "did the service owner personally run all sixteen prototype sessions",
+      "categories": ["semantic_paraphrase", "other_actor", "english"],
+      "language": "EN",
+      "polarity": "POSITIVE",
+      "answerability": "PARTIALLY_SUPPORTED",
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U202-P02-E01", "evidenceGroupId": "SV3-SS-U202-G02", "supportRelation": "INSUFFICIENT"}]
+    },
+    {
+      "queryId": "SV3-SS-U202-Q03",
+      "questionGroupId": "SV3-SS-QG-U202-03",
+      "userBundleId": "SV3-RB-U202",
+      "query": "Were ownership conflicts left unresolved after the decision sessions?",
+      "normalizedQuery": "were ownership conflicts left unresolved after the decision sessions",
+      "categories": ["semantic_paraphrase", "abstract_competency", "negation", "english"],
+      "language": "EN",
+      "polarity": "NEGATIVE",
+      "answerability": "NOT_SUPPORTED",
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U202-P03-E01", "evidenceGroupId": "SV3-SS-U202-G03", "supportRelation": "CONTRADICTS"}]
+    },
+    {
+      "queryId": "SV3-SS-U202-Q04",
+      "questionGroupId": "SV3-SS-QG-U202-04",
+      "userBundleId": "SV3-RB-U202",
+      "query": "What evidence suggests the six-office recovery rollout could generalize to every office nationwide?",
+      "normalizedQuery": "what evidence suggests the six-office recovery rollout could generalize to every office nationwide",
+      "categories": ["semantic_paraphrase", "completion_state", "english"],
+      "language": "EN",
+      "polarity": "POSITIVE",
+      "answerability": "PARTIALLY_SUPPORTED",
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U202-P04-E01", "evidenceGroupId": "SV3-SS-U202-G04", "supportRelation": "RELATED"}]
+    },
+    {
+      "queryId": "SV3-SS-U203-Q01",
+      "questionGroupId": "SV3-SS-QG-U203-01",
+      "userBundleId": "SV3-RB-U203",
+      "query": "production에 incompatible schema 변경이 들어가지 않도록 어떤 검증 절차를 운영했나요?",
+      "normalizedQuery": "production에 incompatible schema 변경이 들어가지 않도록 어떤 검증 절차를 운영했나요",
+      "categories": ["semantic_paraphrase", "abstract_competency", "completion_state", "korean_english_mixed"],
+      "language": "KO_EN_MIXED",
+      "polarity": "POSITIVE",
+      "answerability": "SUPPORTED",
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U203-P01-E01", "evidenceGroupId": "SV3-SS-U203-G01", "supportRelation": "DIRECT_SUPPORT"}]
+    },
+    {
+      "queryId": "SV3-SS-U203-Q02",
+      "questionGroupId": "SV3-SS-QG-U203-02",
+      "userBundleId": "SV3-RB-U203",
+      "query": "model owner가 segment drift monitor를 직접 설계하고 배포했다는 근거가 있나요?",
+      "normalizedQuery": "model owner가 segment drift monitor를 직접 설계하고 배포했다는 근거가 있나요",
+      "categories": ["semantic_paraphrase", "other_actor", "korean_english_mixed"],
+      "language": "KO_EN_MIXED",
+      "polarity": "POSITIVE",
+      "answerability": "PARTIALLY_SUPPORTED",
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U203-P03-E01", "evidenceGroupId": "SV3-SS-U203-G03", "supportRelation": "RELATED"}]
+    },
+    {
+      "queryId": "SV3-SS-U203-Q03",
+      "questionGroupId": "SV3-SS-QG-U203-03",
+      "userBundleId": "SV3-RB-U203",
+      "query": "배치 복구 뒤 duplicate key와 missing partition 검사를 하지 않았나요?",
+      "normalizedQuery": "배치 복구 뒤 duplicate key와 missing partition 검사를 하지 않았나요",
+      "categories": ["semantic_paraphrase", "negation", "korean_english_mixed"],
+      "language": "KO_EN_MIXED",
+      "polarity": "NEGATIVE",
+      "answerability": "NOT_SUPPORTED",
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U203-P02-E01", "evidenceGroupId": "SV3-SS-U203-G02", "supportRelation": "CONTRADICTS"}]
+    },
+    {
+      "queryId": "SV3-SS-U203-Q04",
+      "questionGroupId": "SV3-SS-QG-U203-04",
+      "userBundleId": "SV3-RB-U203",
+      "query": "preventive action에는 owner와 due date만 붙였고 실제로 complete하지 않았나요?",
+      "normalizedQuery": "preventive action에는 owner와 due date만 붙였고 실제로 complete하지 않았나요",
+      "categories": ["abstract_competency", "negation", "completion_state", "korean_english_mixed"],
+      "language": "KO_EN_MIXED",
+      "polarity": "NEGATIVE",
+      "answerability": "NOT_SUPPORTED",
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U203-P04-E01", "evidenceGroupId": "SV3-SS-U203-G04", "supportRelation": "CONTRADICTS"}]
+    }
+  ]
+}

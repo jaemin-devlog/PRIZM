@@ -1,0 +1,40 @@
+{
+  "artifactType": "SEARCH_V3_CORPUS_REFERENCE_OVERLAY",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "semantic-support-stress-1.0.0",
+  "baseDatasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+  "split": "CALIBRATION",
+  "baseCorpus": "../../devcal-robustness-1.0.0/calibration/corpus.json",
+  "userBundles": [
+    {
+      "userBundleId": "SV3-RB-U204",
+      "professionGroup": "FRONTEND_MOBILE",
+      "profession": "frontend platform engineer",
+      "languageProfile": "EN",
+      "documentId": "SV3-RB-U204-D01",
+      "documentVersionId": "SV3-RB-U204-D01-V01",
+      "sourcePath": "../../devcal-robustness-1.0.0/calibration/documents/sv3-rb-u204-frontend-delivery-portfolio-v01.txt",
+      "sourceSha256": "b868b4d19822b51bd35360a5367b921004355294823fbac992be8a903a200d6b"
+    },
+    {
+      "userBundleId": "SV3-RB-U205",
+      "professionGroup": "MARKETING_SALES",
+      "profession": "regional growth/partner marketing manager",
+      "languageProfile": "KO",
+      "documentId": "SV3-RB-U205-D01",
+      "documentVersionId": "SV3-RB-U205-D01-V01",
+      "sourcePath": "../../devcal-robustness-1.0.0/calibration/documents/sv3-rb-u205-partner-marketing-review-v01.txt",
+      "sourceSha256": "8712d61c82d9c21e9b27d783319f9fdd98959a14650a63d71137022dde6bee2c"
+    },
+    {
+      "userBundleId": "SV3-RB-U206",
+      "professionGroup": "NON_DEVELOPMENT_GENERAL",
+      "profession": "community learning operations coordinator",
+      "languageProfile": "KO_EN_MIXED",
+      "documentId": "SV3-RB-U206-D01",
+      "documentVersionId": "SV3-RB-U206-D01-V01",
+      "sourcePath": "../../devcal-robustness-1.0.0/calibration/documents/sv3-rb-u206-learning-operations-portfolio-v01.txt",
+      "sourceSha256": "ed677f263e681b5d9e8fd934abe1eedf95aa2998b0ef03cb684c0e22bb25e0db"
+    }
+  ]
+}

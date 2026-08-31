@@ -27,10 +27,33 @@ other-actor 7건은 positive 0, negation 7건은 positive 0이었다. partial은
 compound query 2건뿐이다. 따라서 기존 자산은 ranking smoke/positive funnel에는
 유용하지만 일반 semantic state ceiling을 독립적으로 판정하기엔 부족하다.
 
-`semantic-support-stress-1.0.0`을 기존 Robustness 문서 재사용 overlay로 추가한다.
-신규 문서/Production 변경은 0이며 현재 상태는 `PRE_FREEZE / NOT_RUN`이다.
+`semantic-support-stress-1.0.0`을 기존 Robustness 문서 재사용 overlay로 추가했다.
+신규 문서/Production 변경은 0이며 검색 전 `INPUT_FROZEN`이다.
 
-## 2. 시작 무결성
+## 2. Semantic Stress input freeze
+
+- 계약 revision: `c5297f2` (Oracle 결과 전 `CAPABILITY_GATE` 동결)
+- dataset: `semantic-support-stress-1.0.0`
+- Gold-free runtime SHA-256: `4e6c6f719f32e11b9039a2f6679c91ff19f1b130675a8afe6d20e024d3748907`
+- full input SHA-256: `449c36af0ac3cf36211eba5a2e6491a54f1ab1553a91d3d264152765e3dea61c`
+- payload: 11 files; DEV/CAL 12/12 query, 6 bundles, base TXT 6개 참조, 문서 복사 0
+- answerability: `SUPPORTED 8 / PARTIALLY_SUPPORTED 8 / NOT_SUPPORTED 8`
+- relation: `DIRECT 8 / RELATED 4 / INSUFFICIENT 4 / CONTRADICTS 8`
+- language: `KO 8 / EN 10 / KO_EN_MIXED 6`
+- Gold span/anchor SHA 24/24, base document SHA 6/6, runtime/Gold question identity 24/24
+- runtime question schema: `queryId / userBundleId / query / language` only
+- freeze 시점 execution: retrieval `false`, embedding `false`, SEALED access `false`
+
+독립 input-freeze audit에서 root manifest가 Gold 분포와 Gold payload hash를 포함한 채
+pre-freeze runtime loader에 노출되는 문제를 발견했다. 결과 실행 전에 Gold-free
+`runtime-manifest.json`을 분리했고, candidate freeze는 runtime SHA만 사용한다. full input
+manifest와 Gold는 verified candidate freeze 후에만 접근한다.
+
+Gold-free B3 replay, candidate canonical hash/phase guard, Oracle stable partition/failure stage/metric과
+stress loader를 evaluation-only 신규 파일로 격리했다. Focused 4 suites는 22 tests,
+failure/error/skipped `0/0/0`으로 통과했다. 이 검증은 모델/benchmark 실행이 아니다.
+
+## 3. 시작 무결성
 
 - 기존 B3 raw report: Original/Long-form `acc4c7e7bdae9296e7ae543ded16dde2f92ad39911df90171c6b09606fca2918`,
   Robustness `f0bf5481a572ad5e21f91916e5cd0fc6c309c50ec59e2f75ac2386433133324d`
@@ -40,6 +63,6 @@ compound query 2건뿐이다. 따라서 기존 자산은 ranking smoke/positive 
 - flags: `opened=false`, `searchExecuted=false`; `CURRENT_FRESH_BASELINE=NOT_RUN`
 - Oracle, Stress B3 retrieval, semantic validator, Sparse, Parent Dense: `NOT_RUN`
 
-## 3. 결과
+## 4. 결과
 
 `NOT_RUN`. Stress input freeze와 code freeze 후에만 기록한다.

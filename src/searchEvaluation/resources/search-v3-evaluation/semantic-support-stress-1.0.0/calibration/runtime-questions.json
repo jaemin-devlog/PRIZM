@@ -1,0 +1,20 @@
+{
+  "artifactType": "SEARCH_V3_RUNTIME_QUESTIONS_OVERLAY",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "semantic-support-stress-1.0.0",
+  "split": "CALIBRATION",
+  "queries": [
+    {"queryId": "SV3-SS-U204-Q01", "userBundleId": "SV3-RB-U204", "query": "Was a resumable form actually shipped and shown to recover interrupted submissions?", "language": "EN"},
+    {"queryId": "SV3-SS-U204-Q02", "userBundleId": "SV3-RB-U204", "query": "Which parts of the thirty-four right-to-left component changes did the candidate personally implement?", "language": "EN"},
+    {"queryId": "SV3-SS-U204-Q03", "userBundleId": "SV3-RB-U204", "query": "Did incident response require a global rollback that interrupted every region?", "language": "EN"},
+    {"queryId": "SV3-SS-U204-Q04", "userBundleId": "SV3-RB-U204", "query": "Did the checkout optimization preserve validation and analytics rather than remove them?", "language": "EN"},
+    {"queryId": "SV3-SS-U205-Q01", "userBundleId": "SV3-RB-U205", "query": "지역 고객 인터뷰와 검색 표현을 근거로 공통 메시지 체계를 운영했나요?", "language": "KO"},
+    {"queryId": "SV3-SS-U205-Q02", "userBundleId": "SV3-RB-U205", "query": "예산 재배분 효과가 다음 분기에도 그대로 유지됐나요?", "language": "KO"},
+    {"queryId": "SV3-SS-U205-Q03", "userBundleId": "SV3-RB-U205", "query": "검증된 상담 요청 수에 중복 계정과 내부 테스트를 포함했나요?", "language": "KO"},
+    {"queryId": "SV3-SS-U205-Q04", "userBundleId": "SV3-RB-U205", "query": "영업 담당자가 누락률 개선 방식을 직접 설계했나요?", "language": "KO"},
+    {"queryId": "SV3-SS-U206-Q01", "userBundleId": "SV3-RB-U206", "query": "역할 연습과 follow-up coaching까지 포함한 facilitator onboarding을 완료했나요?", "language": "KO_EN_MIXED"},
+    {"queryId": "SV3-SS-U206-Q02", "userBundleId": "SV3-RB-U206", "query": "Did partner organizations help design the learning-kit transfer process?", "language": "EN"},
+    {"queryId": "SV3-SS-U206-Q03", "userBundleId": "SV3-RB-U206", "query": "Did the attendance redesign exclude learners who needed schedule changes?", "language": "EN"},
+    {"queryId": "SV3-SS-U206-Q04", "userBundleId": "SV3-RB-U206", "query": "safeguarding escalation card가 한 교육장에만 prototype으로 남았나요?", "language": "KO_EN_MIXED"}
+  ]
+}

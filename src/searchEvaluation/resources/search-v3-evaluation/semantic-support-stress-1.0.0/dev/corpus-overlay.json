@@ -1,0 +1,40 @@
+{
+  "artifactType": "SEARCH_V3_CORPUS_REFERENCE_OVERLAY",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "semantic-support-stress-1.0.0",
+  "baseDatasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+  "split": "DEV",
+  "baseCorpus": "../../devcal-robustness-1.0.0/dev/corpus.json",
+  "userBundles": [
+    {
+      "userBundleId": "SV3-RB-U201",
+      "professionGroup": "FRONTEND_MOBILE",
+      "profession": "mobile product engineer",
+      "languageProfile": "KO",
+      "documentId": "SV3-RB-U201-D01",
+      "documentVersionId": "SV3-RB-U201-D01-V01",
+      "sourcePath": "../../devcal-robustness-1.0.0/dev/documents/sv3-rb-u201-mobile-field-portfolio-v01.txt",
+      "sourceSha256": "4f2f86ffe77e592743256cc3afa675f30a372884be319a934707197e97aba21f"
+    },
+    {
+      "userBundleId": "SV3-RB-U202",
+      "professionGroup": "DESIGN_PRODUCT",
+      "profession": "service designer/product strategist",
+      "languageProfile": "EN",
+      "documentId": "SV3-RB-U202-D01",
+      "documentVersionId": "SV3-RB-U202-D01-V01",
+      "sourcePath": "../../devcal-robustness-1.0.0/dev/documents/sv3-rb-u202-service-design-casebook-v01.txt",
+      "sourceSha256": "a9c971d9b4224b7276388640776d88232b2d433aa2012121fce54d4c08db5c75"
+    },
+    {
+      "userBundleId": "SV3-RB-U203",
+      "professionGroup": "DATA_AI_INFRA",
+      "profession": "data platform/reliability engineer",
+      "languageProfile": "KO_EN_MIXED",
+      "documentId": "SV3-RB-U203-D01",
+      "documentVersionId": "SV3-RB-U203-D01-V01",
+      "sourcePath": "../../devcal-robustness-1.0.0/dev/documents/sv3-rb-u203-data-platform-record-v01.txt",
+      "sourceSha256": "0bee98667beaf5dcaa047d3f8f6c24360358f1b0b2c5660a7f0ce23abff87317"
+    }
+  ]
+}

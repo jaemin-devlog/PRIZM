@@ -1,0 +1,66 @@
+{
+  "artifactType": "SEARCH_V3_SEMANTIC_SUPPORT_STRESS_LINEAGE",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "semantic-support-stress-1.0.0",
+  "baseDatasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+  "derivation": "MANUAL_SOURCE_GROUNDED_QUERY_AND_GOLD_OVERLAY",
+  "baseAssetsModified": false,
+  "documentCopies": 0,
+  "queryPolicy": {
+    "queriesPerBundle": 4,
+    "goldVisibleToRuntime": false,
+    "runtimeIdsAllowed": false,
+    "sourceSpanRequired": true,
+    "splitInheritance": "Each query inherits the split of its referenced base user bundle."
+  },
+  "sourceDocuments": [
+    {
+      "split": "DEV",
+      "userBundleId": "SV3-RB-U201",
+      "documentId": "SV3-RB-U201-D01",
+      "documentVersionId": "SV3-RB-U201-D01-V01",
+      "path": "../devcal-robustness-1.0.0/dev/documents/sv3-rb-u201-mobile-field-portfolio-v01.txt",
+      "sha256": "4f2f86ffe77e592743256cc3afa675f30a372884be319a934707197e97aba21f"
+    },
+    {
+      "split": "DEV",
+      "userBundleId": "SV3-RB-U202",
+      "documentId": "SV3-RB-U202-D01",
+      "documentVersionId": "SV3-RB-U202-D01-V01",
+      "path": "../devcal-robustness-1.0.0/dev/documents/sv3-rb-u202-service-design-casebook-v01.txt",
+      "sha256": "a9c971d9b4224b7276388640776d88232b2d433aa2012121fce54d4c08db5c75"
+    },
+    {
+      "split": "DEV",
+      "userBundleId": "SV3-RB-U203",
+      "documentId": "SV3-RB-U203-D01",
+      "documentVersionId": "SV3-RB-U203-D01-V01",
+      "path": "../devcal-robustness-1.0.0/dev/documents/sv3-rb-u203-data-platform-record-v01.txt",
+      "sha256": "0bee98667beaf5dcaa047d3f8f6c24360358f1b0b2c5660a7f0ce23abff87317"
+    },
+    {
+      "split": "CALIBRATION",
+      "userBundleId": "SV3-RB-U204",
+      "documentId": "SV3-RB-U204-D01",
+      "documentVersionId": "SV3-RB-U204-D01-V01",
+      "path": "../devcal-robustness-1.0.0/calibration/documents/sv3-rb-u204-frontend-delivery-portfolio-v01.txt",
+      "sha256": "b868b4d19822b51bd35360a5367b921004355294823fbac992be8a903a200d6b"
+    },
+    {
+      "split": "CALIBRATION",
+      "userBundleId": "SV3-RB-U205",
+      "documentId": "SV3-RB-U205-D01",
+      "documentVersionId": "SV3-RB-U205-D01-V01",
+      "path": "../devcal-robustness-1.0.0/calibration/documents/sv3-rb-u205-partner-marketing-review-v01.txt",
+      "sha256": "8712d61c82d9c21e9b27d783319f9fdd98959a14650a63d71137022dde6bee2c"
+    },
+    {
+      "split": "CALIBRATION",
+      "userBundleId": "SV3-RB-U206",
+      "documentId": "SV3-RB-U206-D01",
+      "documentVersionId": "SV3-RB-U206-D01-V01",
+      "path": "../devcal-robustness-1.0.0/calibration/documents/sv3-rb-u206-learning-operations-portfolio-v01.txt",
+      "sha256": "ed677f263e681b5d9e8fd934abe1eedf95aa2998b0ef03cb684c0e22bb25e0db"
+    }
+  ]
+}

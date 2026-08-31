@@ -23,6 +23,15 @@ import java.util.regex.Pattern;
 /** Extracts observations from atomic sourceText only; retrieval/context text is not accepted. */
 public final class DeterministicTypedObservationExtractor {
 
+    private static final String ENGLISH_WORD = "[\\p{L}][\\p{L}\\p{N}_-]*";
+    private static final String ENGLISH_NOUN_PHRASE = ENGLISH_WORD + "(?:\\s+" + ENGLISH_WORD + "){0,5}?";
+    private static final String ENGLISH_DIRECTION =
+            "(?:decreas(?:e|ed|es|ing)|reduc(?:e|ed|es|ing|tion)|increas(?:e|ed|es|ing))";
+    private static final String ENGLISH_DURATION_PREDICATE =
+            "(?:last(?:s|ed|ing)?|continu(?:e|es|ed|ing)|run|runs|ran|running)";
+    private static final String ENGLISH_TIME_UNIT =
+            "(?:milliseconds?|minutes?|seconds?|months?|hours?|years?|days?|secs?|mins?|hrs?|sec|min|hr|ms)";
+
     private static final Pattern KOREAN_DATE_RANGE = Pattern.compile(
             "(?iu)(?<start>" + DATE_ATOM + ")\\s*부터\\s*(?<end>" + DATE_ATOM + ")\\s*까지");
     private static final Pattern ENGLISH_DATE_RANGE = Pattern.compile(
@@ -36,6 +45,21 @@ public final class DeterministicTypedObservationExtractor {
     private static final Pattern QUANTITY = Pattern.compile(
             "(?iu)" + NUMBER_START_BOUNDARY + "(?<number>" + NUMBER + ")\\s*(?<unit>" + UNIT + ")"
                     + UNIT_END_BOUNDARY);
+    private static final Pattern PASSIVE_DIRECTIONAL_PERCENTAGE = Pattern.compile(
+            "(?iu)(?<![\\p{L}\\p{N}_])(?<direction>" + ENGLISH_DIRECTION + ")\\s+by\\s+"
+                    + NUMBER_START_BOUNDARY + "(?<number>" + NUMBER + ")\\s*(?<unit>%)(?![\\p{L}\\p{N}_])");
+    private static final Pattern ENGLISH_DURATION = Pattern.compile(
+            "(?iu)(?<![\\p{L}\\p{N}_])(?<predicate>" + ENGLISH_DURATION_PREDICATE + ")\\s+for\\s+"
+                    + NUMBER_START_BOUNDARY + "(?<number>" + NUMBER + ")\\s*(?<unit>" + ENGLISH_TIME_UNIT + ")"
+                    + UNIT_END_BOUNDARY);
+    private static final Pattern BARE_ENGLISH_COUNT = Pattern.compile(
+            "(?iu)" + NUMBER_START_BOUNDARY + "(?<number>" + NUMBER + ")"
+                    + "(?!\\s*(?:" + UNIT + ")" + UNIT_END_BOUNDARY + ")\\s+"
+                    + "(?<qualifier>" + ENGLISH_NOUN_PHRASE + ")"
+                    + "(?=\\s+(?:in|on|at|after|before|during|when|while|from|to|and|or|with|for|as)\\b"
+                    + "|\\s*[?.,!;]|$)");
+    private static final Pattern PRECEDING_IDENTIFIER = Pattern.compile(
+            "(?<identifier>[A-Za-z][A-Za-z+_-]{0,31})(?:\\s+|/)$");
     private static final Pattern SEPARATED_IDENTIFIER_NUMBER = Pattern.compile(
             "(?<![A-Za-z0-9_])(?<identifier>[A-Za-z][A-Za-z+_-]{0,31})(?:\\s+|/)"
                     + "(?<number>\\p{Nd}+(?:\\.\\p{Nd}+){0,3})(?![A-Za-z0-9_])");
@@ -143,7 +167,7 @@ public final class DeterministicTypedObservationExtractor {
                     TypedTextSupport.span(source.sourceText(), charStart, charEnd, source.documentCodePointStart()),
                     interval,
                     TypedTextSupport.leftQualifier(
-                            source.sourceText(), charStart, source.documentCodePointStart(), 4),
+                            source.sourceText(), charStart, source.documentCodePointStart(), 8),
                     source));
         }
         occupied.add(new TypedTextSupport.CharRange(charStart, charEnd));
@@ -168,6 +192,9 @@ public final class DeterministicTypedObservationExtractor {
             List<TypedTextSupport.CharRange> occupied,
             List<CandidateObservation> result) {
         String text = source.sourceText();
+        parsePassiveDirectionalPercentages(source, occupied, result);
+        parseEnglishDurations(source, occupied, result);
+
         Matcher matcher = QUANTITY.matcher(text);
         while (matcher.find()) {
             if (TypedTextSupport.overlaps(occupied, matcher.start(), matcher.end())) {
@@ -186,6 +213,115 @@ public final class DeterministicTypedObservationExtractor {
                     source));
             occupied.add(new TypedTextSupport.CharRange(matcher.start(), matcher.end()));
         }
+
+        parseBareEnglishCounts(source, occupied, result);
+    }
+
+    private void parsePassiveDirectionalPercentages(
+            SourceSlice source,
+            List<TypedTextSupport.CharRange> occupied,
+            List<CandidateObservation> result) {
+        String text = source.sourceText();
+        Matcher matcher = PASSIVE_DIRECTIONAL_PERCENTAGE.matcher(text);
+        while (matcher.find()) {
+            if (TypedTextSupport.overlaps(occupied, matcher.start(), matcher.end())) {
+                continue;
+            }
+            var qualifier = TypedTextSupport.leftQualifier(
+                    text, matcher.start("direction"), source.documentCodePointStart(), 4);
+            if (qualifier.normalized().isBlank()) {
+                continue;
+            }
+            result.add(new QuantityObservation(
+                    TypedTextSupport.span(
+                            text, matcher.start("number"), matcher.end("unit"), source.documentCodePointStart()),
+                    TypedTextSupport.parseNumber(matcher.group("number")),
+                    "%",
+                    qualifier,
+                    new TypedValueModel.DirectionMark(
+                            englishDirection(matcher.group("direction")),
+                            TypedTextSupport.span(
+                                    text,
+                                    matcher.start("direction"),
+                                    matcher.end("direction"),
+                                    source.documentCodePointStart())),
+                    source));
+            occupied.add(new TypedTextSupport.CharRange(matcher.start(), matcher.end()));
+        }
+    }
+
+    private void parseEnglishDurations(
+            SourceSlice source,
+            List<TypedTextSupport.CharRange> occupied,
+            List<CandidateObservation> result) {
+        String text = source.sourceText();
+        Matcher matcher = ENGLISH_DURATION.matcher(text);
+        while (matcher.find()) {
+            if (TypedTextSupport.overlaps(occupied, matcher.start(), matcher.end())) {
+                continue;
+            }
+            var qualifier = TypedTextSupport.leftQualifier(
+                    text, matcher.start("predicate"), source.documentCodePointStart(), 4);
+            if (qualifier.normalized().isBlank()) {
+                continue;
+            }
+            result.add(new QuantityObservation(
+                    TypedTextSupport.span(
+                            text, matcher.start("number"), matcher.end("unit"), source.documentCodePointStart()),
+                    TypedTextSupport.parseNumber(matcher.group("number")),
+                    TypedTextSupport.normalizeUnit(matcher.group("unit")),
+                    qualifier,
+                    TypedValueModel.DirectionMark.none(),
+                    source));
+            occupied.add(new TypedTextSupport.CharRange(matcher.start(), matcher.end()));
+        }
+    }
+
+    private void parseBareEnglishCounts(
+            SourceSlice source,
+            List<TypedTextSupport.CharRange> occupied,
+            List<CandidateObservation> result) {
+        String text = source.sourceText();
+        Matcher matcher = BARE_ENGLISH_COUNT.matcher(text);
+        while (matcher.find()) {
+            if (TypedTextSupport.overlaps(occupied, matcher.start(), matcher.end())
+                    || precededByIdentifier(text, matcher.start("number"))) {
+                continue;
+            }
+            var qualifier = TypedTextSupport.boundedQualifier(
+                    text,
+                    matcher.start("qualifier"),
+                    matcher.end("qualifier"),
+                    source.documentCodePointStart(),
+                    6);
+            if (qualifier.normalized().isBlank()) {
+                continue;
+            }
+            result.add(new QuantityObservation(
+                    TypedTextSupport.span(
+                            text, matcher.start("number"), matcher.end("number"), source.documentCodePointStart()),
+                    TypedTextSupport.parseNumber(matcher.group("number")),
+                    "count",
+                    qualifier,
+                    TypedValueModel.DirectionMark.none(),
+                    source));
+            occupied.add(new TypedTextSupport.CharRange(matcher.start(), matcher.end()));
+        }
+    }
+
+    private boolean precededByIdentifier(String text, int numberStart) {
+        Matcher matcher = PRECEDING_IDENTIFIER.matcher(text.substring(0, numberStart));
+        if (!matcher.find()) {
+            return false;
+        }
+        String identifier = matcher.group("identifier");
+        return identifier.equalsIgnoreCase("v")
+                || identifier.codePoints().anyMatch(Character::isUpperCase);
+    }
+
+    private Direction englishDirection(String surface) {
+        return TypedTextSupport.normalizeCaptured(surface).startsWith("increas")
+                ? Direction.INCREASE : Direction.DECREASE;
     }
 
     private TypedValueModel.Qualifier quantityQualifier(
@@ -205,7 +341,8 @@ public final class DeterministicTypedObservationExtractor {
                 return right;
             }
         }
-        return TypedTextSupport.leftQuantityQualifier(text, coreStart, base, unit.equals("%") ? 2 : 3);
+        int maximumTokens = unit.equals("%") || TypedTextSupport.isDurationUnit(unit) ? 3 : 4;
+        return TypedTextSupport.leftQuantityQualifier(text, coreStart, base, maximumTokens);
     }
 
     private void parseIdentifierNumbers(

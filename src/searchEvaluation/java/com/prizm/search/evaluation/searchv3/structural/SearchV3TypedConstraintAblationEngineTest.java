@@ -83,12 +83,8 @@ class SearchV3TypedConstraintAblationEngineTest {
         assertThat(report.extraction().candidateObservations().truePositive()
                 + report.extraction().candidateObservations().falseNegative()).isEqualTo(25);
         assertThat(report.states().labeledUnitCount()).isEqualTo(104);
-        assertThat(report.states().correct()).isEqualTo(102);
-        assertThat(report.states().mismatches()).containsExactly(
-                new SearchV3TypedConstraintAblationEngine.StateMismatch(
-                        "SV3-U33-Q01", "SV3-U33-P02-E01", "CONTRADICTED", "UNKNOWN"),
-                new SearchV3TypedConstraintAblationEngine.StateMismatch(
-                        "SV3-U33-Q02", "SV3-U33-P02-E01", "CONTRADICTED", "UNKNOWN"));
+        assertThat(report.states().correct()).isEqualTo(104);
+        assertThat(report.states().mismatches()).isEmpty();
         assertThat(report.states().confusion().values().stream()
                 .flatMap(row -> row.values().stream()).mapToLong(Long::longValue).sum()).isEqualTo(104);
         assertThat(report.states().perState()).containsKeys(
@@ -122,6 +118,56 @@ class SearchV3TypedConstraintAblationEngineTest {
                         .mapToInt(this::stateOrder).toArray()).isSorted();
             }
         });
+    }
+
+    @Test
+    void officialCapabilityStressReportsPrimaryFamiliesReasonsAndDirectRank1LossWithoutBge() {
+        DatasetSlice dev = denseDataset.loadTypedStressOfficial(SearchV3DenseAblationDataset.Split.DEV);
+        DatasetSlice calibration = denseDataset.loadTypedStressOfficial(SearchV3DenseAblationDataset.Split.CALIBRATION);
+        TypedConstraintStressDataset strictLoader = new TypedConstraintStressDataset();
+        var devStress = strictLoader.load(
+                TypedConstraintStressDataset.OFFICIAL_1_1_0, TypedConstraintStressDataset.Split.DEV);
+        var calibrationStress = strictLoader.load(
+                TypedConstraintStressDataset.OFFICIAL_1_1_0, TypedConstraintStressDataset.Split.CALIBRATION);
+
+        SearchV3TypedConstraintAblationEngine.ExperimentReport report = engine.evaluate(
+                combine(fakeDenseRun(dev), fakeDenseRun(calibration)),
+                List.of(devStress, calibrationStress));
+
+        assertThat(report.datasetVersion()).isEqualTo(TypedConstraintStressDataset.OFFICIAL_1_1_0.version());
+        assertThat(report.primaryFamilySlices()).containsOnlyKeys(
+                "quantity_wrong_value", "qualifier_mismatch", "date", "identifier_number",
+                "percentage_direction", "range_boundary");
+        assertThat(report.primaryFamilySlices()).allSatisfy((family, metrics) -> {
+            assertThat(metrics.queryCount()).isEqualTo(4);
+            assertThat(metrics.directWins() + metrics.directLosses() + metrics.directTies())
+                    .isEqualTo(metrics.directQueryCount());
+            assertThat(metrics.t0().top1()).isBetween(0.0d, 1.0d);
+            assertThat(metrics.t1().mrr()).isBetween(0.0d, 1.0d);
+            assertThat(metrics.t1().ndcgAt5()).isBetween(0.0d, 1.0d);
+        });
+        assertThat(report.states().diagnostics().qualifierMismatchCount()).isEqualTo(18);
+        assertThat(report.states().diagnostics().qualifierMismatchSatisfiedFalsePositiveCount()).isZero();
+        assertThat(report.states().diagnostics().sameQualifierWrongValueContradictedCount()).isEqualTo(24);
+        assertThat(report.states().diagnostics().labeledReasonCount()).isEqualTo(96);
+        assertThat(report.states().diagnostics().mismatches()).isEmpty();
+        assertThat(report.states().diagnostics().correctReasonCount()).isEqualTo(96);
+        assertThat(report.extraction().queryConstraints().f1()).isEqualTo(1.0d);
+        assertThat(report.extraction().candidateObservations().f1())
+                .as("official observation extraction: %s", report.extraction().candidateObservations())
+                .isGreaterThanOrEqualTo(0.95d);
+        assertThat(report.states().mismatches()).isEmpty();
+        assertThat(report.states().diagnostics().sameQualifierWrongValueContradictedRecall()).isEqualTo(1.0d);
+        assertThat(report.queryMicro().directRank1Losses()).isNotNegative();
+        assertThat(report.slices()).flatExtracting(SearchV3TypedConstraintAblationEngine.SliceReport::queries)
+                .flatExtracting(SearchV3TypedConstraintAblationEngine.QueryReport::t1Ranking)
+                .allSatisfy(candidate -> assertThat(candidate.diagnosticReasons()).isNotNull());
+        assertThat(report.slices()).flatExtracting(SearchV3TypedConstraintAblationEngine.SliceReport::queries)
+                .allSatisfy(query -> assertThat(query.t1Ranking()).allSatisfy(t1 ->
+                        assertThat(t1.cosineScore()).isEqualTo(query.t0Ranking().stream()
+                                .filter(t0 -> t0.candidateId().equals(t1.candidateId()))
+                                .findFirst().orElseThrow().cosineScore())));
+        assertThat(report.runtimeCost().candidateIdentityParityQueryCount()).isEqualTo(24);
     }
 
     private SearchV3DenseAblationEngine.PassageDenseRun combine(

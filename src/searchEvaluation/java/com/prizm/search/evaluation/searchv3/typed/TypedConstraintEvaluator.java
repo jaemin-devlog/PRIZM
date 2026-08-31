@@ -3,7 +3,9 @@ package com.prizm.search.evaluation.searchv3.typed;
 import static com.prizm.search.evaluation.searchv3.typed.TypedValueModel.CandidateObservation;
 import static com.prizm.search.evaluation.searchv3.typed.TypedValueModel.DateConstraint;
 import static com.prizm.search.evaluation.searchv3.typed.TypedValueModel.DateObservation;
+import static com.prizm.search.evaluation.searchv3.typed.TypedValueModel.DiagnosticReason;
 import static com.prizm.search.evaluation.searchv3.typed.TypedValueModel.Direction;
+import static com.prizm.search.evaluation.searchv3.typed.TypedValueModel.EvaluationResult;
 import static com.prizm.search.evaluation.searchv3.typed.TypedValueModel.IdentifierNumberConstraint;
 import static com.prizm.search.evaluation.searchv3.typed.TypedValueModel.IdentifierNumberObservation;
 import static com.prizm.search.evaluation.searchv3.typed.TypedValueModel.LiteralIdentifierConstraint;
@@ -21,41 +23,59 @@ import java.util.Objects;
 public final class TypedConstraintEvaluator {
 
     public MatchState evaluate(QueryConstraint constraint, List<CandidateObservation> observations) {
+        return evaluateDetailed(constraint, observations).state();
+    }
+
+    public EvaluationResult evaluateDetailed(
+            QueryConstraint constraint,
+            List<CandidateObservation> observations) {
         Objects.requireNonNull(constraint, "constraint");
         Objects.requireNonNull(observations, "observations");
-        List<MatchState> compatible = new ArrayList<>();
+        List<EvaluationResult> sameKind = new ArrayList<>();
         for (CandidateObservation observation : observations) {
             if (observation.kind() == constraint.kind()) {
-                compatible.add(evaluateOne(constraint, observation));
+                sameKind.add(evaluateOne(constraint, observation));
             }
         }
-        if (compatible.contains(MatchState.SATISFIED)) {
-            return MatchState.SATISFIED;
+        if (sameKind.isEmpty()) {
+            return EvaluationResult.of(MatchState.UNKNOWN, DiagnosticReason.NO_MATCHING_OBSERVATION);
         }
-        if (compatible.contains(MatchState.CONTRADICTED)) {
-            return MatchState.CONTRADICTED;
+        if (containsState(sameKind, MatchState.SATISFIED)) {
+            return mergeState(sameKind, MatchState.SATISFIED);
         }
-        return MatchState.UNKNOWN;
+        if (containsState(sameKind, MatchState.CONTRADICTED)) {
+            return mergeState(sameKind, MatchState.CONTRADICTED);
+        }
+        return mergeState(sameKind, MatchState.UNKNOWN);
     }
 
     public MatchState evaluateAll(
             List<QueryConstraint> constraints,
             List<CandidateObservation> observations) {
+        return evaluateAllDetailed(constraints, observations).state();
+    }
+
+    public EvaluationResult evaluateAllDetailed(
+            List<QueryConstraint> constraints,
+            List<CandidateObservation> observations) {
         Objects.requireNonNull(constraints, "constraints");
         Objects.requireNonNull(observations, "observations");
         if (constraints.isEmpty()) {
-            return MatchState.UNKNOWN;
+            return EvaluationResult.of(MatchState.UNKNOWN, DiagnosticReason.NO_MATCHING_OBSERVATION);
         }
-        List<MatchState> states = constraints.stream().map(value -> evaluate(value, observations)).toList();
-        if (states.contains(MatchState.CONTRADICTED)) {
-            return MatchState.CONTRADICTED;
+        List<EvaluationResult> results = constraints.stream()
+                .map(value -> evaluateDetailed(value, observations))
+                .toList();
+        if (containsState(results, MatchState.CONTRADICTED)) {
+            return mergeState(results, MatchState.CONTRADICTED);
         }
-        return states.stream().allMatch(value -> value == MatchState.SATISFIED)
-                ? MatchState.SATISFIED
-                : MatchState.UNKNOWN;
+        if (results.stream().allMatch(value -> value.state() == MatchState.SATISFIED)) {
+            return mergeState(results, MatchState.SATISFIED);
+        }
+        return mergeState(results, MatchState.UNKNOWN);
     }
 
-    private MatchState evaluateOne(QueryConstraint constraint, CandidateObservation observation) {
+    private EvaluationResult evaluateOne(QueryConstraint constraint, CandidateObservation observation) {
         if (constraint instanceof QuantityConstraint quantity
                 && observation instanceof QuantityObservation value) {
             return evaluateQuantity(quantity, value);
@@ -70,25 +90,27 @@ public final class TypedConstraintEvaluator {
         if (constraint instanceof LiteralIdentifierConstraint literal
                 && observation instanceof LiteralIdentifierObservation value) {
             return literal.normalizedLiteral().equals(value.normalizedLiteral())
-                    ? MatchState.SATISFIED
-                    : MatchState.UNKNOWN;
+                    ? EvaluationResult.of(MatchState.SATISFIED, DiagnosticReason.MATCHED)
+                    : EvaluationResult.of(MatchState.UNKNOWN, DiagnosticReason.NO_MATCHING_OBSERVATION);
         }
-        return MatchState.UNKNOWN;
+        return EvaluationResult.of(MatchState.UNKNOWN, DiagnosticReason.NO_MATCHING_OBSERVATION);
     }
 
-    private MatchState evaluateQuantity(QuantityConstraint constraint, QuantityObservation observation) {
-        if (!constraint.normalizedUnit().equals(observation.normalizedUnit())
-                || !sameQualifier(constraint.qualifier(), observation.qualifier())) {
-            return MatchState.UNKNOWN;
+    private EvaluationResult evaluateQuantity(QuantityConstraint constraint, QuantityObservation observation) {
+        if (!constraint.normalizedUnit().equals(observation.normalizedUnit())) {
+            return EvaluationResult.of(MatchState.UNKNOWN, DiagnosticReason.UNIT_MISMATCH);
+        }
+        if (!TypedTextSupport.qualifierCompatible(constraint.qualifier(), observation.qualifier())) {
+            return EvaluationResult.of(MatchState.UNKNOWN, DiagnosticReason.QUALIFIER_MISMATCH);
         }
         Direction required = constraint.direction().direction();
         Direction actual = observation.direction().direction();
         if (required != Direction.NONE) {
             if (actual == Direction.NONE) {
-                return MatchState.UNKNOWN;
+                return EvaluationResult.of(MatchState.UNKNOWN, DiagnosticReason.AMBIGUOUS_OBSERVATION);
             }
             if (required != actual) {
-                return MatchState.CONTRADICTED;
+                return EvaluationResult.of(MatchState.CONTRADICTED, DiagnosticReason.DIRECTION_MISMATCH);
             }
         }
         int lower = observation.value().compareTo(constraint.value());
@@ -100,12 +122,14 @@ public final class TypedConstraintEvaluator {
             case LTE -> lower <= 0;
             case RANGE -> lower >= 0 && observation.value().compareTo(constraint.upperValue()) <= 0;
         };
-        return satisfied ? MatchState.SATISFIED : MatchState.CONTRADICTED;
+        return satisfied
+                ? EvaluationResult.of(MatchState.SATISFIED, DiagnosticReason.MATCHED)
+                : EvaluationResult.of(MatchState.CONTRADICTED, DiagnosticReason.VALUE_MISMATCH);
     }
 
-    private MatchState evaluateDate(DateConstraint constraint, DateObservation observation) {
-        if (!sameQualifier(constraint.qualifier(), observation.qualifier())) {
-            return MatchState.UNKNOWN;
+    private EvaluationResult evaluateDate(DateConstraint constraint, DateObservation observation) {
+        if (!TypedTextSupport.qualifierCompatible(constraint.qualifier(), observation.qualifier())) {
+            return EvaluationResult.of(MatchState.UNKNOWN, DiagnosticReason.QUALIFIER_MISMATCH);
         }
         var required = constraint.interval();
         var actual = observation.interval();
@@ -113,62 +137,67 @@ public final class TypedConstraintEvaluator {
             case EQ, RANGE -> {
                 if (!actual.startInclusive().isBefore(required.startInclusive())
                         && !actual.endInclusive().isAfter(required.endInclusive())) {
-                    yield MatchState.SATISFIED;
+                    yield EvaluationResult.of(MatchState.SATISFIED, DiagnosticReason.MATCHED);
                 }
                 if (actual.endInclusive().isBefore(required.startInclusive())
                         || actual.startInclusive().isAfter(required.endInclusive())) {
-                    yield MatchState.CONTRADICTED;
+                    yield EvaluationResult.of(MatchState.CONTRADICTED, DiagnosticReason.VALUE_MISMATCH);
                 }
-                yield MatchState.UNKNOWN;
+                yield EvaluationResult.of(MatchState.UNKNOWN, DiagnosticReason.AMBIGUOUS_OBSERVATION);
             }
             case GT -> {
                 if (actual.startInclusive().isAfter(required.endInclusive())) {
-                    yield MatchState.SATISFIED;
+                    yield EvaluationResult.of(MatchState.SATISFIED, DiagnosticReason.MATCHED);
                 }
                 if (!actual.endInclusive().isAfter(required.endInclusive())) {
-                    yield MatchState.CONTRADICTED;
+                    yield EvaluationResult.of(MatchState.CONTRADICTED, DiagnosticReason.VALUE_MISMATCH);
                 }
-                yield MatchState.UNKNOWN;
+                yield EvaluationResult.of(MatchState.UNKNOWN, DiagnosticReason.AMBIGUOUS_OBSERVATION);
             }
             case GTE -> {
                 if (!actual.startInclusive().isBefore(required.startInclusive())) {
-                    yield MatchState.SATISFIED;
+                    yield EvaluationResult.of(MatchState.SATISFIED, DiagnosticReason.MATCHED);
                 }
                 if (actual.endInclusive().isBefore(required.startInclusive())) {
-                    yield MatchState.CONTRADICTED;
+                    yield EvaluationResult.of(MatchState.CONTRADICTED, DiagnosticReason.VALUE_MISMATCH);
                 }
-                yield MatchState.UNKNOWN;
+                yield EvaluationResult.of(MatchState.UNKNOWN, DiagnosticReason.AMBIGUOUS_OBSERVATION);
             }
             case LT -> {
                 if (actual.endInclusive().isBefore(required.startInclusive())) {
-                    yield MatchState.SATISFIED;
+                    yield EvaluationResult.of(MatchState.SATISFIED, DiagnosticReason.MATCHED);
                 }
                 if (!actual.startInclusive().isBefore(required.startInclusive())) {
-                    yield MatchState.CONTRADICTED;
+                    yield EvaluationResult.of(MatchState.CONTRADICTED, DiagnosticReason.VALUE_MISMATCH);
                 }
-                yield MatchState.UNKNOWN;
+                yield EvaluationResult.of(MatchState.UNKNOWN, DiagnosticReason.AMBIGUOUS_OBSERVATION);
             }
         };
     }
 
-    private MatchState evaluateIdentifierNumber(
+    private EvaluationResult evaluateIdentifierNumber(
             IdentifierNumberConstraint constraint,
             IdentifierNumberObservation observation) {
         if (!constraint.normalizedIdentifier().equals(observation.normalizedIdentifier())) {
-            return MatchState.UNKNOWN;
+            return EvaluationResult.of(MatchState.UNKNOWN, DiagnosticReason.NO_MATCHING_OBSERVATION);
         }
         return constraint.normalizedSegments().equals(observation.normalizedSegments())
-                ? MatchState.SATISFIED
-                : MatchState.CONTRADICTED;
+                ? EvaluationResult.of(MatchState.SATISFIED, DiagnosticReason.MATCHED)
+                : EvaluationResult.of(MatchState.CONTRADICTED, DiagnosticReason.VALUE_MISMATCH);
     }
 
-    private boolean sameQualifier(TypedValueModel.Qualifier left, TypedValueModel.Qualifier right) {
-        boolean leftEmpty = left.normalized().isBlank();
-        boolean rightEmpty = right.normalized().isBlank();
-        if (leftEmpty || rightEmpty) {
-            return leftEmpty == rightEmpty;
+    private boolean containsState(List<EvaluationResult> results, MatchState state) {
+        return results.stream().anyMatch(value -> value.state() == state);
+    }
+
+    private EvaluationResult mergeState(List<EvaluationResult> results, MatchState state) {
+        List<DiagnosticReason> reasons = results.stream()
+                .filter(value -> value.state() == state)
+                .flatMap(value -> value.reasons().stream())
+                .toList();
+        if (reasons.isEmpty()) {
+            throw new IllegalStateException("evaluation reduction selected a state without reasons");
         }
-        return left.normalized().equals(right.normalized())
-                && left.orderedTokens().equals(right.orderedTokens());
+        return new EvaluationResult(state, reasons);
     }
 }

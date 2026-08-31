@@ -28,19 +28,53 @@ import tools.jackson.databind.ObjectMapper;
  */
 public final class TypedConstraintStressDataset {
 
-    public static final Path DATASET_ROOT = Path.of(
-            "src/searchEvaluation/resources/search-v3-evaluation/typed-constraints-stress-1.0.1");
-    public static final String DATASET_VERSION = "search-v3-typed-constraints-stress-1.0.1";
-    public static final String ROOT_SHA256 = "96c1ddc6cbdd6722619d7806cbe418babc414c0d5179af84d4694a94c8ed015b";
-    public static final String DEV_SHA256 = "35c6e84b85302aad5f1499bc5f8a96fdeeb3a635a3d2da3595f4473654e17350";
-    public static final String CALIBRATION_SHA256 = "b754d92e49246aec955c3bef252eeb09a6978272b7b7ba869059bf5a536e606e";
+    public static final DatasetIdentity HISTORICAL_1_0_1 = new DatasetIdentity(
+            Path.of("src/searchEvaluation/resources/search-v3-evaluation/typed-constraints-stress-1.0.1"),
+            "search-v3-typed-constraints-stress-1.0.1",
+            "FRESH_BENCHMARK_SEED_FROZEN",
+            "96c1ddc6cbdd6722619d7806cbe418babc414c0d5179af84d4694a94c8ed015b",
+            "35c6e84b85302aad5f1499bc5f8a96fdeeb3a635a3d2da3595f4473654e17350",
+            "b754d92e49246aec955c3bef252eeb09a6978272b7b7ba869059bf5a536e606e",
+            13,
+            12,
+            13,
+            13,
+            false);
+    public static final DatasetIdentity OFFICIAL_1_1_0 = new DatasetIdentity(
+            Path.of("src/searchEvaluation/resources/search-v3-evaluation/typed-constraints-stress-1.1.0"),
+            "search-v3-typed-constraints-stress-1.1.0",
+            "INPUT_FROZEN",
+            "dec33f2c222f5b159166572aed807b1a50e656dccc7cf728dc19019b9ddcee77",
+            "84fc74b7d44008b90a6a23bdaf5ea3dbebebc00eeaeb683281ef10ceb57f6a36",
+            "184daa39aafada65b6d7165559c02ce5dd1e7a3e1813544392bf6932a75db408",
+            12,
+            12,
+            12,
+            12,
+            true);
+
+    /** Backward-compatible aliases for the historical PRZ-028 official input. */
+    public static final Path DATASET_ROOT = HISTORICAL_1_0_1.root();
+    public static final String DATASET_VERSION = HISTORICAL_1_0_1.version();
+    public static final String ROOT_SHA256 = HISTORICAL_1_0_1.rootSha256();
+    public static final String DEV_SHA256 = HISTORICAL_1_0_1.devSha256();
+    public static final String CALIBRATION_SHA256 = HISTORICAL_1_0_1.calibrationSha256();
 
     private static final Pattern UUID = Pattern.compile(
             "(?i)^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
     private static final Set<String> FORBIDDEN_RUNTIME_KEYS = Set.of(
             "chunkid", "expectedchunkid", "runtimechunkid", "runtimeparentid",
             "databaseparentid", "dbchunkid", "retrievalpassageid");
-    private static final Set<String> MATCH_STATES = Set.of("SATISFIED", "CONTRADICTED", "UNKNOWN");
+    private static final Map<String, Set<String>> DIAGNOSTIC_REASONS_BY_STATE = Map.of(
+            "SATISFIED", Set.of("MATCHED"),
+            "CONTRADICTED", Set.of("VALUE_MISMATCH", "DIRECTION_MISMATCH"),
+            "UNKNOWN", Set.of(
+                    "QUALIFIER_MISMATCH", "UNIT_MISMATCH",
+                    "NO_MATCHING_OBSERVATION", "AMBIGUOUS_OBSERVATION"));
+    private static final Set<String> MATCH_STATES = DIAGNOSTIC_REASONS_BY_STATE.keySet();
+    private static final Set<String> DIAGNOSTIC_REASONS = DIAGNOSTIC_REASONS_BY_STATE.values().stream()
+            .flatMap(Set::stream)
+            .collect(Collectors.toUnmodifiableSet());
     private static final Set<String> SUPPORT_RELATIONS = Set.of(
             "DIRECT_SUPPORT", "RELATED", "CONTRADICTS", "INSUFFICIENT");
     private static final Set<String> CONSTRAINT_KINDS = Set.of(
@@ -49,14 +83,26 @@ public final class TypedConstraintStressDataset {
     private final ObjectMapper mapper = new ObjectMapper();
 
     public DatasetSlice load(Split split) {
-        return load(DATASET_ROOT, split, ROOT_SHA256);
+        return load(HISTORICAL_1_0_1, split);
+    }
+
+    public DatasetSlice load(DatasetIdentity identity, Split split) {
+        return load(identity, identity.root(), split, identity.rootSha256());
     }
 
     public DatasetSlice load(Path root, Split split, String expectedRootSha256) {
+        return load(HISTORICAL_1_0_1, root, split, expectedRootSha256);
+    }
+
+    private DatasetSlice load(
+            DatasetIdentity identity,
+            Path root,
+            Split split,
+            String expectedRootSha256) {
         Path normalizedRoot = root.toAbsolutePath().normalize();
         rejectSealedPath(normalizedRoot);
         JsonNode rootManifest = read(normalizedRoot.resolve("manifest.json"));
-        validateRootManifest(normalizedRoot, rootManifest, expectedRootSha256);
+        validateRootManifest(identity, normalizedRoot, rootManifest, expectedRootSha256);
 
         Path splitRoot = normalizedRoot.resolve(split.directory()).normalize();
         if (!splitRoot.startsWith(normalizedRoot)
@@ -69,13 +115,13 @@ public final class TypedConstraintStressDataset {
         JsonNode questions = read(splitRoot.resolve("questions.json"));
         JsonNode typed = read(splitRoot.resolve("typed-annotations.json"));
         for (JsonNode artifact : List.of(manifest, corpus, gold, questions, typed)) {
-            requireHeader(artifact, split);
+            requireHeader(identity, artifact, split);
         }
         validateNoRuntimeDatabaseIdentifiers(corpus);
         validateNoRuntimeDatabaseIdentifiers(gold);
         validateNoRuntimeDatabaseIdentifiers(questions);
         validateNoRuntimeDatabaseIdentifiers(typed);
-        verifyManifest(splitRoot, manifest, split.expectedSha256(), true);
+        verifyManifest(splitRoot, manifest, identity.splitSha256(split), true);
 
         Map<String, SourceDocument> documents = loadDocuments(splitRoot, corpus, split);
         Map<String, EvidenceParent> parents = loadParents(gold.path("parents"), documents);
@@ -84,10 +130,10 @@ public final class TypedConstraintStressDataset {
         validateGoldGraph(parents, units, groups);
         Map<String, Question> questionValues = loadQuestions(questions.path("queries"), units);
         Map<String, TypedQueryAnnotation> annotations = loadTypedAnnotations(
-                typed.path("queryAnnotations"), questionValues, units);
+                identity, typed.path("queryAnnotations"), questionValues, units);
         Map<String, ObservationAnnotation> observations = loadObservations(
                 typed.path("observations"), documents, units);
-        validateCounts(split, manifest, documents, units, questionValues, annotations, observations);
+        validateCounts(identity, split, manifest, documents, units, questionValues, annotations, observations);
 
         List<RuntimeQuestion> runtimeQuestions = questionValues.values().stream()
                 .map(Question::runtimeQuestion)
@@ -118,7 +164,7 @@ public final class TypedConstraintStressDataset {
                 Map.copyOf(annotations),
                 Map.copyOf(observations));
         return new DatasetSlice(
-                DATASET_VERSION,
+                identity.version(),
                 split,
                 required(rootManifest, "combinedSha256"),
                 required(manifest, "combinedSha256"),
@@ -133,26 +179,48 @@ public final class TypedConstraintStressDataset {
         }
     }
 
-    private void validateRootManifest(Path root, JsonNode manifest, String expectedRootSha256) {
-        if (!DATASET_VERSION.equals(required(manifest, "datasetVersion"))
+    private void validateRootManifest(
+            DatasetIdentity identity,
+            Path root,
+            JsonNode manifest,
+            String expectedRootSha256) {
+        if (!identity.version().equals(required(manifest, "datasetVersion"))
                 || !"ALL".equals(required(manifest, "split"))
-                || !"FRESH_BENCHMARK_SEED_FROZEN".equals(required(manifest, "status"))
+                || !identity.status().equals(required(manifest, "status"))
                 || manifest.path("mutable").asBoolean(true)
                 || manifest.path("searchExecuted").asBoolean(true)
                 || !expectedRootSha256.equals(required(manifest, "combinedSha256"))) {
             throw new IllegalStateException("PRZ-028 root manifest identity/freeze state changed");
         }
-        JsonNode previous = manifest.path("previousDatasets").path(0);
-        if (!"search-v3-typed-constraints-stress-1.0.0".equals(previous.path("datasetVersion").asText())
-                || !"INVALID_INPUT_HISTORICAL".equals(previous.path("status").asText())
-                || previous.path("benchmarkExecuted").asBoolean(true)) {
-            throw new IllegalStateException("PRZ-028 v1.0.0 historical-invalid lineage changed");
-        }
+        validateHistoricalLineage(identity, manifest.path("previousDatasets"));
         verifyManifest(root, manifest, expectedRootSha256, false);
     }
 
-    private void requireHeader(JsonNode artifact, Split split) {
-        if (!DATASET_VERSION.equals(required(artifact, "datasetVersion"))
+    private void validateHistoricalLineage(DatasetIdentity identity, JsonNode previousDatasets) {
+        if (identity.equals(HISTORICAL_1_0_1)) {
+            JsonNode previous = previousDatasets.path(0);
+            if (!"search-v3-typed-constraints-stress-1.0.0".equals(previous.path("datasetVersion").asText())
+                    || !"INVALID_INPUT_HISTORICAL".equals(previous.path("status").asText())
+                    || previous.path("benchmarkExecuted").asBoolean(true)) {
+                throw new IllegalStateException("PRZ-028 v1.0.0 historical-invalid lineage changed");
+            }
+            return;
+        }
+        boolean historicalFrozen = false;
+        for (JsonNode previous : previousDatasets) {
+            if (HISTORICAL_1_0_1.version().equals(previous.path("datasetVersion").asText())
+                    && "HISTORICAL_FROZEN".equals(previous.path("status").asText())
+                    && previous.path("benchmarkExecuted").asBoolean(false)) {
+                historicalFrozen = true;
+            }
+        }
+        if (!historicalFrozen) {
+            throw new IllegalStateException("PRZ-028 v1.0.1 historical-frozen lineage changed");
+        }
+    }
+
+    private void requireHeader(DatasetIdentity identity, JsonNode artifact, Split split) {
+        if (!identity.version().equals(required(artifact, "datasetVersion"))
                 || !split.manifestName().equals(required(artifact, "split"))) {
             throw new IllegalArgumentException("Typed stress artifact version/split mismatch");
         }
@@ -393,6 +461,7 @@ public final class TypedConstraintStressDataset {
     }
 
     private Map<String, TypedQueryAnnotation> loadTypedAnnotations(
+            DatasetIdentity identity,
             JsonNode nodes,
             Map<String, Question> questions,
             Map<String, EvidenceUnit> units) {
@@ -405,7 +474,7 @@ public final class TypedConstraintStressDataset {
                 throw new IllegalArgumentException("Typed annotation query/owner mismatch: " + queryId);
             }
             ConstraintAnnotation constraint = constraintAnnotation(node.path("constraint"));
-            validateConstraintGrounding(question.text(), constraint);
+            validateConstraintGrounding(question.text(), constraint, identity.requiresReasons());
             List<ExpectedEvidenceState> expectedStates = new ArrayList<>();
             Set<String> stateUnitIds = new HashSet<>();
             for (JsonNode state : node.path("expectedEvidenceStates")) {
@@ -416,7 +485,17 @@ public final class TypedConstraintStressDataset {
                         || !MATCH_STATES.contains(value) || !stateUnitIds.add(unitId)) {
                     throw new IllegalArgumentException("Typed expected state mismatch: " + queryId);
                 }
-                expectedStates.add(new ExpectedEvidenceState(unitId, value));
+                String reason = text(state, "reason");
+                if (reason != null && !DIAGNOSTIC_REASONS.contains(reason)) {
+                    throw new IllegalArgumentException("Unknown typed diagnostic reason: " + reason);
+                }
+                if (identity.requiresReasons() && reason == null) {
+                    throw new IllegalArgumentException("Typed expected reason is required: " + queryId);
+                }
+                if (identity.requiresReasons()) {
+                    validateRequiredExpectedStateReasonPair(queryId, value, reason);
+                }
+                expectedStates.add(new ExpectedEvidenceState(unitId, value, reason));
             }
             Set<String> bundleUnitIds = units.values().stream()
                     .filter(unit -> userBundleId.equals(unit.userBundleId()))
@@ -425,9 +504,14 @@ public final class TypedConstraintStressDataset {
             if (!bundleUnitIds.equals(stateUnitIds)) {
                 throw new IllegalArgumentException("Typed query must label every owner evidence unit: " + queryId);
             }
+            String primaryFamily = text(node, "primaryFamily");
+            if (identity.requiresReasons() && primaryFamily == null) {
+                throw new IllegalArgumentException("Typed primary family is required: " + queryId);
+            }
             TypedQueryAnnotation annotation = new TypedQueryAnnotation(
                     queryId,
                     userBundleId,
+                    primaryFamily == null ? "" : primaryFamily,
                     strings(node.path("stressFamilies")),
                     constraint,
                     List.copyOf(expectedStates));
@@ -439,6 +523,14 @@ public final class TypedConstraintStressDataset {
             throw new IllegalArgumentException("Every query must have exactly one typed annotation");
         }
         return result;
+    }
+
+    static void validateRequiredExpectedStateReasonPair(String queryId, String state, String reason) {
+        Set<String> allowedReasons = DIAGNOSTIC_REASONS_BY_STATE.get(state);
+        if (reason == null || allowedReasons == null || !allowedReasons.contains(reason)) {
+            throw new IllegalArgumentException("Typed expected state/reason mismatch: "
+                    + queryId + " (" + state + " -> " + reason + ")");
+        }
     }
 
     private Map<String, ObservationAnnotation> loadObservations(
@@ -484,6 +576,9 @@ public final class TypedConstraintStressDataset {
                 optionalDouble(node, "upperValue"),
                 text(node, "normalizedUnit"),
                 text(node, "direction"),
+                text(node, "directionSourceSurface"),
+                optionalInt(node, "directionCharStart"),
+                optionalInt(node, "directionCharEnd"),
                 date(node, "value"),
                 date(node, "start"),
                 date(node, "end"),
@@ -523,13 +618,31 @@ public final class TypedConstraintStressDataset {
                 text(node, "normalizedLiteral"));
     }
 
-    private void validateConstraintGrounding(String query, ConstraintAnnotation constraint) {
+    private void validateConstraintGrounding(
+            String query,
+            ConstraintAnnotation constraint,
+            boolean requiresExplicitDirectionGrounding) {
         exactSlice(query, constraint.queryCharStart(), constraint.queryCharEnd(), constraint.sourceSurface(),
                 constraint.constraintId() + " constraint surface");
         if (constraint.qualifier() != null) {
             exactSlice(query, required(constraint.qualifierCharStart(), "qualifier start"),
                     required(constraint.qualifierCharEnd(), "qualifier end"), constraint.qualifier(),
                     constraint.constraintId() + " qualifier");
+        }
+        if (constraint.direction() != null && !"NONE".equals(constraint.direction())) {
+            boolean hasExplicitDirectionGrounding = constraint.directionSourceSurface() != null
+                    || constraint.directionCharStart() != null
+                    || constraint.directionCharEnd() != null;
+            if (requiresExplicitDirectionGrounding || hasExplicitDirectionGrounding) {
+                if (constraint.directionSourceSurface() == null) {
+                    throw new IllegalArgumentException("Direction source surface is required: "
+                            + constraint.constraintId());
+                }
+                int start = required(constraint.directionCharStart(), "direction start");
+                int end = required(constraint.directionCharEnd(), "direction end");
+                exactSlice(query, start, end, constraint.directionSourceSurface(),
+                        constraint.constraintId() + " direction");
+            }
         }
         if ("QUANTITY".equals(constraint.kind())) {
             if (constraint.sourceSurface().codePoints().noneMatch(Character::isDigit)
@@ -609,6 +722,7 @@ public final class TypedConstraintStressDataset {
     }
 
     private void validateCounts(
+            DatasetIdentity identity,
             Split split,
             JsonNode manifest,
             Map<String, SourceDocument> documents,
@@ -622,8 +736,8 @@ public final class TypedConstraintStressDataset {
                 || documents.size() != 3
                 || questions.size() != 12
                 || annotations.size() != 12
-                || units.size() != 13
-                || observations.size() != (split == Split.DEV ? 12 : 13)
+                || units.size() != identity.expectedEvidenceUnits(split)
+                || observations.size() != identity.expectedObservations(split)
                 || counts.path("userBundles").asInt() != userBundles
                 || counts.path("documents").asInt() != documents.size()
                 || counts.path("queries").asInt() != questions.size()
@@ -809,17 +923,15 @@ public final class TypedConstraintStressDataset {
     }
 
     public enum Split {
-        DEV("dev", "DEV", DEV_SHA256),
-        CALIBRATION("calibration", "CALIBRATION", CALIBRATION_SHA256);
+        DEV("dev", "DEV"),
+        CALIBRATION("calibration", "CALIBRATION");
 
         private final String directory;
         private final String manifestName;
-        private final String expectedSha256;
 
-        Split(String directory, String manifestName, String expectedSha256) {
+        Split(String directory, String manifestName) {
             this.directory = directory;
             this.manifestName = manifestName;
-            this.expectedSha256 = expectedSha256;
         }
 
         String directory() {
@@ -829,9 +941,39 @@ public final class TypedConstraintStressDataset {
         String manifestName() {
             return manifestName;
         }
+    }
 
-        String expectedSha256() {
-            return expectedSha256;
+    public record DatasetIdentity(
+            Path root,
+            String version,
+            String status,
+            String rootSha256,
+            String devSha256,
+            String calibrationSha256,
+            int devEvidenceUnits,
+            int devObservations,
+            int calibrationEvidenceUnits,
+            int calibrationObservations,
+            boolean requiresReasons) {
+
+        public DatasetIdentity {
+            root = root.normalize();
+            if (version.isBlank() || status.isBlank() || rootSha256.isBlank()
+                    || devSha256.isBlank() || calibrationSha256.isBlank()) {
+                throw new IllegalArgumentException("typed dataset identity must be content-addressed");
+            }
+        }
+
+        String splitSha256(Split split) {
+            return split == Split.DEV ? devSha256 : calibrationSha256;
+        }
+
+        int expectedEvidenceUnits(Split split) {
+            return split == Split.DEV ? devEvidenceUnits : calibrationEvidenceUnits;
+        }
+
+        int expectedObservations(Split split) {
+            return split == Split.DEV ? devObservations : calibrationObservations;
         }
     }
 
@@ -1011,12 +1153,13 @@ public final class TypedConstraintStressDataset {
     public record TypedQueryAnnotation(
             String queryId,
             String userBundleId,
+            String primaryFamily,
             List<String> stressFamilies,
             ConstraintAnnotation constraint,
             List<ExpectedEvidenceState> expectedEvidenceStates) {
     }
 
-    public record ExpectedEvidenceState(String evidenceUnitId, String state) {
+    public record ExpectedEvidenceState(String evidenceUnitId, String state, String reason) {
     }
 
     public record ConstraintAnnotation(
@@ -1033,6 +1176,9 @@ public final class TypedConstraintStressDataset {
             Double upperValue,
             String normalizedUnit,
             String direction,
+            String directionSourceSurface,
+            Integer directionCharStart,
+            Integer directionCharEnd,
             LocalDate dateValue,
             LocalDate dateStart,
             LocalDate dateEnd,

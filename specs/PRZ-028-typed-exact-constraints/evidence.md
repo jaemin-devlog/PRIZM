@@ -351,3 +351,47 @@ commit하거나 benchmark하지 않았으며 최종 hash만 input freeze다.
 SEALED 접근은 manifest hash/flags와 unified lineage identifier metadata 검사에 한정했다. SEALED
 document/question/gold, embedding, retrieval, ranking, prediction과 result 접근은 0이다. 이 input과
 사전 역할 Gate를 먼저 local commit한 뒤에만 qualifier/evaluator 구현을 변경한다.
+
+## 11. Pre-official implementation verification
+
+- input-freeze commit: `e32b9683a7e366e9f7298dc94f04657410abc08e`
+- code baseline: `d195f3bd8645bef88964ecf033a5815626d1004c`
+- model/config freeze candidate: `bge-m3:latest`, digest
+  `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`, 1024 dimensions, cosine
+- candidate K: `ALL_OWNER_SCOPED_B3_PASSAGES`
+- T0/T1: `T0_B3_BGE_M3_RAW_DENSE` / `T1_B3_TYPED_STABLE_PARTITION`
+- policy: `PRZ-028-FINAL-ROLE-GATE-2`; `SATISFIED -> UNKNOWN -> CONTRADICTED`, same-state Dense order 유지
+
+Qualifier는 grounded source span을 보존하고 required whole-token contiguous sequence가 더 구체적인
+observed qualifier에 포함될 때만 호환한다. Qualifier mismatch는 `UNKNOWN + QUALIFIER_MISMATCH`, 같은
+target의 wrong value/direction은 `CONTRADICTED`다. 모호한 한국어 suffix는 제거하지 않는 fail-closed
+정책을 사용한다. Diagnostic reason은 ranking에 사용하지 않는다.
+
+Stress 1.1.0 non-BGE contract 검증 결과는 query constraint `24/24` (`P/R/F1=1.0`), observation
+`23 TP / 1 FP / 1 FN` (`P/R/F1=0.958333`)이다. 유일한 exact 차이는 source-grounded observed
+`primary gallery redesign concept`가 frozen required qualifier `primary gallery redesign`보다 더
+구체적인 경우다. 이를 Gold에 맞추기 위한 `concept` 사전이나 문자열 예외로 자르지 않았으며 subset
+호환과 상태 판정은 유지한다. Status와 singular reason은 각각 `96/96`, qualifier-mismatch 18건의
+SAT false positive는 0, same-qualifier wrong-value 24건의 `CONTRADICTED` recall은 1.0이다.
+
+Pre-BGE read-only audit에서 singular reason이 exact하게 Gate되지 않던 점을 발견했다. Dataset과 결과를
+바꾸지 않고 frozen reason exact conformance를 공통 Gate에 추가했으며, 이는 BGE/official result 0건인
+상태에서 code freeze 전에 이루어진 계약 강화다. 동일 감사에서 official claim을 Stress input identity
+전역으로 고정하고, claim/config에 input/code/model/digest/dimension/cosine/K/T0/T1/policy를 기록하며,
+post-claim failure는 atomic `INVALID_RESULT / ROLE_NOT_ASSESSED`로 종결하도록 했다. 실행 후 model,
+HEAD/clean, input/source/SEALED snapshot 불일치도 같은 invalid 경로로 차단한다.
+
+| 검사 | 실제 결과 |
+| --- | --- |
+| focused non-BGE tests | `PASS`; 71/71, failure/error/skip 0 |
+| Stress 1.1.0 / 1.0.1 deterministic `--check` | `PASS / PASS`; combined `dec33f2c... / 96c1ddc6...` |
+| `git diff --check` | `PASS` |
+| OSS readiness verifier | `PASS`; 97 external links OK, indeterminate/permanent 0 |
+| Production/dependency/migration/frontend/MCP/Docker diff | `PASS`; 0 |
+| Stress 1.0.1 / Stress 1.1.0 resource post-freeze diff | `PASS`; 0 |
+| SEALED FINAL | `PASS`; `e5b31597...`, `opened=false`, `searchExecuted=false`, semantic access 0 |
+| official claim/success/invalid artifact | `NOT_CREATED` |
+| BGE T0/T1 / Dense ranking / final role | `NOT_RUN / NOT_RUN / OPEN` |
+
+현재 상태는 `CODE_FREEZE_READY`다. 다음 local commit의 clean HEAD와 위 input/config를 별도 local
+freeze record 및 official claim에 기록한 뒤에만 공식 BGE T0/T1 1회를 실행한다.

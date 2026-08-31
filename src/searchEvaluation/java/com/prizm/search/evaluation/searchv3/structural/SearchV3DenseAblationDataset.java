@@ -28,11 +28,15 @@ final class SearchV3DenseAblationDataset {
             "src/searchEvaluation/resources/search-v3-evaluation/devcal-robustness-1.0.0");
     static final Path TYPED_STRESS_BENCHMARK_ROOT = Path.of(
             "src/searchEvaluation/resources/search-v3-evaluation/typed-constraints-stress-1.0.1");
+    static final Path TYPED_CAPABILITY_STRESS_BENCHMARK_ROOT = Path.of(
+            "src/searchEvaluation/resources/search-v3-evaluation/typed-constraints-stress-1.1.0");
     static final String ORIGINAL_DATASET_VERSION = "search-v3-fresh-seed-1.0.1";
     static final String LONG_FORM_DATASET_VERSION = "search-v3-fresh-devcal-1.1.0";
     static final String ROBUSTNESS_DATASET_VERSION = "search-v3-fresh-devcal-robustness-1.0.0";
     static final String TYPED_STRESS_DATASET_VERSION =
             "search-v3-typed-constraints-stress-1.0.1";
+    static final String TYPED_CAPABILITY_STRESS_DATASET_VERSION =
+            "search-v3-typed-constraints-stress-1.1.0";
     static final String ROBUSTNESS_SHA256 = "cb43832d48bb1f88e5a24abc520154b8562950ecc973295fdb16936aae08ab54";
     static final String OVERALL_SHA256 = "1f36c4bbb6948b97c4321821cc3d6b8a9e38ab44b81adb1594614c6f7e97289e";
     static final String SEALED_FINAL_SHA256 = "e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383";
@@ -57,10 +61,21 @@ final class SearchV3DenseAblationDataset {
     }
 
     DatasetSlice loadTypedStress(Split split) {
+        return loadTypedStressHistorical(split);
+    }
+
+    DatasetSlice loadTypedStressHistorical(Split split) {
         return load(
                 TYPED_STRESS_BENCHMARK_ROOT.resolve(split.directory()),
                 split,
                 TYPED_STRESS_DATASET_VERSION);
+    }
+
+    DatasetSlice loadTypedStressOfficial(Split split) {
+        return load(
+                TYPED_CAPABILITY_STRESS_BENCHMARK_ROOT.resolve(split.directory()),
+                split,
+                TYPED_CAPABILITY_STRESS_DATASET_VERSION);
     }
 
     DatasetSlice load(Path splitDirectory, Split expectedSplit) {

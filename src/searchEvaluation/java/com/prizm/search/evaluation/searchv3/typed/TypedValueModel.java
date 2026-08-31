@@ -3,6 +3,7 @@ package com.prizm.search.evaluation.searchv3.typed;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,6 +24,43 @@ public final class TypedValueModel {
         SATISFIED,
         CONTRADICTED,
         UNKNOWN
+    }
+
+    /** Deterministic explanation for a three-state evaluation; never a ranking signal. */
+    public enum DiagnosticReason {
+        MATCHED,
+        VALUE_MISMATCH,
+        DIRECTION_MISMATCH,
+        QUALIFIER_MISMATCH,
+        UNIT_MISMATCH,
+        NO_MATCHING_OBSERVATION,
+        AMBIGUOUS_OBSERVATION
+    }
+
+    /** State plus deterministic, de-duplicated reasons in enum declaration order. */
+    public record EvaluationResult(MatchState state, List<DiagnosticReason> reasons) {
+        public EvaluationResult {
+            Objects.requireNonNull(state, "state");
+            Objects.requireNonNull(reasons, "reasons");
+            EnumSet<DiagnosticReason> ordered = EnumSet.noneOf(DiagnosticReason.class);
+            for (DiagnosticReason reason : reasons) {
+                ordered.add(Objects.requireNonNull(reason, "diagnostic reason"));
+            }
+            if (ordered.isEmpty()) {
+                throw new IllegalArgumentException("evaluation result requires at least one diagnostic reason");
+            }
+            if (state == MatchState.SATISFIED && !ordered.equals(EnumSet.of(DiagnosticReason.MATCHED))) {
+                throw new IllegalArgumentException("SATISFIED must contain only MATCHED");
+            }
+            if (state != MatchState.SATISFIED && ordered.contains(DiagnosticReason.MATCHED)) {
+                throw new IllegalArgumentException("only SATISFIED may contain MATCHED");
+            }
+            reasons = List.copyOf(ordered);
+        }
+
+        public static EvaluationResult of(MatchState state, DiagnosticReason reason) {
+            return new EvaluationResult(state, List.of(reason));
+        }
     }
 
     public enum QuantityOperator {

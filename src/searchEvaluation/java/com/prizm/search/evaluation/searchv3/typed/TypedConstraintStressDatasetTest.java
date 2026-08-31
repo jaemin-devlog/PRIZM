@@ -1,6 +1,7 @@
 package com.prizm.search.evaluation.searchv3.typed;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.nio.charset.StandardCharsets;
@@ -11,6 +12,8 @@ import java.security.MessageDigest;
 import java.util.HexFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import tools.jackson.databind.ObjectMapper;
@@ -71,6 +74,72 @@ class TypedConstraintStressDatasetTest {
         assertThat(percentage.directionSourceSurface()).isEqualTo("감소");
         assertThat(percentage.directionCharStart()).isNotNull();
         assertThat(percentage.qualifierCharStart()).isNotNull();
+    }
+
+    @Test
+    void loadsHistoricalAndOfficialStressAsIndependentContentAddressedIdentities() {
+        var historicalDev = loader.load(
+                TypedConstraintStressDataset.HISTORICAL_1_0_1,
+                TypedConstraintStressDataset.Split.DEV);
+        var officialDev = loader.load(
+                TypedConstraintStressDataset.OFFICIAL_1_1_0,
+                TypedConstraintStressDataset.Split.DEV);
+        var officialCalibration = loader.load(
+                TypedConstraintStressDataset.OFFICIAL_1_1_0,
+                TypedConstraintStressDataset.Split.CALIBRATION);
+
+        assertThat(historicalDev.datasetVersion())
+                .isEqualTo("search-v3-typed-constraints-stress-1.0.1");
+        assertThat(officialDev.datasetVersion())
+                .isEqualTo("search-v3-typed-constraints-stress-1.1.0");
+        assertThat(historicalDev.rootSha256()).isNotEqualTo(officialDev.rootSha256());
+        assertThat(officialDev.rootSha256()).isEqualTo(TypedConstraintStressDataset.OFFICIAL_1_1_0.rootSha256());
+        assertThat(officialDev.splitSha256()).isEqualTo(TypedConstraintStressDataset.OFFICIAL_1_1_0.devSha256());
+        assertThat(officialCalibration.splitSha256())
+                .isEqualTo(TypedConstraintStressDataset.OFFICIAL_1_1_0.calibrationSha256());
+        assertThat(List.of(officialDev, officialCalibration)).allSatisfy(slice -> {
+            assertThat(slice.evaluationGold().units()).hasSize(12);
+            assertThat(slice.evaluationGold().observations()).hasSize(12);
+            assertThat(slice.evaluationGold().queryAnnotations().values()).allSatisfy(annotation -> {
+                assertThat(annotation.primaryFamily()).isNotBlank();
+                assertThat(annotation.expectedEvidenceStates()).allSatisfy(state -> {
+                    assertThat(state.reason()).isNotBlank();
+                    assertThat(expectedReasonsByState().get(state.state())).contains(state.reason());
+                });
+            });
+        });
+        var explicitDirection = officialDev.evaluationGold().queryAnnotations()
+                .get("SV3-U42-Q01").constraint();
+        assertThat(explicitDirection.direction()).isEqualTo("DECREASE");
+        assertThat(explicitDirection.directionSourceSurface()).isEqualTo("decrease");
+        assertThat(explicitDirection.directionCharStart()).isEqualTo(26);
+        assertThat(explicitDirection.directionCharEnd()).isEqualTo(34);
+        assertThat(historicalDev.evaluationGold().queryAnnotations().values()).allSatisfy(annotation -> {
+            assertThat(annotation.primaryFamily()).isBlank();
+            assertThat(annotation.expectedEvidenceStates()).allSatisfy(state ->
+                    assertThat(state.reason()).isNull());
+        });
+    }
+
+    @Test
+    void enforcesFrozenOfficialExpectedStateReasonPairingsDeterministically() {
+        Set<String> diagnosticReasons = Set.of(
+                "MATCHED", "VALUE_MISMATCH", "DIRECTION_MISMATCH", "QUALIFIER_MISMATCH",
+                "UNIT_MISMATCH", "NO_MATCHING_OBSERVATION", "AMBIGUOUS_OBSERVATION");
+
+        expectedReasonsByState().forEach((state, allowedReasons) -> {
+            diagnosticReasons.forEach(reason -> {
+                if (allowedReasons.contains(reason)) {
+                    assertThatCode(() -> TypedConstraintStressDataset
+                            .validateRequiredExpectedStateReasonPair("frozen-query", state, reason))
+                            .doesNotThrowAnyException();
+                }
+                else {
+                    assertRejectedStateReasonPair(state, reason);
+                }
+            });
+            assertRejectedStateReasonPair(state, null);
+        });
     }
 
     @Test
@@ -178,6 +247,23 @@ class TypedConstraintStressDatasetTest {
                 parentCandidateId,
                 document.contentSha256(),
                 sha256(codePointSlice(document.sourceText(), start, end)));
+    }
+
+    private static Map<String, Set<String>> expectedReasonsByState() {
+        return Map.of(
+                "SATISFIED", Set.of("MATCHED"),
+                "CONTRADICTED", Set.of("VALUE_MISMATCH", "DIRECTION_MISMATCH"),
+                "UNKNOWN", Set.of(
+                        "QUALIFIER_MISMATCH", "UNIT_MISMATCH",
+                        "NO_MATCHING_OBSERVATION", "AMBIGUOUS_OBSERVATION"));
+    }
+
+    private static void assertRejectedStateReasonPair(String state, String reason) {
+        assertThatThrownBy(() -> TypedConstraintStressDataset
+                .validateRequiredExpectedStateReasonPair("frozen-query", state, reason))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Typed expected state/reason mismatch: frozen-query ("
+                        + state + " -> " + reason + ")");
     }
 
     private static String codePointSlice(String value, int start, int end) {

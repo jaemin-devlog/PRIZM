@@ -264,6 +264,162 @@ class DeterministicTypedParserTest {
         assertThat(value.span().surface()).isEqualTo("１，３００명 이상");
     }
 
+    @Test
+    void parsesActiveAndNounDirectionalPercentagesWithoutAQualifierDictionary() {
+        QuantityConstraint decrease = firstConstraint(queryParser.parse(
+                "Did the permanent exhibit decrease the navigation failure rate by at least 38%?"));
+        QuantityConstraint increase = firstConstraint(queryParser.parse(
+                "Did any installation increase the navigation failure rate by more than 30%?"));
+        QuantityConstraint nounForm = firstConstraint(queryParser.parse(
+                "Did the portfolio document a 38% decrease in fabrication scrap?"));
+
+        assertThat(decrease.span().surface()).isEqualTo("at least 38%");
+        assertThat(decrease.operator()).isEqualTo(QuantityOperator.GTE);
+        assertThat(decrease.qualifier().normalized()).isEqualTo("navigation failure rate");
+        assertThat(decrease.direction().direction()).isEqualTo(Direction.DECREASE);
+        assertThat(increase.span().surface()).isEqualTo("more than 30%");
+        assertThat(increase.operator()).isEqualTo(QuantityOperator.GT);
+        assertThat(increase.qualifier().normalized()).isEqualTo("navigation failure rate");
+        assertThat(increase.direction().direction()).isEqualTo(Direction.INCREASE);
+        assertThat(nounForm.span().surface()).isEqualTo("38% decrease");
+        assertThat(nounForm.qualifier().normalized()).isEqualTo("fabrication scrap");
+        assertThat(nounForm.direction().direction()).isEqualTo(Direction.DECREASE);
+    }
+
+    @Test
+    void extractsPassiveDirectionalPercentagesWithTheSourceSubjectAsQualifier() {
+        QuantityObservation decrease = first(
+                observationExtractor.extract(source(
+                        0, "For the rollout, the navigation failure rate decreased by 38% after the signs changed.")),
+                QuantityObservation.class);
+        QuantityObservation increase = first(
+                observationExtractor.extract(source(
+                        0, "During a preview, the navigation failure rate increased by 38% when signs were removed.")),
+                QuantityObservation.class);
+
+        assertThat(decrease.span().surface()).isEqualTo("38%");
+        assertThat(decrease.qualifier().normalized()).isEqualTo("navigation failure rate");
+        assertThat(decrease.direction().direction()).isEqualTo(Direction.DECREASE);
+        assertThat(decrease.direction().span().surface()).isEqualTo("decreased");
+        assertThat(increase.qualifier().normalized()).isEqualTo("navigation failure rate");
+        assertThat(increase.direction().direction()).isEqualTo(Direction.INCREASE);
+    }
+
+    @Test
+    void parsesEnglishDurationRangeAndExtractsDurationPredicateSubject() {
+        QuantityConstraint range = firstConstraint(queryParser.parse(
+                "Did the primary gallery redesign last between 9 and 11 months?"));
+        QuantityObservation duration = first(
+                observationExtractor.extract(source(
+                        0, "The primary gallery redesign continued for 10 months from research through handoff.")),
+                QuantityObservation.class);
+        QuantityObservation moreSpecific = first(
+                observationExtractor.extract(source(
+                        0, "An earlier primary gallery redesign concept ran for 6 months before it stopped.")),
+                QuantityObservation.class);
+
+        assertThat(range.span().surface()).isEqualTo("between 9 and 11 months");
+        assertThat(range.operator()).isEqualTo(QuantityOperator.RANGE);
+        assertThat(range.value()).isEqualByComparingTo("9");
+        assertThat(range.upperValue()).isEqualByComparingTo("11");
+        assertThat(range.normalizedUnit()).isEqualTo("months");
+        assertThat(range.qualifier().normalized()).isEqualTo("primary gallery redesign");
+        assertThat(duration.span().surface()).isEqualTo("10 months");
+        assertThat(duration.qualifier().normalized()).isEqualTo("primary gallery redesign");
+        assertThat(moreSpecific.qualifier().normalized()).isEqualTo("primary gallery redesign concept");
+    }
+
+    @Test
+    void dateQualifierExpandsGenitiveContextButStopsAtAnAdnominalBoundary() {
+        DateObservation current = first(
+                observationExtractor.extract(source(0, "승인된 permit review 시작일은 2026-02-15이다.")),
+                DateObservation.class);
+        DateObservation earlier = first(
+                observationExtractor.extract(source(0, "이전 승인 주기의 permit review 시작일은 2025-11-20이었다.")),
+                DateObservation.class);
+        DateConstraint query = (DateConstraint) queryParser.parse(
+                "이전 승인 주기의 permit review 시작일이 2025-01-01 이후인가요?").get(0);
+
+        assertThat(current.qualifier().normalized()).isEqualTo("permit review 시작일");
+        assertThat(earlier.qualifier().normalized()).isEqualTo("이전 승인 주기의 permit review 시작일");
+        assertThat(query.qualifier().normalized()).isEqualTo("이전 승인 주기의 permit review 시작일");
+    }
+
+    @Test
+    void parsesComparatorCountsAndExtractsRightNounPhraseWithoutStealingKnownUnitsOrIdentifiers() {
+        List<QuantityConstraint> constraints = List.of(
+                firstConstraint(queryParser.parse("Did the cycle record at least 1,800 member renewals?")),
+                firstConstraint(queryParser.parse("Did the cycle record exactly 1,850 member renewals?")),
+                firstConstraint(queryParser.parse("Was there a cycle with no more than 1,240 member renewals?")),
+                firstConstraint(queryParser.parse("Did a cycle exceed 2,000 member renewals?")));
+        QuantityObservation observation = first(
+                observationExtractor.extract(source(
+                        0, "The annual cycle recorded 1,850 paid member renewals after reconciliation.")),
+                QuantityObservation.class);
+        QuantityObservation alternateNoun = first(
+                observationExtractor.extract(source(
+                        0, "The lecture series recorded 1,850 event registrations in the reporting period.")),
+                QuantityObservation.class);
+
+        assertThat(constraints).extracting(QuantityConstraint::operator)
+                .containsExactly(QuantityOperator.GTE, QuantityOperator.EQ, QuantityOperator.LTE, QuantityOperator.GT);
+        assertThat(constraints).allSatisfy(value -> {
+            assertThat(value.normalizedUnit()).isEqualTo("count");
+            assertThat(value.qualifier().normalized()).isEqualTo("member renewals");
+        });
+        assertThat(observation.span().surface()).isEqualTo("1,850");
+        assertThat(observation.normalizedUnit()).isEqualTo("count");
+        assertThat(observation.qualifier().normalized()).isEqualTo("paid member renewals");
+        assertThat(alternateNoun.qualifier().normalized()).isEqualTo("event registrations");
+        assertThat(observationExtractor.extract(source(0, "The rollout lasted for 10 months.")))
+                .filteredOn(QuantityObservation.class::isInstance)
+                .allSatisfy(value -> assertThat(((QuantityObservation) value).normalizedUnit()).isEqualTo("months"));
+        assertThat(observationExtractor.extract(source(0, "Java 17 in production.")))
+                .noneMatch(value -> value instanceof QuantityObservation);
+    }
+
+    @Test
+    void preservesBoundedThreeTokenKoreanPercentageQualifier() {
+        QuantityConstraint constraint = firstConstraint(queryParser.parse(
+                "냉각 에너지 사용량을 27% 이상 감소시킨 사례가 있나요?"));
+        QuantityObservation observation = first(
+                observationExtractor.extract(source(
+                        0, "서관 최적화에서는 냉각 에너지 사용량이 27% 감소했고 월별 계측값을 검토했다.")),
+                QuantityObservation.class);
+
+        assertThat(constraint.qualifier().normalized()).isEqualTo("냉각 에너지 사용량");
+        assertThat(observation.qualifier().normalized()).isEqualTo("냉각 에너지 사용량");
+        assertThat(observation.direction().direction()).isEqualTo(Direction.DECREASE);
+    }
+
+    @Test
+    void preservesFourTokenKoreanCountQualifierAndStopsAtAnAdnominalBoundary() {
+        QuantityConstraint constraint = firstConstraint(queryParser.parse(
+                "파손 소포 보상 요청을 600건 이상 처리했나요?"));
+        QuantityObservation fourTokens = first(
+                observationExtractor.extract(source(0, "1분기에는 파손 소포 보상 요청 420건을 종결했다.")),
+                QuantityObservation.class);
+        QuantityObservation bounded = first(
+                observationExtractor.extract(source(0, "캠페인에서 검증된 유효 상담 요청 1,300건을 생성했다.")),
+                QuantityObservation.class);
+        QuantityObservation afterPredicate = first(
+                observationExtractor.extract(source(0, "후속 절차를 바꿔 미응답 비율이 65% 감소했다.")),
+                QuantityObservation.class);
+        QuantityObservation afterTimeAdjunct = first(
+                observationExtractor.extract(source(0, "같은 기간 미응답 비율이 65% 증가했다.")),
+                QuantityObservation.class);
+        QuantityObservation duration = first(
+                observationExtractor.extract(source(0, "주요 냉각 최적화 검증은 18개월 동안 진행됐다.")),
+                QuantityObservation.class);
+
+        assertThat(constraint.qualifier().normalized()).isEqualTo("파손 소포 보상 요청");
+        assertThat(fourTokens.qualifier().normalized()).isEqualTo("파손 소포 보상 요청");
+        assertThat(bounded.qualifier().normalized()).isEqualTo("유효 상담 요청");
+        assertThat(afterPredicate.qualifier().normalized()).isEqualTo("미응답 비율");
+        assertThat(afterTimeAdjunct.qualifier().normalized()).isEqualTo("미응답 비율");
+        assertThat(duration.qualifier().normalized()).isEqualTo("냉각 최적화 검증");
+    }
+
     private SourceSlice source(int base, String text) {
         return new SourceSlice("DOC", "V01", "CHILD", null, base, text);
     }
@@ -271,6 +427,13 @@ class DeterministicTypedParserTest {
     @SuppressWarnings("unchecked")
     private <T> T first(List<? extends CandidateObservation> values, Class<T> type) {
         return (T) values.stream().filter(type::isInstance).findFirst().orElseThrow();
+    }
+
+    private QuantityConstraint firstConstraint(List<TypedValueModel.QueryConstraint> values) {
+        return (QuantityConstraint) values.stream()
+                .filter(QuantityConstraint.class::isInstance)
+                .findFirst()
+                .orElseThrow();
     }
 
     private void assertRoundTrip(String text, TypedValueModel.CodePointSpan span) {

@@ -233,6 +233,8 @@ Qualifier mismatch는 값이 같아도 반드시 `UNKNOWN + QUALIFIER_MISMATCH`�
 `INVALID_RESULT / ROLE_NOT_ASSESSED`이며 `DROP`으로 위장하지 않는다. 유효한 run은 다섯 suite를
 Original, Long-form, Robustness, Stress 1.0.1 regression과 Stress 1.1.0 official capability로 분리한다.
 역할은 Stress 1.1.0으로 판정하고 기존 네 suite는 신규 회귀 0 Gate로 사용한다.
+공식 비교의 candidate K는 owner scope의 B3 Retrieval Passage 전체를 보존하는
+`ALL_OWNER_SCOPED_B3_PASSAGES`다. 결과를 보기 전에는 별도 top-K truncation을 도입하지 않는다.
 
 공통 validation/operation Gate:
 
@@ -240,6 +242,7 @@ Original, Long-form, Robustness, Stress 1.0.1 regression과 Stress 1.1.0 officia
 - SAT precision `= 1.0`, CONTR precision `>= 0.95`, CONTR recall `>= 0.90`
 - qualifier-mismatch SAT false positive `= 0`
 - same-qualifier wrong-value expected `CONTRADICTED` recall `= 1.0`
+- Stress 1.1.0의 singular frozen diagnostic reason exact conformance `= 1.0`
 - candidate identity와 parser-empty semantic ordering exact parity
 - 모든 suite Recall@5/20과 nDCG@5 비열화 0, direct rank-1 loss 0
 - persistent index/storage 0, online-added p95가 같은 run의 shared embedding p95 + Dense p95 이하

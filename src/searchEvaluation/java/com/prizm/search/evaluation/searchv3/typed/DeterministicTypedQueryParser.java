@@ -25,6 +25,17 @@ import java.util.regex.Pattern;
 /** Gold-free deterministic parser for source-grounded query constraints. */
 public final class DeterministicTypedQueryParser {
 
+    private static final String ENGLISH_WORD = "[\\p{L}][\\p{L}\\p{N}_-]*";
+    private static final String ENGLISH_NOUN_PHRASE = ENGLISH_WORD + "(?:\\s+" + ENGLISH_WORD + "){0,5}?";
+    private static final String ENGLISH_COMPARATOR =
+            "(?:no\\s+more\\s+than|on\\s+or\\s+above|at\\s+least|more\\s+than|at\\s+most|less\\s+than|exactly|over|under)";
+    private static final String ENGLISH_DIRECTION =
+            "(?:decreas(?:e|ed|es|ing)|reduc(?:e|ed|es|ing|tion)|increas(?:e|ed|es|ing))";
+    private static final String ENGLISH_DURATION_PREDICATE =
+            "(?:last(?:s|ed|ing)?|continu(?:e|es|ed|ing)|run|runs|ran|running)";
+    private static final String ENGLISH_TIME_UNIT =
+            "(?:milliseconds?|minutes?|seconds?|months?|hours?|years?|days?|secs?|mins?|hrs?|sec|min|hr|ms)";
+
     private static final Pattern KOREAN_DATE_RANGE = Pattern.compile(
             "(?iu)(?<start>" + DATE_ATOM + ")\\s*부터\\s*(?<end>" + DATE_ATOM + ")\\s*까지");
     private static final Pattern ENGLISH_DATE_RANGE = Pattern.compile(
@@ -46,6 +57,25 @@ public final class DeterministicTypedQueryParser {
                     + UNIT_END_BOUNDARY
                     + "(?:\\s*(?<suffix>이상|초과|이하|미만))?"
                     + "(?:\\s*(?<direction>감소|증가|decreas(?:e|ed|es|ing)|reduc(?:e|ed|es|ing|tion)|increas(?:e|ed|es|ing)))?");
+    private static final Pattern ACTIVE_DIRECTIONAL_PERCENTAGE = Pattern.compile(
+            "(?iu)(?<![\\p{L}\\p{N}_])(?<direction>" + ENGLISH_DIRECTION + ")\\s+"
+                    + "(?:the\\s+|an?\\s+)?(?<qualifier>" + ENGLISH_NOUN_PHRASE + ")\\s+by\\s+"
+                    + "(?:(?<prefix>" + ENGLISH_COMPARATOR + ")\\s+)?"
+                    + NUMBER_START_BOUNDARY + "(?<number>" + NUMBER + ")\\s*(?<unit>%)(?![\\p{L}\\p{N}_])");
+    private static final Pattern NOUN_DIRECTIONAL_PERCENTAGE = Pattern.compile(
+            "(?iu)" + NUMBER_START_BOUNDARY + "(?<number>" + NUMBER + ")\\s*(?<unit>%)\\s+"
+                    + "(?<direction>" + ENGLISH_DIRECTION + ")\\s+(?:in|of)\\s+"
+                    + "(?:the\\s+|an?\\s+)?(?<qualifier>" + ENGLISH_NOUN_PHRASE + ")"
+                    + "(?=\\s*[?.,!;]|$)");
+    private static final Pattern ENGLISH_DURATION_RANGE = Pattern.compile(
+            "(?iu)(?<![\\p{L}\\p{N}_])(?<predicate>" + ENGLISH_DURATION_PREDICATE + ")\\s+"
+                    + "(?<range>between\\s+(?<lower>" + NUMBER + ")\\s+and\\s+(?<upper>" + NUMBER
+                    + ")\\s*(?<unit>" + ENGLISH_TIME_UNIT + "))" + UNIT_END_BOUNDARY);
+    private static final Pattern BARE_ENGLISH_COUNT = Pattern.compile(
+            "(?iu)(?<![\\p{L}\\p{N}_])(?<prefix>" + ENGLISH_COMPARATOR
+                    + "|exceed(?:s|ed|ing)?)\\s+" + NUMBER_START_BOUNDARY + "(?<number>" + NUMBER + ")"
+                    + "(?!\\s*(?:" + UNIT + ")" + UNIT_END_BOUNDARY + ")\\s+"
+                    + "(?<qualifier>" + ENGLISH_NOUN_PHRASE + ")(?=\\s*[?.,!;]|$)");
 
     private static final Pattern SEPARATED_IDENTIFIER_NUMBER = Pattern.compile(
             "(?<![A-Za-z0-9_])(?<identifier>[A-Za-z][A-Za-z+_-]{0,31})(?<separator>\\s+|/)"
@@ -99,7 +129,7 @@ public final class DeterministicTypedQueryParser {
                     TypedTextSupport.span(text, yearRange.start(), yearRange.end(), 0),
                     DateOperator.RANGE,
                     interval,
-                    TypedTextSupport.leftQualifier(text, yearRange.start(), 0, 4)));
+                    TypedTextSupport.leftQualifier(text, yearRange.start(), 0, 8)));
             occupied.add(new TypedTextSupport.CharRange(yearRange.start(), yearRange.end()));
         }
     }
@@ -125,7 +155,7 @@ public final class DeterministicTypedQueryParser {
                     TypedTextSupport.span(text, matcher.start(), matcher.end(), 0),
                     DateOperator.RANGE,
                     interval,
-                    TypedTextSupport.leftQualifier(text, matcher.start(), 0, 4)));
+                    TypedTextSupport.leftQualifier(text, matcher.start(), 0, 8)));
             occupied.add(new TypedTextSupport.CharRange(matcher.start(), matcher.end()));
         }
     }
@@ -177,7 +207,7 @@ public final class DeterministicTypedQueryParser {
                     TypedTextSupport.span(text, matcher.start(), matcher.end(), 0),
                     operator,
                     interval,
-                    TypedTextSupport.leftQualifier(text, matcher.start(), 0, 4)));
+                    TypedTextSupport.leftQualifier(text, matcher.start(), 0, 8)));
         }
         occupied.add(new TypedTextSupport.CharRange(matcher.start(), matcher.end()));
     }
@@ -186,6 +216,10 @@ public final class DeterministicTypedQueryParser {
             String text,
             List<TypedTextSupport.CharRange> occupied,
             List<QueryConstraint> result) {
+        parseActiveDirectionalPercentages(text, occupied, result);
+        parseNounDirectionalPercentages(text, occupied, result);
+        parseEnglishDurationRanges(text, occupied, result);
+
         Matcher range = QUANTITY_RANGE.matcher(text);
         while (range.find()) {
             if (TypedTextSupport.overlaps(occupied, range.start(), range.end())) {
@@ -235,6 +269,122 @@ public final class DeterministicTypedQueryParser {
                     direction));
             occupied.add(new TypedTextSupport.CharRange(matcher.start(), matcher.end()));
         }
+
+        parseBareEnglishCounts(text, occupied, result);
+    }
+
+    private void parseActiveDirectionalPercentages(
+            String text,
+            List<TypedTextSupport.CharRange> occupied,
+            List<QueryConstraint> result) {
+        Matcher matcher = ACTIVE_DIRECTIONAL_PERCENTAGE.matcher(text);
+        while (matcher.find()) {
+            if (TypedTextSupport.overlaps(occupied, matcher.start(), matcher.end())) {
+                continue;
+            }
+            var qualifier = TypedTextSupport.boundedQualifier(
+                    text, matcher.start("qualifier"), matcher.end("qualifier"), 0, 6);
+            QuantityOperator operator = quantityOperator(matcher.group("prefix"), null);
+            if (qualifier.normalized().isBlank() || operator == null) {
+                continue;
+            }
+            int coreStart = matcher.group("prefix") == null
+                    ? matcher.start("number") : matcher.start("prefix");
+            int coreEnd = matcher.end("unit");
+            result.add(new QuantityConstraint(
+                    TypedTextSupport.span(text, coreStart, coreEnd, 0),
+                    operator,
+                    TypedTextSupport.parseNumber(matcher.group("number")),
+                    null,
+                    "%",
+                    qualifier,
+                    new TypedValueModel.DirectionMark(
+                            englishDirection(matcher.group("direction")),
+                            TypedTextSupport.span(text, matcher.start("direction"), matcher.end("direction"), 0))));
+            occupied.add(new TypedTextSupport.CharRange(matcher.start(), matcher.end()));
+        }
+    }
+
+    private void parseNounDirectionalPercentages(
+            String text,
+            List<TypedTextSupport.CharRange> occupied,
+            List<QueryConstraint> result) {
+        Matcher matcher = NOUN_DIRECTIONAL_PERCENTAGE.matcher(text);
+        while (matcher.find()) {
+            if (TypedTextSupport.overlaps(occupied, matcher.start(), matcher.end())) {
+                continue;
+            }
+            var qualifier = TypedTextSupport.boundedQualifier(
+                    text, matcher.start("qualifier"), matcher.end("qualifier"), 0, 6);
+            if (qualifier.normalized().isBlank()) {
+                continue;
+            }
+            result.add(new QuantityConstraint(
+                    TypedTextSupport.span(text, matcher.start("number"), matcher.end("direction"), 0),
+                    QuantityOperator.EQ,
+                    TypedTextSupport.parseNumber(matcher.group("number")),
+                    null,
+                    "%",
+                    qualifier,
+                    new TypedValueModel.DirectionMark(
+                            englishDirection(matcher.group("direction")),
+                            TypedTextSupport.span(text, matcher.start("direction"), matcher.end("direction"), 0))));
+            occupied.add(new TypedTextSupport.CharRange(matcher.start(), matcher.end()));
+        }
+    }
+
+    private void parseEnglishDurationRanges(
+            String text,
+            List<TypedTextSupport.CharRange> occupied,
+            List<QueryConstraint> result) {
+        Matcher matcher = ENGLISH_DURATION_RANGE.matcher(text);
+        while (matcher.find()) {
+            if (TypedTextSupport.overlaps(occupied, matcher.start(), matcher.end())) {
+                continue;
+            }
+            BigDecimal lower = TypedTextSupport.parseNumber(matcher.group("lower"));
+            BigDecimal upper = TypedTextSupport.parseNumber(matcher.group("upper"));
+            var qualifier = TypedTextSupport.leftQualifier(text, matcher.start("predicate"), 0, 4);
+            if (upper.compareTo(lower) < 0 || qualifier.normalized().isBlank()) {
+                continue;
+            }
+            result.add(new QuantityConstraint(
+                    TypedTextSupport.span(text, matcher.start("range"), matcher.end("range"), 0),
+                    QuantityOperator.RANGE,
+                    lower,
+                    upper,
+                    TypedTextSupport.normalizeUnit(matcher.group("unit")),
+                    qualifier,
+                    TypedValueModel.DirectionMark.none()));
+            occupied.add(new TypedTextSupport.CharRange(matcher.start(), matcher.end()));
+        }
+    }
+
+    private void parseBareEnglishCounts(
+            String text,
+            List<TypedTextSupport.CharRange> occupied,
+            List<QueryConstraint> result) {
+        Matcher matcher = BARE_ENGLISH_COUNT.matcher(text);
+        while (matcher.find()) {
+            if (TypedTextSupport.overlaps(occupied, matcher.start(), matcher.end())) {
+                continue;
+            }
+            var qualifier = TypedTextSupport.boundedQualifier(
+                    text, matcher.start("qualifier"), matcher.end("qualifier"), 0, 6);
+            QuantityOperator operator = quantityOperator(matcher.group("prefix"), null);
+            if (qualifier.normalized().isBlank() || operator == null) {
+                continue;
+            }
+            result.add(new QuantityConstraint(
+                    TypedTextSupport.span(text, matcher.start("prefix"), matcher.end("number"), 0),
+                    operator,
+                    TypedTextSupport.parseNumber(matcher.group("number")),
+                    null,
+                    "count",
+                    qualifier,
+                    TypedValueModel.DirectionMark.none()));
+            occupied.add(new TypedTextSupport.CharRange(matcher.start(), matcher.end()));
+        }
     }
 
     private QuantityOperator quantityOperator(String prefix, String suffix) {
@@ -244,6 +394,7 @@ public final class DeterministicTypedQueryParser {
             case "at most", "no more than" -> QuantityOperator.LTE;
             case "less than", "under" -> QuantityOperator.LT;
             case "exactly" -> QuantityOperator.EQ;
+            case "exceed", "exceeds", "exceeded", "exceeding" -> QuantityOperator.GT;
             default -> null;
         };
         QuantityOperator suffixValue = suffix == null ? null : switch (suffix) {
@@ -257,6 +408,11 @@ public final class DeterministicTypedQueryParser {
             return null;
         }
         return prefixValue != null ? prefixValue : suffixValue != null ? suffixValue : QuantityOperator.EQ;
+    }
+
+    private Direction englishDirection(String surface) {
+        return TypedTextSupport.normalizeCaptured(surface).startsWith("increas")
+                ? Direction.INCREASE : Direction.DECREASE;
     }
 
     private TypedValueModel.Qualifier quantityQualifier(
@@ -274,7 +430,8 @@ public final class DeterministicTypedQueryParser {
                 return right;
             }
         }
-        return TypedTextSupport.leftQuantityQualifier(text, coreStart, 0, 3);
+        int maximumTokens = unit.equals("%") || TypedTextSupport.isDurationUnit(unit) ? 3 : 4;
+        return TypedTextSupport.leftQuantityQualifier(text, coreStart, 0, maximumTokens);
     }
 
     private void parseIdentifierNumbers(

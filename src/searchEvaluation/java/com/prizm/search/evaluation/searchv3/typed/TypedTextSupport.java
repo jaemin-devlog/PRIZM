@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,22 +34,32 @@ final class TypedTextSupport {
     static final String DATE_ATOM = "(?:\\p{Nd}{4}[-./]\\p{Nd}{1,2}[-./]\\p{Nd}{1,2}|\\p{Nd}{4}\\s*년(?:\\s*\\p{Nd}{1,2}\\s*월)?|\\p{Nd}{4}[-./]\\p{Nd}{1,2})";
 
     private static final Pattern WORD = Pattern.compile("[\\p{L}\\p{N}]+(?:[-_.][\\p{L}\\p{N}]+)*");
+    private static final Pattern QUALIFIER_COMPARISON_TOKEN = Pattern.compile("[\\p{L}\\p{N}]+");
     private static final Pattern FULL_DATE = Pattern.compile("(\\d{4})[-./](\\d{1,2})[-./](\\d{1,2})");
     private static final Pattern YEAR_MONTH_SEPARATED = Pattern.compile("(\\d{4})[-./](\\d{1,2})");
     private static final Pattern YEAR_MONTH_KOREAN = Pattern.compile("(\\d{4})\\s*년\\s*(\\d{1,2})\\s*월");
     private static final Pattern YEAR_KOREAN = Pattern.compile("(\\d{4})\\s*년");
     private static final Pattern DIRECTION = Pattern.compile(
             "(?iu)(감소|증가|decreas(?:e|ed|es|ing)|reduc(?:e|ed|es|ing|tion)|increas(?:e|ed|es|ing))");
+    private static final Pattern KOREAN_ADNOMINAL = Pattern.compile(".*(?:된|하는|한|할|했던|되는|될|같은)$");
     private static final Set<String> LEFT_SKIP = Set.of(
-            "of", "on", "at", "in", "from", "was", "were", "is", "are", "exactly", "precisely", "정확히");
+            "of", "on", "at", "in", "from", "was", "were", "is", "are", "exactly", "precisely",
+            "정확히", "뒤", "후");
     private static final Set<String> DETERMINERS = Set.of("a", "an", "the");
     private static final Set<String> RIGHT_STOP = Set.of(
             "in", "on", "at", "from", "to", "before", "after", "and", "or", "was", "were", "is", "are",
             "decrease", "decreased", "decreases", "decreasing", "increase", "increased", "increases", "increasing",
             "감소", "증가");
-    private static final List<String> KOREAN_PARTICLES = List.of(
-            "으로부터", "에게서", "에서는", "에서", "에게", "으로", "까지", "부터", "처럼", "보다",
-            "은", "는", "이", "가", "을", "를", "의", "에", "로", "와", "과", "도", "만");
+    /*
+     * Only alternating case/topic particles are stripped. Non-alternating suffixes such as 만, 도, 의, 에 and
+     * locative compounds are lexically ambiguous without a morphological analyzer (for example 불만). Keeping them
+     * is the fail-closed choice. Hangul attachments must also obey 받침 allomorphy; a Latin/Hangul script boundary is
+     * independently strong evidence of an attached particle (for example operations를).
+     */
+    private static final List<String> HIGH_CONFIDENCE_KOREAN_PARTICLES =
+            List.of("으로", "은", "는", "이", "가", "을", "를", "로", "와", "과");
+    private static final List<String> BOUNDARY_ONLY_KOREAN_PARTICLES =
+            List.of("으로부터", "에게서", "에서는", "에서", "에게", "으로", "에", "로");
     private static final Set<String> KOREAN_BOUNDARY_PARTICLES = Set.of(
             "으로부터", "에게서", "에서는", "에서", "에게", "으로", "은", "는", "이", "가", "을", "를", "에", "로");
 
@@ -72,6 +83,56 @@ final class TypedTextSupport {
     static String normalizeLiteral(String value) {
         String normalized = normalizeCaptured(value);
         return normalized.replaceAll("[\\s._-]+", "");
+    }
+
+    static boolean isDurationUnit(String normalizedUnit) {
+        return Set.of(
+                        "millisecond", "milliseconds", "ms",
+                        "second", "seconds", "sec", "secs", "s",
+                        "minute", "minutes", "min", "mins",
+                        "hour", "hours", "hr", "hrs",
+                        "day", "days", "month", "months", "year", "years",
+                        "개월", "시간", "년", "분", "초", "일")
+                .contains(normalizedUnit);
+    }
+
+    /**
+     * Compares grounded qualifiers without changing their stored normalized value or source span.
+     * A non-empty required token sequence must occur contiguously and in order inside the observed
+     * sequence. Empty qualifiers remain comparable only with another empty qualifier.
+     */
+    static boolean qualifierCompatible(Qualifier required, Qualifier observed) {
+        Objects.requireNonNull(required, "required qualifier");
+        Objects.requireNonNull(observed, "observed qualifier");
+        boolean requiredEmpty = required.normalized().isBlank();
+        boolean observedEmpty = observed.normalized().isBlank();
+        if (requiredEmpty || observedEmpty) {
+            return requiredEmpty && observedEmpty;
+        }
+
+        List<String> requiredTokens = qualifierComparisonTokens(required);
+        List<String> observedTokens = qualifierComparisonTokens(observed);
+        if (requiredTokens.isEmpty() || observedTokens.isEmpty()
+                || requiredTokens.size() > observedTokens.size()) {
+            return false;
+        }
+        for (int start = 0; start <= observedTokens.size() - requiredTokens.size(); start++) {
+            if (observedTokens.subList(start, start + requiredTokens.size()).equals(requiredTokens)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static List<String> qualifierComparisonTokens(Qualifier qualifier) {
+        List<String> result = new ArrayList<>();
+        for (String groundedToken : qualifier.orderedTokens()) {
+            Matcher matcher = QUALIFIER_COMPARISON_TOKEN.matcher(normalizeCaptured(groundedToken));
+            while (matcher.find()) {
+                result.add(matcher.group());
+            }
+        }
+        return List.copyOf(result);
     }
 
     static BigDecimal parseNumber(String surface) {
@@ -174,6 +235,17 @@ final class TypedTextSupport {
             if (!selected.isEmpty() && KOREAN_BOUNDARY_PARTICLES.contains(token.particle())) {
                 break;
             }
+            if (!selected.isEmpty() && KOREAN_ADNOMINAL.matcher(token.normalized()).matches()) {
+                break;
+            }
+            if (requireSameScript && selected.size() == 2 && index > 0) {
+                WordToken preceding = tokens.get(index - 1);
+                boolean predicateBoundary = Set.of("을", "를").contains(preceding.particle());
+                boolean adnominalBoundary = preceding.normalized().equals("같은");
+                if (predicateBoundary || adnominalBoundary) {
+                    break;
+                }
+            }
             Script tokenScript = script(token.normalized());
             if (requireSameScript && firstScript != null && tokenScript != firstScript) {
                 break;
@@ -207,6 +279,26 @@ final class TypedTextSupport {
             }
         }
         return qualifier(text, selected, codePointBase);
+    }
+
+    /** Builds a qualifier only from the caller-provided, source-grounded character range. */
+    static Qualifier boundedQualifier(
+            String text,
+            int charStart,
+            int charEnd,
+            int codePointBase,
+            int maximumTokens) {
+        if (charStart < 0 || charEnd <= charStart || charEnd > text.length() || maximumTokens <= 0) {
+            return Qualifier.empty();
+        }
+        List<WordToken> tokens = new ArrayList<>(words(text, charStart, charEnd));
+        while (!tokens.isEmpty() && DETERMINERS.contains(tokens.get(0).normalized())) {
+            tokens.remove(0);
+        }
+        if (tokens.isEmpty() || tokens.size() > maximumTokens) {
+            return Qualifier.empty();
+        }
+        return qualifier(text, tokens, codePointBase);
     }
 
     static DirectionMark directionAround(String text, int coreStart, int coreEnd, int codePointBase) {
@@ -286,15 +378,42 @@ final class TypedTextSupport {
     }
 
     private static ParticleStrip stripParticle(String raw) {
-        for (String particle : KOREAN_PARTICLES) {
+        if (KOREAN_ADNOMINAL.matcher(normalizeCaptured(raw)).matches()) {
+            return new ParticleStrip(raw, "", 0);
+        }
+        for (String particle : HIGH_CONFIDENCE_KOREAN_PARTICLES) {
             if (raw.length() > particle.length() && raw.endsWith(particle)) {
                 String value = raw.substring(0, raw.length() - particle.length());
-                if (value.codePoints().anyMatch(Character::isLetterOrDigit)) {
+                if (value.codePoints().anyMatch(Character::isLetterOrDigit)
+                        && highConfidenceParticleAttachment(value, particle)) {
                     return new ParticleStrip(value, particle, particle.length());
                 }
             }
         }
+        for (String particle : BOUNDARY_ONLY_KOREAN_PARTICLES) {
+            if (raw.length() > particle.length() && raw.endsWith(particle)) {
+                // Preserve the raw lexical token and span. This marker may stop a qualifier from crossing a
+                // grammatical boundary, but it is not sufficient evidence to normalize the suffix away.
+                return new ParticleStrip(raw, particle, 0);
+            }
+        }
         return new ParticleStrip(raw, "", 0);
+    }
+
+    private static boolean highConfidenceParticleAttachment(String stem, String particle) {
+        int finalCodePoint = stem.codePointBefore(stem.length());
+        if (finalCodePoint < 0xac00 || finalCodePoint > 0xd7a3) {
+            return Character.isLetterOrDigit(finalCodePoint);
+        }
+        int jongseong = (finalCodePoint - 0xac00) % 28;
+        boolean hasFinalConsonant = jongseong != 0;
+        return switch (particle) {
+            case "은", "이", "을", "과" -> hasFinalConsonant;
+            case "는", "가", "를", "와" -> !hasFinalConsonant;
+            case "으로" -> hasFinalConsonant && jongseong != 8;
+            case "로" -> !hasFinalConsonant || jongseong == 8;
+            default -> false;
+        };
     }
 
     private static int clauseStart(String text, int before) {

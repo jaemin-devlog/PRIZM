@@ -14,6 +14,8 @@ import com.prizm.search.evaluation.searchv3.typed.TypedValueModel;
 import com.prizm.search.evaluation.searchv3.typed.TypedValueModel.CandidateObservation;
 import com.prizm.search.evaluation.searchv3.typed.TypedValueModel.DateConstraint;
 import com.prizm.search.evaluation.searchv3.typed.TypedValueModel.DateObservation;
+import com.prizm.search.evaluation.searchv3.typed.TypedValueModel.DiagnosticReason;
+import com.prizm.search.evaluation.searchv3.typed.TypedValueModel.EvaluationResult;
 import com.prizm.search.evaluation.searchv3.typed.TypedValueModel.IdentifierNumberConstraint;
 import com.prizm.search.evaluation.searchv3.typed.TypedValueModel.IdentifierNumberObservation;
 import com.prizm.search.evaluation.searchv3.typed.TypedValueModel.LiteralIdentifierConstraint;
@@ -178,11 +180,13 @@ final class SearchV3TypedConstraintAblationEngine {
                 }
 
                 long partitionStarted = System.nanoTime();
+                Map<String, EvaluationResult> evaluationByCandidate = new LinkedHashMap<>();
                 Map<String, MatchState> stateByCandidate = new LinkedHashMap<>();
                 for (RuntimeCandidate candidate : runtimeRanking.t0Candidates()) {
-                    stateByCandidate.put(
-                            candidate.candidateId(),
-                            evaluator.evaluateAll(constraints, observations.get(candidate.candidateId())));
+                    EvaluationResult evaluation = evaluator.evaluateAllDetailed(
+                            constraints, observations.get(candidate.candidateId()));
+                    evaluationByCandidate.put(candidate.candidateId(), evaluation);
+                    stateByCandidate.put(candidate.candidateId(), evaluation.state());
                 }
                 List<RuntimeCandidate> t1Candidates = partitioner.partitionEvaluated(
                         runtimeRanking.t0Candidates(),
@@ -228,6 +232,7 @@ final class SearchV3TypedConstraintAblationEngine {
                 MatchState t1ExpectedRank1State = annotation == null ? null : expectedCandidateState(
                         annotation, requiredGold(t1Candidates.get(0), gold.candidatesById()));
                 String typedKind = annotation == null ? "" : annotation.constraint().kind();
+                String primaryFamily = annotation == null ? "" : annotation.primaryFamily();
                 List<String> typedFamilies = annotation == null ? List.of() : annotation.stressFamilies();
                 QueryReport report = new QueryReport(
                         denseRun.datasetVersion(),
@@ -240,6 +245,7 @@ final class SearchV3TypedConstraintAblationEngine {
                         constraints.size(),
                         semanticOrderParity,
                         typedKind,
+                        primaryFamily,
                         typedFamilies,
                         runtimeRanking.queryEmbeddingLatencyMs(),
                         runtimeRanking.denseRankingLatencyMs(),
@@ -250,8 +256,10 @@ final class SearchV3TypedConstraintAblationEngine {
                         directOutcome,
                         t0ExpectedRank1State,
                         t1ExpectedRank1State,
-                        rankedCandidates(runtimeRanking.t0Candidates(), stateByCandidate, denseRankByCandidate),
-                        rankedCandidates(t1Candidates, stateByCandidate, denseRankByCandidate));
+                        rankedCandidates(runtimeRanking.t0Candidates(), evaluationByCandidate,
+                                denseRankByCandidate, runtimeRanking.denseScoreByCandidate()),
+                        rankedCandidates(t1Candidates, evaluationByCandidate,
+                                denseRankByCandidate, runtimeRanking.denseScoreByCandidate()));
                 queryReports.add(report);
                 if (annotation != null) {
                     states.add(
@@ -298,6 +306,7 @@ final class SearchV3TypedConstraintAblationEngine {
                 grouped(allQueries, QueryReport::language),
                 grouped(allQueries, QueryReport::split),
                 groupedNonBlank(allQueries, QueryReport::typedKind),
+                groupedNonBlank(allQueries, QueryReport::primaryFamily),
                 groupedFamilies(allQueries),
                 extraction.metrics(),
                 states.metrics(),
@@ -372,6 +381,19 @@ final class SearchV3TypedConstraintAblationEngine {
                             + runtimeQuery.queryId());
                 }
             }
+            Map<String, Double> denseScoreByCandidate = ranking.fullRanking().stream()
+                    .collect(Collectors.toMap(
+                            SearchV3DenseAblationEngine.RankedCandidate::candidateId,
+                            SearchV3DenseAblationEngine.RankedCandidate::cosineScore,
+                            (left, right) -> {
+                                throw new IllegalStateException("duplicate dense candidate score identity: "
+                                        + runtimeQuery.queryId());
+                            },
+                            LinkedHashMap::new));
+            if (denseScoreByCandidate.values().stream().anyMatch(score -> !Double.isFinite(score))) {
+                throw new IllegalStateException("B3 dense ranking contains a non-finite score: "
+                        + runtimeQuery.queryId());
+            }
             List<RuntimeCandidate> ordered = ranking.fullRanking().stream()
                     .map(value -> candidates.get(value.candidateId()))
                     .toList();
@@ -399,6 +421,7 @@ final class SearchV3TypedConstraintAblationEngine {
                     ranking.professionGroup(),
                     ranking.queryEmbeddingLatencyMs(),
                     ranking.denseRankingLatencyMs(),
+                    Map.copyOf(denseScoreByCandidate),
                     List.copyOf(ordered)));
         }
         return new RuntimeProjection(Map.copyOf(candidates), List.copyOf(rankings));
@@ -746,7 +769,8 @@ final class SearchV3TypedConstraintAblationEngine {
                 direct.size(),
                 queries.stream().filter(query -> "WIN".equals(query.directOutcome())).count(),
                 queries.stream().filter(query -> "LOSS".equals(query.directOutcome())).count(),
-                queries.stream().filter(query -> "TIE".equals(query.directOutcome())).count());
+                queries.stream().filter(query -> "TIE".equals(query.directOutcome())).count(),
+                queries.stream().filter(query -> query.t0().top1() && !query.t1().top1()).count());
     }
 
     private ComparisonMetrics macro(
@@ -766,7 +790,8 @@ final class SearchV3TypedConstraintAblationEngine {
                 averageProfiles(t1),
                 values.stream().mapToLong(ComparisonMetrics::directWins).sum(),
                 values.stream().mapToLong(ComparisonMetrics::directLosses).sum(),
-                values.stream().mapToLong(ComparisonMetrics::directTies).sum());
+                values.stream().mapToLong(ComparisonMetrics::directTies).sum(),
+                values.stream().mapToLong(ComparisonMetrics::directRank1Losses).sum());
     }
 
     private ComparisonMetrics comparison(
@@ -775,7 +800,8 @@ final class SearchV3TypedConstraintAblationEngine {
             long directCount,
             long wins,
             long losses,
-            long ties) {
+            long ties,
+            long directRank1Losses) {
         return new ComparisonMetrics(
                 queryCount,
                 directCount,
@@ -783,7 +809,8 @@ final class SearchV3TypedConstraintAblationEngine {
                 profile(direct, QueryReport::t1),
                 wins,
                 losses,
-                ties);
+                ties,
+                directRank1Losses);
     }
 
     private ProfileMetrics profile(List<QueryReport> direct, Function<QueryReport, ProfileResult> getter) {
@@ -852,8 +879,7 @@ final class SearchV3TypedConstraintAblationEngine {
             Query query,
             TypedConstraintStressDataset.TypedQueryAnnotation annotation) {
         return annotation != null
-                && "NOT_SUPPORTED".equals(query.answerability())
-                && annotation.stressFamilies().contains("not_supported_hard_negative");
+                && "NOT_SUPPORTED".equals(query.answerability());
     }
 
     private MatchState expectedCandidateState(
@@ -874,8 +900,9 @@ final class SearchV3TypedConstraintAblationEngine {
 
     private List<RankedCandidateResult> rankedCandidates(
             List<RuntimeCandidate> ranking,
-            Map<String, MatchState> states,
-            Map<String, Integer> denseRankByCandidate) {
+            Map<String, EvaluationResult> evaluations,
+            Map<String, Integer> denseRankByCandidate,
+            Map<String, Double> denseScoreByCandidate) {
         List<RankedCandidateResult> result = new ArrayList<>();
         for (int index = 0; index < ranking.size(); index++) {
             RuntimeCandidate candidate = ranking.get(index);
@@ -883,7 +910,9 @@ final class SearchV3TypedConstraintAblationEngine {
                     index + 1,
                     denseRankByCandidate.get(candidate.candidateId()),
                     candidate.candidateId(),
-                    states.get(candidate.candidateId())));
+                    denseScoreByCandidate.get(candidate.candidateId()),
+                    evaluations.get(candidate.candidateId()).state(),
+                    evaluations.get(candidate.candidateId()).reasons()));
         }
         return List.copyOf(result);
     }
@@ -1055,6 +1084,11 @@ final class SearchV3TypedConstraintAblationEngine {
             TypedConstraintStressDataset.ConstraintAnnotation value) {
         String direction = value.direction() == null ? "NONE" : value.direction();
         if ("NONE".equals(direction)) return direction;
+        if (value.directionSourceSurface() != null) {
+            return direction + "|" + codePointSlice(
+                    query, value.directionCharStart(), value.directionCharEnd()) + "@"
+                    + value.directionCharStart() + ":" + value.directionCharEnd();
+        }
         int start = value.queryCharStart();
         int end = value.queryCharEnd();
         String surface = codePointSlice(query, start, end);
@@ -1183,6 +1217,7 @@ final class SearchV3TypedConstraintAblationEngine {
             String professionGroup,
             double queryEmbeddingLatencyMs,
             double denseRankingLatencyMs,
+            Map<String, Double> denseScoreByCandidate,
             List<RuntimeCandidate> t0Candidates) {
     }
 
@@ -1220,7 +1255,17 @@ final class SearchV3TypedConstraintAblationEngine {
         }
     }
 
-    record RankedCandidateResult(int rank, int denseRank, String candidateId, MatchState matchState) {
+    record RankedCandidateResult(
+            int rank,
+            int denseRank,
+            String candidateId,
+            double cosineScore,
+            MatchState matchState,
+            List<DiagnosticReason> diagnosticReasons) {
+
+        RankedCandidateResult {
+            diagnosticReasons = List.copyOf(diagnosticReasons);
+        }
     }
 
     record ProfileResult(
@@ -1244,6 +1289,7 @@ final class SearchV3TypedConstraintAblationEngine {
             int parsedConstraintCount,
             boolean semanticExactOrderParity,
             String typedKind,
+            String primaryFamily,
             List<String> typedFamilies,
             double sharedQueryEmbeddingLatencyMs,
             double sharedDenseRankingLatencyMs,
@@ -1275,7 +1321,8 @@ final class SearchV3TypedConstraintAblationEngine {
             ProfileMetrics t1,
             long directWins,
             long directLosses,
-            long directTies) {
+            long directTies,
+            long directRank1Losses) {
     }
 
     record ExactSetMetrics(
@@ -1286,9 +1333,16 @@ final class SearchV3TypedConstraintAblationEngine {
             long falseNegative,
             double precision,
             double recall,
-            double f1) {
+            double f1,
+            List<String> falsePositiveItems,
+            List<String> falseNegativeItems) {
+        ExactSetMetrics {
+            falsePositiveItems = List.copyOf(falsePositiveItems);
+            falseNegativeItems = List.copyOf(falseNegativeItems);
+        }
+
         static ExactSetMetrics empty() {
-            return new ExactSetMetrics(0, 0, 0, 0, 0, 0.0d, 0.0d, 0.0d);
+            return new ExactSetMetrics(0, 0, 0, 0, 0, 0.0d, 0.0d, 0.0d, List.of(), List.of());
         }
     }
 
@@ -1304,9 +1358,35 @@ final class SearchV3TypedConstraintAblationEngine {
             double accuracy,
             Map<String, Map<String, Long>> confusion,
             Map<String, ClassMetrics> perState,
+            DiagnosticReport diagnostics,
             List<StateMismatch> mismatches) {
         static StateReport empty() {
-            return new StateReport(0, 0, 0.0d, Map.of(), Map.of(), List.of());
+            return new StateReport(0, 0, 0.0d, Map.of(), Map.of(), DiagnosticReport.empty(), List.of());
+        }
+    }
+
+    record DiagnosticReport(
+            long labeledReasonCount,
+            long correctReasonCount,
+            long qualifierMismatchCount,
+            long qualifierMismatchSatisfiedFalsePositiveCount,
+            long sameQualifierWrongValueContradictedCount,
+            long sameQualifierWrongValueCorrectCount,
+            double sameQualifierWrongValueContradictedRecall,
+            List<ReasonMismatch> mismatches) {
+
+        static DiagnosticReport empty() {
+            return new DiagnosticReport(0, 0, 0, 0, 0, 0, 0.0d, List.of());
+        }
+    }
+
+    record ReasonMismatch(
+            String queryId,
+            String evidenceUnitId,
+            String expectedReason,
+            List<DiagnosticReason> predictedReasons) {
+        ReasonMismatch {
+            predictedReasons = List.copyOf(predictedReasons);
         }
     }
 
@@ -1380,6 +1460,7 @@ final class SearchV3TypedConstraintAblationEngine {
             Map<String, ComparisonMetrics> languageSlices,
             Map<String, ComparisonMetrics> splitSlices,
             Map<String, ComparisonMetrics> typedKindSlices,
+            Map<String, ComparisonMetrics> primaryFamilySlices,
             Map<String, ComparisonMetrics> typedFamilySlices,
             ExtractionReport extraction,
             StateReport states,
@@ -1419,13 +1500,19 @@ final class SearchV3TypedConstraintAblationEngine {
         private ExactSetMetrics exact(Set<String> predicted, Set<String> expected) {
             Set<String> intersection = new HashSet<>(predicted);
             intersection.retainAll(expected);
+            List<String> falsePositiveItems = predicted.stream()
+                    .filter(value -> !expected.contains(value)).sorted().toList();
+            List<String> falseNegativeItems = expected.stream()
+                    .filter(value -> !predicted.contains(value)).sorted().toList();
             long tp = intersection.size();
-            long fp = predicted.size() - tp;
-            long fn = expected.size() - tp;
+            long fp = falsePositiveItems.size();
+            long fn = falseNegativeItems.size();
             double precision = predicted.isEmpty() ? 0.0d : tp / (double) predicted.size();
             double recall = expected.isEmpty() ? 0.0d : tp / (double) expected.size();
             double f1 = precision + recall == 0.0d ? 0.0d : 2.0d * precision * recall / (precision + recall);
-            return new ExactSetMetrics(predicted.size(), expected.size(), tp, fp, fn, precision, recall, f1);
+            return new ExactSetMetrics(
+                    predicted.size(), expected.size(), tp, fp, fn, precision, recall, f1,
+                    falsePositiveItems, falseNegativeItems);
         }
 
     }
@@ -1435,6 +1522,13 @@ final class SearchV3TypedConstraintAblationEngine {
         private final List<StateMismatch> mismatches = new ArrayList<>();
         private long count;
         private long correct;
+        private long labeledReasons;
+        private long correctReasons;
+        private long qualifierMismatches;
+        private long qualifierMismatchSatisfiedFalsePositives;
+        private long sameQualifierWrongValues;
+        private long sameQualifierWrongValueCorrect;
+        private final List<ReasonMismatch> reasonMismatches = new ArrayList<>();
 
         void add(
                 TypedConstraintStressDataset.TypedQueryAnnotation annotation,
@@ -1454,7 +1548,8 @@ final class SearchV3TypedConstraintAblationEngine {
                                 span.codePointStart() <= observation.span().startInclusive()
                                         && span.codePointEnd() >= observation.span().endExclusive()))
                         .toList();
-                MatchState predicted = evaluator.evaluateAll(constraints, unitObservations);
+                EvaluationResult evaluation = evaluator.evaluateAllDetailed(constraints, unitObservations);
+                MatchState predicted = evaluation.state();
                 String actual = expected.state();
                 confusion.computeIfAbsent(actual, ignored -> new LinkedHashMap<>())
                         .merge(predicted.name(), 1L, Long::sum);
@@ -1465,6 +1560,28 @@ final class SearchV3TypedConstraintAblationEngine {
                 else {
                     mismatches.add(new StateMismatch(
                             annotation.queryId(), expected.evidenceUnitId(), actual, predicted.name()));
+                }
+                if (expected.reason() != null) {
+                    DiagnosticReason expectedReason = DiagnosticReason.valueOf(expected.reason());
+                    boolean exactReason = evaluation.reasons().equals(List.of(expectedReason));
+                    labeledReasons++;
+                    if (exactReason) correctReasons++;
+                    else reasonMismatches.add(new ReasonMismatch(
+                            annotation.queryId(),
+                            expected.evidenceUnitId(),
+                            expectedReason.name(),
+                            evaluation.reasons()));
+                    if (expectedReason == DiagnosticReason.QUALIFIER_MISMATCH) {
+                        qualifierMismatches++;
+                        if (predicted == MatchState.SATISFIED) qualifierMismatchSatisfiedFalsePositives++;
+                    }
+                    if (expectedReason == DiagnosticReason.VALUE_MISMATCH
+                            && "CONTRADICTED".equals(expected.state())) {
+                        sameQualifierWrongValues++;
+                        if (predicted == MatchState.CONTRADICTED && exactReason) {
+                            sameQualifierWrongValueCorrect++;
+                        }
+                    }
                 }
             }
         }
@@ -1494,6 +1611,16 @@ final class SearchV3TypedConstraintAblationEngine {
                     correct / (double) count,
                     Map.copyOf(frozen),
                     Map.copyOf(classes),
+                    new DiagnosticReport(
+                            labeledReasons,
+                            correctReasons,
+                            qualifierMismatches,
+                            qualifierMismatchSatisfiedFalsePositives,
+                            sameQualifierWrongValues,
+                            sameQualifierWrongValueCorrect,
+                            sameQualifierWrongValues == 0 ? 0.0d
+                                    : sameQualifierWrongValueCorrect / (double) sameQualifierWrongValues,
+                            List.copyOf(reasonMismatches)),
                     List.copyOf(mismatches));
         }
     }

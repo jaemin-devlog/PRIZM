@@ -69,9 +69,10 @@ PR, push, merge와 Sparse 실험은 실행하지 않는다.
 3. Grounded qualifier를 바꾸지 않는 comparison-token compatibility와 status/reason 분리 API를
    evaluation-only 코드에 구현한다.
 4. Stress 1.0.1과 1.1.0을 독립 hash로 함께 읽는 loader, 다섯 suite 분리 report, 역할 Gate와
-   `CREATE_NEW` official-run claim/output guard를 구현한다.
+   dataset-global `CREATE_NEW` official-run claim 및 atomic terminal output guard를 구현한다.
 5. 모든 non-BGE unit/regression, materializer, scope와 Final guard를 통과한 source/config/model/K/policy를
-   code-freeze commit으로 봉인한다.
+   code-freeze commit으로 봉인한다. K는 `ALL_OWNER_SCOPED_B3_PASSAGES`, ranking은 state-only stable
+   partition으로 고정한다.
 6. Input/code freeze가 일치하는 Stress 1.1.0 T0/T1 BGE를 단 한 번 실행한다. 기존 네 suite는
    regression으로만 별도 보고한다.
 7. 사전 Gate를 기계적으로 적용해 `RANKING_COMPONENT`, `EVIDENCE_VALIDATION_ONLY`, `DROP` 중 하나를

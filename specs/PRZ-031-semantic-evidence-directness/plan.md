@@ -16,11 +16,10 @@
 
 ## 현재 Gate
 
-`ORIENT`, `SPEC`, `MODEL_SELECTION_GATE`를 수행했고 최초 `BLOCKED_MODEL_SELECTION` 기록을
-보존했다. 별도 승인 후 official Qwen3-4B GGUF revision/file과 local Ollama blob의 동일
-SHA/size를 확인하여 blocker를 해소했다. model/instruction/schema/config/policy를
-`execution-contract.json`에 고정했으며, 다음 Gate는 evaluation-only code와 Gold-free input을
-commit/hash로 동결하는 것이다. 공식 inference는 아직 `NOT_RUN`이다.
+code/contract/input/model identity를 동결하고 official inference를 한 번 시작했다. 첫 response가
+strict relation/reasonCode pair validation을 통과하지 못해 output freeze와 Gold join 전에
+fail-closed했다. 같은 dataset 재실행, prompt/model/policy 수정과 다른 모델 시험은 하지 않는다.
+PRZ-031 판정은 `NO_GO`이며 Evidence Selection 통합 단계로 진행하지 않는다.
 
 ## 공식 실행 조건
 

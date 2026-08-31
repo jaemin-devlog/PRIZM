@@ -87,8 +87,17 @@ semantic core는 79 query, Top20-or-less candidate 670개이며 Top10 inference 
 relation accuracy/macro F1은 judged pair만 대상으로 하고 judged coverage를 함께 기록한다.
 `UNJUDGED`를 `INSUFFICIENT`로 간주하지 않는다.
 
-PRZ-031 combined candidate input SHA-256: `NOT_CREATED / NOT_RUN`.
-instruction/model SHA-256는 2.1절에 동결했고 output SHA-256은 `NOT_CREATED / NOT_RUN`이다.
+Gold-free candidate와 model input은 code-freeze
+`3d1f57b969d97d1b73a2531ba990cd9beaed57db`에서 CREATE_NEW로 봉인했다.
+
+| artifact | SHA-256 |
+|---|---|
+| B3 candidate file | `708f8f647a57a3b42a55a9c11ac76d925646491d5bee1997e052f6690e77107a` |
+| semantic input file | `b91c6864f809560ee486cd00cad2a21ec7aae02844fa51a902a842e909943671` |
+| semantic input canonical | `4242e751831cb59d1a2c9849a1063f6a6044bae87f2a6cbdbce168acedfd6359` |
+
+79 semantic query, 670 candidate, Top10 578 pair, typed query 0을 확인했다. instruction/model
+SHA-256는 2.1절에 동결했다. official output은 생성되지 않았다.
 
 독립 사전 audit에서 O10/capture 식, semantic core와 typed-overlap 분리, no-support comparator
 정의가 충분히 명시되지 않은 것을 발견했다. 공식 inference 전 spec을 다음처럼 보강했다.
@@ -105,20 +114,30 @@ instruction/model SHA-256는 2.1절에 동결했고 output SHA-256은 `NOT_CREAT
 
 | 항목 | 상태 |
 |---|---|
-| D0 B3 replay | `NOT_RUN` |
-| D1 model inference | `NOT_RUN` |
+| D0 B3 candidate freeze | `PASS`; 네 suite exact parity, Stress만 동일 BGE-M3로 재생성 |
+| D1 official model run | `STARTED_ONCE / FAILED_CLOSED`; 첫 API response의 relation/reasonCode pair 불일치 |
+| official marker SHA-256 | `af1ba1d799153b09a83e13114128824636517d6c2fed5da73de1fa667fd5a470` |
+| frozen prediction rows | 0 / 578 |
+| official output freeze | `NOT_CREATED` |
 | Gold join | `NOT_RUN` |
-| relation accuracy / macro F1 | `NOT_RUN` |
-| DIRECT precision / recall | `NOT_RUN` |
-| Top1 / MRR / nDCG@5 / user-macro | `NOT_RUN` |
-| win / loss / tie / retention | `NOT_RUN` |
-| Oracle capture ratio | `NOT_RUN` |
-| profession/language/category slices | `NOT_RUN` |
-| no-support Dense Top1 / D1 final Top1 diagnostics | `NOT_RUN` |
-| latency / RSS / GPU / VRAM | `NOT_RUN` |
+| relation accuracy / macro F1 | `NOT_EVALUABLE` |
+| DIRECT precision / recall | `NOT_EVALUABLE` |
+| Top1 / MRR / nDCG@5 / user-macro | `NOT_EVALUABLE` |
+| win / loss / tie / retention | `NOT_EVALUABLE` |
+| Oracle recovery / capture ratio | `0 verified recoveries / NOT_EVALUABLE` |
+| profession/language/category slices | `NOT_EVALUABLE` |
+| no-support diagnostic | `NOT_EVALUABLE` |
 
-실행하지 않은 값을 PASS나 0으로 해석하지 않는다. 최종
-`PROMISING / NEEDS_ADJUSTMENT / NO_GO` 판정도 `NOT_RUN`이다.
+strict schema는 두 enum을 각각 제한했지만 둘의 의미적 짝까지 JSON Schema로 표현하지 않았고,
+runner의 frozen pair validation이 첫 response를 거부했다. 실제 relation 값과 source/query는
+evidence에 복사하지 않는다. 실패 후 prompt/schema/model/policy를 수정하지 않았고 같은
+dataset을 공식 재실행하지 않았다.
+
+전체 latency, pair/query p50/p95와 peak RSS는 output freeze 전에 중단되어
+`NOT_AVAILABLE`이다. 모델 artifact는 2,497,280,256 bytes, Ollama aggregate는
+2,497,294,275 bytes다. 실패 직후 진단값은 Ollama working set 96,169,984 bytes, private
+144,687,104 bytes, loaded model VRAM 3,178,149,969 bytes, host GPU 4,154 / 16,303 MiB다.
+이는 Production-scale 또는 peak 비용 근거가 아니다.
 
 ## 5. SEALED FINAL과 scope
 
@@ -128,15 +147,17 @@ instruction/model SHA-256는 2.1절에 동결했고 output SHA-256은 `NOT_CREAT
 - `searchExecuted=false`
 - `CURRENT_FRESH_BASELINE=NOT_RUN`
 - SEALED semantic load/search/prediction/result: `0`
-- candidate export, BGE execution, model inference, Gold join: `0`
+- SEALED candidate export/BGE/Qwen/Gold join: `0`
+- DEV/CAL candidate materialization: `1`; Qwen official attempt: `1`; output freeze/Gold join: `0`
 - `src/main/**`, migration, dependency/build, frontend, MCP, Docker, `v1.0.0`: 변경 `0`
 
-## 6. 공식 실행 전 상태
+## 6. 판정
 
-Evidence Selection 통합 Phase로는 아직 진행할 수 없다. 승인된 exact local instruction
-artifact와 instruction/schema/config/policy는 동결됐다. evaluation-only guard/adapter를 현재
-source에서 검증하고 code/contract를 commit한 뒤, ignored local candidate/input을 CREATE_NEW와
-file/canonical SHA-256으로 봉인해야 단 한 번의 공식 inference를 시작할 수 있다.
+최종 판정은 `NO_GO`다. 동결된 Qwen artifact는 첫 pair조차 검증 가능한 relation output으로
+봉인하지 못했고 relation/ranking 품질이나 Oracle headroom 회수를 증명하지 못했다. 따라서
+다음 Evidence Selection 통합 Phase로 진행하지 않는다. 이 결과는 해당 exact
+model/instruction/schema/config/input의 `HISTORICAL_RESULT`로 보존한다. 다른 model 시험이나
+prompt 수정은 새로운 사전 계약과 별도 평가 없이는 허용하지 않는다.
 
 ## 7. 검증
 
@@ -147,9 +168,12 @@ file/canonical SHA-256으로 봉인해야 단 한 번의 공식 inference를 시
 | 승인 전 focused `searchEvaluation` unit test 3 suites | `HISTORICAL_RESULT`; 17 tests, failure/error/skip 0 |
 | 현재 PRZ-031 focused `searchEvaluation` 5 suites | `PASS`; 32 tests, failure/error 0, official opt-in 2 skipped |
 | Python runner self-test / compile | `PASS`; payload가 query + sourceText 두 필드뿐임을 포함한 8 checks |
+| Gold-free input materialization opt-in | `PASS`; candidate/input CREATE_NEW, 79/670/578/0, exact suite freeze parity |
+| frozen Qwen official run | `FAILED_CLOSED`; 공식 시도 1회, first response pair contract mismatch, rerun 0 |
+| output verify / Gold join / official evaluation | `NOT_RUN`; official output file 없음 |
 | `node scripts/evaluation/search-v3/validate-search-v3-benchmark.mjs` | `PASS`; `FRESH_BENCHMARK_SEED_FROZEN`, sealed search false |
 | benchmark validator unit test | `PASS`; 18 tests, failure 0 |
-| `node scripts/verify-oss-readiness.mjs` | `PASS`; Markdown 206, tracked safety 1088, verifier tests 16 |
+| `node scripts/verify-oss-readiness.mjs` | `PASS`; Markdown 206, tracked safety 1097, verifier tests 16 |
 | PRZ-031 Registry link/file existence | `PASS` |
 
 현재 focused Gradle test의 최초 sandbox 실행은 wrapper distribution network 접근이 거부돼

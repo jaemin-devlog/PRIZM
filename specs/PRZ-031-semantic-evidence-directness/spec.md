@@ -1,6 +1,6 @@
 # PRZ-031 Search V3 Semantic Evidence Directness
 
-- 상태: `IN_PROGRESS / MODEL_AND_INSTRUCTION_FROZEN / OFFICIAL_INFERENCE_NOT_RUN`
+- 상태: `VERIFIED / NO_GO / OFFICIAL_OUTPUT_CONTRACT_FAILURE`
 - 기준 branch: `PRZ-031-semantic-evidence-directness`
 - 기준 source: `PRZ-030-semantic-evidence-validation-ceiling@aca58a6c11b517557d6081756a3ea2cdc5f0550c`
 - 선행 계약: `DEPENDS_ON_PRZ_025@5f8229f`, `DEPENDS_ON_PRZ_026_B3@1bbc1d7`,
@@ -100,9 +100,10 @@ revision/file identity는 고정하지만 base safetensors의 별도 revision li
 않는다.
 
 instruction, strict output schema, `think=false`, temperature 0, seed 31031, Top10과 stable
-partition은 `execution-contract.json`에 동결했다. benchmark 결과를 본 뒤 model, instruction,
-schema, config 또는 policy를 바꾸지 않는다. official inference는 code/input freeze 이후 한
-번만 실행한다.
+partition은 `execution-contract.json`에 동결했다. code/input freeze 뒤 official 실행을 한
+번 시작했으나 첫 API response가 허용 enum 안에서 고정 relation/reasonCode 짝을 위반해
+output freeze 전에 중단됐다. 결과 후 model, instruction, schema, config 또는 policy를
+바꾸거나 같은 dataset을 재실행하지 않았다.
 
 ## 5. 비범위와 보존 경계
 

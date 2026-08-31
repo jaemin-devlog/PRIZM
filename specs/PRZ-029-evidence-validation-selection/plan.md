@@ -1,6 +1,6 @@
 # PRZ-029 Plan
 
-- 상태: `IN_PROGRESS`
+- 상태: `COMPLETED`
 
 ## 1. ORIENT / SPEC
 

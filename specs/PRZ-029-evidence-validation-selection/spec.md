@@ -1,6 +1,6 @@
 # PRZ-029 Search V3 Evidence Validation and Selection
 
-- 상태: `IN_PROGRESS`
+- 상태: `VERIFIED / PROMISING`
 - 기준 branch: `PRZ-029-evidence-validation-selection`
 - 기준 source: `PRZ-028-typed-exact-constraints@33c702aa0bff86502f7f70a343b60c59c13eb80f`
 - 선행 조건: `DEPENDS_ON_PRZ_025`, `DEPENDS_ON_PRZ_026_B3`, `DEPENDS_ON_PRZ_028_EVIDENCE_VALIDATION_ONLY`

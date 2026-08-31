@@ -1,6 +1,6 @@
 # PRZ-028 Plan
 
-- 상태: `IN_PROGRESS / STRESS_1.1.0_INPUT_FROZEN`
+- 상태: `VERIFIED / FINAL_ROLE_EVIDENCE_VALIDATION_ONLY / STRESS_1.1.0_OFFICIAL_RESULT_FROZEN`
 - 허용 단계: `ORIENT → SPEC → PLAN → IMPLEMENT(evaluation-only) → VERIFY → AUDIT → INTEGRATE(commit only)`
 - baseline: PRZ-026 B3; PRZ-027 Cross Encoder `NO_GO` 제외
 
@@ -47,10 +47,10 @@ source provenance, Production/SEALED 불변 중 하나라도 실패하면 결과
 
 PR, push, merge와 Sparse 실험은 실행하지 않는다.
 
-## 5. 공식 결과와 다음 조정 Gate
+## 5. Stress 1.0.1 HISTORICAL_RESULT와 다음 조정 Gate
 
 - code freeze: `2e9c9ff2fb21744a6fea9b8bcf03962e392c84f8`
-- official T0/T1: DEV/CAL 4 suite, 1회 실행, `NEEDS_ADJUSTMENT`
+- Stress 1.0.1 official T0/T1: 당시 DEV/CAL 4 suite 1회 실행, `NEEDS_ADJUSTMENT`
 - 유지된 Gate: candidate/semantic parity, Recall, nDCG, latency envelope, persistent storage 0
 - 미측정: exact additional heap (`NOT_MEASURED`)
 - 관찰된 순증: typed hard-negative Gold-expected `CONTRADICTED@1` `7→1`
@@ -77,3 +77,16 @@ PR, push, merge와 Sparse 실험은 실행하지 않는다.
    regression으로만 별도 보고한다.
 7. 사전 Gate를 기계적으로 적용해 `RANKING_COMPONENT`, `EVIDENCE_VALIDATION_ONLY`, `DROP` 중 하나를
    결정하고 문서·scope를 감사해 local commit한다. PR/push/merge와 Sparse는 실행하지 않는다.
+
+## 7. Final adjustment 결과
+
+- input freeze: `e32b9683a7e366e9f7298dc94f04657410abc08e`
+- code freeze: `194bf80771f5ecedf91adb0cc6b8f835c4b21b16`
+- official BGE: Stress 1.1.0 T0/T1 정확히 1회, 이후 재실행 0
+- validation/operation Gate: `PASS`
+- ranking Gate: `FAIL`; strict Top1/MRR improvement와 direct win 0
+- 최종 역할: `EVIDENCE_VALIDATION_ONLY`
+
+PRZ-028은 이 역할 결정으로 종료한다. Production ranking 적용과 Sparse는 자동 후속 단계가 아니며,
+향후 evidence selection/answerability 계약이 구체화될 때 parser/evaluator의 validation-only 재사용을
+별도 PRZ에서 검증한다.

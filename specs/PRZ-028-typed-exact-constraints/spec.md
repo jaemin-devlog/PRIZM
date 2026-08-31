@@ -1,6 +1,6 @@
 # PRZ-028 Search V3 Typed Exact Constraints
 
-- 상태: `IN_PROGRESS / STRESS_1.0.1_HISTORICAL_FROZEN / STRESS_1.1.0_INPUT_FROZEN`
+- 상태: `VERIFIED / FINAL_ROLE_EVIDENCE_VALIDATION_ONLY / STRESS_1.0.1_HISTORICAL_FROZEN / STRESS_1.1.0_OFFICIAL_RESULT_FROZEN`
 - 기준 branch: `PRZ-028-typed-exact-constraints`
 - 기준 source: `PRZ-026-structural-parsing-parent-child@a7dbb12ea7c0a3f4a502c1ae0252177d9c78a8b9`
 - 선행 조건: `DEPENDS_ON_PRZ_025@5f8229f88251938dc5b34588676cc69edf409c99`, `DEPENDS_ON_PRZ_026_B3`
@@ -96,7 +96,9 @@ Runtime passage/DB ID는 허용하지 않는다. 기존 Original/Long-form/Robus
 
 최초 freeze `1.0.0`은 검색 전 독립 annotation 감사에서 qualifier/span 계약 결함이 발견되어
 `INVALID_INPUT_HISTORICAL`로 보존했다. 이를 덮어쓰지 않고 교정·재봉인한 `1.0.1`만 PRZ-028의
-공식 stress input으로 사용한다. 두 version의 변경 이유, lineage와 hash는 evidence에 고정한다.
+최초 조정 단계 공식 stress input으로 사용했다. Final adjustment에서는 별도 봉인한 `1.1.0`을 공식
+input으로 사용하며 `1.0.1` 결과는 `HISTORICAL_RESULT`로만 보존한다. 각 version의 변경 이유,
+lineage와 hash는 evidence에 고정한다.
 
 ## 6. 평가와 acceptance criteria
 
@@ -168,9 +170,10 @@ win, qualifier/date/identifier-number mismatch 각 family의 Gold-expected `CONT
 요구한다. 일부 순증만 있으면 `NEEDS_ADJUSTMENT`, 순증이 없거나 hard gate가 깨지면 `NO_GO`다.
 공식 runner는 전달받은 code-freeze SHA와 실제 clean `HEAD`를 비교한 뒤에만 BGE를 실행한다.
 
-## 8. 공식 DEV/CAL 판정
+## 8. Stress 1.0.1 HISTORICAL_RESULT 공식 DEV/CAL 판정
 
-Code freeze `2e9c9ff2fb21744a6fea9b8bcf03962e392c84f8`에서 공식 T0/T1을 한 번 실행했다.
+당시 code freeze `2e9c9ff2fb21744a6fea9b8bcf03962e392c84f8`에서 Stress 1.0.1 공식 T0/T1을
+한 번 실행했다.
 Candidate identity `93/93`, parser-empty semantic order `57/57`, 모든 suite의 Recall@5/10/20과
 nDCG@5 비열화 없음, persistent index/storage 0으로 hard gate는 통과했다. 그러나 Typed Stress의
 DIRECT_SUPPORT 13문항은 T0부터 Top1/MRR이 1.0이어서 T1 direct win/loss/tie가 `0/0/13`이었고,
@@ -255,3 +258,17 @@ Gold-expected wrong-condition rank-1 demotion과 predicted `SATISFIED@1` 비증�
 evaluator는 evidence selection 뒤 `FOUND/PARTIAL/NONE` 검증 후보로만 보존하고 Dense ranking에서는
 제거한다. 공통 validation Gate가 실패하면 `DROP`이다. Sparse는 역할 판정과 PRZ-028 종료 전까지
 `NOT_RUN`이다.
+
+## 12. Final role 결정
+
+Stress 1.1.0 input freeze `e32b9683a7e366e9f7298dc94f04657410abc08e`와 code freeze
+`194bf80771f5ecedf91adb0cc6b8f835c4b21b16`을 일치시킨 뒤 공식 BGE T0/T1을 정확히 한 번
+실행했다. 공통 integrity, extraction/state, candidate/semantic parity, Recall/nDCG, direct-rank1,
+latency와 storage Gate는 통과했다. 그러나 Stress 1.1.0 DIRECT_SUPPORT 16문항의 T0/T1
+Top1/MRR/nDCG@5가 모두 `1.0→1.0`, direct W/L/T가 `0/0/16`이어서 strict ranking improvement,
+winning user와 winning primary family가 모두 0이었다.
+
+따라서 Typed Constraint의 최종 역할은 `EVIDENCE_VALIDATION_ONLY`다. Parser/evaluator와 generic
+diagnostic reason 계약은 향후 evidence selection 뒤 source-grounded `FOUND/PARTIAL/NONE` 판정을
+검증하는 후보로 보존하지만 Search V3 Dense ranking 구성요소로 채택하지 않는다. Production 적용,
+Sparse, PR, push와 merge는 `NOT_RUN`이며 PRZ-028의 evaluation-only 역할 판정은 완료됐다.

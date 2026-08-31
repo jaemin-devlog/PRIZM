@@ -1,6 +1,6 @@
 # PRZ-028 Evidence
 
-- 상태: `IN_PROGRESS / STRESS_1.0.1_HISTORICAL_FROZEN / STRESS_1.1.0_INPUT_FROZEN`
+- 상태: `VERIFIED / FINAL_ROLE_EVIDENCE_VALIDATION_ONLY / STRESS_1.0.1_HISTORICAL_FROZEN / STRESS_1.1.0_OFFICIAL_RESULT_FROZEN`
 - 시작 branch / HEAD: `PRZ-027-cross-encoder-reranking@7271654b80ba7db3bc9cec89cba8ba1000660132`
 - 현재 branch base: `PRZ-028-typed-exact-constraints@a7dbb12ea7c0a3f4a502c1ae0252177d9c78a8b9`
 - `origin/main`: `2c8fd5c0d2f62b154642d703a0970389f8abed8e`
@@ -37,7 +37,8 @@ Parent Context, Parent Dense, Cross Encoder와 QueryPlanner는 사용하지 않�
   `e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383`
 - flags: `opened=false`, `searchExecuted=false`
 - `CURRENT_FRESH_BASELINE=NOT_RUN`
-- DEV/CAL T0/T1: code freeze에서 공식 1회 실행
+- DEV/CAL T0/T1: Stress 1.0.1/code freeze `2e9c9ff`에서 당시 공식 1회,
+  Stress 1.1.0/code freeze `194bf80`에서 final official 1회 실행
 - Production/dependency/migration/frontend/MCP/Docker 변경: `0`
 
 ## 3. 최초 Typed Stress input freeze — INVALID_INPUT_HISTORICAL
@@ -115,7 +116,8 @@ operator 의미를 분리했고 U36 Java query를 실제 mixed 문장으로 바�
 | external lineage separation | `PASS`; Original/Long-form/Robustness 충돌 0, v1.0.0 continuity 명시 |
 | SEALED manifest metadata | `PASS`; combined `e5b315...`, opened/search false |
 
-v1.0.1이 PRZ-028 구현과 공식 T0/T1의 유일한 stress input이다.
+v1.0.1은 최초 조정 단계 구현과 당시 공식 T0/T1의 유일한 stress input이었다. Final adjustment의
+공식 input은 별도 `1.1.0`이며 v1.0.1 결과는 `HISTORICAL_RESULT`로만 보존한다.
 
 ## 5. Evaluation-only 구현과 code freeze 근거
 
@@ -155,7 +157,7 @@ Pre-freeze 독립 감사에서 발견해 수정한 항목:
 | official BGE T0/T1 | code freeze 전 당시 `NOT_RUN` |
 | SEALED FINAL search/prediction/result | `NOT_RUN`; metadata/hash verification only |
 
-## 6. 공식 T0/T1 실행
+## 6. Stress 1.0.1 HISTORICAL_RESULT 공식 T0/T1 실행
 
 - code freeze commit: `2e9c9ff2fb21744a6fea9b8bcf03962e392c84f8`
 - official input freeze: `3e3bf652c5661a5bab34eb68e174dcea7459d6b5`
@@ -165,7 +167,7 @@ Pre-freeze 독립 감사에서 발견해 수정한 항목:
   `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`, 1024 dimensions, cosine
 - raw local report: `local/search-v3-evaluation/prz028/typed-constraint-t1.json`
 - report SHA-256: `5bc0016a4807af099b0aff3e1fff76c63a1271a82c8f52b56dd660b2cae50d9e`
-- 실행 횟수: 공식 BGE T0/T1 `1`
+- 실행 횟수: Stress 1.0.1/code freeze `2e9c9ff` 기준 공식 BGE T0/T1 `1`
 
 공식 실행은 ignored local init script로 test JVM에 freeze SHA를 전달했고, runner가 실제 clean `HEAD`와
 SHA 일치를 검증한 뒤에만 시작했다. T0/T1은 query embedding과 full B3 Dense ranking을 공유했다.
@@ -270,11 +272,11 @@ PRZ-025 integrity validator는 요청된 기존 integrity test로서 SEALED fixt
 PRZ-028 official evaluator의 SEALED semantic access가 아니며 manifest flags와 tracked bytes를 바꾸지
 않았다.
 
-## 8. 최종 검증
+## 8. Stress 1.0.1 HISTORICAL_RESULT 최종 검증
 
 | 명령/검사 | 실제 결과 |
 | --- | --- |
-| official T0/T1 benchmark | `PASS`; code freeze에서 1/1, 이후 재실행 0 |
+| Stress 1.0.1 official T0/T1 benchmark | `PASS`; code freeze `2e9c9ff`에서 1/1, 이후 해당 version 재실행 0 |
 | 관련 non-BGE searchEvaluation unit/regression | `PASS`; 14 suites / 116 tests, failure/error/skipped 0 |
 | PRZ-025 validator unit | `PASS`; 18/18 |
 | PRZ-025 validator CLI | `PASS`; `FRESH_BENCHMARK_SEED_FROZEN`, Final search false |
@@ -395,3 +397,117 @@ HEAD/clean, input/source/SEALED snapshot 불일치도 같은 invalid 경로로 �
 
 현재 상태는 `CODE_FREEZE_READY`다. 다음 local commit의 clean HEAD와 위 input/config를 별도 local
 freeze record 및 official claim에 기록한 뒤에만 공식 BGE T0/T1 1회를 실행한다.
+
+## 12. Stress 1.1.0 official one-shot 결과와 최종 역할
+
+### 12.1 Freeze와 실행 무결성
+
+- input freeze commit: `e32b9683a7e366e9f7298dc94f04657410abc08e`
+- code freeze commit: `194bf80771f5ecedf91adb0cc6b8f835c4b21b16`
+- Stress 1.1.0 combined SHA-256:
+  `dec33f2c222f5b159166572aed807b1a50e656dccc7cf728dc19019b9ddcee77`
+- execution source combined SHA-256:
+  `1c5f4921159d4e7b4fb651a4857ec24530550622af82f2528d53a0ffed36d530`
+- model: `bge-m3:latest`, digest
+  `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`, 1024 dimensions, cosine
+- candidate K: `ALL_OWNER_SCOPED_B3_PASSAGES`
+- ranking: `T0_B3_BGE_M3_RAW_DENSE` / `T1_B3_TYPED_STABLE_PARTITION`
+- verdict policy: `PRZ-028-FINAL-ROLE-GATE-2`
+- official BGE 실행: `1회`; 성공 뒤 재실행 `0`
+- raw local report: `local/search-v3-evaluation/prz028/typed-constraint-role-1.1.0.json`
+- report SHA-256: `1ae2c66797c9e05a1ebfdc41ccd08ba5985747959e3f73d1a2c3d5c64bf3604b`
+
+Runner는 BGE 호출 전에 input/code/model/digest/dimension/cosine/K/T0/T1/policy 전체 claim을
+dataset-global `CREATE_NEW`로 만들었다. Official success artifact는 원자적으로 한 번 publish됐고 invalid
+artifact는 없다. 실행 후 HEAD/clean worktree, model, input/source와 SEALED snapshot 재검증도 통과했다.
+
+### 12.2 Qualifier, extraction과 상태 판정
+
+Final qualifier 계약은 required whole-token contiguous sequence가 더 구체적인 observed qualifier에
+포함되는 경우만 호환한다. 서로 다른 qualifier는 값이 같아도 `UNKNOWN + QUALIFIER_MISMATCH`, 같은
+qualifier의 wrong value/direction만 `CONTRADICTED`다. NFKC/lowercase/punctuation/space와 최소한의
+한국어 조사 외 dictionary, ontology, embedding, LLM 또는 query별 예외는 사용하지 않았다.
+
+| 항목 | official Stress 1.1.0 결과 |
+| --- | --- |
+| query constraint extraction | `24/24 TP`, FP/FN `0/0`, P/R/F1 `1/1/1` |
+| candidate observation extraction | `23 TP / 1 FP / 1 FN`, P/R/F1 `0.9583/0.9583/0.9583` |
+| status accuracy | `96/96 = 1.0` |
+| SATISFIED | support/predicted/TP `16/16/16`, P/R `1/1` |
+| UNKNOWN | `52/52/52`, P/R `1/1` |
+| CONTRADICTED | `28/28/28`, P/R `1/1` |
+| diagnostic reason | `96/96 = 1.0` |
+| qualifier mismatch | 18 labels, `SATISFIED` false positive `0` |
+| same-qualifier wrong value | 24/24 `CONTRADICTED`, recall `1.0` |
+
+Observation의 유일한 exact mismatch는 source-grounded
+`primary gallery redesign concept`와 frozen annotation `primary gallery redesign`의 specificity
+차이다. `concept`를 제거하는 dictionary나 fixture 사후 수정은 하지 않았다. Subset compatibility로
+status와 reason 96개는 모두 정확했다.
+
+### 12.3 Ranking과 회귀 suite
+
+| suite | direct | Recall@5/20 T0→T1 | Top1 T0→T1 | MRR T0→T1 | nDCG@5 T0→T1 | W/L/T |
+| --- | ---: | --- | --- | --- | --- | --- |
+| Original Seed | 14 | `1/1→1/1` | `0.9286→0.9286` | `0.9643→0.9643` | `0.9736→0.9736` | `0/0/14` |
+| Long-form | 15 | `1/1→1/1` | `0.8000→0.8000` | `0.8833→0.8833` | `0.9128→0.9128` | `0/0/15` |
+| Robustness | 24 | `1/1→1/1` | `1→1` | `1→1` | `1→1` | `0/0/24` |
+| Stress 1.0.1 historical | 13 | `1/1→1/1` | `1→1` | `1→1` | `1→1` | `0/0/13` |
+| Stress 1.1.0 official | 16 | `1/1→1/1` | `1→1` | `1→1` | `1→1` | `0/0/16` |
+
+모든 117 query의 candidate identity가 같았고 일반 semantic query `55/55`의 ID·cosine·순서도
+완전 parity였다. Direct rank-1 loss는 모든 suite에서 0이다. Stress 1.1.0 user-macro도 T0/T1
+Top1/MRR/nDCG@5/Recall@5/20 전부 `1.0`이었다.
+
+Stress 1.1.0의 `range_boundary`와 `percentage_direction`은 각각 direct 4, 나머지
+`qualifier_mismatch`, `identifier_number`, `date`, `quantity_wrong_value`는 각각 direct 2다. 여섯
+primary family 모두 Recall@5/20, Top1, MRR, nDCG@5가 T0/T1 `1.0`, win/loss 0이었다. Winning user와
+winning primary family도 각각 0이다.
+
+NOT_SUPPORTED hard negative 8문항에서 predicted `SATISFIED@1`은 `0→0`이었다. Gold-expected와
+predicted `CONTRADICTED@1`은 모두 `6→0`이며 transition은
+`CONTRADICTED→UNKNOWN` 6, `UNKNOWN→UNKNOWN` 2다. Wrong-condition 후보를 내려 안전성은
+보존했지만 DIRECT_SUPPORT rank 개선은 아니므로 ranking 순증으로 세지 않는다.
+
+### 12.4 Operation, SEALED와 판정
+
+Stress 1.1.0의 online-added latency는 평균 `0.1649 ms`, p95 `0.2974 ms`였다. T0/T1 end-to-end
+평균은 `29.0069→29.1718 ms`, p95는 `32.6878→32.8634 ms`다. Query parse p95 `0.2235 ms`,
+one-time observation parse p95 `0.1489 ms`, match/partition p95 `0.0957 ms`이며 persistent
+index/storage write는 `0/0`이다. Exact additional heap은 `NOT_MEASURED`; JVM 전체 비격리 point
+observation은 Typed component 비용으로 해석하지 않는다.
+
+SEALED FINAL combined
+`e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383`은 불변이며
+`opened=false`, `searchExecuted=false`, semantic access/prediction/result `false/false/false`다.
+`CURRENT_FRESH_BASELINE=NOT_RUN`을 유지한다. Production, dependency, migration, frontend, MCP,
+Docker, Sparse, PR, push와 merge는 모두 `NOT_RUN` 또는 변경 0이다.
+
+공통 validation/operation Gate는 통과했고 integrity/validation failure와 direct rank-1 loss는 0이다.
+그러나 official Stress에서 Top1/MRR strict improvement, direct win, winning user와 winning primary
+family가 모두 0이므로 ranking Gate는 통과하지 못했다. 사전 정책에 따른 최종 역할은
+`EVIDENCE_VALIDATION_ONLY`다. Typed parser/evaluator는 evidence selection 뒤 source-grounded
+`FOUND/PARTIAL/NONE` 검증 후보로 보존하고 Dense ranking에서는 제거한다. 이 역할 결정과 closeout
+감사를 근거로 PRZ-028은 `VERIFIED`로 종료하며 Sparse는 자동 후속 단계가 아니다.
+
+### 12.5 Closeout 검증
+
+| 명령/검사 | 실제 결과 |
+| --- | --- |
+| official BGE T0/T1 benchmark | `PASS`; code freeze `194bf80`에서 정확히 1회, report `1ae2c667...` |
+| focused non-BGE typed/engine/verdict tests | `PASS`; 6 suites / 71 tests, failure/error/skipped `0/0/0` |
+| Stress 1.1.0 materializer `--check` | `PASS`; 19 files, 6 bundles, 24 queries, combined `dec33f2c...` |
+| Stress 1.0.1 materializer `--check` | `PASS`; historical 19 files, 24 queries, combined `96c1ddc6...` |
+| OSS readiness verifier | `PASS`; Markdown 193, local links 766, verifier 16/16, external 97/97 |
+| `git diff --check` | `PASS` |
+| Production·SEALED forbidden diff | `PASS`; 각각 0 |
+| official artifact guard | `PASS`; claim 1, success report 1, invalid artifact 0 |
+| full backend/integration/frontend/Docker | `NOT_RUN`; evaluation-only 범위에 불필요 |
+
+Focused test의 첫 sandbox 시도는 Gradle distribution network 권한에서 test 시작 전에 실패했고,
+승인된 기존 local Gradle 환경에서 같은 비-BGE 명령을 재실행해 71/71을 확인했다. Official BGE
+benchmark는 이 과정에서 재실행하지 않았다.
+
+독립 closeout 감사가 찾은 Stress 1.0.1/1.1.0 official input 범위와 실행 횟수 표현은 과거 결과를
+바꾸지 않고 `HISTORICAL_RESULT` 범위로 교정했다. 재감사 결과 내용·수치·금지 경계 finding은
+P0/P1/P2 모두 0이며, 남은 temporal Gate는 이 문서의 local closeout commit뿐이다.

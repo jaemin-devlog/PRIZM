@@ -1,6 +1,6 @@
 # PRZ-028 Tasks
 
-- 상태: `IN_PROGRESS / CODE_FREEZE_READY`
+- 상태: `VERIFIED / FINAL_ROLE_EVIDENCE_VALIDATION_ONLY / STRESS_1.1.0_OFFICIAL_RESULT_FROZEN`
 
 - [x] ORIENT: branch/HEAD/origin/main, PRZ-025/026 dependency와 clean worktree 확인
 - [x] ORIENT: PRZ-027 `NO_GO`를 제외한 B3 baseline 계보 확인
@@ -39,8 +39,8 @@
 - [x] IMPLEMENT: qualifier compatibility와 diagnostic reason; ranking은 state-only stable partition 유지
 - [x] IMPLEMENT: dual stress loader, five-suite report, dataset-global claim/atomic output와 final role policy
 - [x] VERIFY-CODE: non-BGE 71 tests, regression, materializer, forbidden scope/SEALED/OSS audit
-- [ ] INTEGRATE-CODE-FREEZE: source/input/model/K/policy local commit
-- [ ] VERIFY-OFFICIAL: Stress 1.1.0 T0/T1 BGE 공식 1회와 기존 네 suite regression
-- [ ] AUDIT: 사전 Gate 기반 역할 판정, aggregate evidence, scope/final/OSS 검증
-- [ ] INTEGRATE: PRZ-028 최종 역할·종료 판단 local commit
+- [x] INTEGRATE-CODE-FREEZE: source/input/model/K/policy local commit `194bf80`
+- [x] VERIFY-OFFICIAL: Stress 1.1.0 T0/T1 BGE 공식 1회와 기존 네 suite regression
+- [x] AUDIT: 사전 Gate 기반 역할 판정, aggregate evidence, scope/final/OSS 최종 재감사
+- [ ] INTEGRATE: PRZ-028 최종 역할·종료 판단 local closeout commit
 - [ ] PR/push/merge/Sparse — `NOT_RUN` (금지)

@@ -1,6 +1,6 @@
 # PRZ-031 Search V3 Semantic Evidence Directness
 
-- 상태: `IN_PROGRESS / BLOCKED_MODEL_SELECTION`
+- 상태: `IN_PROGRESS / MODEL_AND_INSTRUCTION_FROZEN / OFFICIAL_INFERENCE_NOT_RUN`
 - 기준 branch: `PRZ-031-semantic-evidence-directness`
 - 기준 source: `PRZ-030-semantic-evidence-validation-ceiling@aca58a6c11b517557d6081756a3ea2cdc5f0550c`
 - 선행 계약: `DEPENDS_ON_PRZ_025@5f8229f`, `DEPENDS_ON_PRZ_026_B3@1bbc1d7`,
@@ -34,8 +34,8 @@ O1@20은 참고 ceiling일 뿐 capture 분모로 쓰지 않는다. metric `M`의
 모델 입력은 original query와 Evidence `sourceText`뿐이다. Gold, answerability, category,
 Gold Parent/relation/ID, Oracle 결과, C1 heading context는 금지한다. 공식 순서는
 `Gold-free candidate/input freeze → model inference → output freeze/hash/verify → Gold join →
-evaluation`이다. model output은 relation, 확률로 해석하지 않는 raw score, 제한된
-reason code만 가진다. malformed/timeout은 relation으로 꾸미지 않고 실행 실패로 처리한다.
+evaluation`이다. model output은 relation과 제한된 reason code만 가진다. confidence나 복합
+점수는 생성하지 않는다. malformed/timeout은 relation으로 꾸미지 않고 실행 실패로 처리한다.
 
 Gold relation은 candidate 전체를 exhaustive하게 판단하지 않는다. Gold에 없는 후보는
 `UNJUDGED` 평가 상태로만 보존하며 `INSUFFICIENT`로 재라벨링하지 않는다. relation
@@ -85,20 +85,33 @@ PRZ-030의 `BUILD_SEMANTIC_VALIDATOR`는 실제 validator를 시험할 가치가
 만족해야 한다. 모델 쇼핑, 외부 유료 API, benchmark-specific fine-tuning, 결과 후 prompt
 수정은 금지한다.
 
-현재 호스트의 Ollama에는 embedding 전용 `bge-m3:latest`만 있다. repository의 과거
-`qwen3:4b-instruct` harness는 재사용 가능한 transport이지만 해당 mutable tag의 exact
-digest/revision/license가 보존되지 않았고 모델도 설치되어 있지 않다. 따라서 계약에 따라
-`BLOCKED_MODEL_SELECTION`에서 중단한다. 별도 승인으로 적합한 exact local artifact가
-준비되기 전에는 input/instruction/code freeze, 공식 inference와 metric evaluation을
-실행하지 않는다.
+최초 audit에서는 적합한 설치 model이 없어 `BLOCKED_MODEL_SELECTION`으로 중단했다. 별도
+승인 후 단일 모델을 official `Qwen/Qwen3-4B-GGUF` revision
+`bc640142c66e1fdd12af0bd68f40445458f3869b`의 `Qwen3-4B-Q4_K_M.gguf`로 고정했다.
+upstream file SHA-256과 Ollama local model blob SHA-256은 모두
+`7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5`, 크기는
+2,497,280,256 bytes다. local Ollama manifest digest는
+`3c4f22130d403283bb961721f2c4f83e4409afcbb7a7cd992f425c62b9304e35`다.
+
+선택 artifact는 Apache-2.0, 4,022,468,096 parameters, `Q4_K_M`이며 Ollama `0.33.2`에서만
+이번 공식 실행에 사용한다. 원격 tag는 mutable할 수 있으므로 실행 직전 local manifest와
+blob SHA/size를 다시 검증하고 불일치 시 `BLOCKED_MODEL_METADATA`로 중단한다. 선택 GGUF
+revision/file identity는 고정하지만 base safetensors의 별도 revision lineage는 주장하지
+않는다.
+
+instruction, strict output schema, `think=false`, temperature 0, seed 31031, Top10과 stable
+partition은 `execution-contract.json`에 동결했다. benchmark 결과를 본 뒤 model, instruction,
+schema, config 또는 policy를 바꾸지 않는다. official inference는 code/input freeze 이후 한
+번만 실행한다.
 
 ## 5. 비범위와 보존 경계
 
 Sparse, Parent Dense/Context, QueryPlanner/rewrite, RRF, FTS/BM25, MMR, Grounded Answer,
-Typed 통합, Production 적용은 `NOT_RUN`이다. 새 dataset/query/retrieval 실험과 model
-download도 하지 않는다.
+Typed 통합, Production 적용은 `NOT_RUN`이다. 새 dataset/query/retrieval 실험은 하지
+않는다. 승인된 단일 model weight는 local cache에만 보관하며 Git artifact나 Production
+dependency로 만들지 않는다.
 
-허용 범위는 PRZ-031 문서, Registry, 향후 최소 evaluation-only runner/test와 ignored
+허용 범위는 PRZ-031 문서/contract, 최소 evaluation-only runner/test와 ignored
 `local/search-v3-evaluation/prz031/**`다. `src/main/**`, migration, dependency/build,
 frontend, MCP, Docker, `v1.0.0`과 SEALED FINAL은 변경하지 않는다.
 

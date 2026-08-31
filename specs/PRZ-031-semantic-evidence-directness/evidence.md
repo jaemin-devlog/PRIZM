@@ -36,6 +36,37 @@ PRZ-027에서 이미 `NO_GO`였다. 이 audit에서 download나 model inference�
 
 결론: `BLOCKED_MODEL_SELECTION`. model download, 다른 모델 시험, inference는 모두 0건이다.
 
+### 2.1 승인 후 단일 모델 동결
+
+위 최초 blocker 기록은 삭제하지 않는다. 별도 승인 후 다른 모델을 쇼핑하지 않고 official
+`Qwen/Qwen3-4B-GGUF` revision
+`bc640142c66e1fdd12af0bd68f40445458f3869b`의 `Qwen3-4B-Q4_K_M.gguf` 하나만
+선택했다.
+
+| field | frozen value |
+|---|---|
+| upstream file SHA-256 / bytes | `7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5` / 2,497,280,256 |
+| license / parameters / quantization | Apache-2.0 / 4,022,468,096 / `Q4_K_M` |
+| local Ollama tag | `hf.co/Qwen/Qwen3-4B-GGUF:Q4_K_M` |
+| local manifest SHA-256 / bytes | `3c4f22130d403283bb961721f2c4f83e4409afcbb7a7cd992f425c62b9304e35` / 859 |
+| local model blob SHA-256 / bytes | `7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5` / 2,497,280,256 |
+| Ollama aggregate bytes | 2,497,294,275 |
+| runtime | Ollama `0.33.2` |
+
+Ollama local model blob은 upstream pinned file과 실제 SHA/size가 일치한다. remote tag만
+신뢰하지 않고 공식 실행 직전 manifest와 blob을 다시 검사한다. 이 freeze는 선택 GGUF
+artifact identity를 증명하지만 base safetensors의 별도 revision lineage까지 주장하지 않는다.
+모델 weight는 Git에 추가하지 않았고 Production dependency/config 변경은 0이다.
+
+`execution-contract.json`에 고정한 hash는 다음과 같다.
+
+- instruction: `3b76fc147b2c8cb3ac0baab4b01a2611aebaadfd77b051b4185be0baa1fc5a55`
+- output schema: `1738194f5d44b72b19e2e51513ba627fc8f8bcd7e1ae190e0f0e5c450745c1d7`
+- inference config: `c63e74cb4e7d79453973d747819eef0a0d9ea0420f0ae95dfb1cfc57938b6c32`
+- ranking policy: `25e484a0d5f2c450cd63288160c2ab334e71e398bffc6ccf3c94867614602d88`
+
+이 subsection 작성 시점의 official inference, model output, Gold join은 여전히 0건이다.
+
 ## 3. Candidate / Gold 경계 사전 감사
 
 PRZ-030의 기존 candidate freeze는 다음과 같다.
@@ -57,7 +88,7 @@ relation accuracy/macro F1은 judged pair만 대상으로 하고 judged coverage
 `UNJUDGED`를 `INSUFFICIENT`로 간주하지 않는다.
 
 PRZ-031 combined candidate input SHA-256: `NOT_CREATED / NOT_RUN`.
-instruction/model/output SHA-256: `NOT_CREATED / NOT_RUN`.
+instruction/model SHA-256는 2.1절에 동결했고 output SHA-256은 `NOT_CREATED / NOT_RUN`이다.
 
 독립 사전 audit에서 O10/capture 식, semantic core와 typed-overlap 분리, no-support comparator
 정의가 충분히 명시되지 않은 것을 발견했다. 공식 inference 전 spec을 다음처럼 보강했다.
@@ -100,27 +131,31 @@ instruction/model/output SHA-256: `NOT_CREATED / NOT_RUN`.
 - candidate export, BGE execution, model inference, Gold join: `0`
 - `src/main/**`, migration, dependency/build, frontend, MCP, Docker, `v1.0.0`: 변경 `0`
 
-## 6. 재개 결정
+## 6. 공식 실행 전 상태
 
-현재는 Evidence Selection 통합 Phase로 진행할 수 없다. 별도 승인 아래 exact local
-instruction artifact의 digest/revision/license/size를 고정한 뒤 이 PRZ의 input/code/instruction
-freeze와 단 한 번의 공식 inference부터 재개해야 한다.
+Evidence Selection 통합 Phase로는 아직 진행할 수 없다. 승인된 exact local instruction
+artifact와 instruction/schema/config/policy는 동결됐다. evaluation-only guard/adapter를 현재
+source에서 검증하고 code/contract를 commit한 뒤, ignored local candidate/input을 CREATE_NEW와
+file/canonical SHA-256으로 봉인해야 단 한 번의 공식 inference를 시작할 수 있다.
 
 ## 7. 검증
 
 | 명령/검사 | 실제 결과 |
 |---|---|
-| Ollama `/api/version`, `/api/tags`, `/api/show` model audit | `PASS`; version `0.33.2`, 설치 model 1개, Qwen `404` |
-| focused `searchEvaluation` unit test 3 suites | `PASS`; 17 tests, failure/error/skip 0 |
+| 승인 전 Ollama `/api/version`, `/api/tags`, `/api/show` model audit | `HISTORICAL_RESULT`; version `0.33.2`, 설치 model 1개, Qwen `404` |
+| 승인 후 frozen Qwen local manifest/blob/runtime 재검증 | `PASS`; model/blob/runtime executable SHA·size와 Ollama `0.33.2` 일치, inference 0 |
+| 승인 전 focused `searchEvaluation` unit test 3 suites | `HISTORICAL_RESULT`; 17 tests, failure/error/skip 0 |
+| 현재 PRZ-031 focused `searchEvaluation` 5 suites | `PASS`; 32 tests, failure/error 0, official opt-in 2 skipped |
+| Python runner self-test / compile | `PASS`; payload가 query + sourceText 두 필드뿐임을 포함한 8 checks |
 | `node scripts/evaluation/search-v3/validate-search-v3-benchmark.mjs` | `PASS`; `FRESH_BENCHMARK_SEED_FROZEN`, sealed search false |
 | benchmark validator unit test | `PASS`; 18 tests, failure 0 |
 | `node scripts/verify-oss-readiness.mjs` | `PASS`; Markdown 206, tracked safety 1088, verifier tests 16 |
 | PRZ-031 Registry link/file existence | `PASS` |
 
-Focused Gradle test의 최초 sandbox 실행은 wrapper distribution network 접근이 거부돼
-실패했다. 기존 사용자 Gradle cache 접근을 승인받아 같은 명령을 재실행했고 17 tests가
-통과했다. 전체 backend unit/integration, frontend test, model inference benchmark는 이
-documentation/model-selection-blocker 범위에서 `NOT_RUN`이다.
+현재 focused Gradle test의 최초 sandbox 실행은 wrapper distribution network 접근이 거부돼
+실패했다. 기존 사용자 Gradle cache 접근을 승인받아 같은 명령을 재실행했고 32 tests 중
+공식 opt-in 2건만 의도대로 skip됐다. 전체 backend unit/integration, frontend test와 official
+model inference는 이 pre-inference code-freeze 시점에 `NOT_RUN`이다.
 
 실행한 정확한 명령은 다음과 같다.
 

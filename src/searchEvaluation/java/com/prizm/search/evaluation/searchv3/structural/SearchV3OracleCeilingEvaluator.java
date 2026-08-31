@@ -286,29 +286,91 @@ final class SearchV3OracleCeilingEvaluator {
     }
 
     private List<OracleCandidate> stableOraclePartition(List<OracleCandidate> source) {
+        return stablePartitionPrefix(source, source.size());
+    }
+
+    /**
+     * Applies the frozen Gold relation order to a bounded prefix while preserving the untouched
+     * tail. This is package-private so a real validator can be compared with an addressable
+     * Oracle without redefining PRZ-030 relevance or aspect completeness.
+     */
+    List<OracleCandidate> stablePartitionPrefix(List<OracleCandidate> source, int cutoff) {
+        Objects.requireNonNull(source, "source");
+        if (cutoff < 0 || cutoff > source.size()) {
+            throw new IllegalArgumentException("Oracle prefix cutoff is outside candidate ranking");
+        }
         List<OracleCandidate> result = new ArrayList<>();
         for (OracleRelation relation : OracleRelation.values()) {
-            for (OracleCandidate candidate : source) {
+            for (OracleCandidate candidate : source.subList(0, cutoff)) {
                 if (candidate.relation() == relation) {
                     result.add(new OracleCandidate(
                             candidate.sourceRank(), result.size() + 1, candidate.candidate(), relation));
                 }
             }
         }
-        return List.copyOf(result);
+        for (OracleCandidate candidate : source.subList(cutoff, source.size())) {
+            result.add(new OracleCandidate(
+                    candidate.sourceRank(), result.size() + 1, candidate.candidate(), candidate.relation()));
+        }
+        List<OracleCandidate> immutable = List.copyOf(result);
+        validateParity(source, immutable);
+        return immutable;
+    }
+
+    /** Scores an exact candidate permutation with the existing Gold/aspect-aware metric logic. */
+    ScoredRanking scoreCandidateOrder(
+            QueryGold gold,
+            List<OracleCandidate> canonicalS0,
+            List<String> orderedCandidateIds) {
+        Objects.requireNonNull(gold, "gold");
+        Objects.requireNonNull(canonicalS0, "canonicalS0");
+        Objects.requireNonNull(orderedCandidateIds, "orderedCandidateIds");
+        Map<String, OracleCandidate> byId = canonicalS0.stream().collect(Collectors.toMap(
+                value -> value.candidate().candidateId(),
+                Function.identity(),
+                (left, right) -> {
+                    throw new IllegalArgumentException(
+                            "duplicate canonical candidate: " + left.candidate().candidateId());
+                },
+                LinkedHashMap::new));
+        Set<String> orderedIds = new LinkedHashSet<>(orderedCandidateIds);
+        if (orderedCandidateIds.size() != canonicalS0.size()
+                || orderedIds.size() != orderedCandidateIds.size()
+                || !orderedIds.equals(byId.keySet())) {
+            throw new IllegalArgumentException("scored candidate order must be an exact S0 permutation");
+        }
+        List<OracleCandidate> ranking = new ArrayList<>();
+        for (String candidateId : orderedCandidateIds) {
+            OracleCandidate candidate = byId.get(candidateId);
+            ranking.add(new OracleCandidate(
+                    candidate.sourceRank(),
+                    ranking.size() + 1,
+                    candidate.candidate(),
+                    candidate.relation()));
+        }
+        List<OracleCandidate> immutable = List.copyOf(ranking);
+        validateIdentityParity(canonicalS0, immutable);
+        return new ScoredRanking(
+                immutable,
+                rankingMetrics(immutable, gold),
+                ceilingState(gold, immutable));
+    }
+
+    private void validateIdentityParity(List<OracleCandidate> source, List<OracleCandidate> result) {
+        if (source.size() != result.size()) {
+            throw new IllegalStateException("candidate count parity failed");
+        }
+        Map<String, CandidateProjection> sourceById = source.stream().collect(Collectors.toMap(
+                value -> value.candidate().candidateId(), OracleCandidate::candidate));
+        Map<String, CandidateProjection> resultById = result.stream().collect(Collectors.toMap(
+                value -> value.candidate().candidateId(), OracleCandidate::candidate));
+        if (!sourceById.equals(resultById)) {
+            throw new IllegalStateException("candidate identity/cosine/source parity failed");
+        }
     }
 
     private void validateParity(List<OracleCandidate> s0, List<OracleCandidate> o1) {
-        if (s0.size() != o1.size()) {
-            throw new IllegalStateException("S0/O1 candidate count parity failed");
-        }
-        Map<String, CandidateProjection> s0ById = s0.stream().collect(Collectors.toMap(
-                value -> value.candidate().candidateId(), OracleCandidate::candidate));
-        Map<String, CandidateProjection> o1ById = o1.stream().collect(Collectors.toMap(
-                value -> value.candidate().candidateId(), OracleCandidate::candidate));
-        if (!s0ById.equals(o1ById)) {
-            throw new IllegalStateException("S0/O1 candidate identity/cosine/source parity failed");
-        }
+        validateIdentityParity(s0, o1);
         for (OracleRelation relation : OracleRelation.values()) {
             List<String> s0LocalOrder = s0.stream().filter(value -> value.relation() == relation)
                     .map(value -> value.candidate().candidateId()).toList();
@@ -601,6 +663,18 @@ final class SearchV3OracleCeilingEvaluator {
             boolean top1,
             double mrr,
             double ndcgAt5) {
+    }
+
+    record ScoredRanking(
+            List<OracleCandidate> ranking,
+            RankingMetrics metrics,
+            CeilingState ceilingState) {
+
+        ScoredRanking {
+            ranking = List.copyOf(ranking);
+            Objects.requireNonNull(metrics, "metrics");
+            Objects.requireNonNull(ceilingState, "ceilingState");
+        }
     }
 
     record QueryResult(

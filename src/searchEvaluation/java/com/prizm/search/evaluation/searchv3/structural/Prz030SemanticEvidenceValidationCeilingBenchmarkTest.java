@@ -110,6 +110,35 @@ class Prz030SemanticEvidenceValidationCeilingBenchmarkTest {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
+    /**
+     * Rebuilds the exact Gold-free PRZ-030 candidate inventory for a downstream frozen
+     * evaluation. The historical suites are replayed; only Stress invokes BGE-M3.
+     */
+    GoldFreeCandidateInventory freezeGoldFreeCandidatesForDownstream() {
+        SearchV3SemanticOracleDataset dataset = new SearchV3SemanticOracleDataset();
+        PreRetrievalInventory preRetrieval = preRetrievalInventory(dataset);
+        SearchV3DenseAblationEngine denseEngine = new SearchV3DenseAblationEngine();
+        SearchV3B3CandidateReplay replayLoader = new SearchV3B3CandidateReplay();
+        List<FrozenSuite> frozenSuites = new ArrayList<>();
+        frozenSuites.add(freezeHistorical(
+                Suite.ORIGINAL_SEED, dataset, denseEngine, replayLoader));
+        frozenSuites.add(freezeHistorical(
+                Suite.LONG_FORM_EXPANSION, dataset, denseEngine, replayLoader));
+        frozenSuites.add(freezeHistorical(
+                Suite.INDEPENDENT_ROBUSTNESS, dataset, denseEngine, replayLoader));
+        OllamaBgeM3EmbeddingClient embeddingClient = new OllamaBgeM3EmbeddingClient();
+        OllamaBgeM3EmbeddingClient.ModelMetadata model = embeddingClient.inspectModel();
+        verifyModel(model);
+        frozenSuites.add(freezeStress(
+                preRetrieval.stressRuntime(), denseEngine, embeddingClient, model));
+        if (frozenSuites.size() != 4 || frozenSuites.stream().anyMatch(
+                value -> value.guard().phase() != SearchV3CandidateFreeze.Phase.VERIFIED)) {
+            throw new IllegalStateException("downstream candidate inventory did not freeze exactly four suites");
+        }
+        return new GoldFreeCandidateInventory(
+                List.copyOf(frozenSuites), preRetrieval.inventory(), model);
+    }
+
     @Test
     void computesSemanticOracleCeilingOnlyAfterEveryCandidateSuiteIsFrozen() throws Exception {
         String codeFreeze = System.getProperty(CODE_FREEZE_PROPERTY, "");
@@ -851,6 +880,16 @@ class Prz030SemanticEvidenceValidationCeilingBenchmarkTest {
 
         PreRetrievalInventory {
             stressRuntime = List.copyOf(stressRuntime);
+        }
+    }
+
+    record GoldFreeCandidateInventory(
+            List<FrozenSuite> suites,
+            QueryTrackInventory queryTracks,
+            OllamaBgeM3EmbeddingClient.ModelMetadata model) {
+
+        GoldFreeCandidateInventory {
+            suites = List.copyOf(suites);
         }
     }
 

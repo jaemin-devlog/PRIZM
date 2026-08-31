@@ -11,22 +11,24 @@
    output/phase guard, Top10 partition과 metric을 evaluation-only로 구현한다.
 5. `VERIFY` — code/input/instruction/model freeze 뒤 공식 inference를 한 번 실행하고 output을
    봉인한 다음 Gold를 join한다.
-6. `AUDIT / INTEGRATE` — 실행됐다면 Gate와 운영 비용을 감사한다. 차단된 현재 상태에서는
-   blocker, Production/SEALED/scope와 문서 정합성만 감사하고 local commit을 남긴다.
+6. `AUDIT / INTEGRATE` — Gate와 운영 비용을 감사하고 Production/SEALED/scope와 문서
+   정합성을 확인한 뒤 local commit만 남긴다.
 
 ## 현재 Gate
 
-`ORIENT`, `SPEC`, `MODEL_SELECTION_GATE`까지 수행했다. 설치된 유일한 Ollama model은
-embedding-only `bge-m3`이고, 과거 Qwen tag는 exact identity와 license를 고정할 수 없어
-`BLOCKED_MODEL_SELECTION`이다. 계약에 따라 4~5단계와 공식 inference를 시작하지 않는다.
-6단계는 blocker와 보존 경계 감사로만 제한한다.
+`ORIENT`, `SPEC`, `MODEL_SELECTION_GATE`를 수행했고 최초 `BLOCKED_MODEL_SELECTION` 기록을
+보존했다. 별도 승인 후 official Qwen3-4B GGUF revision/file과 local Ollama blob의 동일
+SHA/size를 확인하여 blocker를 해소했다. model/instruction/schema/config/policy를
+`execution-contract.json`에 고정했으며, 다음 Gate는 evaluation-only code와 Gold-free input을
+commit/hash로 동결하는 것이다. 공식 inference는 아직 `NOT_RUN`이다.
 
-## 재개 조건
+## 공식 실행 조건
 
-- 하나의 local instruction model artifact에 대해 immutable digest/revision, license, size와
-  Korean/English/mixed relation classification capability를 검증한다.
-- 모델 취득·보관이 repository/dependency/Production을 바꾸지 않으며 별도 승인을 받는다.
+- 고정한 Qwen artifact의 local manifest/blob identity를 실행 직전 재검증한다.
 - PRZ-030 Stress 후보는 Gold-bearing report에서 재사용하지 않고 동일 BGE digest로 한 번
   재생성해 기존 canonical freeze SHA와 exact parity를 확인한다.
 - PRZ-031 Gold-free input에 query text, Top20 candidate identities, Top10 cutoff, model,
   instruction/schema/policy hash를 포함해 공식 inference 전에 봉인한다.
+- code/contract는 local commit으로, ignored local candidate/input은 CREATE_NEW와 file/canonical
+  SHA-256으로 고정한 뒤 한 번의 official inference만 허용한다. output을 검증·봉인하기
+  전에는 Gold supplier를 호출하지 않는다.

@@ -17,3 +17,9 @@
 - Typed Stress 제외, SEALED semantic access/search 0
 - Production·migration·dependency·frontend·MCP·Docker·PRZ-029 변경 0
 - 실행하지 않은 검증은 `NOT_RUN`
+
+## 종료 판정
+
+`ORIENT → SPEC → PLAN → IMPLEMENT → VERIFY → AUDIT → INTEGRATE`를 완료했다.
+Oracle 결과는 `BUILD_SEMANTIC_VALIDATOR`; 실제 validator, Sparse, Parent Dense, Production,
+SEALED FINAL은 이 PRZ에서 시작하지 않는다.

@@ -1,6 +1,6 @@
 # PRZ-030 Search V3 Semantic Evidence Validation Ceiling
 
-- 상태: `IN_PROGRESS`
+- 상태: `VERIFIED / BUILD_SEMANTIC_VALIDATOR`
 - 기준 branch: `PRZ-030-semantic-evidence-validation-ceiling`
 - 기준 source: `PRZ-029-evidence-validation-selection@f7e4a7adffd5574526d6c00c76ece9113a68d69f`
 - 선행 계약: `DEPENDS_ON_PRZ_025@5f8229f`, `DEPENDS_ON_PRZ_026_B3@1bbc1d7`,
@@ -112,7 +112,15 @@ SHA-256은 `6eb8db7e2cbbb4c4821e857dc3c72f70526c0014abf99fcc596951588cdd02c4`다
 Retrieval 차단이 있으면 `RETRIEVAL_AUGMENTATION_NEEDED`를 남기되 Sparse나 Parent Dense를
 자동 채택하지 않는다. 그 외에는 둘 다 `DEFER`를 유지한다.
 
-## 6. 보존 경계
+## 6. 판정
+
+동결된 semantic core 79건에서 Direct Recall@20은 `1.0`, retrieval miss bundle은 0이었다.
+S0→O1 user-macro Direct Top1은 `0.8452 → 1.0`(+15.48pp), ranking-recoverable은
+7 query / 7 bundles, judged false-positive risk는 15 query / 13 bundles였다. 세 capability
+clause를 모두 만족해 `BUILD_SEMANTIC_VALIDATOR`로 판정한다. Sparse, retrieval augmentation,
+Parent Dense는 `DEFER`이며 실제 semantic validator와 Production 적용은 `NOT_RUN`이다.
+
+## 7. 보존 경계
 
 허용 범위는 `src/searchEvaluation/**`, PRZ-030 문서, Registry와 ignored
 `local/search-v3-evaluation/prz030/**`다. `src/main/**`, migration, dependency/build, frontend,

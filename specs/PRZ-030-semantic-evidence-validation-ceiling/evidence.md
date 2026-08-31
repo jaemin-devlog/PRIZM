@@ -1,6 +1,6 @@
 # PRZ-030 Evidence
 
-- 상태: `IN_PROGRESS / ORACLE_NOT_RUN`
+- 상태: `VERIFIED / BUILD_SEMANTIC_VALIDATOR`
 - 시작 branch / HEAD: `PRZ-029-evidence-validation-selection@f7e4a7adffd5574526d6c00c76ece9113a68d69f`
 - 현재 branch: `PRZ-030-semantic-evidence-validation-ceiling`
 - `origin/main`: `2c8fd5c0d2f62b154642d703a0970389f8abed8e`
@@ -8,6 +8,7 @@
 - PRZ-026 B3 lifecycle close: `1bbc1d761bd314a17e8f3ed4e2bcceb23a2fc96a`
 - PRZ-028 final: `33c702aa0bff86502f7f70a343b60c59c13eb80f`
 - PRZ-029 final: `f7e4a7adffd5574526d6c00c76ece9113a68d69f`
+- 공식 code freeze: `39d8b3553d5b4c8b33c98297b7969f9296539a5a`
 - 시작 working tree: `CLEAN`
 
 ## 1. 검색 전 coverage audit
@@ -91,8 +92,141 @@ ranking이라는 별도 의미를 유지한다.
 - SEALED FINAL tree: `a129080861d7dafd32a9b3b3357b61aebb237e59`
 - SEALED FINAL combined: `e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383`
 - flags: `opened=false`, `searchExecuted=false`; `CURRENT_FRESH_BASELINE=NOT_RUN`
-- Oracle, Stress B3 retrieval, semantic validator, Sparse, Parent Dense: `NOT_RUN`
+- 시작 시 Oracle, Stress B3 retrieval, semantic validator, Sparse, Parent Dense: `NOT_RUN`
 
 ## 4. 결과
 
-`NOT_RUN`. Stress input freeze와 code freeze 후에만 기록한다.
+### 4.1 공식 실행 경계
+
+- raw report: ignored `local/search-v3-evaluation/prz030/semantic-evidence-validation-ceiling.json`
+- report SHA-256 / bytes:
+  `833160910e2cdc5d8228bd0a59e46cd18b330ffdf7d832c79b688a23d872d5be` / `3,769,137`
+- code freeze: `39d8b3553d5b4c8b33c98297b7969f9296539a5a`; 실행 전후 tracked/untracked tree `CLEAN`
+- model: `bge-m3:latest`, digest
+  `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`, 1024, cosine
+- Stress full/runtime SHA-256:
+  `b541a570eb304970d165ce25e835f15576381d29670c7439bd60c25f3e46f75d` /
+  `c20d42920ee4cc509981de5e50dd70cfa6f5ebf9a5c3fdfad229c1ae546528af`
+- Stress Git tree: `f6236d6a2f86072687b040d15fc8c4046df1a66d`; 입력은 BGE 실행 전에
+  `INPUT_FROZEN`
+- Original/Long-form/Robustness는 동결 B3 exact replay(model call 0), Stress만 동일 BGE-M3
+  candidate export를 실행했다. 네 candidate freeze가 모두 `VERIFIED`가 된 뒤 Gold를 열었다.
+- 독립 raw audit: 93 query / 93 unique ID, S0/O1 candidate-set·stable-order parity error 0
+- query track: semantic core 79 / typed-overlap diagnostic 14; inventory SHA-256 `6eb8db7e...`
+
+| candidate freeze | query / candidates | canonical SHA-256 |
+| --- | ---: | --- |
+| Original | 21 / 63 | `fe69d2cbbc3d679b49e449d5d2b7a4c7387069d3d0b29b43df8772dc76be6d79` |
+| Long-form | 24 / 288 | `0935f6eeaad188005011d25374f012b66e843f34b7653a1ec981645a4e182570` |
+| Robustness | 24 / 200 | `20346aea334c7cb662dd459b7ca5b8e44a3a4dffa4382006f892c0c99fd0fba9` |
+| Semantic Stress | 24 / 200 | `ee3142abfe2097799f03998cb6b7acfd35ebc0c70a58618c43c33cd8ab709da8` |
+
+### 4.2 Semantic core aggregate
+
+Answerability는 `SUPPORTED 47 / PARTIALLY_SUPPORTED 10 / NOT_SUPPORTED 22`이며,
+DIRECT-positive는 supported+partial 57건이다.
+
+| metric | S0 B3 Dense | O1 Gold Oracle | 변화 |
+| --- | ---: | ---: | ---: |
+| Direct Recall@5 | 1.0000 | 1.0000 | 0 |
+| Direct Recall@20 | 1.0000 | 1.0000 | 0 |
+| Direct Top1 | 0.8772 | 1.0000 | +12.28pp |
+| Direct MRR | 0.9313 | 1.0000 | +0.0687 |
+| judged nDCG@5 lower bound | 0.9063 | 0.9620 | +0.0557 |
+
+Direct Recall은 required aspect/group completeness, Top1/MRR은 첫 DIRECT Evidence의 순위다.
+O1 nDCG가 1이 아닌 이유는 explicit positive-gain judgment가 없는 NO_SUPPORT 3건을 0으로
+보존했기 때문이다. query ceiling state는 `FOUND 47 / PARTIAL 10 / NONE 22`, 정합
+`79/79`다.
+
+```text
+DIRECT-positive 57
+ALREADY_CORRECT       50
+RANKING_RECOVERABLE    7
+RETRIEVAL_MISS          0
+
+DIRECT 없는 22
+FALSE_POSITIVE_RISK    15
+NO_SUPPORT              7
+PARTIAL_ONLY            0
+```
+
+Recoverable 7건은 7개 bundle에 분포하며 DIRECT의 기존 rank는 2/2/4/2/2/3/2였다.
+typed-overlap 14건은 별도 diagnostic이고 Gate weight는 0이다.
+
+### 4.3 Suite와 user-macro
+
+| suite | semantic q / positive | S0→O1 Top1 | S0→O1 MRR | recoverable / miss |
+| --- | ---: | ---: | ---: | ---: |
+| Original | 14 / 8 | .8750→1 | .9375→1 | 1 / 0 |
+| Long-form | 18 / 10 | .7000→1 | .8250→1 | 3 / 0 |
+| Robustness | 23 / 23 | 1→1 | 1→1 | 0 / 0 |
+| Semantic Stress | 24 / 16 | .8125→1 | .8958→1 | 3 / 0 |
+
+DIRECT-positive user 16명 기준 user-macro Top1은 `.8452 → 1.0`(+15.48pp), MRR은
+`.9053 → 1.0`(+0.0947)이다.
+
+### 4.4 Profession / language slice
+
+모든 slice의 Direct Recall@20은 1.0이고 신규 regression은 없다. 작은 DEV/CAL slice이므로
+release-grade 일반화 결과로 해석하지 않는다.
+
+| profession | q / positive | S0→O1 Top1 | S0→O1 MRR |
+| --- | ---: | ---: | ---: |
+| BACKEND | 2 / 1 | 1→1 | 1→1 |
+| FRONTEND_MOBILE | 23 / 19 | .9474→1 | .9737→1 |
+| DATA_AI_INFRA | 15 / 11 | .8182→1 | .8939→1 |
+| DESIGN_PRODUCT | 15 / 11 | .8182→1 | .9091→1 |
+| PLANNING | 2 / 1 | 1→1 | 1→1 |
+| MARKETING_SALES | 11 / 7 | .7143→1 | .8214→1 |
+| NON_DEVELOPMENT_GENERAL | 11 / 7 | 1→1 | 1→1 |
+
+| language | q / positive | S0→O1 Top1 | S0→O1 MRR |
+| --- | ---: | ---: | ---: |
+| KO | 25 / 22 | .9545→1 | .9773→1 |
+| EN | 38 / 28 | .8929→1 | .9464→1 |
+| KO_EN_MIXED | 16 / 7 | .5714→1 | .7262→1 |
+
+### 4.5 Semantic focus와 no-support ceiling
+
+| slice | q / positive | S0→O1 Top1 | S0→O1 MRR | recoverable / FP risk |
+| --- | ---: | ---: | ---: | ---: |
+| other actor | 13 / 8 | .6250→1 | .7917→1 | 3 / 2 |
+| completion | 30 / 20 | .9000→1 | .9375→1 | 2 / 9 |
+| abstract | 28 / 24 | .8750→1 | .9375→1 | 3 / 1 |
+| paraphrase | 45 / 39 | .8718→1 | .9316→1 | 5 / 3 |
+| negation | 15 / 0 | 0→0 | 0→0 | 0 / 11 |
+
+negation slice는 DIRECT-positive가 없어 positive ranking 근거가 아니라 NOT_SUPPORTED state와
+false-positive-risk 근거다. NOT_SUPPORTED 22건 중 명시적으로 judged된 rank-1
+RELATED/CONTRADICTS 15건(13 bundles)을 완벽한 validator가 `NONE`으로 판정할 수 있다.
+이는 expectedEvidence 밖 candidate를 추정하지 않은 lower bound이며 실제 validator 성능이 아니다.
+
+### 4.6 Gate와 아키텍처 판정
+
+- retrieval blocker: Direct Recall@20 `1.0`, retrieval miss bundle `0` → 없음
+- user-macro Top1 Gate: `+15.48pp` ≥ `+5pp` → PASS
+- recoverable Gate: `7 bundles` ≥ `3` → PASS
+- false-positive-risk Gate: `15 query / 13 bundles` ≥ `2 / 2` → PASS
+- 최종: `BUILD_SEMANTIC_VALIDATOR`
+- retrieval augmentation / Sparse: `DEFER`
+- Parent Dense: `DEFER`
+
+판정은 실제 validator가 성공했다는 뜻이 아니다. 동일 B3 후보를 유지한 evaluation-only 실제
+semantic validator ablation을 다음 별도 Phase에서 검증할 가치가 있다는 뜻이다.
+
+### 4.7 SEALED / Production / 검증
+
+- SEALED FINAL tree: `a129080861d7dafd32a9b3b3357b61aebb237e59`
+- SEALED combined: `e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383`
+- `opened=false`, `searchExecuted=false`, `mutable=false`
+- `CURRENT_FRESH_BASELINE=NOT_RUN`
+- Production, migration, dependency/build, frontend, MCP, Docker, `v1.0.0`: 변경 0
+- 공식 runner: `PASS 1 / FAIL 0`; raw SHA 출력과 `BUILD_SEMANTIC_VALIDATOR` 판정 확인
+- PRZ-030 강제 focused: `PASS 36 / SKIPPED 1 / FAIL 0`; skip은 opt-in 공식 runner
+- independent raw candidate parity: `93 query / error 0`
+- `node scripts/verify-oss-readiness.mjs`: PASS; Markdown 202 / local link 770,
+  tracked safety 1084, SBOM 및 verifier test 16 PASS, external link 97 OK
+- `git diff --check`: PASS
+- 전체 backend unit/integration, frontend app test/build: `NOT_RUN` (evaluation-only scope)
+- push / PR / merge / 실제 semantic validator: `NOT_RUN`

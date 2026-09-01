@@ -1,11 +1,11 @@
 # PRZ-032 Minimal Search V3 Shadow Comparison
 
-- 상태: `IN_PROGRESS / OFFICIAL_COMPARISON_NOT_RUN`
+- 상태: `VERIFIED / MIXED_NEEDS_NEXT_CAPABILITY`
 - 기준 branch: `PRZ-032-minimal-v3-shadow-comparison`
 - 기준 source: `PRZ-031-semantic-evidence-directness@a68e95a8b1adb9915fc6359cc6687e9d55068b45`
 - 선행 계약: `DEPENDS_ON_PRZ_025@5f8229f`, `DEPENDS_ON_PRZ_026_B3@a7dbb12`,
   `DEPENDS_ON_PRZ_028@33c702a`, `DEPENDS_ON_PRZ_029@f7e4a7a`
-- Production 적용: `NOT_RUN`
+- Production 적용: `NO_CHANGE`
 
 ## 1. 목적과 비교 구성
 
@@ -87,6 +87,12 @@ advantage는 직교 diagnostic flag로 둔다.
 
 이번 판정은 Production cutover가 아니다. 결과가 mixed면 관찰된 가장 큰 병목 하나만 다음
 Phase 후보로 제안하며 Sparse 등 특정 해법을 자동 선택하지 않는다.
+
+공식 1회 비교 결과 candidate Direct Recall@5/20은 두 경로 모두 `1.0000`이었다. V3는
+근거 경계·localization과 Typed Stress에서 개선됐지만, user-macro final Top1은
+`0.6957 → 0.5880`으로 회귀했다. 따라서 판정은 `MIXED_NEEDS_NEXT_CAPABILITY`다. 다음 병목은
+새 retrieval이 아니라 B3 RetrievalPassage 안에서 질문에 직접 답하는 atomic EvidenceChild를
+최종 1위로 선택하는 단계다. Semantic no-answer는 계속 `UNASSESSED`다.
 
 ## 7. 보존 범위
 

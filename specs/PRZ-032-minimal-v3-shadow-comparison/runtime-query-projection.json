@@ -1,0 +1,1255 @@
+{
+  "artifactType": "PRZ032_GOLD_FREE_RUNTIME_QUERY_PROJECTION",
+  "schemaVersion": 1,
+  "status": "INPUT_FROZEN",
+  "projectionPolicy": "Exact projection of query identity/text/language and typed applicability; no Gold fields.",
+  "counts": {
+    "queries": 117,
+    "dev": 61,
+    "calibration": 56
+  },
+  "sources": [
+    {
+      "suite": "ORIGINAL",
+      "split": "DEV",
+      "path": "src/test/resources/search-v3-evaluation/dev/questions.json",
+      "bytes": 21832,
+      "sha256": "ce2315fcc4d8fc918697f6c5bcf593061efae65fe88d8981d3b414259e7dc654"
+    },
+    {
+      "suite": "ORIGINAL",
+      "split": "CALIBRATION",
+      "path": "src/test/resources/search-v3-evaluation/calibration/questions.json",
+      "bytes": 13030,
+      "sha256": "57d2caaa22e371503e726bb7f4b0473552b0c788baab27c0f3a7c02e8a04622c"
+    },
+    {
+      "suite": "LONG_FORM",
+      "split": "DEV",
+      "path": "src/searchEvaluation/resources/search-v3-evaluation/devcal-1.1.0/dev/questions.json",
+      "bytes": 17475,
+      "sha256": "31425bb2c1ede2dd235f3e334471d97121ed74cc468f07b99a8dc7ad40899621"
+    },
+    {
+      "suite": "LONG_FORM",
+      "split": "CALIBRATION",
+      "path": "src/searchEvaluation/resources/search-v3-evaluation/devcal-1.1.0/calibration/questions.json",
+      "bytes": 16669,
+      "sha256": "94d9806f913b7611cc0082322263de0809c5945259a623bcd20934362fb647ac"
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "split": "DEV",
+      "path": "src/searchEvaluation/resources/search-v3-evaluation/devcal-robustness-1.0.0/dev/questions.json",
+      "bytes": 17362,
+      "sha256": "1139e49ce2a4be8553b11badee1217af3ab2380748f08d8f237de85d611cad83"
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "split": "CALIBRATION",
+      "path": "src/searchEvaluation/resources/search-v3-evaluation/devcal-robustness-1.0.0/calibration/questions.json",
+      "bytes": 17335,
+      "sha256": "8205d19a68702c35e3cc1f9f2967cdbe48959e5cb695265ed5aef22b3ecf7ee5"
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "split": "DEV",
+      "path": "src/searchEvaluation/resources/search-v3-evaluation/typed-constraints-stress-1.1.0/dev/questions.json",
+      "bytes": 19341,
+      "sha256": "eac28d2f760966b628b28497d69ef3666e63ae360e2279e138f2a8e191518166"
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "split": "CALIBRATION",
+      "path": "src/searchEvaluation/resources/search-v3-evaluation/typed-constraints-stress-1.1.0/calibration/questions.json",
+      "bytes": 18965,
+      "sha256": "33a92ff84da81b265c1a39da8347159862727feb21e335a328a0dfe79831a526"
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "split": "DEV",
+      "path": "src/searchEvaluation/resources/search-v3-evaluation/semantic-support-stress-1.0.1/dev/runtime-questions.json",
+      "bytes": 2598,
+      "sha256": "c78ac6083306cbd28701b9fea4e413ba9a27c5e7220d22c2c7bbe5562abbdf4d"
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "split": "CALIBRATION",
+      "path": "src/searchEvaluation/resources/search-v3-evaluation/semantic-support-stress-1.0.1/calibration/runtime-questions.json",
+      "bytes": 2549,
+      "sha256": "510d0c7e696177ddace6771b648335e62be72cbed669df6078151c2d5bbdd81b"
+    }
+  ],
+  "queries": [
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-U01-Q01",
+      "userBundleId": "SV3-U01",
+      "query": "PAY GW 운영 경험이 있나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-U01-Q02",
+      "userBundleId": "SV3-U01",
+      "query": "하루 1,000건 이상 요청을 처리한 경험이 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-U01-Q03",
+      "userBundleId": "SV3-U01",
+      "query": "Kafka를 운영 환경에 도입했나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-U01-Q04",
+      "userBundleId": "SV3-U01",
+      "query": "장애가 반복되지 않도록 어떤 체계를 만들었나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-U01-Q05",
+      "userBundleId": "SV3-U01",
+      "query": "DormantQueue 운영 경험이 있나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-U04-Q01",
+      "userBundleId": "SV3-U04",
+      "query": "사용자 문제를 발견하고 디자인 결정으로 연결한 근거는?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-U04-Q02",
+      "userBundleId": "SV3-U04",
+      "query": "본인이 A/B 테스트를 수행했나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-U04-Q03",
+      "userBundleId": "SV3-U04",
+      "query": "본인이 사용자 인터뷰와 A/B 테스트를 모두 했나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-U04-Q04",
+      "userBundleId": "SV3-U04",
+      "query": "재설계가 실제 사용성 결과로 이어졌나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-U06-Q01",
+      "userBundleId": "SV3-U06",
+      "query": "Did the campaign generate at least 1,000 qualified leads?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-U06-Q02",
+      "userBundleId": "SV3-U06",
+      "query": "Did the campaign acquire 1,000 paid customers?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-U06-Q03",
+      "userBundleId": "SV3-U06",
+      "query": "Did this person close 40 enterprise accounts?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-U06-Q04",
+      "userBundleId": "SV3-U06",
+      "query": "email/webinar campaign과 CRM 운영 경험을 모두 보여 주세요.",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U02-Q01",
+      "userBundleId": "SV3-U02",
+      "query": "Did the candidate ship WCAG 2.1 AA improvements?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U02-Q02",
+      "userBundleId": "SV3-U02",
+      "query": "What evidence shows the account flow became more accessible?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U02-Q03",
+      "userBundleId": "SV3-U02",
+      "query": "Was voice navigation released to production?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U02-Q04",
+      "userBundleId": "SV3-U02",
+      "query": "Show accessibilty work for screen reader users.",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U03-Q01",
+      "userBundleId": "SV3-U03",
+      "query": "2023년 3월부터 2024년 2월까지 pipeline을 운영했나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U03-Q02",
+      "userBundleId": "SV3-U03",
+      "query": "월 200만 records 이상을 검증한 경험이 있나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U03-Q03",
+      "userBundleId": "SV3-U03",
+      "query": "운영 pipeline과 Kubernetes 교육을 모두 갖췄나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ORIGINAL",
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U03-Q04",
+      "userBundleId": "SV3-U03",
+      "query": "추천 모델을 production에 배포했나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-LF-U101-Q01",
+      "userBundleId": "SV3-LF-U101",
+      "query": "현장 관찰을 사용자 흐름 문제로 구조화한 근거가 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-LF-U101-Q02",
+      "userBundleId": "SV3-LF-U101",
+      "query": "예약 변경 과업 완료율을 80% 이상으로 개선했나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-LF-U101-Q03",
+      "userBundleId": "SV3-LF-U101",
+      "query": "본인이 광고 문구 A/B 테스트를 직접 수행했나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-LF-U101-Q04",
+      "userBundleId": "SV3-LF-U101",
+      "query": "접근성 연구를 이미 production에 적용해 완료했나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-LF-U102-Q01",
+      "userBundleId": "SV3-LF-U102",
+      "query": "Did the candidate validate at least two million records each day in production?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-LF-U102-Q02",
+      "userBundleId": "SV3-LF-U102",
+      "query": "Was the recommendation model serving live customers in production?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-LF-U102-Q03",
+      "userBundleId": "SV3-LF-U102",
+      "query": "What evidence shows preventive ownership after a data incident?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-LF-U102-Q04",
+      "userBundleId": "SV3-LF-U102",
+      "query": "Show both high-volume pipeline operation and a concrete prevention process.",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-LF-U103-Q01",
+      "userBundleId": "SV3-LF-U103",
+      "query": "Did the bilingual campaign produce at least 800 qualified leads?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-LF-U103-Q02",
+      "userBundleId": "SV3-LF-U103",
+      "query": "5개 지역에서 CRM stage 기준을 실제 운영으로 전환했나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-LF-U103-Q03",
+      "userBundleId": "SV3-LF-U103",
+      "query": "Did this person personally close 32 enterprise accounts?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-LF-U103-Q04",
+      "userBundleId": "SV3-LF-U103",
+      "query": "webinar campaign과 geo budget experiment를 모두 이미 실행했나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-LF-U104-Q01",
+      "userBundleId": "SV3-LF-U104",
+      "query": "What evidence shows resilient mobile checkout under unreliable connectivity?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-LF-U104-Q02",
+      "userBundleId": "SV3-LF-U104",
+      "query": "Were verified accessibility findings reduced to five or fewer?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-LF-U104-Q03",
+      "userBundleId": "SV3-LF-U104",
+      "query": "Was voice navigation released to production on mobile?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-LF-U104-Q04",
+      "userBundleId": "SV3-LF-U104",
+      "query": "Show both shipped offline reliability and completed accessibility remediation.",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-LF-U105-Q01",
+      "userBundleId": "SV3-LF-U105",
+      "query": "문의 표본 400건 이상을 검토해 실제 정책에 반영했나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-LF-U105-Q02",
+      "userBundleId": "SV3-LF-U105",
+      "query": "여러 부서의 판단 차이를 구조화해 우선순위를 조정한 경험이 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-LF-U105-Q03",
+      "userBundleId": "SV3-LF-U105",
+      "query": "해외 법인 연계 운영을 이미 production으로 전환했나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-LF-U105-Q04",
+      "userBundleId": "SV3-LF-U105",
+      "query": "본인이 전사 교육 12회를 직접 진행했나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-LF-U106-Q01",
+      "userBundleId": "SV3-LF-U106",
+      "query": "여러 현장의 인수인계 누락을 20% 이상 줄인 경험이 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-LF-U106-Q02",
+      "userBundleId": "SV3-LF-U106",
+      "query": "Did the candidate complete emergency response training?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-LF-U106-Q03",
+      "userBundleId": "SV3-LF-U106",
+      "query": "지게차 운전 자격증을 보유하고 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "LONG_FORM",
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-LF-U106-Q04",
+      "userBundleId": "SV3-LF-U106",
+      "query": "Did this person develop the warehouse barcode routing software?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "DEV",
+      "queryId": "SV3-RB-U201-Q01",
+      "userBundleId": "SV3-RB-U201",
+      "query": "연결이 불안정한 현장 앱에서 기록 중복을 줄이고 실제 배포한 근거가 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "DEV",
+      "queryId": "SV3-RB-U201-Q02",
+      "userBundleId": "SV3-RB-U201",
+      "query": "보조 기술만으로 핵심 점검 과업을 끝낼 수 있게 검증한 경험이 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "DEV",
+      "queryId": "SV3-RB-U201-Q03",
+      "userBundleId": "SV3-RB-U201",
+      "query": "대규모 모바일 목록의 첫 화면 지연을 절반 이하로 줄였다는 근거를 보여 주세요.",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "DEV",
+      "queryId": "SV3-RB-U201-Q04",
+      "userBundleId": "SV3-RB-U201",
+      "query": "위험 신호를 근거로 모바일 배포를 중단하고 복구한 운영 경험이 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "DEV",
+      "queryId": "SV3-RB-U202-Q01",
+      "userBundleId": "SV3-RB-U202",
+      "query": "What evidence shows the candidate converted field observation into a cross-channel recovery model?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "DEV",
+      "queryId": "SV3-RB-U202-Q02",
+      "userBundleId": "SV3-RB-U202",
+      "query": "Did a tested design improve appointment completion to at least eighty percent before approval?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "DEV",
+      "queryId": "SV3-RB-U202-Q03",
+      "userBundleId": "SV3-RB-U202",
+      "query": "Is there evidence of aligning several departments around a single operational escalation rule?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "DEV",
+      "queryId": "SV3-RB-U202-Q04",
+      "userBundleId": "SV3-RB-U202",
+      "query": "Was the redesigned recovery service launched across multiple offices with a sustained reduction in repeat contacts?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "DEV",
+      "queryId": "SV3-RB-U203-Q01",
+      "userBundleId": "SV3-RB-U203",
+      "query": "How did the candidate prevent incompatible event schemas from reaching production consumers?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "DEV",
+      "queryId": "SV3-RB-U203-Q02",
+      "userBundleId": "SV3-RB-U203",
+      "query": "대규모 배치 지연 뒤 안전한 지점부터 데이터를 검증하며 복구한 근거가 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "DEV",
+      "queryId": "SV3-RB-U203-Q03",
+      "userBundleId": "SV3-RB-U203",
+      "query": "Was automatic model promotion stopped when segment-level drift crossed the monitoring boundary?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "DEV",
+      "queryId": "SV3-RB-U203-Q04",
+      "userBundleId": "SV3-RB-U203",
+      "query": "반복 데이터 사고를 분류해 예방 조치를 끝까지 완료한 경험이 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-RB-U204-Q01",
+      "userBundleId": "SV3-RB-U204",
+      "query": "What evidence shows that interrupted web applications could resume without losing submitted work?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-RB-U204-Q02",
+      "userBundleId": "SV3-RB-U204",
+      "query": "Was bidirectional layout support released and verified across the shared component library?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-RB-U204-Q03",
+      "userBundleId": "SV3-RB-U204",
+      "query": "Did the candidate bring typical checkout interaction latency below two hundred milliseconds?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-RB-U204-Q04",
+      "userBundleId": "SV3-RB-U204",
+      "query": "Is there evidence of limiting a frontend incident to one locale while keeping other regions available?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-RB-U205-Q01",
+      "userBundleId": "SV3-RB-U205",
+      "query": "공동 파트너 캠페인으로 천 건 이상의 유효 상담 요청을 만든 근거가 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-RB-U205-Q02",
+      "userBundleId": "SV3-RB-U205",
+      "query": "여러 지역의 실제 고객 언어를 근거로 마케팅 메시지를 표준화했나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-RB-U205-Q03",
+      "userBundleId": "SV3-RB-U205",
+      "query": "실험 결과를 근거로 낮은 성과 채널의 예산을 실제 재배치한 경험이 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-RB-U205-Q04",
+      "userBundleId": "SV3-RB-U205",
+      "query": "영업 인계에 필요한 맥락 누락을 10% 아래로 낮춘 근거가 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-RB-U206-Q01",
+      "userBundleId": "SV3-RB-U206",
+      "query": "실제 상황 연습과 관찰을 포함해 수십 명의 진행자를 준비시킨 근거가 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-RB-U206-Q02",
+      "userBundleId": "SV3-RB-U206",
+      "query": "Did the revised class follow-up process reduce missed attendance while retaining schedule-change cases?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-RB-U206-Q03",
+      "userBundleId": "SV3-RB-U206",
+      "query": "여러 교육장에서 보호 우려를 같은 절차로 기록하고 담당자에게 인계했나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "ROBUSTNESS",
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-RB-U206-Q04",
+      "userBundleId": "SV3-RB-U206",
+      "query": "What evidence shows that accountable transfers sharply reduced missing learning kits?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-U41-Q01",
+      "userBundleId": "SV3-U41",
+      "query": "파손 소포 보상 요청을 600건 이상 종결한 경험이 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-U41-Q02",
+      "userBundleId": "SV3-U41",
+      "query": "파손 소포 보상 요청을 정확히 680건 종결한 기간이 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-U41-Q03",
+      "userBundleId": "SV3-U41",
+      "query": "파손 소포 보상 요청을 420건 이하 종결한 기간이 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-U41-Q04",
+      "userBundleId": "SV3-U41",
+      "query": "파손 소포 보상 요청을 700건 초과 종결한 기간이 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-U42-Q01",
+      "userBundleId": "SV3-U42",
+      "query": "Did the permanent exhibit decrease the wayfinding error rate by at least 38%?",
+      "language": "EN",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-U42-Q02",
+      "userBundleId": "SV3-U42",
+      "query": "Did any installation increase the wayfinding error rate by more than 30%?",
+      "language": "EN",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-U42-Q03",
+      "userBundleId": "SV3-U42",
+      "query": "Did the primary gallery redesign last between 9 and 11 months?",
+      "language": "EN",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-U42-Q04",
+      "userBundleId": "SV3-U42",
+      "query": "Did the portfolio document a 38% decrease in fabrication scrap?",
+      "language": "EN",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-U43-Q01",
+      "userBundleId": "SV3-U43",
+      "query": "permit review 시작일이 2026-01-31 이후였나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-U43-Q02",
+      "userBundleId": "SV3-U43",
+      "query": "permit review 시작일이 2025-01-01 이전이었나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-U43-Q03",
+      "userBundleId": "SV3-U43",
+      "query": "승인된 운영 명세가 TransitForm 4.2를 요구했나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "DEV",
+      "queryId": "SV3-U43-Q04",
+      "userBundleId": "SV3-U43",
+      "query": "승인된 운영 명세가 TransitForm 4.5를 요구했나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U44-Q01",
+      "userBundleId": "SV3-U44",
+      "query": "Did the membership cycle record at least 1,800 member renewals?",
+      "language": "EN",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U44-Q02",
+      "userBundleId": "SV3-U44",
+      "query": "Did the cycle record exactly 1,850 member renewals?",
+      "language": "EN",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U44-Q03",
+      "userBundleId": "SV3-U44",
+      "query": "Was there a cycle with no more than 1,240 member renewals?",
+      "language": "EN",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U44-Q04",
+      "userBundleId": "SV3-U44",
+      "query": "Did a cycle exceed 2,000 member renewals?",
+      "language": "EN",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U45-Q01",
+      "userBundleId": "SV3-U45",
+      "query": "냉각 에너지 사용량을 27% 이상 감소시킨 사례가 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U45-Q02",
+      "userBundleId": "SV3-U45",
+      "query": "냉각 에너지 사용량이 20% 초과 증가한 사례가 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U45-Q03",
+      "userBundleId": "SV3-U45",
+      "query": "냉각 최적화 검증을 15~20개월 동안 진행했나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U45-Q04",
+      "userBundleId": "SV3-U45",
+      "query": "냉각수 누수율을 27% 감소시킨 기록이 있나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U46-Q01",
+      "userBundleId": "SV3-U46",
+      "query": "production kiosk client가 KioskLink 8.4를 사용하나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U46-Q02",
+      "userBundleId": "SV3-U46",
+      "query": "production kiosk client가 KioskLink 8.7을 사용하나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U46-Q03",
+      "userBundleId": "SV3-U46",
+      "query": "maintenance window 시작일이 2026-06-30 이후였나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "TYPED_STRESS",
+      "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+      "split": "CALIBRATION",
+      "queryId": "SV3-U46-Q04",
+      "userBundleId": "SV3-U46",
+      "query": "maintenance window 시작일이 2025-01-01 이전이었나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": true
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-SS-U201-Q01",
+      "userBundleId": "SV3-RB-U201",
+      "query": "연결이 끊겨도 점검 기록의 무결성을 지키는 기능을 실제 현장 앱에 배포했나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-SS-U201-Q02",
+      "userBundleId": "SV3-RB-U201",
+      "query": "연결 중단 뒤 기록 무결성 보호 기능을 현장 앱에 배포했고, 성능 측정 기준도 기기 공급업체 표준으로 확장했나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-SS-U201-Q03",
+      "userBundleId": "SV3-RB-U201",
+      "query": "위험 신호가 있었지만 전체 롤아웃을 중단하지 않았나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-SS-U201-Q04",
+      "userBundleId": "SV3-RB-U201",
+      "query": "스크린 리더만으로 핵심 점검 과업을 끝낼 수 있도록 검증했나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-SS-U202-Q01",
+      "userBundleId": "SV3-RB-U202",
+      "query": "Did the candidate turn observed handoff failures into a shared recovery model?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-SS-U202-Q02",
+      "userBundleId": "SV3-RB-U202",
+      "query": "Did the candidate create the shared recovery model, and did the service owner personally run all sixteen prototype sessions?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-SS-U202-Q03",
+      "userBundleId": "SV3-RB-U202",
+      "query": "Were ownership conflicts left unresolved after the decision sessions?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-SS-U202-Q04",
+      "userBundleId": "SV3-RB-U202",
+      "query": "Did the candidate create a shared recovery model, and was it proven to generalize to every office nationwide?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-SS-U203-Q01",
+      "userBundleId": "SV3-RB-U203",
+      "query": "production에 incompatible schema 변경이 들어가지 않도록 어떤 검증 절차를 운영했나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-SS-U203-Q02",
+      "userBundleId": "SV3-RB-U203",
+      "query": "incompatible schema 차단 절차를 운영했고, model owner가 segment drift monitor도 직접 설계·배포했나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-SS-U203-Q03",
+      "userBundleId": "SV3-RB-U203",
+      "query": "배치 복구 뒤 duplicate key와 missing partition 검사를 하지 않았나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "DEV",
+      "queryId": "SV3-SS-U203-Q04",
+      "userBundleId": "SV3-RB-U203",
+      "query": "preventive action에는 owner와 due date만 붙였고 실제로 complete하지 않았나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-SS-U204-Q01",
+      "userBundleId": "SV3-RB-U204",
+      "query": "Was a resumable form actually shipped and shown to recover interrupted submissions?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-SS-U204-Q02",
+      "userBundleId": "SV3-RB-U204",
+      "query": "Was the resumable form shipped, and which of the thirty-four right-to-left component changes did the candidate personally implement?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-SS-U204-Q03",
+      "userBundleId": "SV3-RB-U204",
+      "query": "Did incident response require a global rollback that interrupted every region?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-SS-U204-Q04",
+      "userBundleId": "SV3-RB-U204",
+      "query": "Did the team release right-to-left support across all thirty-four shared components?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-SS-U205-Q01",
+      "userBundleId": "SV3-RB-U205",
+      "query": "지역 고객 인터뷰와 검색 표현을 근거로 공통 메시지 체계를 운영했나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-SS-U205-Q02",
+      "userBundleId": "SV3-RB-U205",
+      "query": "고객 인터뷰 기반 공통 메시지 체계를 운영했고, 예산 재배분 효과도 다음 분기까지 그대로 유지됐나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-SS-U205-Q03",
+      "userBundleId": "SV3-RB-U205",
+      "query": "검증된 상담 요청 수에 중복 계정과 내부 테스트를 포함했나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-SS-U205-Q04",
+      "userBundleId": "SV3-RB-U205",
+      "query": "공통 메시지 체계를 운영했고, 영업 담당자가 누락률 개선 방식도 직접 설계했나요?",
+      "language": "KO",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-SS-U206-Q01",
+      "userBundleId": "SV3-RB-U206",
+      "query": "역할 연습과 follow-up coaching까지 포함한 facilitator onboarding을 완료했나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-SS-U206-Q02",
+      "userBundleId": "SV3-RB-U206",
+      "query": "Was facilitator onboarding completed, and did partner organizations help design the learning-kit transfer process?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-SS-U206-Q03",
+      "userBundleId": "SV3-RB-U206",
+      "query": "Did the attendance redesign exclude learners who needed schedule changes?",
+      "language": "EN",
+      "typedApplicabilityVerified": false
+    },
+    {
+      "suite": "SEMANTIC_STRESS",
+      "datasetVersion": "semantic-support-stress-1.0.1",
+      "split": "CALIBRATION",
+      "queryId": "SV3-SS-U206-Q04",
+      "userBundleId": "SV3-RB-U206",
+      "query": "safeguarding escalation card가 한 교육장에만 prototype으로 남았나요?",
+      "language": "KO_EN_MIXED",
+      "typedApplicabilityVerified": false
+    }
+  ]
+}

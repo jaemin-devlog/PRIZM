@@ -15,7 +15,7 @@
 - [x] code/input/model freeze와 official comparison 1회
 - [x] output SHA 검증 뒤 Gold join 및 aggregate evidence 기록
 - [x] Production/SEALED/diff/OSS audit
-- [ ] local commit과 PRZ-032 branch push-only backup
+- [x] local commit과 PRZ-032 branch push-only backup
 
 `CURRENT_FRESH_BASELINE=NOT_RUN`은 SEALED FINAL에서 유지한다. official DEV/CAL shadow가
 완료돼도 SEALED FINAL baseline 실행으로 재라벨링하지 않는다.

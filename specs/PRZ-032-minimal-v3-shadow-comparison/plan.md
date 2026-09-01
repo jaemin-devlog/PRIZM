@@ -14,7 +14,7 @@
    push한다. PR과 main merge는 하지 않는다.
 
 공식 비교는 실행 계약 HEAD `6b7cfab`에서 한 번 완료했다. 결과는
-`MIXED_NEEDS_NEXT_CAPABILITY`이며, 현재 단계에는 문서 감사·commit·push-only backup만 남는다.
+`MIXED_NEEDS_NEXT_CAPABILITY`이며, 문서 감사·local commit·push-only backup까지 완료했다.
 
 ## 공식 실행 Gate
 

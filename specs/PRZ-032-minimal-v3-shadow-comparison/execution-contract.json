@@ -6,7 +6,7 @@
   "v2SourceSha256": "2e5a1f1ae34cc177e8c867ac9625076cf56a7c8ac4568e3844143afa2431c122",
   "v3SourceSha256": "65f301b96bb243b5f9393926a3a502adaa054a0aa7716d7f4fc48f4b6ab2cdad",
   "comparisonPolicySha256": "d4ad1d95997cebd9f4e6105df6fa42ecf671a116f22b178d89507a32d64e1060",
-  "inputCanonicalSha256": "47a2356bde46cd80204466a5f419b3fcbb6233d31f59d64a5792b5f9a27807db",
+  "inputCanonicalSha256": "166a8aef77f59d322216d5b1b77cb872d0c18a6e78cfbab07757f281441e83cf",
   "goldSchemaSha256": "186bed560c9a84b699c05640ff1393a5048ecec4b0a6ed366c0ae59f58254084",
   "model": {
     "name": "bge-m3:latest",

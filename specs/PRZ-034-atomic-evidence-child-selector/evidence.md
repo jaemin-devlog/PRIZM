@@ -1,6 +1,15 @@
-# PRZ-034 Evidence
+# PRZ-034 EvidenceChild 선택기 근거
 
-- 상태: `VERIFIED / PROMISING`
+## 최종 판정
+
+`VERIFIED / PROMISING`
+
+같은 BGE-M3로 `RetrievalPassage` 내부 `EvidenceChild.sourceText`만 다시 비교한 결과, 최종
+Top1은 0.5412에서 0.9059로 개선됐다. 개선 33건, 회귀 0건이며 기존 rank1 정답 46/46과
+Recall@5 0.9882를 보존했다. 이 결과는 평가 전용 근거이며 Production 채택 승인이 아니다.
+
+## 기준선
+
 - 시작 HEAD: `1a92add07be092457634b4dc83468ec3d951fe04`
 - `origin/main`: `2c8fd5c0d2f62b154642d703a0970389f8abed8e`
 - 시작 working tree: `CLEAN`

@@ -1,11 +1,22 @@
-# PRZ-025 Search V3 Foundation Evidence
+# PRZ-025 Search V3 기반 계약 근거
 
-- 상태: `IN_PROGRESS / FRESH_BENCHMARK_SEED_FROZEN`
-- 기록일: 2026-08-30 (Asia/Seoul)
-- 기준 source: `origin/main@2c8fd5c0d2f62b154642d703a0970389f8abed8e`
-- seed materialization/integrity validation: `COMPLETED`
-- 검색 benchmark/model/generalization 실행: `NOT_RUN`
-- Search V3/Production 변경: `NOT_RUN`
+## 최종 상태
+
+`IN_PROGRESS / FRESH_BENCHMARK_SEED_FROZEN`
+
+Search V3의 아키텍처·근거·평가 계약을 먼저 고정하고 Fresh benchmark seed를
+봉인했다. 이 결과는 데이터 구조와 무결성을 검증한 것이며 검색 품질이나 일반화 성능을 검증한
+결과가 아니다.
+
+| 항목 | 결과 |
+| --- | --- |
+| 기록일 | 2026-08-30 (Asia/Seoul) |
+| 기준 source | `origin/main@2c8fd5c0d2f62b154642d703a0970389f8abed8e` |
+| seed materialization/integrity validation | `COMPLETED` |
+| 검색 benchmark/model/generalization | `NOT_RUN` |
+| Search V3 구현 | `NOT_RUN` |
+| Production 변경 | `0` |
+| 다음 판단 | `SAFE_TO_START_PRZ_026_DEV_CAL_ONLY` |
 
 이 파일은 이번 Phase에서 직접 확인하거나 실행한 사실만 기록한다. 계약상 목표나 미래 수치는
 `spec.md`의 `PROPOSED_TARGET`이며 여기서 PASS로 취급하지 않는다.

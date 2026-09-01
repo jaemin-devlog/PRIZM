@@ -1,6 +1,15 @@
-# PRZ-033 Evidence
+# PRZ-033 EvidenceChild 선택 상한 근거
 
-- 상태: `VERIFIED / BUILD_CHILD_SELECTOR`
+## 최종 판정
+
+`VERIFIED / BUILD_CHILD_SELECTOR`
+
+Passage 순위를 그대로 둔 채 Gold Oracle로 내부 Child만 고르면 Final Top1이 0.5412에서
+0.9176으로 회복됐다. `TOP_PASSAGE_CHILD_RECOVERABLE`은 32건, 해당 user bundle은 9개였고
+loss와 retrieval miss는 모두 0건이었다. 실제 Child Selector를 만들 근거가 충분했다.
+
+## 기준선
+
 - 시작: `PRZ-032-minimal-v3-shadow-comparison@7e9c1361ca47a06a3957e62fdc34e9793c2a9863`
 - 공식 code freeze: `03a2285e148aa0a45b032746266fdc9802be690d`
 - Production 변경: `0`

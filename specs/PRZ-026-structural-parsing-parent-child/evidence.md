@@ -1,15 +1,24 @@
-# PRZ-026 Phase 1 Evidence
+# PRZ-026 구조 분할과 Parent-Child 검색 근거
 
-- 상태: `IN_PROGRESS / PHASE_1_C1_NEEDS_ADJUSTMENT`
+## 최종 상태
+
+`IN_PROGRESS / PHASE_1_C1_NEEDS_ADJUSTMENT`
+
+B3 `RetrievalPassage`는 독립 robustness suite까지 통과해 `PROMISING`으로 남았다. C1 Parent
+Context는 구조 안전성을 지켰지만 rank loss 3건과 false hit 3건이 발생해 공식 판정
+`NEEDS_ADJUSTMENT`로 끝났다. 후속 Search V3 기준선에는 C1을 넣지 않았다.
+
+| 단계 | 판정 |
+| --- | --- |
+| B1 Structural Child v1 | `NEEDS_ADJUSTMENT` — standalone heading 회귀 |
+| B2 Structural Child v2 | `NEEDS_ADJUSTMENT` — heading 회귀 해소, 장문 순위 순증 없음 |
+| B3 RetrievalPassage 최초 평가 | `NEEDS_ADJUSTMENT` — `FRONTEND_MOBILE` 신규 회귀 |
+| B3 RetrievalPassage robustness | `PROMISING` — 사전 봉인한 독립 suite 통과 |
+| C1 Parent Context | `NEEDS_ADJUSTMENT` — rank loss 3, false hit 3; 후속 기준선에서 비채택 |
+| Parent Dense | `NOT_RUN` |
+
 - 기록일: 2026-08-31 (Asia/Seoul)
 - 선행 조건: `DEPENDS_ON_PRZ_025`
-- 현재 판정: `NEEDS_ADJUSTMENT` — C1 heading-path context Search Quality Gate 미충족
-- Phase 1 역사 판정: `NEEDS_ADJUSTMENT` — standalone heading 회귀
-- Phase 1 Adjustment 판정: `NEEDS_ADJUSTMENT` — heading은 제거됐으나 장문 ranking 순증 없음
-- Phase 1 Retrieval Passage 판정: `NEEDS_ADJUSTMENT` — 비용과 전체 metric은 개선·유지했으나
-  `FRONTEND_MOBILE` 신규 회귀
-- Phase 1 Retrieval Passage Robustness 판정: `PROMISING` — 결과 전 입력/Gate 봉인 후 독립 suite 통과
-- Phase 1 C1 Parent Context 판정: `NEEDS_ADJUSTMENT` — 구조 불변성 유지, rank loss 3/false hit 3
 - Production 변경·적용: `0 / NOT_RUN`
 
 ## 1. 역사적 Phase 1 시작 상태

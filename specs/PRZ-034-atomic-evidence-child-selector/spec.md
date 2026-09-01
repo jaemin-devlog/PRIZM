@@ -1,4 +1,4 @@
-# PRZ-034 Atomic EvidenceChild Selector
+# PRZ-034 EvidenceChild 선택기
 
 - 상태: `VERIFIED / PROMISING`
 - branch: `PRZ-034-atomic-evidence-child-selector`

@@ -1,4 +1,4 @@
-# PRZ-029 Search V3 Evidence Validation and Selection
+# PRZ-029 Search V3 근거 검증과 선택
 
 - 상태: `VERIFIED / PROMISING`
 - 기준 branch: `PRZ-029-evidence-validation-selection`

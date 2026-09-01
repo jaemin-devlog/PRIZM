@@ -42,6 +42,9 @@ PRZ는 PRIZM의 기능 개발과 기술 검증을 작업 단위로 남기는 기
 
 ## PRZ Registry
 
+Search V3의 실험 흐름, 채택·비채택 결과와 전용 branch 운영 경계는
+[Search V3 개발 기록](search-v3/README.md)에 따로 정리했습니다.
+
 | PRZ | 작업 | 상태 | 통합/근거 |
 | --- | --- | --- | --- |
 | PRZ&#8209;000 | [플랫폼·문서 보관함 기준](PRZ-000-platform-baseline/spec.md) | `AS_BUILT_BASELINE` | [근거](PRZ-000-platform-baseline/evidence.md) · [도입 전 이력](000-pre-spec-implementation-history.md) |
@@ -70,14 +73,15 @@ PRZ는 PRIZM의 기능 개발과 기술 검증을 작업 단위로 남기는 기
 | PRZ&#8209;023 | [PRIZM 프로젝트 최종 Closeout](PRZ-023-project-closeout/spec.md) | `VERIFIED` | [근거](PRZ-023-project-closeout/evidence.md) |
 | PRZ&#8209;024 | [PRIZM v1.0.0 소스 릴리스](PRZ-024-release-v1.0.0/spec.md) | `VERIFIED` | [근거](PRZ-024-release-v1.0.0/evidence.md) |
 | PRZ&#8209;025 | [Search V3 기반 계약](PRZ-025-search-v3-foundation/spec.md) | `IN_PROGRESS` | [근거](PRZ-025-search-v3-foundation/evidence.md) |
-| PRZ&#8209;026 | [Search V3 Structural Parsing과 Parent-Child Retrieval](PRZ-026-structural-parsing-parent-child/spec.md) | `IN_PROGRESS` | [근거](PRZ-026-structural-parsing-parent-child/evidence.md) |
-| PRZ&#8209;028 | [Search V3 Typed Exact Constraint](PRZ-028-typed-exact-constraints/spec.md) | `VERIFIED` | [근거](PRZ-028-typed-exact-constraints/evidence.md) |
-| PRZ&#8209;029 | [Search V3 Evidence Validation과 Selection](PRZ-029-evidence-validation-selection/spec.md) | `VERIFIED` | [근거](PRZ-029-evidence-validation-selection/evidence.md) |
-| PRZ&#8209;030 | [Search V3 Semantic Evidence Validation Ceiling](PRZ-030-semantic-evidence-validation-ceiling/spec.md) | `VERIFIED` | [근거](PRZ-030-semantic-evidence-validation-ceiling/evidence.md) |
-| PRZ&#8209;031 | [Search V3 Semantic Evidence Directness](PRZ-031-semantic-evidence-directness/spec.md) | `VERIFIED` | [근거](PRZ-031-semantic-evidence-directness/evidence.md) |
-| PRZ&#8209;032 | [Minimal Search V3 Shadow Comparison](PRZ-032-minimal-v3-shadow-comparison/spec.md) | `VERIFIED` | [근거](PRZ-032-minimal-v3-shadow-comparison/evidence.md) |
-| PRZ&#8209;033 | [Atomic EvidenceChild Selection Ceiling](PRZ-033-atomic-evidence-child-selection-ceiling/spec.md) | `VERIFIED` | [근거](PRZ-033-atomic-evidence-child-selection-ceiling/evidence.md) |
-| PRZ&#8209;034 | [Atomic EvidenceChild Selector](PRZ-034-atomic-evidence-child-selector/spec.md) | `VERIFIED` | [근거](PRZ-034-atomic-evidence-child-selector/evidence.md) |
+| PRZ&#8209;026 | [Search V3 구조 분할과 Parent-Child 검색](PRZ-026-structural-parsing-parent-child/spec.md) | `IN_PROGRESS` | [근거](PRZ-026-structural-parsing-parent-child/evidence.md) |
+| PRZ&#8209;027 | [Search V3 Cross Encoder 재정렬](PRZ-027-cross-encoder-reranking/spec.md) | `VERIFIED` | [근거](PRZ-027-cross-encoder-reranking/evidence.md) |
+| PRZ&#8209;028 | [Search V3 정확 조건 검증](PRZ-028-typed-exact-constraints/spec.md) | `VERIFIED` | [근거](PRZ-028-typed-exact-constraints/evidence.md) |
+| PRZ&#8209;029 | [Search V3 근거 검증과 선택](PRZ-029-evidence-validation-selection/spec.md) | `VERIFIED` | [근거](PRZ-029-evidence-validation-selection/evidence.md) |
+| PRZ&#8209;030 | [Search V3 의미 근거 검증 상한](PRZ-030-semantic-evidence-validation-ceiling/spec.md) | `VERIFIED` | [근거](PRZ-030-semantic-evidence-validation-ceiling/evidence.md) |
+| PRZ&#8209;031 | [Search V3 의미 직접성 판별](PRZ-031-semantic-evidence-directness/spec.md) | `VERIFIED` | [근거](PRZ-031-semantic-evidence-directness/evidence.md) |
+| PRZ&#8209;032 | [최소 Search V3 Shadow 비교](PRZ-032-minimal-v3-shadow-comparison/spec.md) | `VERIFIED` | [근거](PRZ-032-minimal-v3-shadow-comparison/evidence.md) |
+| PRZ&#8209;033 | [EvidenceChild 선택 상한](PRZ-033-atomic-evidence-child-selection-ceiling/spec.md) | `VERIFIED` | [근거](PRZ-033-atomic-evidence-child-selection-ceiling/evidence.md) |
+| PRZ&#8209;034 | [EvidenceChild 선택기](PRZ-034-atomic-evidence-child-selector/spec.md) | `VERIFIED` | [근거](PRZ-034-atomic-evidence-child-selector/evidence.md) |
 
 ## 연구·미채택 기록
 
@@ -87,6 +91,9 @@ PRZ는 PRIZM의 기능 개발과 기술 검증을 작업 단위로 남기는 기
 - [PRZ&#8209;008](PRZ-008-search-evidence-reliability/evidence.md) — 기본 profile과 API 개선은 `main`에 통합됐지만 의미 단위 청킹·batch embedding·PDF 중복 최적화의 제품 적용 Gate가 남아 `IN_PROGRESS`입니다.
 - [PRZ&#8209;014](PRZ-014-openha-topology-gate/evidence.md) — 다중 OpenSQL DB node와 장애전환을 현재 제품 로드맵에서 제외해 `REJECTED`로 보존합니다.
 - [PRZ&#8209;016](PRZ-016-search-performance-v2/README.md) — P15의 인증된 PDF 이동은 `NOT_VERIFIED`, P16은 `NEEDS_ADJUSTMENT`·제품 미적용이어서 전체 상태를 `IN_PROGRESS`로 유지합니다.
+- [PRZ&#8209;026](PRZ-026-structural-parsing-parent-child/evidence.md) — B3 `RetrievalPassage`는 `PROMISING`이지만 C1 Parent Context의 공식 판정은 `NEEDS_ADJUSTMENT`이며 제품에 적용하지 않았습니다.
+- [PRZ&#8209;027](PRZ-027-cross-encoder-reranking/evidence.md) — GTE Cross Encoder 재정렬은 공식 평가 결과 `NO_GO`로 채택하지 않았습니다.
+- [PRZ&#8209;031](PRZ-031-semantic-evidence-directness/evidence.md) — Qwen 직접성 판별은 D1 protocol 실패와 D2 의미 품질 실패를 거쳐 최종 `NO_GO`로 남겼습니다.
 
 ## 더 자세히 보기
 

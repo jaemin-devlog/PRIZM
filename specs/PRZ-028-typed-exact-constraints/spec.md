@@ -1,4 +1,4 @@
-# PRZ-028 Search V3 Typed Exact Constraints
+# PRZ-028 Search V3 정확 조건 검증
 
 - 상태: `VERIFIED / FINAL_ROLE_EVIDENCE_VALIDATION_ONLY / STRESS_1.0.1_HISTORICAL_FROZEN / STRESS_1.1.0_OFFICIAL_RESULT_FROZEN`
 - 기준 branch: `PRZ-028-typed-exact-constraints`

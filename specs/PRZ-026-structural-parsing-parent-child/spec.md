@@ -1,4 +1,4 @@
-# PRZ-026 Structural Parsing and Parent-Child Retrieval
+# PRZ-026 구조 분할과 Parent-Child 검색
 
 - 상태: `IN_PROGRESS / PHASE_1_C1_NEEDS_ADJUSTMENT`
 - 현재 Phase: `Phase 1 C1 Structural Heading Path Parent Context — COMPLETED / NEEDS_ADJUSTMENT`

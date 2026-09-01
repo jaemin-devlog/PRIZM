@@ -1,4 +1,4 @@
-# PRZ-025 Search V3 Foundation Contract
+# PRZ-025 Search V3 기반 계약
 
 - 상태: `IN_PROGRESS / FRESH_BENCHMARK_SEED_FROZEN`
 - Phase: Architecture Contract + Fresh Generalization Evaluation Contract + materialized seed freeze

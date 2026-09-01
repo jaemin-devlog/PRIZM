@@ -1,4 +1,4 @@
-# PRZ-031 Search V3 Semantic Evidence Directness
+# PRZ-031 Search V3 의미 직접성 판별
 
 - 상태: `VERIFIED / D1_HISTORICAL_PROTOCOL_NO_GO / D2_PROTOCOL_V2_PASS / D2_SEMANTIC_NO_GO`
 - 기준 branch: `PRZ-031-semantic-evidence-directness`

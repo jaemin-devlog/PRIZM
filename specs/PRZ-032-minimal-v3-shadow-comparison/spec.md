@@ -1,4 +1,4 @@
-# PRZ-032 Minimal Search V3 Shadow Comparison
+# PRZ-032 최소 Search V3 Shadow 비교
 
 - 상태: `VERIFIED / MIXED_NEEDS_NEXT_CAPABILITY`
 - 기준 branch: `PRZ-032-minimal-v3-shadow-comparison`

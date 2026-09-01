@@ -1,6 +1,15 @@
-# PRZ-029 Evidence
+# PRZ-029 근거 검증과 선택 결과
 
-- 상태: `VERIFIED / PROMISING`
+## 최종 판정
+
+`VERIFIED / PROMISING`
+
+PRZ-028의 Typed Validation을 순위 점수로 쓰지 않고, B3 후보에서 조건에 맞는 원문 근거를
+고르는 단계로 배치했다. 일반 의미 검색 69/69의 순서와 provenance를 보존하면서 Typed
+Stress의 state macro F1과 선택 precision이 모두 1.0이었고 신규 loss는 0건이었다.
+
+## 기준선
+
 - 시작 branch / HEAD: `PRZ-028-typed-exact-constraints@33c702aa0bff86502f7f70a343b60c59c13eb80f`
 - 현재 branch: `PRZ-029-evidence-validation-selection`
 - `origin/main`: `2c8fd5c0d2f62b154642d703a0970389f8abed8e`
@@ -19,9 +28,16 @@ B3 full owner-scoped Dense ranking은 E0/E1이 한 번만 공유한다. PRZ-028 
 동결해 source-only validation으로만 재사용하고, 비채택된 stable partition은 재사용하지 않는다.
 Gold와 answerability는 runtime 입력에서 분리한다.
 
-역사 상태는 그대로 유지한다. PRZ-026 C1 Parent Context는 `NO_GO`, Parent Dense는 `DEFER`,
-PRZ-027 GTE Cross Encoder는 `NO_GO`, QueryPlanner와 Sparse는 `DEFER`, PRZ-028 ranking은 비채택이며
-이번 Phase에서는 `EVIDENCE_VALIDATION_ONLY` 경계만 재사용한다. 이들은 PRZ-029에서 새로 실행하지 않는다.
+역사 상태는 그대로 유지한다. PRZ-026 C1 Parent Context의 공식 판정은 `NEEDS_ADJUSTMENT`이고
+후속 기준선에서는 비채택했다. Parent Dense는 `DEFER`, PRZ-027 GTE Cross Encoder는 `NO_GO`,
+QueryPlanner와 Sparse는 `DEFER`, PRZ-028 ranking은 비채택이며 이번 Phase에서는
+`EVIDENCE_VALIDATION_ONLY` 경계만 재사용한다. 이들은 PRZ-029에서 새로 실행하지 않는다.
+
+### DOCUMENTATION_CORRECTION
+
+이 절의 이전 문장은 PRZ-026 C1을 `NO_GO`라고 적어 후속 기준선의 비채택 결정과 당시 공식
+판정 `NEEDS_ADJUSTMENT`를 혼동했다. PRZ-026 source·spec·tasks·evidence에 맞춰 표현만 바로잡았고
+PRZ-029의 결과, 수치와 판정은 바꾸지 않았다.
 
 Stress 1.1.0 frozen per-unit states의 query reduction을 검색 결과 전에 확인했다.
 

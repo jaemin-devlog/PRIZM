@@ -1,4 +1,4 @@
-# PRZ-030 Search V3 Semantic Evidence Validation Ceiling
+# PRZ-030 Search V3 의미 근거 검증 상한
 
 - 상태: `VERIFIED / BUILD_SEMANTIC_VALIDATOR`
 - 기준 branch: `PRZ-030-semantic-evidence-validation-ceiling`

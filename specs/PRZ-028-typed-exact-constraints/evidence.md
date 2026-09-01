@@ -1,6 +1,15 @@
-# PRZ-028 Evidence
+# PRZ-028 정확 조건 검증 근거
 
-- 상태: `VERIFIED / FINAL_ROLE_EVIDENCE_VALIDATION_ONLY / STRESS_1.0.1_HISTORICAL_FROZEN / STRESS_1.1.0_OFFICIAL_RESULT_FROZEN`
+## 최종 판정
+
+`VERIFIED / FINAL_ROLE_EVIDENCE_VALIDATION_ONLY / STRESS_1.0.1_HISTORICAL_FROZEN / STRESS_1.1.0_OFFICIAL_RESULT_FROZEN`
+
+Typed Constraint는 숫자·날짜·식별자 조건을 source-grounded state로 검증하는 데 쓸 수 있었지만
+Dense 순위에서는 순증을 만들지 못했다. 따라서 Search V3의 순위 구성에는 넣지 않고
+`EVIDENCE_VALIDATION_ONLY` 역할로 제한했다.
+
+## 기준선
+
 - 시작 branch / HEAD: `PRZ-027-cross-encoder-reranking@7271654b80ba7db3bc9cec89cba8ba1000660132`
 - 현재 branch base: `PRZ-028-typed-exact-constraints@a7dbb12ea7c0a3f4a502c1ae0252177d9c78a8b9`
 - `origin/main`: `2c8fd5c0d2f62b154642d703a0970389f8abed8e`

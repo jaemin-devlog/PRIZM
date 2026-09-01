@@ -1,4 +1,13 @@
-# PRZ-031 Evidence
+# PRZ-031 의미 직접성 판별 근거
+
+## 최종 판정
+
+`VERIFIED / D1_HISTORICAL_PROTOCOL_NO_GO / D2_PROTOCOL_V2_PASS / D2_SEMANTIC_NO_GO`
+
+D1은 첫 응답의 출력 계약 불일치로 `PROTOCOL_NO_GO`였고 semantic quality는
+`NOT_EVALUATED`다. 출력 계약만 줄인 D2는 protocol을 통과했지만 relation macro F1 0.4422,
+win/loss 1/2로 Quality Gate를 충족하지 못해 `NO_GO`로 끝났다. Qwen 모델과 prompt를 다시
+조정하거나 다른 모델을 시험하지 않았다.
 
 ## 1. 시작 상태
 

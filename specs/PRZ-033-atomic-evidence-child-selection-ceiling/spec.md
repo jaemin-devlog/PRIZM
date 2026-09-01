@@ -1,4 +1,4 @@
-# PRZ-033 Atomic EvidenceChild Selection Ceiling
+# PRZ-033 EvidenceChild 선택 상한
 
 - 상태: `VERIFIED / BUILD_CHILD_SELECTOR`
 - 기준 branch: `PRZ-033-atomic-evidence-child-selection-ceiling`

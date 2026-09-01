@@ -1,6 +1,15 @@
-# PRZ-032 Evidence
+# PRZ-032 최소 Search V3 Shadow 비교 근거
 
-- 상태: `VERIFIED / MIXED_NEEDS_NEXT_CAPABILITY`
+## 최종 판정
+
+`VERIFIED / MIXED_NEEDS_NEXT_CAPABILITY`
+
+최소 V3는 후보 Top1 0.9176과 Recall@5/20 1.0000을 확보했지만 최종 Top1은 0.5412로
+떨어졌다. 구조 오염과 localization은 개선됐으나 최종 `RetrievalPassage → EvidenceChild`
+선택에서 후보 단계의 장점을 잃었다. 다음 병목은 새 retrieval이 아니라 atomic Child 선택이다.
+
+## 기준선
+
 - 시작: `PRZ-031-semantic-evidence-directness@a68e95a8b1adb9915fc6359cc6687e9d55068b45`
 - code freeze: `6027494b80c765be905ae29a743b823dde05e96d`
 - 공식 실행 HEAD: `6b7cfab` (`execution-contract.json`만 code freeze 이후 변경)

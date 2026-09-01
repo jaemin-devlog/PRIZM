@@ -1,6 +1,15 @@
-# PRZ-030 Evidence
+# PRZ-030 의미 근거 검증 상한 근거
 
-- 상태: `VERIFIED / BUILD_SEMANTIC_VALIDATOR`
+## 최종 판정
+
+`VERIFIED / BUILD_SEMANTIC_VALIDATOR`
+
+B3 Top20에는 Direct-positive 57건의 직접 근거가 모두 있었고, 그중 7건은 순위만 바로잡으면
+Top1을 회복할 수 있었다. 이 결과는 실제 semantic validator의 성공이 아니라 다음 실험을
+진행할 가치가 있다는 Oracle 상한 판정이다. Sparse와 Parent Dense는 계속 `DEFER`다.
+
+## 기준선
+
 - 시작 branch / HEAD: `PRZ-029-evidence-validation-selection@f7e4a7adffd5574526d6c00c76ece9113a68d69f`
 - 현재 branch: `PRZ-030-semantic-evidence-validation-ceiling`
 - `origin/main`: `2c8fd5c0d2f62b154642d703a0970389f8abed8e`

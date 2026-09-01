@@ -48,8 +48,8 @@ class DocumentChangeLogMigrationDatabaseIntegrationTest {
                 .load();
         MigrateResult firstMigration = flyway.migrate();
 
-        assertThat(firstMigration.migrationsExecuted).isEqualTo(19);
-        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("19");
+        assertThat(firstMigration.migrationsExecuted).isEqualTo(20);
+        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("20");
         assertThat(flyway.migrate().migrationsExecuted).isZero();
         assertThat(tableCount(jdbcTemplate, "document_change_logs")).isEqualTo(1L);
         assertThat(nullableProcessingJobColumn(jdbcTemplate)).isEqualTo("YES");

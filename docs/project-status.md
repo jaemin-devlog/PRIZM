@@ -1,6 +1,6 @@
 # PRIZM 현재 구현 현황
 
-> 기준일: 2026-08-30
+> 기준일: 2026-09-02
 >
 > PRZ-020 기능 통합 근거: [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b`
 >
@@ -71,18 +71,23 @@
 ### Search V3 리팩토링 branch
 
 - V18은 기존 `document_chunks` 옆에 generation, V3 전용 작업, `RetrievalPassage`, `EvidenceChild`와 두 vector
-  계열을 저장하는 shadow schema를 정의하고, V19은 검증된 inventory fingerprint와 V2 lifecycle 호환 trigger를 추가함
+  계열을 저장하는 shadow schema를 정의함. V19은 검증된 inventory fingerprint와 V2 lifecycle 호환 trigger를,
+  V20은 Worker가 claim 뒤 expected manifest를 동결할 수 있는 전이 제약을 추가함
 - owner·문서·version·generation composite FK, nullable active-generation pointer와 artifact/vector 중복·orphan
   방지 제약을 포함함
 - V3 전용 JDBC job runtime은 full owner·문서·version·generation identity로 claim, lease renew, retry/failure,
   recovery lock과 exact-token reclaim을 수행함
 - 실제 PostgreSQL inventory의 key·순서·membership·hash·provenance와 vector 계약을 검증하고,
   `BUILDING → READY`와 같은-version generation 활성화를 full claim fencing 아래 원자적으로 수행함
+- Search V3 수동 Worker 진입점은 TXT와 text-layer PDF 원문을 구조 분석해 B3 `RetrievalPassage`와
+  `EvidenceChild`를 만들고, 동일 BGE-M3로 두 vector 계열을 미리 계산해 generation 단위로 원자 저장함
+- Worker는 원문 읽기부터 activation 전까지 lease를 갱신하며, reclaim된 이전 claim의 저장·READY·activation을
+  차단함. inactive version은 `READY`와 activation 재시도 상태에 두고 같은 Production active version만 활성화함
 - Production Search V2 source·query·API·frontend·MCP는 shadow schema를 직접 사용하지 않음. 다만 V19 trigger는
   V2가 active version을 바꾸거나 해제할 때 stale V3 generation을 `SUPERSEDED`로 바꾸고 shadow pointer만 비움
-- 실제 V3 Worker coordinator, Passage·Child·embedding 생성과 Search V3 query/API/cutover는 아직 구현하지 않음
-- PostgreSQL 16+pgvector Testcontainers에서 V1~V19 migration 회귀 `9/9`, Search V3 lineage·vector·active
-  pointer와 V19 upgrade 제약 `8/8`을 실행함. V18 저장 범위는 PRZ-037, 현재 V19 포함 회귀는 PRZ-039 evidence를 따름
+- Worker는 아직 자동 scheduler·dispatch에 연결하지 않았고 Search V3 query/API/cutover도 구현하지 않음
+- PostgreSQL 16+pgvector Testcontainers에서 V1~V20 fresh migration과 PRZ-037~040 저장·job·activation·Worker
+  focused suite `52/52`를 실행함. 실제 Ollama와 OpenSQL 실행은 `NOT_RUN`이며 상세 범위는 PRZ-040 evidence를 따름
 - Search V3 job fencing은 PostgreSQL 시나리오 `6/6`에서 concurrent duplicate claim 0, recovery token과
   stale claim·cross-lineage 차단을 확인했으며 자세한 범위는 PRZ-038 evidence를 따름
 - Search V3 inventory·activation은 PostgreSQL 시나리오 `11/11`에서 exact inventory, READY, 첫 activation,

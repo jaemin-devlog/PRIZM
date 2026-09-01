@@ -1,6 +1,8 @@
 package com.prizm.search.v3.indexing.service;
 
 import com.prizm.search.v3.indexing.exception.SearchV3InventoryActivationException;
+import com.prizm.search.v3.indexing.exception.SearchV3ActivationDeferredException;
+import com.prizm.search.v3.indexing.exception.SearchV3ActivationDeferredException.Reason;
 import com.prizm.search.v3.indexing.exception.StaleSearchV3IndexingJobClaimException;
 import com.prizm.search.v3.indexing.model.SearchV3IndexingJobClaim;
 import com.prizm.search.v3.indexing.repository.SearchV3InventoryActivationRepository;
@@ -77,7 +79,7 @@ public class SearchV3InventoryActivationService {
         }
         catch (DataAccessException exception) {
             if (hasSqlState(exception, "55P03")) {
-                throw rejected("Document is locked by another lifecycle transaction.");
+                throw deferred(Reason.DOCUMENT_LOCKED, "Document is locked by another lifecycle transaction.");
             }
             throw exception;
         }
@@ -121,13 +123,19 @@ public class SearchV3InventoryActivationService {
             DocumentContract document,
             ActiveGeneration previous) {
         if (!"ACTIVE".equals(version.status())) {
-            throw rejected("Candidate document version is not ACTIVE in Production Search V2.");
+            throw deferred(
+                    Reason.NOT_CURRENT_VERSION,
+                    "Candidate document version is not ACTIVE in Production Search V2.");
         }
         if (document.activeVersionId() == null) {
-            throw rejected("Document does not have an ACTIVE Production version.");
+            throw deferred(
+                    Reason.NOT_CURRENT_VERSION,
+                    "Document does not have an ACTIVE Production version.");
         }
         if (document.activeVersionId() != claim.documentVersionId()) {
-            throw rejected("Candidate Search V3 generation is not for the current ACTIVE document version.");
+            throw deferred(
+                    Reason.NOT_CURRENT_VERSION,
+                    "Candidate Search V3 generation is not for the current ACTIVE document version.");
         }
 
         if (previous == null) {
@@ -150,6 +158,10 @@ public class SearchV3InventoryActivationService {
 
     private static SearchV3InventoryActivationException rejected(String message) {
         return new SearchV3InventoryActivationException(message);
+    }
+
+    private static SearchV3ActivationDeferredException deferred(Reason reason, String message) {
+        return new SearchV3ActivationDeferredException(reason, message);
     }
 
     private static boolean hasSqlState(Throwable failure, String expectedSqlState) {

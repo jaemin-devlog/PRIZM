@@ -41,7 +41,9 @@ class SearchV3ShadowStorageMigrationTest {
         MigrationDatabase database = createMigratedDatabase();
         JdbcTemplate jdbc = database.jdbcTemplate();
 
-        assertThat(successfulMigrationCount(jdbc)).isEqualTo(19L);
+        assertThat(successfulMigrationCount(jdbc)).isEqualTo(20L);
+        assertThat(Flyway.configure().dataSource(database.dataSource()).load()
+                .info().current().getVersion().getVersion()).isEqualTo("20");
         assertThat(existingTables(jdbc)).contains(
                 "documents",
                 "document_versions",
@@ -78,15 +80,15 @@ class SearchV3ShadowStorageMigrationTest {
     }
 
     @Test
-    void migratesV18GenerationWithNullableVerifiedInventoryAndEnforcesLowercaseSha256() {
+    void migratesV18GenerationThroughV20AndEnforcesLowercaseVerifiedInventorySha256() {
         MigrationDatabase database = createMigratedDatabase("18");
         JdbcTemplate jdbc = database.jdbcTemplate();
         Fixture fixture = createFixture(jdbc, "verified-inventory-owner");
         Long generation = insertBuildingGeneration(jdbc, fixture);
 
         assertThat(Flyway.configure().dataSource(database.dataSource()).load().migrate().migrationsExecuted)
-                .isEqualTo(1);
-        assertThat(successfulMigrationCount(jdbc)).isEqualTo(19L);
+                .isEqualTo(2);
+        assertThat(successfulMigrationCount(jdbc)).isEqualTo(20L);
         assertThat(jdbc.queryForObject(
                 "SELECT verified_inventory_sha256 FROM search_v3_index_generations WHERE id = ?",
                 String.class,
@@ -121,6 +123,135 @@ class SearchV3ShadowStorageMigrationTest {
                 "UPDATE search_v3_index_generations SET verified_inventory_sha256 = ? WHERE id = ?",
                 "e".repeat(63),
                 generation)).isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void migratesV19FrozenManifestToV20WithoutChangingValues() {
+        MigrationDatabase database = createMigratedDatabase("19");
+        JdbcTemplate jdbc = database.jdbcTemplate();
+        Fixture fixture = createFixture(jdbc, "v19-frozen-manifest-owner");
+        Long generation = insertBuildingGeneration(jdbc, fixture);
+        String verifiedInventory = "e".repeat(64);
+        jdbc.update(
+                "UPDATE search_v3_index_generations SET verified_inventory_sha256 = ? WHERE id = ?",
+                verifiedInventory,
+                generation);
+
+        Flyway flyway = Flyway.configure().dataSource(database.dataSource()).load();
+        assertThat(flyway.migrate().migrationsExecuted).isEqualTo(1);
+        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("20");
+        assertThat(successfulMigrationCount(jdbc)).isEqualTo(20L);
+
+        assertThat(jdbc.queryForMap(
+                """
+                SELECT expected_passage_count, expected_child_count,
+                       expected_manifest_sha256, verified_inventory_sha256
+                FROM search_v3_index_generations
+                WHERE id = ?
+                """,
+                generation))
+                .containsEntry("expected_passage_count", 1)
+                .containsEntry("expected_child_count", 1)
+                .containsEntry("expected_manifest_sha256", MANIFEST_HASH)
+                .containsEntry("verified_inventory_sha256", verifiedInventory);
+        assertThat(jdbc.queryForList(
+                """
+                SELECT is_nullable
+                FROM information_schema.columns
+                WHERE table_schema = 'public'
+                  AND table_name = 'search_v3_index_generations'
+                  AND column_name IN (
+                      'expected_passage_count',
+                      'expected_child_count',
+                      'expected_manifest_sha256'
+                  )
+                ORDER BY column_name
+                """,
+                String.class)).containsExactly("YES", "YES", "YES");
+    }
+
+    @Test
+    void allowsAllNullManifestOnlyForBuildingAndFailedGenerations() {
+        JdbcTemplate jdbc = createMigratedDatabase().jdbcTemplate();
+        Fixture fixture = createFixture(jdbc, "unfrozen-manifest-owner");
+
+        Long building = insertGenerationWithManifest(jdbc, fixture, "BUILDING", null, null, null);
+        Long failed = insertGenerationWithManifest(jdbc, fixture, "FAILED", null, null, null);
+
+        assertThat(jdbc.queryForList(
+                """
+                SELECT status
+                FROM search_v3_index_generations
+                WHERE id IN (?, ?)
+                ORDER BY status
+                """,
+                String.class,
+                building,
+                failed)).containsExactly("BUILDING", "FAILED");
+        for (String status : List.of("READY", "ACTIVE", "SUPERSEDED")) {
+            assertThatThrownBy(() -> insertGenerationWithManifest(
+                    jdbc,
+                    fixture,
+                    status,
+                    null,
+                    null,
+                    null))
+                    .as("manifest-less %s generation", status)
+                    .isInstanceOf(DataIntegrityViolationException.class);
+        }
+    }
+
+    @Test
+    void rejectsPartialNullAndInvalidFrozenManifest() {
+        JdbcTemplate jdbc = createMigratedDatabase().jdbcTemplate();
+        Fixture fixture = createFixture(jdbc, "invalid-manifest-owner");
+        ManifestValues[] partialValues = {
+            new ManifestValues(1, null, null),
+            new ManifestValues(null, 1, null),
+            new ManifestValues(null, null, MANIFEST_HASH),
+            new ManifestValues(1, 1, null),
+            new ManifestValues(1, null, MANIFEST_HASH),
+            new ManifestValues(null, 1, MANIFEST_HASH)
+        };
+
+        for (ManifestValues manifest : partialValues) {
+            assertThatThrownBy(() -> insertGenerationWithManifest(
+                    jdbc,
+                    fixture,
+                    "BUILDING",
+                    manifest.passageCount(),
+                    manifest.childCount(),
+                    manifest.sha256()))
+                    .as("partial manifest %s", manifest)
+                    .isInstanceOf(DataIntegrityViolationException.class);
+        }
+        assertThatThrownBy(() -> insertGenerationWithManifest(
+                jdbc,
+                fixture,
+                "BUILDING",
+                0,
+                1,
+                MANIFEST_HASH))
+                .as("zero passage count")
+                .isInstanceOf(DataIntegrityViolationException.class);
+        assertThatThrownBy(() -> insertGenerationWithManifest(
+                jdbc,
+                fixture,
+                "BUILDING",
+                1,
+                0,
+                MANIFEST_HASH))
+                .as("zero child count")
+                .isInstanceOf(DataIntegrityViolationException.class);
+        assertThatThrownBy(() -> insertGenerationWithManifest(
+                jdbc,
+                fixture,
+                "BUILDING",
+                1,
+                1,
+                MANIFEST_HASH.toUpperCase()))
+                .as("non-lowercase manifest hash")
+                .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
@@ -490,14 +621,34 @@ class SearchV3ShadowStorageMigrationTest {
             Long document,
             Long version,
             String status) {
+        return insertGenerationWithManifest(
+                jdbc,
+                new Fixture(owner, document, version),
+                status,
+                1,
+                1,
+                MANIFEST_HASH);
+    }
+
+    private Long insertGenerationWithManifest(
+            JdbcTemplate jdbc,
+            Fixture fixture,
+            String status,
+            Integer expectedPassageCount,
+            Integer expectedChildCount,
+            String expectedManifestSha256) {
         String statusColumns = switch (status) {
             case "READY" -> ", build_completed_at";
             case "ACTIVE" -> ", build_completed_at, activated_at";
+            case "SUPERSEDED" -> ", build_completed_at, activated_at, superseded_at";
+            case "FAILED" -> ", failed_at, failure_stage";
             default -> "";
         };
         String statusValues = switch (status) {
             case "READY" -> ", now()";
             case "ACTIVE" -> ", now(), now()";
+            case "SUPERSEDED" -> ", now(), now(), now()";
+            case "FAILED" -> ", now(), 'STORAGE'";
             default -> "";
         };
         return jdbc.queryForObject(
@@ -510,15 +661,17 @@ class SearchV3ShadowStorageMigrationTest {
                     expected_passage_count, expected_child_count, expected_manifest_sha256
                 """ + statusColumns + """
                 ) VALUES (?, ?, ?, ?, 'struct-v1', 'passage-v1', 'child-v1',
-                    'bge-m3', ?, 1024, 'passage-source-v1', 'child-source-v1', 1, 1, ?
+                    'bge-m3', ?, 1024, 'passage-source-v1', 'child-source-v1', ?, ?, ?
                 """ + statusValues + ") RETURNING id",
                 Long.class,
-                owner,
-                document,
-                version,
+                fixture.ownerUserId(),
+                fixture.documentId(),
+                fixture.documentVersionId(),
                 status,
                 MODEL_DIGEST,
-                MANIFEST_HASH);
+                expectedPassageCount,
+                expectedChildCount,
+                expectedManifestSha256);
     }
 
     private void insertPendingJob(JdbcTemplate jdbc, Fixture fixture, Long generation) {
@@ -691,6 +844,7 @@ class SearchV3ShadowStorageMigrationTest {
                 "fk_s3_child_vectors_artifact_input",
                 "fk_s3_child_vectors_generation_contract",
                 "fk_documents_active_s3_generation_lineage",
+                "ck_s3_generations_manifest",
                 "ck_s3_generations_verified_inventory")) {
             assertThat(jdbc.queryForObject(
                     "SELECT COUNT(*) FROM pg_constraint WHERE conname = ?",
@@ -713,5 +867,8 @@ class SearchV3ShadowStorageMigrationTest {
     }
 
     private record Fixture(Long ownerUserId, Long documentId, Long documentVersionId) {
+    }
+
+    private record ManifestValues(Integer passageCount, Integer childCount, String sha256) {
     }
 }

@@ -5,10 +5,12 @@ import com.prizm.ingestion.service.IndexingRetryPolicy;
 import com.prizm.search.v3.indexing.exception.StaleSearchV3IndexingJobClaimException;
 import com.prizm.search.v3.indexing.exception.StaleSearchV3RecoveryLockException;
 import com.prizm.search.v3.indexing.model.SearchV3IndexingFailureStage;
+import com.prizm.search.v3.indexing.model.SearchV3IndexGenerationStatus;
 import com.prizm.search.v3.indexing.model.SearchV3IndexingJobClaim;
 import com.prizm.search.v3.indexing.model.SearchV3IndexingJobStatus;
 import com.prizm.search.v3.indexing.model.SearchV3RecoveryLock;
 import com.prizm.search.v3.indexing.repository.SearchV3IndexingJobRepository;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SearchV3IndexingJobService {
 
     private static final int MAX_ERROR_MESSAGE_LENGTH = 2000;
+    private static final Duration ACTIVATION_RETRY_DELAY = Duration.ofMinutes(1);
 
     private final SearchV3IndexingJobRepository repository;
     private final IngestionProperties ingestionProperties;
@@ -42,6 +45,12 @@ public class SearchV3IndexingJobService {
     @Transactional
     public Instant renewLease(SearchV3IndexingJobClaim claim) {
         return repository.renewLease(claim, ingestionProperties.getLeaseDuration())
+                .orElseThrow(() -> new StaleSearchV3IndexingJobClaimException(claim));
+    }
+
+    @Transactional(readOnly = true)
+    public SearchV3IndexGenerationStatus currentGenerationStatus(SearchV3IndexingJobClaim claim) {
+        return repository.findCurrentGenerationStatus(claim)
                 .orElseThrow(() -> new StaleSearchV3IndexingJobClaimException(claim));
     }
 
@@ -77,6 +86,16 @@ public class SearchV3IndexingJobService {
             throw new StaleSearchV3IndexingJobClaimException(claim);
         }
         return SearchV3IndexingJobStatus.FAILED;
+    }
+
+    /** READY generation을 실패 처리하지 않고 별도의 activation 재시도로 미룬다. */
+    @Transactional
+    public Instant deferActivation(SearchV3IndexingJobClaim claim, String reason) {
+        String safeMessage = truncate(reason == null
+                ? "Search V3 activation was deferred."
+                : reason);
+        return repository.deferActivation(claim, ACTIVATION_RETRY_DELAY, safeMessage)
+                .orElseThrow(() -> new StaleSearchV3IndexingJobClaimException(claim));
     }
 
     private String truncate(String message) {

@@ -7,6 +7,7 @@ import com.prizm.ingestion.config.IngestionProperties;
 import com.prizm.ingestion.service.IndexingRetryPolicy;
 import com.prizm.search.v3.indexing.exception.StaleSearchV3IndexingJobClaimException;
 import com.prizm.search.v3.indexing.exception.StaleSearchV3RecoveryLockException;
+import com.prizm.search.v3.indexing.model.SearchV3IndexGenerationStatus;
 import com.prizm.search.v3.indexing.model.SearchV3IndexingFailureStage;
 import com.prizm.search.v3.indexing.model.SearchV3IndexingJobClaim;
 import com.prizm.search.v3.indexing.model.SearchV3IndexingJobStatus;
@@ -84,6 +85,138 @@ class SearchV3IndexingJobRuntimeTest {
         assertThat(second.claimVersion()).isEqualTo(2);
         assertThat(second.attemptCount()).isEqualTo(2);
         assertThat(second.generationId()).isEqualTo(generationId);
+    }
+
+    @Test
+    void pendingJobDoesNotClaimAReadyGeneration() {
+        RuntimeDatabase database = createRuntimeDatabase();
+        Fixture fixture = createFixture(database.jdbc(), "pending-ready-owner");
+        long generationId = insertBuildingGeneration(database.jdbc(), fixture);
+        long jobId = insertPendingJob(database.jdbc(), fixture, generationId);
+        markGenerationReady(database.jdbc(), generationId);
+
+        assertThat(database.service().claimNext()).isEmpty();
+        assertThat(database.jdbc().queryForMap(
+                        "SELECT status, claim_version, attempt_count FROM search_v3_indexing_jobs WHERE id = ?",
+                        jobId))
+                .containsEntry("status", "PENDING")
+                .containsEntry("claim_version", 0L)
+                .containsEntry("attempt_count", 0);
+    }
+
+    @Test
+    void readyActivationDeferralResumesOnlyWhenDueWithoutUsingFailureRetryBudget() {
+        RuntimeDatabase database = createRuntimeDatabase();
+        Fixture fixture = createFixture(database.jdbc(), "ready-resume-owner");
+        long generationId = insertBuildingGeneration(database.jdbc(), fixture);
+        insertPendingJob(database.jdbc(), fixture, generationId);
+        SearchV3IndexingJobService service = database.service();
+        SearchV3IndexingJobClaim current = service.claimNext().orElseThrow();
+
+        assertThat(service.currentGenerationStatus(current))
+                .isEqualTo(SearchV3IndexGenerationStatus.BUILDING);
+        markGenerationReady(database.jdbc(), generationId);
+        assertThat(service.currentGenerationStatus(current))
+                .isEqualTo(SearchV3IndexGenerationStatus.READY);
+
+        for (int deferral = 1; deferral <= 5; deferral++) {
+            SearchV3IndexingJobClaim deferredClaim = current;
+            Instant nextRetryAt = service.deferActivation(
+                    deferredClaim, "Production version is not active yet.");
+            assertThat(database.jdbc().queryForObject(
+                    "SELECT next_retry_at FROM search_v3_indexing_jobs WHERE id = ?",
+                    java.sql.Timestamp.class,
+                    deferredClaim.jobId()).toInstant()).isEqualTo(nextRetryAt);
+            assertThat(database.jdbc().queryForObject(
+                    "SELECT status FROM search_v3_indexing_jobs WHERE id = ?",
+                    String.class,
+                    deferredClaim.jobId())).isEqualTo("RETRY_WAIT");
+            assertThat(database.jdbc().queryForObject(
+                    "SELECT status FROM search_v3_index_generations WHERE id = ?",
+                    String.class,
+                    generationId)).isEqualTo("READY");
+            assertThat(service.claimNext()).isEmpty();
+            assertThatThrownBy(() -> service.currentGenerationStatus(deferredClaim))
+                    .isInstanceOf(StaleSearchV3IndexingJobClaimException.class);
+
+            database.jdbc().update(
+                    "UPDATE search_v3_indexing_jobs SET next_retry_at = now() - interval '1 second' WHERE id = ?",
+                    deferredClaim.jobId());
+            current = service.claimNext().orElseThrow();
+            assertThat(current.attemptCount()).isEqualTo(deferral + 1);
+            assertThat(current.claimVersion()).isEqualTo(deferral + 1L);
+            assertThat(service.currentGenerationStatus(current))
+                    .isEqualTo(SearchV3IndexGenerationStatus.READY);
+        }
+
+        assertThat(database.jdbc().queryForObject(
+                "SELECT status FROM search_v3_index_generations WHERE id = ?",
+                String.class,
+                generationId)).isEqualTo("READY");
+        assertThat(database.jdbc().queryForObject(
+                "SELECT status FROM search_v3_indexing_jobs WHERE id = ?",
+                String.class,
+                current.jobId())).isEqualTo("PROCESSING");
+    }
+
+    @Test
+    void activationDeferralRequiresReadyCurrentFullLineageWithoutRecoveryLock() {
+        RuntimeDatabase database = createRuntimeDatabase();
+        Fixture fixture = createFixture(database.jdbc(), "deferral-fencing-owner");
+        long generationId = insertBuildingGeneration(database.jdbc(), fixture);
+        insertPendingJob(database.jdbc(), fixture, generationId);
+        SearchV3IndexingJobService service = database.service();
+        SearchV3IndexingJobClaim claim = service.claimNext().orElseThrow();
+
+        assertThatThrownBy(() -> service.deferActivation(claim, "not ready"))
+                .isInstanceOf(StaleSearchV3IndexingJobClaimException.class);
+        markGenerationReady(database.jdbc(), generationId);
+
+        Fixture foreign = createFixture(database.jdbc(), "foreign-deferral-owner");
+        long foreignGeneration = insertBuildingGeneration(database.jdbc(), foreign);
+        SearchV3IndexingJobClaim[] invalidClaims = {
+                withGeneration(claim, foreignGeneration),
+                withOwner(claim, foreign.ownerUserId()),
+                withDocument(claim, foreign.documentId()),
+                withVersion(claim, foreign.documentVersionId()),
+                withClaimVersion(claim, claim.claimVersion() + 1)
+        };
+        for (SearchV3IndexingJobClaim invalid : invalidClaims) {
+            assertThatThrownBy(() -> service.deferActivation(invalid, "foreign"))
+                    .isInstanceOf(StaleSearchV3IndexingJobClaimException.class);
+            assertThatThrownBy(() -> service.currentGenerationStatus(invalid))
+                    .isInstanceOf(StaleSearchV3IndexingJobClaimException.class);
+        }
+
+        database.jdbc().update(
+                """
+                UPDATE search_v3_indexing_jobs
+                SET recovery_lock_token = ?, recovery_locked_at = now()
+                WHERE id = ?
+                """,
+                UUID.randomUUID(),
+                claim.jobId());
+        assertThatThrownBy(() -> service.deferActivation(claim, "recovery locked"))
+                .isInstanceOf(StaleSearchV3IndexingJobClaimException.class);
+        assertThatThrownBy(() -> service.currentGenerationStatus(claim))
+                .isInstanceOf(StaleSearchV3IndexingJobClaimException.class);
+
+        database.jdbc().update(
+                """
+                UPDATE search_v3_indexing_jobs
+                SET recovery_lock_token = NULL, recovery_locked_at = NULL
+                WHERE id = ?
+                """,
+                claim.jobId());
+        assertThat(service.deferActivation(claim, "safe deferral")).isNotNull();
+        assertThat(database.jdbc().queryForObject(
+                "SELECT status FROM search_v3_indexing_jobs WHERE id = ?",
+                String.class,
+                claim.jobId())).isEqualTo("RETRY_WAIT");
+        assertThat(database.jdbc().queryForObject(
+                "SELECT status FROM search_v3_index_generations WHERE id = ?",
+                String.class,
+                generationId)).isEqualTo("READY");
     }
 
     @Test
@@ -384,6 +517,19 @@ class SearchV3IndexingJobRuntimeTest {
                 fixture.ownerUserId(),
                 fixture.documentId(),
                 fixture.documentVersionId());
+    }
+
+    private void markGenerationReady(JdbcTemplate jdbc, long generationId) {
+        jdbc.update(
+                """
+                UPDATE search_v3_index_generations
+                SET status = 'READY',
+                    build_completed_at = now(),
+                    verified_inventory_sha256 = ?
+                WHERE id = ?
+                """,
+                "c".repeat(64),
+                generationId);
     }
 
     private <T> T transaction(RuntimeDatabase database, java.util.concurrent.Callable<T> operation) {

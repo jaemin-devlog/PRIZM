@@ -324,6 +324,11 @@ vector PK/FK는 artifact별 중복과 orphan을 막고, frozen manifest와 실�
 READY/activation service가 잠금 아래 확인합니다. V19의 `verified_inventory_sha256`은 READY에서 검증한
 logical inventory와 vector payload를 묶고, activation은 이를 현재 DB inventory와 다시 비교합니다.
 
+V20은 `BUILDING` generation의 expected manifest 세 필드를 모두 null로 시작할 수 있게 합니다. Worker가
+원문을 구조화한 뒤 DB insert 전 논리 inventory를 canonicalize하고, current full claim과 빈 inventory를
+확인해 count와 SHA-256을 한 번만 동결합니다. partial manifest와 manifest 없는 READY 이후 상태는 DB
+constraint가 거부합니다.
+
 Search V3 전용 job runtime은 V18의 full owner·문서·version·generation identity를 JDBC 조건으로 확인합니다.
 `PENDING` 또는 due `RETRY_WAIT` 작업은 `FOR UPDATE SKIP LOCKED`로 한 Worker만 claim하고, lease와 retry 시각은
 PostgreSQL `now()`를 기준으로 계산합니다. 만료 작업은 recovery token을 먼저 기록한 뒤 exact token을 가진
@@ -338,8 +343,20 @@ activation에서도 ACTIVE와 pointer를 하나로 유지합니다.
 
 V19 trigger는 Production V2가 active version을 바꾸거나 null로 해제할 때 기존 ACTIVE V3 generation을
 `SUPERSEDED`로 바꾸고 shadow pointer만 비웁니다. `documents.active_version_id`, version 상태와 V2 chunk를
-V3 activation이 변경하지는 않습니다. 실제 Search V3 Worker coordinator, Passage·Child·embedding 생성과
-Search V3 query/API/cutover는 아직 구현하지 않았습니다.
+V3 activation이 변경하지는 않습니다.
+
+Search V3 shadow Worker는 claim한 immutable `DocumentVersion` 원문을 기존 추출기로 읽고, 구조 신호만으로
+page-aware `EvidenceChild`와 B3 `RetrievalPassage`를 만듭니다. TXT provenance의 page는 null이고 text-layer
+PDF는 원래 1-based page를 보존하며, 서로 다른 page나 structural parent를 한 Passage로 합치지 않습니다.
+Passage는 `retrievalText`, Child는 `sourceText`를 동일 BGE-M3로 미리 embedding합니다. Ollama model digest는
+embedding 전후에 generation 계약과 다시 맞춰 tag 변경으로 생길 수 있는 metadata 불일치를 저장 전에
+차단합니다.
+
+저장은 current `job → generation` 잠금 아래 candidate generation의 기존 Passage를 지우고 네 artifact 계열을
+한 transaction에서 전체 치환합니다. 실패하면 delete와 일부 insert가 함께 rollback됩니다. READY activation이
+현재 Production active version과 아직 맞지 않으면 generation은 READY로 유지하고 job만 `RETRY_WAIT`으로
+연기합니다. 다음 claim은 parsing과 embedding을 반복하지 않고 activation만 재시도합니다. 현재 진입점은
+수동 `processNext()`이며 자동 dispatch/scheduler, Search V3 query/API/cutover는 아직 구현하지 않았습니다.
 
 근거:
 
@@ -356,12 +373,17 @@ Search V3 query/API/cutover는 아직 구현하지 않았습니다.
 - [문서 태그 migration](../src/main/resources/db/migration/V16__create_document_tags.sql)
 - [Search V3 shadow storage migration](../src/main/resources/db/migration/V18__create_search_v3_shadow_storage.sql)
 - [Search V3 inventory fingerprint migration](../src/main/resources/db/migration/V19__add_verified_search_v3_inventory_fingerprint.sql)
+- [Search V3 claim-first manifest migration](../src/main/resources/db/migration/V20__allow_unfrozen_search_v3_generation_manifest.sql)
 - [Search V3 job repository](../src/main/java/com/prizm/search/v3/indexing/repository/SearchV3IndexingJobRepository.java)
 - [Search V3 job service](../src/main/java/com/prizm/search/v3/indexing/service/SearchV3IndexingJobService.java)
 - [Search V3 inventory repository](../src/main/java/com/prizm/search/v3/indexing/repository/SearchV3InventoryActivationRepository.java)
 - [Search V3 inventory verifier](../src/main/java/com/prizm/search/v3/indexing/service/SearchV3InventoryVerifier.java)
 - [Search V3 activation service](../src/main/java/com/prizm/search/v3/indexing/service/SearchV3InventoryActivationService.java)
+- [Search V3 shadow indexing processor](../src/main/java/com/prizm/search/v3/indexing/service/SearchV3ShadowIndexingProcessor.java)
+- [Search V3 artifact storage service](../src/main/java/com/prizm/search/v3/indexing/service/SearchV3ArtifactStorageService.java)
+- [Search V3 structure builder](../src/main/java/com/prizm/search/v3/indexing/structure/SearchV3StructureBuilder.java)
 - [Search V3 inventory·activation PostgreSQL test](../src/integrationTest/java/com/prizm/infrastructure/SearchV3InventoryActivationRuntimeTest.java)
+- [Search V3 shadow Worker PostgreSQL test](../src/integrationTest/java/com/prizm/infrastructure/SearchV3ShadowIndexingWorkerRuntimeTest.java)
 
 ## 8. 상태 전이
 

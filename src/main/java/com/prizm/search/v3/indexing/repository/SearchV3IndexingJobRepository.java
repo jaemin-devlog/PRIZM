@@ -1,6 +1,7 @@
 package com.prizm.search.v3.indexing.repository;
 
 import com.prizm.search.v3.indexing.model.SearchV3IndexingFailureStage;
+import com.prizm.search.v3.indexing.model.SearchV3IndexGenerationStatus;
 import com.prizm.search.v3.indexing.model.SearchV3IndexingJobClaim;
 import com.prizm.search.v3.indexing.model.SearchV3RecoveryLock;
 import java.sql.ResultSet;
@@ -27,9 +28,10 @@ public class SearchV3IndexingJobRepository {
                  AND generation.owner_user_id = job.owner_user_id
                  AND generation.document_id = job.document_id
                  AND generation.document_version_id = job.document_version_id
-                WHERE (job.status = 'PENDING'
-                       OR (job.status = 'RETRY_WAIT' AND job.next_retry_at <= now()))
-                  AND generation.status = 'BUILDING'
+                WHERE (job.status = 'PENDING' AND generation.status = 'BUILDING')
+                   OR (job.status = 'RETRY_WAIT'
+                       AND job.next_retry_at <= now()
+                       AND generation.status IN ('BUILDING', 'READY'))
                 ORDER BY COALESCE(job.next_retry_at, job.created_at), job.id
                 FOR UPDATE OF job SKIP LOCKED
                 LIMIT 1
@@ -79,6 +81,26 @@ public class SearchV3IndexingJobRepository {
                     AND generation.status IN ('BUILDING', 'READY')
               )
             RETURNING job.lease_expires_at
+            """;
+
+    private static final String FIND_CURRENT_GENERATION_STATUS_SQL = """
+            SELECT generation.status
+            FROM search_v3_indexing_jobs job
+            JOIN search_v3_index_generations generation
+              ON generation.id = job.generation_id
+             AND generation.owner_user_id = job.owner_user_id
+             AND generation.document_id = job.document_id
+             AND generation.document_version_id = job.document_version_id
+            WHERE job.id = ?
+              AND job.generation_id = ?
+              AND job.owner_user_id = ?
+              AND job.document_id = ?
+              AND job.document_version_id = ?
+              AND job.claim_version = ?
+              AND job.status = 'PROCESSING'
+              AND job.recovery_lock_token IS NULL
+              AND job.recovery_locked_at IS NULL
+              AND generation.status IN ('BUILDING', 'READY')
             """;
 
     private static final String ACQUIRE_RECOVERY_LOCK_SQL = """
@@ -174,6 +196,40 @@ public class SearchV3IndexingJobRepository {
               )
             """;
 
+    private static final String DEFER_ACTIVATION_SQL = """
+            UPDATE search_v3_indexing_jobs job
+            SET status = 'RETRY_WAIT',
+                next_retry_at = now() + make_interval(secs => CAST(? AS double precision) / 1000.0),
+                lease_expires_at = NULL,
+                recovery_lock_token = NULL,
+                recovery_locked_at = NULL,
+                started_at = NULL,
+                completed_at = NULL,
+                failed_at = NULL,
+                failure_stage = NULL,
+                error_message = ?,
+                updated_at = now()
+            WHERE job.id = ?
+              AND job.generation_id = ?
+              AND job.owner_user_id = ?
+              AND job.document_id = ?
+              AND job.document_version_id = ?
+              AND job.claim_version = ?
+              AND job.status = 'PROCESSING'
+              AND job.recovery_lock_token IS NULL
+              AND job.recovery_locked_at IS NULL
+              AND EXISTS (
+                  SELECT 1
+                  FROM search_v3_index_generations generation
+                  WHERE generation.id = job.generation_id
+                    AND generation.owner_user_id = job.owner_user_id
+                    AND generation.document_id = job.document_id
+                    AND generation.document_version_id = job.document_version_id
+                    AND generation.status = 'READY'
+              )
+            RETURNING job.next_retry_at
+            """;
+
     private static final String FAIL_SQL = """
             WITH locked_job AS (
                 SELECT job.id, job.generation_id, job.owner_user_id,
@@ -254,6 +310,15 @@ public class SearchV3IndexingJobRepository {
         return expiries.stream().findFirst();
     }
 
+    public Optional<SearchV3IndexGenerationStatus> findCurrentGenerationStatus(
+            SearchV3IndexingJobClaim claim) {
+        List<SearchV3IndexGenerationStatus> statuses = jdbcTemplate.query(
+                FIND_CURRENT_GENERATION_STATUS_SQL,
+                statement -> bindClaimIdentity(statement, 1, claim),
+                (resultSet, rowNum) -> SearchV3IndexGenerationStatus.valueOf(resultSet.getString("status")));
+        return statuses.stream().findFirst();
+    }
+
     public Optional<SearchV3RecoveryLock> acquireNextRecoveryLock(UUID recoveryToken) {
         List<SearchV3RecoveryLock> locks = jdbcTemplate.query(
                 ACQUIRE_RECOVERY_LOCK_SQL,
@@ -289,6 +354,21 @@ public class SearchV3IndexingJobRepository {
                     statement.setString(2, errorMessage);
                     bindClaimIdentity(statement, 3, claim);
                 }) == 1;
+    }
+
+    public Optional<Instant> deferActivation(
+            SearchV3IndexingJobClaim claim,
+            Duration retryDelay,
+            String errorMessage) {
+        List<Instant> retryTimes = jdbcTemplate.query(
+                DEFER_ACTIVATION_SQL,
+                statement -> {
+                    statement.setLong(1, retryDelay.toMillis());
+                    statement.setString(2, errorMessage);
+                    bindClaimIdentity(statement, 3, claim);
+                },
+                (resultSet, rowNum) -> resultSet.getTimestamp("next_retry_at").toInstant());
+        return retryTimes.stream().findFirst();
     }
 
     public boolean fail(

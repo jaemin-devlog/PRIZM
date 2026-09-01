@@ -91,7 +91,7 @@ final class OpenSqlRuntimePrivilegePreparation {
                 .outOfOrder(false)
                 .load();
         assertThat(flyway.info().current()).isNotNull();
-        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("19");
+        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("20");
         assertThat(flyway.info().pending()).isEmpty();
 
         List<String> versions = jdbc.queryForList(
@@ -99,7 +99,8 @@ final class OpenSqlRuntimePrivilegePreparation {
                         + "WHERE success AND version IS NOT NULL ORDER BY installed_rank",
                 String.class);
         assertThat(versions).containsExactly(
-                "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19");
+                "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+                "11", "12", "13", "14", "15", "16", "17", "18", "19", "20");
         assertThat(jdbc.queryForObject(
                 "SELECT COUNT(*) FROM flyway_schema_history WHERE NOT success", Long.class)).isZero();
 

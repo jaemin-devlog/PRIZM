@@ -307,6 +307,22 @@ flowchart TD
 브라우저가 임의 경로를 등록하는 API는 없으며, 사용자별 문서 작업이나 업로드
 rollback 보상 경로가 정리 작업을 만듭니다.
 
+### Search V3 shadow 저장 경계
+
+V18은 Search V2의 `document_chunks`를 유지한 채 Search V3 색인 세대를 나란히 저장할 수 있는
+shadow schema를 추가합니다. `SearchIndexGeneration`은 `DocumentVersion`과 분리돼 같은 원본 version을
+정책·모델 계약이 다른 여러 세대로 다시 색인할 수 있습니다. 각 세대에는 독립 manifest, V3 전용 작업,
+`RetrievalPassage`, `EvidenceChild`와 두 종류의 BGE-M3 vector가 연결됩니다.
+
+`documents.active_search_v3_generation_id`는 nullable입니다. 최초 업로드나 V3 색인이 없는 문서는 null이
+정상이며, 값이 있으면 owner·문서·현재 `active_version_id`가 같은 generation만 가리킬 수 있습니다. 실제
+검색 가능 조건인 `ACTIVE generation + COMPLETED V3 job` 확인과 원자적 pointer 교체는 후속 service
+transaction 책임입니다. 현재 Production Search와 Worker는 이 schema를 읽거나 쓰지 않습니다.
+
+복합 FK는 generation부터 Passage·Child·vector까지 owner·문서·version 계보가 섞이지 않게 합니다.
+vector PK/FK는 artifact별 중복과 orphan을 막고, frozen manifest와 실제 inventory가 모두 존재하는지는
+READY/activation service가 잠금 아래 확인해야 합니다.
+
 근거:
 
 - [사용자 entity](../src/main/java/com/prizm/user/entity/UserAccount.java)
@@ -320,6 +336,7 @@ rollback 보상 경로가 정리 작업을 만듭니다.
 - [ChangeLog migration](../src/main/resources/db/migration/V14__create_document_change_logs.sql)
 - [파일 정리 migration](../src/main/resources/db/migration/V12__add_file_cleanup_jobs.sql)
 - [문서 태그 migration](../src/main/resources/db/migration/V16__create_document_tags.sql)
+- [Search V3 shadow storage migration](../src/main/resources/db/migration/V18__create_search_v3_shadow_storage.sql)
 
 ## 8. 상태 전이
 

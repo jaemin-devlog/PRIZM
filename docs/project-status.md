@@ -68,6 +68,17 @@
 - 실패 시 이전 `ACTIVE` 유지, 작업 유효시간·복구·선점 세대 확인으로 이전 Worker 결과 차단
 - 안전한 파일 삭제 조건을 만족하지 않으면 정리를 중단하는 fail-closed 동작
 
+### Search V3 리팩토링 branch
+
+- V18 migration source는 기존 `document_chunks` 옆에 generation, V3 전용 작업, `RetrievalPassage`,
+  `EvidenceChild`와 두 vector 계열을 저장하는 shadow schema를 정의함
+- owner·문서·version·generation composite FK, nullable active-generation pointer와 artifact/vector 중복·orphan
+  방지 제약을 포함함
+- JPA entity/repository, V3 Worker, 활성화 transaction과 검색 query는 아직 구현하지 않음
+- Production Search V2, API, frontend와 MCP는 Search V3 shadow table을 사용하지 않음
+- PostgreSQL 16+pgvector Testcontainers에서 V1~V18 migration 회귀 `9/9`, Search V3 lineage·vector·active
+  pointer 제약 `7/7`을 실행했으며 자세한 범위는 PRZ-037 evidence를 따름
+
 ### 검색과 원문 위치
 
 - 단일 결과와 최대 5개의 경력 근거 결과

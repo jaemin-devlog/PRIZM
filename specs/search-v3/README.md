@@ -10,8 +10,9 @@ Search V3는 검색 알고리즘을 먼저 정하지 않고, 같은 Fresh Genera
 | --- | --- |
 | 통합 개발선 | `refactor/search-v3` |
 | 생성 기준 HEAD | `PRZ-034-atomic-evidence-child-selector@500e53453b01b6cf922f221794257eb523a80bd6` |
-| Production 적용 | `NOT_RUN` |
+| Production 검색 적용 | `NOT_RUN` |
 | Production 변경 | `0` |
+| Shadow 저장 구조 | PRZ-037 V18 migration `SHADOW_STORAGE_READY` |
 | SEALED FINAL | `opened=false`, `searchExecuted=false` |
 | Fresh baseline | `CURRENT_FRESH_BASELINE=NOT_RUN` |
 
@@ -33,6 +34,9 @@ Typed Validation과 Evidence Selection, 같은 Passage 안에서 동작하는 `C
 | [PRZ-032](../PRZ-032-minimal-v3-shadow-comparison/evidence.md) | 기존 Search V2와 최소 V3 비교 | `MIXED_NEEDS_NEXT_CAPABILITY`; Child 선택 병목 확인 |
 | [PRZ-033](../PRZ-033-atomic-evidence-child-selection-ceiling/evidence.md) | Passage 내부 Child 선택 Oracle 상한 | `BUILD_CHILD_SELECTOR` |
 | [PRZ-034](../PRZ-034-atomic-evidence-child-selector/evidence.md) | 동일 BGE-M3로 Passage 내부 Child 선택 | `PROMISING` |
+| [PRZ-035](../PRZ-035-child-embedding-operation-strategy/evidence.md) | Child embedding 계산·보관 시점 비교 | `PRECOMPUTE_CHILD_EMBEDDINGS` |
+| [PRZ-036](../PRZ-036-search-v3-index-lifecycle/evidence.md) | generation, manifest, activation·복구 생명주기 | `SHADOW_INDEX_LIFECYCLE_READY` |
+| [PRZ-037](../PRZ-037-search-v3-shadow-storage/evidence.md) | PostgreSQL shadow 저장 구조와 제약 | `SHADOW_STORAGE_READY` |
 
 PRZ-027은 PRZ-026에서 갈라진 `NO_GO` side branch이며 PRZ-028 이후 commit의 조상이 아니다.
 PRZ-031은 `NO_GO` 실험 기록을 포함하지만 그 다음 PRZ가 같은 branch 계보에서 이어졌다. 실패
@@ -53,6 +57,9 @@ origin/main
                      └─ PRZ-033
                         └─ PRZ-034
                            └─ refactor/search-v3
+                              └─ PRZ-035
+                                 └─ PRZ-036
+                                    └─ PRZ-037  SHADOW_STORAGE_READY
 ```
 
 ## Search V3 branch 운영

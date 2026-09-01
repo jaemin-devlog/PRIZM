@@ -113,3 +113,49 @@ generalization benchmark는 아니다. 현재 정확도를 주장하려면 corpu
 - [PRZ-016 검색 연구 기록](../../specs/PRZ-016-search-performance-v2/README.md)
 - [PRZ-022 검색 재계산 결과](../../specs/PRZ-022-backend-reliability-evidence/results/search.json)
 - [PRZ-022 최종 판정](../../specs/PRZ-022-backend-reliability-evidence/evidence.md#1-검색-품질일반화)
+
+## 5. 검색 규칙을 덧붙이지 않고 근거 구조부터 다시 설계
+
+### 문제
+
+`v1.0.0`의 검색은 문서를 800자 단위로 자르고 앞 조각과 120자를 겹쳤다. 구현은
+단순했지만 서로 다른 경험이 한 검색 조각에 함께 들어가 사용자에게 보여 줄 근거의 경계가
+흐려질 수 있었다. 개발용 데이터에서 좋아진 방법도 처음 보는 사용자 문서와 질문에서
+실패했다. 실패 사례마다 규칙을 보태면 특정 문서와 질문에 맞춰질 위험이 있었고, 이미
+릴리스한 검색을 곧바로 교체해서는 공정한 비교도 할 수 없었다.
+
+### 해결
+
+- Search V3를 구현하기 전에 데이터를 개발용, 조정용, 최종 검증용으로 나눴다. 같은
+  사용자, 원문 사실, 문서 양식 계보가 평가 구간을 넘지 않게 했고 정답은 조각 ID가 아니라
+  실제 원문 위치로 정의했다. 최종 검증 데이터는 검색에 사용하지 않고 봉인했다.
+- 원문 근거인 `EvidenceChild`와 검색 단위인 `RetrievalPassage`를 분리했다. 화면에 보여 줄
+  근거는 작고 정확하게 보존하고, 검색할 때만 같은 경험 안의 인접 근거를 묶었다. 서로 다른
+  경험은 합치지 않았다.
+- 숫자·날짜·버전 조건은 의미 유사도 점수에 섞지 않고, 검색된 원문이 질문의 정확한 조건과 맞는지 확인하는 데만 사용했다.
+- 상위 제목 추가, 별도 Cross Encoder 재정렬, Qwen3-4B 직접 관련성 판별은 평가에서
+  개선을 증명하지 못해 제외했다. Parent Dense, Sparse Search와 QueryPlanner도 보류했다.
+  남은 병목은 올바른 `RetrievalPassage` 안에서 최종 `EvidenceChild`를 고르는 단계였다.
+  새 모델 대신 기존 BGE-M3와 같은 질문 벡터로 한 묶음 안의 원문만 다시 비교했다.
+
+### 검증과 트레이드오프
+
+DEV/CAL 비교 평가에서 기존 검색과 V3의 검색 후보 Recall@5/20은 모두 100%였다. 반면
+기존 검색 최종 결과에서 서로 다른 경험이 섞인 비율은 70.80%였고 V3는 0%였다. 원문
+위치 정확도 지표도 49.43%에서 95.73%로 높아졌다.
+
+같은 V3 검색 묶음 안에서 BGE-M3로 원문을 다시 고르자 Top1은 54.12%에서 90.59%,
+MRR은 75.76%에서 94.12%, 사용자 단위 평균 Top1은 58.80%에서 90.06%로 개선됐다.
+개선 33건, 회귀 0건이었고 기존 1위 직접 근거 46/46을 유지했다. 이론적으로 복구
+가능했던 Child 선택 문제도 32건 중 31건을 해결했다. 대신 Child 227개를 추가로
+임베딩해야 했다. 이 수치는 117개 DEV/CAL 질문의 평가 결과이며 실서비스 성능을 뜻하지
+않는다. Search V3는 아직 평가 전용이고 최종 봉인 데이터도 열지 않았다.
+
+근거:
+
+- [Search V3 평가 기반](../../specs/PRZ-025-search-v3-foundation/spec.md)
+- [구조형 검색과 RetrievalPassage](../../specs/PRZ-026-structural-parsing-parent-child/evidence.md)
+- [기존 검색과 최소 V3 비교](../../specs/PRZ-032-minimal-v3-shadow-comparison/evidence.md)
+- [EvidenceChild 선택의 이론적 최대치](../../specs/PRZ-033-atomic-evidence-child-selection-ceiling/evidence.md)
+- [BGE-M3 EvidenceChild 선택 결과](../../specs/PRZ-034-atomic-evidence-child-selector/evidence.md)
+- [채택하지 않은 Qwen3-4B 실험](../../specs/PRZ-031-semantic-evidence-directness/evidence.md)

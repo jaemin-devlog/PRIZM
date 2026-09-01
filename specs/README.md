@@ -83,6 +83,7 @@ Search V3의 실험 흐름, 채택·비채택 결과와 전용 branch 운영 경
 | PRZ&#8209;033 | [EvidenceChild 선택 상한](PRZ-033-atomic-evidence-child-selection-ceiling/spec.md) | `VERIFIED` | [근거](PRZ-033-atomic-evidence-child-selection-ceiling/evidence.md) |
 | PRZ&#8209;034 | [EvidenceChild 선택기](PRZ-034-atomic-evidence-child-selector/spec.md) | `VERIFIED` | [근거](PRZ-034-atomic-evidence-child-selector/evidence.md) |
 | PRZ&#8209;035 | [Child embedding 운영 전략](PRZ-035-child-embedding-operation-strategy/spec.md) | `VERIFIED` | [근거](PRZ-035-child-embedding-operation-strategy/evidence.md) |
+| PRZ&#8209;036 | [Search V3 색인 생명주기](PRZ-036-search-v3-index-lifecycle/spec.md) | `VERIFIED` | [근거](PRZ-036-search-v3-index-lifecycle/evidence.md) |
 
 ## 연구·미채택 기록
 

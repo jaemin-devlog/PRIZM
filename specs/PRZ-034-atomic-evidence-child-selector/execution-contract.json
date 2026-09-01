@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "artifactType": "PRZ034_ATOMIC_CHILD_DENSE_SELECTOR_EXECUTION_CONTRACT",
+  "status": "OFFICIAL_COMPARISON_NOT_RUN",
+  "codeFreezeCommit": "8838985a05653ec719bfc7e346186fda78a53da0",
+  "selectorInputCanonicalSha256": "778b79117d47344433bed8d01f0f18a39ab4ae20f8f0ff444b2d8d5bd41c43ca",
+  "selectorPolicyVersion": "CHILD_DENSE_V1",
+  "selectorPolicySha256": "29b211d18478f600356c4e9d92835eeae7f218d9a04fa8f9cb5751a937ad9e23",
+  "sourceSha256": "447e2630a0217e11c870b0a4131b46d3f0d44d34afa967ae7771f9e6d13ec8ce",
+  "modelDigest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+  "topPassageK": 5,
+  "comparisonPolicySha256": "bcd0cbd76c1899498a26bd4ea70c5f77841e5a676954ef9feba6632eb1c1143e"
+}

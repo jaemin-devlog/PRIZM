@@ -1,6 +1,6 @@
 # PRZ-035 Plan
 
-- 상태: `IN_PROGRESS`
+- 상태: `COMPLETED / PRECOMPUTE_CHILD_EMBEDDINGS`
 
 1. `ORIENT` — `refactor/search-v3`, PRZ-034 ancestry, clean worktree, local artifact와 SEALED 상태를 확인한다.
 2. `SPEC` — A/B 정의, exact result parity, 비용 산식과 판정 Gate를 결과 전에 고정한다.

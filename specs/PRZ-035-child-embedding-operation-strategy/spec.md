@@ -1,6 +1,6 @@
 # PRZ-035 Child embedding 운영 전략
 
-- 상태: `IN_PROGRESS`
+- 상태: `VERIFIED / PRECOMPUTE_CHILD_EMBEDDINGS`
 - 유형: Search V3 운영 전략 비교
 - branch: `PRZ-035-child-embedding-operation-strategy`
 - 기준: `refactor/search-v3@a6fb5ee5240b0b1fcc59f78b329b55563512df1d`

@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  */
 final class SearchV3SemanticDirectnessPredictionFreeze {
 
-    static final int SCHEMA_VERSION = 1;
+    static final int SCHEMA_VERSION = 2;
     static final int SEMANTIC_QUERY_COUNT = 79;
     static final int SEMANTIC_CANDIDATE_COUNT = 670;
     static final int INFERENCE_TOP_K = 10;
@@ -44,7 +44,7 @@ final class SearchV3SemanticDirectnessPredictionFreeze {
     static final int TYPED_QUERY_COUNT = 0;
 
     private static final String COMBINED_SUITE = "PRZ031_SEMANTIC_DIRECTNESS_INPUT";
-    private static final String COMBINED_VERSION = "PRZ031_SEMANTIC_DIRECTNESS_INPUT_V1";
+    private static final String COMBINED_VERSION = "PRZ031_SEMANTIC_DIRECTNESS_INPUT_V2";
     private static final Pattern SHA256 = Pattern.compile("^[0-9a-f]{64}$");
     private static final List<ExpectedSuite> EXPECTED_SUITES = List.of(
             new ExpectedSuite(
@@ -318,10 +318,6 @@ final class SearchV3SemanticDirectnessPredictionFreeze {
             requireNonBlank(prediction.queryId(), "prediction queryId");
             requireNonBlank(prediction.candidateId(), "prediction candidateId");
             Objects.requireNonNull(prediction.relation(), "prediction relation");
-            Objects.requireNonNull(prediction.reasonCode(), "prediction reasonCode");
-            if (prediction.reasonCode() != prediction.relation().requiredReasonCode()) {
-                throw new IllegalArgumentException("prediction relation/reason-code mismatch");
-            }
             PairKey key = new PairKey(prediction.queryId(), prediction.candidateId());
             ExpectedPair expectedPair = expected.get(key);
             if (expectedPair == null || expectedPair.sourceRank() != prediction.sourceRank()) {
@@ -388,7 +384,7 @@ final class SearchV3SemanticDirectnessPredictionFreeze {
         try {
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             try (DataOutputStream output = new DataOutputStream(bytes)) {
-                writeString(output, "PRIZM_SEARCH_V3_DIRECTNESS_RUN_CONTRACT");
+                writeString(output, "PRIZM_SEARCH_V3_DIRECTNESS_RUN_CONTRACT_V2");
                 writeContract(output, contract);
             }
             return sha256(bytes.toByteArray());
@@ -402,7 +398,7 @@ final class SearchV3SemanticDirectnessPredictionFreeze {
         try {
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             try (DataOutputStream output = new DataOutputStream(bytes)) {
-                writeString(output, "PRIZM_SEARCH_V3_DIRECTNESS_INPUT_FREEZE");
+                writeString(output, "PRIZM_SEARCH_V3_DIRECTNESS_INPUT_FREEZE_V2");
                 output.writeInt(input.schemaVersion());
                 writeContract(output, input.contract());
                 output.writeInt(input.sourceSuites().size());
@@ -437,7 +433,7 @@ final class SearchV3SemanticDirectnessPredictionFreeze {
         try {
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             try (DataOutputStream canonical = new DataOutputStream(bytes)) {
-                writeString(canonical, "PRIZM_SEARCH_V3_DIRECTNESS_OUTPUT_FREEZE");
+                writeString(canonical, "PRIZM_SEARCH_V3_DIRECTNESS_OUTPUT_FREEZE_V2");
                 canonical.writeInt(output.schemaVersion());
                 writeString(canonical, output.inputSha256());
                 writeString(canonical, output.contractSha256());
@@ -447,7 +443,6 @@ final class SearchV3SemanticDirectnessPredictionFreeze {
                     writeString(canonical, prediction.candidateId());
                     canonical.writeInt(prediction.sourceRank());
                     writeString(canonical, prediction.relation().name());
-                    writeString(canonical, prediction.reasonCode().name());
                 }
             }
             return bytes.toByteArray();
@@ -475,7 +470,7 @@ final class SearchV3SemanticDirectnessPredictionFreeze {
     }
 
     private static String sourceInventorySha256(List<SourceSuite> sources) {
-        StringBuilder canonical = new StringBuilder("PRZ031_SOURCE_CANDIDATE_FREEZES\n");
+        StringBuilder canonical = new StringBuilder("PRZ031_V2_SOURCE_CANDIDATE_FREEZES\n");
         for (SourceSuite source : sources) {
             canonical.append(source.suite()).append('\0')
                     .append(source.datasetVersion()).append('\0')
@@ -557,27 +552,10 @@ final class SearchV3SemanticDirectnessPredictionFreeze {
     }
 
     enum Relation {
-        DIRECT_MATCH(ReasonCode.DIRECT_ANSWER),
-        RELATED_CONTEXT(ReasonCode.RELATED_NOT_DIRECT),
-        QUERY_CONFLICT(ReasonCode.QUERY_MEANING_MISMATCH),
-        INSUFFICIENT(ReasonCode.INSUFFICIENT_INFORMATION);
-
-        private final ReasonCode requiredReasonCode;
-
-        Relation(ReasonCode requiredReasonCode) {
-            this.requiredReasonCode = requiredReasonCode;
-        }
-
-        ReasonCode requiredReasonCode() {
-            return requiredReasonCode;
-        }
-    }
-
-    enum ReasonCode {
-        DIRECT_ANSWER,
-        RELATED_NOT_DIRECT,
-        QUERY_MEANING_MISMATCH,
-        INSUFFICIENT_INFORMATION
+        DIRECT_MATCH,
+        RELATED_CONTEXT,
+        QUERY_CONFLICT,
+        INSUFFICIENT
     }
 
     record RunContract(
@@ -680,8 +658,7 @@ final class SearchV3SemanticDirectnessPredictionFreeze {
             String queryId,
             String candidateId,
             int sourceRank,
-            Relation relation,
-            ReasonCode reasonCode) {
+            Relation relation) {
     }
 
     record Output(

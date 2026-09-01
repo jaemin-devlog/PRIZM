@@ -234,3 +234,53 @@ $prz031Docs = @(
 $prz031Docs | Where-Object { -not (Test-Path -LiteralPath $_) }
 git diff --cached --name-only
 ```
+
+## 8. D2 Output Protocol V2
+
+### 시작과 역사 경계
+
+- 시작 HEAD: `c7bde3598403d495a44236dc166123d733be8e64`
+- D1: `PROTOCOL_NO_GO / SEMANTIC_QUALITY_NOT_EVALUATED`; output row `0`, Gold join `0`
+- D1 candidate file SHA-256: `708f8f647a57a3b42a55a9c11ac76d925646491d5bee1997e052f6690e77107a`
+- D1 input file/canonical SHA-256:
+  `b91c6864f809560ee486cd00cad2a21ec7aae02844fa51a902a842e909943671` /
+  `4242e751831cb59d1a2c9849a1063f6a6044bae87f2a6cbdbce168acedfd6359`
+- D1 marker/failure SHA-256:
+  `af1ba1d799153b09a83e13114128824636517d6c2fed5da73de1fa667fd5a470` /
+  `aa2319d98f887da2d249bc6721072dac21c9dd66ba41997770e9f9d516ad202c`
+
+D2는 model, instruction, inference config, ranking policy와 candidate payload를 D1과 exact
+parity로 유지하고 output schema만 relation 단일 필드로 바꿨다. D1 contract SHA-256은
+`aa683f4cecb21c90d91d43c7b77bb31cb2f98fe0cd8c7a2c916962eef620d77e`, D2 contract는
+`ea04a9429aa42d1e2032d7165b01576d239dcc3248d4ce212ed71c74e5eb3a84`, instruction/config/ranking
+hash는 각각 `3b76fc147b2c8cb3ac0baab4b01a2611aebaadfd77b051b4185be0baa1fc5a55`,
+`c63e74cb4e7d79453973d747819eef0a0d9ea0420f0ae95dfb1cfc57938b6c32`,
+`25e484a0d5f2c450cd63288160c2ab334e71e398bffc6ccf3c94867614602d88`로 동일하다.
+
+### Protocol conformance
+
+- protocol: `SEMANTIC_DIRECTNESS_PROTOCOL_V2`
+- fixture: benchmark와 무관한 generic pair 16개; file SHA-256
+  `0f7625b2119f6ad0de9957803fa8d13c2ac4151c11c4b2161b669a4f816c1007`
+- 실제 결과: attempted `16`, parse success `16`, schema success `16`, enum violation `0`,
+  extra field `0`, malformed `0`
+- 판정: `PROTOCOL_V2_PASS`
+- conformance output file/canonical SHA-256:
+  `084cbb4d8755d6dda29840e0ca39f78d8fe15dc42156e3e98258217fca4c0b0c` /
+  `76863e106754e7271a056b3d5cd65c7d1b80ac829027425205e4e6b063828571`
+- marker SHA-256: `8b24830d134ee2bc6091249d1706b51d6dafc433aaedded6e5d1af12509e08be`
+- conformance wall/average/p95: `37,729.30 ms` / `2,357.90 ms` / `5,118.36 ms`
+
+첫 sandbox 실행은 model call과 marker 생성 전에 Ollama executable read 권한으로 중단됐다.
+동일 command를 승인된 host 경계에서 실행해 위 단일 conformance marker/output을 생성했다.
+공식 D2 semantic inference, V2 output, Gold join과 semantic metric은 아직 `NOT_RUN`이다.
+
+### 현재 검증
+
+- Python compile/self-test: `PASS`; valid enum 4, invalid form 12 reject, violation category 4
+- focused `searchEvaluation`: 27 tests, 24 `PASS`, opt-in 3 `SKIPPED`, failure/error `0`
+- 독립 audit: 최초 finding인 official marker 전 code-freeze/clean-tree 확인 누락을 runner에서
+  fail-closed로 보완했고 재감사 blocking finding `0`
+- Production/migration/dependency/frontend/MCP/Docker 변경: `0`
+- SEALED manifest/tree/combined: 기존 SHA 유지, `opened=false`, `searchExecuted=false`,
+  `CURRENT_FRESH_BASELINE=NOT_RUN`

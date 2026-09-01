@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/** Evaluation-only D0/D1/O10 comparison over an already Gold-joined candidate freeze. */
+/** Evaluation-only D0/D2/O10 comparison over an already Gold-joined candidate freeze. */
 final class SearchV3SemanticDirectnessEvaluator {
 
     static final int VALIDATION_TOP_K = 10;
@@ -33,6 +33,11 @@ final class SearchV3SemanticDirectnessEvaluator {
 
     private static final Set<String> COMPLETION_CATEGORIES = Set.of(
             "completion_state", "completed_production", "attempted_prototype", "planned");
+    private static final List<DirectnessRelation> RELATION_PRIORITY = List.of(
+            DirectnessRelation.DIRECT_MATCH,
+            DirectnessRelation.RELATED_CONTEXT,
+            DirectnessRelation.QUERY_CONFLICT,
+            DirectnessRelation.INSUFFICIENT);
     private final SearchV3OracleCeilingEvaluator oracle;
 
     SearchV3SemanticDirectnessEvaluator() {
@@ -77,27 +82,27 @@ final class SearchV3SemanticDirectnessEvaluator {
             validatePredictions(source, queryPredictions);
 
             List<String> d0Order = candidateIds(source.s0Ranking());
-            List<String> d1Order = d1Order(source.s0Ranking(), queryPredictions.candidates());
+            List<String> d2Order = d2Order(source.s0Ranking(), queryPredictions.candidates());
             List<OracleCandidate> o10Ranking = oracle.stablePartitionPrefix(
                     source.s0Ranking(), Math.min(VALIDATION_TOP_K, source.s0Ranking().size()));
             List<String> o10Order = candidateIds(o10Ranking);
             ScoredRanking d0 = oracle.scoreCandidateOrder(gold, source.s0Ranking(), d0Order);
-            ScoredRanking d1 = oracle.scoreCandidateOrder(gold, source.s0Ranking(), d1Order);
+            ScoredRanking d2 = oracle.scoreCandidateOrder(gold, source.s0Ranking(), d2Order);
             ScoredRanking o10 = oracle.scoreCandidateOrder(gold, source.s0Ranking(), o10Order);
-            if (d0.metrics().directRecallAt20() != d1.metrics().directRecallAt20()) {
-                throw new IllegalStateException("D0/D1 Direct Recall@20 candidate parity failed");
+            if (d0.metrics().directRecallAt20() != d2.metrics().directRecallAt20()) {
+                throw new IllegalStateException("D0/D2 Direct Recall@20 candidate parity failed");
             }
 
             Integer d0DirectRank = firstDirectRank(d0.ranking());
-            Integer d1DirectRank = firstDirectRank(d1.ranking());
+            Integer d2DirectRank = firstDirectRank(d2.ranking());
             Integer o10DirectRank = firstDirectRank(o10.ranking());
-            RankOutcome outcome = rankOutcome(source.directPositive(), d0DirectRank, d1DirectRank);
+            RankOutcome outcome = rankOutcome(source.directPositive(), d0DirectRank, d2DirectRank);
             boolean retentionEligible = Integer.valueOf(1).equals(d0DirectRank);
-            boolean retained = retentionEligible && Integer.valueOf(1).equals(d1DirectRank);
+            boolean retained = retentionEligible && Integer.valueOf(1).equals(d2DirectRank);
             boolean recovered = d0DirectRank != null
                     && d0DirectRank >= 2
                     && d0DirectRank <= VALIDATION_TOP_K
-                    && Integer.valueOf(1).equals(d1DirectRank);
+                    && Integer.valueOf(1).equals(d2DirectRank);
 
             Map<String, CandidatePrediction> predictionByCandidate = queryPredictions.candidates().stream()
                     .collect(Collectors.toMap(
@@ -111,9 +116,9 @@ final class SearchV3SemanticDirectnessEvaluator {
             CandidatePrediction denseTop1 = predictionByCandidate.get(
                     source.s0Ranking().get(0).candidate().candidateId());
             CandidatePrediction finalTop1 = predictionByCandidate.get(
-                    d1.ranking().get(0).candidate().candidateId());
+                    d2.ranking().get(0).candidate().candidateId());
             if (denseTop1 == null || finalTop1 == null) {
-                throw new IllegalStateException("D0/D1 Top1 must remain inside predicted Top10");
+                throw new IllegalStateException("D0/D2 Top1 must remain inside predicted Top10");
             }
 
             List<RelationJudgment> judgments = queryPredictions.candidates().stream()
@@ -134,13 +139,13 @@ final class SearchV3SemanticDirectnessEvaluator {
                     gold.answerability(),
                     source.directPositive(),
                     d0.metrics(),
-                    d1.metrics(),
+                    d2.metrics(),
                     o10.metrics(),
                     d0.ranking(),
-                    d1.ranking(),
+                    d2.ranking(),
                     o10.ranking(),
                     d0DirectRank,
-                    d1DirectRank,
+                    d2DirectRank,
                     o10DirectRank,
                     outcome,
                     retentionEligible,
@@ -177,11 +182,11 @@ final class SearchV3SemanticDirectnessEvaluator {
         }
     }
 
-    private List<String> d1Order(
+    private List<String> d2Order(
             List<OracleCandidate> s0,
             List<CandidatePrediction> predictions) {
         List<String> result = new ArrayList<>();
-        for (DirectnessRelation relation : DirectnessRelation.values()) {
+        for (DirectnessRelation relation : RELATION_PRIORITY) {
             predictions.stream()
                     .filter(value -> value.relation() == relation)
                     .map(CandidatePrediction::candidateId)
@@ -209,7 +214,7 @@ final class SearchV3SemanticDirectnessEvaluator {
         List<QueryMetrics> values = List.copyOf(queries);
         long directCount = values.stream().filter(QueryMetrics::directPositive).count();
         PathAggregate d0 = pathAggregate(values, QueryMetrics::d0, directCount);
-        PathAggregate d1 = pathAggregate(values, QueryMetrics::d1, directCount);
+        PathAggregate d2 = pathAggregate(values, QueryMetrics::d2, directCount);
         PathAggregate o10 = pathAggregate(values, QueryMetrics::o10, directCount);
         UserMacroMetrics userMacro = userMacro(values);
         long wins = countOutcome(values, RankOutcome.WIN);
@@ -225,16 +230,16 @@ final class SearchV3SemanticDirectnessEvaluator {
                 .flatMap(value -> value.relationJudgments().stream()).toList());
         NoSupportDiagnostics noSupport = noSupport(values);
         CaptureMetrics captures = new CaptureMetrics(
-                capture(d0.top1(), d1.top1(), o10.top1()),
-                capture(d0.mrr(), d1.mrr(), o10.mrr()),
-                capture(d0.ndcgAt5(), d1.ndcgAt5(), o10.ndcgAt5()),
-                capture(userMacro.d0().top1(), userMacro.d1().top1(), userMacro.o10().top1()),
-                capture(userMacro.d0().mrr(), userMacro.d1().mrr(), userMacro.o10().mrr()));
+                capture(d0.top1(), d2.top1(), o10.top1()),
+                capture(d0.mrr(), d2.mrr(), o10.mrr()),
+                capture(d0.ndcgAt5(), d2.ndcgAt5(), o10.ndcgAt5()),
+                capture(userMacro.d0().top1(), userMacro.d2().top1(), userMacro.o10().top1()),
+                capture(userMacro.d0().mrr(), userMacro.d2().mrr(), userMacro.o10().mrr()));
         return new AggregateMetrics(
                 values.size(),
                 directCount,
                 d0,
-                d1,
+                d2,
                 o10,
                 userMacro,
                 wins,
@@ -276,7 +281,7 @@ final class SearchV3SemanticDirectnessEvaluator {
         return new UserMacroMetrics(
                 directUsers.size(),
                 pathMacro(directUsers, QueryMetrics::d0),
-                pathMacro(directUsers, QueryMetrics::d1),
+                pathMacro(directUsers, QueryMetrics::d2),
                 pathMacro(directUsers, QueryMetrics::o10));
     }
 
@@ -358,12 +363,12 @@ final class SearchV3SemanticDirectnessEvaluator {
                 ComparatorStatus.NOT_APPLICABLE);
     }
 
-    static CaptureMetric capture(double d0, double d1, double o10) {
+    static CaptureMetric capture(double d0, double d2, double o10) {
         double denominator = o10 - d0;
         if (Math.abs(denominator) <= GATE_EPSILON) {
-            return new CaptureMetric(d0, d1, o10, MetricStatus.NOT_APPLICABLE, null);
+            return new CaptureMetric(d0, d2, o10, MetricStatus.NOT_APPLICABLE, null);
         }
-        return new CaptureMetric(d0, d1, o10, MetricStatus.APPLICABLE, (d1 - d0) / denominator);
+        return new CaptureMetric(d0, d2, o10, MetricStatus.APPLICABLE, (d2 - d0) / denominator);
     }
 
     static GateAssessment assessGate(AggregateMetrics metrics, SafetyInputs safety) {
@@ -373,7 +378,7 @@ final class SearchV3SemanticDirectnessEvaluator {
         boolean retentionPassed = metrics.rank1Retention().status() == MetricStatus.APPLICABLE
                 && metrics.rank1Retention().value() + GATE_EPSILON >= MIN_RANK1_RETENTION;
         boolean winLossPassed = metrics.winCount() > metrics.lossCount();
-        boolean userMacroImproved = metrics.userMacro().d1().top1()
+        boolean userMacroImproved = metrics.userMacro().d2().top1()
                 > metrics.userMacro().d0().top1() + GATE_EPSILON;
         boolean relationPassed = metrics.relations().macroF1() + GATE_EPSILON
                 >= MIN_RELATION_MACRO_F1;
@@ -490,13 +495,13 @@ final class SearchV3SemanticDirectnessEvaluator {
                 .orElse(null);
     }
 
-    private static RankOutcome rankOutcome(boolean directPositive, Integer d0, Integer d1) {
+    private static RankOutcome rankOutcome(boolean directPositive, Integer d0, Integer d2) {
         if (!directPositive) return RankOutcome.NOT_APPLICABLE;
         if (d0 == null) return RankOutcome.RETRIEVAL_MISS;
-        if (d1 == null) {
-            throw new IllegalStateException("D1 lost a DIRECT candidate from an identical candidate set");
+        if (d2 == null) {
+            throw new IllegalStateException("D2 lost a DIRECT candidate from an identical candidate set");
         }
-        int compared = Integer.compare(d1, d0);
+        int compared = Integer.compare(d2, d0);
         if (compared < 0) return RankOutcome.WIN;
         if (compared > 0) return RankOutcome.LOSS;
         return RankOutcome.TIE;
@@ -585,12 +590,11 @@ final class SearchV3SemanticDirectnessEvaluator {
     record CandidatePrediction(
             int denseRank,
             String candidateId,
-            DirectnessRelation relation,
-            String reasonCode) {
+            DirectnessRelation relation) {
 
         CandidatePrediction {
             if (denseRank < 1 || candidateId == null || candidateId.isBlank()
-                    || relation == null || reasonCode == null || reasonCode.isBlank()) {
+                    || relation == null) {
                 throw new IllegalArgumentException("semantic directness prediction is invalid");
             }
         }
@@ -624,13 +628,13 @@ final class SearchV3SemanticDirectnessEvaluator {
             GoldAnswerability answerability,
             boolean directPositive,
             RankingMetrics d0,
-            RankingMetrics d1,
+            RankingMetrics d2,
             RankingMetrics o10,
             List<OracleCandidate> d0Ranking,
-            List<OracleCandidate> d1Ranking,
+            List<OracleCandidate> d2Ranking,
             List<OracleCandidate> o10Ranking,
             Integer d0FirstDirectRank,
-            Integer d1FirstDirectRank,
+            Integer d2FirstDirectRank,
             Integer o10FirstDirectRank,
             RankOutcome rankOutcome,
             boolean retentionEligible,
@@ -643,7 +647,7 @@ final class SearchV3SemanticDirectnessEvaluator {
         QueryMetrics {
             categories = List.copyOf(categories);
             d0Ranking = List.copyOf(d0Ranking);
-            d1Ranking = List.copyOf(d1Ranking);
+            d2Ranking = List.copyOf(d2Ranking);
             o10Ranking = List.copyOf(o10Ranking);
             relationJudgments = List.copyOf(relationJudgments);
         }
@@ -669,14 +673,14 @@ final class SearchV3SemanticDirectnessEvaluator {
     record UserMacroMetrics(
             long directPositiveUserCount,
             PathMacro d0,
-            PathMacro d1,
+            PathMacro d2,
             PathMacro o10) {
     }
 
     record RatioMetric(long numerator, long denominator, MetricStatus status, Double value) {
     }
 
-    record CaptureMetric(double d0, double d1, double o10, MetricStatus status, Double ratio) {
+    record CaptureMetric(double d0, double d2, double o10, MetricStatus status, Double ratio) {
     }
 
     record CaptureMetrics(
@@ -728,7 +732,7 @@ final class SearchV3SemanticDirectnessEvaluator {
             long queryCount,
             long directPositiveQueryCount,
             PathAggregate d0,
-            PathAggregate d1,
+            PathAggregate d2,
             PathAggregate o10,
             UserMacroMetrics userMacro,
             long winCount,

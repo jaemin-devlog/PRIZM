@@ -18,7 +18,6 @@ import com.prizm.search.evaluation.searchv3.structural.SearchV3SemanticDirectnes
 import com.prizm.search.evaluation.searchv3.structural.SearchV3SemanticDirectnessPredictionFreeze.PhaseGuard;
 import com.prizm.search.evaluation.searchv3.structural.SearchV3SemanticDirectnessPredictionFreeze.Prediction;
 import com.prizm.search.evaluation.searchv3.structural.SearchV3SemanticDirectnessPredictionFreeze.QueryInput;
-import com.prizm.search.evaluation.searchv3.structural.SearchV3SemanticDirectnessPredictionFreeze.ReasonCode;
 import com.prizm.search.evaluation.searchv3.structural.SearchV3SemanticDirectnessPredictionFreeze.Relation;
 import com.prizm.search.evaluation.searchv3.structural.SearchV3SemanticDirectnessPredictionFreeze.RunContract;
 import java.util.ArrayList;
@@ -31,6 +30,7 @@ class SearchV3SemanticDirectnessPredictionFreezeTest {
 
     @Test
     void freezesExactSemanticInventoryAndExposesOnlyQueryAndSourceTextForInference() {
+        assertThat(SearchV3SemanticDirectnessPredictionFreeze.SCHEMA_VERSION).isEqualTo(2);
         Input input = validInput();
         List<QueryInput> reversedQueries = new ArrayList<>(input.queries());
         Collections.reverse(reversedQueries);
@@ -116,7 +116,7 @@ class SearchV3SemanticDirectnessPredictionFreezeTest {
     }
 
     @Test
-    void outputRequiresEveryTop10PairAndStrictRelationReasonCodes() {
+    void outputRequiresEveryTop10PairAndFreezesRelationOnly() {
         FrozenInput input = SearchV3SemanticDirectnessPredictionFreeze.freezeInput(validInput());
         InputVerification inputVerification = SearchV3SemanticDirectnessPredictionFreeze.verifyInput(input);
         PhaseGuard guard = new PhaseGuard();
@@ -130,6 +130,9 @@ class SearchV3SemanticDirectnessPredictionFreezeTest {
         assertThat(verified.predictionCount()).isEqualTo(578);
         assertThat(verified.inputSha256()).isEqualTo(inputVerification.canonicalSha256());
         assertThat(verified.contractSha256()).isEqualTo(inputVerification.contractSha256());
+        assertThat(Prediction.class.getRecordComponents())
+                .extracting(java.lang.reflect.RecordComponent::getName)
+                .containsExactly("queryId", "candidateId", "sourceRank", "relation");
 
         List<Prediction> missing = new ArrayList<>(valid.predictions());
         missing.remove(missing.size() - 1);
@@ -138,21 +141,11 @@ class SearchV3SemanticDirectnessPredictionFreezeTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("578 prediction rows");
 
-        List<Prediction> wrongReason = new ArrayList<>(valid.predictions());
-        Prediction first = wrongReason.get(0);
-        wrongReason.set(0, new Prediction(
-                first.queryId(), first.candidateId(), first.sourceRank(),
-                Relation.DIRECT_MATCH, ReasonCode.RELATED_NOT_DIRECT));
-        assertThatThrownBy(() -> SearchV3SemanticDirectnessPredictionFreeze.freezeOutput(input, new Output(
-                valid.schemaVersion(), valid.inputSha256(), valid.contractSha256(), wrongReason)))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("relation/reason-code mismatch");
-
         List<Prediction> nonTop10 = new ArrayList<>(valid.predictions());
         Prediction last = nonTop10.get(nonTop10.size() - 1);
         nonTop10.set(nonTop10.size() - 1, new Prediction(
                 last.queryId(), last.candidateId(), 11,
-                last.relation(), last.reasonCode()));
+                last.relation()));
         assertThatThrownBy(() -> SearchV3SemanticDirectnessPredictionFreeze.freezeOutput(input, new Output(
                 valid.schemaVersion(), valid.inputSha256(), valid.contractSha256(), nonTop10)))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -207,7 +200,7 @@ class SearchV3SemanticDirectnessPredictionFreezeTest {
         Prediction first = changed.get(0);
         changed.set(0, new Prediction(
                 first.queryId(), first.candidateId(), first.sourceRank(),
-                Relation.RELATED_CONTEXT, ReasonCode.RELATED_NOT_DIRECT));
+                Relation.RELATED_CONTEXT));
         FrozenOutput tampered = new FrozenOutput(
                 new Output(output.schemaVersion(), output.inputSha256(), output.contractSha256(), changed),
                 frozen.canonicalSha256(), frozen.canonicalByteLength());
@@ -233,7 +226,7 @@ class SearchV3SemanticDirectnessPredictionFreezeTest {
             Relation relation = relations[index % relations.length];
             predictions.add(new Prediction(
                     pair.queryId(), pair.candidateId(), pair.sourceRank(),
-                    relation, relation.requiredReasonCode()));
+                    relation));
         }
         return new Output(
                 SearchV3SemanticDirectnessPredictionFreeze.SCHEMA_VERSION,
@@ -259,7 +252,7 @@ class SearchV3SemanticDirectnessPredictionFreezeTest {
 
     private RunContract contract() {
         String instruction = "Classify only query-to-source directness.";
-        String schema = "{relation:enum,reasonCode:enum}";
+        String schema = "{relation:enum}";
         String config = "temperature=0;seed=31;format=json";
         String policy = "Top10 stable partition; preserve ranks 11-20";
         return new RunContract(

@@ -41,10 +41,10 @@ import tools.jackson.databind.ObjectMapper;
 /** Gold-after-output adapter for the one-shot PRZ-031 semantic directness evaluation. */
 final class SearchV3SemanticDirectnessOfficialEvaluationAdapter {
 
-    static final int REPORT_SCHEMA_VERSION = 1;
-    static final String REPORT_ARTIFACT_TYPE = "PRZ031_SEMANTIC_DIRECTNESS_EVALUATION";
+    static final int REPORT_SCHEMA_VERSION = 2;
+    static final String REPORT_ARTIFACT_TYPE = "PRZ031_SEMANTIC_DIRECTNESS_EVALUATION_V2";
     static final Path DEFAULT_REPORT = Path.of(
-            "local/search-v3-evaluation/prz031/semantic-directness-evaluation.json");
+            "local/search-v3-evaluation/prz031/semantic-directness-v2-evaluation.json");
     private static final String LOCAL_REPORT_PREFIX = "local/search-v3-evaluation/prz031/";
     private static final Pattern SHA256 = Pattern.compile("^[0-9a-f]{64}$");
 
@@ -265,8 +265,7 @@ final class SearchV3SemanticDirectnessOfficialEvaluationAdapter {
                 values.stream().map(value -> new CandidatePrediction(
                         value.sourceRank(),
                         value.candidateId(),
-                        DirectnessRelation.valueOf(value.relation().name()),
-                        value.reasonCode().name())).toList())));
+                        DirectnessRelation.valueOf(value.relation().name()))).toList())));
         return Map.copyOf(result);
     }
 
@@ -358,7 +357,7 @@ final class SearchV3SemanticDirectnessOfficialEvaluationAdapter {
             List<String> categories,
             String answerability,
             Integer d0FirstDirectRank,
-            Integer d1FirstDirectRank,
+            Integer d2FirstDirectRank,
             Integer o10FirstDirectRank,
             String rankOutcome,
             boolean retained,
@@ -366,7 +365,7 @@ final class SearchV3SemanticDirectnessOfficialEvaluationAdapter {
             boolean denseTop1PredictedDirect,
             boolean finalTop1PredictedDirect,
             SearchV3OracleCeilingEvaluator.RankingMetrics d0,
-            SearchV3OracleCeilingEvaluator.RankingMetrics d1,
+            SearchV3OracleCeilingEvaluator.RankingMetrics d2,
             SearchV3OracleCeilingEvaluator.RankingMetrics o10) {
 
         QueryRow {
@@ -377,10 +376,10 @@ final class SearchV3SemanticDirectnessOfficialEvaluationAdapter {
             return new QueryRow(
                     value.queryId(), value.userBundleId(), value.suite(), value.split(),
                     value.professionGroup(), value.language(), value.categories(),
-                    value.answerability().name(), value.d0FirstDirectRank(), value.d1FirstDirectRank(),
+                    value.answerability().name(), value.d0FirstDirectRank(), value.d2FirstDirectRank(),
                     value.o10FirstDirectRank(), value.rankOutcome().name(), value.retained(),
                     value.recoveredToRank1(), value.denseTop1PredictedDirect(),
-                    value.finalTop1PredictedDirect(), value.d0(), value.d1(), value.o10());
+                    value.finalTop1PredictedDirect(), value.d0(), value.d2(), value.o10());
         }
     }
 
@@ -486,7 +485,7 @@ final class SearchV3SemanticDirectnessOfficialEvaluationAdapter {
                 metrics.lossCount(),
                 metrics.winCount(),
                 metrics.userMacro().d0().top1(),
-                metrics.userMacro().d1().top1(),
+                metrics.userMacro().d2().top1(),
                 metrics.rank1Retention().status(),
                 metrics.rank1Retention().value());
     }
@@ -497,7 +496,7 @@ final class SearchV3SemanticDirectnessOfficialEvaluationAdapter {
             long losses,
             long wins,
             double userMacroD0Top1,
-            double userMacroD1Top1,
+            double userMacroD2Top1,
             SearchV3SemanticDirectnessEvaluator.MetricStatus retentionStatus,
             Double retention) {
         if (gate == SearchV3SemanticDirectnessEvaluator.GateStatus.PASS) {
@@ -506,7 +505,7 @@ final class SearchV3SemanticDirectnessOfficialEvaluationAdapter {
         boolean coreNoGo = relationMacroF1 + SearchV3SemanticDirectnessEvaluator.GATE_EPSILON
                         < SearchV3SemanticDirectnessEvaluator.MIN_RELATION_MACRO_F1
                 || losses >= wins
-                || userMacroD1Top1
+                || userMacroD2Top1
                         <= userMacroD0Top1
                                 + SearchV3SemanticDirectnessEvaluator.GATE_EPSILON
                 || retentionStatus != SearchV3SemanticDirectnessEvaluator.MetricStatus.APPLICABLE

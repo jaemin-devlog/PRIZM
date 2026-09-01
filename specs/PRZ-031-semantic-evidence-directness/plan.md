@@ -16,10 +16,12 @@
 
 ## 현재 Gate
 
-code/contract/input/model identity를 동결하고 official inference를 한 번 시작했다. 첫 response가
-strict relation/reasonCode pair validation을 통과하지 못해 output freeze와 Gold join 전에
-fail-closed했다. 같은 dataset 재실행, prompt/model/policy 수정과 다른 모델 시험은 하지 않는다.
-PRZ-031 판정은 `NO_GO`이며 Evidence Selection 통합 단계로 진행하지 않는다.
+D1은 첫 response의 strict relation/reasonCode pair validation 실패로 output freeze와 Gold
+join 전에 fail-closed했고 `PROTOCOL_NO_GO / SEMANTIC_QUALITY_NOT_EVALUATED`로 보존한다.
+D2는 동일 model/instruction/config/candidate/ranking에서 output을 relation 단일 필드로만
+줄인다. 16-pair generic conformance는 16/16 strict parse/schema, enum/extra/malformed 0으로
+`PROTOCOL_V2_PASS`다. 다음 Gate는 code/contract를 commit으로 동결하고 D1 candidate
+payload를 V2 envelope로 재봉인하는 것이다.
 
 ## 공식 실행 조건
 
@@ -31,3 +33,8 @@ PRZ-031 판정은 `NO_GO`이며 Evidence Selection 통합 단계로 진행하지
 - code/contract는 local commit으로, ignored local candidate/input은 CREATE_NEW와 file/canonical
   SHA-256으로 고정한 뒤 한 번의 official inference만 허용한다. output을 검증·봉인하기
   전에는 Gold supplier를 호출하지 않는다.
+- D1 candidate/input hash를 먼저 검증하고 candidate payload를 그대로 V2 contract에
+  재봉인한다. candidate retrieval과 BGE-M3는 재실행하지 않는다.
+- V2 conformance report를 CREATE_NEW로 한 번 생성하고 PASS hash를 official runner의
+  선행 조건으로 강제한다.
+- D2 output/marker/report는 D1과 다른 local 경로를 사용한다.

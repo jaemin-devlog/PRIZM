@@ -59,7 +59,7 @@ class SearchV3SemanticDirectnessEvaluatorTest {
             new SearchV3SemanticDirectnessEvaluator();
 
     @Test
-    void evaluatesD0D1AndO10WithJudgedMetricsSlicesRetentionRecoveryAndNoSupportDiagnostics() {
+    void evaluatesD0D2AndO10WithJudgedMetricsSlicesRetentionRecoveryAndNoSupportDiagnostics() {
         List<QueryProjection> queries = List.of(
                 query("Q1", "U1", candidates("Q1", "U1", 4)),
                 query("Q2", "U2", candidates("Q2", "U2", 2)),
@@ -97,10 +97,10 @@ class SearchV3SemanticDirectnessEvaluatorTest {
         assertThat(metrics.queryCount()).isEqualTo(5);
         assertThat(metrics.directPositiveQueryCount()).isEqualTo(4);
         assertThat(metrics.d0().top1()).isEqualTo(0.25d);
-        assertThat(metrics.d1().top1()).isEqualTo(1.0d);
+        assertThat(metrics.d2().top1()).isEqualTo(1.0d);
         assertThat(metrics.o10().top1()).isEqualTo(1.0d);
         assertThat(metrics.d0().directRecallAt20()).isEqualTo(1.0d);
-        assertThat(metrics.d1().directRecallAt20()).isEqualTo(1.0d);
+        assertThat(metrics.d2().directRecallAt20()).isEqualTo(1.0d);
         assertThat(metrics.winCount()).isEqualTo(3);
         assertThat(metrics.lossCount()).isZero();
         assertThat(metrics.tieCount()).isEqualTo(1);
@@ -109,7 +109,7 @@ class SearchV3SemanticDirectnessEvaluatorTest {
         assertThat(metrics.rank1Retention().value()).isEqualTo(1.0d);
         assertThat(metrics.recoveredBundleCount()).isEqualTo(3);
         assertThat(metrics.userMacro().d0().top1()).isEqualTo(0.25d);
-        assertThat(metrics.userMacro().d1().top1()).isEqualTo(1.0d);
+        assertThat(metrics.userMacro().d2().top1()).isEqualTo(1.0d);
         assertThat(metrics.captures().userMacroTop1().ratio()).isEqualTo(1.0d);
 
         assertThat(metrics.relations().predictedPairCount()).isEqualTo(12);
@@ -173,6 +173,38 @@ class SearchV3SemanticDirectnessEvaluatorTest {
     }
 
     @Test
+    void D2UsesFrozenRelationPriorityStableWithinBucketsAndPreservesDenseTail() {
+        QueryProjection query = query("Q1", "U1", candidates("Q1", "U1", 12));
+        QueryGold gold = gold(
+                "Q1", "U1", "BACKEND", "KO", List.of("semantic_paraphrase"),
+                SUPPORTED, Map.of("Q1-C2", DIRECT_SUPPORT));
+        QueryPredictions predictions = predictions(
+                "Q1",
+                RELATED_CONTEXT,
+                DIRECT_MATCH,
+                DIRECT_MATCH,
+                QUERY_CONFLICT,
+                RELATED_CONTEXT,
+                INSUFFICIENT,
+                QUERY_CONFLICT,
+                RELATED_CONTEXT,
+                INSUFFICIENT,
+                DIRECT_MATCH);
+
+        QueryMetrics result = evaluator.evaluate(
+                        joined(List.of(query), List.of(gold)), Set.of("Q1"), List.of(predictions))
+                .queries().get(0);
+
+        assertThat(result.d2Ranking()).extracting(value -> value.candidate().candidateId())
+                .containsExactly(
+                        "Q1-P2", "Q1-P3", "Q1-P10",
+                        "Q1-P1", "Q1-P5", "Q1-P8",
+                        "Q1-P4", "Q1-P7",
+                        "Q1-P6", "Q1-P9",
+                        "Q1-P11", "Q1-P12");
+    }
+
+    @Test
     void O10OnlyPartitionsTop10AndLeavesGoldDirectAtRank11InTheDenseTail() {
         QueryProjection query = query("Q1", "U1", candidates("Q1", "U1", 12));
         QueryGold gold = gold(
@@ -189,7 +221,7 @@ class SearchV3SemanticDirectnessEvaluatorTest {
         QueryMetrics result = run.queries().get(0);
 
         assertThat(result.d0FirstDirectRank()).isEqualTo(11);
-        assertThat(result.d1FirstDirectRank()).isEqualTo(11);
+        assertThat(result.d2FirstDirectRank()).isEqualTo(11);
         assertThat(result.o10FirstDirectRank()).isEqualTo(11);
         assertThat(result.o10().top1()).isFalse();
         assertThat(result.o10().mrr()).isEqualTo(1.0d / 11.0d);
@@ -209,7 +241,7 @@ class SearchV3SemanticDirectnessEvaluatorTest {
                 SUPPORTED, Map.of("Q1-C1", DIRECT_SUPPORT));
         QueryPredictions missing = new QueryPredictions(
                 "Q1", List.of(new CandidatePrediction(
-                        1, "Q1-P1", DIRECT_MATCH, "DIRECT_ANSWER")));
+                        1, "Q1-P1", DIRECT_MATCH)));
 
         assertThatThrownBy(() -> evaluator.evaluate(
                 joined(List.of(query), List.of(gold)), Set.of("Q1"), List.of(missing)))
@@ -242,7 +274,7 @@ class SearchV3SemanticDirectnessEvaluatorTest {
                 insufficientA,
                 base.captures().userMacroMrr());
         AggregateMetrics withoutAOrB = new AggregateMetrics(
-                base.queryCount(), base.directPositiveQueryCount(), base.d0(), base.d1(), base.o10(),
+                base.queryCount(), base.directPositiveQueryCount(), base.d0(), base.d2(), base.o10(),
                 base.userMacro(), base.winCount(), base.lossCount(), base.tieCount(),
                 base.retrievalMissCount(), base.rank1Retention(), base.recoveredQueryCount(), 0,
                 captures, base.relations(), base.noSupport());
@@ -385,19 +417,9 @@ class SearchV3SemanticDirectnessEvaluatorTest {
                 .mapToObj(index -> new CandidatePrediction(
                         index + 1,
                         queryId + "-P" + (index + 1),
-                        relations[index],
-                        reasonCode(relations[index])))
+                        relations[index]))
                 .toList();
         return new QueryPredictions(queryId, candidates);
-    }
-
-    private String reasonCode(DirectnessRelation relation) {
-        return switch (relation) {
-            case DIRECT_MATCH -> "DIRECT_ANSWER";
-            case RELATED_CONTEXT -> "RELATED_NOT_DIRECT";
-            case QUERY_CONFLICT -> "QUERY_MEANING_MISMATCH";
-            case INSUFFICIENT -> "INSUFFICIENT_INFORMATION";
-        };
     }
 
     private QueryGold gold(

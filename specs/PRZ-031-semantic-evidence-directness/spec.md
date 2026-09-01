@@ -1,6 +1,6 @@
 # PRZ-031 Search V3 Semantic Evidence Directness
 
-- 상태: `VERIFIED / NO_GO / OFFICIAL_OUTPUT_CONTRACT_FAILURE`
+- 상태: `IN_PROGRESS / D1_HISTORICAL_PROTOCOL_NO_GO / D2_PROTOCOL_V2_PASS`
 - 기준 branch: `PRZ-031-semantic-evidence-directness`
 - 기준 source: `PRZ-030-semantic-evidence-validation-ceiling@aca58a6c11b517557d6081756a3ea2cdc5f0550c`
 - 선행 계약: `DEPENDS_ON_PRZ_025@5f8229f`, `DEPENDS_ON_PRZ_026_B3@1bbc1d7`,
@@ -100,12 +100,34 @@ revision/file identity는 고정하지만 base safetensors의 별도 revision li
 않는다.
 
 instruction, strict output schema, `think=false`, temperature 0, seed 31031, Top10과 stable
-partition은 `execution-contract.json`에 동결했다. code/input freeze 뒤 official 실행을 한
-번 시작했으나 첫 API response가 허용 enum 안에서 고정 relation/reasonCode 짝을 위반해
-output freeze 전에 중단됐다. 결과 후 model, instruction, schema, config 또는 policy를
-바꾸거나 같은 dataset을 재실행하지 않았다.
+partition은 D1 `execution-contract.json`에 동결했다. code/input freeze 뒤 official 실행을
+한 번 시작했으나 첫 API response가 허용 enum 안에서 고정 relation/reasonCode 짝을 위반해
+output freeze 전에 중단됐다. D1은 `PROTOCOL_NO_GO / SEMANTIC_QUALITY_NOT_EVALUATED`로
+역사 보존하며 결과 후 model, instruction, config 또는 ranking policy를 바꾸거나 D1을
+재실행하지 않았다.
 
-## 5. 비범위와 보존 경계
+## 5. D2 Output Protocol V2
+
+D2에서 바꿀 수 있는 변수는 model output protocol 하나뿐이다. model, revision/digest,
+quantization, instruction의 의미와 bytes, inference config, B3 candidate/Top10, relation 의미,
+stable partition, query/dataset/Gold는 D1과 동일해야 한다. 새
+`execution-contract-v2.json`의 model output은 추가 필드 없이
+`{"relation":"DIRECT_MATCH"}` 형태의 relation 하나만 허용한다. protocol 이름은
+`SEMANTIC_DIRECTNESS_PROTOCOL_V2`다.
+
+공식 benchmark 전에 benchmark와 무관한 16개 generic pair로 parse 100%, schema 100%,
+enum violation 0, extra field 0을 확인한다. 하나라도 실패하면 `PROTOCOL_V2_NO_GO`로
+종료하고 semantic benchmark는 `NOT_RUN`이다. 통과하면 exact contract/code/model과
+conformance output을 동결하고, 기존 B3 candidate artifact와 D1 candidate payload의
+identity/order/provenance parity를 검증해 V2 contract만 바인딩한 local input envelope를
+만든다. BGE-M3는 다시 실행하지 않는다.
+
+공식 순서는 `V2 input freeze → Qwen inference 1회 → 전체 output freeze/hash/verify → Gold
+join → D0/D2 evaluation`이다. D2 실패 후 prompt/schema/model/policy를 수정하거나 같은
+dataset을 공식 재실행하지 않는다. D1 contract, marker, failure artifact와 판정은 변경하지
+않는다.
+
+## 6. 비범위와 보존 경계
 
 Sparse, Parent Dense/Context, QueryPlanner/rewrite, RRF, FTS/BM25, MMR, Grounded Answer,
 Typed 통합, Production 적용은 `NOT_RUN`이다. 새 dataset/query/retrieval 실험은 하지

@@ -74,7 +74,7 @@ PRZ는 PRIZM의 기능 개발과 기술 검증을 작업 단위로 남기는 기
 | PRZ&#8209;028 | [Search V3 Typed Exact Constraint](PRZ-028-typed-exact-constraints/spec.md) | `VERIFIED` | [근거](PRZ-028-typed-exact-constraints/evidence.md) |
 | PRZ&#8209;029 | [Search V3 Evidence Validation과 Selection](PRZ-029-evidence-validation-selection/spec.md) | `VERIFIED` | [근거](PRZ-029-evidence-validation-selection/evidence.md) |
 | PRZ&#8209;030 | [Search V3 Semantic Evidence Validation Ceiling](PRZ-030-semantic-evidence-validation-ceiling/spec.md) | `VERIFIED` | [근거](PRZ-030-semantic-evidence-validation-ceiling/evidence.md) |
-| PRZ&#8209;031 | [Search V3 Semantic Evidence Directness](PRZ-031-semantic-evidence-directness/spec.md) | `VERIFIED` | [근거](PRZ-031-semantic-evidence-directness/evidence.md) |
+| PRZ&#8209;031 | [Search V3 Semantic Evidence Directness](PRZ-031-semantic-evidence-directness/spec.md) | `IN_PROGRESS` | [근거](PRZ-031-semantic-evidence-directness/evidence.md) |
 
 ## 연구·미채택 기록
 

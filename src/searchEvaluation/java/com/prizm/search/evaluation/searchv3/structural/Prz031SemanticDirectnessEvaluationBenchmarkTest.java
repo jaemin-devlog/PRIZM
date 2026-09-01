@@ -24,7 +24,6 @@ import com.prizm.search.evaluation.searchv3.structural.SearchV3SemanticDirectnes
 import com.prizm.search.evaluation.searchv3.structural.SearchV3SemanticDirectnessPredictionFreeze.Output;
 import com.prizm.search.evaluation.searchv3.structural.SearchV3SemanticDirectnessPredictionFreeze.Prediction;
 import com.prizm.search.evaluation.searchv3.structural.SearchV3SemanticDirectnessPredictionFreeze.QueryInput;
-import com.prizm.search.evaluation.searchv3.structural.SearchV3SemanticDirectnessPredictionFreeze.ReasonCode;
 import com.prizm.search.evaluation.searchv3.structural.SearchV3SemanticDirectnessPredictionFreeze.Relation;
 import com.prizm.search.evaluation.searchv3.structural.SearchV3SemanticDirectnessPredictionFreeze.RunContract;
 import com.prizm.search.evaluation.searchv3.structural.SearchV3SemanticDirectnessPredictionFreeze.SourceSuite;
@@ -55,19 +54,26 @@ import tools.jackson.databind.node.ObjectNode;
 /** Opt-in official PRZ-031 Gold-after-output evaluation shell plus its offline policy tests. */
 class Prz031SemanticDirectnessEvaluationBenchmarkTest {
 
-    static final String RUN_PROPERTY = "prizm.prz031.official-evaluation";
-    static final String CODE_FREEZE_PROPERTY = "prizm.prz031.code-freeze-commit";
+    static final String RUN_PROPERTY = "prizm.prz031.d2-official-evaluation";
+    static final String CODE_FREEZE_PROPERTY =
+            Prz031SemanticDirectnessInputBenchmarkTest.V2_CODE_FREEZE_PROPERTY;
     static final String CONTRACT_FILE_SHA_PROPERTY =
-            Prz031SemanticDirectnessInputBenchmarkTest.CONTRACT_SHA_PROPERTY;
+            Prz031SemanticDirectnessInputBenchmarkTest.V2_CONTRACT_SHA_PROPERTY;
     static final String CANDIDATE_FILE_SHA_PROPERTY = "prizm.prz031.candidate-file-sha256";
     static final String INPUT_FILE_SHA_PROPERTY = "prizm.prz031.input-file-sha256";
     static final String OUTPUT_FILE_SHA_PROPERTY = "prizm.prz031.output-file-sha256";
     static final Path OFFICIAL_OUTPUT = Path.of(
-            "local/search-v3-evaluation/prz031/semantic-directness-output.json");
+            "local/search-v3-evaluation/prz031/semantic-directness-output-protocol-v2.json");
     static final Path OFFICIAL_RUN_MARKER = Path.of(
-            "local/search-v3-evaluation/prz031/semantic-directness-output.json.official-run-started.json");
+            "local/search-v3-evaluation/prz031/semantic-directness-output-protocol-v2.json.official-run-started.json");
 
-    private static final String EXPECTED_OUTPUT_ARTIFACT = "PRZ031_SEMANTIC_DIRECTNESS_OUTPUT";
+    private static final String EXPECTED_OUTPUT_ARTIFACT =
+            "PRZ031_SEMANTIC_DIRECTNESS_OUTPUT_PROTOCOL_V2";
+    private static final String EXPECTED_PROTOCOL = "SEMANTIC_DIRECTNESS_PROTOCOL_V2";
+    private static final String D1_CODE_FREEZE_COMMIT =
+            "3d1f57b969d97d1b73a2531ba990cd9beaed57db";
+    private static final String D1_CONTRACT_SHA256 =
+            "aa683f4cecb21c90d91d43c7b77bb31cb2f98fe0cd8c7a2c916962eef620d77e";
     private static final String SHA_PATTERN = "^[0-9a-f]{64}$";
     private static final String COMMIT_PATTERN = "^[0-9a-f]{40}$";
     private final ObjectMapper mapper = new ObjectMapper();
@@ -86,12 +92,20 @@ class Prz031SemanticDirectnessEvaluationBenchmarkTest {
         CandidateArtifact candidateArtifact = readCandidateArtifact(
                 Prz031SemanticDirectnessInputBenchmarkTest.CANDIDATE_OUTPUT, candidateFileSha);
         ModelInputArtifact inputArtifact = readInputArtifact(
-                Prz031SemanticDirectnessInputBenchmarkTest.MODEL_INPUT_OUTPUT, inputFileSha);
-        if (!candidateArtifact.codeFreezeCommit().equals(codeFreeze)
+                Prz031SemanticDirectnessInputBenchmarkTest.MODEL_INPUT_V2_OUTPUT, inputFileSha);
+        if (!candidateArtifact.codeFreezeCommit().equals(D1_CODE_FREEZE_COMMIT)
                 || !inputArtifact.codeFreezeCommit().equals(codeFreeze)
-                || !candidateArtifact.contractSha256().equals(contractFileSha)
+                || !candidateArtifact.contractSha256().equals(D1_CONTRACT_SHA256)
                 || !inputArtifact.contractSha256().equals(contractFileSha)
-                || !inputArtifact.candidateFreezeFileSha256().equals(candidateFileSha)) {
+                || !inputArtifact.candidateFreezeFileSha256().equals(candidateFileSha)
+                || !inputArtifact.sourceD1InputFileSha256().equals(
+                        Prz031SemanticDirectnessInputBenchmarkTest.D1_INPUT_FILE_SHA256)
+                || !inputArtifact.sourceD1InputCanonicalSha256().equals(
+                        Prz031SemanticDirectnessInputBenchmarkTest.D1_INPUT_CANONICAL_SHA256)
+                || !inputArtifact.sourceD1GuardContractSha256().equals(
+                        Prz031SemanticDirectnessInputBenchmarkTest.D1_GUARD_CONTRACT_SHA256)
+                || !inputArtifact.candidatePayloadSha256().equals(
+                        Prz031SemanticDirectnessInputBenchmarkTest.D1_CANDIDATE_PAYLOAD_SHA256)) {
             throw new IllegalStateException("candidate/input artifact lineage differs from official properties");
         }
         FrozenInput frozenInput = inputFreeze(inputArtifact);
@@ -224,10 +238,12 @@ class Prz031SemanticDirectnessEvaluationBenchmarkTest {
                 SearchV3B3CandidateReplay.BGE_M3_DIGEST, 79, 670,
                 List.of(new CandidateSuite("combined", fixture.input().candidateFreeze())));
         ModelInputArtifact input = new ModelInputArtifact(
-                1, "PRZ031_SEMANTIC_DIRECTNESS_INPUT", "a".repeat(40), "b".repeat(64),
-                "c".repeat(64), SearchV3B3CandidateReplay.BGE_M3_DIGEST,
+                2, "PRZ031_SEMANTIC_DIRECTNESS_PROTOCOL_V2_INPUT", EXPECTED_PROTOCOL,
+                "a".repeat(40), "b".repeat(64),
+                "c".repeat(64), "d".repeat(64), "e".repeat(64), "f".repeat(64),
+                "1".repeat(64),
                 fixture.input().canonicalSha256(), fixture.input().canonicalByteLength(),
-                fixture.input().contractSha256(), 79, 670, 578, 0,
+                fixture.input().contractSha256(), 79, 670, 578, 0, "NOT_RUN",
                 fixture.input().input().contract(), fixture.input().input().sourceSuites(),
                 fixture.input().input().queries().stream().map(value -> new ModelInputQuery(
                         value.suite(), value.datasetVersion(), value.queryId(), value.userBundleId(),
@@ -251,23 +267,52 @@ class Prz031SemanticDirectnessEvaluationBenchmarkTest {
         String started = "2026-09-01T00:00:00Z";
         Path outputPath = temporary.resolve("output.json");
         Path markerPath = temporary.resolve("output.json.official-run-started.json");
+        JsonNode executionContract = mapper.readTree(Files.readString(
+                Prz031SemanticDirectnessInputBenchmarkTest.CONTRACT_V2, StandardCharsets.UTF_8));
+        ObjectNode marker = mapper.createObjectNode();
+        marker.put("artifactType", "PRZ031_OUTPUT_PROTOCOL_V2_OFFICIAL_RUN_STARTED");
+        marker.put("protocol", EXPECTED_PROTOCOL);
+        marker.put("startedAtUtc", started);
+        marker.put("contractSha256", contractFileSha);
+        marker.put("conformanceOutputFileSha256", "c".repeat(64));
+        marker.put("candidateInputFileSha256", inputFileSha);
+        marker.put("candidatePayloadSha256",
+                Prz031SemanticDirectnessInputBenchmarkTest.D1_CANDIDATE_PAYLOAD_SHA256);
+        marker.put("candidateFreezeFileSha256",
+                Prz031SemanticDirectnessInputBenchmarkTest.D1_CANDIDATE_FILE_SHA256);
+        marker.put("modelManifestDigest",
+                required(executionContract.path("model"), "ollamaManifestDigest"));
+        Files.writeString(markerPath, mapper.writeValueAsString(marker), StandardCharsets.UTF_8);
+
         ObjectNode output = mapper.createObjectNode();
-        output.put("schemaVersion", 1);
+        output.put("schemaVersion", 2);
         output.put("artifactType", EXPECTED_OUTPUT_ARTIFACT);
+        output.put("protocol", EXPECTED_PROTOCOL);
         output.put("startedAtUtc", started);
         output.put("contractSha256", contractFileSha);
+        output.put("conformanceOutputFileSha256", "c".repeat(64));
+        output.put("runMarkerFileSha256", sha256(markerPath));
         output.put("candidateInputFileSha256", inputFileSha);
-        output.put("candidateInputCanonicalSha256", fixture.input().canonicalSha256());
+        output.put("candidatePayloadSha256",
+                Prz031SemanticDirectnessInputBenchmarkTest.D1_CANDIDATE_PAYLOAD_SHA256);
+        output.put("candidateFreezeFileSha256",
+                Prz031SemanticDirectnessInputBenchmarkTest.D1_CANDIDATE_FILE_SHA256);
         output.put("queryCount", 79);
         output.put("pairCount", 578);
         var rows = output.putArray("rows");
         for (Prediction prediction : fixture.output().output().predictions()) {
             ObjectNode row = rows.addObject();
+            row.put("pairId", prediction.queryId() + "::" + prediction.sourceRank());
+            row.put("suite", "synthetic");
             row.put("queryId", prediction.queryId());
+            row.put("userBundleId", "synthetic-user");
             row.put("candidateId", prediction.candidateId());
             row.put("denseRank", prediction.sourceRank());
             row.put("relation", prediction.relation().name());
-            row.put("reasonCode", prediction.reasonCode().name());
+            row.put("rawMessageContentSha256", "a".repeat(64));
+            row.put("responseEnvelopeSha256", "b".repeat(64));
+            row.put("latencyMs", 1.0d);
+            row.putObject("ollama");
         }
         ObjectNode cost = output.putObject("cost");
         for (String field : List.of(
@@ -286,24 +331,48 @@ class Prz031SemanticDirectnessEvaluationBenchmarkTest {
                 sha256(canonicalJson(output).getBytes(StandardCharsets.UTF_8)));
         Files.writeString(outputPath, mapper.writeValueAsString(output), StandardCharsets.UTF_8);
 
-        JsonNode executionContract = mapper.readTree(Files.readString(
-                Prz031SemanticDirectnessInputBenchmarkTest.CONTRACT, StandardCharsets.UTF_8));
-        ObjectNode marker = mapper.createObjectNode();
-        marker.put("artifactType", "PRZ031_OFFICIAL_RUN_STARTED");
-        marker.put("startedAtUtc", started);
-        marker.put("contractSha256", contractFileSha);
-        marker.put("candidateInputFileSha256", inputFileSha);
-        marker.put("candidateInputCanonicalSha256", fixture.input().canonicalSha256());
-        marker.put("modelManifestDigest",
-                required(executionContract.path("model"), "ollamaManifestDigest"));
-        Files.writeString(markerPath, mapper.writeValueAsString(marker), StandardCharsets.UTF_8);
-
         ParsedOutput parsed = outputFreeze(
                 outputPath, markerPath, sha256(outputPath), inputFileSha, contractFileSha,
                 fixture.input());
 
         assertThat(parsed.frozen()).isEqualTo(fixture.output());
         assertThat(parsed.markerFileSha256()).isEqualTo(sha256(markerPath));
+
+        ObjectNode extraField = output.deepCopy();
+        ((ObjectNode) extraField.path("rows").get(0)).put("reasonCode", "DIRECT_ANSWER");
+        rewriteCanonical(extraField);
+        Path extraPath = temporary.resolve("output-extra.json");
+        Files.writeString(extraPath, mapper.writeValueAsString(extraField), StandardCharsets.UTF_8);
+        assertThatThrownBy(() -> outputFreeze(
+                extraPath, markerPath, sha256(extraPath), inputFileSha, contractFileSha,
+                fixture.input()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("prediction row fields drifted");
+
+        ObjectNode invalidEnum = output.deepCopy();
+        ((ObjectNode) invalidEnum.path("rows").get(0)).put("relation", "UNKNOWN");
+        rewriteCanonical(invalidEnum);
+        Path invalidEnumPath = temporary.resolve("output-invalid-enum.json");
+        Files.writeString(
+                invalidEnumPath, mapper.writeValueAsString(invalidEnum), StandardCharsets.UTF_8);
+        assertThatThrownBy(() -> outputFreeze(
+                invalidEnumPath, markerPath, sha256(invalidEnumPath), inputFileSha,
+                contractFileSha, fixture.input()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("prediction relation is invalid");
+
+        Path malformedPath = temporary.resolve("output-malformed.json");
+        Files.writeString(malformedPath, "{", StandardCharsets.UTF_8);
+        assertThatThrownBy(() -> outputFreeze(
+                malformedPath, markerPath, sha256(malformedPath), inputFileSha,
+                contractFileSha, fixture.input()))
+                .isInstanceOfAny(IOException.class, RuntimeException.class);
+    }
+
+    private void rewriteCanonical(ObjectNode output) throws IOException {
+        output.remove("outputCanonicalSha256");
+        output.put("outputCanonicalSha256",
+                sha256(canonicalJson(output).getBytes(StandardCharsets.UTF_8)));
     }
 
     private CandidateArtifact readCandidateArtifact(Path path, String expectedFileSha) throws IOException {
@@ -337,13 +406,14 @@ class Prz031SemanticDirectnessEvaluationBenchmarkTest {
         byte[] bytes = readVerified(path, expectedFileSha);
         ModelInputArtifact artifact = mapper.readValue(new String(bytes, StandardCharsets.UTF_8),
                 ModelInputArtifact.class);
-        if (artifact.schemaVersion() != 1
-                || !"PRZ031_SEMANTIC_DIRECTNESS_INPUT".equals(artifact.artifactType())
+        if (artifact.schemaVersion() != 2
+                || !"PRZ031_SEMANTIC_DIRECTNESS_PROTOCOL_V2_INPUT".equals(artifact.artifactType())
+                || !EXPECTED_PROTOCOL.equals(artifact.protocol())
                 || artifact.semanticQueryCount() != 79
                 || artifact.candidateCount() != 670
                 || artifact.inferencePairCount() != 578
                 || artifact.typedQueryCount() != 0
-                || !SearchV3B3CandidateReplay.BGE_M3_DIGEST.equals(artifact.bgeM3Digest())) {
+                || !"NOT_RUN".equals(artifact.currentFreshBaseline())) {
             throw new IllegalStateException("official model input artifact contract drifted");
         }
         return artifact;
@@ -374,10 +444,14 @@ class Prz031SemanticDirectnessEvaluationBenchmarkTest {
             FrozenInput input) throws IOException {
         byte[] bytes = readVerified(path, expectedFileSha);
         ObjectNode root = (ObjectNode) mapper.readTree(bytes);
-        if (root.path("schemaVersion").asInt(-1) != 1
+        if (root.path("schemaVersion").asInt(-1) != 2
                 || !EXPECTED_OUTPUT_ARTIFACT.equals(root.path("artifactType").asText())
+                || !EXPECTED_PROTOCOL.equals(root.path("protocol").asText())
                 || !inputFileSha.equals(root.path("candidateInputFileSha256").asText())
-                || !input.canonicalSha256().equals(root.path("candidateInputCanonicalSha256").asText())
+                || !Prz031SemanticDirectnessInputBenchmarkTest.D1_CANDIDATE_FILE_SHA256.equals(
+                        root.path("candidateFreezeFileSha256").asText())
+                || !Prz031SemanticDirectnessInputBenchmarkTest.D1_CANDIDATE_PAYLOAD_SHA256.equals(
+                        root.path("candidatePayloadSha256").asText())
                 || !contractFileSha.equals(root.path("contractSha256").asText())
                 || root.path("queryCount").asInt(-1) != 79
                 || root.path("pairCount").asInt(-1) != 578
@@ -395,12 +469,12 @@ class Prz031SemanticDirectnessEvaluationBenchmarkTest {
                 markerPath, inputFileSha, contractFileSha, input, root);
         List<Prediction> predictions = new ArrayList<>();
         for (JsonNode row : root.path("rows")) {
+            assertExactPredictionRow(row);
             predictions.add(new Prediction(
                     required(row, "queryId"),
                     required(row, "candidateId"),
                     row.path("denseRank").asInt(-1),
-                    Relation.valueOf(required(row, "relation")),
-                    ReasonCode.valueOf(required(row, "reasonCode"))));
+                    Relation.valueOf(required(row, "relation"))));
         }
         FrozenOutput frozen = SearchV3SemanticDirectnessPredictionFreeze.freezeOutput(
                 input,
@@ -411,6 +485,33 @@ class Prz031SemanticDirectnessEvaluationBenchmarkTest {
                 frozen, declaredCanonical, markerFileSha, officialCost(root.path("cost"), input));
     }
 
+    private void assertExactPredictionRow(JsonNode row) {
+        Set<String> expected = Set.of(
+                "pairId",
+                "suite",
+                "queryId",
+                "userBundleId",
+                "denseRank",
+                "candidateId",
+                "relation",
+                "rawMessageContentSha256",
+                "responseEnvelopeSha256",
+                "latencyMs",
+                "ollama");
+        Set<String> actual = new LinkedHashSet<>();
+        row.propertyNames().forEach(actual::add);
+        if (!expected.equals(actual)) {
+            throw new IllegalStateException("protocol-v2 prediction row fields drifted");
+        }
+        String relation = required(row, "relation");
+        try {
+            Relation.valueOf(relation);
+        }
+        catch (IllegalArgumentException exception) {
+            throw new IllegalStateException("protocol-v2 prediction relation is invalid", exception);
+        }
+    }
+
     private String verifyOfficialRunMarker(
             Path markerPath,
             String inputFileSha,
@@ -418,20 +519,28 @@ class Prz031SemanticDirectnessEvaluationBenchmarkTest {
             FrozenInput input,
             JsonNode output) throws IOException {
         byte[] markerBytes = Files.readAllBytes(markerPath);
+        String markerFileSha = sha256(markerBytes);
         JsonNode marker = mapper.readTree(markerBytes);
         JsonNode executionContract = mapper.readTree(Files.readString(
-                Prz031SemanticDirectnessInputBenchmarkTest.CONTRACT, StandardCharsets.UTF_8));
-        if (!"PRZ031_OFFICIAL_RUN_STARTED".equals(marker.path("artifactType").asText())
+                Prz031SemanticDirectnessInputBenchmarkTest.CONTRACT_V2, StandardCharsets.UTF_8));
+        if (!"PRZ031_OUTPUT_PROTOCOL_V2_OFFICIAL_RUN_STARTED".equals(
+                        marker.path("artifactType").asText())
+                || !EXPECTED_PROTOCOL.equals(marker.path("protocol").asText())
                 || !contractFileSha.equals(marker.path("contractSha256").asText())
+                || !required(marker, "conformanceOutputFileSha256").equals(
+                        output.path("conformanceOutputFileSha256").asText())
                 || !inputFileSha.equals(marker.path("candidateInputFileSha256").asText())
-                || !input.canonicalSha256().equals(
-                        marker.path("candidateInputCanonicalSha256").asText())
+                || !Prz031SemanticDirectnessInputBenchmarkTest.D1_CANDIDATE_FILE_SHA256.equals(
+                        marker.path("candidateFreezeFileSha256").asText())
+                || !Prz031SemanticDirectnessInputBenchmarkTest.D1_CANDIDATE_PAYLOAD_SHA256.equals(
+                        marker.path("candidatePayloadSha256").asText())
+                || !markerFileSha.equals(output.path("runMarkerFileSha256").asText())
                 || !required(executionContract.path("model"), "ollamaManifestDigest").equals(
                         marker.path("modelManifestDigest").asText())
                 || !required(marker, "startedAtUtc").equals(output.path("startedAtUtc").asText())) {
             throw new IllegalStateException("official-run marker/output identity chain drifted");
         }
-        return sha256(markerBytes);
+        return markerFileSha;
     }
 
     private OfficialCost officialCost(JsonNode node, FrozenInput input) {
@@ -488,9 +597,7 @@ class Prz031SemanticDirectnessEvaluationBenchmarkTest {
         List<Prediction> predictions = input.input().queries().stream().flatMap(query ->
                 query.rankedCandidates().stream().limit(10).map(candidate -> new Prediction(
                         query.queryId(), candidate.candidateId(), candidate.rank(),
-                        candidate.rank() == 1 ? Relation.DIRECT_MATCH : Relation.INSUFFICIENT,
-                        candidate.rank() == 1
-                                ? ReasonCode.DIRECT_ANSWER : ReasonCode.INSUFFICIENT_INFORMATION)))
+                        candidate.rank() == 1 ? Relation.DIRECT_MATCH : Relation.INSUFFICIENT)))
                 .toList();
         FrozenOutput output = SearchV3SemanticDirectnessPredictionFreeze.freezeOutput(
                 input,
@@ -568,7 +675,8 @@ class Prz031SemanticDirectnessEvaluationBenchmarkTest {
     private void verifyOfficialPreconditions(String codeFreeze, String contractFileSha) throws Exception {
         assertThat(git("rev-parse", "HEAD")).isEqualTo(codeFreeze);
         assertThat(git("status", "--porcelain")).isEmpty();
-        assertThat(sha256(Prz031SemanticDirectnessInputBenchmarkTest.CONTRACT)).isEqualTo(contractFileSha);
+        assertThat(sha256(Prz031SemanticDirectnessInputBenchmarkTest.CONTRACT_V2))
+                .isEqualTo(contractFileSha);
         assertThat(sealedState()).isEqualTo(new SealedState(
                 Prz031SemanticDirectnessInputBenchmarkTest.SEALED_COMBINED_SHA256,
                 Prz031SemanticDirectnessInputBenchmarkTest.SEALED_MANIFEST_SHA256,
@@ -702,10 +810,14 @@ class Prz031SemanticDirectnessEvaluationBenchmarkTest {
     record ModelInputArtifact(
             int schemaVersion,
             String artifactType,
+            String protocol,
             String codeFreezeCommit,
             String contractSha256,
             String candidateFreezeFileSha256,
-            String bgeM3Digest,
+            String sourceD1InputFileSha256,
+            String sourceD1InputCanonicalSha256,
+            String sourceD1GuardContractSha256,
+            String candidatePayloadSha256,
             String inputCanonicalSha256,
             int inputCanonicalByteLength,
             String guardContractSha256,
@@ -713,6 +825,7 @@ class Prz031SemanticDirectnessEvaluationBenchmarkTest {
             long candidateCount,
             long inferencePairCount,
             int typedQueryCount,
+            String currentFreshBaseline,
             RunContract runContract,
             List<SourceSuite> sourceSuites,
             List<ModelInputQuery> queries) {

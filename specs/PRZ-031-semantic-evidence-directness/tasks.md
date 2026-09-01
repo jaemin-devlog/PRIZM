@@ -1,6 +1,6 @@
 # PRZ-031 Tasks
 
-- 상태: `VERIFIED / NO_GO / OFFICIAL_OUTPUT_CONTRACT_FAILURE`
+- 상태: `IN_PROGRESS / D1_HISTORICAL_PROTOCOL_NO_GO / D2_PROTOCOL_V2_PASS`
 
 - [x] PRZ-030 HEAD, dependency, origin/main, clean tree를 확인했다.
 - [x] 제품 의미, relation, D0/D1, Top10, Gold-after-output와 Capability Gate를 문서화했다.
@@ -19,3 +19,15 @@
 - [x] 공식 directness inference 1회 시작 — 첫 response contract failure, output freeze 없음
 - [x] Gold join/metric은 `NOT_EVALUABLE`, 최종 판정은 `NO_GO`로 기록
 - [x] Production/Typed 통합/SEALED FINAL 검색/push/PR/merge를 실행하지 않음
+
+## D2 Output Protocol V2
+
+- [x] D1 `PROTOCOL_NO_GO / SEMANTIC_QUALITY_NOT_EVALUATED`와 local marker/failure를 보존
+- [x] relation-only V2 contract, strict parser와 16-pair generic conformance 구현
+- [x] protocol parser/freeze/evaluator focused test 통과
+- [x] protocol conformance parse/schema 100%, enum/extra field 0 확인
+- [ ] D1 candidate/input SHA와 full candidate payload parity 검증 후 V2 input 봉인
+- [ ] code/model/instruction/schema/config/candidate/ranking hash 동결
+- [ ] 공식 D2 inference 1회와 output freeze/hash/verify
+- [ ] output 검증 뒤 Gold join, D0/D2 metrics·slice·Gate 산출
+- [ ] Production/SEALED/scope/OSS audit와 최종 판정 기록

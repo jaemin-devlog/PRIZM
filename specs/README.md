@@ -85,6 +85,7 @@ Search V3의 실험 흐름, 채택·비채택 결과와 전용 branch 운영 경
 | PRZ&#8209;035 | [Child embedding 운영 전략](PRZ-035-child-embedding-operation-strategy/spec.md) | `VERIFIED` | [근거](PRZ-035-child-embedding-operation-strategy/evidence.md) |
 | PRZ&#8209;036 | [Search V3 색인 생명주기](PRZ-036-search-v3-index-lifecycle/spec.md) | `VERIFIED` | [근거](PRZ-036-search-v3-index-lifecycle/evidence.md) |
 | PRZ&#8209;037 | [Search V3 Shadow Storage](PRZ-037-search-v3-shadow-storage/spec.md) | `VERIFIED` | [근거](PRZ-037-search-v3-shadow-storage/evidence.md) |
+| PRZ&#8209;038 | [Search V3 job fencing runtime](PRZ-038-search-v3-job-fencing-runtime/spec.md) | `VERIFIED` | [근거](PRZ-038-search-v3-job-fencing-runtime/evidence.md) |
 
 ## 연구·미채택 기록
 

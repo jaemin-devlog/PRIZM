@@ -74,10 +74,14 @@
   `EvidenceChild`와 두 vector 계열을 저장하는 shadow schema를 정의함
 - owner·문서·version·generation composite FK, nullable active-generation pointer와 artifact/vector 중복·orphan
   방지 제약을 포함함
-- JPA entity/repository, V3 Worker, 활성화 transaction과 검색 query는 아직 구현하지 않음
+- V3 전용 JDBC job runtime은 full owner·문서·version·generation identity로 claim, lease renew, retry/failure,
+  recovery lock과 exact-token reclaim을 수행함
+- 실제 V3 Worker coordinator, Passage·Child 생성, exact inventory, 완료·활성화 transaction과 검색 query는 아직 구현하지 않음
 - Production Search V2, API, frontend와 MCP는 Search V3 shadow table을 사용하지 않음
 - PostgreSQL 16+pgvector Testcontainers에서 V1~V18 migration 회귀 `9/9`, Search V3 lineage·vector·active
   pointer 제약 `7/7`을 실행했으며 자세한 범위는 PRZ-037 evidence를 따름
+- Search V3 job fencing은 PostgreSQL 시나리오 `6/6`에서 concurrent duplicate claim 0, recovery token과
+  stale claim·cross-lineage 차단을 확인했으며 자세한 범위는 PRZ-038 evidence를 따름
 
 ### 검색과 원문 위치
 

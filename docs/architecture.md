@@ -317,11 +317,20 @@ shadow schema를 추가합니다. `SearchIndexGeneration`은 `DocumentVersion`�
 `documents.active_search_v3_generation_id`는 nullable입니다. 최초 업로드나 V3 색인이 없는 문서는 null이
 정상이며, 값이 있으면 owner·문서·현재 `active_version_id`가 같은 generation만 가리킬 수 있습니다. 실제
 검색 가능 조건인 `ACTIVE generation + COMPLETED V3 job` 확인과 원자적 pointer 교체는 후속 service
-transaction 책임입니다. 현재 Production Search와 Worker는 이 schema를 읽거나 쓰지 않습니다.
+transaction 책임입니다. 현재 Production Search와 Search V2 Worker는 이 schema를 읽거나 쓰지 않습니다.
 
 복합 FK는 generation부터 Passage·Child·vector까지 owner·문서·version 계보가 섞이지 않게 합니다.
 vector PK/FK는 artifact별 중복과 orphan을 막고, frozen manifest와 실제 inventory가 모두 존재하는지는
 READY/activation service가 잠금 아래 확인해야 합니다.
+
+Search V3 전용 job runtime은 V18의 full owner·문서·version·generation identity를 JDBC 조건으로 확인합니다.
+`PENDING` 또는 due `RETRY_WAIT` 작업은 `FOR UPDATE SKIP LOCKED`로 한 Worker만 claim하고, lease와 retry 시각은
+PostgreSQL `now()`를 기준으로 계산합니다. 만료 작업은 recovery token을 먼저 기록한 뒤 exact token을 가진
+복구자만 claim version을 올려 reclaim할 수 있습니다. retry·terminal failure도 같은 full identity와 현재
+claim에 묶이며 terminal failure는 job과 generation을 함께 `FAILED`로 바꿉니다.
+
+아직 실제 Search V3 Worker coordinator, Passage·Child 생성, exact inventory, `READY`·`COMPLETED`와 active
+pointer 전환은 구현하지 않았습니다.
 
 근거:
 
@@ -337,6 +346,8 @@ READY/activation service가 잠금 아래 확인해야 합니다.
 - [파일 정리 migration](../src/main/resources/db/migration/V12__add_file_cleanup_jobs.sql)
 - [문서 태그 migration](../src/main/resources/db/migration/V16__create_document_tags.sql)
 - [Search V3 shadow storage migration](../src/main/resources/db/migration/V18__create_search_v3_shadow_storage.sql)
+- [Search V3 job repository](../src/main/java/com/prizm/search/v3/indexing/repository/SearchV3IndexingJobRepository.java)
+- [Search V3 job service](../src/main/java/com/prizm/search/v3/indexing/service/SearchV3IndexingJobService.java)
 
 ## 8. 상태 전이
 

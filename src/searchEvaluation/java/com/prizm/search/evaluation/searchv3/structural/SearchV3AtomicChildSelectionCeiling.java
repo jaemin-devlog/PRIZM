@@ -369,14 +369,38 @@ final class SearchV3AtomicChildSelectionCeiling {
         for (Map.Entry<String, String> relation : query.relationByUnitId().entrySet()) {
             SearchV3MinimalShadowGold.GoldUnit unit = gold.units().get(relation.getKey());
             if (unit == null || !covers(child.span(), unit)) continue;
-            if (!passage.parentId().equals(unit.parentId())) {
-                throw new IllegalStateException("Gold relation crossed structural parent: "
-                        + query.queryId() + " / " + child.evidenceChildId());
-            }
+            validateGoldParentScope(query, passage, child, unit, gold);
             if ("DIRECT_SUPPORT".equals(relation.getValue())) return 0;
             if ("RELATED".equals(relation.getValue())) tier = 1;
         }
         return tier;
+    }
+
+    private void validateGoldParentScope(
+            SearchV3MinimalShadowGold.GoldQuery query,
+            PassageCandidateInput passage,
+            ChildInput child,
+            SearchV3MinimalShadowGold.GoldUnit unit,
+            SearchV3MinimalShadowGold.GoldSnapshot gold) {
+        // Structural parent IDs and benchmark annotation parent IDs are independent namespaces.
+        // The invariant is source containment, never string equality between those IDs.
+        SearchV3MinimalShadowGold.GoldParent parent = gold.parents().get(unit.parentId());
+        boolean unitWithinParent = parent != null
+                && unit.userBundleId().equals(parent.userBundleId())
+                && unit.documentId().equals(parent.documentId())
+                && unit.versionId().equals(parent.versionId())
+                && unit.spans().stream().allMatch(span ->
+                        span.documentId().equals(parent.span().documentId())
+                                && span.versionId().equals(parent.span().versionId())
+                                && Objects.equals(span.page(), parent.span().page())
+                                && parent.span().codePointStart() <= span.codePointStart()
+                                && parent.span().codePointEnd() >= span.codePointEnd());
+        if (!unitWithinParent
+                || !passage.parentId().equals(child.parentId())
+                || !query.userBundleId().equals(child.span().userBundleId())) {
+            throw new IllegalStateException("Gold relation crossed source-grounded parent scope: "
+                    + query.queryId() + " / " + child.evidenceChildId());
+        }
     }
 
     private boolean covers(

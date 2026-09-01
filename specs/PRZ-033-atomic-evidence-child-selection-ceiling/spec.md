@@ -61,7 +61,9 @@ provenance를 기록한다.
 
 candidate identity와 Passage rank/score/hash는 100% 같아야 한다. Oracle 결과는 Gold Unit의
 모든 source span을 하나의 Child가 포함할 때만 Direct다. 서로 다른 Passage·Parent의 Child를
-합치지 않는다.
+합치지 않는다. Benchmark Gold Parent ID와 parser structural parent candidate ID는 독립 ID
+namespace이므로 문자열 동일성을 요구하지 않는다. 대신 Gold Unit이 Gold Parent source span에
+포함되고 Child가 그 Unit span을 완전히 포함하는지 검증한다.
 
 ## 6. 사전 동결 Capability Gate
 

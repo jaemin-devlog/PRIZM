@@ -44,7 +44,6 @@ class Prz033AtomicChildSelectionCeilingBenchmarkTest {
         assertThat(codeFreeze).matches(SHA);
         assertThat(git("rev-parse", "HEAD")).isEqualTo(codeFreeze);
         assertThat(git("status", "--porcelain")).isBlank();
-        assertThat(Files.exists(CANDIDATE_INPUT)).isFalse();
         assertThat(Files.exists(REPORT)).isFalse();
 
         SealedSnapshot sealedBefore = sealedSnapshot();
@@ -56,7 +55,9 @@ class Prz033AtomicChildSelectionCeilingBenchmarkTest {
         SearchV3MinimalShadowDataset.RuntimeInput runtime = new SearchV3MinimalShadowDataset().loadRuntime();
         SearchV3AtomicChildSelectionCeiling.FrozenCandidateInput frozen = guard.freezeCandidate(
                 () -> ceiling.deriveCandidateInput(artifact, runtime));
-        ceiling.writeCreateNew(CANDIDATE_INPUT, frozen);
+        if (!Files.exists(CANDIDATE_INPUT)) {
+            ceiling.writeCreateNew(CANDIDATE_INPUT, frozen);
+        }
         SearchV3AtomicChildSelectionCeiling.VerifiedCandidateInput verified = guard.verifyCandidate(
                 value -> ceiling.verifyCandidateInput(CANDIDATE_INPUT, value));
 

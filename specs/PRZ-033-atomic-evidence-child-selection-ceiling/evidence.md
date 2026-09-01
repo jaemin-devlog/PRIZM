@@ -15,6 +15,14 @@
 - official PRZ-032 재실행: `0`
 - PRZ-033 official ceiling: `NOT_RUN`
 
+첫 code-freeze `016eb6ac1e6fbb50c7ce0fd16420362ceb24345c`의 official test body는 candidate
+freeze/verify와 Gold join 뒤 첫 Oracle relation에서 중단됐다. 원인은 benchmark Gold Parent ID
+(`SV3-U03-P01`)와 parser structural parent candidate ID
+(`SV3-U03-D01-V01-SB-0001`)라는 서로 다른 namespace를 문자열로 비교한 validator 결함이다.
+prediction/report/metric은 생성되지 않았고 BGE 실행은 `0`이다. candidate file은 CREATE_NEW로
+보존하며, source-span parent containment 검증으로 수정한 새 code-freeze에서 hash parity 후
+재사용한다. 이 시도는 `INVALID_PRE_RESULT_VALIDATOR_ATTEMPT`로 역사 보존한다.
+
 PRZ-032 historical F0는 Direct-positive `85`, final Top1/MRR/nDCG@5/Recall@5
 `0.5412/0.7576/0.7942/0.9882`, user-macro Top1/MRR `0.5880/0.7827`, typed selected
 Evidence precision `0.6316`이다. 이는 아직 PRZ-033 결과가 아니다.

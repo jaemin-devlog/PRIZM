@@ -27,7 +27,7 @@ class SearchV3AtomicChildSelectionCeilingTest {
         units.put("G-RELATED", unit("G-RELATED", 8, 15));
         units.put("G-DIRECT", unit("G-DIRECT", 23, 29));
         SearchV3MinimalShadowGold.GoldSnapshot gold = new SearchV3MinimalShadowGold.GoldSnapshot(
-                Map.of(), Map.copyOf(units), Map.of(), Map.of());
+                Map.of(), Map.copyOf(units), Map.of("P1", parent("P1", "D1", 0, 29)), Map.of());
         SearchV3MinimalShadowGold.GoldQuery query = query(Map.of(
                 "G-CONFLICT", "CONTRADICTS",
                 "G-RELATED", "RELATED",
@@ -39,7 +39,7 @@ class SearchV3AtomicChildSelectionCeilingTest {
     }
 
     @Test
-    void rejectsGoldRelationAcrossStructuralParent() {
+    void rejectsGoldRelationWhoseAnnotationParentDoesNotContainItsUnit() {
         SearchV3AtomicChildSelectionCeiling.ChildInput unrelated = child("E0", 6, 11, "other");
         SearchV3AtomicChildSelectionCeiling.ChildInput child = child("E1", 0, 6, "direct");
         SearchV3AtomicChildSelectionCeiling.PassageCandidateInput passage =
@@ -48,12 +48,13 @@ class SearchV3AtomicChildSelectionCeilingTest {
                 "G1", "U1", "P2", "GROUP", "D1", "V1",
                 List.of(new SearchV3MinimalShadowGold.GoldSpan("D1", "V1", null, 0, 6, null)));
         SearchV3MinimalShadowGold.GoldSnapshot gold = new SearchV3MinimalShadowGold.GoldSnapshot(
-                Map.of(), Map.of("G1", wrongParent), Map.of(), Map.of());
+                Map.of(), Map.of("G1", wrongParent),
+                Map.of("P2", parent("P2", "D2", 0, 6)), Map.of());
 
         assertThatThrownBy(() -> ceiling.stableLocalPartition(
                 passage, query(Map.of("G1", "DIRECT_SUPPORT")), gold))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("crossed structural parent");
+                .hasMessageContaining("source-grounded parent scope");
     }
 
     @Test
@@ -146,6 +147,14 @@ class SearchV3AtomicChildSelectionCeilingTest {
         return new SearchV3MinimalShadowGold.GoldUnit(
                 id, "U1", "P1", "GROUP-" + id, "D1", "V1",
                 List.of(new SearchV3MinimalShadowGold.GoldSpan("D1", "V1", null, start, end, null)));
+    }
+
+    private SearchV3MinimalShadowGold.GoldParent parent(
+            String id, String documentId, int start, int end) {
+        return new SearchV3MinimalShadowGold.GoldParent(
+                id, "U1", documentId, "V1",
+                new SearchV3MinimalShadowGold.GoldSpan(
+                        documentId, "V1", null, start, end, null));
     }
 
     private SearchV3MinimalShadowGold.GoldQuery query(Map<String, String> relations) {

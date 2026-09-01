@@ -77,6 +77,8 @@ Testcontainers 검증을 수행했다.
 | integration test Java compile | `PASS` |
 | `SearchV3ShadowStorageMigrationTest` | `7/7 PASS`, failure·error·skip `0` |
 | `CareerPlatformMigrationTest` | `9/9 PASS`, failure·error·skip `0` |
+| V18 기대값 회귀 재현·수정 | PostgreSQL 3개 클래스 `36`건, failure·error `0`, skip `3` |
+| 전체 backend `check` | unit `610`건·integration `125`건, failure·error `0`, skip `20`·`9` |
 | 기존 owner·lease·완료·실패·복구 unit | `19/19 PASS` |
 | PRZ-036 lifecycle·Child reuse | `28/28 PASS` |
 | Search V3 dataset·SEALED guard | `15/15 PASS` |
@@ -93,6 +95,8 @@ Testcontainers 검증을 수행했다.
 ```text
 gradlew.bat compileIntegrationTestJava integrationTest --tests ...SearchV3ShadowStorageMigrationTest --no-daemon --rerun-tasks
 gradlew.bat integrationTest --tests ...CareerPlatformMigrationTest --no-daemon --rerun-tasks
+gradlew.bat integrationTest --tests ...DocumentChangeLogMigrationDatabaseIntegrationTest --tests ...PgVectorInfrastructureTest --tests ...PostgreSqlOpenSqlCompatibilityTest --no-daemon --rerun-tasks
+gradlew.bat check --no-daemon --dependency-verification=strict --rerun-tasks
 gradlew.bat test --tests ...IndexingCompletionOwnershipTest --tests ...ProcessingJobLeaseServiceTest --tests ...WorkerLeaseHeartbeatTest --tests ...IndexingFailureServiceTest --tests ...ProcessingJobRecoveryServiceTest --no-daemon --rerun-tasks
 gradlew.bat searchEvaluation --tests ...SearchV3IndexLifecycleTest --tests ...SearchV3ChildEmbeddingReusePlannerTest --no-daemon --rerun-tasks
 gradlew.bat searchEvaluation --tests ...SearchV3DenseAblationDatasetTest --tests ...SearchV3MinimalShadowIntegrityTest --no-daemon --rerun-tasks
@@ -102,6 +106,12 @@ git diff --check
 
 초기 `initializationError`는 Docker 환경 복구 전 결과로 보존한다. 최종 실행에서는 실제 DB test method
 7개와 기존 migration test 9개가 모두 실행됐고 blocking schema finding은 `0`이었다.
+
+첫 push의 GitHub CI는 V18이 정상 적용된 뒤에도 기존 테스트가 migration 수와 최신 버전을 V17로
+고정해 둬 4건 실패했다. 같은 실패를 로컬에서 재현한 뒤 migration 기대값, 오류 추적 범위와 OpenSQL
+객체 inventory를 V18로 맞췄다. V3 shadow table과 sequence는 소유권 검사에만 포함했고 Production
+runtime 권한은 추가하지 않았다. 수정 후 전체 `check`가 통과했다. 이는 OpenSQL 실행 근거가 아니므로
+OpenSQL migration 상태는 계속 `NOT_RUN`이다.
 
 ## 호환성과 남은 Gate
 

@@ -45,13 +45,16 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 final class OpenSqlCompatibilityAssertions {
 
-    private static final int EXPECTED_MIGRATION_COUNT = 17;
+    private static final int EXPECTED_MIGRATION_COUNT = 18;
     private static final Duration LEASE_DURATION = Duration.ofSeconds(30);
     private static final List<String> DOMAIN_TABLES = List.of(
             "users", "documents", "document_versions", "document_chunks",
-            "processing_jobs", "file_cleanup_jobs", "document_change_logs", "document_tags");
-    private static final Pattern MIGRATION_FILE_PATTERN = Pattern.compile("(?i)\\bV(1[0-7]|[1-9])(?:__|\\b)");
-    private static final Pattern MIGRATION_VERSION_PATTERN = Pattern.compile("(?i)\\bversion\\s+['\"]?(1[0-7]|[1-9])\\b");
+            "processing_jobs", "file_cleanup_jobs", "document_change_logs", "document_tags",
+            "search_v3_index_generations", "search_v3_indexing_jobs",
+            "search_v3_retrieval_passages", "search_v3_evidence_children",
+            "search_v3_passage_embeddings", "search_v3_child_embeddings");
+    private static final Pattern MIGRATION_FILE_PATTERN = Pattern.compile("(?i)\\bV(1[0-8]|[1-9])(?:__|\\b)");
+    private static final Pattern MIGRATION_VERSION_PATTERN = Pattern.compile("(?i)\\bversion\\s+['\"]?(1[0-8]|[1-9])\\b");
 
     private OpenSqlCompatibilityAssertions() {
     }
@@ -148,10 +151,10 @@ final class OpenSqlCompatibilityAssertions {
                     .cleanDisabled(true)
                     .load();
             MigrateResult latestMigration = latestFlyway.migrate();
-            assertThat(latestMigration.migrationsExecuted).isEqualTo(4);
+            assertThat(latestMigration.migrationsExecuted).isEqualTo(5);
             assertSuccessfulMigrationVersions(flywayJdbc, EXPECTED_MIGRATION_COUNT);
             assertThat(latestFlyway.info().current()).isNotNull();
-            assertThat(latestFlyway.info().current().getVersion().getVersion()).isEqualTo("17");
+            assertThat(latestFlyway.info().current().getVersion().getVersion()).isEqualTo("18");
             assertPreV14ProcessingFixturePreserved(flywayJdbc, preV14Fixture);
 
             MigrateResult secondMigration = latestFlyway.migrate();
@@ -353,7 +356,10 @@ final class OpenSqlCompatibilityAssertions {
     private static void assertSchema(JdbcTemplate jdbcTemplate) {
         for (String table : List.of(
                 "users", "documents", "document_versions", "document_chunks",
-                "processing_jobs", "file_cleanup_jobs", "document_change_logs", "tags", "document_tags")) {
+                "processing_jobs", "file_cleanup_jobs", "document_change_logs", "tags", "document_tags",
+                "search_v3_index_generations", "search_v3_indexing_jobs",
+                "search_v3_retrieval_passages", "search_v3_evidence_children",
+                "search_v3_passage_embeddings", "search_v3_child_embeddings")) {
             assertThat(jdbcTemplate.queryForObject(
                     """
                     SELECT COUNT(*)
@@ -1310,7 +1316,8 @@ final class OpenSqlCompatibilityAssertions {
             case "15" -> "processing progress columns and CHECK constraints";
             case "16" -> "document tags, owner-scoped user tags and SYSTEM seed data";
             case "17" -> "legacy SYSTEM_ADMIN deactivation and USER-only role CHECK";
-            default -> "V1-V17 Flyway SQL";
+            case "18" -> "Search V3 shadow generation, artifact, vector and active-pointer schema";
+            default -> "V1-V18 Flyway SQL";
         };
     }
 

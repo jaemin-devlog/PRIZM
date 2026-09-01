@@ -20,8 +20,17 @@ final class OpenSqlRuntimePrivilegePreparation {
     private static final String RUNTIME = configured("PRIZM_OPENSQL_EXPECTED_RUNTIME_USER", "prizm_app");
     private static final List<String> DOMAIN_TABLES = List.of(
             "users", "documents", "document_versions", "document_chunks",
-            "processing_jobs", "file_cleanup_jobs", "document_change_logs", "tags", "document_tags");
+            "processing_jobs", "file_cleanup_jobs", "document_change_logs", "tags", "document_tags",
+            "search_v3_index_generations", "search_v3_indexing_jobs",
+            "search_v3_retrieval_passages", "search_v3_evidence_children",
+            "search_v3_passage_embeddings", "search_v3_child_embeddings");
     private static final List<String> DOMAIN_SEQUENCES = List.of(
+            "users_id_seq", "documents_id_seq", "document_versions_id_seq",
+            "document_chunks_id_seq", "processing_jobs_id_seq", "file_cleanup_jobs_id_seq",
+            "document_change_logs_id_seq", "tags_id_seq", "search_v3_index_generations_id_seq",
+            "search_v3_indexing_jobs_id_seq", "search_v3_retrieval_passages_id_seq",
+            "search_v3_evidence_children_id_seq");
+    private static final List<String> RUNTIME_SEQUENCES = List.of(
             "users_id_seq", "documents_id_seq", "document_versions_id_seq",
             "document_chunks_id_seq", "processing_jobs_id_seq", "file_cleanup_jobs_id_seq",
             "document_change_logs_id_seq", "tags_id_seq");
@@ -82,7 +91,7 @@ final class OpenSqlRuntimePrivilegePreparation {
                 .outOfOrder(false)
                 .load();
         assertThat(flyway.info().current()).isNotNull();
-        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("17");
+        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("18");
         assertThat(flyway.info().pending()).isEmpty();
 
         List<String> versions = jdbc.queryForList(
@@ -90,7 +99,7 @@ final class OpenSqlRuntimePrivilegePreparation {
                         + "WHERE success AND version IS NOT NULL ORDER BY installed_rank",
                 String.class);
         assertThat(versions).containsExactly(
-                "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17");
+                "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18");
         assertThat(jdbc.queryForObject(
                 "SELECT COUNT(*) FROM flyway_schema_history WHERE NOT success", Long.class)).isZero();
 
@@ -101,6 +110,9 @@ final class OpenSqlRuntimePrivilegePreparation {
         assertThat(tables).containsExactlyInAnyOrderElementsOf(List.of(
                 "users", "documents", "document_versions", "document_chunks",
                 "processing_jobs", "file_cleanup_jobs", "document_change_logs", "tags", "document_tags",
+                "search_v3_index_generations", "search_v3_indexing_jobs",
+                "search_v3_retrieval_passages", "search_v3_evidence_children",
+                "search_v3_passage_embeddings", "search_v3_child_embeddings",
                 "flyway_schema_history"));
         List<String> sequences = jdbc.queryForList(
                 "SELECT sequence_name FROM information_schema.sequences "
@@ -111,6 +123,9 @@ final class OpenSqlRuntimePrivilegePreparation {
         assertThat(badOwnerCount(jdbc, "r", List.of(
                 "users", "documents", "document_versions", "document_chunks",
                 "processing_jobs", "file_cleanup_jobs", "document_change_logs", "tags", "document_tags",
+                "search_v3_index_generations", "search_v3_indexing_jobs",
+                "search_v3_retrieval_passages", "search_v3_evidence_children",
+                "search_v3_passage_embeddings", "search_v3_child_embeddings",
                 "flyway_schema_history"), OWNER)).isZero();
         assertThat(badOwnerCount(jdbc, "S", DOMAIN_SEQUENCES, OWNER)).isZero();
         assertThat(jdbc.queryForObject(
@@ -175,7 +190,7 @@ final class OpenSqlRuntimePrivilegePreparation {
                 }, RUNTIME);
         assertThat(actual).containsExactlyInAnyOrderEntriesOf(EXPECTED_TABLE_PRIVILEGES);
 
-        for (String sequence : DOMAIN_SEQUENCES) {
+        for (String sequence : RUNTIME_SEQUENCES) {
             assertThat(hasSequencePrivilege(jdbc, sequence, "USAGE")).isTrue();
             assertThat(hasSequencePrivilege(jdbc, sequence, "SELECT")).isFalse();
             assertThat(hasSequencePrivilege(jdbc, sequence, "UPDATE")).isFalse();

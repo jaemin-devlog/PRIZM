@@ -263,7 +263,7 @@ class PgVectorInfrastructureTest {
                 PgVectorSmokeAssertions.verifyExactCosineSearch(jdbcTemplate);
 
         assertThat(serverVersion / 10000).isIn(16, 17);
-        assertThat(successfulMigrations).isEqualTo(17L);
+        assertThat(successfulMigrations).isEqualTo(18L);
         assertThat(result.extensionVersion()).isIn("0.8.1", "0.8.2");
         assertThat(documentCount).isZero();
         assertThat(versionCount).isZero();

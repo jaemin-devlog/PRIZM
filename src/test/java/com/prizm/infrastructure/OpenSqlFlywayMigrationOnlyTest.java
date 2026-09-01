@@ -26,7 +26,7 @@ import org.springframework.boot.logging.LoggingSystem;
 @EnabledIfEnvironmentVariable(named = "PRIZM_OPENSQL_MIGRATION_EXECUTION", matches = "APPROVED")
 class OpenSqlFlywayMigrationOnlyTest {
 
-    private static final int EXPECTED_MIGRATION_COUNT = 17;
+    private static final int EXPECTED_MIGRATION_COUNT = 18;
     private static final List<String> EXPECTED_MIGRATION_VERSIONS = IntStream
             .rangeClosed(1, EXPECTED_MIGRATION_COUNT)
             .mapToObj(Integer::toString)
@@ -40,7 +40,13 @@ class OpenSqlFlywayMigrationOnlyTest {
             "file_cleanup_jobs",
             "document_change_logs",
             "tags",
-            "document_tags");
+            "document_tags",
+            "search_v3_index_generations",
+            "search_v3_indexing_jobs",
+            "search_v3_retrieval_passages",
+            "search_v3_evidence_children",
+            "search_v3_passage_embeddings",
+            "search_v3_child_embeddings");
 
     @BeforeAll
     static void suppressConnectionDetailsFromLibraryLogs() {
@@ -81,13 +87,13 @@ class OpenSqlFlywayMigrationOnlyTest {
             assertEquals(EXPECTED_MIGRATION_COUNT, applied.length);
             assertEquals(EXPECTED_MIGRATION_VERSIONS, migrationVersions(applied));
             assertNotNull(flyway.info().current());
-            assertEquals("17", flyway.info().current().getVersion().getVersion());
+            assertEquals("18", flyway.info().current().getVersion().getVersion());
             assertEquals(0, flyway.info().pending().length);
             verifyNoFailedHistory(url, username, password);
 
             MigrateResult secondMigration = flyway.migrate();
             assertEquals(0, secondMigration.migrationsExecuted);
-            assertEquals("17", flyway.info().current().getVersion().getVersion());
+            assertEquals("18", flyway.info().current().getVersion().getVersion());
             assertEquals(0, flyway.info().pending().length);
         }
         catch (AssertionError failure) {

@@ -1,6 +1,6 @@
 # PRZ-033 Atomic EvidenceChild Selection Ceiling
 
-- 상태: `IN_PROGRESS / OFFICIAL_CEILING_NOT_RUN`
+- 상태: `VERIFIED / BUILD_CHILD_SELECTOR`
 - 기준 branch: `PRZ-033-atomic-evidence-child-selection-ceiling`
 - 기준 source: `PRZ-032-minimal-v3-shadow-comparison@7e9c1361ca47a06a3957e62fdc34e9793c2a9863`
 - Production 적용: `NO_CHANGE`
@@ -91,3 +91,14 @@ ignored `local/search-v3-evaluation/prz033/`에만 저장한다.
 SEALED FINAL은 combined SHA-256
 `e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383`,
 `opened=false`, `searchExecuted=false`, `CURRENT_FRESH_BASELINE=NOT_RUN`을 유지한다.
+
+## 8. 공식 결과
+
+Direct-positive 85건 중 F0 rank 1 정답은 46건이었다. LOCAL_CHILD_ORACLE은 Passage 순위를
+바꾸지 않고 Top Passage 내부 선택 문제 32건을 모두 회복해 Top1을 `0.5412 → 0.9176`,
+user-macro Top1을 `0.5880 → 0.9224`로 높였다. candidate Top1 headroom capture는 `1.0000`이고
+Top1 loss는 0건이다. 남은 7건은 lower Passage 6건과 multi-aspect 1건이며 retrieval miss는 0이다.
+
+사전 Gate를 모두 통과했으므로 판정은 `BUILD_CHILD_SELECTOR`다. 이는 실제 selector의 채택이나
+Production 전환이 아니라, 같은 frozen 후보에서 atomic Child selector를 후속 ablation할 충분한
+ceiling이 있다는 뜻이다.

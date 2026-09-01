@@ -16,3 +16,14 @@
 - F0 metric이 PRZ-032 공식 결과와 일치
 - output path가 존재하지 않는 clean code-freeze HEAD
 - SEALED FINAL metadata/hash 불변
+
+## 완료 결과
+
+- 공식 code freeze: `03a2285e148aa0a45b032746266fdc9802be690d`
+- BGE/model 실행: `0`
+- F0 Top1: `0.5412`
+- LOCAL_CHILD_ORACLE Top1: `0.9176`
+- user-macro Top1 gain: `+0.3344`
+- 판정: `BUILD_CHILD_SELECTOR`
+
+실제 Child Selector 구현과 Production 통합은 이 PRZ의 범위가 아니다.

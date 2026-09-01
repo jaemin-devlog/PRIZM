@@ -19,9 +19,10 @@
 D1은 첫 response의 strict relation/reasonCode pair validation 실패로 output freeze와 Gold
 join 전에 fail-closed했고 `PROTOCOL_NO_GO / SEMANTIC_QUALITY_NOT_EVALUATED`로 보존한다.
 D2는 동일 model/instruction/config/candidate/ranking에서 output을 relation 단일 필드로만
-줄인다. 16-pair generic conformance는 16/16 strict parse/schema, enum/extra/malformed 0으로
-`PROTOCOL_V2_PASS`다. 다음 Gate는 code/contract를 commit으로 동결하고 D1 candidate
-payload를 V2 envelope로 재봉인하는 것이다.
+줄였다. 16-pair generic conformance는 16/16 strict parse/schema, enum/extra/malformed 0으로
+`PROTOCOL_V2_PASS`였다. code/contract와 candidate input을 동결한 뒤 공식 inference 1회,
+output freeze, Gold-after-output evaluation을 완료했다. semantic Gate는 relation macro F1,
+win/loss, user-macro Top1 개선과 Oracle capture 조건을 충족하지 못해 `NO_GO`다.
 
 ## 공식 실행 조건
 
@@ -38,3 +39,11 @@ payload를 V2 envelope로 재봉인하는 것이다.
 - V2 conformance report를 CREATE_NEW로 한 번 생성하고 PASS hash를 official runner의
   선행 조건으로 강제한다.
 - D2 output/marker/report는 D1과 다른 local 경로를 사용한다.
+
+## 완료 판정
+
+- D1: `PROTOCOL_NO_GO / SEMANTIC_QUALITY_NOT_EVALUATED` 역사 보존
+- D2 protocol: `PROTOCOL_V2_PASS`
+- D2 semantic directness: `NO_GO`
+- Evidence Selection 통합: `NOT_SAFE_TO_PROCEED`
+- Production/SEALED FINAL: 변경·실행 `0`

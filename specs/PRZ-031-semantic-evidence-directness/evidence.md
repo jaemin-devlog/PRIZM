@@ -148,10 +148,11 @@ dataset을 공식 재실행하지 않았다.
 - `CURRENT_FRESH_BASELINE=NOT_RUN`
 - SEALED semantic load/search/prediction/result: `0`
 - SEALED candidate export/BGE/Qwen/Gold join: `0`
-- DEV/CAL candidate materialization: `1`; Qwen official attempt: `1`; output freeze/Gold join: `0`
+- DEV/CAL candidate materialization: `1`; Qwen official attempt: D1 `1` + D2 `1`;
+  D2 output freeze/Gold join: `1` / `1`
 - `src/main/**`, migration, dependency/build, frontend, MCP, Docker, `v1.0.0`: 변경 `0`
 
-## 6. 판정
+## 6. D1 역사 판정
 
 최종 판정은 `NO_GO`다. 동결된 Qwen artifact는 첫 pair조차 검증 가능한 relation output으로
 봉인하지 못했고 relation/ranking 품질이나 Oracle headroom 회수를 증명하지 못했다. 따라서
@@ -273,7 +274,8 @@ hash는 각각 `3b76fc147b2c8cb3ac0baab4b01a2611aebaadfd77b051b4185be0baa1fc5a55
 
 첫 sandbox 실행은 model call과 marker 생성 전에 Ollama executable read 권한으로 중단됐다.
 동일 command를 승인된 host 경계에서 실행해 위 단일 conformance marker/output을 생성했다.
-공식 D2 semantic inference, V2 output, Gold join과 semantic metric은 아직 `NOT_RUN`이다.
+이 conformance 기록 시점에는 공식 D2 semantic inference, V2 output, Gold join과 semantic
+metric이 `NOT_RUN`이었다. 아래 공식 실행에서 이 순서를 변경하지 않고 완료했다.
 
 ### 현재 검증
 
@@ -284,3 +286,84 @@ hash는 각각 `3b76fc147b2c8cb3ac0baab4b01a2611aebaadfd77b051b4185be0baa1fc5a55
 - Production/migration/dependency/frontend/MCP/Docker 변경: `0`
 - SEALED manifest/tree/combined: 기존 SHA 유지, `opened=false`, `searchExecuted=false`,
   `CURRENT_FRESH_BASELINE=NOT_RUN`
+
+### 공식 D2 실행과 Gold-after-output 검증
+
+- code freeze commit: `9549ea0227a433abc2dc3cde83ba67803737e9c5`
+- V2 input file/canonical SHA-256:
+  `696cd617e8d3e5563581c0432ff8e84c63c4cabaa4d3c46cbe2cfe3f88207013` /
+  `21e3713f818f18ebc3163109472adf8d97c28ebb3d08749ad490bc12c5c61a47`
+- candidate payload SHA-256: D1과 동일한
+  `5e4863f245f258dcdc96eed755bf17159ae55c5711ec2b967b6169ee000b885f`
+- 공식 inference: `1회`, query `79`, pair/prediction `578/578`
+- output file/canonical SHA-256:
+  `eea203905cb24edcf7d625665710363f3a5a50ceacfc5c278fcb31bda6f71a4c` /
+  `0282d469f47e36768e99c1f2ea9cbfbd9c6cd06ac99e7aac13b284a193c77a3f`
+- official marker SHA-256:
+  `9b07a3748893bab63e7ea98f5f1bd294273d785495dc98447633145e51ed5a6b`
+- output verification 뒤에만 Gold를 열었으며 report 상태는
+  `GOLD_JOINED_AFTER_OUTPUT_VERIFIED`다.
+- evaluation report SHA-256:
+  `10c2fa909693ddf14f470d31b8e1dc5c790a98e5729c4690b8f507f8d84ae789`
+
+| relation metric (judged 92 / predicted 578) | 결과 |
+|---|---:|
+| accuracy / macro F1 | `0.6413` / `0.4422` |
+| DIRECT precision / recall / F1 | `0.7705` / `0.7833` / `0.7769` |
+| RELATED precision / recall / F1 | `0.1111` / `0.2000` / `0.1429` |
+| QUERY_CONFLICT precision / recall / F1 | `0.7273` / `0.4211` / `0.5333` |
+| INSUFFICIENT precision / recall / F1 | `0.2727` / `0.3750` / `0.3158` |
+
+| ranking metric | D0 | D2 | O10 |
+|---|---:|---:|---:|
+| Direct Top1 | `0.8772` | `0.8772` | `1.0000` |
+| MRR | `0.9313` | `0.9313` | `1.0000` |
+| nDCG@5 | `0.9063` | `0.8990` | `0.9620` |
+| Recall@5 / Recall@20 | `1.0000 / 1.0000` | `1.0000 / 1.0000` | `1.0000 / 1.0000` |
+| user-macro Top1 | `0.8452` | `0.8452` | `1.0000` |
+| user-macro MRR | `0.9053` | `0.9157` | `1.0000` |
+
+- win/loss/tie: `1 / 2 / 54`
+- 기존 rank1 DIRECT retention: `49/50 = 0.9800`
+- recoverable 7건 중 복구: query `1`, unique user bundle `1`
+- Oracle capture: user-macro Top1 `0`, user-macro MRR `0.1099`, query-micro nDCG@5
+  `-0.1302`
+- `NOT_SUPPORTED` final Top1 predicted DIRECT: `9/22 → 15/22`; frozen comparator가 없어
+  Gate 조건 C는 계속 `NOT_APPLICABLE`이며 현실 경력 부재 판정으로 해석하지 않는다.
+
+유일한 win은 `SV3-LF-U103-Q04`의 first-DIRECT rank `4 → 1`이다. 회귀는
+`SV3-LF-U101-Q01`의 `1 → 2`, `SV3-LF-U102-Q03`의 `2 → 4` 두 건이다. profession에서는
+Marketing/Sales가 개선됐지만 Design/Product Top1 `0.8182 → 0.7273`, Data/AI/Infra MRR
+`0.8939 → 0.8712` 회귀가 생겼다. language에서는 mixed Top1 `0.5714 → 0.7143` 개선과
+동시에 Korean Top1 `0.9545 → 0.9091`, English MRR `0.9464 → 0.9375` 회귀가 있었다.
+other-actor는 Top1/MRR 변화가 없고, negation의 no-support predicted DIRECT는 `5 → 9`,
+completion Top1은 `0.9000 → 0.9500`이었다.
+
+공식 inference 비용은 pair 평균/p50/p95 `2,169.51 / 2,166.07 / 2,208.21 ms`, query Top10
+p50/p95 `17,335.08 / 21,850.99 ms`, 전체 `1,267,382.39 ms`였다. runner RSS는
+70,774,784 bytes에서 peak 85,454,848 bytes, host GPU used는 4,152 MiB에서 peak 4,154
+MiB였다. loaded model VRAM snapshot은 3,178,149,969 bytes다. 이는 evaluation host의
+측정치이며 Production-scale 근거가 아니다.
+
+Capability Gate는 Safety와 retention만 통과했다. relation macro F1 `0.4422 < 0.85`,
+win `1 < loss 2`, user-macro Top1 개선 `0`, Oracle Top1 capture `0`, recovered bundle
+`1 < 3`으로 Quality와 추가 조건이 실패했다. 최종 판정은 `NO_GO`이며 동일 dataset 재실행,
+prompt/schema/model 변경, 다른 model 시험을 하지 않았다. Evidence Selection 통합으로
+진행하지 않는다.
+
+### D2 최종 검증
+
+| 검사 | 실제 결과 |
+|---|---|
+| Python compile / protocol self-test | `PASS`; valid enum 4, invalid form 12 reject, conformance case 16, repository freeze check 4 |
+| protocol conformance | `PROTOCOL_V2_PASS`; 16/16 parse/schema, enum/extra/malformed 0 |
+| official inference | `PASS`; 공식 1회, 578/578 output freeze |
+| official Gold-after-output evaluation | `PASS`; test 1, report SHA `10c2fa909693ddf14f470d31b8e1dc5c790a98e5729c4690b8f507f8d84ae789` |
+| PRZ-031 focused `searchEvaluation` 4 suites | `PASS`; 27 tests 중 24 pass, official opt-in 3 skip, failure/error 0 |
+| Fresh benchmark validator / unit test | `PASS`; SEALED search false / 18 tests pass |
+| OSS readiness | `PASS`; Markdown 206, tracked safety 1099, verifier tests 16 |
+| `git diff --check` | `PASS` |
+| independent final audit | `PASS`; blocking finding 0 |
+
+전체 backend unit/integration과 frontend test는 evaluation-only 변경 범위에서 `NOT_RUN`이다.
+Production source, migration, dependency, frontend, MCP, Docker와 `v1.0.0` 변경은 0이다.

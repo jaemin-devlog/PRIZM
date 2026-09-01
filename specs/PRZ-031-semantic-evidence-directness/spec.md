@@ -1,6 +1,6 @@
 # PRZ-031 Search V3 Semantic Evidence Directness
 
-- 상태: `IN_PROGRESS / D1_HISTORICAL_PROTOCOL_NO_GO / D2_PROTOCOL_V2_PASS`
+- 상태: `VERIFIED / D1_HISTORICAL_PROTOCOL_NO_GO / D2_PROTOCOL_V2_PASS / D2_SEMANTIC_NO_GO`
 - 기준 branch: `PRZ-031-semantic-evidence-directness`
 - 기준 source: `PRZ-030-semantic-evidence-validation-ceiling@aca58a6c11b517557d6081756a3ea2cdc5f0550c`
 - 선행 계약: `DEPENDS_ON_PRZ_025@5f8229f`, `DEPENDS_ON_PRZ_026_B3@1bbc1d7`,
@@ -126,6 +126,12 @@ identity/order/provenance parity를 검증해 V2 contract만 바인딩한 local 
 join → D0/D2 evaluation`이다. D2 실패 후 prompt/schema/model/policy를 수정하거나 같은
 dataset을 공식 재실행하지 않는다. D1 contract, marker, failure artifact와 판정은 변경하지
 않는다.
+
+공식 D2는 16/16 protocol conformance와 578/578 prediction freeze를 통과했지만 semantic
+Capability Gate를 통과하지 못했다. judged relation macro F1은 `0.4422`, win/loss는 `1/2`,
+user-macro Top1은 `0.8452 → 0.8452`, Oracle Top1 capture는 `0`이었다. 따라서 exact
+model/instruction/protocol/config/input 조합의 판정은 `NO_GO`이며 Evidence Selection
+통합으로 진행하지 않는다.
 
 ## 6. 비범위와 보존 경계
 

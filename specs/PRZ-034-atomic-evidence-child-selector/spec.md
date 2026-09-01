@@ -1,6 +1,6 @@
 # PRZ-034 Atomic EvidenceChild Selector
 
-- 상태: `IN_PROGRESS / OFFICIAL_COMPARISON_NOT_RUN`
+- 상태: `VERIFIED / PROMISING`
 - branch: `PRZ-034-atomic-evidence-child-selector`
 - 기준 source: `PRZ-033-atomic-evidence-child-selection-ceiling@1a92add07be092457634b4dc83468ec3d951fe04`
 - Production 적용: `NO_CHANGE`

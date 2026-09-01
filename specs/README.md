@@ -77,7 +77,7 @@ PRZ는 PRIZM의 기능 개발과 기술 검증을 작업 단위로 남기는 기
 | PRZ&#8209;031 | [Search V3 Semantic Evidence Directness](PRZ-031-semantic-evidence-directness/spec.md) | `VERIFIED` | [근거](PRZ-031-semantic-evidence-directness/evidence.md) |
 | PRZ&#8209;032 | [Minimal Search V3 Shadow Comparison](PRZ-032-minimal-v3-shadow-comparison/spec.md) | `VERIFIED` | [근거](PRZ-032-minimal-v3-shadow-comparison/evidence.md) |
 | PRZ&#8209;033 | [Atomic EvidenceChild Selection Ceiling](PRZ-033-atomic-evidence-child-selection-ceiling/spec.md) | `VERIFIED` | [근거](PRZ-033-atomic-evidence-child-selection-ceiling/evidence.md) |
-| PRZ&#8209;034 | [Atomic EvidenceChild Selector](PRZ-034-atomic-evidence-child-selector/spec.md) | `IN_PROGRESS` | [근거](PRZ-034-atomic-evidence-child-selector/evidence.md) |
+| PRZ&#8209;034 | [Atomic EvidenceChild Selector](PRZ-034-atomic-evidence-child-selector/spec.md) | `VERIFIED` | [근거](PRZ-034-atomic-evidence-child-selector/evidence.md) |
 
 ## 연구·미채택 기록
 

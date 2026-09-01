@@ -1,5 +1,7 @@
 # PRZ-034 Plan
 
+- 상태: `COMPLETED / PROMISING`
+
 1. `ORIENT` — PRZ-033/032/029/026 dependency와 clean 기준점, local artifact/model을 확인한다.
 2. `SPEC` — CHILD_DENSE_V1, Top5, query-vector 한계, Typed source-order prepare/state/eligibility 보존과
    selected Evidence 변경 허용 경계를 결과 전에 고정한다.

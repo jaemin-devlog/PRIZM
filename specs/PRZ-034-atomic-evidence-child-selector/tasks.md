@@ -1,6 +1,6 @@
 # PRZ-034 Tasks
 
-- 상태: `IN_PROGRESS / OFFICIAL_COMPARISON_NOT_RUN`
+- 상태: `VERIFIED / PROMISING`
 
 - [x] PRZ-033 HEAD와 PRZ-032/029/026 dependency, clean worktree를 확인했다.
 - [x] CHILD_DENSE_V1 단일 변수와 사전 Gate를 고정하고, Typed selected-set 불변 계약을 결과 전에
@@ -12,9 +12,9 @@
 - [x] Typed applicability/parsed constraint/state exact parity, selected Evidence match tier/provenance와
   precision 변화, failure/cost report 구현
 - [x] model-free focused test와 Typed/provenance overlay preflight
-- [ ] code-freeze commit
-- [ ] official S0/S1 비교 1회 실행
-- [ ] result/evidence, SEALED/diff/OSS audit
-- [ ] local commit
+- [x] code-freeze commit
+- [x] official S0/S1 비교 1회 실행
+- [x] result/evidence, SEALED/diff/OSS audit
+- [x] local commit
 
-Production, SEALED FINAL, 다른 Selector, push/PR/merge는 `NOT_RUN`이다.
+Production, SEALED FINAL 검색, 다른 Selector, push/PR/merge는 `NOT_RUN`이다.

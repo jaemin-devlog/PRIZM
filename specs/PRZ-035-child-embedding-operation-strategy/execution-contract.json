@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "artifactType": "PRZ035_CHILD_EMBEDDING_OPERATION_EXECUTION_CONTRACT",
   "status": "OFFICIAL_COMPARISON_NOT_RUN",
-  "codeFreezeCommit": "PENDING",
+  "codeFreezeCommit": "4526437ebc3e36e7eec43d3a74889a6b055c066e",
   "selectorInputCanonicalSha256": "778b79117d47344433bed8d01f0f18a39ab4ae20f8f0ff444b2d8d5bd41c43ca",
   "prz034PredictionCanonicalSha256": "7d3023903fa4d1178dd0bf624f042d3fb09a9b54f2e1f4b1b5942f0ff241bab0",
   "bgeM3Digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
-  "selectorSourceSha256": "PENDING",
-  "strategyDefinitionSha256": "PENDING",
-  "comparisonConfigSha256": "PENDING",
-  "sourceSha256": "PENDING"
+  "selectorSourceSha256": "c7c962aebcab4dbe836955912e8ad14cfaf828aa885a6d1b63f1c2036ff7a8ea",
+  "strategyDefinitionSha256": "117df007373724426c4beb2e670088bda118d6a6b7e90eae2b46580bc692e7fb",
+  "comparisonConfigSha256": "b203179dfe2f180fe579ea212ec46cd6d71b8f19ceb97f6da2ca4fb9584377f3",
+  "sourceSha256": "c089dee699df8a8492f9f38082baf589ba1fc75b2569a13e266ef0c303341a6a"
 }

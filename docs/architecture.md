@@ -307,7 +307,7 @@ flowchart TD
 브라우저가 임의 경로를 등록하는 API는 없으며, 사용자별 문서 작업이나 업로드
 rollback 보상 경로가 정리 작업을 만듭니다.
 
-### Search V3 shadow 저장 경계
+### Search V3 shadow 저장과 활성화 경계
 
 V18은 Search V2의 `document_chunks`를 유지한 채 Search V3 색인 세대를 나란히 저장할 수 있는
 shadow schema를 추가합니다. `SearchIndexGeneration`은 `DocumentVersion`과 분리돼 같은 원본 version을
@@ -316,12 +316,13 @@ shadow schema를 추가합니다. `SearchIndexGeneration`은 `DocumentVersion`�
 
 `documents.active_search_v3_generation_id`는 nullable입니다. 최초 업로드나 V3 색인이 없는 문서는 null이
 정상이며, 값이 있으면 owner·문서·현재 `active_version_id`가 같은 generation만 가리킬 수 있습니다. 실제
-검색 가능 조건인 `ACTIVE generation + COMPLETED V3 job` 확인과 원자적 pointer 교체는 후속 service
-transaction 책임입니다. 현재 Production Search와 Search V2 Worker는 이 schema를 읽거나 쓰지 않습니다.
+검색 가능 조건인 `ACTIVE generation + COMPLETED V3 job` 확인과 원자적 pointer 교체는 PRZ-039 service
+transaction이 수행합니다. 현재 Production Search와 Search V2 Worker source는 이 schema를 직접 읽거나 쓰지 않습니다.
 
 복합 FK는 generation부터 Passage·Child·vector까지 owner·문서·version 계보가 섞이지 않게 합니다.
 vector PK/FK는 artifact별 중복과 orphan을 막고, frozen manifest와 실제 inventory가 모두 존재하는지는
-READY/activation service가 잠금 아래 확인해야 합니다.
+READY/activation service가 잠금 아래 확인합니다. V19의 `verified_inventory_sha256`은 READY에서 검증한
+logical inventory와 vector payload를 묶고, activation은 이를 현재 DB inventory와 다시 비교합니다.
 
 Search V3 전용 job runtime은 V18의 full owner·문서·version·generation identity를 JDBC 조건으로 확인합니다.
 `PENDING` 또는 due `RETRY_WAIT` 작업은 `FOR UPDATE SKIP LOCKED`로 한 Worker만 claim하고, lease와 retry 시각은
@@ -329,8 +330,16 @@ PostgreSQL `now()`를 기준으로 계산합니다. 만료 작업은 recovery to
 복구자만 claim version을 올려 reclaim할 수 있습니다. retry·terminal failure도 같은 full identity와 현재
 claim에 묶이며 terminal failure는 job과 generation을 함께 `FAILED`로 바꿉니다.
 
-아직 실제 Search V3 Worker coordinator, Passage·Child 생성, exact inventory, `READY`·`COMPLETED`와 active
-pointer 전환은 구현하지 않았습니다.
+READY는 현재 PROCESSING claim과 BUILDING generation을 full lineage로 잠근 뒤 exact inventory를 검증합니다.
+같은 Production `active_version_id`의 READY generation만 활성화할 수 있으며, transaction 하나에서 기존
+ACTIVE를 `SUPERSEDED`, 신규 READY를 `ACTIVE`, 신규 job을 `COMPLETED`로 바꾸고 V3 pointer를 전환합니다.
+document row는 검증 뒤 `NOWAIT`로 짧게 잠가 V2 lifecycle과의 역순 대기를 피하며, rollback과 concurrent
+activation에서도 ACTIVE와 pointer를 하나로 유지합니다.
+
+V19 trigger는 Production V2가 active version을 바꾸거나 null로 해제할 때 기존 ACTIVE V3 generation을
+`SUPERSEDED`로 바꾸고 shadow pointer만 비웁니다. `documents.active_version_id`, version 상태와 V2 chunk를
+V3 activation이 변경하지는 않습니다. 실제 Search V3 Worker coordinator, Passage·Child·embedding 생성과
+Search V3 query/API/cutover는 아직 구현하지 않았습니다.
 
 근거:
 
@@ -346,8 +355,13 @@ pointer 전환은 구현하지 않았습니다.
 - [파일 정리 migration](../src/main/resources/db/migration/V12__add_file_cleanup_jobs.sql)
 - [문서 태그 migration](../src/main/resources/db/migration/V16__create_document_tags.sql)
 - [Search V3 shadow storage migration](../src/main/resources/db/migration/V18__create_search_v3_shadow_storage.sql)
+- [Search V3 inventory fingerprint migration](../src/main/resources/db/migration/V19__add_verified_search_v3_inventory_fingerprint.sql)
 - [Search V3 job repository](../src/main/java/com/prizm/search/v3/indexing/repository/SearchV3IndexingJobRepository.java)
 - [Search V3 job service](../src/main/java/com/prizm/search/v3/indexing/service/SearchV3IndexingJobService.java)
+- [Search V3 inventory repository](../src/main/java/com/prizm/search/v3/indexing/repository/SearchV3InventoryActivationRepository.java)
+- [Search V3 inventory verifier](../src/main/java/com/prizm/search/v3/indexing/service/SearchV3InventoryVerifier.java)
+- [Search V3 activation service](../src/main/java/com/prizm/search/v3/indexing/service/SearchV3InventoryActivationService.java)
+- [Search V3 inventory·activation PostgreSQL test](../src/integrationTest/java/com/prizm/infrastructure/SearchV3InventoryActivationRuntimeTest.java)
 
 ## 8. 상태 전이
 

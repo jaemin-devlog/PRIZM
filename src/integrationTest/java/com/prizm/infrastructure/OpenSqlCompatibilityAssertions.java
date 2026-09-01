@@ -45,7 +45,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 final class OpenSqlCompatibilityAssertions {
 
-    private static final int EXPECTED_MIGRATION_COUNT = 18;
+    private static final int EXPECTED_MIGRATION_COUNT = 19;
     private static final Duration LEASE_DURATION = Duration.ofSeconds(30);
     private static final List<String> DOMAIN_TABLES = List.of(
             "users", "documents", "document_versions", "document_chunks",
@@ -151,10 +151,10 @@ final class OpenSqlCompatibilityAssertions {
                     .cleanDisabled(true)
                     .load();
             MigrateResult latestMigration = latestFlyway.migrate();
-            assertThat(latestMigration.migrationsExecuted).isEqualTo(5);
+            assertThat(latestMigration.migrationsExecuted).isEqualTo(6);
             assertSuccessfulMigrationVersions(flywayJdbc, EXPECTED_MIGRATION_COUNT);
             assertThat(latestFlyway.info().current()).isNotNull();
-            assertThat(latestFlyway.info().current().getVersion().getVersion()).isEqualTo("18");
+            assertThat(latestFlyway.info().current().getVersion().getVersion()).isEqualTo("19");
             assertPreV14ProcessingFixturePreserved(flywayJdbc, preV14Fixture);
 
             MigrateResult secondMigration = latestFlyway.migrate();
@@ -1317,7 +1317,8 @@ final class OpenSqlCompatibilityAssertions {
             case "16" -> "document tags, owner-scoped user tags and SYSTEM seed data";
             case "17" -> "legacy SYSTEM_ADMIN deactivation and USER-only role CHECK";
             case "18" -> "Search V3 shadow generation, artifact, vector and active-pointer schema";
-            default -> "V1-V18 Flyway SQL";
+            case "19" -> "Search V3 verified inventory fingerprint and V2 lifecycle compatibility trigger";
+            default -> "V1-V19 Flyway SQL";
         };
     }
 

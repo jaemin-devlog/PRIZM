@@ -70,18 +70,23 @@
 
 ### Search V3 리팩토링 branch
 
-- V18 migration source는 기존 `document_chunks` 옆에 generation, V3 전용 작업, `RetrievalPassage`,
-  `EvidenceChild`와 두 vector 계열을 저장하는 shadow schema를 정의함
+- V18은 기존 `document_chunks` 옆에 generation, V3 전용 작업, `RetrievalPassage`, `EvidenceChild`와 두 vector
+  계열을 저장하는 shadow schema를 정의하고, V19은 검증된 inventory fingerprint와 V2 lifecycle 호환 trigger를 추가함
 - owner·문서·version·generation composite FK, nullable active-generation pointer와 artifact/vector 중복·orphan
   방지 제약을 포함함
 - V3 전용 JDBC job runtime은 full owner·문서·version·generation identity로 claim, lease renew, retry/failure,
   recovery lock과 exact-token reclaim을 수행함
-- 실제 V3 Worker coordinator, Passage·Child 생성, exact inventory, 완료·활성화 transaction과 검색 query는 아직 구현하지 않음
-- Production Search V2, API, frontend와 MCP는 Search V3 shadow table을 사용하지 않음
-- PostgreSQL 16+pgvector Testcontainers에서 V1~V18 migration 회귀 `9/9`, Search V3 lineage·vector·active
-  pointer 제약 `7/7`을 실행했으며 자세한 범위는 PRZ-037 evidence를 따름
+- 실제 PostgreSQL inventory의 key·순서·membership·hash·provenance와 vector 계약을 검증하고,
+  `BUILDING → READY`와 같은-version generation 활성화를 full claim fencing 아래 원자적으로 수행함
+- Production Search V2 source·query·API·frontend·MCP는 shadow schema를 직접 사용하지 않음. 다만 V19 trigger는
+  V2가 active version을 바꾸거나 해제할 때 stale V3 generation을 `SUPERSEDED`로 바꾸고 shadow pointer만 비움
+- 실제 V3 Worker coordinator, Passage·Child·embedding 생성과 Search V3 query/API/cutover는 아직 구현하지 않음
+- PostgreSQL 16+pgvector Testcontainers에서 V1~V19 migration 회귀 `9/9`, Search V3 lineage·vector·active
+  pointer와 V19 upgrade 제약 `8/8`을 실행함. V18 저장 범위는 PRZ-037, 현재 V19 포함 회귀는 PRZ-039 evidence를 따름
 - Search V3 job fencing은 PostgreSQL 시나리오 `6/6`에서 concurrent duplicate claim 0, recovery token과
   stale claim·cross-lineage 차단을 확인했으며 자세한 범위는 PRZ-038 evidence를 따름
+- Search V3 inventory·activation은 PostgreSQL 시나리오 `11/11`에서 exact inventory, READY, 첫 activation,
+  같은-version 재색인, rollback·동시성과 V2 active-version 변경 경계를 확인했으며 자세한 범위는 PRZ-039 evidence를 따름
 
 ### 검색과 원문 위치
 

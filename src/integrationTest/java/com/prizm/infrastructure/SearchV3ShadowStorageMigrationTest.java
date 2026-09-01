@@ -18,7 +18,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
-/** V18 Search V3 shadow schema의 PostgreSQL·pgvector 제약을 검증한다. */
+/** Search V3 shadow schema의 PostgreSQL·pgvector 제약을 검증한다. */
 @Testcontainers
 class SearchV3ShadowStorageMigrationTest {
 
@@ -41,7 +41,7 @@ class SearchV3ShadowStorageMigrationTest {
         MigrationDatabase database = createMigratedDatabase();
         JdbcTemplate jdbc = database.jdbcTemplate();
 
-        assertThat(successfulMigrationCount(jdbc)).isEqualTo(18L);
+        assertThat(successfulMigrationCount(jdbc)).isEqualTo(19L);
         assertThat(existingTables(jdbc)).contains(
                 "documents",
                 "document_versions",
@@ -75,6 +75,52 @@ class SearchV3ShadowStorageMigrationTest {
                 "SELECT active_search_v3_generation_id FROM documents WHERE id = ?",
                 Long.class,
                 fixture.documentId())).isNull();
+    }
+
+    @Test
+    void migratesV18GenerationWithNullableVerifiedInventoryAndEnforcesLowercaseSha256() {
+        MigrationDatabase database = createMigratedDatabase("18");
+        JdbcTemplate jdbc = database.jdbcTemplate();
+        Fixture fixture = createFixture(jdbc, "verified-inventory-owner");
+        Long generation = insertBuildingGeneration(jdbc, fixture);
+
+        assertThat(Flyway.configure().dataSource(database.dataSource()).load().migrate().migrationsExecuted)
+                .isEqualTo(1);
+        assertThat(successfulMigrationCount(jdbc)).isEqualTo(19L);
+        assertThat(jdbc.queryForObject(
+                "SELECT verified_inventory_sha256 FROM search_v3_index_generations WHERE id = ?",
+                String.class,
+                generation)).isNull();
+        assertThat(jdbc.queryForObject(
+                "SELECT COUNT(*) FROM pg_proc WHERE proname = 'detach_search_v3_generation_on_version_change'",
+                Long.class)).isEqualTo(1L);
+        assertThat(jdbc.queryForObject(
+                """
+                SELECT COUNT(*)
+                FROM pg_trigger
+                WHERE tgname = 'trg_documents_detach_search_v3_on_version_change'
+                  AND NOT tgisinternal
+                """,
+                Long.class)).isEqualTo(1L);
+
+        String verifiedInventory = "e".repeat(64);
+        assertThat(jdbc.update(
+                "UPDATE search_v3_index_generations SET verified_inventory_sha256 = ? WHERE id = ?",
+                verifiedInventory,
+                generation)).isEqualTo(1);
+        assertThat(jdbc.queryForObject(
+                "SELECT verified_inventory_sha256 FROM search_v3_index_generations WHERE id = ?",
+                String.class,
+                generation)).isEqualTo(verifiedInventory);
+
+        assertThatThrownBy(() -> jdbc.update(
+                "UPDATE search_v3_index_generations SET verified_inventory_sha256 = ? WHERE id = ?",
+                "E".repeat(64),
+                generation)).isInstanceOf(DataIntegrityViolationException.class);
+        assertThatThrownBy(() -> jdbc.update(
+                "UPDATE search_v3_index_generations SET verified_inventory_sha256 = ? WHERE id = ?",
+                "e".repeat(63),
+                generation)).isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
@@ -376,13 +422,20 @@ class SearchV3ShadowStorageMigrationTest {
     }
 
     private MigrationDatabase createMigratedDatabase() {
+        return createMigratedDatabase(null);
+    }
+
+    private MigrationDatabase createMigratedDatabase(String target) {
         String databaseName = "prizm_s3_" + UUID.randomUUID().toString().replace("-", "");
         JdbcTemplate admin = new JdbcTemplate(new DriverManagerDataSource(
                 postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword()));
         admin.execute("CREATE DATABASE " + databaseName);
         String url = postgres.getJdbcUrl().replace("/" + postgres.getDatabaseName(), "/" + databaseName);
         DataSource dataSource = new DriverManagerDataSource(url, postgres.getUsername(), postgres.getPassword());
-        Flyway.configure().dataSource(dataSource).load().migrate();
+        Flyway flyway = target == null
+                ? Flyway.configure().dataSource(dataSource).load()
+                : Flyway.configure().dataSource(dataSource).target(target).load();
+        flyway.migrate();
         return new MigrationDatabase(dataSource, new JdbcTemplate(dataSource));
     }
 
@@ -637,7 +690,8 @@ class SearchV3ShadowStorageMigrationTest {
                 "fk_s3_passage_vectors_generation_contract",
                 "fk_s3_child_vectors_artifact_input",
                 "fk_s3_child_vectors_generation_contract",
-                "fk_documents_active_s3_generation_lineage")) {
+                "fk_documents_active_s3_generation_lineage",
+                "ck_s3_generations_verified_inventory")) {
             assertThat(jdbc.queryForObject(
                     "SELECT COUNT(*) FROM pg_constraint WHERE conname = ?",
                     Long.class,

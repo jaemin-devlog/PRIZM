@@ -2,18 +2,20 @@
 
 Search V3는 검색 알고리즘을 먼저 정하지 않고, 같은 Fresh Generalization 기준으로 기존 검색과
 비교해 순증을 확인한 구성만 남기는 장기 리팩터링 작업이다. 현재 결과는 모두 evaluation/shadow
-경로의 검증 기록이며 Production Search V2를 바꾸지 않았다.
+경로의 검증 기록이며 Production Search V2 검색 source·query 계약은 바꾸지 않았다.
 
 ## 현재 상태
 
 | 항목 | 상태 |
 | --- | --- |
 | 통합 개발선 | `refactor/search-v3` |
-| 통합선 기준 HEAD | `PRZ-037-search-v3-shadow-storage@f3bfab34d864f475b6ad3e3d79eeec7e94625fed` |
+| 통합선 기준 HEAD | `PRZ-038-search-v3-job-fencing-runtime@dab65383c0b3221fc2845951486cda986cdaf712` |
+| 현재 검증 branch | `PRZ-039-search-v3-inventory-activation-runtime` |
 | Production 검색 적용 | `NOT_RUN` |
-| Production 변경 | `0` |
+| Production Search V2 source·query 계약 변경 | `0` |
 | Shadow 저장 구조 | PRZ-037 V18 migration `SHADOW_STORAGE_READY` |
-| Job fencing runtime | PRZ-038 branch `JOB_FENCING_READY` |
+| Job fencing runtime | PRZ-038 `JOB_FENCING_READY` |
+| Inventory·activation runtime | PRZ-039 `INVENTORY_ACTIVATION_READY` |
 | SEALED FINAL | `opened=false`, `searchExecuted=false` |
 | Fresh baseline | `CURRENT_FRESH_BASELINE=NOT_RUN` |
 
@@ -39,6 +41,7 @@ Typed Validation과 Evidence Selection, 같은 Passage 안에서 동작하는 `C
 | [PRZ-036](../PRZ-036-search-v3-index-lifecycle/evidence.md) | generation, manifest, activation·복구 생명주기 | `SHADOW_INDEX_LIFECYCLE_READY` |
 | [PRZ-037](../PRZ-037-search-v3-shadow-storage/evidence.md) | PostgreSQL shadow 저장 구조와 제약 | `SHADOW_STORAGE_READY` |
 | [PRZ-038](../PRZ-038-search-v3-job-fencing-runtime/evidence.md) | PostgreSQL claim·lease·recovery token·stale Worker 차단 | `JOB_FENCING_READY` |
+| [PRZ-039](../PRZ-039-search-v3-inventory-activation-runtime/evidence.md) | exact inventory, READY와 같은-version 원자 활성화 | `INVENTORY_ACTIVATION_READY` |
 
 PRZ-027은 PRZ-026에서 갈라진 `NO_GO` side branch이며 PRZ-028 이후 commit의 조상이 아니다.
 PRZ-031은 `NO_GO` 실험 기록을 포함하지만 그 다음 PRZ가 같은 branch 계보에서 이어졌다. 실패
@@ -58,11 +61,11 @@ origin/main
                   └─ PRZ-032
                      └─ PRZ-033
                         └─ PRZ-034
-                           └─ refactor/search-v3
-                              └─ PRZ-035
-                                 └─ PRZ-036
-                                    └─ PRZ-037  SHADOW_STORAGE_READY
-                                       └─ PRZ-038  JOB_FENCING_READY
+                           └─ PRZ-035
+                              └─ PRZ-036
+                                 └─ PRZ-037  SHADOW_STORAGE_READY
+                                    └─ PRZ-038  JOB_FENCING_READY ← refactor/search-v3@dab6538
+                                       └─ PRZ-039  INVENTORY_ACTIVATION_READY
 ```
 
 ## Search V3 branch 운영

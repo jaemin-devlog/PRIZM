@@ -199,8 +199,8 @@ tasks.register('prz044Preflight', Test) {
     }
 }
 
-tasks.register('prz044Attempt2Preflight', Test) {
-    description = 'Runs the Gold-free PRZ-044 attempt-2 DocumentType mapping and runtime preflight.'
+tasks.register('prz044Attempt3Preflight', Test) {
+    description = 'Runs the Gold-free PRZ-044 attempt-3 mapping and runtime preflight.'
     group = 'verification'
     testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
     classpath = sourceSets.searchEvaluation.runtimeClasspath
@@ -211,12 +211,12 @@ tasks.register('prz044Attempt2Preflight', Test) {
     outputs.upToDateWhen { false }
     maxParallelForks = 1
     failFast = true
-    systemProperty 'prizm.prz044.attempt2-preflight', 'true'
+    systemProperty 'prizm.prz044.attempt3-preflight', 'true'
     systemProperty 'prizm.prz044.input-zip', providers.gradleProperty('prz044InputZip').getOrElse('')
     doFirst {
         if (!providers.gradleProperty('prz044InputZip').isPresent()
                 || providers.gradleProperty('prz044InputZip').get().trim().isEmpty()) {
-            throw new GradleException('PRZ-044 attempt-2 preflight requires -Pprz044InputZip=<path>.')
+            throw new GradleException('PRZ-044 attempt-3 preflight requires -Pprz044InputZip=<path>.')
         }
     }
     testLogging {
@@ -224,8 +224,8 @@ tasks.register('prz044Attempt2Preflight', Test) {
     }
 }
 
-tasks.register('prz044Attempt2OfficialPredictions', Test) {
-    description = 'Runs the one-shot Gold-free PRZ-044 attempt-2 V2-all then V3-all prediction freeze.'
+tasks.register('prz044Attempt3OfficialPredictions', Test) {
+    description = 'Runs the one-shot Gold-free PRZ-044 attempt-3 V2-all then V3-all prediction freeze.'
     group = 'verification'
     testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
     classpath = sourceSets.searchEvaluation.runtimeClasspath
@@ -242,7 +242,7 @@ tasks.register('prz044Attempt2OfficialPredictions', Test) {
     doFirst {
         if (!providers.gradleProperty('prz044InputZip').isPresent()
                 || providers.gradleProperty('prz044InputZip').get().trim().isEmpty()) {
-            throw new GradleException('PRZ-044 attempt-2 predictions require -Pprz044InputZip=<path>.')
+            throw new GradleException('PRZ-044 attempt-3 predictions require -Pprz044InputZip=<path>.')
         }
     }
     testLogging {

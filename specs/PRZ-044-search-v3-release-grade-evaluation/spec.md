@@ -137,6 +137,24 @@ Preflight가 하나라도 실패하면 official attempt는 `0`으로 유지한�
 `attempt-1` 계약과 artifact는 수정하지 않는다. `attempt-2`는 V2 전체 동결 후에만 V3를
 시작하며, completion receipt 전 Gold 접근을 금지한다.
 
+### attempt-3 계약
+
+`attempt-1`과 `attempt-2`는 소비된 실패 기록으로 그대로 보존한다. Passage 상한 결함 수정
+commit `25f39795ba7073242c04604185387f05e4b49080`을 Search source로 고정하고, 새 one-shot
+계약 `PRZ044_PREDICTION_FREEZE_V3`만 사용한다.
+
+- identity: `PRZ044_ATTEMPT_3_PASSAGE_BOUND_FIX_V1`
+- run directory: `local/search-v3-evaluation/prz044/official/6a7eca9b327b59ec5d0c5448cb08d1738298739747dd9509ec5a335a467f68ec/contract-v3/attempt-3`
+- `officialRunsAllowed=1`
+- V2 600건 전체 동결 뒤에만 V3를 실행한다.
+- V2/V3 prediction과 completion receipt가 모두 검증되기 전에는 Gold 접근과 metric 계산을
+  금지한다.
+- 결과를 본 뒤 source, dataset, mapping, scoring, metric, Gate를 바꾸거나 같은 attempt를
+  재실행하지 않는다.
+
+Adoption Gate와 metric 정의는 위에서 고정한 PRZ-044 계약을 그대로 사용한다. attempt-3 결과를
+보고 기준을 완화하거나 새 metric을 추가하지 않는다.
+
 ## Gold release 조건
 
 다음을 모두 만족한 completion receipt가 있어야 다음 별도 단계에서 Gold artifact를 받을 수 있다.

@@ -1,5 +1,6 @@
 package com.prizm.search.evaluation.searchv3.structural;
 
+import com.prizm.search.v3.indexing.model.SearchV3IndexingPolicies;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
@@ -31,22 +32,22 @@ import tools.jackson.databind.node.ObjectNode;
 final class Prz044PredictionFreeze {
 
     static final String CONTRACT_TYPE = "PRZ044_PREDICTION_FREEZE_CONTRACT";
-    static final String PROTOCOL_VERSION = "PRZ044_PREDICTION_FREEZE_V2";
+    static final String PROTOCOL_VERSION = "PRZ044_PREDICTION_FREEZE_V3";
     static final String CONTRACT_RELATIVE =
-            "specs/PRZ-044-search-v3-release-grade-evaluation/execution-contract-attempt-2.json";
+            "specs/PRZ-044-search-v3-release-grade-evaluation/execution-contract-attempt-3.json";
     static final String OFFICIAL_RUN_DIRECTORY =
             "local/search-v3-evaluation/prz044/official/"
                     + "6a7eca9b327b59ec5d0c5448cb08d1738298739747dd9509ec5a335a467f68ec/"
-                    + "contract-v2/attempt-2";
-    static final String ATTEMPT_IDENTITY = "PRZ044_ATTEMPT_2_DOCUMENT_TYPE_MAPPING_V1";
+                    + "contract-v3/attempt-3";
+    static final String ATTEMPT_IDENTITY = "PRZ044_ATTEMPT_3_PASSAGE_BOUND_FIX_V1";
     static final String PREFLIGHT_RECEIPT_RELATIVE =
-            "local/search-v3-evaluation/prz044/preflight/source-freeze-v2/"
+            "local/search-v3-evaluation/prz044/preflight/source-freeze-v3/"
                     + "preflight-pass-receipt.json";
     private static final String PREFLIGHT_HASH_RECEIPT_RELATIVE =
-            "local/search-v3-evaluation/prz044/preflight/source-freeze-v2/"
+            "local/search-v3-evaluation/prz044/preflight/source-freeze-v3/"
                     + "preflight-pass-receipt-hash.json";
     private static final String PREFLIGHT_PROBE_DIRECTORY =
-            "build/prz044-preflight-source-freeze-v2-prediction-probes";
+            "build/prz044-preflight-source-freeze-v3-prediction-probes";
 
     private static final String DATASET_ID = "prizm-release-eval-v1.0.3";
     private static final String DATASET_VERSION = "1.0.3";
@@ -65,7 +66,7 @@ final class Prz044PredictionFreeze {
             "d0a507764449315645fabac06d785c1ef8598b1f9ab131674b6e20ad58dda696";
     private static final String MODEL_ID = "bge-m3";
     private static final String SEARCH_SOURCE_BASE_COMMIT =
-            "0e95472bb68f72accf0d6b2171c22f0719fe6941";
+            "25f39795ba7073242c04604185387f05e4b49080";
     private static final String MODEL_DIGEST =
             "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab";
 
@@ -103,12 +104,13 @@ final class Prz044PredictionFreeze {
         JsonNode root = read(contractPath);
         requireExactFields(root, "contract", Set.of(
                 "artifactType", "protocolVersion", "status", "attempt", "baseCommit",
-                "dataset", "model", "profiles", "documentTypeMapping", "sourceBoundaries",
+                "dataset", "model", "runtime", "profiles", "searchPolicies",
+                "documentTypeMapping", "sourceBoundaries",
                 "execution", "goldPolicy"));
         require(CONTRACT_TYPE.equals(text(root, "artifactType")), "contract artifact type changed");
         require(PROTOCOL_VERSION.equals(text(root, "protocolVersion")), "contract protocol changed");
         require("INPUT_FROZEN".equals(text(root, "status")), "contract is not INPUT_FROZEN");
-        require(root.path("attempt").asInt(-1) == 2, "official attempt must be attempt-2");
+        require(root.path("attempt").asInt(-1) == 3, "official attempt must be attempt-3");
         require(SEARCH_SOURCE_BASE_COMMIT.equals(text(root, "baseCommit")),
                 "Search source base commit changed");
 
@@ -171,6 +173,13 @@ final class Prz044PredictionFreeze {
         require(expectedModel.dimension() == 1024, "model dimension changed");
         require("COSINE".equals(expectedModel.similarity()), "model similarity changed");
 
+        JsonNode runtime = root.path("runtime");
+        requireExactFields(runtime, "runtime", Set.of("postgresqlMajor", "pgvectorVersion"));
+        require(runtime.path("postgresqlMajor").asInt(-1) == 16,
+                "PostgreSQL major version changed");
+        require("0.8.2".equals(text(runtime, "pgvectorVersion")),
+                "pgvector version changed");
+
         Map<String, String> sourceHashes = verifySourceBoundaries(rootDirectory, root.path("sourceBoundaries"));
         require(sourceHashes.keySet().equals(Set.of("V2", "V3", "SHARED", "EVALUATOR")),
                 "source boundary inventory changed");
@@ -181,6 +190,22 @@ final class Prz044PredictionFreeze {
                 Prz044PredictionArtifact.Engine.class);
         expectedProfiles.put(Prz044PredictionArtifact.Engine.V2, text(profiles, "v2"));
         expectedProfiles.put(Prz044PredictionArtifact.Engine.V3, text(profiles, "v3"));
+
+        JsonNode policies = root.path("searchPolicies");
+        requireExactFields(policies, "searchPolicies", Set.of(
+                "v2", "v3Structure", "v3Passage", "v3Child", "v3PassageInput", "v3ChildInput"));
+        require(expectedProfiles.get(Prz044PredictionArtifact.Engine.V2).equals(text(policies, "v2")),
+                "V2 policy identity changed");
+        require(SearchV3IndexingPolicies.STRUCTURE.equals(text(policies, "v3Structure")),
+                "V3 structure policy changed");
+        require(SearchV3IndexingPolicies.PASSAGE.equals(text(policies, "v3Passage")),
+                "V3 passage policy changed");
+        require(SearchV3IndexingPolicies.CHILD.equals(text(policies, "v3Child")),
+                "V3 child policy changed");
+        require(SearchV3IndexingPolicies.PASSAGE_INPUT.equals(text(policies, "v3PassageInput")),
+                "V3 passage input policy changed");
+        require(SearchV3IndexingPolicies.CHILD_INPUT.equals(text(policies, "v3ChildInput")),
+                "V3 child input policy changed");
 
         JsonNode mapping = root.path("documentTypeMapping");
         requireExactFields(mapping, "documentTypeMapping", Set.of("path", "version", "sha256"));
@@ -225,7 +250,7 @@ final class Prz044PredictionFreeze {
                 Map.copyOf(expectedProfiles),
                 OFFICIAL_RUN_DIRECTORY,
                 1,
-                2,
+                3,
                 ATTEMPT_IDENTITY,
                 verifiedMapping.sha256());
     }
@@ -425,11 +450,7 @@ final class Prz044PredictionFreeze {
         Objects.requireNonNull(actualModel, "actualModel");
         verifyContractFile(contract);
         require(contract.officialRunsAllowed() == 1, "officialRunsAllowed changed after verification");
-        new Prz044Attempt2PreflightReceipt().verify(
-                contract.projectRoot(),
-                new Prz044DocumentTypeMapping().verifyContract(contract.projectRoot()),
-                contract.expectedInput().zipSha256(),
-                contract.expectedModel());
+        verifyPreflightPass(contract);
         require(contract.expectedModel().equals(actualModel), "actual model differs from the frozen contract");
         requireInputIdentity(contract.expectedInput(), input);
 

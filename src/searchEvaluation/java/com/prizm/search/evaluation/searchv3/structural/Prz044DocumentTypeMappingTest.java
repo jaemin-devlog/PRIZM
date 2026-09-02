@@ -51,10 +51,10 @@ class Prz044DocumentTypeMappingTest {
     }
 
     @Test
-    void verifiesFrozenAttempt2ExecutionContract() {
+    void verifiesFrozenAttempt3ExecutionContract() {
         var contract = new Prz044PredictionFreeze().verifyContract(PROJECT_ROOT);
 
-        assertThat(contract.attempt()).isEqualTo(2);
+        assertThat(contract.attempt()).isEqualTo(3);
         assertThat(contract.attemptIdentity()).isEqualTo(Prz044PredictionFreeze.ATTEMPT_IDENTITY);
         assertThat(contract.mappingContractSha256()).isEqualTo(mapping.verifyContract(PROJECT_ROOT).sha256());
         assertThat(contract.officialRunsAllowed()).isEqualTo(1);

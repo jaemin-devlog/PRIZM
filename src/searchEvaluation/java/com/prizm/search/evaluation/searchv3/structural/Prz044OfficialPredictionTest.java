@@ -104,10 +104,9 @@ class Prz044OfficialPredictionTest {
             assertThat(mappingAudit.mappedCount()).isEqualTo(90);
             assertThat(mappingAudit.unmappedCount()).isZero();
             assertThat(mappingAudit.ambiguousCount()).isZero();
-            stage.set("VERIFY_ATTEMPT_2_PREFLIGHT_RECEIPT");
-            var preflight = new Prz044Attempt2PreflightReceipt().verify(
-                    PROJECT_ROOT, verifiedMapping, input.zipSha256(), contract.expectedModel());
-            assertThat(preflight.sha256()).matches("[0-9a-f]{64}");
+            stage.set("VERIFY_ATTEMPT_3_PREFLIGHT_RECEIPT");
+            var preflight = freeze.verifyPreflightPass(contract);
+            assertThat(preflight.receiptSha256()).matches("[0-9a-f]{64}");
 
             Prz044PredictionRuntime runtime = new Prz044PredictionRuntime(
                     jdbc,

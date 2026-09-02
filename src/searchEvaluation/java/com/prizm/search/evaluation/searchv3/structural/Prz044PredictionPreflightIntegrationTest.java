@@ -47,11 +47,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
-/** Attempt-2 mapping inventory and small actual PostgreSQL/BGE-M3 indexing preflight. */
+/** Attempt-3 mapping inventory and small actual PostgreSQL/BGE-M3 indexing preflight. */
 @ActiveProfiles("search-evaluation")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @Testcontainers
-@EnabledIfSystemProperty(named = "prizm.prz044.attempt2-preflight", matches = "true")
+@EnabledIfSystemProperty(named = "prizm.prz044.attempt3-preflight", matches = "true")
 class Prz044PredictionPreflightIntegrationTest {
 
     private static final DockerImageName PGVECTOR = DockerImageName
@@ -66,9 +66,9 @@ class Prz044PredictionPreflightIntegrationTest {
 
     @Container
     static final PostgreSQLContainer postgres = new PostgreSQLContainer(PGVECTOR)
-            .withDatabaseName("prz044_attempt2_preflight")
+            .withDatabaseName("prz044_attempt3_preflight")
             .withUsername("prizm")
-            .withPassword("prz044-attempt2-preflight");
+            .withPassword("prz044-attempt3-preflight");
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
@@ -111,8 +111,10 @@ class Prz044PredictionPreflightIntegrationTest {
         assertThat(attempt1.attemptSha256())
                 .isEqualTo("5630c6d6d2028076b862abdb3e2fa60b2c80e81196cdb71e596cc8e033c7bb74");
 
+        Prz044PredictionFreeze freeze = new Prz044PredictionFreeze();
+        var verifiedContract = freeze.verifyContract(PROJECT_ROOT);
         var officialInput = new Prz044PredictionDataset().preflight(
-                inputZip(), Prz044PredictionFreeze.officialExpectedInput(), textExtractor);
+                inputZip(), verifiedContract.expectedInput(), textExtractor);
         var mappingAudit = mapping.audit(officialInput.documents());
         assertThat(mappingAudit.documentCount()).isEqualTo(90);
         assertThat(mappingAudit.mappedCount()).isEqualTo(90);
@@ -127,8 +129,8 @@ class Prz044PredictionPreflightIntegrationTest {
                 DocumentType.PORTFOLIO, 15));
 
         var synthetic = syntheticInput();
-        var model = Prz044PredictionFreeze.officialModelIdentity();
-        var contract = new Prz044PredictionRuntime.RunContract(
+        var model = verifiedContract.expectedModel();
+        var runContract = new Prz044PredictionRuntime.RunContract(
                 Prz044PredictionRuntime.RunMode.PREFLIGHT,
                 V2_PROFILE,
                 V3_PROFILE,
@@ -148,11 +150,12 @@ class Prz044PredictionPreflightIntegrationTest {
                 jdbc, fileStorage, textExtractor, textChunker, ingestionProperties,
                 embeddingService, embeddingValidator, v2Coordinator, v2SearchService,
                 v3Dispatch, v3Coordinator, v3QueryService, modelProvider, mapping);
-        var precheck = runtime.precheckAndWarmUp(contract);
+        var precheck = runtime.precheckAndWarmUp(runContract);
         AtomicBoolean v2Boundary = new AtomicBoolean();
-        var completed = runtime.execute(synthetic, contract, precheck, v2 -> {
+        var preflightRun = freeze.beginPreflight(verifiedContract, precheck);
+        var completed = runtime.execute(synthetic, runContract, precheck, v2 -> {
             v2Boundary.set(true);
-            return Boolean.TRUE;
+            return freeze.freezePreflightV2(preflightRun, v2);
         });
 
         assertThat(v2Boundary).isTrue();
@@ -170,15 +173,17 @@ class Prz044PredictionPreflightIntegrationTest {
         String postgresqlVersion = jdbc.queryForObject("SELECT version()", String.class);
         String pgvectorVersion = jdbc.queryForObject(
                 "SELECT extversion FROM pg_extension WHERE extname = 'vector'", String.class);
-        var receipt = new Prz044Attempt2PreflightReceipt().write(
-                PROJECT_ROOT, verifiedMapping, officialInput, mappingAudit, precheck.model(),
-                postgresqlVersion, pgvectorVersion, 3, 3);
-        assertThat(receipt.path()).isRegularFile();
-        assertThat(receipt.sha256()).matches("[0-9a-f]{64}");
+        var receipt = freeze.completePreflight(
+                completed.frozenV2(),
+                completed.v3(),
+                new Prz044PredictionFreeze.PreflightEvidence(
+                        postgresqlVersion, pgvectorVersion, true, true, true));
+        assertThat(receipt.receiptPath()).isRegularFile();
+        assertThat(receipt.receiptSha256()).matches("[0-9a-f]{64}");
         assertThat(Files.exists(PROJECT_ROOT.resolve(
                 "local/search-v3-evaluation/prz044/official/"
                         + "6a7eca9b327b59ec5d0c5448cb08d1738298739747dd9509ec5a335a467f68ec/"
-                        + "contract-v2/attempt-2"))).isFalse();
+                        + "contract-v3/attempt-3"))).isFalse();
     }
 
     private Prz044PredictionDataset.VerifiedInputPackage syntheticInput() throws IOException {
@@ -238,7 +243,7 @@ class Prz044PredictionPreflightIntegrationTest {
     private static Path inputZip() {
         String value = System.getProperty("prizm.prz044.input-zip");
         if (value == null || value.isBlank()) {
-            throw new IllegalStateException("attempt-2 mapping preflight requires INPUT ZIP");
+            throw new IllegalStateException("attempt-3 mapping preflight requires INPUT ZIP");
         }
         return Path.of(value).toAbsolutePath().normalize();
     }

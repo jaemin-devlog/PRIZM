@@ -88,11 +88,11 @@ class Prz044PredictionFreezeTest {
                 "missing-preflight", Prz044PredictionFreeze.OFFICIAL_RUN_DIRECTORY, 1);
         var missingContract = freeze.verifyContract(missingPreflight);
         Files.delete(Prz044PredictionFreeze.resolvePortable(
-                missingPreflight, Prz044Attempt2PreflightReceipt.RECEIPT_RELATIVE));
+                missingPreflight, Prz044PredictionFreeze.PREFLIGHT_RECEIPT_RELATIVE));
         assertThatThrownBy(() -> freeze.claimOfficialAttempt(
                 missingContract, input(missingPreflight), missingContract.expectedModel()))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("attempt-2 preflight receipt");
+                .hasMessageContaining("preflight PASS receipt");
         assertThat(Files.exists(Prz044PredictionFreeze.resolvePortable(
                 missingPreflight, Prz044PredictionFreeze.OFFICIAL_RUN_DIRECTORY))).isFalse();
     }
@@ -103,7 +103,7 @@ class Prz044PredictionFreezeTest {
         Path receiptPath = Prz044PredictionFreeze.resolvePortable(
                 project, Prz044PredictionFreeze.PREFLIGHT_RECEIPT_RELATIVE);
         Path hashPath = project.resolve(
-                "local/search-v3-evaluation/prz044/preflight/source-freeze-v2/"
+                "local/search-v3-evaluation/prz044/preflight/source-freeze-v3/"
                         + "preflight-pass-receipt-hash.json");
         Files.delete(receiptPath);
         Files.delete(hashPath);
@@ -220,8 +220,8 @@ class Prz044PredictionFreezeTest {
         root.put("artifactType", Prz044PredictionFreeze.CONTRACT_TYPE);
         root.put("protocolVersion", Prz044PredictionFreeze.PROTOCOL_VERSION);
         root.put("status", "INPUT_FROZEN");
-        root.put("attempt", 2);
-        root.put("baseCommit", "0e95472bb68f72accf0d6b2171c22f0719fe6941");
+        root.put("attempt", 3);
+        root.put("baseCommit", "25f39795ba7073242c04604185387f05e4b49080");
         ObjectNode dataset = root.putObject("dataset");
         dataset.put("datasetId", "prizm-release-eval-v1.0.3");
         dataset.put("datasetVersion", "1.0.3");
@@ -251,7 +251,15 @@ class Prz044PredictionFreezeTest {
                 "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab");
         model.put("dimension", 1024);
         model.put("similarity", "COSINE");
+        root.putObject("runtime").put("postgresqlMajor", 16).put("pgvectorVersion", "0.8.2");
         root.putObject("profiles").put("v2", "V2_PROFILE").put("v3", "V3_PROFILE");
+        root.putObject("searchPolicies")
+                .put("v2", "V2_PROFILE")
+                .put("v3Structure", com.prizm.search.v3.indexing.model.SearchV3IndexingPolicies.STRUCTURE)
+                .put("v3Passage", com.prizm.search.v3.indexing.model.SearchV3IndexingPolicies.PASSAGE)
+                .put("v3Child", com.prizm.search.v3.indexing.model.SearchV3IndexingPolicies.CHILD)
+                .put("v3PassageInput", com.prizm.search.v3.indexing.model.SearchV3IndexingPolicies.PASSAGE_INPUT)
+                .put("v3ChildInput", com.prizm.search.v3.indexing.model.SearchV3IndexingPolicies.CHILD_INPUT);
         writeMappingContract(project);
         String mappingSha = Prz044PredictionFreeze.sha256(Prz044PredictionFreeze.resolvePortable(
                 project, Prz044DocumentTypeMapping.CONTRACT_RELATIVE));
@@ -282,16 +290,6 @@ class Prz044PredictionFreezeTest {
         writeAttempt1Artifacts(project);
         var input = input(project);
         var mapping = new Prz044DocumentTypeMapping();
-        new Prz044Attempt2PreflightReceipt().write(
-                project,
-                mapping.verifyContract(project),
-                input,
-                mapping.audit(input.documents()),
-                Prz044PredictionFreeze.officialModelIdentity(),
-                "PostgreSQL 16.10 synthetic unit fixture",
-                "0.8.2",
-                1,
-                1);
         return project.toAbsolutePath().normalize();
     }
 
@@ -349,7 +347,7 @@ class Prz044PredictionFreezeTest {
         receipt.put("protocolVersion", Prz044PredictionFreeze.PROTOCOL_VERSION);
         receipt.put("status", "PASS");
         receipt.put("contractSha256", Prz044PredictionFreeze.sha256(contract));
-        receipt.put("baseCommit", "0e95472bb68f72accf0d6b2171c22f0719fe6941");
+        receipt.put("baseCommit", "25f39795ba7073242c04604185387f05e4b49080");
         receipt.set("model", mapper.valueToTree(new Prz044PredictionArtifact.ModelIdentity(
                 "bge-m3",
                 "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
@@ -389,7 +387,7 @@ class Prz044PredictionFreezeTest {
         receiptHash.put("receiptPath", Prz044PredictionFreeze.PREFLIGHT_RECEIPT_RELATIVE);
         receiptHash.put("receiptSha256", Prz044PredictionFreeze.sha256(receiptPath));
         Path hashPath = project.resolve(
-                "local/search-v3-evaluation/prz044/preflight/source-freeze-v2/"
+                "local/search-v3-evaluation/prz044/preflight/source-freeze-v3/"
                         + "preflight-pass-receipt-hash.json");
         Files.writeString(hashPath, mapper.writeValueAsString(receiptHash), StandardCharsets.UTF_8);
     }

@@ -170,6 +170,7 @@ tasks.register('prz044Focused', Test) {
         includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz044PredictionArtifactTest'
         includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz044PredictionFreezeTest'
         includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz044PredictionRuntimeTest'
+        includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz044DocumentTypeMappingTest'
     }
     outputs.upToDateWhen { false }
     maxParallelForks = 1
@@ -198,10 +199,34 @@ tasks.register('prz044Preflight', Test) {
     }
 }
 
-tasks.register('prz044OfficialPredictions', Test) {
-    description = 'Runs the one-shot Gold-free PRZ-044 V2-all then V3-all official prediction freeze.'
+tasks.register('prz044Attempt2Preflight', Test) {
+    description = 'Runs the Gold-free PRZ-044 attempt-2 DocumentType mapping and runtime preflight.'
     group = 'verification'
-    dependsOn tasks.named('prz044Preflight')
+    testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
+    classpath = sourceSets.searchEvaluation.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz044PredictionPreflightIntegrationTest'
+    }
+    outputs.upToDateWhen { false }
+    maxParallelForks = 1
+    failFast = true
+    systemProperty 'prizm.prz044.attempt2-preflight', 'true'
+    systemProperty 'prizm.prz044.input-zip', providers.gradleProperty('prz044InputZip').getOrElse('')
+    doFirst {
+        if (!providers.gradleProperty('prz044InputZip').isPresent()
+                || providers.gradleProperty('prz044InputZip').get().trim().isEmpty()) {
+            throw new GradleException('PRZ-044 attempt-2 preflight requires -Pprz044InputZip=<path>.')
+        }
+    }
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+tasks.register('prz044Attempt2OfficialPredictions', Test) {
+    description = 'Runs the one-shot Gold-free PRZ-044 attempt-2 V2-all then V3-all prediction freeze.'
+    group = 'verification'
     testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
     classpath = sourceSets.searchEvaluation.runtimeClasspath
     useJUnitPlatform()
@@ -217,7 +242,7 @@ tasks.register('prz044OfficialPredictions', Test) {
     doFirst {
         if (!providers.gradleProperty('prz044InputZip').isPresent()
                 || providers.gradleProperty('prz044InputZip').get().trim().isEmpty()) {
-            throw new GradleException('PRZ-044 official predictions require -Pprz044InputZip=<path>.')
+            throw new GradleException('PRZ-044 attempt-2 predictions require -Pprz044InputZip=<path>.')
         }
     }
     testLogging {

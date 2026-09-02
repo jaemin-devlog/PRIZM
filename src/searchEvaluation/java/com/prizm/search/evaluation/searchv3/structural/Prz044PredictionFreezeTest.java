@@ -88,11 +88,11 @@ class Prz044PredictionFreezeTest {
                 "missing-preflight", Prz044PredictionFreeze.OFFICIAL_RUN_DIRECTORY, 1);
         var missingContract = freeze.verifyContract(missingPreflight);
         Files.delete(Prz044PredictionFreeze.resolvePortable(
-                missingPreflight, Prz044PredictionFreeze.PREFLIGHT_RECEIPT_RELATIVE));
+                missingPreflight, Prz044Attempt2PreflightReceipt.RECEIPT_RELATIVE));
         assertThatThrownBy(() -> freeze.claimOfficialAttempt(
                 missingContract, input(missingPreflight), missingContract.expectedModel()))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("preflight PASS receipt");
+                .hasMessageContaining("attempt-2 preflight receipt");
         assertThat(Files.exists(Prz044PredictionFreeze.resolvePortable(
                 missingPreflight, Prz044PredictionFreeze.OFFICIAL_RUN_DIRECTORY))).isFalse();
     }
@@ -220,7 +220,7 @@ class Prz044PredictionFreezeTest {
         root.put("artifactType", Prz044PredictionFreeze.CONTRACT_TYPE);
         root.put("protocolVersion", Prz044PredictionFreeze.PROTOCOL_VERSION);
         root.put("status", "INPUT_FROZEN");
-        root.put("attempt", 1);
+        root.put("attempt", 2);
         root.put("baseCommit", "0e95472bb68f72accf0d6b2171c22f0719fe6941");
         ObjectNode dataset = root.putObject("dataset");
         dataset.put("datasetId", "prizm-release-eval-v1.0.3");
@@ -252,6 +252,13 @@ class Prz044PredictionFreezeTest {
         model.put("dimension", 1024);
         model.put("similarity", "COSINE");
         root.putObject("profiles").put("v2", "V2_PROFILE").put("v3", "V3_PROFILE");
+        writeMappingContract(project);
+        String mappingSha = Prz044PredictionFreeze.sha256(Prz044PredictionFreeze.resolvePortable(
+                project, Prz044DocumentTypeMapping.CONTRACT_RELATIVE));
+        root.putObject("documentTypeMapping")
+                .put("path", Prz044DocumentTypeMapping.CONTRACT_RELATIVE)
+                .put("version", Prz044DocumentTypeMapping.VERSION)
+                .put("sha256", mappingSha);
         var boundaries = root.putArray("sourceBoundaries");
         for (String boundaryName : List.of("V2", "V3", "SHARED", "EVALUATOR")) {
             ObjectNode boundary = boundaries.addObject();
@@ -262,7 +269,8 @@ class Prz044PredictionFreezeTest {
         }
         root.putObject("execution")
                 .put("runDirectory", runDirectory)
-                .put("officialRunsAllowed", allowedRuns);
+                .put("officialRunsAllowed", allowedRuns)
+                .put("attemptIdentity", Prz044PredictionFreeze.ATTEMPT_IDENTITY);
         root.putObject("goldPolicy")
                 .put("physicalGoldAllowed", false)
                 .put("goldLoaderAllowed", false)
@@ -271,7 +279,68 @@ class Prz044PredictionFreezeTest {
         Files.createDirectories(contract.getParent());
         Files.writeString(contract, mapper.writeValueAsString(root), StandardCharsets.UTF_8);
         writeSyntheticPreflightReceipt(project, contract, sourceSha);
+        writeAttempt1Artifacts(project);
+        var input = input(project);
+        var mapping = new Prz044DocumentTypeMapping();
+        new Prz044Attempt2PreflightReceipt().write(
+                project,
+                mapping.verifyContract(project),
+                input,
+                mapping.audit(input.documents()),
+                Prz044PredictionFreeze.officialModelIdentity(),
+                "PostgreSQL 16.10 synthetic unit fixture",
+                "0.8.2",
+                1,
+                1);
         return project.toAbsolutePath().normalize();
+    }
+
+    private void writeMappingContract(Path project) throws Exception {
+        ObjectNode root = mapper.createObjectNode();
+        root.put("artifactType", Prz044DocumentTypeMapping.ARTIFACT_TYPE);
+        root.put("version", Prz044DocumentTypeMapping.VERSION);
+        root.putArray("datasetTypes").add("CAREER_DESCRIPTION").add("PORTFOLIO").add("RESUME");
+        var production = root.putArray("productionTypes");
+        for (var type : com.prizm.document.entity.DocumentType.values()) production.add(type.name());
+        var mappings = root.putArray("mappings");
+        mappings.addObject().put("source", "CAREER_DESCRIPTION").put("target", "RESUME");
+        mappings.addObject().put("source", "PORTFOLIO").put("target", "PORTFOLIO");
+        mappings.addObject().put("source", "RESUME").put("target", "RESUME");
+        root.put("unknownPolicy", "FAIL_CLOSED");
+        root.put("fallbackAllowed", false);
+        Path path = Prz044PredictionFreeze.resolvePortable(
+                project, Prz044DocumentTypeMapping.CONTRACT_RELATIVE);
+        Files.createDirectories(path.getParent());
+        Files.writeString(path, mapper.writeValueAsString(root) + "\n", StandardCharsets.UTF_8);
+    }
+
+    private void writeAttempt1Artifacts(Path project) throws Exception {
+        Path directory = Prz044PredictionFreeze.resolvePortable(project,
+                "local/search-v3-evaluation/prz044/official/"
+                        + "6a7eca9b327b59ec5d0c5448cb08d1738298739747dd9509ec5a335a467f68ec/attempt-1");
+        Files.createDirectories(directory);
+        String attempt = "{\"artifactType\":\"PRZ044_OFFICIAL_PREDICTION_ATTEMPT\","
+                + "\"attempt\":1,\"contractSha256\":\"be03a7edb6d836478b7daaa406b52bf023e67e222be37d020a89f1700bb51913\","
+                + "\"goldAccessed\":false,\"goldPresent\":false,"
+                + "\"inputZipSha256\":\"8293ba115b74967b137d2ddd5f21dee98b8bbdb4822958808e6d117552bfb8c0\","
+                + "\"manifestCombinedCommitmentSha256\":\"6a7eca9b327b59ec5d0c5448cb08d1738298739747dd9509ec5a335a467f68ec\","
+                + "\"modelDigest\":\"7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab\","
+                + "\"modelId\":\"bge-m3\","
+                + "\"physicalPayloadCombinedSha256\":\"8413cf153302754c0625fb2d594bea4e10df8ac73f35259b7f7fe4695dad63b0\","
+                + "\"protocolVersion\":\"PRZ044_PREDICTION_FREEZE_V1\","
+                + "\"startedAt\":\"2026-09-02T18:36:17.849961800Z\"}\n";
+        String failure = "{\"artifactType\":\"PRZ044_PREDICTION_FAILURE_RECEIPT\","
+                + "\"attempt\":1,\"attemptSha256\":\"5630c6d6d2028076b862abdb3e2fa60b2c80e81196cdb71e596cc8e033c7bb74\","
+                + "\"contractSha256\":\"be03a7edb6d836478b7daaa406b52bf023e67e222be37d020a89f1700bb51913\","
+                + "\"failureMessageSha256\":\"6b34f994a9fbcc9ac0fd09328b82d82c50ca515b964b3c193acdd2d859bedd7f\","
+                + "\"failureType\":\"java.lang.IllegalStateException\","
+                + "\"goldAccessed\":false,\"goldPresent\":false,"
+                + "\"protocolVersion\":\"PRZ044_PREDICTION_FREEZE_V1\","
+                + "\"recordedAt\":\"2026-09-02T18:36:17.940027400Z\","
+                + "\"stage\":\"RUNTIME_V2\",\"status\":\"FAILED_ATTEMPT_CONSUMED\","
+                + "\"v2Frozen\":false,\"v3Frozen\":false}\n";
+        Files.writeString(directory.resolve("attempt.json"), attempt, StandardCharsets.UTF_8);
+        Files.writeString(directory.resolve("failure-receipt.json"), failure, StandardCharsets.UTF_8);
     }
 
     private void writeSyntheticPreflightReceipt(Path project, Path contract, String sourceSha) throws Exception {
@@ -338,10 +407,13 @@ class Prz044PredictionFreezeTest {
                     int professionIndex = ((ownerIndex - 1) / 5) + 1;
                     DocumentFileType fileType = index <= 45 ? DocumentFileType.TXT : DocumentFileType.PDF;
                     String extension = fileType == DocumentFileType.TXT ? ".txt" : ".pdf";
+                    String sourceType = index <= 15
+                            ? "CAREER_DESCRIPTION"
+                            : index <= 30 ? "PORTFOLIO" : "RESUME";
                     return new Prz044PredictionDataset.RuntimeDocument(
                             "user-" + ownerIndex, "PROFESSION-" + professionIndex,
                             "직군 " + professionIndex, "document-" + index, "version-" + index,
-                            "RESUME", fileType, "document-" + index + extension,
+                            sourceType, fileType, "document-" + index + extension,
                             "corpus/document-" + index + extension,
                             Prz044PredictionFreeze.sha256(content), content,
                             List.of(new PageText(1, "문서")), List.of());

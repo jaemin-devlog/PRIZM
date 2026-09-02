@@ -3,6 +3,7 @@ package com.prizm.search.evaluation.searchv3.structural;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.prizm.document.entity.DocumentFileType;
+import com.prizm.document.entity.DocumentType;
 import com.prizm.embedding.service.EmbeddingService;
 import com.prizm.embedding.service.EmbeddingValidator;
 import com.prizm.infrastructure.storage.FileStorage;
@@ -25,6 +26,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -45,26 +47,28 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
-/** Opt-in, Gold-free real PostgreSQL/pgvector and local Ollama BGE-M3 runtime preflight. */
+/** Attempt-2 mapping inventory and small actual PostgreSQL/BGE-M3 indexing preflight. */
 @ActiveProfiles("search-evaluation")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @Testcontainers
-@EnabledIfSystemProperty(named = "prizm.prz044.preflight", matches = "true")
+@EnabledIfSystemProperty(named = "prizm.prz044.attempt2-preflight", matches = "true")
 class Prz044PredictionPreflightIntegrationTest {
 
     private static final DockerImageName PGVECTOR = DockerImageName
             .parse("pgvector/pgvector:0.8.2-pg16-bookworm")
             .asCompatibleSubstituteFor("postgres");
-    private static final Path STORAGE = Path.of(
-                    "build", "prz044-preflight-storage-" + UUID.randomUUID())
-            .toAbsolutePath().normalize();
     private static final Path PROJECT_ROOT = Path.of("").toAbsolutePath().normalize();
+    private static final Path STORAGE = Path.of(
+                    "build", "prz044-attempt2-preflight-storage-" + UUID.randomUUID())
+            .toAbsolutePath().normalize();
+    private static final String V2_PROFILE = "PRODUCTION_SEARCH_V2_SOURCE_DEDUP_EVIDENCE_SIGNALS_V1";
+    private static final String V3_PROFILE = "MINIMAL_V3_B3_TYPED_CHILD_DENSE_V1";
 
     @Container
     static final PostgreSQLContainer postgres = new PostgreSQLContainer(PGVECTOR)
-            .withDatabaseName("prz044_preflight")
+            .withDatabaseName("prz044_attempt2_preflight")
             .withUsername("prizm")
-            .withPassword("prz044-preflight");
+            .withPassword("prz044-attempt2-preflight");
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
@@ -100,194 +104,155 @@ class Prz044PredictionPreflightIntegrationTest {
     @Autowired SearchV3EmbeddingModelContractProvider modelProvider;
 
     @Test
-    void runsMixedTxtAndPdfThroughActualV2ThenActualV3() throws IOException {
-        Prz044PredictionFreeze freeze = new Prz044PredictionFreeze();
-        Prz044PredictionFreeze.VerifiedContract verifiedContract = freeze.verifyContract(PROJECT_ROOT);
-        byte[] txt = """
-                Release operations
-                Automated deployment checks reduced repeated release errors.
-                """.getBytes(StandardCharsets.UTF_8);
-        byte[] pdf = pdf(
-                "Incident review - Reduced response delay by 30 percent.",
-                "Training record - Completed safety training in March 2026.");
-        List<PageText> txtPages = textExtractor.extract(DocumentFileType.TXT, txt);
-        List<PageText> pdfPages = textExtractor.extract(DocumentFileType.PDF, pdf);
+    void validatesAllOfficialMappingsThenExercisesActualIndexingWithoutOfficialPredictions() throws IOException {
+        Prz044DocumentTypeMapping mapping = new Prz044DocumentTypeMapping();
+        var verifiedMapping = mapping.verifyContract(PROJECT_ROOT);
+        var attempt1 = new Prz044Attempt2PreflightReceipt().verifyAttempt1(PROJECT_ROOT);
+        assertThat(attempt1.attemptSha256())
+                .isEqualTo("5630c6d6d2028076b862abdb3e2fa60b2c80e81196cdb71e596cc8e033c7bb74");
 
-        var users = List.of(
-                new Prz044PredictionDataset.RuntimeUser(
-                        "U1", "operations", "Operations", List.of("Release automation")),
-                new Prz044PredictionDataset.RuntimeUser(
-                        "U2", "support", "Support", List.of("Incident review")));
-        var documents = List.of(
-                document(
-                        users.get(0), "D1", "V1", DocumentFileType.TXT, "release.txt",
-                        "evaluation/users/U1/documents/D1/release.txt", txt, txtPages),
-                document(
-                        users.get(1), "D2", "V2", DocumentFileType.PDF, "incident.pdf",
-                        "evaluation/users/U2/documents/D2/incident.pdf", pdf, pdfPages));
-        var queries = List.of(
-                query(users.get(0), "Q1", "automated deployment checks reduced release errors"),
-                query(users.get(1), "Q2", "response delay reduced by 30 percent"));
-        var input = new Prz044PredictionDataset.VerifiedInputPackage(
-                Path.of("build/prz044-synthetic-input.zip"),
-                "1".repeat(64),
-                "2".repeat(64),
-                "3".repeat(64),
-                "4".repeat(64),
-                "5".repeat(64),
-                new Prz044PredictionDataset.SealedCommitment(
-                        "sealed/gold.json", 1L, "6".repeat(64)),
-                List.of(),
-                List.of(),
-                users,
-                documents,
-                queries);
+        var officialInput = new Prz044PredictionDataset().preflight(
+                inputZip(), Prz044PredictionFreeze.officialExpectedInput(), textExtractor);
+        var mappingAudit = mapping.audit(officialInput.documents());
+        assertThat(mappingAudit.documentCount()).isEqualTo(90);
+        assertThat(mappingAudit.mappedCount()).isEqualTo(90);
+        assertThat(mappingAudit.unmappedCount()).isZero();
+        assertThat(mappingAudit.ambiguousCount()).isZero();
+        assertThat(mappingAudit.sourceCounts()).containsExactlyInAnyOrderEntriesOf(Map.of(
+                "CAREER_DESCRIPTION", 15,
+                "PORTFOLIO", 15,
+                "RESUME", 60));
+        assertThat(mappingAudit.targetCounts()).containsExactlyInAnyOrderEntriesOf(Map.of(
+                DocumentType.RESUME, 75,
+                DocumentType.PORTFOLIO, 15));
+
+        var synthetic = syntheticInput();
+        var model = Prz044PredictionFreeze.officialModelIdentity();
         var contract = new Prz044PredictionRuntime.RunContract(
                 Prz044PredictionRuntime.RunMode.PREFLIGHT,
-                verifiedContract.expectedProfiles().get(Prz044PredictionArtifact.Engine.V2),
-                verifiedContract.expectedProfiles().get(Prz044PredictionArtifact.Engine.V3),
-                verifiedContract.contractSha256(),
-                input.zipSha256(),
-                input.manifestCanonicalSha256(),
-                input.physicalCombinedSha256(),
-                input.commitmentCombinedSha256(),
-                verifiedContract.sourceBoundaryHashes(),
-                Prz044PredictionFreeze.queryInventorySha256(queries),
-                verifiedContract.expectedModel(),
-                users.size(),
-                documents.size(),
-                queries.size(),
+                V2_PROFILE,
+                V3_PROFILE,
+                verifiedMapping.sha256(),
+                synthetic.zipSha256(),
+                synthetic.manifestCanonicalSha256(),
+                synthetic.physicalCombinedSha256(),
+                synthetic.commitmentCombinedSha256(),
+                Map.of("DOCUMENT_TYPE_MAPPING", verifiedMapping.sha256()),
+                Prz044PredictionFreeze.queryInventorySha256(synthetic.queries()),
+                model,
+                synthetic.users().size(),
+                synthetic.documents().size(),
+                synthetic.queries().size(),
                 true);
         var runtime = new Prz044PredictionRuntime(
-                jdbc,
-                fileStorage,
-                textExtractor,
-                textChunker,
-                ingestionProperties,
-                embeddingService,
-                embeddingValidator,
-                v2Coordinator,
-                v2SearchService,
-                v3Dispatch,
-                v3Coordinator,
-                v3QueryService,
-                modelProvider);
+                jdbc, fileStorage, textExtractor, textChunker, ingestionProperties,
+                embeddingService, embeddingValidator, v2Coordinator, v2SearchService,
+                v3Dispatch, v3Coordinator, v3QueryService, modelProvider, mapping);
         var precheck = runtime.precheckAndWarmUp(contract);
-        var preflightRun = freeze.beginPreflight(verifiedContract, precheck);
-        AtomicBoolean v2Reloaded = new AtomicBoolean();
-
-        var completed = runtime.execute(input, contract, precheck, v2 -> {
-            assertThat(v2.engine()).isEqualTo(Prz044PredictionArtifact.Engine.V2);
-            assertThat(v2.queries()).extracting(Prz044PredictionArtifact.QueryPrediction::queryId)
-                    .containsExactly("Q1", "Q2");
-            Prz044PredictionFreeze.FrozenPreflightV2 frozen =
-                    freeze.freezePreflightV2(preflightRun, v2);
-            v2Reloaded.set(true);
-            return frozen;
+        AtomicBoolean v2Boundary = new AtomicBoolean();
+        var completed = runtime.execute(synthetic, contract, precheck, v2 -> {
+            v2Boundary.set(true);
+            return Boolean.TRUE;
         });
 
-        assertThat(v2Reloaded).isTrue();
-        assertThat(completed.frozenV2().prediction().engine())
-                .isEqualTo(Prz044PredictionArtifact.Engine.V2);
-        assertThat(completed.v2().queries()).hasSize(2);
-        assertThat(completed.v3().queries()).hasSize(2);
-        assertThat(completed.v2().runtimeAudit().ownerLeakageCount()).isZero();
-        assertThat(completed.v3().runtimeAudit().ownerLeakageCount()).isZero();
-        assertThat(completed.v2().runtimeAudit().lifecycleViolationCount()).isZero();
-        assertThat(completed.v3().runtimeAudit().lifecycleViolationCount()).isZero();
-        assertThat(completed.v2().indexingStats().documentCount()).isEqualTo(2);
-        assertThat(completed.v3().indexingStats().documentCount()).isEqualTo(2);
+        assertThat(v2Boundary).isTrue();
+        assertThat(completed.v2().queries()).hasSize(3);
+        assertThat(completed.v3().queries()).hasSize(3);
+        assertThat(completed.v2().indexingStats().documentCount()).isEqualTo(3);
+        assertThat(completed.v3().indexingStats().documentCount()).isEqualTo(3);
         assertThat(jdbc.queryForObject(
                 "SELECT count(*) FROM processing_jobs WHERE status = 'COMPLETED'", Long.class))
-                .isEqualTo(2L);
+                .isEqualTo(3L);
         assertThat(jdbc.queryForObject(
                 "SELECT count(*) FROM search_v3_index_generations WHERE status = 'ACTIVE'", Long.class))
-                .isEqualTo(2L);
-        assertThat(completed.v3().queries().get(1).finalResults()).isNotEmpty();
-        assertThat(completed.v3().queries().get(1).finalResults())
-                .allSatisfy(result -> {
-                    assertThat(result.selectedSpans()).hasSize(1);
-                    assertThat(result.displaySpans()).hasSize(1);
-                    assertThat(result.selectedSpans().get(0).fileType())
-                            .isEqualTo(DocumentFileType.PDF);
-                    assertThat(result.selectedSpans().get(0).pageNumber()).isPositive();
-                });
-        boolean pdfProvenanceVerified = completed.v3().queries().get(1).finalResults().stream()
-                .flatMap(result -> result.selectedSpans().stream())
-                .allMatch(span -> span.fileType() == DocumentFileType.PDF
-                        && span.pageNumber() != null && span.pageNumber() > 0);
+                .isEqualTo(3L);
+
         String postgresqlVersion = jdbc.queryForObject("SELECT version()", String.class);
         String pgvectorVersion = jdbc.queryForObject(
                 "SELECT extversion FROM pg_extension WHERE extname = 'vector'", String.class);
-        Prz044PredictionFreeze.PreflightReceipt receipt = freeze.completePreflight(
-                completed.frozenV2(),
-                completed.v3(),
-                new Prz044PredictionFreeze.PreflightEvidence(
-                        postgresqlVersion,
-                        pgvectorVersion,
-                        !txtPages.isEmpty(),
-                        pdfPages.size() == 2,
-                        pdfProvenanceVerified));
-        assertThat(receipt.receiptPath()).isRegularFile();
-        assertThat(receipt.receiptSha256()).matches("[0-9a-f]{64}");
-        assertThat(freeze.verifyPreflightPass(verifiedContract).receiptSha256())
-                .isEqualTo(receipt.receiptSha256());
-        assertThat(Files.exists(Prz044PredictionFreeze.resolvePortable(
-                PROJECT_ROOT, Prz044PredictionFreeze.OFFICIAL_RUN_DIRECTORY))).isFalse();
+        var receipt = new Prz044Attempt2PreflightReceipt().write(
+                PROJECT_ROOT, verifiedMapping, officialInput, mappingAudit, precheck.model(),
+                postgresqlVersion, pgvectorVersion, 3, 3);
+        assertThat(receipt.path()).isRegularFile();
+        assertThat(receipt.sha256()).matches("[0-9a-f]{64}");
+        assertThat(Files.exists(PROJECT_ROOT.resolve(
+                "local/search-v3-evaluation/prz044/official/"
+                        + "6a7eca9b327b59ec5d0c5448cb08d1738298739747dd9509ec5a335a467f68ec/"
+                        + "contract-v2/attempt-2"))).isFalse();
+    }
+
+    private Prz044PredictionDataset.VerifiedInputPackage syntheticInput() throws IOException {
+        byte[] career = "Career summary\nReduced deployment errors through release checks."
+                .getBytes(StandardCharsets.UTF_8);
+        byte[] resume = "Resume\nCoordinated incident response and documented recovery steps."
+                .getBytes(StandardCharsets.UTF_8);
+        byte[] portfolio = pdf("Portfolio - Improved onboarding completion by 20 percent.");
+        var users = List.of(
+                new Prz044PredictionDataset.RuntimeUser("U1", "backend", "Backend", List.of()),
+                new Prz044PredictionDataset.RuntimeUser("U2", "design", "Design", List.of()),
+                new Prz044PredictionDataset.RuntimeUser("U3", "operations", "Operations", List.of()));
+        var documents = List.of(
+                document(users.get(0), "D1", "V1", "CAREER_DESCRIPTION",
+                        DocumentFileType.TXT, "career.txt", career,
+                        textExtractor.extract(DocumentFileType.TXT, career)),
+                document(users.get(1), "D2", "V2", "PORTFOLIO",
+                        DocumentFileType.PDF, "portfolio.pdf", portfolio,
+                        textExtractor.extract(DocumentFileType.PDF, portfolio)),
+                document(users.get(2), "D3", "V3", "RESUME",
+                        DocumentFileType.TXT, "resume.txt", resume,
+                        textExtractor.extract(DocumentFileType.TXT, resume)));
+        var queries = List.of(
+                query(users.get(0), "Q1", "release checks reduced deployment errors"),
+                query(users.get(1), "Q2", "onboarding completion improvement"),
+                query(users.get(2), "Q3", "incident recovery documentation"));
+        return new Prz044PredictionDataset.VerifiedInputPackage(
+                Path.of("build/prz044-attempt2-synthetic.zip"),
+                "1".repeat(64), "2".repeat(64), "3".repeat(64), "4".repeat(64),
+                "5".repeat(64),
+                new Prz044PredictionDataset.SealedCommitment("sealed/gold.json", 1, "6".repeat(64)),
+                List.of(), List.of(), users, documents, queries);
     }
 
     private static Prz044PredictionDataset.RuntimeDocument document(
             Prz044PredictionDataset.RuntimeUser user,
             String documentId,
             String versionId,
+            String sourceType,
             DocumentFileType fileType,
             String filename,
-            String relativePath,
             byte[] bytes,
             List<PageText> pages) {
         return new Prz044PredictionDataset.RuntimeDocument(
-                user.userId(),
-                user.professionId(),
-                user.professionLabel(),
-                documentId,
-                versionId,
-                "OTHER",
-                fileType,
-                filename,
-                relativePath,
-                sha256(bytes),
-                bytes,
-                pages,
+                user.userId(), user.professionId(), user.professionLabel(), documentId, versionId,
+                sourceType, fileType, filename, "synthetic/" + filename, sha256(bytes), bytes, pages,
                 user.projectNames());
     }
 
     private static Prz044PredictionDataset.RuntimeQuery query(
-            Prz044PredictionDataset.RuntimeUser user,
-            String queryId,
-            String text) {
+            Prz044PredictionDataset.RuntimeUser user, String queryId, String text) {
         return new Prz044PredictionDataset.RuntimeQuery(
-                queryId,
-                user.userId(),
-                user.professionId(),
-                user.professionLabel(),
-                "EN",
-                text,
-                sha256(text.getBytes(StandardCharsets.UTF_8)));
+                queryId, user.userId(), user.professionId(), user.professionLabel(),
+                "EN", text, sha256(text.getBytes(StandardCharsets.UTF_8)));
     }
 
-    private static byte[] pdf(String... pages) throws IOException {
+    private static Path inputZip() {
+        String value = System.getProperty("prizm.prz044.input-zip");
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException("attempt-2 mapping preflight requires INPUT ZIP");
+        }
+        return Path.of(value).toAbsolutePath().normalize();
+    }
+
+    private static byte[] pdf(String text) throws IOException {
         try (PDDocument document = new PDDocument(); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-            PDType1Font font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
-            for (String text : pages) {
-                PDPage page = new PDPage();
-                document.addPage(page);
-                try (PDPageContentStream stream = new PDPageContentStream(document, page)) {
-                    stream.beginText();
-                    stream.setFont(font, 12);
-                    stream.newLineAtOffset(72, 720);
-                    stream.showText(text);
-                    stream.endText();
-                }
+            PDPage page = new PDPage();
+            document.addPage(page);
+            try (PDPageContentStream stream = new PDPageContentStream(document, page)) {
+                stream.beginText();
+                stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+                stream.newLineAtOffset(72, 720);
+                stream.showText(text);
+                stream.endText();
             }
             document.save(output);
             return output.toByteArray();

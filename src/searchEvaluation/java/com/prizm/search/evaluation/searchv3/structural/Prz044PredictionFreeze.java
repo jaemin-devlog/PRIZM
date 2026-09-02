@@ -31,12 +31,14 @@ import tools.jackson.databind.node.ObjectNode;
 final class Prz044PredictionFreeze {
 
     static final String CONTRACT_TYPE = "PRZ044_PREDICTION_FREEZE_CONTRACT";
-    static final String PROTOCOL_VERSION = "PRZ044_PREDICTION_FREEZE_V1";
+    static final String PROTOCOL_VERSION = "PRZ044_PREDICTION_FREEZE_V2";
     static final String CONTRACT_RELATIVE =
-            "specs/PRZ-044-search-v3-release-grade-evaluation/execution-contract.json";
+            "specs/PRZ-044-search-v3-release-grade-evaluation/execution-contract-attempt-2.json";
     static final String OFFICIAL_RUN_DIRECTORY =
             "local/search-v3-evaluation/prz044/official/"
-                    + "6a7eca9b327b59ec5d0c5448cb08d1738298739747dd9509ec5a335a467f68ec/attempt-1";
+                    + "6a7eca9b327b59ec5d0c5448cb08d1738298739747dd9509ec5a335a467f68ec/"
+                    + "contract-v2/attempt-2";
+    static final String ATTEMPT_IDENTITY = "PRZ044_ATTEMPT_2_DOCUMENT_TYPE_MAPPING_V1";
     static final String PREFLIGHT_RECEIPT_RELATIVE =
             "local/search-v3-evaluation/prz044/preflight/source-freeze-v2/"
                     + "preflight-pass-receipt.json";
@@ -69,6 +71,31 @@ final class Prz044PredictionFreeze {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
+    static Prz044PredictionDataset.ExpectedInput officialExpectedInput() {
+        return new Prz044PredictionDataset.ExpectedInput(
+                DATASET_ID,
+                DATASET_VERSION,
+                EVALUATION_SPLIT,
+                INPUT_ZIP_SHA256,
+                MANIFEST_SHA256,
+                MANIFEST_CANONICAL_SHA256,
+                PHYSICAL_PAYLOAD_SHA256,
+                COMMITMENT_SHA256,
+                SEALED_COMMITMENT_SHA256,
+                92,
+                75,
+                90,
+                600,
+                45,
+                45,
+                15);
+    }
+
+    static Prz044PredictionArtifact.ModelIdentity officialModelIdentity() {
+        return new Prz044PredictionArtifact.ModelIdentity(
+                MODEL_ID, MODEL_DIGEST, 1024, "COSINE");
+    }
+
     VerifiedContract verifyContract(Path projectRoot) {
         Path rootDirectory = normalizedDirectory(projectRoot, "PRZ-044 project root");
         Path contractPath = regularProjectFile(
@@ -76,11 +103,12 @@ final class Prz044PredictionFreeze {
         JsonNode root = read(contractPath);
         requireExactFields(root, "contract", Set.of(
                 "artifactType", "protocolVersion", "status", "attempt", "baseCommit",
-                "dataset", "model", "profiles", "sourceBoundaries", "execution", "goldPolicy"));
+                "dataset", "model", "profiles", "documentTypeMapping", "sourceBoundaries",
+                "execution", "goldPolicy"));
         require(CONTRACT_TYPE.equals(text(root, "artifactType")), "contract artifact type changed");
         require(PROTOCOL_VERSION.equals(text(root, "protocolVersion")), "contract protocol changed");
         require("INPUT_FROZEN".equals(text(root, "status")), "contract is not INPUT_FROZEN");
-        require(root.path("attempt").asInt(-1) == 1, "official attempt must be exactly one");
+        require(root.path("attempt").asInt(-1) == 2, "official attempt must be attempt-2");
         require(SEARCH_SOURCE_BASE_COMMIT.equals(text(root, "baseCommit")),
                 "Search source base commit changed");
 
@@ -154,12 +182,26 @@ final class Prz044PredictionFreeze {
         expectedProfiles.put(Prz044PredictionArtifact.Engine.V2, text(profiles, "v2"));
         expectedProfiles.put(Prz044PredictionArtifact.Engine.V3, text(profiles, "v3"));
 
+        JsonNode mapping = root.path("documentTypeMapping");
+        requireExactFields(mapping, "documentTypeMapping", Set.of("path", "version", "sha256"));
+        require(Prz044DocumentTypeMapping.CONTRACT_RELATIVE.equals(text(mapping, "path")),
+                "DocumentType mapping path changed");
+        require(Prz044DocumentTypeMapping.VERSION.equals(text(mapping, "version")),
+                "DocumentType mapping version changed");
+        Prz044DocumentTypeMapping.VerifiedMapping verifiedMapping =
+                new Prz044DocumentTypeMapping().verifyContract(rootDirectory);
+        require(verifiedMapping.sha256().equals(text(mapping, "sha256")),
+                "DocumentType mapping SHA changed");
+
         JsonNode execution = root.path("execution");
-        requireExactFields(execution, "execution", Set.of("runDirectory", "officialRunsAllowed"));
+        requireExactFields(execution, "execution",
+                Set.of("runDirectory", "officialRunsAllowed", "attemptIdentity"));
         require(execution.path("officialRunsAllowed").asInt(-1) == 1,
                 "officialRunsAllowed must be exactly one");
         require(OFFICIAL_RUN_DIRECTORY.equals(text(execution, "runDirectory")),
                 "official run directory changed");
+        require(ATTEMPT_IDENTITY.equals(text(execution, "attemptIdentity")),
+                "official attempt identity changed");
         resolvePortable(rootDirectory, text(execution, "runDirectory"));
 
         JsonNode goldPolicy = root.path("goldPolicy");
@@ -182,7 +224,10 @@ final class Prz044PredictionFreeze {
                 Map.copyOf(sourceHashes),
                 Map.copyOf(expectedProfiles),
                 OFFICIAL_RUN_DIRECTORY,
-                1);
+                1,
+                2,
+                ATTEMPT_IDENTITY,
+                verifiedMapping.sha256());
     }
 
     PreflightRun beginPreflight(
@@ -380,7 +425,11 @@ final class Prz044PredictionFreeze {
         Objects.requireNonNull(actualModel, "actualModel");
         verifyContractFile(contract);
         require(contract.officialRunsAllowed() == 1, "officialRunsAllowed changed after verification");
-        verifyPreflightPass(contract);
+        new Prz044Attempt2PreflightReceipt().verify(
+                contract.projectRoot(),
+                new Prz044DocumentTypeMapping().verifyContract(contract.projectRoot()),
+                contract.expectedInput().zipSha256(),
+                contract.expectedModel());
         require(contract.expectedModel().equals(actualModel), "actual model differs from the frozen contract");
         requireInputIdentity(contract.expectedInput(), input);
 
@@ -400,8 +449,10 @@ final class Prz044PredictionFreeze {
         ObjectNode marker = mapper.createObjectNode();
         marker.put("artifactType", "PRZ044_OFFICIAL_PREDICTION_ATTEMPT");
         marker.put("protocolVersion", PROTOCOL_VERSION);
-        marker.put("attempt", 1);
+        marker.put("attempt", contract.attempt());
+        marker.put("attemptIdentity", contract.attemptIdentity());
         marker.put("contractSha256", contract.contractSha256());
+        marker.put("mappingContractSha256", contract.mappingContractSha256());
         marker.put("inputZipSha256", input.zipSha256());
         marker.put("physicalPayloadCombinedSha256", input.physicalCombinedSha256());
         marker.put("manifestCombinedCommitmentSha256", input.commitmentCombinedSha256());
@@ -526,8 +577,10 @@ final class Prz044PredictionFreeze {
         receipt.put("artifactType", "PRZ044_PREDICTION_COMPLETION_RECEIPT");
         receipt.put("protocolVersion", PROTOCOL_VERSION);
         receipt.put("status", "PREDICTIONS_FROZEN");
-        receipt.put("attempt", 1);
+        receipt.put("attempt", attempt.contract().attempt());
+        receipt.put("attemptIdentity", attempt.contract().attemptIdentity());
         receipt.put("contractSha256", attempt.contract().contractSha256());
+        receipt.put("mappingContractSha256", attempt.contract().mappingContractSha256());
         receipt.put("attemptSha256", attempt.attemptSha256());
         receipt.put("inputZipSha256", attempt.input().zipSha256());
         receipt.put("manifestCombinedCommitmentSha256", attempt.input().commitmentCombinedSha256());
@@ -558,9 +611,11 @@ final class Prz044PredictionFreeze {
         receipt.put("artifactType", "PRZ044_PREDICTION_FAILURE_RECEIPT");
         receipt.put("protocolVersion", PROTOCOL_VERSION);
         receipt.put("status", "FAILED_ATTEMPT_CONSUMED");
-        receipt.put("attempt", 1);
+        receipt.put("attempt", attempt.contract().attempt());
+        receipt.put("attemptIdentity", attempt.contract().attemptIdentity());
         receipt.put("stage", stage);
         receipt.put("contractSha256", attempt.contract().contractSha256());
+        receipt.put("mappingContractSha256", attempt.contract().mappingContractSha256());
         receipt.put("attemptSha256", attempt.attemptSha256());
         receipt.put("v2Frozen", predictionArtifactExists(attempt, Prz044PredictionArtifact.Engine.V2));
         receipt.put("v3Frozen", predictionArtifactExists(attempt, Prz044PredictionArtifact.Engine.V3));
@@ -1061,7 +1116,11 @@ final class Prz044PredictionFreeze {
         require("PRZ044_OFFICIAL_PREDICTION_ATTEMPT".equals(text(value, "artifactType")),
                 "attempt marker type changed");
         require(PROTOCOL_VERSION.equals(text(value, "protocolVersion")), "attempt protocol changed");
-        require(value.path("attempt").asInt(-1) == 1, "attempt number changed");
+        require(value.path("attempt").asInt(-1) == attempt.contract().attempt(), "attempt number changed");
+        require(attempt.contract().attemptIdentity().equals(text(value, "attemptIdentity")),
+                "attempt identity changed");
+        require(attempt.contract().mappingContractSha256().equals(text(value, "mappingContractSha256")),
+                "attempt mapping contract changed");
         require(attempt.contract().contractSha256().equals(text(value, "contractSha256")),
                 "attempt contract changed");
         require(attempt.input().zipSha256().equals(text(value, "inputZipSha256")),
@@ -1290,7 +1349,10 @@ final class Prz044PredictionFreeze {
             Map<String, String> sourceBoundaryHashes,
             Map<Prz044PredictionArtifact.Engine, String> expectedProfiles,
             String runDirectory,
-            int officialRunsAllowed) {
+            int officialRunsAllowed,
+            int attempt,
+            String attemptIdentity,
+            String mappingContractSha256) {
     }
 
     record PreflightRun(

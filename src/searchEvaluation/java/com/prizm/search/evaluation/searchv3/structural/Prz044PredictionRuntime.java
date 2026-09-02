@@ -77,6 +77,7 @@ final class Prz044PredictionRuntime {
     private final SearchV3IndexingCoordinator v3Coordinator;
     private final SearchV3ShadowQueryService v3QueryService;
     private final SearchV3EmbeddingModelContractProvider modelProvider;
+    private final Prz044DocumentTypeMapping documentTypeMapping;
 
     Prz044PredictionRuntime(
             JdbcTemplate jdbc,
@@ -91,7 +92,8 @@ final class Prz044PredictionRuntime {
             SearchV3JobDispatchService v3Dispatch,
             SearchV3IndexingCoordinator v3Coordinator,
             SearchV3ShadowQueryService v3QueryService,
-            SearchV3EmbeddingModelContractProvider modelProvider) {
+            SearchV3EmbeddingModelContractProvider modelProvider,
+            Prz044DocumentTypeMapping documentTypeMapping) {
         this.jdbc = Objects.requireNonNull(jdbc, "jdbc");
         this.fileStorage = Objects.requireNonNull(fileStorage, "fileStorage");
         this.textExtractor = Objects.requireNonNull(textExtractor, "textExtractor");
@@ -107,6 +109,7 @@ final class Prz044PredictionRuntime {
         this.v3Coordinator = Objects.requireNonNull(v3Coordinator, "v3Coordinator");
         this.v3QueryService = Objects.requireNonNull(v3QueryService, "v3QueryService");
         this.modelProvider = Objects.requireNonNull(modelProvider, "modelProvider");
+        this.documentTypeMapping = Objects.requireNonNull(documentTypeMapping, "documentTypeMapping");
     }
 
     /** Performs the real model resolve/warm-up/re-resolve check before an official attempt is claimed. */
@@ -223,14 +226,7 @@ final class Prz044PredictionRuntime {
         for (int index = 0; index < orderedDocuments.size(); index++) {
             Prz044PredictionDataset.RuntimeDocument source = orderedDocuments.get(index);
             FixtureOwner owner = requiredOwner(owners, source.userId());
-            DocumentType type;
-            try {
-                type = DocumentType.valueOf(source.sourceDocumentType());
-            }
-            catch (IllegalArgumentException exception) {
-                throw new IllegalStateException(
-                        "unknown PRZ-044 source document type: " + source.sourceDocumentType(), exception);
-            }
+            DocumentType type = documentTypeMapping.map(source.sourceDocumentType());
             long documentId = requiredLong(jdbc.queryForObject(
                     """
                     INSERT INTO documents(owner_user_id, title, document_type)

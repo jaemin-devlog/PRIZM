@@ -94,15 +94,20 @@ class Prz044OfficialPredictionTest {
             Path inputZip = inputZip();
             stage.set("VERIFY_CONTRACT");
             Prz044PredictionFreeze.VerifiedContract contract = freeze.verifyContract(PROJECT_ROOT);
-            stage.set("VERIFY_PREFLIGHT_PASS_RECEIPT");
-            Prz044PredictionFreeze.PreflightReceipt preflight = freeze.verifyPreflightPass(contract);
-            assertThat(preflight.receiptPath()).isEqualTo(Prz044PredictionFreeze.resolvePortable(
-                    PROJECT_ROOT, Prz044PredictionFreeze.PREFLIGHT_RECEIPT_RELATIVE));
-            assertThat(preflight.receiptSha256()).matches("[0-9a-f]{64}");
             stage.set("PREFLIGHT_INPUT");
             Prz044PredictionDataset.VerifiedInputPackage input = new Prz044PredictionDataset().preflight(
                     inputZip, contract.expectedInput(), textExtractor);
             assertThat(input.goldPresent()).isFalse();
+            Prz044DocumentTypeMapping mapping = new Prz044DocumentTypeMapping();
+            var verifiedMapping = mapping.verifyContract(PROJECT_ROOT);
+            var mappingAudit = mapping.audit(input.documents());
+            assertThat(mappingAudit.mappedCount()).isEqualTo(90);
+            assertThat(mappingAudit.unmappedCount()).isZero();
+            assertThat(mappingAudit.ambiguousCount()).isZero();
+            stage.set("VERIFY_ATTEMPT_2_PREFLIGHT_RECEIPT");
+            var preflight = new Prz044Attempt2PreflightReceipt().verify(
+                    PROJECT_ROOT, verifiedMapping, input.zipSha256(), contract.expectedModel());
+            assertThat(preflight.sha256()).matches("[0-9a-f]{64}");
 
             Prz044PredictionRuntime runtime = new Prz044PredictionRuntime(
                     jdbc,
@@ -117,7 +122,8 @@ class Prz044OfficialPredictionTest {
                     v3Dispatch,
                     v3Coordinator,
                     v3QueryService,
-                    modelProvider);
+                    modelProvider,
+                    mapping);
             Prz044PredictionRuntime.RunContract runContract =
                     Prz044PredictionRuntime.RunContract.official(contract, input);
 

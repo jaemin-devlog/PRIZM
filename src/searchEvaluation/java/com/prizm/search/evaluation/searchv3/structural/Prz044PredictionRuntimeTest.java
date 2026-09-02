@@ -152,7 +152,8 @@ class Prz044PredictionRuntimeTest {
                 mock(SearchV3JobDispatchService.class),
                 mock(SearchV3IndexingCoordinator.class),
                 mock(SearchV3ShadowQueryService.class),
-                provider);
+                provider,
+                new Prz044DocumentTypeMapping());
     }
 
     private static Prz044PredictionDataset.RuntimeDocument document(
@@ -164,7 +165,7 @@ class Prz044PredictionRuntimeTest {
                 "Engineering",
                 "D1-" + fileType,
                 "V1-" + fileType,
-                "OTHER",
+                "RESUME",
                 fileType,
                 "source." + fileType.name().toLowerCase(),
                 "evaluation/source." + fileType.name().toLowerCase(),

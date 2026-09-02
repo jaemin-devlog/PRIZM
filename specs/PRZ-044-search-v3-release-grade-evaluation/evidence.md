@@ -315,3 +315,27 @@ Preflight receipt SHA-256은
 `attempt-1`과 `attempt-2`는 실패로, `attempt-3`은 prediction 완료로 각각 소비됐다. 같은
 attempt를 재실행하지 않는다. 채점은 commitment와 일치하는 정식 PRZ-044 Gold artifact가 별도로
 제공될 때만 가능하며, 제공 전에는 `EVALUATION_INTEGRITY_BLOCKED`를 유지한다.
+
+## Practical validation 종료
+
+Release-grade 평가 infrastructure는 더 확장하지 않는다. Passage 상한 결함 수정 뒤 문제 PDF
+8개와 전체 V2/V3 문서 90개가 모두 색인됐고, 기존 frozen artifact의 V2/V3 예측도 각각
+600건이다. Passage 상한 실패는 0건이며 backend 669건, Search V3 PostgreSQL integration 46건,
+PRZ-044 focused 28건이 모두 통과했다.
+
+Gold나 결과를 보지 않고 15개 직군마다 복수 TXT 문서 사용자 1건과 단일 PDF 이력서 사용자
+1건을 query ID SHA-256 순으로 골랐다. 총 30건이며 선택 목록 SHA-256은
+`bb5d0e8c727b5ec02caf88145badf65acc04bbd732dcce75433829d05a40e973`다.
+
+- V2가 결과를 반환한 24건의 1위 원문은 모두 V3 최종 5건 안에 남았다. V3가 기존 근거를
+  완전히 놓친 사례는 없었다.
+- V2가 결과를 내지 못한 6건에서는 V3가 기간, 직접 수행 작업, 운영 맥락이나 조건 불일치 근거를
+  추가로 보여줬다. `query-0162`, `query-0046`, `query-0105`는 V3 쪽 원문이 더 직접적이었다.
+- `query-0077`, `query-0313`에서는 V3의 일반 프로필 문구가 1위로 올라왔지만 V2의 직접 근거는
+  각각 V3 5위와 2위에 남았다. 일부 PDF 결과는 시각적 제목 경계가 추출 과정에서 사라져 한
+  표시 범위가 여러 경험을 넓게 포함했다.
+
+정식 Gold가 없으므로 Top1, MRR, Recall 같은 수치와 채택 판정은 계산하지 않았다. 이번 정성
+검증에서는 심각한 V2 근거 누락을 발견하지 않았으므로 종료 판정은
+`V3_PRACTICAL_VALIDATION_PASS`다. 이는 Release-grade 품질 PASS나 Production 기본 검색 채택을
+뜻하지 않는다.

@@ -42,10 +42,23 @@
 - [ ] completion receipt — `NOT_CREATED`; failure receipt 생성
 - [ ] Gold·metric — `NOT_RUN`
 
+### attempt-3
+
+- [x] Passage 상한 production fix 별도 commit과 source SHA 동결
+- [x] 새 attempt-3 contract와 source/model/input/mapping hash 동결
+- [x] synthetic preflight — PostgreSQL 16.14·pgvector 0.8.2·실제 BGE-M3 `PASS`
+- [x] official V2/V3 indexing — `90/90`, `90/90`
+- [x] V2/V3 prediction freeze/reload — `600/600`, `600/600`
+- [x] duplicate/missing query — `0/0`
+- [x] completion receipt — `PASS`, official run `1/1`
+- [x] Gold-after-completion 순서 검증 — prediction 이전 Gold 접근 `0`
+- [x] focused/PostgreSQL/backend/OSS regression — `PASS`
+- [ ] Gold·metric·Adoption Gate — `NOT_RUN`, 정식 PRZ-044 Gold artifact 미제공
+
 ## INTEGRATE
 
 - [x] `evidence.md`, `prediction-failure-receipt.json`
 - [x] Registry 상태·판정 일치
-- [ ] `prediction-completion-receipt.json` — `NOT_CREATED`
-- [ ] PRZ-044 branch commit/push와 origin parity — 성공 Gate 미충족으로 `NOT_RUN`
+- [x] `prediction-completion-receipt.json` — attempt-3 `PASS`
+- [ ] PRZ-044 branch commit/push와 origin parity
 - [ ] `NOT_RUN`: Gold, metric, V3 adoption, PR/merge/cutover/다음 PRZ

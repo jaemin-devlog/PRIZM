@@ -1,24 +1,26 @@
 # PRZ-044 Search V3 Release-grade Prediction Freeze
 
 - 상태: `VERIFIED`
-- 최종 판정: `PREDICTION_PHASE_BLOCKED`
+- 최종 판정: `EVALUATION_INTEGRITY_BLOCKED`
 - branch: `PRZ-044-search-v3-release-grade-evaluation`
 - 기준: `PRZ-043-search-v3-release-grade-evaluation@82606d242c2e1077c25ffefaeae98c2cdb51c4b4`
 - Search V2/V3 Production source: `refactor/search-v3@0e95472bb68f72accf0d6b2171c22f0719fe6941`
 - PRZ-042: `V3_NO_GO / SEED_FINAL_PROTOCOL_RESULT` — 역사 기록 유지
 - PRZ-043: `EVALUATION_INVALID` — 역사 기록 유지
-- Gold 채점: `NOT_RUN`
+- Gold 채점: `NOT_RUN` — 정식 PRZ-044 Gold artifact 미제공
 
 공식 `attempt-1`은 입력 문서 유형 호환성 오류로 종료됐다. 명시적 DocumentType 매핑과 별도
 계약을 고정한 `attempt-2`에서는 V2 600건을 동결했지만, V3 색인 중 8개 문서의 atomic
 `EvidenceChild`가 `RetrievalPassage` 절대 상한을 넘어 종료됐다. 두 시도 모두
-`FAILED_ATTEMPT_CONSUMED`로 보존하며 Gold와 metric 단계는 실행하지 않았다.
+`FAILED_ATTEMPT_CONSUMED`로 보존한다. 이 결함을 고친 `attempt-3`은 V2/V3 예측을 각각
+600건 동결하고 completion receipt까지 생성했다. 다만 별도 Gold artifact가 제공되지 않아
+채점과 채택 판정은 진행하지 않았다.
 
 ## 목적
 
 Gold가 물리적으로 빠진 `prizm-release-eval-v1.0.3` 입력 패키지로 현재 Search V2와 Search V3의
-prediction만 정확히 한 번 생성하고 동결한다. 이번 PRZ에서는 Gold를 찾거나 열지 않으며 metric과
-V3 채택 판정을 계산하지 않는다.
+prediction을 정확히 한 번 생성하고 동결한다. Gold는 completion receipt 이후 별도 artifact로
+제공될 때만 열며, 제공되지 않으면 metric과 V3 채택 판정을 계산하지 않는다.
 
 ## 변경 범위
 
@@ -205,9 +207,11 @@ Gold schema가 핵심 Gate 계산 정보를 제공하지 않으면 해당 Gate�
 - official attempt `1`, Gold present/accessed `false/false`
 - branch commit/push, origin parity, clean worktree
 
-`attempt-2`는 V2 `600/600`을 동결했으나 V3 prediction과 completion receipt를 만들지 못했다.
-따라서 최종 판정은 `PREDICTION_PHASE_BLOCKED`다. `V3_ADOPT`와 `V3_NO_GO`는 이번 PRZ에서
-판정하지 않는다.
+`attempt-3`은 V2/V3 `600/600`과 completion receipt를 모두 동결해
+`PREDICTIONS_FROZEN_READY_FOR_GOLD`를 충족했다. 이후 정식 Gold artifact의 제공 여부만
+확인했으나 사용할 수 있는 PRZ-044 Gold가 없었다. 다른 버전의 Gold를 대체하지 않았으며 metric과
+Adoption Gate는 `NOT_RUN`이다. 최종 판정은 `EVALUATION_INTEGRITY_BLOCKED`이고,
+`V3_ADOPT`와 `V3_NO_GO`는 판정하지 않는다.
 
 ## 비범위
 

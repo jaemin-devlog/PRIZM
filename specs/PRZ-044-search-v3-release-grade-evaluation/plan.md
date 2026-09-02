@@ -46,7 +46,8 @@ Gold loader, metric evaluator와 `src/main/**`는 만들거나 수정하지 않�
 
 ## 실제 종료
 
-`attempt-1` 실패 후 dataset type 3개를 Production enum에 명시적으로 매핑하고, 90/90 매핑과
-소규모 실제 색인 preflight를 통과했다. 별도 V2 계약으로 실행한 `attempt-2`는 V2 600건을
-동결했지만, V3 색인 중 8개 문서에서 atomic child가 passage 절대 상한을 넘어 종료됐다.
-`attempt-2`도 소비됐으며 Gold·metric 단계는 실행하지 않았다.
+`attempt-1` 실패 후 dataset type 3개를 Production enum에 명시적으로 매핑했다. `attempt-2`는
+V2 600건을 동결했지만 V3 색인 중 8개 문서에서 atomic child가 passage 절대 상한을 넘어
+종료됐다. Passage 상한 결함을 고정한 `attempt-3`은 V2/V3 90문서와 예측 600건을 모두 완료하고
+completion receipt를 생성했다. 그 뒤 정식 PRZ-044 Gold artifact의 제공 여부를 확인했으나
+사용할 수 있는 Gold가 없어 metric과 Adoption Gate는 `NOT_RUN`으로 종료했다.

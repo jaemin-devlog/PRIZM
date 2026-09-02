@@ -46,6 +46,7 @@ Gold loader, metric evaluator와 `src/main/**`는 만들거나 수정하지 않�
 
 ## 실제 종료
 
-Synthetic preflight는 통과했지만 공식 `attempt-1`은 첫 문서 적재 전에 입력의
-`CAREER_DESCRIPTION`을 Production `DocumentType`으로 직접 변환하지 못해 실패했다. 실패한
-시도도 소비한다는 계약에 따라 official task는 재실행하지 않았고, 이후 단계는 중단했다.
+`attempt-1` 실패 후 dataset type 3개를 Production enum에 명시적으로 매핑하고, 90/90 매핑과
+소규모 실제 색인 preflight를 통과했다. 별도 V2 계약으로 실행한 `attempt-2`는 V2 600건을
+동결했지만, V3 색인 중 8개 문서에서 atomic child가 passage 절대 상한을 넘어 종료됐다.
+`attempt-2`도 소비됐으며 Gold·metric 단계는 실행하지 않았다.

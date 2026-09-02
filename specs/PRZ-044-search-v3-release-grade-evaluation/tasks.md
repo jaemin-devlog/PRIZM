@@ -17,10 +17,13 @@
 - [x] synthetic actual PostgreSQL/BGE-M3 preflight
 - [x] `build.gradle` focused/preflight/official task
 - [x] execution contract source/model/input hash freeze
+- [x] `CAREER_DESCRIPTION`, `PORTFOLIO`, `RESUME` 명시적 fail-closed 매핑
+- [x] attempt-1 byte parity와 failure receipt 보존
+- [x] 별도 attempt-2 contract/source/mapping hash freeze
 
 ## VERIFY / AUDIT
 
-- [x] compile/focused unit tests — `PASS`, 24/24
+- [x] compile/focused unit tests — `PASS`, 28/28
 - [x] synthetic runtime preflight — `PASS`, PostgreSQL 16.14·pgvector 0.8.2·실제 BGE-M3
 - [x] official INPUT/model/source/attempt precheck
 - [ ] official indexing 90 documents — `FAIL`, 첫 문서 적재 전 중단
@@ -29,6 +32,15 @@
 - [ ] completion receipt — `NOT_CREATED`; failure receipt와 Gold absent/access `false/false` 확인
 - [ ] 관련 backend/PostgreSQL/frontend 회귀 — official one-shot 실패 뒤 `NOT_RUN`
 - [x] OSS readiness, Markdown, `git diff --check`, scope audit — `PASS`
+
+### attempt-2
+
+- [x] official 90-document DocumentType mapping — `PASS`, mapped/unmapped/ambiguous `90/0/0`
+- [x] 실제 PostgreSQL 16.14·pgvector 0.8.2·BGE-M3 indexing preflight — `PASS`
+- [x] V2 prediction `600/600` freeze/reload — `PASS`
+- [ ] V3 prediction `600/600` — `NOT_CREATED`; 8개 문서 `PASSAGE_GENERATION` 실패
+- [ ] completion receipt — `NOT_CREATED`; failure receipt 생성
+- [ ] Gold·metric — `NOT_RUN`
 
 ## INTEGRATE
 

@@ -9,9 +9,10 @@
 - PRZ-043: `EVALUATION_INVALID` — 역사 기록 유지
 - Gold 채점: `NOT_RUN`
 
-공식 `attempt-1`은 `RUNTIME_V2` 단계에서 입력 문서 유형 호환성 오류로 종료됐다. One-shot
-계약에 따라 같은 dataset으로 다시 실행하지 않았으며, prediction과 completion receipt는 생성되지
-않았다. 아래 계약은 결과를 보기 전에 동결한 원문 그대로 유지한다.
+공식 `attempt-1`은 입력 문서 유형 호환성 오류로 종료됐다. 명시적 DocumentType 매핑과 별도
+계약을 고정한 `attempt-2`에서는 V2 600건을 동결했지만, V3 색인 중 8개 문서의 atomic
+`EvidenceChild`가 `RetrievalPassage` 절대 상한을 넘어 종료됐다. 두 시도 모두
+`FAILED_ATTEMPT_CONSUMED`로 보존하며 Gold와 metric 단계는 실행하지 않았다.
 
 ## 목적
 
@@ -123,6 +124,19 @@ Preflight가 하나라도 실패하면 official attempt는 `0`으로 유지한�
 - official root의 다른 attempt와 기존 marker가 있으면 거부한다.
 - 실패한 attempt도 소비되며 같은 dataset으로 다시 실행하지 않는다.
 
+### attempt-2 계약
+
+- protocol: `PRZ044_PREDICTION_FREEZE_V2`
+- identity: `PRZ044_ATTEMPT_2_DOCUMENT_TYPE_MAPPING_V1`
+- contract SHA-256: `eea133dca032aef1f4ac186cc85bbfe078a9369446e2b10486824f84531e8823`
+- run directory: `local/search-v3-evaluation/prz044/official/6a7eca9b327b59ec5d0c5448cb08d1738298739747dd9509ec5a335a467f68ec/contract-v2/attempt-2`
+- `officialRunsAllowed=1`
+- mapping: `CAREER_DESCRIPTION→RESUME`, `PORTFOLIO→PORTFOLIO`, `RESUME→RESUME`
+- unknown type: fail-closed, fallback 없음
+
+`attempt-1` 계약과 artifact는 수정하지 않는다. `attempt-2`는 V2 전체 동결 후에만 V3를
+시작하며, completion receipt 전 Gold 접근을 금지한다.
+
 ## Gold release 조건
 
 다음을 모두 만족한 completion receipt가 있어야 다음 별도 단계에서 Gold artifact를 받을 수 있다.
@@ -173,7 +187,8 @@ Gold schema가 핵심 Gate 계산 정보를 제공하지 않으면 해당 Gate�
 - official attempt `1`, Gold present/accessed `false/false`
 - branch commit/push, origin parity, clean worktree
 
-하나라도 실패하면 `PREDICTION_PHASE_BLOCKED`다. `V3_ADOPT`와 `V3_NO_GO`는 이번 PRZ에서
+`attempt-2`는 V2 `600/600`을 동결했으나 V3 prediction과 completion receipt를 만들지 못했다.
+따라서 최종 판정은 `PREDICTION_PHASE_BLOCKED`다. `V3_ADOPT`와 `V3_NO_GO`는 이번 PRZ에서
 판정하지 않는다.
 
 ## 비범위

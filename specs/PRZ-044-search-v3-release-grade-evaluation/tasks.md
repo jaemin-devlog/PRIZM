@@ -60,5 +60,5 @@
 - [x] `evidence.md`, `prediction-failure-receipt.json`
 - [x] Registry 상태·판정 일치
 - [x] `prediction-completion-receipt.json` — attempt-3 `PASS`
-- [ ] PRZ-044 branch commit/push와 origin parity
+- [x] PRZ-044 branch commit/push와 origin parity
 - [ ] `NOT_RUN`: Gold, metric, V3 adoption, PR/merge/cutover/다음 PRZ

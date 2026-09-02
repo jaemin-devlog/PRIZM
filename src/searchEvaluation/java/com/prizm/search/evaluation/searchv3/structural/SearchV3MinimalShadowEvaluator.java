@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 final class SearchV3MinimalShadowEvaluator {
 
     static final int EXPECTED_QUERY_COUNT = 117;
+    static final int EXPECTED_USER_COUNT = 23;
     static final int EXPECTED_DIRECT_POSITIVE_COUNT = 85;
     static final int EXPECTED_NOT_SUPPORTED_COUNT = 32;
     static final int CANDIDATE_LIMIT = 20;
@@ -39,9 +40,17 @@ final class SearchV3MinimalShadowEvaluator {
     EvaluationReport evaluate(
             SearchV3MinimalShadowFreeze.OutputArtifact output,
             SearchV3MinimalShadowGold.GoldSnapshot gold) {
+        return evaluate(output, gold, InventoryContract.prz032());
+    }
+
+    EvaluationReport evaluate(
+            SearchV3MinimalShadowFreeze.OutputArtifact output,
+            SearchV3MinimalShadowGold.GoldSnapshot gold,
+            InventoryContract inventory) {
         Objects.requireNonNull(output, "output");
         Objects.requireNonNull(gold, "gold");
-        DedupAudit dedup = validateInventory(output, gold);
+        Objects.requireNonNull(inventory, "inventory");
+        DedupAudit dedup = validateInventory(output, gold, inventory);
 
         List<QueryEvaluation> queries = new ArrayList<>();
         Set<String> seenQueryIds = new LinkedHashSet<>();
@@ -121,26 +130,46 @@ final class SearchV3MinimalShadowEvaluator {
 
     private DedupAudit validateInventory(
             SearchV3MinimalShadowFreeze.OutputArtifact output,
-            SearchV3MinimalShadowGold.GoldSnapshot gold) {
-        if (output.queryCount() != EXPECTED_QUERY_COUNT
-                || output.queries().size() != EXPECTED_QUERY_COUNT
-                || gold.queriesById().size() != EXPECTED_QUERY_COUNT) {
-            throw new IllegalStateException("PRZ-032 requires exactly 117 canonical queries");
+            SearchV3MinimalShadowGold.GoldSnapshot gold,
+            InventoryContract inventory) {
+        int expectedQueries = inventory.expectedQueryCount();
+        if (output.queryCount() != expectedQueries
+                || output.queries().size() != expectedQueries
+                || gold.queriesById().size() != expectedQueries) {
+            throw new IllegalStateException(
+                    inventory.label() + " requires exactly " + expectedQueries + " canonical queries");
+        }
+        Set<String> outputUsers = output.queries().stream()
+                .map(SearchV3MinimalShadowFreeze.QueryOutput::userBundleId)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<String> goldUsers = gold.queriesById().values().stream()
+                .map(SearchV3MinimalShadowGold.GoldQuery::userBundleId)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        int expectedUsers = inventory.expectedUserCount();
+        if (output.userCount() != expectedUsers
+                || outputUsers.size() != expectedUsers
+                || goldUsers.size() != expectedUsers
+                || !outputUsers.equals(goldUsers)) {
+            throw new IllegalStateException(
+                    inventory.label() + " user inventory changed: declared=" + output.userCount()
+                            + " output=" + outputUsers.size() + " Gold=" + goldUsers.size());
         }
         long direct = gold.queriesById().values().stream()
                 .filter(SearchV3MinimalShadowGold.GoldQuery::hasDirectSupport).count();
         long negatives = gold.queriesById().values().stream()
                 .filter(value -> "NOT_SUPPORTED".equals(value.answerability())).count();
-        if (direct != EXPECTED_DIRECT_POSITIVE_COUNT || negatives != EXPECTED_NOT_SUPPORTED_COUNT) {
+        if (direct != inventory.expectedDirectPositiveCount()
+                || negatives != inventory.expectedNotSupportedCount()) {
             throw new IllegalStateException(
-                    "PRZ-032 Gold inventory changed: direct=" + direct + " negatives=" + negatives);
+                    inventory.label() + " Gold inventory changed: direct=" + direct
+                            + " negatives=" + negatives);
         }
         Map<String, Long> suites = output.queries().stream().collect(Collectors.groupingBy(
                 SearchV3MinimalShadowFreeze.QueryOutput::suite,
                 LinkedHashMap::new,
                 Collectors.counting()));
-        if (!EXPECTED_SUITE_COUNTS.equals(suites)) {
-            throw new IllegalStateException("PRZ-032 suite inventory changed: " + suites);
+        if (!inventory.expectedSuiteCounts().equals(suites)) {
+            throw new IllegalStateException(inventory.label() + " suite inventory changed: " + suites);
         }
 
         Map<String, List<String>> canonicalIds = new LinkedHashMap<>();
@@ -156,7 +185,7 @@ final class SearchV3MinimalShadowEvaluator {
                         entry -> List.copyOf(entry.getValue()),
                         (left, right) -> left,
                         LinkedHashMap::new));
-        if (canonicalIds.size() != EXPECTED_QUERY_COUNT || !collisions.isEmpty()) {
+        if (canonicalIds.size() != expectedQueries || !collisions.isEmpty()) {
             throw new IllegalStateException(
                     "canonical query dedup changed: unique=" + canonicalIds.size()
                             + " collisions=" + collisions);
@@ -164,11 +193,11 @@ final class SearchV3MinimalShadowEvaluator {
         long frozenExecutionKeys = output.queries().stream()
                 .map(value -> value.userBundleId() + "\u0000" + value.queryTextSha256())
                 .distinct().count();
-        if (frozenExecutionKeys != EXPECTED_QUERY_COUNT) {
+        if (frozenExecutionKeys != expectedQueries) {
             throw new IllegalStateException("frozen query execution identity is not unique");
         }
         return new DedupAudit(
-                EXPECTED_QUERY_COUNT, canonicalIds.size(), (int) frozenExecutionKeys,
+                expectedQueries, canonicalIds.size(), (int) frozenExecutionKeys,
                 Map.copyOf(collisions), Map.copyOf(suites));
     }
 
@@ -1136,6 +1165,50 @@ final class SearchV3MinimalShadowEvaluator {
     }
 
     private record DecisionResult(Decision decision, String biggestBottleneck) {
+    }
+
+    record InventoryContract(
+            String label,
+            int expectedQueryCount,
+            int expectedUserCount,
+            int expectedDirectPositiveCount,
+            int expectedNotSupportedCount,
+            Map<String, Long> expectedSuiteCounts) {
+
+        InventoryContract {
+            if (label == null || label.isBlank()) {
+                throw new IllegalArgumentException("inventory label must not be blank");
+            }
+            if (expectedQueryCount <= 0 || expectedUserCount <= 0) {
+                throw new IllegalArgumentException("query and user counts must be positive");
+            }
+            if (expectedDirectPositiveCount < 0
+                    || expectedDirectPositiveCount > expectedQueryCount
+                    || expectedNotSupportedCount < 0
+                    || expectedNotSupportedCount > expectedQueryCount) {
+                throw new IllegalArgumentException("Gold counts must be within the query inventory");
+            }
+            Objects.requireNonNull(expectedSuiteCounts, "expectedSuiteCounts");
+            if (expectedSuiteCounts.isEmpty()
+                    || expectedSuiteCounts.entrySet().stream().anyMatch(entry ->
+                            entry.getKey() == null || entry.getKey().isBlank()
+                                    || entry.getValue() == null || entry.getValue() < 0L)
+                    || expectedSuiteCounts.values().stream().mapToLong(Long::longValue).sum()
+                            != expectedQueryCount) {
+                throw new IllegalArgumentException("suite counts must be non-negative and sum to query count");
+            }
+            expectedSuiteCounts = Map.copyOf(expectedSuiteCounts);
+        }
+
+        private static InventoryContract prz032() {
+            return new InventoryContract(
+                    "PRZ-032",
+                    EXPECTED_QUERY_COUNT,
+                    EXPECTED_USER_COUNT,
+                    EXPECTED_DIRECT_POSITIVE_COUNT,
+                    EXPECTED_NOT_SUPPORTED_COUNT,
+                    EXPECTED_SUITE_COUNTS);
+        }
     }
 
     /** Canonical key is owner + NUL + NFKC/lowercase/whitespace-collapsed query text. */

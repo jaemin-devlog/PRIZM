@@ -119,6 +119,46 @@ tasks.register('searchEvaluation', Test) {
     }
 }
 
+tasks.register('prz042RuntimeSmoke', Test) {
+    description = 'Runs the non-sealed PRZ-042 PostgreSQL and real BGE-M3 runtime smoke.'
+    group = 'verification'
+    testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
+    classpath = sourceSets.searchEvaluation.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz042RuntimeComparisonIntegrationTest'
+    }
+    outputs.upToDateWhen { false }
+    maxParallelForks = 1
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+tasks.register('prz042FinalEvaluation', Test) {
+    description = 'Runs the one-shot PRZ-042 SEALED final protocol. Do not rerun an official attempt.'
+    group = 'verification'
+    testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
+    classpath = sourceSets.searchEvaluation.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz042FinalEvaluationTest'
+    }
+    outputs.upToDateWhen { false }
+    maxParallelForks = 1
+    failFast = true
+    systemProperty 'prizm.prz042.official', 'true'
+    systemProperty 'prizm.prz042.contract',
+            providers.gradleProperty('prz042Contract')
+                    .getOrElse('specs/PRZ-042-search-v3-final-evaluation/execution-contract.json')
+    systemProperty 'prizm.prz042.run-dir',
+            providers.gradleProperty('prz042RunDir')
+                    .getOrElse('local/search-v3-evaluation/prz042/final/attempt-1')
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
 tasks.register('p6ShadowBenchmark', Test) {
     description = 'Runs the PRZ-016 P6 external-corpus retrieval shadow benchmark.'
     group = 'verification'

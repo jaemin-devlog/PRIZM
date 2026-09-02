@@ -1,7 +1,9 @@
 package com.prizm.search.evaluation.searchv3.structural;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,6 +32,80 @@ class SearchV3MinimalShadowEvaluatorTest {
         assertThat(report.semantic().v3AssessedStateViolationCount()).isZero();
         assertThat(report.decision())
                 .isEqualTo(SearchV3MinimalShadowEvaluator.Decision.MINIMAL_V3_AHEAD);
+    }
+
+    @Test
+    void acceptsAnExplicitInventoryWithoutChangingThePrz032Default() {
+        Fixture fixture = subset(fixture(), 3);
+        SearchV3MinimalShadowEvaluator.InventoryContract inventory =
+                new SearchV3MinimalShadowEvaluator.InventoryContract(
+                        "NON_SEALED_UNIT", 3, 3, 3, 0, Map.of("ORIGINAL", 3L));
+
+        SearchV3MinimalShadowEvaluator.EvaluationReport report =
+                new SearchV3MinimalShadowEvaluator().evaluate(
+                        fixture.output(), fixture.gold(), inventory);
+
+        assertThat(report.queries()).hasSize(3);
+        assertThat(report.dedup().rawLineageCount()).isEqualTo(3);
+        assertThat(report.dedup().suiteCounts()).containsExactlyEntriesOf(Map.of("ORIGINAL", 3L));
+    }
+
+    @Test
+    void rejectsAnExplicitInventoryWhenTheDeclaredUserCountDoesNotMatch() {
+        Fixture fixture = subset(fixture(), 3);
+        SearchV3MinimalShadowEvaluator.InventoryContract inventory =
+                new SearchV3MinimalShadowEvaluator.InventoryContract(
+                        "NON_SEALED_UNIT", 3, 2, 3, 0, Map.of("ORIGINAL", 3L));
+
+        assertThatThrownBy(() -> new SearchV3MinimalShadowEvaluator().evaluate(
+                fixture.output(), fixture.gold(), inventory))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("user inventory changed");
+    }
+
+    @Test
+    void finalGateDoesNotTurnAProtocolSeedIntoAdoptionEvidence() {
+        Fixture fixture = fixture();
+        var report = new SearchV3MinimalShadowEvaluator().evaluate(fixture.output(), fixture.gold());
+        var input = new Prz042FinalFreeze.VerifiedInput(
+                Path.of("contract"), "a".repeat(64), Path.of("split"), Path.of("manifest"),
+                "b".repeat(64), "c".repeat(64), "seed", "SEALED_FINAL_TEST",
+                "d".repeat(64), "e".repeat(40), "f".repeat(40),
+                "bge-m3", "digest", 1024, Map.of(), 23, 117, 85, 32);
+        var runtime = new Prz042FinalFreeze.RuntimeAudit(
+                23, 117, 117, 117, 0, 117, 117, 117, 117,
+                0, 0, 0, 0, 0, true, "bge-m3", "digest", 1024,
+                117, 117, 0, 0, false);
+
+        Prz042FinalGate.GateReport gate = new Prz042FinalGate().evaluate(report, runtime, input);
+
+        assertThat(gate.verdict()).isEqualTo(Prz042FinalGate.Verdict.V3_NEEDS_ADJUSTMENT);
+        assertThat(gate.releaseAdequacy()).isEqualTo(Prz042FinalGate.Status.FAIL);
+        assertThat(gate.primaryQuality()).isEqualTo(Prz042FinalGate.Status.NOT_ASSESSED);
+        assertThat(gate.indexingAndStorage()).isEqualTo(Prz042FinalGate.Status.NOT_ASSESSED);
+        assertThat(gate.actualRuntime()).isEqualTo(Prz042FinalGate.Status.PASS);
+        assertThat(gate.resources()).isEqualTo(Prz042FinalGate.Status.PASS);
+    }
+
+    private Fixture subset(Fixture source, int count) {
+        List<SearchV3MinimalShadowFreeze.QueryOutput> outputs = source.output().queries().stream()
+                .limit(count).toList();
+        Map<String, SearchV3MinimalShadowGold.GoldQuery> queries = new LinkedHashMap<>();
+        outputs.forEach(value -> queries.put(value.queryId(), source.gold().queriesById().get(value.queryId())));
+        SearchV3MinimalShadowFreeze.IndexingStats stats =
+                new SearchV3MinimalShadowFreeze.IndexingStats(count, count, 1, 1, 1, count * 4096L);
+        SearchV3MinimalShadowFreeze.OutputArtifact output =
+                new SearchV3MinimalShadowFreeze.OutputArtifact(
+                        source.output().schemaVersion(), source.output().artifactType(),
+                        source.output().codeFreezeCommit(), source.output().sourceFreeze(),
+                        source.output().model(), source.output().v2Profile(), source.output().v3Profile(),
+                        source.output().jdbcExecutionBoundary(), count, count, count, stats, stats,
+                        source.output().v2IndexUnits().stream().limit(count).toList(),
+                        source.output().v3IndexUnits().stream().limit(count).toList(), outputs,
+                        source.output().sealedState());
+        SearchV3MinimalShadowGold.GoldSnapshot gold = new SearchV3MinimalShadowGold.GoldSnapshot(
+                queries, source.gold().units(), source.gold().parents(), source.gold().groups());
+        return new Fixture(output, gold);
     }
 
     private Fixture fixture() {

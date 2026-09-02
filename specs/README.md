@@ -89,6 +89,7 @@ Search V3의 실험 흐름, 채택·비채택 결과와 전용 branch 운영 경
 | PRZ&#8209;039 | [Search V3 inventory와 원자 활성화 runtime](PRZ-039-search-v3-inventory-activation-runtime/spec.md) | `VERIFIED` | [근거](PRZ-039-search-v3-inventory-activation-runtime/evidence.md) |
 | PRZ&#8209;040 | [Search V3 Shadow Indexing Worker](PRZ-040-search-v3-shadow-indexing-worker/spec.md) | `VERIFIED` | [근거](PRZ-040-search-v3-shadow-indexing-worker/evidence.md) |
 | PRZ&#8209;041 | [Search V3 Runtime Completion](PRZ-041-search-v3-runtime-completion/spec.md) | `VERIFIED` | [근거](PRZ-041-search-v3-runtime-completion/evidence.md) |
+| PRZ&#8209;042 | [Search V3 최종 평가](PRZ-042-search-v3-final-evaluation/spec.md) | `VERIFIED` | [근거](PRZ-042-search-v3-final-evaluation/evidence.md) |
 
 ## 연구·미채택 기록
 

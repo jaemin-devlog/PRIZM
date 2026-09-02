@@ -47,6 +47,120 @@ class StructuralEvidenceChildBuilderTest {
     }
 
     @Test
+    void keepsExactlyBoundedParagraphAsOneChild() {
+        List<EvidenceChild> children = children("a".repeat(480));
+
+        assertThat(children).singleElement().satisfies(child -> {
+            assertThat(codePointLength(child.retrievalText())).isEqualTo(480);
+            assertThat(child.sourceText()).isEqualTo("a".repeat(480));
+        });
+    }
+
+    @Test
+    void subdividesParagraphOneCodePointOverPassageBound() {
+        List<EvidenceChild> children = children("a".repeat(481));
+
+        assertThat(children).hasSize(2);
+        assertRetrievalTextWithinBound(children);
+        assertThat(children.stream().map(EvidenceChild::sourceText).reduce("", String::concat))
+                .isEqualTo("a".repeat(481));
+    }
+
+    @Test
+    void subdividesParagraphAtFormerChildMaximum() {
+        List<EvidenceChild> children = children("a".repeat(800));
+
+        assertThat(children).hasSize(2);
+        assertRetrievalTextWithinBound(children);
+        assertThat(children.stream().map(EvidenceChild::sourceText).reduce("", String::concat))
+                .isEqualTo("a".repeat(800));
+    }
+
+    @Test
+    void prefersSentenceBoundaryBeforeLineOrCodePointFallback() {
+        String firstSentence = "a".repeat(300) + ".";
+        String secondSentence = "b".repeat(220) + ".";
+
+        List<EvidenceChild> children = children(firstSentence + " " + secondSentence);
+
+        assertThat(children).extracting(EvidenceChild::sourceText)
+                .containsExactly(firstSentence, secondSentence);
+        assertRetrievalTextWithinBound(children);
+    }
+
+    @Test
+    void prefersAnEarlierSentenceBoundaryOverALaterLineBoundary() {
+        String firstSentence = "a".repeat(100) + ".";
+        String source = firstSentence + " " + "b".repeat(200) + "\n" + "c".repeat(300);
+
+        List<EvidenceChild> children = children(source);
+
+        assertThat(children.get(0).sourceText()).isEqualTo(firstSentence);
+        assertRetrievalTextWithinBound(children);
+    }
+
+    @Test
+    void usesLineBoundaryWhenNoSentenceBoundaryExists() {
+        String firstLine = "a".repeat(300);
+        String secondLine = "b".repeat(220);
+
+        List<EvidenceChild> children = children(firstLine + "\n" + secondLine);
+
+        assertThat(children).extracting(EvidenceChild::sourceText)
+                .containsExactly(firstLine, secondLine);
+        assertRetrievalTextWithinBound(children);
+    }
+
+    @Test
+    void usesCodePointSafeFallbackForAtomicSupplementaryText() {
+        String source = "😀".repeat(481);
+
+        List<EvidenceChild> children = children(source);
+
+        assertThat(children).hasSize(2);
+        assertThat(codePointLength(children.get(0).sourceText())).isEqualTo(480);
+        assertThat(codePointLength(children.get(1).sourceText())).isEqualTo(1);
+        assertThat(children.stream().map(EvidenceChild::sourceText).reduce("", String::concat))
+                .isEqualTo(source);
+        assertRetrievalTextWithinBound(children);
+    }
+
+    @Test
+    void includesTableHeaderInTheAvailableRetrievalBudget() {
+        List<EvidenceChild> children = children(
+                "Metrics\nName | Period | Result\n| --- | --- | --- |\n"
+                        + "Alpha | " + "x".repeat(500) + " | completed");
+
+        assertThat(children).hasSizeGreaterThan(2);
+        assertThat(children.subList(1, children.size())).allSatisfy(child -> {
+            assertThat(child.contextSourceBlockIds()).hasSize(1);
+            assertThat(child.retrievalText()).startsWith("Name | Period | Result\n");
+        });
+        assertRetrievalTextWithinBound(children);
+    }
+
+    @Test
+    void makesLfAndCrLfProduceTheSameSemanticSplitWithoutChangingRawProvenance() {
+        String lf = "a".repeat(300) + ".\n" + "b".repeat(220) + ".";
+        String crlf = lf.replace("\n", "\r\n");
+
+        List<EvidenceChild> lfChildren = children(lf);
+        List<EvidenceChild> crlfChildren = children(crlf);
+
+        assertThat(crlfChildren).extracting(EvidenceChild::retrievalText)
+                .containsExactlyElementsOf(lfChildren.stream().map(EvidenceChild::retrievalText).toList());
+        assertThat(crlfChildren).extracting(child -> child.provenance().lineStart())
+                .containsExactlyElementsOf(lfChildren.stream()
+                        .map(child -> child.provenance().lineStart()).toList());
+        assertThat(crlfChildren).extracting(child -> child.provenance().lineEnd())
+                .containsExactlyElementsOf(lfChildren.stream()
+                        .map(child -> child.provenance().lineEnd()).toList());
+        assertExactRawProvenance(lf, lfChildren);
+        assertExactRawProvenance(crlf, crlfChildren);
+        assertRetrievalTextWithinBound(crlfChildren);
+    }
+
+    @Test
     void splitsOnlyLongBlocksWithoutOverlap() {
         String text = "Long section\n"
                 + "First sentence is deliberately extended with neutral words. ".repeat(12)
@@ -61,6 +175,28 @@ class StructuralEvidenceChildBuilderTest {
             assertThat(children.get(index).provenance().codePointStart())
                     .isGreaterThanOrEqualTo(children.get(index - 1).provenance().codePointEnd());
         }
+    }
+
+    private void assertRetrievalTextWithinBound(List<EvidenceChild> children) {
+        assertThat(children).allSatisfy(child -> assertThat(codePointLength(child.retrievalText()))
+                .isLessThanOrEqualTo(StructuralEvidenceChildBuilder.DEFAULT_MAX_CHILD_CODE_POINTS));
+    }
+
+    private void assertExactRawProvenance(String source, List<EvidenceChild> children) {
+        assertThat(children).allSatisfy(child -> assertThat(substringByCodePoints(
+                source,
+                child.provenance().codePointStart(),
+                child.provenance().codePointEnd())).isEqualTo(child.sourceText()));
+    }
+
+    private int codePointLength(String value) {
+        return value.codePointCount(0, value.length());
+    }
+
+    private String substringByCodePoints(String value, int start, int end) {
+        int charStart = value.offsetByCodePoints(0, start);
+        int charEnd = value.offsetByCodePoints(0, end);
+        return value.substring(charStart, charEnd);
     }
 
     private List<EvidenceChild> children(String text) {

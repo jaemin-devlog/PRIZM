@@ -48,24 +48,59 @@ class StructuralRetrievalPassageBuilderTest {
     }
 
     @Test
-    void rejectsAtomicChildBetweenPassageAndChildMaximums() {
+    void retainsFailClosedGuardForAnOversizedChildFromAStalePolicy() {
+        StructuralEvidenceChildBuilder staleChildBuilder = new StructuralEvidenceChildBuilder(800);
         List<EvidenceChild> children = children(
+                staleChildBuilder,
                 "Oversized evidence\n" + "Long evidence sentence. ".repeat(25));
 
         assertThat(children).singleElement().satisfies(child -> assertThat(
                 child.retrievalText().codePointCount(0, child.retrievalText().length()))
-                .isBetween(481, StructuralEvidenceChildBuilder.DEFAULT_MAX_CHILD_CODE_POINTS));
+                .isBetween(481, 800));
         assertThatThrownBy(() -> passageBuilder.build(children))
                 .isInstanceOf(SearchV3StructureException.class)
                 .satisfies(exception -> assertThat(((SearchV3StructureException) exception).reason())
                         .isEqualTo(SearchV3StructureException.Reason.ATOMIC_CHILD_EXCEEDS_PASSAGE_BOUND));
     }
 
+    @Test
+    void acceptsDefaultBuilderSubdivisionBeforePassageConstruction() {
+        List<EvidenceChild> children = children(
+                "Oversized evidence\n" + "Long evidence sentence. ".repeat(25));
+
+        assertThat(children).hasSizeGreaterThan(1);
+        assertThat(children).allSatisfy(child -> assertThat(
+                child.retrievalText().codePointCount(0, child.retrievalText().length()))
+                .isLessThanOrEqualTo(
+                        StructuralRetrievalPassageBuilder.DEFAULT_ABSOLUTE_MAX_CODE_POINTS));
+        assertThat(passageBuilder.build(children)).isNotEmpty();
+    }
+
+    @Test
+    void usesCanonicalChildRetrievalTextWhenContextIsEmpty() {
+        List<EvidenceChild> children = children(
+                "Long evidence\r\n" + "a".repeat(465));
+
+        RetrievalPassage passage = passageBuilder.build(children).get(0);
+
+        assertThat(passage.retrievalText()).doesNotContain("\r");
+        assertThat(passage.retrievalText()).isEqualTo(children.get(0).retrievalText());
+        assertThat(passage.retrievalText().codePointCount(0, passage.retrievalText().length()))
+                .isLessThanOrEqualTo(
+                        StructuralRetrievalPassageBuilder.DEFAULT_ABSOLUTE_MAX_CODE_POINTS);
+    }
+
     private List<EvidenceChild> children(String text) {
+        return children(childBuilder, text);
+    }
+
+    private List<EvidenceChild> children(
+            StructuralEvidenceChildBuilder builder,
+            String text) {
         StructuralSourceUnit unit = ExtractedDocumentSource.from(
                 1, 10, "documents/test.txt", DocumentFileType.TXT,
                 List.of(new PageText(1, text))).sourceUnits().get(0);
-        return childBuilder.build(parser.parse(unit));
+        return builder.build(parser.parse(unit));
     }
 
     private int occurrences(String source, String token) {

@@ -73,6 +73,25 @@ class SearchV3StructureBuilderTest {
     }
 
     @Test
+    void buildsLongPdfParagraphWithoutExceedingPassageBoundAndPreservesCoordinates() {
+        String pageText = "Profile\r\n" + "Long source sentence. ".repeat(30);
+        ExtractedDocumentSource document = ExtractedDocumentSource.from(
+                23, 203, "owners/23/document.pdf", DocumentFileType.PDF,
+                List.of(new PageText(1, pageText)));
+
+        SearchV3Structure structure = builder.build(document);
+
+        assertThat(structure.children()).hasSizeGreaterThan(1).allSatisfy(child -> {
+            assertThat(substringByCodePoints(pageText, child.codePointStart(), child.codePointEnd()))
+                    .isEqualTo(child.sourceText());
+        });
+        assertThat(structure.passages()).allSatisfy(passage -> assertThat(
+                passage.retrievalText().codePointCount(0, passage.retrievalText().length()))
+                .isLessThanOrEqualTo(
+                        StructuralRetrievalPassageBuilder.DEFAULT_ABSOLUTE_MAX_CODE_POINTS));
+    }
+
+    @Test
     void failsClosedWhenNoSearchableChildExists() {
         ExtractedDocumentSource document = ExtractedDocumentSource.from(
                 22, 202, "owners/22/document.txt", DocumentFileType.TXT,

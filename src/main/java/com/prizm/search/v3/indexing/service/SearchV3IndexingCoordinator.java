@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-/** Search V3 job claim과 shadow processor, fenced failure transition을 잇는 수동 Worker 진입점이다. */
+/** Search V3 일반 claim·recovery claim과 shadow processor, fenced failure transition을 잇는다. */
 @Service
 public class SearchV3IndexingCoordinator {
 
@@ -24,14 +24,28 @@ public class SearchV3IndexingCoordinator {
         this.processor = processor;
     }
 
-    /** 대기 중인 Search V3 shadow job을 최대 한 건 처리한다. 자동 scheduler는 PRZ-040 범위가 아니다. */
+    /** 대기 중인 Search V3 shadow job을 최대 한 건 처리한다. */
     public boolean processNext() {
         Optional<SearchV3IndexingJobClaim> claimed = jobService.claimNext();
         if (claimed.isEmpty()) {
             return false;
         }
 
-        SearchV3IndexingJobClaim claim = claimed.orElseThrow();
+        processClaim(claimed.orElseThrow());
+        return true;
+    }
+
+    /** 만료 job을 exact recovery token으로 reclaim하고 새 claim을 즉시 처리한다. */
+    public boolean recoverNext() {
+        var recoveryLock = jobService.acquireNextRecoveryLock();
+        if (recoveryLock.isEmpty()) {
+            return false;
+        }
+        processClaim(jobService.reclaim(recoveryLock.orElseThrow()));
+        return true;
+    }
+
+    void processClaim(SearchV3IndexingJobClaim claim) {
         try {
             processor.process(claim);
         }
@@ -50,7 +64,6 @@ public class SearchV3IndexingCoordinator {
                             exception.getMessage() == null ? "Search V3 indexing failed." : exception.getMessage(),
                             exception));
         }
-        return true;
     }
 
     private void recordFailure(

@@ -79,15 +79,19 @@
   recovery lock과 exact-token reclaim을 수행함
 - 실제 PostgreSQL inventory의 key·순서·membership·hash·provenance와 vector 계약을 검증하고,
   `BUILDING → READY`와 같은-version generation 활성화를 full claim fencing 아래 원자적으로 수행함
-- Search V3 수동 Worker 진입점은 TXT와 text-layer PDF 원문을 구조 분석해 B3 `RetrievalPassage`와
+- Search V3 Worker는 TXT와 text-layer PDF 원문을 구조 분석해 B3 `RetrievalPassage`와
   `EvidenceChild`를 만들고, 동일 BGE-M3로 두 vector 계열을 미리 계산해 generation 단위로 원자 저장함
 - Worker는 원문 읽기부터 activation 전까지 lease를 갱신하며, reclaim된 이전 claim의 저장·READY·activation을
   차단함. inactive version은 `READY`와 activation 재시도 상태에 두고 같은 Production active version만 활성화함
 - Production Search V2 source·query·API·frontend·MCP는 shadow schema를 직접 사용하지 않음. 다만 V19 trigger는
   V2가 active version을 바꾸거나 해제할 때 stale V3 generation을 `SUPERSEDED`로 바꾸고 shadow pointer만 비움
-- Worker는 아직 자동 scheduler·dispatch에 연결하지 않았고 Search V3 query/API/cutover도 구현하지 않음
-- PostgreSQL 16+pgvector Testcontainers에서 V1~V20 fresh migration과 PRZ-037~040 저장·job·activation·Worker
-  focused suite `52/52`를 실행함. 실제 Ollama와 OpenSQL 실행은 `NOT_RUN`이며 상세 범위는 PRZ-040 evidence를 따름
+- opt-in Search V3 scheduler는 현재 active version을 원자 dispatch하고, 일반 claim과 만료 lease exact-token
+  recovery를 같은 Worker 경로로 처리함. 기본 설정은 꺼져 있어 Search V2 scheduler와 나란히 존재함
+- 비공개 shadow query service는 V3 pointer가 가리키는 `ACTIVE` generation과 `COMPLETED` job만 owner 범위에서 읽고,
+  Passage exact cosine Top20 뒤 Top5 Passage 내부 저장 Child vector로 `CHILD_DENSE_V1`을 적용해 원문 근거 최대 5건을 반환함
+- PostgreSQL 16+pgvector Testcontainers와 실제 로컬 Ollama `bge-m3`로 TXT 색인·activation·query smoke를 통과함.
+  전체 backend `check`는 unit `657`건과 integration `164`건에서 failure/error `0`이며 OpenSQL은 `NOT_RUN`
+- Search V3 API/cutover는 구현하지 않았고 Production Search V2는 계속 기본 검색임
 - Search V3 job fencing은 PostgreSQL 시나리오 `6/6`에서 concurrent duplicate claim 0, recovery token과
   stale claim·cross-lineage 차단을 확인했으며 자세한 범위는 PRZ-038 evidence를 따름
 - Search V3 inventory·activation은 PostgreSQL 시나리오 `11/11`에서 exact inventory, READY, 첫 activation,

@@ -355,8 +355,17 @@ embedding 전후에 generation 계약과 다시 맞춰 tag 변경으로 생길 �
 저장은 current `job → generation` 잠금 아래 candidate generation의 기존 Passage를 지우고 네 artifact 계열을
 한 transaction에서 전체 치환합니다. 실패하면 delete와 일부 insert가 함께 rollback됩니다. READY activation이
 현재 Production active version과 아직 맞지 않으면 generation은 READY로 유지하고 job만 `RETRY_WAIT`으로
-연기합니다. 다음 claim은 parsing과 embedding을 반복하지 않고 activation만 재시도합니다. 현재 진입점은
-수동 `processNext()`이며 자동 dispatch/scheduler, Search V3 query/API/cutover는 아직 구현하지 않았습니다.
+연기합니다. 다음 claim은 parsing과 embedding을 반복하지 않고 activation만 재시도합니다.
+
+PRZ-041의 opt-in scheduler는 current V3 계약이 없는 Production active version을 `FOR UPDATE SKIP LOCKED`로
+한 건씩 dispatch합니다. 일반 claim과 due retry는 기존 processor로 보내고, 만료 lease는 exact recovery token으로
+reclaim한 새 claim을 즉시 같은 processor에 전달합니다. 기본값은 꺼져 있으며 Search V2 scheduler를 교체하지 않습니다.
+
+비공개 shadow query runtime은 owner의 `active_search_v3_generation_id`가 가리키고 current active version과 같은
+`ACTIVE + COMPLETED` inventory만 조회합니다. 동일 BGE-M3 query vector로 Passage exact cosine Top20을 구한 뒤,
+Top5 Passage 각각에서 저장된 Child vector를 다시 비교합니다. Passage 순서는 바꾸지 않고 원문·page·line·code-point
+provenance를 보존한 `EvidenceChild`를 최대 5건 반환합니다. deterministic typed validation은 원문의 숫자·날짜 등
+조건만 검증하며 경력의 진위나 보유 여부를 판정하지 않습니다. Search V3 API와 Search V2 cutover는 아직 없습니다.
 
 근거:
 
@@ -382,8 +391,12 @@ embedding 전후에 generation 계약과 다시 맞춰 tag 변경으로 생길 �
 - [Search V3 shadow indexing processor](../src/main/java/com/prizm/search/v3/indexing/service/SearchV3ShadowIndexingProcessor.java)
 - [Search V3 artifact storage service](../src/main/java/com/prizm/search/v3/indexing/service/SearchV3ArtifactStorageService.java)
 - [Search V3 structure builder](../src/main/java/com/prizm/search/v3/indexing/structure/SearchV3StructureBuilder.java)
+- [Search V3 dispatch repository](../src/main/java/com/prizm/search/v3/indexing/repository/SearchV3JobDispatchRepository.java)
+- [Search V3 shadow query repository](../src/main/java/com/prizm/search/v3/query/repository/SearchV3ShadowQueryRepository.java)
+- [Search V3 shadow query service](../src/main/java/com/prizm/search/v3/query/service/SearchV3ShadowQueryService.java)
 - [Search V3 inventory·activation PostgreSQL test](../src/integrationTest/java/com/prizm/infrastructure/SearchV3InventoryActivationRuntimeTest.java)
 - [Search V3 shadow Worker PostgreSQL test](../src/integrationTest/java/com/prizm/infrastructure/SearchV3ShadowIndexingWorkerRuntimeTest.java)
+- [Search V3 실제 BGE-M3 smoke](../src/integrationTest/java/com/prizm/infrastructure/SearchV3RealBgeM3RuntimeIntegrationTest.java)
 
 ## 8. 상태 전이
 

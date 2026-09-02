@@ -13,8 +13,10 @@ import com.prizm.search.v3.indexing.exception.SearchV3IndexingWorkerException;
 import com.prizm.search.v3.indexing.exception.StaleSearchV3IndexingJobClaimException;
 import com.prizm.search.v3.indexing.model.SearchV3IndexingFailureStage;
 import com.prizm.search.v3.indexing.model.SearchV3IndexingJobClaim;
+import com.prizm.search.v3.indexing.model.SearchV3RecoveryLock;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -133,5 +135,33 @@ class SearchV3IndexingCoordinatorTest {
                 false,
                 SearchV3IndexingFailureStage.PASSAGE_GENERATION,
                 "Invalid document structure.");
+    }
+
+    @Test
+    void returnsFalseWhenNoExpiredJobCanBeRecoveryLocked() {
+        when(jobService.acquireNextRecoveryLock()).thenReturn(Optional.empty());
+
+        assertThat(coordinator.recoverNext()).isFalse();
+
+        verify(processor, never()).process(any());
+    }
+
+    @Test
+    void reclaimsAndImmediatelyProcessesTheNewClaim() {
+        SearchV3RecoveryLock lock = new SearchV3RecoveryLock(
+                claim,
+                UUID.fromString("4ae0a508-9f54-4ea5-a953-7da88a5af760"),
+                Instant.parse("2026-09-02T00:02:00Z"));
+        SearchV3IndexingJobClaim reclaimed = new SearchV3IndexingJobClaim(
+                claim.jobId(), claim.generationId(), claim.ownerUserId(), claim.documentId(),
+                claim.documentVersionId(), claim.claimVersion() + 1, claim.attemptCount() + 1,
+                Instant.parse("2026-09-02T00:12:00Z"));
+        when(jobService.acquireNextRecoveryLock()).thenReturn(Optional.of(lock));
+        when(jobService.reclaim(lock)).thenReturn(reclaimed);
+
+        assertThat(coordinator.recoverNext()).isTrue();
+
+        verify(processor).process(reclaimed);
+        verify(processor, never()).process(claim);
     }
 }

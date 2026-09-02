@@ -86,6 +86,11 @@ prizm:
     lease-refresh-chunk-interval: ${PRIZM_INDEXING_LEASE_REFRESH_CHUNK_INTERVAL:10}
     recovery-delay-ms: ${PRIZM_INDEXING_RECOVERY_DELAY_MS:60000}
     worker-enabled: ${PRIZM_INDEXING_WORKER_ENABLED:true}
+  search-v3:
+    worker-enabled: ${PRIZM_SEARCH_V3_WORKER_ENABLED:false}
+    dispatch-delay-ms: ${PRIZM_SEARCH_V3_DISPATCH_DELAY_MS:5000}
+    poll-delay-ms: ${PRIZM_SEARCH_V3_POLL_DELAY_MS:1000}
+    recovery-delay-ms: ${PRIZM_SEARCH_V3_RECOVERY_DELAY_MS:60000}
   cleanup:
     worker-enabled: ${PRIZM_CLEANUP_WORKER_ENABLED:true}
     poll-delay-ms: ${PRIZM_CLEANUP_POLL_DELAY_MS:5000}

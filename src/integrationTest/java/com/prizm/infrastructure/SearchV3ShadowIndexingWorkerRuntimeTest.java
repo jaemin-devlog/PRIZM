@@ -27,6 +27,7 @@ import com.prizm.search.v3.indexing.repository.SearchV3DocumentSourceRepository;
 import com.prizm.search.v3.indexing.repository.SearchV3GenerationContractRepository;
 import com.prizm.search.v3.indexing.repository.SearchV3IndexingJobRepository;
 import com.prizm.search.v3.indexing.repository.SearchV3InventoryActivationRepository;
+import com.prizm.search.v3.indexing.repository.SearchV3JobDispatchRepository;
 import com.prizm.search.v3.indexing.service.SearchV3ArtifactStorageService;
 import com.prizm.search.v3.indexing.service.SearchV3EmbeddingModelContractProvider;
 import com.prizm.search.v3.indexing.service.SearchV3GenerationContractService;
@@ -41,6 +42,10 @@ import com.prizm.search.v3.indexing.service.SearchV3WorkerLeaseHeartbeat;
 import com.prizm.search.v3.indexing.structure.ExtractedDocumentSource;
 import com.prizm.search.v3.indexing.structure.SearchV3Structure;
 import com.prizm.search.v3.indexing.structure.SearchV3StructureBuilder;
+import com.prizm.search.v3.query.repository.SearchV3ShadowQueryRepository;
+import com.prizm.search.v3.query.model.SearchV3TypedEvidenceState;
+import com.prizm.search.v3.query.service.SearchV3ShadowQueryTransaction;
+import com.prizm.search.v3.query.service.SearchV3TypedEvidenceSelector;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -55,6 +60,9 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.sql.DataSource;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -164,6 +172,120 @@ class SearchV3ShadowIndexingWorkerRuntimeTest {
     }
 
     @Test
+    void automaticDispatchIndexesAndQueriesOnlyTheOwnersActiveCompletedGeneration() {
+        LocalFileStorage storage = new LocalFileStorage(storageRoot.toString());
+        Runtime runtime = runtime(storage, deterministicEmbedding());
+        String directEvidence = "장애 대응 절차를 자동화해 복구 시간을 30% 단축했다.";
+        Fixture fixture = createCurrentFixture(
+                storage,
+                DocumentFileType.TXT,
+                "runtime-completion.txt",
+                ("운영 자동화\n" + directEvidence + "\n\n고객 요청을 분류해 처리 우선순위를 정했다.")
+                        .getBytes(StandardCharsets.UTF_8));
+        SearchV3EmbeddingModelContract model =
+                new SearchV3EmbeddingModelContract("bge-m3", MODEL_DIGEST, 1024);
+        SearchV3JobDispatchRepository dispatch = new SearchV3JobDispatchRepository(jdbc);
+
+        var created = dispatch.dispatchNext(model).orElseThrow();
+        assertThat(dispatch.dispatchNext(model)).isEmpty();
+        assertThat(runtime.coordinator().processNext()).isTrue();
+
+        assertThat(created.ownerUserId()).isEqualTo(fixture.ownerUserId());
+        assertThat(status("search_v3_index_generations", created.generationId())).isEqualTo("ACTIVE");
+        assertThat(status("search_v3_indexing_jobs", created.jobId())).isEqualTo("COMPLETED");
+
+        SearchV3ShadowQueryTransaction query = new SearchV3ShadowQueryTransaction(
+                new SearchV3ShadowQueryRepository(jdbc),
+                new SearchV3TypedEvidenceSelector());
+        var result = query.search(
+                fixture.ownerUserId(), directEvidence, deterministicVector(directEvidence), model);
+        var otherOwner = query.search(
+                fixture.ownerUserId() + 1, directEvidence, deterministicVector(directEvidence), model);
+
+        assertThat(result.passageCandidateCount()).isPositive();
+        assertThat(result.state()).isEqualTo(SearchV3TypedEvidenceState.FOUND);
+        assertThat(result.evidence()).isNotEmpty();
+        assertThat(result.evidence().get(0).sourceText()).isEqualTo(directEvidence);
+        assertThat(result.evidence()).allSatisfy(value -> {
+            assertThat(value.generationId()).isEqualTo(created.generationId());
+            assertThat(value.documentId()).isEqualTo(fixture.documentId());
+            assertThat(value.documentVersionId()).isEqualTo(fixture.documentVersionId());
+        });
+        assertThat(otherOwner.passageCandidateCount()).isZero();
+        assertThat(otherOwner.evidence()).isEmpty();
+
+        jdbc.update("UPDATE documents SET active_search_v3_generation_id = NULL WHERE id = ?", fixture.documentId());
+        assertThat(query.search(
+                fixture.ownerUserId(), directEvidence, deterministicVector(directEvidence), model).evidence())
+                .isEmpty();
+    }
+
+    @Test
+    void concurrentDispatchCreatesExactlyOneGenerationAndJobForTheActiveVersion() throws Exception {
+        LocalFileStorage storage = new LocalFileStorage(storageRoot.toString());
+        Fixture fixture = createCurrentFixture(
+                storage,
+                DocumentFileType.TXT,
+                "dispatch-race.txt",
+                "동시 dispatch에서도 하나의 Search V3 job만 생성한다.".getBytes(StandardCharsets.UTF_8));
+        SearchV3EmbeddingModelContract model =
+                new SearchV3EmbeddingModelContract("bge-m3", MODEL_DIGEST, 1024);
+        CountDownLatch ready = new CountDownLatch(2);
+        CountDownLatch start = new CountDownLatch(1);
+        var workers = Executors.newFixedThreadPool(2);
+        try {
+            List<Future<Boolean>> outcomes = new ArrayList<>();
+            for (int index = 0; index < 2; index++) {
+                outcomes.add(workers.submit(() -> {
+                    ready.countDown();
+                    start.await();
+                    return new SearchV3JobDispatchRepository(new JdbcTemplate(dataSource))
+                            .dispatchNext(model)
+                            .isPresent();
+                }));
+            }
+            ready.await();
+            start.countDown();
+
+            assertThat(outcomes).extracting(Future::get).containsExactlyInAnyOrder(true, false);
+        }
+        finally {
+            workers.shutdownNow();
+        }
+        assertThat(jdbc.queryForObject(
+                "SELECT count(*) FROM search_v3_index_generations WHERE document_version_id = ?",
+                Long.class,
+                fixture.documentVersionId())).isEqualTo(1L);
+        assertThat(jdbc.queryForObject(
+                "SELECT count(*) FROM search_v3_indexing_jobs WHERE document_version_id = ?",
+                Long.class,
+                fixture.documentVersionId())).isEqualTo(1L);
+    }
+
+    @Test
+    void expiredClaimIsRecoveredAndProcessedWhileTheOldWorkerStaysFenced() {
+        LocalFileStorage storage = new LocalFileStorage(storageRoot.toString());
+        Runtime runtime = runtime(storage, deterministicEmbedding());
+        Fixture fixture = createCurrentFixture(
+                storage,
+                DocumentFileType.TXT,
+                "automatic-recovery.txt",
+                "만료된 Worker를 회수해 Search V3 shadow 색인을 완료한다.".getBytes(StandardCharsets.UTF_8));
+        Job job = insertPendingGeneration(fixture);
+        SearchV3IndexingJobClaim stale = runtime.jobService().claimNext().orElseThrow();
+        jdbc.update(
+                "UPDATE search_v3_indexing_jobs SET lease_expires_at = now() - interval '1 second' WHERE id = ?",
+                job.jobId());
+
+        assertThat(runtime.coordinator().recoverNext()).isTrue();
+
+        assertThat(status("search_v3_index_generations", job.generationId())).isEqualTo("ACTIVE");
+        assertThat(status("search_v3_indexing_jobs", job.jobId())).isEqualTo("COMPLETED");
+        assertThatThrownBy(() -> runtime.jobService().renewLease(stale))
+                .isInstanceOf(StaleSearchV3IndexingJobClaimException.class);
+    }
+
+    @Test
     void indexesTextLayerPdfWithoutCrossPageGroupingAndDefersNonCurrentVersion() {
         LocalFileStorage storage = new LocalFileStorage(storageRoot.toString());
         Runtime runtime = runtime(storage, deterministicEmbedding());
@@ -228,6 +350,18 @@ class SearchV3ShadowIndexingWorkerRuntimeTest {
         assertThat(status("search_v3_index_generations", first.generationId())).isEqualTo("SUPERSEDED");
         assertThat(status("search_v3_index_generations", second.generationId())).isEqualTo("ACTIVE");
         assertThat(activeSearchV3Generation(fixture.documentId())).isEqualTo(second.generationId());
+        String indexedSource = jdbc.queryForObject(
+                "SELECT source_text FROM search_v3_evidence_children WHERE generation_id = ? ORDER BY child_order LIMIT 1",
+                String.class,
+                second.generationId());
+        SearchV3ShadowQueryTransaction query = new SearchV3ShadowQueryTransaction(
+                new SearchV3ShadowQueryRepository(jdbc), new SearchV3TypedEvidenceSelector());
+        assertThat(query.search(
+                        fixture.ownerUserId(), indexedSource, deterministicVector(indexedSource),
+                        new SearchV3EmbeddingModelContract("bge-m3", MODEL_DIGEST, 1024))
+                .evidence())
+                .isNotEmpty()
+                .allSatisfy(value -> assertThat(value.generationId()).isEqualTo(second.generationId()));
 
         Runtime passageFailing = runtime(storage, failingEmbedding(0));
         Job passageFailed = insertPendingGeneration(fixture);

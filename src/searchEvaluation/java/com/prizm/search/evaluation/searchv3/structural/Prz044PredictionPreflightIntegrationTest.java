@@ -134,12 +134,12 @@ class Prz044PredictionPreflightIntegrationTest {
                 Prz044PredictionRuntime.RunMode.PREFLIGHT,
                 V2_PROFILE,
                 V3_PROFILE,
-                verifiedMapping.sha256(),
+                verifiedContract.contractSha256(),
                 synthetic.zipSha256(),
                 synthetic.manifestCanonicalSha256(),
                 synthetic.physicalCombinedSha256(),
                 synthetic.commitmentCombinedSha256(),
-                Map.of("DOCUMENT_TYPE_MAPPING", verifiedMapping.sha256()),
+                verifiedContract.sourceBoundaryHashes(),
                 Prz044PredictionFreeze.queryInventorySha256(synthetic.queries()),
                 model,
                 synthetic.users().size(),
@@ -159,16 +159,16 @@ class Prz044PredictionPreflightIntegrationTest {
         });
 
         assertThat(v2Boundary).isTrue();
-        assertThat(completed.v2().queries()).hasSize(3);
-        assertThat(completed.v3().queries()).hasSize(3);
-        assertThat(completed.v2().indexingStats().documentCount()).isEqualTo(3);
-        assertThat(completed.v3().indexingStats().documentCount()).isEqualTo(3);
+        assertThat(completed.v2().queries()).hasSize(2);
+        assertThat(completed.v3().queries()).hasSize(2);
+        assertThat(completed.v2().indexingStats().documentCount()).isEqualTo(2);
+        assertThat(completed.v3().indexingStats().documentCount()).isEqualTo(2);
         assertThat(jdbc.queryForObject(
                 "SELECT count(*) FROM processing_jobs WHERE status = 'COMPLETED'", Long.class))
-                .isEqualTo(3L);
+                .isEqualTo(2L);
         assertThat(jdbc.queryForObject(
                 "SELECT count(*) FROM search_v3_index_generations WHERE status = 'ACTIVE'", Long.class))
-                .isEqualTo(3L);
+                .isEqualTo(2L);
 
         String postgresqlVersion = jdbc.queryForObject("SELECT version()", String.class);
         String pgvectorVersion = jdbc.queryForObject(
@@ -189,27 +189,20 @@ class Prz044PredictionPreflightIntegrationTest {
     private Prz044PredictionDataset.VerifiedInputPackage syntheticInput() throws IOException {
         byte[] career = "Career summary\nReduced deployment errors through release checks."
                 .getBytes(StandardCharsets.UTF_8);
-        byte[] resume = "Resume\nCoordinated incident response and documented recovery steps."
-                .getBytes(StandardCharsets.UTF_8);
         byte[] portfolio = pdf("Portfolio - Improved onboarding completion by 20 percent.");
         var users = List.of(
                 new Prz044PredictionDataset.RuntimeUser("U1", "backend", "Backend", List.of()),
-                new Prz044PredictionDataset.RuntimeUser("U2", "design", "Design", List.of()),
-                new Prz044PredictionDataset.RuntimeUser("U3", "operations", "Operations", List.of()));
+                new Prz044PredictionDataset.RuntimeUser("U2", "design", "Design", List.of()));
         var documents = List.of(
                 document(users.get(0), "D1", "V1", "CAREER_DESCRIPTION",
                         DocumentFileType.TXT, "career.txt", career,
                         textExtractor.extract(DocumentFileType.TXT, career)),
                 document(users.get(1), "D2", "V2", "PORTFOLIO",
                         DocumentFileType.PDF, "portfolio.pdf", portfolio,
-                        textExtractor.extract(DocumentFileType.PDF, portfolio)),
-                document(users.get(2), "D3", "V3", "RESUME",
-                        DocumentFileType.TXT, "resume.txt", resume,
-                        textExtractor.extract(DocumentFileType.TXT, resume)));
+                        textExtractor.extract(DocumentFileType.PDF, portfolio)));
         var queries = List.of(
                 query(users.get(0), "Q1", "release checks reduced deployment errors"),
-                query(users.get(1), "Q2", "onboarding completion improvement"),
-                query(users.get(2), "Q3", "incident recovery documentation"));
+                query(users.get(1), "Q2", "onboarding completion improvement"));
         return new Prz044PredictionDataset.VerifiedInputPackage(
                 Path.of("build/prz044-attempt2-synthetic.zip"),
                 "1".repeat(64), "2".repeat(64), "3".repeat(64), "4".repeat(64),

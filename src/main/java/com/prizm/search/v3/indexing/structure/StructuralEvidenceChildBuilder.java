@@ -1,5 +1,6 @@
 package com.prizm.search.v3.indexing.structure;
 
+import com.prizm.search.v3.indexing.model.SearchV3IndexingPolicies;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -8,22 +9,23 @@ import java.util.regex.Pattern;
 /** Builds source-grounded EvidenceChild values without global overlap or generated context. */
 public final class StructuralEvidenceChildBuilder {
 
-    public static final int DEFAULT_MAX_CHILD_CODE_POINTS = 800;
+    public static final int DEFAULT_MAX_CHILD_CODE_POINTS =
+            SearchV3IndexingPolicies.RETRIEVAL_PASSAGE_ABSOLUTE_MAX_CODE_POINTS;
     private static final Pattern SENTENCE_BOUNDARY = Pattern.compile("[.!?。！？](?:\\s+|$)");
     private static final Pattern MARKDOWN_TABLE_DIVIDER = Pattern.compile(
             "^\\s*\\|?\\s*:?-{3,}:?\\s*(?:\\|\\s*:?-{3,}:?\\s*)+\\|?\\s*$");
 
-    private final int maxChildCodePoints;
+    private final int maxRetrievalCodePoints;
 
     public StructuralEvidenceChildBuilder() {
         this(DEFAULT_MAX_CHILD_CODE_POINTS);
     }
 
-    StructuralEvidenceChildBuilder(int maxChildCodePoints) {
-        if (maxChildCodePoints < 32) {
-            throw new IllegalArgumentException("maxChildCodePoints must be at least 32");
+    StructuralEvidenceChildBuilder(int maxRetrievalCodePoints) {
+        if (maxRetrievalCodePoints < 32) {
+            throw new IllegalArgumentException("maxRetrievalCodePoints must be at least 32");
         }
-        this.maxChildCodePoints = maxChildCodePoints;
+        this.maxRetrievalCodePoints = maxRetrievalCodePoints;
     }
 
     public List<EvidenceChild> build(List<StructuralBlock> blocks) {
@@ -65,15 +67,21 @@ public final class StructuralEvidenceChildBuilder {
                 tableHeader = null;
             }
 
-            List<Segment> segments = split(block);
+            boolean usesTableHeader = block.type() == StructuralBlockType.TABLE_ROW
+                    && tableHeader != null
+                    && tableHeader != block;
+            String retrievalContext = usesTableHeader
+                    ? SearchV3RetrievalTextPolicy.canonicalizeLineEndings(tableHeader.sourceText())
+                    : "";
+            int sourceBudget = sourceBudget(retrievalContext);
+            List<Segment> segments = split(block, sourceBudget);
             for (int segmentIndex = 0; segmentIndex < segments.size(); segmentIndex++) {
                 Segment segment = segments.get(segmentIndex);
-                boolean usesTableHeader = block.type() == StructuralBlockType.TABLE_ROW
-                        && tableHeader != null
-                        && tableHeader != block;
                 String retrievalText = usesTableHeader
-                        ? tableHeader.sourceText() + "\n" + segment.sourceText()
-                        : segment.sourceText();
+                        ? retrievalContext + "\n"
+                                + SearchV3RetrievalTextPolicy.canonicalizeLineEndings(segment.sourceText())
+                        : SearchV3RetrievalTextPolicy.canonicalizeLineEndings(segment.sourceText());
+                requireRetrievalTextWithinBound(block, retrievalText);
                 List<String> contextBlockIds = usesTableHeader
                         ? List.of(tableHeader.blockId())
                         : List.of();
@@ -92,9 +100,24 @@ public final class StructuralEvidenceChildBuilder {
         return List.copyOf(children);
     }
 
-    private List<Segment> split(StructuralBlock block) {
+    private int sourceBudget(String retrievalContext) {
+        if (retrievalContext.isEmpty()) {
+            return maxRetrievalCodePoints;
+        }
+        int budget = maxRetrievalCodePoints
+                - SearchV3RetrievalTextPolicy.codePointLength(retrievalContext)
+                - 1;
+        if (budget < 1) {
+            throw new SearchV3StructureException(
+                    SearchV3StructureException.Reason.ATOMIC_CHILD_EXCEEDS_PASSAGE_BOUND,
+                    "retrieval context leaves no EvidenceChild source budget");
+        }
+        return budget;
+    }
+
+    private List<Segment> split(StructuralBlock block, int sourceBudget) {
         String source = block.sourceText();
-        if (source.codePointCount(0, source.length()) <= maxChildCodePoints) {
+        if (canonicalCodePointLength(source, 0, source.length()) <= sourceBudget) {
             return List.of(new Segment(0, source.length(), source));
         }
 
@@ -105,11 +128,11 @@ public final class StructuralEvidenceChildBuilder {
             if (start >= source.length()) {
                 break;
             }
-            int remainingCodePoints = source.codePointCount(start, source.length());
-            int hardEnd = remainingCodePoints <= maxChildCodePoints
+            int remainingCodePoints = canonicalCodePointLength(source, start, source.length());
+            int hardEnd = remainingCodePoints <= sourceBudget
                     ? source.length()
-                    : source.offsetByCodePoints(start, maxChildCodePoints);
-            int end = remainingCodePoints <= maxChildCodePoints
+                    : charIndexAfterCanonicalCodePoints(source, start, sourceBudget);
+            int end = remainingCodePoints <= sourceBudget
                     ? source.length()
                     : preferredBoundary(source, start, hardEnd);
             end = trimTrailingWhitespace(source, start, end);
@@ -123,21 +146,70 @@ public final class StructuralEvidenceChildBuilder {
     }
 
     private int preferredBoundary(String source, int start, int hardEnd) {
-        int minimum = source.offsetByCodePoints(start, Math.max(1, maxChildCodePoints / 2));
-        int boundary = -1;
+        int sentenceBoundary = -1;
         Matcher matcher = SENTENCE_BOUNDARY.matcher(source);
         matcher.region(start, hardEnd);
         while (matcher.find()) {
             int candidate = matcher.start() + 1;
-            if (candidate >= minimum) {
-                boundary = candidate;
+            if (candidate > start) {
+                sentenceBoundary = candidate;
             }
         }
-        int newline = source.lastIndexOf('\n', hardEnd - 1);
-        if (newline >= minimum) {
-            boundary = Math.max(boundary, newline);
+        if (sentenceBoundary > start) {
+            return sentenceBoundary;
         }
-        return boundary > start ? boundary : hardEnd;
+        int lineBoundary = lastLineBoundary(source, start + 1, hardEnd);
+        return lineBoundary > start ? lineBoundary : hardEnd;
+    }
+
+    private int lastLineBoundary(String source, int minimum, int hardEnd) {
+        for (int index = hardEnd - 1; index >= minimum; index--) {
+            char value = source.charAt(index);
+            if (value == '\n' || value == '\r') {
+                return index;
+            }
+        }
+        return -1;
+    }
+
+    private int canonicalCodePointLength(String value, int start, int end) {
+        int count = 0;
+        int index = start;
+        while (index < end) {
+            char current = value.charAt(index);
+            if (current == '\r' && index + 1 < end && value.charAt(index + 1) == '\n') {
+                index += 2;
+            }
+            else {
+                index += Character.charCount(value.codePointAt(index));
+            }
+            count++;
+        }
+        return count;
+    }
+
+    private int charIndexAfterCanonicalCodePoints(String value, int start, int count) {
+        int index = start;
+        int remaining = count;
+        while (index < value.length() && remaining > 0) {
+            char current = value.charAt(index);
+            if (current == '\r' && index + 1 < value.length() && value.charAt(index + 1) == '\n') {
+                index += 2;
+            }
+            else {
+                index += Character.charCount(value.codePointAt(index));
+            }
+            remaining--;
+        }
+        return index;
+    }
+
+    private void requireRetrievalTextWithinBound(StructuralBlock block, String retrievalText) {
+        if (SearchV3RetrievalTextPolicy.codePointLength(retrievalText) > maxRetrievalCodePoints) {
+            throw new SearchV3StructureException(
+                    SearchV3StructureException.Reason.ATOMIC_CHILD_EXCEEDS_PASSAGE_BOUND,
+                    "EvidenceChild retrieval text exceeds the passage bound: " + block.blockId());
+        }
     }
 
     private int skipWhitespace(String source, int index) {

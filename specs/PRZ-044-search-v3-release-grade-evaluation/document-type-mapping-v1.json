@@ -1,0 +1,30 @@
+{
+  "artifactType": "PRZ044_DOCUMENT_TYPE_MAPPING",
+  "version": "DOCUMENT_TYPE_MAPPING_V1",
+  "datasetTypes": [
+    "CAREER_DESCRIPTION",
+    "PORTFOLIO",
+    "RESUME"
+  ],
+  "productionTypes": [
+    "RESUME",
+    "COVER_LETTER",
+    "PORTFOLIO",
+    "PROJECT_REPORT",
+    "PRESENTATION",
+    "CERTIFICATE",
+    "COURSE_COMPLETION",
+    "SCHOOL_ASSIGNMENT",
+    "CAREER_REVIEW",
+    "JOB_POSTING",
+    "INTERVIEW_FEEDBACK",
+    "OTHER"
+  ],
+  "mappings": [
+    { "source": "CAREER_DESCRIPTION", "target": "RESUME" },
+    { "source": "PORTFOLIO", "target": "PORTFOLIO" },
+    { "source": "RESUME", "target": "RESUME" }
+  ],
+  "unknownPolicy": "FAIL_CLOSED",
+  "fallbackAllowed": false
+}

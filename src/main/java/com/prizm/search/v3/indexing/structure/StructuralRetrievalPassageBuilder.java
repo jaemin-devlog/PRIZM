@@ -1,5 +1,6 @@
 package com.prizm.search.v3.indexing.structure;
 
+import com.prizm.search.v3.indexing.model.SearchV3IndexingPolicies;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -11,9 +12,12 @@ import java.util.regex.Pattern;
 /** Groups adjacent atomic children for B3 retrieval without query or label input. */
 public final class StructuralRetrievalPassageBuilder {
 
-    public static final int DEFAULT_MIN_TARGET_CODE_POINTS = 120;
-    public static final int DEFAULT_TARGET_MAX_CODE_POINTS = 320;
-    public static final int DEFAULT_ABSOLUTE_MAX_CODE_POINTS = 480;
+    public static final int DEFAULT_MIN_TARGET_CODE_POINTS =
+            SearchV3IndexingPolicies.RETRIEVAL_PASSAGE_MIN_TARGET_CODE_POINTS;
+    public static final int DEFAULT_TARGET_MAX_CODE_POINTS =
+            SearchV3IndexingPolicies.RETRIEVAL_PASSAGE_TARGET_MAX_CODE_POINTS;
+    public static final int DEFAULT_ABSOLUTE_MAX_CODE_POINTS =
+            SearchV3IndexingPolicies.RETRIEVAL_PASSAGE_ABSOLUTE_MAX_CODE_POINTS;
     private static final Pattern SOURCE_BLOCK_ORDINAL = Pattern.compile(".*-SB-(\\d+)$");
 
     private final int minimumTargetCodePoints;
@@ -160,9 +164,13 @@ public final class StructuralRetrievalPassageBuilder {
         Set<String> representedSourceBlocks = new LinkedHashSet<>();
         Set<String> representedContextBlocks = new LinkedHashSet<>();
         for (EvidenceChild child : children) {
-            boolean contextAlreadyRepresented = representedSourceBlocks.containsAll(child.contextSourceBlockIds())
-                    || representedContextBlocks.containsAll(child.contextSourceBlockIds());
-            parts.add(contextAlreadyRepresented ? child.sourceText() : child.retrievalText());
+            boolean hasContext = !child.contextSourceBlockIds().isEmpty();
+            boolean contextAlreadyRepresented = hasContext
+                    && (representedSourceBlocks.containsAll(child.contextSourceBlockIds())
+                            || representedContextBlocks.containsAll(child.contextSourceBlockIds()));
+            parts.add(contextAlreadyRepresented
+                    ? SearchV3RetrievalTextPolicy.canonicalizeLineEndings(child.sourceText())
+                    : child.retrievalText());
             representedSourceBlocks.addAll(child.sourceBlockIds());
             representedContextBlocks.addAll(child.contextSourceBlockIds());
         }
@@ -216,6 +224,6 @@ public final class StructuralRetrievalPassageBuilder {
     }
 
     private int codePointLength(String value) {
-        return value.codePointCount(0, value.length());
+        return SearchV3RetrievalTextPolicy.codePointLength(value);
     }
 }

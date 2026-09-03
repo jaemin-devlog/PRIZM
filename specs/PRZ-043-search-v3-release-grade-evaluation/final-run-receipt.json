@@ -1,0 +1,31 @@
+{
+  "artifactType": "PRZ043_FINAL_RUN_RECEIPT",
+  "schemaVersion": 1,
+  "datasetId": "prizm-release-eval-v1.0.2",
+  "datasetZipSha256": "b513fbfced174b8ced15d122a80d7e12c0315376d1f9770a3f2ac29ade07cdee",
+  "datasetCombinedSha256": "78b8612eab01ec09be4e30f665366b45366b0f12f1d9d516ab247bf6a33617a8",
+  "goldRawSha256": "0707b2effa3e0c4573c31fbe0252f483fa2d18f89259bcaf7f5235c3b03ce715",
+  "evaluationStatus": "EVALUATION_INVALID",
+  "reasonCode": "GOLD_MEANING_CONTENT_EXPOSED_BEFORE_PREDICTION_FREEZE",
+  "recordedAt": "2026-09-03T01:00:00+09:00",
+  "officialRunsAllowed": 1,
+  "officialAttemptsClaimed": 0,
+  "officialRunDirectoryExists": false,
+  "v2PredictionStatus": "NOT_RUN",
+  "v3PredictionStatus": "NOT_RUN",
+  "v2PredictionSha256": null,
+  "v3PredictionSha256": null,
+  "goldAccess": {
+    "stage": "IMPLEMENT_PRE_PREDICTION",
+    "jsonParserInvoked": false,
+    "meaningContentExposed": true,
+    "exposureBoundary": "manual source-audit search whose Gold exclude glob did not match Windows path separators",
+    "goldJoinExecuted": false
+  },
+  "datasetMutationCount": 0,
+  "productionSearchSourceMutationCount": 0,
+  "searchExecuted": false,
+  "metricsComputed": false,
+  "sameDatasetOfficialRetryAllowed": false,
+  "verdict": "EVALUATION_INVALID"
+}

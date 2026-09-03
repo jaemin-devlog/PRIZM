@@ -119,6 +119,137 @@ tasks.register('searchEvaluation', Test) {
     }
 }
 
+tasks.register('prz042RuntimeSmoke', Test) {
+    description = 'Runs the non-sealed PRZ-042 PostgreSQL and real BGE-M3 runtime smoke.'
+    group = 'verification'
+    testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
+    classpath = sourceSets.searchEvaluation.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz042RuntimeComparisonIntegrationTest'
+    }
+    outputs.upToDateWhen { false }
+    maxParallelForks = 1
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+tasks.register('prz042FinalEvaluation', Test) {
+    description = 'Runs the one-shot PRZ-042 SEALED final protocol. Do not rerun an official attempt.'
+    group = 'verification'
+    testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
+    classpath = sourceSets.searchEvaluation.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz042FinalEvaluationTest'
+    }
+    outputs.upToDateWhen { false }
+    maxParallelForks = 1
+    failFast = true
+    systemProperty 'prizm.prz042.official', 'true'
+    systemProperty 'prizm.prz042.contract',
+            providers.gradleProperty('prz042Contract')
+                    .getOrElse('specs/PRZ-042-search-v3-final-evaluation/execution-contract.json')
+    systemProperty 'prizm.prz042.run-dir',
+            providers.gradleProperty('prz042RunDir')
+                    .getOrElse('local/search-v3-evaluation/prz042/final/attempt-1')
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+tasks.register('prz044Focused', Test) {
+    description = 'Runs Gold-free PRZ-044 input, artifact, and one-shot freeze tests.'
+    group = 'verification'
+    testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
+    classpath = sourceSets.searchEvaluation.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz044PredictionDatasetTest'
+        includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz044PredictionArtifactTest'
+        includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz044PredictionFreezeTest'
+        includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz044PredictionRuntimeTest'
+        includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz044DocumentTypeMappingTest'
+    }
+    outputs.upToDateWhen { false }
+    maxParallelForks = 1
+    failFast = true
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+tasks.register('prz044Preflight', Test) {
+    description = 'Runs the synthetic Gold-free PRZ-044 PostgreSQL and real BGE-M3 preflight.'
+    group = 'verification'
+    testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
+    classpath = sourceSets.searchEvaluation.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz044PredictionPreflightIntegrationTest'
+    }
+    outputs.upToDateWhen { false }
+    maxParallelForks = 1
+    failFast = true
+    systemProperty 'prizm.prz044.preflight', 'true'
+    systemProperty 'prizm.prz044.project-root', layout.projectDirectory.asFile.absolutePath
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+tasks.register('prz044Attempt3Preflight', Test) {
+    description = 'Runs the Gold-free PRZ-044 attempt-3 mapping and runtime preflight.'
+    group = 'verification'
+    testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
+    classpath = sourceSets.searchEvaluation.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz044PredictionPreflightIntegrationTest'
+    }
+    outputs.upToDateWhen { false }
+    maxParallelForks = 1
+    failFast = true
+    systemProperty 'prizm.prz044.attempt3-preflight', 'true'
+    systemProperty 'prizm.prz044.input-zip', providers.gradleProperty('prz044InputZip').getOrElse('')
+    doFirst {
+        if (!providers.gradleProperty('prz044InputZip').isPresent()
+                || providers.gradleProperty('prz044InputZip').get().trim().isEmpty()) {
+            throw new GradleException('PRZ-044 attempt-3 preflight requires -Pprz044InputZip=<path>.')
+        }
+    }
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+tasks.register('prz044Attempt3OfficialPredictions', Test) {
+    description = 'Runs the one-shot Gold-free PRZ-044 attempt-3 V2-all then V3-all prediction freeze.'
+    group = 'verification'
+    testClassesDirs = sourceSets.searchEvaluation.output.classesDirs
+    classpath = sourceSets.searchEvaluation.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching 'com.prizm.search.evaluation.searchv3.structural.Prz044OfficialPredictionTest'
+    }
+    outputs.upToDateWhen { false }
+    maxParallelForks = 1
+    failFast = true
+    systemProperty 'prizm.prz044.official', 'true'
+    systemProperty 'prizm.prz044.project-root', layout.projectDirectory.asFile.absolutePath
+    systemProperty 'prizm.prz044.input-zip', providers.gradleProperty('prz044InputZip').getOrElse('')
+    doFirst {
+        if (!providers.gradleProperty('prz044InputZip').isPresent()
+                || providers.gradleProperty('prz044InputZip').get().trim().isEmpty()) {
+            throw new GradleException('PRZ-044 attempt-3 predictions require -Pprz044InputZip=<path>.')
+        }
+    }
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
 tasks.register('p6ShadowBenchmark', Test) {
     description = 'Runs the PRZ-016 P6 external-corpus retrieval shadow benchmark.'
     group = 'verification'

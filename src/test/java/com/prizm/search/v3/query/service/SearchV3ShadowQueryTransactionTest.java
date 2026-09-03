@@ -28,7 +28,10 @@ class SearchV3ShadowQueryTransactionTest {
 
     @BeforeEach
     void setUp() {
-        transaction = new SearchV3ShadowQueryTransaction(repository, new SearchV3TypedEvidenceSelector());
+        transaction = new SearchV3ShadowQueryTransaction(
+                repository,
+                new SearchV3TypedEvidenceSelector(),
+                new SearchV3Top2DocumentRanker());
         model = new SearchV3EmbeddingModelContract("bge-m3", "a".repeat(64), 1024);
         queryVector = new float[1024];
         queryVector[0] = 1.0f;
@@ -88,15 +91,59 @@ class SearchV3ShadowQueryTransactionTest {
                 .hasMessageContaining("inventory is incomplete");
     }
 
+    @Test
+    void reordersOnlyTheSelectedEvidenceByDocumentScoreAndPreservesProvenance() {
+        var p1 = passage(1, 11, 51, 0.95);
+        var p2 = passage(2, 12, 52, 0.90);
+        var p3 = passage(3, 13, 52, 0.88);
+        var p4 = passage(4, 14, 51, 0.10);
+        var p5 = passage(5, 15, 53, 0.05);
+        var c1 = child(101, 11, 51, 0, "첫 문서의 강한 근거");
+        var c2 = child(102, 12, 52, 0, "둘째 문서의 첫 근거");
+        var c3 = child(103, 13, 52, 1, "둘째 문서의 둘째 근거");
+        var c4 = child(104, 14, 51, 1, "첫 문서의 약한 근거");
+        var c5 = child(105, 15, 53, 0, "셋째 문서의 근거");
+        List<SearchV3PassageCandidate> passages = List.of(p1, p2, p3, p4, p5);
+        when(repository.findPassages(41, queryVector, model)).thenReturn(passages);
+        when(repository.findChildren(41, passages)).thenReturn(List.of(c1, c2, c3, c4, c5));
+        when(repository.scoreChildren(41, passages, queryVector, model)).thenReturn(List.of(
+                new ChildScore(101, 11, 0.05, 0.95),
+                new ChildScore(102, 12, 0.10, 0.90),
+                new ChildScore(103, 13, 0.12, 0.88),
+                new ChildScore(104, 14, 0.90, 0.10),
+                new ChildScore(105, 15, 0.95, 0.05)));
+
+        var result = transaction.search(41, "관련 경험", queryVector, model);
+
+        assertThat(result.evidence()).extracting(value -> value.evidenceChildId())
+                .containsExactly(102L, 103L, 101L, 104L, 105L);
+        assertThat(result.evidence()).extracting(value -> value.evidenceChildId())
+                .containsExactlyInAnyOrder(101L, 102L, 103L, 104L, 105L);
+        assertThat(result.evidence().get(0).sourceText()).isEqualTo(c2.sourceText());
+        assertThat(result.evidence().get(0).sourcePath()).isEqualTo(c2.sourcePath());
+        assertThat(result.evidence().get(0).codePointStart()).isEqualTo(c2.codePointStart());
+        assertThat(result.evidence().get(0).codePointEnd()).isEqualTo(c2.codePointEnd());
+        assertThat(result.passageCandidateCount()).isEqualTo(5);
+    }
+
     private static SearchV3PassageCandidate passage(int rank, long id) {
+        return passage(rank, id, 51, 1 - 0.1 * rank);
+    }
+
+    private static SearchV3PassageCandidate passage(int rank, long id, long documentId, double score) {
         return new SearchV3PassageCandidate(
-                rank, id, 31, 41, 51, 61, "P-" + id, rank - 1,
-                "parent-" + id, 0.1 * rank, 1 - 0.1 * rank);
+                rank, id, 31, 41, documentId, 61, "P-" + id, rank - 1,
+                "parent-" + id, 1 - score, score);
     }
 
     private static SearchV3EvidenceChildCandidate child(long id, long passage, int order, String text) {
+        return child(id, passage, 51, order, text);
+    }
+
+    private static SearchV3EvidenceChildCandidate child(
+            long id, long passage, long documentId, int order, String text) {
         return new SearchV3EvidenceChildCandidate(
-                id, passage, 31, 41, 51, 61, "C-" + id, order, order,
+                id, passage, 31, 41, documentId, 61, "C-" + id, order, order,
                 "PARAGRAPH", text, "a".repeat(64), "fixture.txt", null,
                 order + 1, order + 1, order * 100,
                 order * 100 + text.codePointCount(0, text.length()),

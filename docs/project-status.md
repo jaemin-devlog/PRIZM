@@ -88,7 +88,8 @@
 - opt-in Search V3 scheduler는 현재 active version을 원자 dispatch하고, 일반 claim과 만료 lease exact-token
   recovery를 같은 Worker 경로로 처리함. 기본 설정은 꺼져 있어 Search V2 scheduler와 나란히 존재함
 - 비공개 shadow query service는 V3 pointer가 가리키는 `ACTIVE` generation과 `COMPLETED` job만 owner 범위에서 읽고,
-  Passage exact cosine Top20 뒤 Top5 Passage 내부 저장 Child vector로 `CHILD_DENSE_V1`을 적용해 원문 근거 최대 5건을 반환함
+  Passage exact cosine Top20 뒤 Top5 Passage 내부 저장 Child vector로 `CHILD_DENSE_V1`을 적용함. 선택된 원문 근거는
+  문서별 상위 비중복 Passage 최대 2개의 평균 점수로 문서 순서만 정한 뒤 최대 5건을 반환함
 - PostgreSQL 16+pgvector Testcontainers와 실제 로컬 Ollama `bge-m3`로 TXT 색인·activation·query smoke를 통과함.
   전체 backend `check`는 unit `657`건과 integration `164`건에서 failure/error `0`이며 OpenSQL은 `NOT_RUN`
 - Search V3 API/cutover는 구현하지 않았고 Production Search V2는 계속 기본 검색임

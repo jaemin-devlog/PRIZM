@@ -363,9 +363,11 @@ reclaim한 새 claim을 즉시 같은 processor에 전달합니다. 기본값은
 
 비공개 shadow query runtime은 owner의 `active_search_v3_generation_id`가 가리키고 current active version과 같은
 `ACTIVE + COMPLETED` inventory만 조회합니다. 동일 BGE-M3 query vector로 Passage exact cosine Top20을 구한 뒤,
-Top5 Passage 각각에서 저장된 Child vector를 다시 비교합니다. Passage 순서는 바꾸지 않고 원문·page·line·code-point
-provenance를 보존한 `EvidenceChild`를 최대 5건 반환합니다. deterministic typed validation은 원문의 숫자·날짜 등
-조건만 검증하며 경력의 진위나 보유 여부를 판정하지 않습니다. Search V3 API와 Search V2 cutover는 아직 없습니다.
+Top5 Passage 각각에서 저장된 Child vector를 다시 비교합니다. 후보와 최종 근거 집합은 바꾸지 않고, 문서별 상위
+비중복 Passage 최대 2개의 cosine score 평균으로 최종 문서 순서만 정합니다. 같은 Child ID 또는 동일 source span은
+두 번 집계하지 않습니다. 원문·page·line·code-point provenance를 보존한 `EvidenceChild`를 최대 5건 반환하며,
+deterministic typed validation은 원문의 숫자·날짜 등 조건만 검증합니다. 경력의 진위나 보유 여부는 판정하지 않으며
+Search V3 API와 Search V2 cutover는 아직 없습니다.
 
 근거:
 

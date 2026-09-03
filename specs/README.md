@@ -92,6 +92,7 @@ Search V3의 실험 흐름, 채택·비채택 결과와 전용 branch 운영 경
 | PRZ&#8209;042 | [Search V3 최종 평가](PRZ-042-search-v3-final-evaluation/spec.md) | `VERIFIED` | [근거](PRZ-042-search-v3-final-evaluation/evidence.md) |
 | PRZ&#8209;043 | [Search V3 Release-grade 평가](PRZ-043-search-v3-release-grade-evaluation/spec.md) | `VERIFIED` | [근거](PRZ-043-search-v3-release-grade-evaluation/evidence.md) |
 | PRZ&#8209;044 | [Search V3 Release-grade prediction 동결](PRZ-044-search-v3-release-grade-evaluation/spec.md) | `VERIFIED` | [근거](PRZ-044-search-v3-release-grade-evaluation/evidence.md) — `EVALUATION_INTEGRITY_BLOCKED` |
+| PRZ&#8209;045 | [Search V3 Top2 문서 순위 집계](PRZ-045-search-v3-top2-document-aggregation/spec.md) | `VERIFIED` | [근거](PRZ-045-search-v3-top2-document-aggregation/evidence.md) |
 
 ## 연구·미채택 기록
 

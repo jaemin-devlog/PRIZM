@@ -29,12 +29,15 @@ public class SearchV3ShadowQueryTransaction {
 
     private final SearchV3ShadowQueryRepository repository;
     private final SearchV3TypedEvidenceSelector selector;
+    private final SearchV3Top2DocumentRanker documentRanker;
 
     public SearchV3ShadowQueryTransaction(
             SearchV3ShadowQueryRepository repository,
-            SearchV3TypedEvidenceSelector selector) {
+            SearchV3TypedEvidenceSelector selector,
+            SearchV3Top2DocumentRanker documentRanker) {
         this.repository = repository;
         this.selector = selector;
+        this.documentRanker = documentRanker;
     }
 
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
@@ -54,8 +57,10 @@ public class SearchV3ShadowQueryTransaction {
         List<ChildScore> scores = repository.scoreChildren(ownerUserId, top5, queryVector, model);
         List<RankedPassage> ranked = rankChildren(passages, children, scores);
         var selection = selector.select(query, ranked);
+        List<SelectedChild> documentRanked = rankSelectedEvidence(
+                selection.children(), documentRanker.rank(passages, children));
         List<SearchV3EvidenceResult> evidence = new ArrayList<>();
-        for (SelectedChild selected : selection.children()) {
+        for (SelectedChild selected : documentRanked) {
             var passage = selected.passage();
             var child = selected.child().child();
             var typed = selected.typedResult();
@@ -85,6 +90,24 @@ public class SearchV3ShadowQueryTransaction {
         }
         return new SearchV3QueryResult(
                 selection.state(), selection.parsedConstraintCount(), passages.size(), evidence);
+    }
+
+    private static List<SelectedChild> rankSelectedEvidence(
+            List<SelectedChild> selected,
+            List<SearchV3Top2DocumentRanker.RankedDocument> documents) {
+        Map<Long, Integer> documentOrder = new LinkedHashMap<>();
+        for (int index = 0; index < documents.size(); index++) {
+            documentOrder.put(documents.get(index).documentId(), index);
+        }
+        List<SelectedChild> ordered = new ArrayList<>(selected);
+        ordered.sort(Comparator.comparingInt(value -> {
+            Integer rank = documentOrder.get(value.child().child().documentId());
+            if (rank == null) {
+                throw new IllegalStateException("Selected Search V3 EvidenceChild has no document rank.");
+            }
+            return rank;
+        }));
+        return List.copyOf(ordered);
     }
 
     private List<RankedPassage> rankChildren(

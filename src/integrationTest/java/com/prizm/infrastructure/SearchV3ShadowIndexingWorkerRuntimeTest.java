@@ -45,6 +45,7 @@ import com.prizm.search.v3.indexing.structure.SearchV3StructureBuilder;
 import com.prizm.search.v3.query.repository.SearchV3ShadowQueryRepository;
 import com.prizm.search.v3.query.model.SearchV3TypedEvidenceState;
 import com.prizm.search.v3.query.service.SearchV3ShadowQueryTransaction;
+import com.prizm.search.v3.query.service.SearchV3Top2DocumentRanker;
 import com.prizm.search.v3.query.service.SearchV3TypedEvidenceSelector;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -196,7 +197,8 @@ class SearchV3ShadowIndexingWorkerRuntimeTest {
 
         SearchV3ShadowQueryTransaction query = new SearchV3ShadowQueryTransaction(
                 new SearchV3ShadowQueryRepository(jdbc),
-                new SearchV3TypedEvidenceSelector());
+                new SearchV3TypedEvidenceSelector(),
+                new SearchV3Top2DocumentRanker());
         var result = query.search(
                 fixture.ownerUserId(), directEvidence, deterministicVector(directEvidence), model);
         var otherOwner = query.search(
@@ -355,7 +357,9 @@ class SearchV3ShadowIndexingWorkerRuntimeTest {
                 String.class,
                 second.generationId());
         SearchV3ShadowQueryTransaction query = new SearchV3ShadowQueryTransaction(
-                new SearchV3ShadowQueryRepository(jdbc), new SearchV3TypedEvidenceSelector());
+                new SearchV3ShadowQueryRepository(jdbc),
+                new SearchV3TypedEvidenceSelector(),
+                new SearchV3Top2DocumentRanker());
         assertThat(query.search(
                         fixture.ownerUserId(), indexedSource, deterministicVector(indexedSource),
                         new SearchV3EmbeddingModelContract("bge-m3", MODEL_DIGEST, 1024))

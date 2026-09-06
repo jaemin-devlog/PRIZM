@@ -16,6 +16,8 @@ class SearchEvaluationDatasetSelectorTest {
             .load(Path.of("src/test/resources/search-evaluation/v2"));
     private final Dataset frozenTestDataset = new SearchEvaluationDatasetLoader(new ObjectMapper())
             .load(Path.of("src/test/resources/search-evaluation/v2-3"));
+    private final Dataset prizmCareerEvidenceDataset = new SearchEvaluationDatasetLoader(new ObjectMapper())
+            .load(Path.of("src/test/resources/search-evaluation/prizm-v1"));
 
     @Test
     void selectsOnlyTuningQuestionsAndDocuments() {
@@ -52,7 +54,7 @@ class SearchEvaluationDatasetSelectorTest {
     }
 
     @Test
-    void permitsOnlyAnExplicitFrozenV23TestRun() {
+    void permitsTestOnlyForAnExplicitlyAllowedFrozenDataset() {
         assertThat(SearchEvaluationBaselineTest.allowsFrozenTestRun(
                         dataset, Split.TEST, "true"))
                 .isFalse();
@@ -64,6 +66,18 @@ class SearchEvaluationDatasetSelectorTest {
                 .isFalse();
         assertThat(SearchEvaluationBaselineTest.allowsFrozenTestRun(
                         frozenTestDataset, Split.TEST, "true"))
+                .isTrue();
+        assertThat(SearchEvaluationBaselineTest.allowsFrozenTestRun(
+                        prizmCareerEvidenceDataset, Split.TEST, null))
+                .isFalse();
+        assertThat(SearchEvaluationBaselineTest.allowsFrozenTestRun(
+                        prizmCareerEvidenceDataset, Split.TUNING, "true"))
+                .isFalse();
+        assertThat(SearchEvaluationBaselineTest.allowsFrozenTestRun(
+                        prizmCareerEvidenceDataset, Split.TEST, "TRUE"))
+                .isFalse();
+        assertThat(SearchEvaluationBaselineTest.allowsFrozenTestRun(
+                        prizmCareerEvidenceDataset, Split.TEST, "true"))
                 .isTrue();
     }
 }

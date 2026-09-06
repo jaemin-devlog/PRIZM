@@ -95,7 +95,9 @@ class SearchEvaluationBaselineTest {
     private static final DockerImageName PGVECTOR_IMAGE = DockerImageName
             .parse("pgvector/pgvector:0.8.2-pg16-bookworm")
             .asCompatibleSubstituteFor("postgres");
-    private static final String FROZEN_TEST_DATASET_ID = "prizm-search-evidence-synthetic-v2.3";
+    private static final Set<String> FROZEN_TEST_DATASET_IDS = Set.of(
+            "prizm-search-evidence-synthetic-v2.3",
+            "prizm-career-evidence-synthetic-v1.0");
     private static final String FROZEN_TEST_ALLOW_ENVIRONMENT_VARIABLE =
             "PRIZM_SEARCH_EVALUATION_ALLOW_FROZEN_TEST";
     private static final String CHUNKING_ENVIRONMENT_VARIABLE =
@@ -274,14 +276,14 @@ class SearchEvaluationBaselineTest {
                         selectedSplit,
                         System.getenv(FROZEN_TEST_ALLOW_ENVIRONMENT_VARIABLE))) {
             throw new SearchEvaluationDataException(
-                    "Dataset v2 TEST execution requires the explicit frozen v2.3 allow flag.");
+                    "Dataset v2 TEST execution requires the explicit frozen-dataset allow flag.");
         }
         return selector.select(loadedDataset, selectedSplit);
     }
 
     static boolean allowsFrozenTestRun(Dataset dataset, Split split, String allowFlag) {
         return split == Split.TEST
-                && FROZEN_TEST_DATASET_ID.equals(dataset.corpus().datasetId())
+                && FROZEN_TEST_DATASET_IDS.contains(dataset.corpus().datasetId())
                 && "true".equals(allowFlag);
     }
 

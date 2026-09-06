@@ -132,6 +132,12 @@ PostgreSQL 성공은 OpenSQL 증거가 아닙니다. OpenSQL·OpenProxy 결과�
 - PRZ-016은 현재 검색 구조를 통합한 뒤에도 P15 `NOT_VERIFIED`와 제품에 적용하지
   않은 P16 `NEEDS_ADJUSTMENT`를 역사 판정으로 보존해 lifecycle 상태가
   `IN_PROGRESS`입니다.
+- PRZ-016 P17의 `prizm-career-evidence-synthetic-v1.0` 평가셋은 schema v2,
+  프로젝트·식별자·source fact가 겹치지 않는 A/B/C cohort의 114문서·300문항으로
+  구현됐습니다. focused test 24건, 전체 backend unit, SBOM·OSS readiness와 독립 AUDIT가
+  통과했습니다. frozen TEST 검색, 실제 PDF·OpenSQL과 Production 검색 방식 비교는
+  `NOT_RUN`이며 P17은 Production 검색 코드를 바꾸지 않습니다. 현재 evaluation FTS의
+  자연어 전체 AND 질의와 이 데이터셋의 실행 적합성도 `NOT_VERIFIED`입니다.
 - 이 상태들은 현재 기능 개발이 진행 중이라는 뜻이 아닙니다. 현재 검색과 연구
   기록의 경계는 [PRZ-016 검색 문서 안내](../specs/PRZ-016-search-performance-v2/README.md)를
   따릅니다.

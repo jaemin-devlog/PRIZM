@@ -60,7 +60,7 @@ PRZ는 PRIZM의 기능 개발과 기술 검증을 작업 단위로 남기는 기
 | PRZ&#8209;013 | [OpenProxy 단일 Primary 검증](PRZ-013-openproxy-single-primary-gate/spec.md) | `VERIFIED` | [근거](PRZ-013-openproxy-single-primary-gate/evidence.md) |
 | PRZ&#8209;014 | [OpenHA topology 검토](PRZ-014-openha-topology-gate/spec.md) | `REJECTED` | [근거](PRZ-014-openha-topology-gate/evidence.md) |
 | PRZ&#8209;015 | [읽기 전용 MCP 검색](PRZ-015-mcp-career-evidence-search/spec.md) | `VERIFIED` | [근거](PRZ-015-mcp-career-evidence-search/evidence.md) |
-| PRZ&#8209;016 | [Search Performance V2](PRZ-016-search-performance-v2/README.md) | `IN_PROGRESS` | [근거](PRZ-016-search-performance-v2/evidence.md) |
+| PRZ&#8209;016 | [Search Performance V2](PRZ-016-search-performance-v2/README.md) | `IN_PROGRESS` | [근거](PRZ-016-search-performance-v2/evidence.md) · [P17 평가셋](PRZ-016-search-performance-v2/p17-prizm-dedicated-dataset/spec.md) |
 | PRZ&#8209;017 | [채용공고 항목별 근거 검색 V1](PRZ-017-job-posting-evidence-v1/spec.md) | `VERIFIED` | [근거](PRZ-017-job-posting-evidence-v1/evidence.md) |
 | PRZ&#8209;018 | [문서 상세 미리보기](PRZ-018-document-detail-page/spec.md) | `VERIFIED` | [근거](PRZ-018-document-detail-page/evidence.md) |
 | PRZ&#8209;019 | [태그 문서 수·TXT 원문 미리보기](PRZ-019-document-usability-fixes/spec.md) | `VERIFIED` | [근거](PRZ-019-document-usability-fixes/evidence.md) |
@@ -77,7 +77,7 @@ PRZ는 PRIZM의 기능 개발과 기술 검증을 작업 단위로 남기는 기
 
 - [PRZ&#8209;008](PRZ-008-search-evidence-reliability/evidence.md) — 기본 profile과 API 개선은 `main`에 통합됐지만 의미 단위 청킹·batch embedding·PDF 중복 최적화의 제품 적용 Gate가 남아 `IN_PROGRESS`입니다.
 - [PRZ&#8209;014](PRZ-014-openha-topology-gate/evidence.md) — 다중 OpenSQL DB node와 장애전환을 현재 제품 로드맵에서 제외해 `REJECTED`로 보존합니다.
-- [PRZ&#8209;016](PRZ-016-search-performance-v2/README.md) — P15의 인증된 PDF 이동은 `NOT_VERIFIED`, P16은 `NEEDS_ADJUSTMENT`·제품 미적용이어서 전체 상태를 `IN_PROGRESS`로 유지합니다.
+- [PRZ&#8209;016](PRZ-016-search-performance-v2/README.md) — P15의 인증된 PDF 이동은 `NOT_VERIFIED`, P16은 `NEEDS_ADJUSTMENT`·제품 미적용입니다. P17 전용 합성 평가셋은 구현·전체 unit·AUDIT를 통과했지만 실제 검색 방식 비교는 `NOT_RUN`이므로 전체 상태를 `IN_PROGRESS`로 유지합니다.
 
 ## 더 자세히 보기
 

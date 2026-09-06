@@ -10,6 +10,7 @@
 - 추적 가능한 합성 예제: `src/test/resources/search-evaluation/sample/`
 - PRZ-008 Dataset v2.2(보존): `src/test/resources/search-evaluation/v2/`
 - PRZ-008 Dataset v2.3(현재 TUNING): `src/test/resources/search-evaluation/v2-3/`
+- PRZ-016 P17 전용 합성 Dataset v1.0: `src/test/resources/search-evaluation/prizm-v1/`
 - 실제 개인 평가 데이터: `local/search-evaluation/<dataset>/`
 - 실행 결과 기본 위치: `local/search-evaluation/results/`
 
@@ -75,6 +76,46 @@ gold page는 v2.2와 byte 단위로 같습니다. 변경된 원문은 합성 Atl
 
 v2·v2.1·v2.2·v2.3의 날짜별 측정 결과와 profile 채택 과정은
 [검색 평가 실행 이력](../archive/evaluation/search-evaluation-history.md)에서 확인합니다.
+
+## PRIZM 전용 합성 Dataset v1.0
+
+`prizm-career-evidence-synthetic-v1.0`은 기존 v2.3을 덮어쓰지 않고 schema version 2로
+추가한 PRIZM 전용 평가셋입니다. 프로젝트·식별자·source fact가 겹치지 않는 A/B/C 세
+cohort로 합성 문서 114개와 질문 300개를 구성합니다. TUNING은
+`180=90 positive+90 no-evidence`, 동결 TEST는 `120=60 positive+60 no-evidence`입니다.
+12개 `DocumentType`과 schema v2의 15개 평가 category를 모두 포함합니다. positive 가운데
+60개는 프로젝트명·식별자·ASCII 기술명·수치를 뺀 한국어 `PARAPHRASE` 질문입니다.
+
+고정 fact matrix를 corpus와 questions로 렌더링하는 결정적 generator와 SHA-256 freeze
+manifest를 함께 둡니다. 아래 명령은 생성 파일이 fact matrix와 generator에서 다시 만든
+canonical bytes와 같은지 확인합니다.
+
+```powershell
+node scripts/generate-prizm-search-evaluation-dataset.mjs --check
+```
+
+TEST 질문 파일의 hard-coded SHA-256은
+`c07e105023287663542601133e82fbfa78f3a341e75efc326989a0aadcc63600`입니다.
+`humanize-korean` 기본 강도 로컬 작성 감사에서는 문장 항목 576개와 보호 요소 619개를 대조했고,
+보호 요소 변경과 새 경력 사실 추가는 각각 0건으로 `PASS`했습니다. generator drift 검사와
+dataset·loader·selector focused test 24건, 전체 backend unit, SBOM·OSS readiness와 최종
+diff 검사도 `PASS`했습니다. 독립 AUDIT의 blocking finding은 0건입니다.
+
+일부 B/C 사실은 같은 검색 위험을 다른 기술과 맥락으로 바꾼 평행 시나리오군입니다. 세
+cohort나 같은 fact의 질문 변형을 통계적으로 독립한 표본이라고 가정하지 않습니다. 전체 수치와
+함께 cohort·평행 시나리오군·fact/question group별 결과와 정확한 오류 건수를 봐야 합니다.
+
+현재 evaluation-only PostgreSQL FTS는 자연어 질문 전체를 `simple` 구성의 AND 조건으로
+바꿉니다. 한국어 조사와 질문 종결어까지 모두 일치해야 해 이 데이터셋과의 실행 적합성은
+`NOT_VERIFIED`입니다. Hybrid/RRF 비교 전에 FTS 질의 구성 방식을 별도로 사전 등록하고,
+lexical candidate가 실제로 회수되는지 먼저 확인해야 합니다.
+
+TEST retrieval은 holdout을 보존하려고 이번 생성 단계에서 `NOT_RUN`으로 유지합니다. 실제
+PDF ingestion, OpenSQL/OpenProxy와 Production Dense·PostgreSQL FTS+Dense RRF·Cross-encoder
+Reranker·chunking 비교도 `NOT_RUN`입니다. 따라서 지금 확인된 내용은 dataset의 구조와
+격리 계약이며, 특정 검색 방식이 더 낫다는 성능 근거가 아닙니다. 세부 계약과 남은 Gate는
+[PRZ-016 P17 Spec](../../specs/PRZ-016-search-performance-v2/p17-prizm-dedicated-dataset/spec.md)을
+따릅니다.
 
 ## 실행
 

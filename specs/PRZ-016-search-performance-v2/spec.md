@@ -12,6 +12,7 @@
   현재 구현은 위 현재 문서와 실제 `src/main`을 따른다.
 - 현재 제한: P15 인증된 PDF 페이지 이동은 `NOT_VERIFIED`이며, 이 문서는 이를 `VERIFIED`로
   표현하지 않는다. P16 실험은 `NEEDS_ADJUSTMENT`로 Production 검색에 적용하지 않았다.
+  P17 평가셋은 전체 unit과 독립 AUDIT를 통과했지만 실제 검색 방식 비교는 `NOT_RUN`이다.
 - 목표: PRIZM 커리어 근거 검색의 retrieval, ranking, query understanding과 evidence
   localization을 같은 평가 기준으로 측정하고 단계적으로 개선한다.
 
@@ -47,6 +48,7 @@ PRZ는 독립적인 기능 또는 자체적으로 완료·폐기할 수 있는 �
 | P14 Claim-Complete Snippet | `PASS` | 해결 질문은 contiguous problem/action/result window를 단문보다 우선 | [공개 요약](evidence.md) |
 | P15 PDF Document Confirmation UX | `IMPLEMENTED — PAGE_NAVIGATION_NOT_BROWSER_VERIFIED` | 검색 카드에서 기존 owner-scoped PDF original viewer를 열고 evidence page로 이동. 검색 정책·결과는 불변 | — |
 | P16 Literal Candidate Phase A | `NEEDS_ADJUSTMENT` | D0 parity·literal lookup·격리는 통과했으나 frozen corpus의 positive 7개가 모두 Dense rank 1이라 literal-only 복구 사례를 만들지 못함 | [P16 Evidence](p16-literal-candidate-phase-a/evidence.md) |
+| P17 PRIZM Dedicated Evaluation Dataset | `IMPLEMENTED — VERIFY_AND_AUDIT_PASS` | 엔터티·ID·source fact가 겹치지 않는 A/B/C cohort의 114문서·300문항 schema v2 합성 평가셋. 통합·실제 방식 비교는 `NOT_RUN` | [P17 Spec](p17-prizm-dedicated-dataset/spec.md) |
 
 P4는 focused 검증과 동일 72-query benchmark를 통과했다. P5와 P7-B는 서로 다른 unseen
 조건에서 모두 일반화 Gate를 통과하지 못했다. P7-B는 앞으로 `DIAGNOSTIC / HISTORICAL
@@ -180,6 +182,32 @@ ACTIVE dense 후보 중 상위 10개에 자연어 evidence 판정만 추가하�
 Production 요청 경로와 응답에는 연결하지 않는다. 상세 계약과 결과는
 [GPT-J1 Spec](gpt-evidence-judge-shadow/spec.md)과
 [Evidence](gpt-evidence-judge-shadow/evidence.md)에서 관리한다.
+
+## P17 PRIZM 전용 검색 평가 데이터셋
+
+P17은 Production 검색을 바꾸지 않고 Dense, PostgreSQL FTS+Dense RRF, Cross-encoder
+Reranker와 chunking profile을 같은 질문·qrel로 비교할 측정 기반을 만든다. dataset ID는
+`prizm-career-evidence-synthetic-v1.0`, schema version은 2다. 프로젝트·식별자·source fact가
+겹치지 않는 A/B/C cohort로
+114문서·300문항을 구성했고, TUNING `180=90 positive+90 no-evidence`와 동결 TEST
+`120=60 positive+60 no-evidence`로 나눴다. 12개 `DocumentType`과 15개 평가 category를
+모두 포함한다. positive 중 60개는 프로젝트명·식별자·ASCII 기술명·수치를 뺀 한국어
+`PARAPHRASE` 질문이다.
+
+고정 fact matrix, 결정적 generator와 SHA-256 freeze manifest를 함께 보존한다. TEST 질문
+파일의 hard-coded SHA-256은
+`c07e105023287663542601133e82fbfa78f3a341e75efc326989a0aadcc63600`다.
+`$humanize-korean` 로컬 작성 감사는 문장 항목 576개·보호 요소 619개를 대조해 보호 요소 변경 0건과
+새 사실 추가 0건으로 `PASS`했다. generator drift, focused test 24건, 전체 backend unit,
+SBOM·OSS readiness와 독립 AUDIT도 `PASS`했다.
+
+일부 B/C 사실은 같은 위험을 다른 기술과 맥락으로 바꾼 평행 시나리오군이므로 세 cohort를
+통계적으로 독립한 표본으로 가정하지 않는다. frozen TEST retrieval, 실제 PDF ingestion,
+OpenSQL/OpenProxy와 Production Dense·Hybrid/RRF·Reranker·chunking 비교는 `NOT_RUN`이며
+P17의 구조 검증을 성능 우위 근거로 사용하지 않는다. 현재 evaluation FTS의 자연어 전체
+AND 질의와 이 데이터셋의 실행 적합성도 `NOT_VERIFIED`다. 자세한 범위와 현재 Gate는
+[P17 Spec](p17-prizm-dedicated-dataset/spec.md)과 [Plan](p17-prizm-dedicated-dataset/plan.md)을
+따른다.
 
 ## 보존 계약
 

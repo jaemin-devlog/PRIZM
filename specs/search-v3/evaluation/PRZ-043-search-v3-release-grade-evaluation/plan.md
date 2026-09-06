@@ -17,7 +17,7 @@
 
 - `build.gradle`: PRZ-043 preflight/focused/official task
 - `src/searchEvaluation/java/**/Prz043*`: ZIP loader, freeze, runtime adapter, Gold join, metric/Gate
-- `specs/PRZ-043-search-v3-release-grade-evaluation/**`
+- `specs/search-v3/evaluation/PRZ-043-search-v3-release-grade-evaluation/**`
 - `specs/README.md`
 
 `src/main/**`, migration, frontend, MCP, dataset ZIP/payload는 수정하지 않는다.

@@ -4,8 +4,8 @@
 - 결과 범위: `SEED_FINAL_PROTOCOL_RESULT`
 - branch: `PRZ-042-search-v3-final-evaluation`
 - 기준: `0e95472bb68f72accf0d6b2171c22f0719fe6941`
-- 선행 계약: [PRZ-025 Search V3 기반 계약](../PRZ-025-search-v3-foundation/spec.md)
-- 선행 runtime: [PRZ-041 Search V3 Runtime Completion](../PRZ-041-search-v3-runtime-completion/spec.md)
+- 선행 계약: [PRZ-025 Search V3 기반 계약](../../research/PRZ-025-search-v3-foundation/spec.md)
+- 선행 runtime: [PRZ-041 Search V3 Runtime Completion](../../runtime/PRZ-041-search-v3-runtime-completion/spec.md)
 - Production Search V2 적용: `NO_CHANGE`
 - 공식 SEALED 실행: `COMPLETED_ONCE`
 

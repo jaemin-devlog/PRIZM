@@ -97,7 +97,7 @@ selection 오류는 `NEEDS_ADJUSTMENT`, semantic 회귀·false NONE·correct evi
 
 ## 6. 안전·변경 경계
 
-허용 범위는 `src/searchEvaluation/**`, `specs/PRZ-029-evidence-validation-selection/**`와 Registry다.
+허용 범위는 `src/searchEvaluation/**`, `specs/search-v3/research/PRZ-029-evidence-validation-selection/**`와 Registry다.
 `src/main/**`, migration, dependency/build, frontend, MCP, Docker와 `v1.0.0` 변경은 0이어야 한다.
 Raw report는 ignored `local/search-v3-evaluation/prz029/`에만 둔다.
 

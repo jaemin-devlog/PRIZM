@@ -21,7 +21,7 @@
 
 - `build.gradle`: PRZ-044 focused/preflight/official task
 - `src/searchEvaluation/java/**/Prz044*`: dataset, freeze, prediction DTO/writer, runtime, tests
-- `specs/PRZ-044-search-v3-release-grade-evaluation/**`
+- `specs/search-v3/evaluation/PRZ-044-search-v3-release-grade-evaluation/**`의 문서와 기존 경로에 보존한 동결 JSON
 - `specs/README.md`
 
 Gold loader, metric evaluator와 `src/main/**`는 만들거나 수정하지 않는다.

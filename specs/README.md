@@ -44,6 +44,9 @@ PRZ는 PRIZM의 기능 개발과 기술 검증을 작업 단위로 남기는 기
 
 Search V3의 실험 흐름, 채택·비채택 결과와 전용 branch 운영 경계는
 [Search V3 개발 기록](search-v3/README.md)에 따로 정리했습니다.
+PRZ-025~045의 문서는 `search-v3/research`, `search-v3/runtime`,
+`search-v3/evaluation`에서 읽을 수 있습니다. 기존 경로가 남은 여섯 폴더에는 평가 코드가
+경로와 SHA를 함께 검증하는 동결 JSON만 보존했습니다.
 
 | PRZ | 작업 | 상태 | 통합/근거 |
 | --- | --- | --- | --- |
@@ -72,27 +75,27 @@ Search V3의 실험 흐름, 채택·비채택 결과와 전용 branch 운영 경
 | PRZ&#8209;022 | [백엔드 신뢰성 근거 재검증](PRZ-022-backend-reliability-evidence/spec.md) | `VERIFIED` | [근거](PRZ-022-backend-reliability-evidence/evidence.md) |
 | PRZ&#8209;023 | [PRIZM 프로젝트 최종 Closeout](PRZ-023-project-closeout/spec.md) | `VERIFIED` | [근거](PRZ-023-project-closeout/evidence.md) |
 | PRZ&#8209;024 | [PRIZM v1.0.0 소스 릴리스](PRZ-024-release-v1.0.0/spec.md) | `VERIFIED` | [근거](PRZ-024-release-v1.0.0/evidence.md) |
-| PRZ&#8209;025 | [Search V3 기반 계약](PRZ-025-search-v3-foundation/spec.md) | `IN_PROGRESS` | [근거](PRZ-025-search-v3-foundation/evidence.md) |
-| PRZ&#8209;026 | [Search V3 구조 분할과 Parent-Child 검색](PRZ-026-structural-parsing-parent-child/spec.md) | `IN_PROGRESS` | [근거](PRZ-026-structural-parsing-parent-child/evidence.md) |
-| PRZ&#8209;027 | [Search V3 Cross Encoder 재정렬](PRZ-027-cross-encoder-reranking/spec.md) | `VERIFIED` | [근거](PRZ-027-cross-encoder-reranking/evidence.md) |
-| PRZ&#8209;028 | [Search V3 정확 조건 검증](PRZ-028-typed-exact-constraints/spec.md) | `VERIFIED` | [근거](PRZ-028-typed-exact-constraints/evidence.md) |
-| PRZ&#8209;029 | [Search V3 근거 검증과 선택](PRZ-029-evidence-validation-selection/spec.md) | `VERIFIED` | [근거](PRZ-029-evidence-validation-selection/evidence.md) |
-| PRZ&#8209;030 | [Search V3 의미 근거 검증 상한](PRZ-030-semantic-evidence-validation-ceiling/spec.md) | `VERIFIED` | [근거](PRZ-030-semantic-evidence-validation-ceiling/evidence.md) |
-| PRZ&#8209;031 | [Search V3 의미 직접성 판별](PRZ-031-semantic-evidence-directness/spec.md) | `VERIFIED` | [근거](PRZ-031-semantic-evidence-directness/evidence.md) |
-| PRZ&#8209;032 | [최소 Search V3 Shadow 비교](PRZ-032-minimal-v3-shadow-comparison/spec.md) | `VERIFIED` | [근거](PRZ-032-minimal-v3-shadow-comparison/evidence.md) |
-| PRZ&#8209;033 | [EvidenceChild 선택 상한](PRZ-033-atomic-evidence-child-selection-ceiling/spec.md) | `VERIFIED` | [근거](PRZ-033-atomic-evidence-child-selection-ceiling/evidence.md) |
-| PRZ&#8209;034 | [EvidenceChild 선택기](PRZ-034-atomic-evidence-child-selector/spec.md) | `VERIFIED` | [근거](PRZ-034-atomic-evidence-child-selector/evidence.md) |
-| PRZ&#8209;035 | [Child embedding 운영 전략](PRZ-035-child-embedding-operation-strategy/spec.md) | `VERIFIED` | [근거](PRZ-035-child-embedding-operation-strategy/evidence.md) |
-| PRZ&#8209;036 | [Search V3 색인 생명주기](PRZ-036-search-v3-index-lifecycle/spec.md) | `VERIFIED` | [근거](PRZ-036-search-v3-index-lifecycle/evidence.md) |
-| PRZ&#8209;037 | [Search V3 Shadow Storage](PRZ-037-search-v3-shadow-storage/spec.md) | `VERIFIED` | [근거](PRZ-037-search-v3-shadow-storage/evidence.md) |
-| PRZ&#8209;038 | [Search V3 job fencing runtime](PRZ-038-search-v3-job-fencing-runtime/spec.md) | `VERIFIED` | [근거](PRZ-038-search-v3-job-fencing-runtime/evidence.md) |
-| PRZ&#8209;039 | [Search V3 inventory와 원자 활성화 runtime](PRZ-039-search-v3-inventory-activation-runtime/spec.md) | `VERIFIED` | [근거](PRZ-039-search-v3-inventory-activation-runtime/evidence.md) |
-| PRZ&#8209;040 | [Search V3 Shadow Indexing Worker](PRZ-040-search-v3-shadow-indexing-worker/spec.md) | `VERIFIED` | [근거](PRZ-040-search-v3-shadow-indexing-worker/evidence.md) |
-| PRZ&#8209;041 | [Search V3 Runtime Completion](PRZ-041-search-v3-runtime-completion/spec.md) | `VERIFIED` | [근거](PRZ-041-search-v3-runtime-completion/evidence.md) |
-| PRZ&#8209;042 | [Search V3 최종 평가](PRZ-042-search-v3-final-evaluation/spec.md) | `VERIFIED` | [근거](PRZ-042-search-v3-final-evaluation/evidence.md) |
-| PRZ&#8209;043 | [Search V3 Release-grade 평가](PRZ-043-search-v3-release-grade-evaluation/spec.md) | `VERIFIED` | [근거](PRZ-043-search-v3-release-grade-evaluation/evidence.md) |
-| PRZ&#8209;044 | [Search V3 Release-grade prediction 동결](PRZ-044-search-v3-release-grade-evaluation/spec.md) | `VERIFIED` | [근거](PRZ-044-search-v3-release-grade-evaluation/evidence.md) — `EVALUATION_INTEGRITY_BLOCKED` |
-| PRZ&#8209;045 | [Search V3 Top2 문서 순위 집계](PRZ-045-search-v3-top2-document-aggregation/spec.md) | `VERIFIED` | [근거](PRZ-045-search-v3-top2-document-aggregation/evidence.md) |
+| PRZ&#8209;025 | [Search V3 기반 계약](search-v3/research/PRZ-025-search-v3-foundation/spec.md) | `IN_PROGRESS` | [근거](search-v3/research/PRZ-025-search-v3-foundation/evidence.md) |
+| PRZ&#8209;026 | [Search V3 구조 분할과 Parent-Child 검색](search-v3/research/PRZ-026-structural-parsing-parent-child/spec.md) | `IN_PROGRESS` | [근거](search-v3/research/PRZ-026-structural-parsing-parent-child/evidence.md) |
+| PRZ&#8209;027 | [Search V3 Cross Encoder 재정렬](search-v3/research/PRZ-027-cross-encoder-reranking/spec.md) | `VERIFIED` | [근거](search-v3/research/PRZ-027-cross-encoder-reranking/evidence.md) |
+| PRZ&#8209;028 | [Search V3 정확 조건 검증](search-v3/research/PRZ-028-typed-exact-constraints/spec.md) | `VERIFIED` | [근거](search-v3/research/PRZ-028-typed-exact-constraints/evidence.md) |
+| PRZ&#8209;029 | [Search V3 근거 검증과 선택](search-v3/research/PRZ-029-evidence-validation-selection/spec.md) | `VERIFIED` | [근거](search-v3/research/PRZ-029-evidence-validation-selection/evidence.md) |
+| PRZ&#8209;030 | [Search V3 의미 근거 검증 상한](search-v3/research/PRZ-030-semantic-evidence-validation-ceiling/spec.md) | `VERIFIED` | [근거](search-v3/research/PRZ-030-semantic-evidence-validation-ceiling/evidence.md) |
+| PRZ&#8209;031 | [Search V3 의미 직접성 판별](search-v3/research/PRZ-031-semantic-evidence-directness/spec.md) | `VERIFIED` | [근거](search-v3/research/PRZ-031-semantic-evidence-directness/evidence.md) |
+| PRZ&#8209;032 | [최소 Search V3 Shadow 비교](search-v3/research/PRZ-032-minimal-v3-shadow-comparison/spec.md) | `VERIFIED` | [근거](search-v3/research/PRZ-032-minimal-v3-shadow-comparison/evidence.md) |
+| PRZ&#8209;033 | [EvidenceChild 선택 상한](search-v3/research/PRZ-033-atomic-evidence-child-selection-ceiling/spec.md) | `VERIFIED` | [근거](search-v3/research/PRZ-033-atomic-evidence-child-selection-ceiling/evidence.md) |
+| PRZ&#8209;034 | [EvidenceChild 선택기](search-v3/research/PRZ-034-atomic-evidence-child-selector/spec.md) | `VERIFIED` | [근거](search-v3/research/PRZ-034-atomic-evidence-child-selector/evidence.md) |
+| PRZ&#8209;035 | [Child embedding 운영 전략](search-v3/research/PRZ-035-child-embedding-operation-strategy/spec.md) | `VERIFIED` | [근거](search-v3/research/PRZ-035-child-embedding-operation-strategy/evidence.md) |
+| PRZ&#8209;036 | [Search V3 색인 생명주기](search-v3/runtime/PRZ-036-search-v3-index-lifecycle/spec.md) | `VERIFIED` | [근거](search-v3/runtime/PRZ-036-search-v3-index-lifecycle/evidence.md) |
+| PRZ&#8209;037 | [Search V3 Shadow Storage](search-v3/runtime/PRZ-037-search-v3-shadow-storage/spec.md) | `VERIFIED` | [근거](search-v3/runtime/PRZ-037-search-v3-shadow-storage/evidence.md) |
+| PRZ&#8209;038 | [Search V3 job fencing runtime](search-v3/runtime/PRZ-038-search-v3-job-fencing-runtime/spec.md) | `VERIFIED` | [근거](search-v3/runtime/PRZ-038-search-v3-job-fencing-runtime/evidence.md) |
+| PRZ&#8209;039 | [Search V3 inventory와 원자 활성화 runtime](search-v3/runtime/PRZ-039-search-v3-inventory-activation-runtime/spec.md) | `VERIFIED` | [근거](search-v3/runtime/PRZ-039-search-v3-inventory-activation-runtime/evidence.md) |
+| PRZ&#8209;040 | [Search V3 Shadow Indexing Worker](search-v3/runtime/PRZ-040-search-v3-shadow-indexing-worker/spec.md) | `VERIFIED` | [근거](search-v3/runtime/PRZ-040-search-v3-shadow-indexing-worker/evidence.md) |
+| PRZ&#8209;041 | [Search V3 Runtime Completion](search-v3/runtime/PRZ-041-search-v3-runtime-completion/spec.md) | `VERIFIED` | [근거](search-v3/runtime/PRZ-041-search-v3-runtime-completion/evidence.md) |
+| PRZ&#8209;042 | [Search V3 최종 평가](search-v3/evaluation/PRZ-042-search-v3-final-evaluation/spec.md) | `VERIFIED` | [근거](search-v3/evaluation/PRZ-042-search-v3-final-evaluation/evidence.md) |
+| PRZ&#8209;043 | [Search V3 Release-grade 평가](search-v3/evaluation/PRZ-043-search-v3-release-grade-evaluation/spec.md) | `VERIFIED` | [근거](search-v3/evaluation/PRZ-043-search-v3-release-grade-evaluation/evidence.md) |
+| PRZ&#8209;044 | [Search V3 Release-grade prediction 동결](search-v3/evaluation/PRZ-044-search-v3-release-grade-evaluation/spec.md) | `VERIFIED` | [근거](search-v3/evaluation/PRZ-044-search-v3-release-grade-evaluation/evidence.md) — `EVALUATION_INTEGRITY_BLOCKED` |
+| PRZ&#8209;045 | [Search V3 Top2 문서 순위 집계](search-v3/evaluation/PRZ-045-search-v3-top2-document-aggregation/spec.md) | `VERIFIED` | [근거](search-v3/evaluation/PRZ-045-search-v3-top2-document-aggregation/evidence.md) |
 
 ## 연구·미채택 기록
 
@@ -102,9 +105,9 @@ Search V3의 실험 흐름, 채택·비채택 결과와 전용 branch 운영 경
 - [PRZ&#8209;008](PRZ-008-search-evidence-reliability/evidence.md) — 기본 profile과 API 개선은 `main`에 통합됐지만 의미 단위 청킹·batch embedding·PDF 중복 최적화의 제품 적용 Gate가 남아 `IN_PROGRESS`입니다.
 - [PRZ&#8209;014](PRZ-014-openha-topology-gate/evidence.md) — 다중 OpenSQL DB node와 장애전환을 현재 제품 로드맵에서 제외해 `REJECTED`로 보존합니다.
 - [PRZ&#8209;016](PRZ-016-search-performance-v2/README.md) — P15의 인증된 PDF 이동은 `NOT_VERIFIED`, P16은 `NEEDS_ADJUSTMENT`·제품 미적용이어서 전체 상태를 `IN_PROGRESS`로 유지합니다.
-- [PRZ&#8209;026](PRZ-026-structural-parsing-parent-child/evidence.md) — B3 `RetrievalPassage`는 `PROMISING`이지만 C1 Parent Context의 공식 판정은 `NEEDS_ADJUSTMENT`이며 제품에 적용하지 않았습니다.
-- [PRZ&#8209;027](PRZ-027-cross-encoder-reranking/evidence.md) — GTE Cross Encoder 재정렬은 공식 평가 결과 `NO_GO`로 채택하지 않았습니다.
-- [PRZ&#8209;031](PRZ-031-semantic-evidence-directness/evidence.md) — Qwen 직접성 판별은 D1 protocol 실패와 D2 의미 품질 실패를 거쳐 최종 `NO_GO`로 남겼습니다.
+- [PRZ&#8209;026](search-v3/research/PRZ-026-structural-parsing-parent-child/evidence.md) — B3 `RetrievalPassage`는 `PROMISING`이지만 C1 Parent Context의 공식 판정은 `NEEDS_ADJUSTMENT`이며 제품에 적용하지 않았습니다.
+- [PRZ&#8209;027](search-v3/research/PRZ-027-cross-encoder-reranking/evidence.md) — GTE Cross Encoder 재정렬은 공식 평가 결과 `NO_GO`로 채택하지 않았습니다.
+- [PRZ&#8209;031](search-v3/research/PRZ-031-semantic-evidence-directness/evidence.md) — Qwen 직접성 판별은 D1 protocol 실패와 D2 의미 품질 실패를 거쳐 최종 `NO_GO`로 남겼습니다.
 
 ## 더 자세히 보기
 

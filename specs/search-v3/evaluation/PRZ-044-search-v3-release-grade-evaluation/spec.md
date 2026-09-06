@@ -26,7 +26,7 @@ prediction을 정확히 한 번 생성하고 동결한다. Gold는 completion re
 
 - `src/searchEvaluation/**`: Gold-free 입력 검증, prediction runtime, canonical freeze, one-shot guard
 - `build.gradle`: PRZ-044 focused/preflight/official task
-- `specs/PRZ-044-search-v3-release-grade-evaluation/**`, `specs/README.md`
+- `specs/search-v3/evaluation/PRZ-044-search-v3-release-grade-evaluation/**`, 기존 경로의 동결 JSON, `specs/README.md`
 
 `src/main/**`, migration, dependency, frontend, MCP, Search V2/V3 검색·색인 정책은 수정하지 않는다.
 

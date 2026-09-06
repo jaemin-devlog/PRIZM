@@ -153,9 +153,9 @@ MRR은 75.76%에서 94.12%, 사용자 단위 평균 Top1은 58.80%에서 90.06%�
 
 근거:
 
-- [Search V3 평가 기반](../../specs/PRZ-025-search-v3-foundation/spec.md)
-- [구조형 검색과 RetrievalPassage](../../specs/PRZ-026-structural-parsing-parent-child/evidence.md)
-- [기존 검색과 최소 V3 비교](../../specs/PRZ-032-minimal-v3-shadow-comparison/evidence.md)
-- [EvidenceChild 선택의 이론적 최대치](../../specs/PRZ-033-atomic-evidence-child-selection-ceiling/evidence.md)
-- [BGE-M3 EvidenceChild 선택 결과](../../specs/PRZ-034-atomic-evidence-child-selector/evidence.md)
-- [채택하지 않은 Qwen3-4B 실험](../../specs/PRZ-031-semantic-evidence-directness/evidence.md)
+- [Search V3 평가 기반](../../specs/search-v3/research/PRZ-025-search-v3-foundation/spec.md)
+- [구조형 검색과 RetrievalPassage](../../specs/search-v3/research/PRZ-026-structural-parsing-parent-child/evidence.md)
+- [기존 검색과 최소 V3 비교](../../specs/search-v3/research/PRZ-032-minimal-v3-shadow-comparison/evidence.md)
+- [EvidenceChild 선택의 이론적 최대치](../../specs/search-v3/research/PRZ-033-atomic-evidence-child-selection-ceiling/evidence.md)
+- [BGE-M3 EvidenceChild 선택 결과](../../specs/search-v3/research/PRZ-034-atomic-evidence-child-selector/evidence.md)
+- [채택하지 않은 Qwen3-4B 실험](../../specs/search-v3/research/PRZ-031-semantic-evidence-directness/evidence.md)

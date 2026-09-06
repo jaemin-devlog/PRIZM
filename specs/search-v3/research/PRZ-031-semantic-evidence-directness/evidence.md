@@ -236,10 +236,10 @@ Registry/scope 검사는 다음 명령 형태로 수행했다.
 
 ```powershell
 $prz031Docs = @(
-  'specs/PRZ-031-semantic-evidence-directness/spec.md',
-  'specs/PRZ-031-semantic-evidence-directness/plan.md',
-  'specs/PRZ-031-semantic-evidence-directness/tasks.md',
-  'specs/PRZ-031-semantic-evidence-directness/evidence.md'
+  'specs/search-v3/research/PRZ-031-semantic-evidence-directness/spec.md',
+  'specs/search-v3/research/PRZ-031-semantic-evidence-directness/plan.md',
+  'specs/search-v3/research/PRZ-031-semantic-evidence-directness/tasks.md',
+  'specs/search-v3/research/PRZ-031-semantic-evidence-directness/evidence.md'
 )
 $prz031Docs | Where-Object { -not (Test-Path -LiteralPath $_) }
 git diff --cached --name-only

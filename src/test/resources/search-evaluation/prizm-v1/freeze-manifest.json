@@ -1,0 +1,114 @@
+{
+  "datasetId": "prizm-career-evidence-synthetic-v1.0",
+  "schemaVersion": 2,
+  "frozenAtSourceRevision": "2c8fd5c0d2f62b154642d703a0970389f8abed8e",
+  "hashAlgorithm": "SHA-256",
+  "lineEnding": "LF",
+  "frozenBeforeSearch": true,
+  "searchExecutedAtFreeze": false,
+  "immutableTestSplit": true,
+  "counts": {
+    "cohorts": 3,
+    "documents": 114,
+    "questions": 300,
+    "evidenceQuestions": 150,
+    "noEvidenceQuestions": 150,
+    "projectIdentifierAsciiDigitBlindParaphraseQuestions": 60,
+    "splits": {
+      "TUNING": {
+        "documents": 63,
+        "questions": 180,
+        "evidenceQuestions": 90,
+        "noEvidenceQuestions": 90
+      },
+      "TEST": {
+        "documents": 51,
+        "questions": 120,
+        "evidenceQuestions": 60,
+        "noEvidenceQuestions": 60
+      }
+    },
+    "categories": {
+      "ABSENT_ENTITY": 21,
+      "ALTERED_FACT": 21,
+      "COLLABORATION": 11,
+      "DIRECT_EVIDENCE": 9,
+      "EXACT_VALUE": 15,
+      "NEAR_TOPIC_NO_EVIDENCE": 33,
+      "NO_EVIDENCE": 27,
+      "NO_SEARCHABLE_DOCUMENTS": 15,
+      "OVERLAP_DUPLICATE": 8,
+      "OWNER_BOUNDARY": 18,
+      "PARAPHRASE": 60,
+      "PDF_EVIDENCE": 21,
+      "PROBLEM_SOLVING": 11,
+      "TECHNICAL_EXPERIENCE": 15,
+      "VERSION_BOUNDARY": 15
+    }
+  },
+  "chunkingContract": {
+    "profile": "production",
+    "maxChunkLength": 800,
+    "overlap": 120
+  },
+  "provenance": {
+    "syntheticOnly": true,
+    "personalDataIncluded": false,
+    "thirdPartyDatasetTextIncluded": false,
+    "realUserDocumentsUsed": false,
+    "sourceKind": "PRIZM_AUTHORED_FICTIONAL_FACT_MATRIX",
+    "generationMethod": "DETERMINISTIC_TEMPLATE",
+    "authoringAssistance": "OpenAI Codex; exact service model metadata is not asserted",
+    "latentTrainingOverlapGuaranteedAbsent": false,
+    "license": "Apache-2.0",
+    "thirdPartyNotices": []
+  },
+  "humanization": {
+    "skill": "humanize-korean",
+    "mode": "사실 행렬 교정·문장 다듬기·AI 문체 신호 점검",
+    "intensity": "기본",
+    "protectedElements": [
+      "project names",
+      "identifiers",
+      "numbers",
+      "dates",
+      "units",
+      "technology terms",
+      "negation scope",
+      "qrels"
+    ],
+    "reviewScope": "AUTHORED_FACT_MATRIX_TEXT_ONLY",
+    "reviewedTextItems": 576,
+    "protectedElementsBefore": 619,
+    "protectedElementsAfter": 619,
+    "addedCareerFacts": 0,
+    "newKnowledgeClaims": 0,
+    "protectedElementChanges": 0,
+    "auditGate": "PASS",
+    "auditResultBasis": "LOCAL_AUTHORING_AUDIT",
+    "auditInputArtifactsIncluded": false,
+    "deterministicContextTemplatesReviewedSeparately": true
+  },
+  "files": {
+    "README.md": {
+      "bytes": 4728,
+      "sha256": "85ae45d8446733239b1b9575766b8dd819055b73488bda0d52c96c9e8c407258"
+    },
+    "fact-matrix.json": {
+      "bytes": 105116,
+      "sha256": "6ceaea80834c809a6eb56ed7e5e9dd7ecf56c22d61cad56151ab5c6b60cde3e7"
+    },
+    "corpus.json": {
+      "bytes": 846801,
+      "sha256": "68584bd3888873e0ff3f8b0d203c11c530e778a1a5bf1accae7dfa2d34240fdf"
+    },
+    "questions.jsonl": {
+      "bytes": 185358,
+      "sha256": "10739296597c5372ed7467a8dcf1867f66de4924c3a2931b7ddf59f1d5c15a61"
+    },
+    "../../../../../scripts/generate-prizm-search-evaluation-dataset.mjs": {
+      "bytes": 36065,
+      "sha256": "c7b31b8924ad735300e92d3428cfad5771f24dd259dec2215674e784194dfbca"
+    }
+  }
+}

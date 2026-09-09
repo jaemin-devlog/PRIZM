@@ -1,0 +1,113 @@
+{
+  "artifactType": "CORPUS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+  "split": "DEV",
+  "userBundles": [
+    {
+      "userBundleId": "SV3-RB-U201",
+      "split": "DEV",
+      "professionGroup": "FRONTEND_MOBILE",
+      "profession": "mobile product engineer",
+      "languageProfile": "KO",
+      "documentFamilyId": "SV3-RB-U201-DOC-FAMILY",
+      "templateFamilyId": "SV3-RB-TEMPLATE-MOBILE-NARRATIVE-201",
+      "documents": [
+        {
+          "documentId": "SV3-RB-U201-D01",
+          "logicalDocumentId": "SV3-RB-U201-D01-LOGICAL",
+          "versionLineageId": "SV3-RB-U201-D01-LINEAGE",
+          "versionId": "SV3-RB-U201-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "합성 모바일 현장 서비스 포트폴리오",
+          "documentType": "PORTFOLIO",
+          "documentStructure": "LONG_PORTFOLIO",
+          "fileType": "TXT",
+          "language": "KO",
+          "contentPath": "documents/sv3-rb-u201-mobile-field-portfolio-v01.txt",
+          "contentSha256": "4f2f86ffe77e592743256cc3afa675f30a372884be319a934707197e97aba21f",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-prz026-robustness-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-RB-SEED-MOBILE-201-7F31"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-RB-U202",
+      "split": "DEV",
+      "professionGroup": "DESIGN_PRODUCT",
+      "profession": "service designer and product strategist",
+      "languageProfile": "EN",
+      "documentFamilyId": "SV3-RB-U202-DOC-FAMILY",
+      "templateFamilyId": "SV3-RB-TEMPLATE-DESIGN-CASEBOOK-202",
+      "documents": [
+        {
+          "documentId": "SV3-RB-U202-D01",
+          "logicalDocumentId": "SV3-RB-U202-D01-LOGICAL",
+          "versionLineageId": "SV3-RB-U202-D01-LINEAGE",
+          "versionId": "SV3-RB-U202-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Synthetic Public Service Design Casebook",
+          "documentType": "PORTFOLIO",
+          "documentStructure": "LONG_PORTFOLIO",
+          "fileType": "TXT",
+          "language": "EN",
+          "contentPath": "documents/sv3-rb-u202-service-design-casebook-v01.txt",
+          "contentSha256": "a9c971d9b4224b7276388640776d88232b2d433aa2012121fce54d4c08db5c75",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-prz026-robustness-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-RB-SEED-DESIGN-202-4A86"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-RB-U203",
+      "split": "DEV",
+      "professionGroup": "DATA_AI_INFRA",
+      "profession": "data platform and reliability engineer",
+      "languageProfile": "KO_EN_MIXED",
+      "documentFamilyId": "SV3-RB-U203-DOC-FAMILY",
+      "templateFamilyId": "SV3-RB-TEMPLATE-DATA-OPERATIONS-203",
+      "documents": [
+        {
+          "documentId": "SV3-RB-U203-D01",
+          "logicalDocumentId": "SV3-RB-U203-D01-LOGICAL",
+          "versionLineageId": "SV3-RB-U203-D01-LINEAGE",
+          "versionId": "SV3-RB-U203-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Synthetic Data Platform 운영 기록",
+          "documentType": "CAREER_REVIEW",
+          "documentStructure": "CAREER_DESCRIPTION",
+          "fileType": "TXT",
+          "language": "KO_EN_MIXED",
+          "contentPath": "documents/sv3-rb-u203-data-platform-record-v01.txt",
+          "contentSha256": "0bee98667beaf5dcaa047d3f8f6c24360358f1b0b2c5660a7f0ce23abff87317",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-prz026-robustness-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-RB-SEED-DATA-203-C912"
+          }
+        }
+      ]
+    }
+  ]
+}

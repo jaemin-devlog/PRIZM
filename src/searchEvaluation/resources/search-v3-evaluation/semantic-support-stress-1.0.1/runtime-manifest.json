@@ -1,0 +1,34 @@
+{
+  "artifactType": "SEARCH_V3_SEMANTIC_SUPPORT_STRESS_RUNTIME_MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "semantic-support-stress-1.0.1",
+  "previousVersion": "semantic-support-stress-1.0.0",
+  "changeReason": "PRE_RETRIEVAL_FIX_PRZ025_ASPECT_CONTRACT_AND_OTHER_ACTOR_COVERAGE",
+  "status": "INPUT_FROZEN",
+  "mutable": false,
+  "baseDatasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+  "splits": ["DEV", "CALIBRATION"],
+  "counts": {
+    "userBundlesReferenced": 6,
+    "documentsReferenced": 6,
+    "documentsCopied": 0,
+    "queries": 24,
+    "devQueries": 12,
+    "calibrationQueries": 12,
+    "runtimePayloadFiles": 4
+  },
+  "hashStatus": "SHA256_FROZEN",
+  "combinedHashAlgorithm": "SHA-256(relativePath + NUL + lowercaseSha256 + LF, sorted by ordinal relativePath; runtime manifest excluded)",
+  "combinedSha256": "c20d42920ee4cc509981de5e50dd70cfa6f5ebf9a5c3fdfad229c1ae546528af",
+  "files": [
+    {"path": "calibration/corpus-overlay.json", "bytes": 1803, "sha256": "50299bf59211bad5edf04e3d6aecfb39c8b52c6da2107acf8b1473bed118424d"},
+    {"path": "calibration/runtime-questions.json", "bytes": 2549, "sha256": "510d0c7e696177ddace6771b648335e62be72cbed669df6078151c2d5bbdd81b"},
+    {"path": "dev/corpus-overlay.json", "bytes": 1721, "sha256": "0510ccde4ad650d163dfb28d5cbb97278ec2c2f4429aef2ae6af824c36ece456"},
+    {"path": "dev/runtime-questions.json", "bytes": 2598, "sha256": "c78ac6083306cbd28701b9fea4e413ba9a27c5e7220d22c2c7bbe5562abbdf4d"}
+  ],
+  "execution": {
+    "retrievalExecuted": false,
+    "embeddingExecuted": false,
+    "sealedFinalAccessed": false
+  }
+}

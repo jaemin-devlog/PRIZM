@@ -1,0 +1,1012 @@
+{
+  "artifactType": "GOLD_EVIDENCE",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.0.1",
+  "split": "DEV",
+  "parents": [
+    {
+      "parentId": "SV3-U31-P01",
+      "userBundleId": "SV3-U31",
+      "documentId": "SV3-U31-D01",
+      "versionId": "SV3-U31-D01-V01",
+      "label": "검증된 상담 요청",
+      "sourceSpan": {
+        "spanId": "SV3-U31-P01-PS01",
+        "parentId": "SV3-U31-P01",
+        "documentId": "SV3-U31-D01",
+        "versionId": "SV3-U31-D01-V01",
+        "sourcePath": "documents/sv3-u31-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 25,
+        "charEnd": 68,
+        "lineStart": 4,
+        "lineEnd": 4,
+        "text": "본인은 지역 파트너 캠페인에서 검증된 유효 상담 요청 1,300건을 생성했다.",
+        "textSha256": "1e57ab7d629a9e0f62b4bb9a7b6c4c96e44e9cc4a9bd3fe0986530d65090c630"
+      }
+    },
+    {
+      "parentId": "SV3-U31-P02",
+      "userBundleId": "SV3-U31",
+      "documentId": "SV3-U31-D01",
+      "versionId": "SV3-U31-D01-V01",
+      "label": "설문 데이터 정리",
+      "sourceSpan": {
+        "spanId": "SV3-U31-P02-PS01",
+        "parentId": "SV3-U31-P02",
+        "documentId": "SV3-U31-D01",
+        "versionId": "SV3-U31-D01-V01",
+        "sourcePath": "documents/sv3-u31-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 80,
+        "charEnd": 121,
+        "lineStart": 7,
+        "lineEnd": 7,
+        "text": "별도의 데이터 정리 작업에서는 설문 응답 데이터 1,300건을 정규화했다.",
+        "textSha256": "3511990610ee564f606d395c03fd204cb174d39dc72d451d9a7a1a0eede5c5a0"
+      }
+    },
+    {
+      "parentId": "SV3-U31-P03",
+      "userBundleId": "SV3-U31",
+      "documentId": "SV3-U31-D01",
+      "versionId": "SV3-U31-D01-V01",
+      "label": "후속 연락 개선",
+      "sourceSpan": {
+        "spanId": "SV3-U31-P03-PS01",
+        "parentId": "SV3-U31-P03",
+        "documentId": "SV3-U31-D01",
+        "versionId": "SV3-U31-D01-V01",
+        "sourcePath": "documents/sv3-u31-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 132,
+        "charEnd": 163,
+        "lineStart": 10,
+        "lineEnd": 10,
+        "text": "후속 연락 절차를 바꿔 미응답 비율을 65% 감소시켰다.",
+        "textSha256": "60b3b5c56968363652118eca4f480b7830d7a2f942b8c645ff193fbc2d38b61d"
+      }
+    },
+    {
+      "parentId": "SV3-U31-P04",
+      "userBundleId": "SV3-U31",
+      "documentId": "SV3-U31-D01",
+      "versionId": "SV3-U31-D01-V01",
+      "label": "다른 지역의 경고 신호",
+      "sourceSpan": {
+        "spanId": "SV3-U31-P04-PS01",
+        "parentId": "SV3-U31-P04",
+        "documentId": "SV3-U31-D01",
+        "versionId": "SV3-U31-D01-V01",
+        "sourcePath": "documents/sv3-u31-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 178,
+        "charEnd": 210,
+        "lineStart": 13,
+        "lineEnd": 13,
+        "text": "다른 지역에서는 같은 기간 미응답 비율이 65% 증가했다.",
+        "textSha256": "92ff3d048217961393f823b8cb1513c15c6ce5dc33ca4c0090754fa02525898d"
+      }
+    },
+    {
+      "parentId": "SV3-U31-P05",
+      "userBundleId": "SV3-U31",
+      "documentId": "SV3-U31-D01",
+      "versionId": "SV3-U31-D01-V01",
+      "label": "상담 단계 관리",
+      "sourceSpan": {
+        "spanId": "SV3-U31-P05-PS01",
+        "parentId": "SV3-U31-P05",
+        "documentId": "SV3-U31-D01",
+        "versionId": "SV3-U31-D01-V01",
+        "sourcePath": "documents/sv3-u31-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 221,
+        "charEnd": 256,
+        "lineStart": 16,
+        "lineEnd": 16,
+        "text": "OrbitCRM에서 파트너 상담 단계와 후속 담당자를 관리했다.",
+        "textSha256": "b3382750b5bc60833868691e2280f683e0e592683645c9a69398a485825ba28f"
+      }
+    },
+    {
+      "parentId": "SV3-U32-P01",
+      "userBundleId": "SV3-U32",
+      "documentId": "SV3-U32-D01",
+      "versionId": "SV3-U32-D01-V01",
+      "label": "Approved booking flow",
+      "sourceSpan": {
+        "spanId": "SV3-U32-P01-PS01",
+        "parentId": "SV3-U32-P01",
+        "documentId": "SV3-U32-D01",
+        "versionId": "SV3-U32-D01-V01",
+        "sourcePath": "documents/sv3-u32-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 50,
+        "charEnd": 141,
+        "lineStart": 4,
+        "lineEnd": 4,
+        "text": "The redesigned booking flow achieved an 80% task completion rate in the controlled rollout.",
+        "textSha256": "43cc9f3c01b8363a6093aa9461d297a57ab44145328a0f55389085275b30663d"
+      }
+    },
+    {
+      "parentId": "SV3-U32-P02",
+      "userBundleId": "SV3-U32",
+      "documentId": "SV3-U32-D01",
+      "versionId": "SV3-U32-D01-V01",
+      "label": "Earlier concept test",
+      "sourceSpan": {
+        "spanId": "SV3-U32-P02-PS01",
+        "parentId": "SV3-U32-P02",
+        "documentId": "SV3-U32-D01",
+        "versionId": "SV3-U32-D01-V01",
+        "sourcePath": "documents/sv3-u32-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 164,
+        "charEnd": 244,
+        "lineStart": 7,
+        "lineEnd": 7,
+        "text": "An earlier concept test reached a 72% task completion rate and was not approved.",
+        "textSha256": "75c283e8fba17a55f6da25d89fd0279961c9f3126107a2922aff11b1dd10a40f"
+      }
+    },
+    {
+      "parentId": "SV3-U32-P03",
+      "userBundleId": "SV3-U32",
+      "documentId": "SV3-U32-D01",
+      "versionId": "SV3-U32-D01-V01",
+      "label": "Service launch",
+      "sourceSpan": {
+        "spanId": "SV3-U32-P03-PS01",
+        "parentId": "SV3-U32-P03",
+        "documentId": "SV3-U32-D01",
+        "versionId": "SV3-U32-D01-V01",
+        "sourcePath": "documents/sv3-u32-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 261,
+        "charEnd": 340,
+        "lineStart": 10,
+        "lineEnd": 10,
+        "text": "The approved service launch date was 2025-07-15 after the accessibility review.",
+        "textSha256": "ce21f71586149464955b605b6e1c170bca97b874ab3600cd8af07c3c926bc760"
+      }
+    },
+    {
+      "parentId": "SV3-U32-P04",
+      "userBundleId": "SV3-U32",
+      "documentId": "SV3-U32-D01",
+      "versionId": "SV3-U32-D01-V01",
+      "label": "Research archive",
+      "sourceSpan": {
+        "spanId": "SV3-U32-P04-PS01",
+        "parentId": "SV3-U32-P04",
+        "documentId": "SV3-U32-D01",
+        "versionId": "SV3-U32-D01-V01",
+        "sourcePath": "documents/sv3-u32-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 359,
+        "charEnd": 431,
+        "lineStart": 13,
+        "lineEnd": 13,
+        "text": "Research notes were archived without a release date or deployment claim.",
+        "textSha256": "d8019323b8af24665ebd5fd2a7fa666777f7784ec4071b3206f883ad2afe6314"
+      }
+    },
+    {
+      "parentId": "SV3-U33-P01",
+      "userBundleId": "SV3-U33",
+      "documentId": "SV3-U33-D01",
+      "versionId": "SV3-U33-D01-V01",
+      "label": "운영 기간",
+      "sourceSpan": {
+        "spanId": "SV3-U33-P01-PS01",
+        "parentId": "SV3-U33-P01",
+        "documentId": "SV3-U33-D01",
+        "versionId": "SV3-U33-D01-V01",
+        "sourcePath": "documents/sv3-u33-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 31,
+        "charEnd": 87,
+        "lineStart": 4,
+        "lineEnd": 4,
+        "text": "본인은 community operations를 4년 동안 맡아 정기 인수인계와 현장 점검을 운영했다.",
+        "textSha256": "ccff274cd8bc92216e69412dc0970f775df586381268ca646bef882062344f9e"
+      }
+    },
+    {
+      "parentId": "SV3-U33-P02",
+      "userBundleId": "SV3-U33",
+      "documentId": "SV3-U33-D01",
+      "versionId": "SV3-U33-D01-V01",
+      "label": "한시적 pilot",
+      "sourceSpan": {
+        "spanId": "SV3-U33-P02-PS01",
+        "parentId": "SV3-U33-P02",
+        "documentId": "SV3-U33-D01",
+        "versionId": "SV3-U33-D01-V01",
+        "sourcePath": "documents/sv3-u33-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 99,
+        "charEnd": 148,
+        "lineStart": 7,
+        "lineEnd": 7,
+        "text": "한시적 community operations pilot은 2년 동안 운영된 뒤 종료됐다.",
+        "textSha256": "f6e9f3e440ad85fd45aa266f8df8fb96d2f9a4d99b42363b803014ea14637bb4"
+      }
+    },
+    {
+      "parentId": "SV3-U33-P03",
+      "userBundleId": "SV3-U33",
+      "documentId": "SV3-U33-D01",
+      "versionId": "SV3-U33-D01-V01",
+      "label": "교육 키트 1차 점검",
+      "sourceSpan": {
+        "spanId": "SV3-U33-P03-PS01",
+        "parentId": "SV3-U33-P03",
+        "documentId": "SV3-U33-D01",
+        "versionId": "SV3-U33-D01-V01",
+        "sourcePath": "documents/sv3-u33-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 162,
+        "charEnd": 200,
+        "lineStart": 10,
+        "lineEnd": 10,
+        "text": "분기 점검에서는 75건의 교육 키트를 확인하고 누락 사유를 기록했다.",
+        "textSha256": "02e4d1d767947bb85951b0bad9b058a9c1f55e02366c40d0d2d6c21f375dfbbe"
+      }
+    },
+    {
+      "parentId": "SV3-U33-P04",
+      "userBundleId": "SV3-U33",
+      "documentId": "SV3-U33-D01",
+      "versionId": "SV3-U33-D01-V01",
+      "label": "교육 키트 2차 점검",
+      "sourceSpan": {
+        "spanId": "SV3-U33-P04-PS01",
+        "parentId": "SV3-U33-P04",
+        "documentId": "SV3-U33-D01",
+        "versionId": "SV3-U33-D01-V01",
+        "sourcePath": "documents/sv3-u33-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 214,
+        "charEnd": 247,
+        "lineStart": 13,
+        "lineEnd": 13,
+        "text": "다음 분기에는 120건의 교육 키트를 같은 절차로 점검했다.",
+        "textSha256": "d896b01a432e3d3336e091c95694dd2c817d8f7ea68083d3c97b8e7f409f9ec0"
+      }
+    }
+  ],
+  "evidenceGroups": [
+    {
+      "groupId": "SV3-U31-G01",
+      "userBundleId": "SV3-U31",
+      "sourceFactId": "SV3-TC-FACT-U31-P01",
+      "description": "검증된 상담 요청",
+      "evidenceUnitIds": [
+        "SV3-U31-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U31-G02",
+      "userBundleId": "SV3-U31",
+      "sourceFactId": "SV3-TC-FACT-U31-P02",
+      "description": "설문 데이터 정리",
+      "evidenceUnitIds": [
+        "SV3-U31-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U31-G03",
+      "userBundleId": "SV3-U31",
+      "sourceFactId": "SV3-TC-FACT-U31-P03",
+      "description": "후속 연락 개선",
+      "evidenceUnitIds": [
+        "SV3-U31-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U31-G04",
+      "userBundleId": "SV3-U31",
+      "sourceFactId": "SV3-TC-FACT-U31-P04",
+      "description": "다른 지역의 경고 신호",
+      "evidenceUnitIds": [
+        "SV3-U31-P04-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U31-G05",
+      "userBundleId": "SV3-U31",
+      "sourceFactId": "SV3-TC-FACT-U31-P05",
+      "description": "상담 단계 관리",
+      "evidenceUnitIds": [
+        "SV3-U31-P05-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U32-G01",
+      "userBundleId": "SV3-U32",
+      "sourceFactId": "SV3-TC-FACT-U32-P01",
+      "description": "Approved booking flow",
+      "evidenceUnitIds": [
+        "SV3-U32-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U32-G02",
+      "userBundleId": "SV3-U32",
+      "sourceFactId": "SV3-TC-FACT-U32-P02",
+      "description": "Earlier concept test",
+      "evidenceUnitIds": [
+        "SV3-U32-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U32-G03",
+      "userBundleId": "SV3-U32",
+      "sourceFactId": "SV3-TC-FACT-U32-P03",
+      "description": "Service launch",
+      "evidenceUnitIds": [
+        "SV3-U32-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U32-G04",
+      "userBundleId": "SV3-U32",
+      "sourceFactId": "SV3-TC-FACT-U32-P04",
+      "description": "Research archive",
+      "evidenceUnitIds": [
+        "SV3-U32-P04-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U33-G01",
+      "userBundleId": "SV3-U33",
+      "sourceFactId": "SV3-TC-FACT-U33-P01",
+      "description": "운영 기간",
+      "evidenceUnitIds": [
+        "SV3-U33-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U33-G02",
+      "userBundleId": "SV3-U33",
+      "sourceFactId": "SV3-TC-FACT-U33-P02",
+      "description": "한시적 pilot",
+      "evidenceUnitIds": [
+        "SV3-U33-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U33-G03",
+      "userBundleId": "SV3-U33",
+      "sourceFactId": "SV3-TC-FACT-U33-P03",
+      "description": "교육 키트 1차 점검",
+      "evidenceUnitIds": [
+        "SV3-U33-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U33-G04",
+      "userBundleId": "SV3-U33",
+      "sourceFactId": "SV3-TC-FACT-U33-P04",
+      "description": "교육 키트 2차 점검",
+      "evidenceUnitIds": [
+        "SV3-U33-P04-E01"
+      ]
+    }
+  ],
+  "evidenceUnits": [
+    {
+      "evidenceUnitId": "SV3-U31-P01-E01",
+      "userBundleId": "SV3-U31",
+      "parentId": "SV3-U31-P01",
+      "groupId": "SV3-U31-G01",
+      "documentId": "SV3-U31-D01",
+      "versionId": "SV3-U31-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U31-P01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U31-P01-E01-S01",
+          "parentId": "SV3-U31-P01",
+          "documentId": "SV3-U31-D01",
+          "versionId": "SV3-U31-D01-V01",
+          "sourcePath": "documents/sv3-u31-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 25,
+          "charEnd": 68,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "본인은 지역 파트너 캠페인에서 검증된 유효 상담 요청 1,300건을 생성했다.",
+          "textSha256": "1e57ab7d629a9e0f62b4bb9a7b6c4c96e44e9cc4a9bd3fe0986530d65090c630"
+        }
+      ],
+      "primarySpanId": "SV3-U31-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p01"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 1300,
+          "unit": "건",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "1,300건",
+          "qualifierTokens": [
+            "유효",
+            "상담",
+            "요청"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U31-P02-E01",
+      "userBundleId": "SV3-U31",
+      "parentId": "SV3-U31-P02",
+      "groupId": "SV3-U31-G02",
+      "documentId": "SV3-U31-D01",
+      "versionId": "SV3-U31-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U31-P02",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U31-P02-E01-S01",
+          "parentId": "SV3-U31-P02",
+          "documentId": "SV3-U31-D01",
+          "versionId": "SV3-U31-D01-V01",
+          "sourcePath": "documents/sv3-u31-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 80,
+          "charEnd": 121,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "별도의 데이터 정리 작업에서는 설문 응답 데이터 1,300건을 정규화했다.",
+          "textSha256": "3511990610ee564f606d395c03fd204cb174d39dc72d451d9a7a1a0eede5c5a0"
+        }
+      ],
+      "primarySpanId": "SV3-U31-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p02"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 1300,
+          "unit": "건",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "1,300건",
+          "qualifierTokens": [
+            "설문",
+            "응답",
+            "데이터"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U31-P03-E01",
+      "userBundleId": "SV3-U31",
+      "parentId": "SV3-U31-P03",
+      "groupId": "SV3-U31-G03",
+      "documentId": "SV3-U31-D01",
+      "versionId": "SV3-U31-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U31-P03",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U31-P03-E01-S01",
+          "parentId": "SV3-U31-P03",
+          "documentId": "SV3-U31-D01",
+          "versionId": "SV3-U31-D01-V01",
+          "sourcePath": "documents/sv3-u31-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 132,
+          "charEnd": 163,
+          "lineStart": 10,
+          "lineEnd": 10,
+          "text": "후속 연락 절차를 바꿔 미응답 비율을 65% 감소시켰다.",
+          "textSha256": "60b3b5c56968363652118eca4f480b7830d7a2f942b8c645ff193fbc2d38b61d"
+        }
+      ],
+      "primarySpanId": "SV3-U31-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p03"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 65,
+          "unit": "%",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "65%",
+          "qualifierTokens": [
+            "미응답",
+            "비율"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U31-P04-E01",
+      "userBundleId": "SV3-U31",
+      "parentId": "SV3-U31-P04",
+      "groupId": "SV3-U31-G04",
+      "documentId": "SV3-U31-D01",
+      "versionId": "SV3-U31-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U31-P04",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U31-P04-E01-S01",
+          "parentId": "SV3-U31-P04",
+          "documentId": "SV3-U31-D01",
+          "versionId": "SV3-U31-D01-V01",
+          "sourcePath": "documents/sv3-u31-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 178,
+          "charEnd": 210,
+          "lineStart": 13,
+          "lineEnd": 13,
+          "text": "다른 지역에서는 같은 기간 미응답 비율이 65% 증가했다.",
+          "textSha256": "92ff3d048217961393f823b8cb1513c15c6ce5dc33ca4c0090754fa02525898d"
+        }
+      ],
+      "primarySpanId": "SV3-U31-P04-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p04"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 65,
+          "unit": "%",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "65%",
+          "qualifierTokens": [
+            "미응답",
+            "비율"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U31-P05-E01",
+      "userBundleId": "SV3-U31",
+      "parentId": "SV3-U31-P05",
+      "groupId": "SV3-U31-G05",
+      "documentId": "SV3-U31-D01",
+      "versionId": "SV3-U31-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U31-P05",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U31-P05-E01-S01",
+          "parentId": "SV3-U31-P05",
+          "documentId": "SV3-U31-D01",
+          "versionId": "SV3-U31-D01-V01",
+          "sourcePath": "documents/sv3-u31-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 221,
+          "charEnd": 256,
+          "lineStart": 16,
+          "lineEnd": 16,
+          "text": "OrbitCRM에서 파트너 상담 단계와 후속 담당자를 관리했다.",
+          "textSha256": "b3382750b5bc60833868691e2280f683e0e592683645c9a69398a485825ba28f"
+        }
+      ],
+      "primarySpanId": "SV3-U31-P05-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p05"
+      ],
+      "entities": [
+        {
+          "entityType": "LITERAL_IDENTIFIER",
+          "canonicalValue": "ORBITCRM",
+          "surfaceForms": [
+            "OrbitCRM"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U32-P01-E01",
+      "userBundleId": "SV3-U32",
+      "parentId": "SV3-U32-P01",
+      "groupId": "SV3-U32-G01",
+      "documentId": "SV3-U32-D01",
+      "versionId": "SV3-U32-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U32-P01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U32-P01-E01-S01",
+          "parentId": "SV3-U32-P01",
+          "documentId": "SV3-U32-D01",
+          "versionId": "SV3-U32-D01-V01",
+          "sourcePath": "documents/sv3-u32-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 50,
+          "charEnd": 141,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "The redesigned booking flow achieved an 80% task completion rate in the controlled rollout.",
+          "textSha256": "43cc9f3c01b8363a6093aa9461d297a57ab44145328a0f55389085275b30663d"
+        }
+      ],
+      "primarySpanId": "SV3-U32-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p01"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 80,
+          "unit": "%",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "80%",
+          "qualifierTokens": [
+            "task",
+            "completion",
+            "rate"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U32-P02-E01",
+      "userBundleId": "SV3-U32",
+      "parentId": "SV3-U32-P02",
+      "groupId": "SV3-U32-G02",
+      "documentId": "SV3-U32-D01",
+      "versionId": "SV3-U32-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U32-P02",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U32-P02-E01-S01",
+          "parentId": "SV3-U32-P02",
+          "documentId": "SV3-U32-D01",
+          "versionId": "SV3-U32-D01-V01",
+          "sourcePath": "documents/sv3-u32-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 164,
+          "charEnd": 244,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "An earlier concept test reached a 72% task completion rate and was not approved.",
+          "textSha256": "75c283e8fba17a55f6da25d89fd0279961c9f3126107a2922aff11b1dd10a40f"
+        }
+      ],
+      "primarySpanId": "SV3-U32-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p02"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 72,
+          "unit": "%",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "72%",
+          "qualifierTokens": [
+            "task",
+            "completion",
+            "rate"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U32-P03-E01",
+      "userBundleId": "SV3-U32",
+      "parentId": "SV3-U32-P03",
+      "groupId": "SV3-U32-G03",
+      "documentId": "SV3-U32-D01",
+      "versionId": "SV3-U32-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U32-P03",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U32-P03-E01-S01",
+          "parentId": "SV3-U32-P03",
+          "documentId": "SV3-U32-D01",
+          "versionId": "SV3-U32-D01-V01",
+          "sourcePath": "documents/sv3-u32-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 261,
+          "charEnd": 340,
+          "lineStart": 10,
+          "lineEnd": 10,
+          "text": "The approved service launch date was 2025-07-15 after the accessibility review.",
+          "textSha256": "ce21f71586149464955b605b6e1c170bca97b874ab3600cd8af07c3c926bc760"
+        }
+      ],
+      "primarySpanId": "SV3-U32-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p03"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": [
+        {
+          "start": "2025-07-15",
+          "end": "2025-07-15",
+          "precision": "DAY",
+          "sourceSurface": "2025-07-15"
+        }
+      ]
+    },
+    {
+      "evidenceUnitId": "SV3-U32-P04-E01",
+      "userBundleId": "SV3-U32",
+      "parentId": "SV3-U32-P04",
+      "groupId": "SV3-U32-G04",
+      "documentId": "SV3-U32-D01",
+      "versionId": "SV3-U32-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U32-P04",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U32-P04-E01-S01",
+          "parentId": "SV3-U32-P04",
+          "documentId": "SV3-U32-D01",
+          "versionId": "SV3-U32-D01-V01",
+          "sourcePath": "documents/sv3-u32-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 359,
+          "charEnd": 431,
+          "lineStart": 13,
+          "lineEnd": 13,
+          "text": "Research notes were archived without a release date or deployment claim.",
+          "textSha256": "d8019323b8af24665ebd5fd2a7fa666777f7784ec4071b3206f883ad2afe6314"
+        }
+      ],
+      "primarySpanId": "SV3-U32-P04-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p04"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U33-P01-E01",
+      "userBundleId": "SV3-U33",
+      "parentId": "SV3-U33-P01",
+      "groupId": "SV3-U33-G01",
+      "documentId": "SV3-U33-D01",
+      "versionId": "SV3-U33-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U33-P01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U33-P01-E01-S01",
+          "parentId": "SV3-U33-P01",
+          "documentId": "SV3-U33-D01",
+          "versionId": "SV3-U33-D01-V01",
+          "sourcePath": "documents/sv3-u33-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 31,
+          "charEnd": 87,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "본인은 community operations를 4년 동안 맡아 정기 인수인계와 현장 점검을 운영했다.",
+          "textSha256": "ccff274cd8bc92216e69412dc0970f775df586381268ca646bef882062344f9e"
+        }
+      ],
+      "primarySpanId": "SV3-U33-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p01"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 4,
+          "unit": "년",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "4년",
+          "qualifierTokens": [
+            "community",
+            "operations"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U33-P02-E01",
+      "userBundleId": "SV3-U33",
+      "parentId": "SV3-U33-P02",
+      "groupId": "SV3-U33-G02",
+      "documentId": "SV3-U33-D01",
+      "versionId": "SV3-U33-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U33-P02",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U33-P02-E01-S01",
+          "parentId": "SV3-U33-P02",
+          "documentId": "SV3-U33-D01",
+          "versionId": "SV3-U33-D01-V01",
+          "sourcePath": "documents/sv3-u33-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 99,
+          "charEnd": 148,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "한시적 community operations pilot은 2년 동안 운영된 뒤 종료됐다.",
+          "textSha256": "f6e9f3e440ad85fd45aa266f8df8fb96d2f9a4d99b42363b803014ea14637bb4"
+        }
+      ],
+      "primarySpanId": "SV3-U33-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p02"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 2,
+          "unit": "년",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "2년",
+          "qualifierTokens": [
+            "community",
+            "operations"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U33-P03-E01",
+      "userBundleId": "SV3-U33",
+      "parentId": "SV3-U33-P03",
+      "groupId": "SV3-U33-G03",
+      "documentId": "SV3-U33-D01",
+      "versionId": "SV3-U33-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U33-P03",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U33-P03-E01-S01",
+          "parentId": "SV3-U33-P03",
+          "documentId": "SV3-U33-D01",
+          "versionId": "SV3-U33-D01-V01",
+          "sourcePath": "documents/sv3-u33-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 162,
+          "charEnd": 200,
+          "lineStart": 10,
+          "lineEnd": 10,
+          "text": "분기 점검에서는 75건의 교육 키트를 확인하고 누락 사유를 기록했다.",
+          "textSha256": "02e4d1d767947bb85951b0bad9b058a9c1f55e02366c40d0d2d6c21f375dfbbe"
+        }
+      ],
+      "primarySpanId": "SV3-U33-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p03"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 75,
+          "unit": "건",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "75건",
+          "qualifierTokens": [
+            "교육",
+            "키트"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U33-P04-E01",
+      "userBundleId": "SV3-U33",
+      "parentId": "SV3-U33-P04",
+      "groupId": "SV3-U33-G04",
+      "documentId": "SV3-U33-D01",
+      "versionId": "SV3-U33-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U33-P04",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U33-P04-E01-S01",
+          "parentId": "SV3-U33-P04",
+          "documentId": "SV3-U33-D01",
+          "versionId": "SV3-U33-D01-V01",
+          "sourcePath": "documents/sv3-u33-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 214,
+          "charEnd": 247,
+          "lineStart": 13,
+          "lineEnd": 13,
+          "text": "다음 분기에는 120건의 교육 키트를 같은 절차로 점검했다.",
+          "textSha256": "d896b01a432e3d3336e091c95694dd2c817d8f7ea68083d3c97b8e7f409f9ec0"
+        }
+      ],
+      "primarySpanId": "SV3-U33-P04-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p04"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 120,
+          "unit": "건",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "120건",
+          "qualifierTokens": [
+            "교육",
+            "키트"
+          ]
+        }
+      ],
+      "dates": []
+    }
+  ]
+}

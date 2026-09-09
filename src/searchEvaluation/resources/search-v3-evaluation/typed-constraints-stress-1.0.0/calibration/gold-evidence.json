@@ -1,0 +1,992 @@
+{
+  "artifactType": "GOLD_EVIDENCE",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.0.0",
+  "split": "CALIBRATION",
+  "parents": [
+    {
+      "parentId": "SV3-U34-P01",
+      "userBundleId": "SV3-U34",
+      "documentId": "SV3-U34-D01",
+      "versionId": "SV3-U34-D01-V01",
+      "label": "Primary transport",
+      "sourceSpan": {
+        "spanId": "SV3-U34-P01-PS01",
+        "parentId": "SV3-U34-P01",
+        "documentId": "SV3-U34-D01",
+        "versionId": "SV3-U34-D01-V01",
+        "sourcePath": "documents/sv3-u34-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 42,
+        "charEnd": 128,
+        "lineStart": 4,
+        "lineEnd": 4,
+        "text": "The mobile gateway negotiated HTTP/2 in production and recorded the selected protocol.",
+        "textSha256": "892b5d12b07df4f5e1247238c19f4b088c8fa51afb9696e90a3458cc4d9f1a3d"
+      }
+    },
+    {
+      "parentId": "SV3-U34-P02",
+      "userBundleId": "SV3-U34",
+      "documentId": "SV3-U34-D01",
+      "versionId": "SV3-U34-D01-V01",
+      "label": "Fallback transport",
+      "sourceSpan": {
+        "spanId": "SV3-U34-P02-PS01",
+        "parentId": "SV3-U34-P02",
+        "documentId": "SV3-U34-D01",
+        "versionId": "SV3-U34-D01-V01",
+        "sourcePath": "documents/sv3-u34-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 149,
+        "charEnd": 226,
+        "lineStart": 7,
+        "lineEnd": 7,
+        "text": "A retired fallback endpoint remained on HTTP/1.1 during the migration window.",
+        "textSha256": "07dcf970d234ab95b68351552c89f768edfdd9ae286dc57775eb025b4d958cb3"
+      }
+    },
+    {
+      "parentId": "SV3-U34-P03",
+      "userBundleId": "SV3-U34",
+      "documentId": "SV3-U34-D01",
+      "versionId": "SV3-U34-D01-V01",
+      "label": "Offline queue",
+      "sourceSpan": {
+        "spanId": "SV3-U34-P03-PS01",
+        "parentId": "SV3-U34-P03",
+        "documentId": "SV3-U34-D01",
+        "versionId": "SV3-U34-D01-V01",
+        "sourcePath": "documents/sv3-u34-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 242,
+        "charEnd": 330,
+        "lineStart": 10,
+        "lineEnd": 10,
+        "text": "The offline queue used NimbusCache to retain submitted work until connectivity returned.",
+        "textSha256": "7dbc068b3fdff60e4aad7444bcf246495278b8e6394ca7ed4c6c0d2e3d50d3df"
+      }
+    },
+    {
+      "parentId": "SV3-U34-P04",
+      "userBundleId": "SV3-U34",
+      "documentId": "SV3-U34-D01",
+      "versionId": "SV3-U34-D01-V01",
+      "label": "Unshipped prototype",
+      "sourceSpan": {
+        "spanId": "SV3-U34-P04-PS01",
+        "parentId": "SV3-U34-P04",
+        "documentId": "SV3-U34-D01",
+        "versionId": "SV3-U34-D01-V01",
+        "sourcePath": "documents/sv3-u34-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 352,
+        "charEnd": 439,
+        "lineStart": 13,
+        "lineEnd": 13,
+        "text": "A separate prototype mentioned ZephyrDBX but was never connected to the mobile gateway.",
+        "textSha256": "6ee81407ff513e4b3e22453ac8ce495b93d2ebe0eff887a797e543e5125b61d7"
+      }
+    },
+    {
+      "parentId": "SV3-U35-P01",
+      "userBundleId": "SV3-U35",
+      "documentId": "SV3-U35-D01",
+      "versionId": "SV3-U35-D01-V01",
+      "label": "정책 조사 기간",
+      "sourceSpan": {
+        "spanId": "SV3-U35-P01-PS01",
+        "parentId": "SV3-U35-P01",
+        "documentId": "SV3-U35-D01",
+        "versionId": "SV3-U35-D01-V01",
+        "sourcePath": "documents/sv3-u35-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 24,
+        "charEnd": 76,
+        "lineStart": 4,
+        "lineEnd": 4,
+        "text": "정책 조사 기간은 2024-03-01부터 2025-02-28까지였고 월별 검토 기록을 남겼다.",
+        "textSha256": "a5ece692ab1460d13f2fdabb062ac0031d8885cfe9b820ccc18cc91a8e684179"
+      }
+    },
+    {
+      "parentId": "SV3-U35-P02",
+      "userBundleId": "SV3-U35",
+      "documentId": "SV3-U35-D01",
+      "versionId": "SV3-U35-D01-V01",
+      "label": "전국 적용 시작",
+      "sourceSpan": {
+        "spanId": "SV3-U35-P02-PS01",
+        "parentId": "SV3-U35-P02",
+        "documentId": "SV3-U35-D01",
+        "versionId": "SV3-U35-D01-V01",
+        "sourcePath": "documents/sv3-u35-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 87,
+        "charEnd": 137,
+        "lineStart": 7,
+        "lineEnd": 7,
+        "text": "전국 rollout은 2025-07-01에 시작됐고 지역별 담당자가 적용 상태를 확인했다.",
+        "textSha256": "49734e79e41f1c469a6f685a7bd5bd8e9e5b5b166004d9a7f5b4c723e7309ac1"
+      }
+    },
+    {
+      "parentId": "SV3-U35-P03",
+      "userBundleId": "SV3-U35",
+      "documentId": "SV3-U35-D01",
+      "versionId": "SV3-U35-D01-V01",
+      "label": "계획 관리 도구",
+      "sourceSpan": {
+        "spanId": "SV3-U35-P03-PS01",
+        "parentId": "SV3-U35-P03",
+        "documentId": "SV3-U35-D01",
+        "versionId": "SV3-U35-D01-V01",
+        "sourcePath": "documents/sv3-u35-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 148,
+        "charEnd": 183,
+        "lineStart": 10,
+        "lineEnd": 10,
+        "text": "프로그램 일정과 의사결정 기록은 AtlasPlan으로 관리했다.",
+        "textSha256": "93576959edee7a0a97fc3d49ed82b7798a0111e6477317f5b29d979cf5475ad1"
+      }
+    },
+    {
+      "parentId": "SV3-U35-P04",
+      "userBundleId": "SV3-U35",
+      "documentId": "SV3-U35-D01",
+      "versionId": "SV3-U35-D01-V01",
+      "label": "미채택 초안",
+      "sourceSpan": {
+        "spanId": "SV3-U35-P04-PS01",
+        "parentId": "SV3-U35-P04",
+        "documentId": "SV3-U35-D01",
+        "versionId": "SV3-U35-D01-V01",
+        "sourcePath": "documents/sv3-u35-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 192,
+        "charEnd": 230,
+        "lineStart": 13,
+        "lineEnd": 13,
+        "text": "별도 검토 문서에는 NorthStarX라는 초안 명칭만 남아 있었다.",
+        "textSha256": "11c20373cb263f9205665d423bcd0a7a5e71bbb80e493c7ebad1226b9231682a"
+      }
+    },
+    {
+      "parentId": "SV3-U36-P01",
+      "userBundleId": "SV3-U36",
+      "documentId": "SV3-U36-D01",
+      "versionId": "SV3-U36-D01-V01",
+      "label": "Current batch runtime",
+      "sourceSpan": {
+        "spanId": "SV3-U36-P01-PS01",
+        "parentId": "SV3-U36-P01",
+        "documentId": "SV3-U36-D01",
+        "versionId": "SV3-U36-D01-V01",
+        "sourcePath": "documents/sv3-u36-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 46,
+        "charEnd": 134,
+        "lineStart": 4,
+        "lineEnd": 4,
+        "text": "The production batch service runs on Java 17 and records its runtime version at startup.",
+        "textSha256": "568623bce5b829c8f6063248501a73440f135f188e1b312ef0df29a52fc081e3"
+      }
+    },
+    {
+      "parentId": "SV3-U36-P02",
+      "userBundleId": "SV3-U36",
+      "documentId": "SV3-U36-D01",
+      "versionId": "SV3-U36-D01-V01",
+      "label": "Retired utility",
+      "sourceSpan": {
+        "spanId": "SV3-U36-P02-PS01",
+        "parentId": "SV3-U36-P02",
+        "documentId": "SV3-U36-D01",
+        "versionId": "SV3-U36-D01-V01",
+        "sourcePath": "documents/sv3-u36-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 152,
+        "charEnd": 237,
+        "lineStart": 7,
+        "lineEnd": 7,
+        "text": "A retired import utility remained on Java 11 and was excluded from active processing.",
+        "textSha256": "e818c0cd9ccc4139e2d42af2a3942f4bfab989a711f446a80ddafdb0c7023f74"
+      }
+    },
+    {
+      "parentId": "SV3-U36-P03",
+      "userBundleId": "SV3-U36",
+      "documentId": "SV3-U36-D01",
+      "versionId": "SV3-U36-D01-V01",
+      "label": "재처리 오류 개선",
+      "sourceSpan": {
+        "spanId": "SV3-U36-P03-PS01",
+        "parentId": "SV3-U36-P03",
+        "documentId": "SV3-U36-D01",
+        "versionId": "SV3-U36-D01-V01",
+        "sourcePath": "documents/sv3-u36-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 249,
+        "charEnd": 285,
+        "lineStart": 10,
+        "lineEnd": 10,
+        "text": "검증 단계를 분리한 뒤 재처리 오류율을 정확히 50% 감소시켰다.",
+        "textSha256": "5c1155eb7fbf44be082fab3a3965e4e543671729e41c3ac35de47e5a0cb66007"
+      }
+    },
+    {
+      "parentId": "SV3-U36-P04",
+      "userBundleId": "SV3-U36",
+      "documentId": "SV3-U36-D01",
+      "versionId": "SV3-U36-D01-V01",
+      "label": "데이터 검증량",
+      "sourceSpan": {
+        "spanId": "SV3-U36-P04-PS01",
+        "parentId": "SV3-U36-P04",
+        "documentId": "SV3-U36-D01",
+        "versionId": "SV3-U36-D01-V01",
+        "sourcePath": "documents/sv3-u36-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 295,
+        "charEnd": 366,
+        "lineStart": 13,
+        "lineEnd": 13,
+        "text": "The import job validated 데이터 2,329건 before publishing the daily report.",
+        "textSha256": "ca056563843b5b6a9a5bc4e06c339e2a0466f9e3528cf8aaa5dcee8435b0a96b"
+      }
+    },
+    {
+      "parentId": "SV3-U36-P05",
+      "userBundleId": "SV3-U36",
+      "documentId": "SV3-U36-D01",
+      "versionId": "SV3-U36-D01-V01",
+      "label": "사용자 preview",
+      "sourceSpan": {
+        "spanId": "SV3-U36-P05-PS01",
+        "parentId": "SV3-U36-P05",
+        "documentId": "SV3-U36-D01",
+        "versionId": "SV3-U36-D01-V01",
+        "sourcePath": "documents/sv3-u36-typed-stress-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 380,
+        "charEnd": 455,
+        "lineStart": 16,
+        "lineEnd": 16,
+        "text": "A small preview involved 사용자 300명 and did not proceed to a general release.",
+        "textSha256": "b4b198def9a1b91bb43465e3b9ebbaf5914bfa899995fc79d0cd61ac268c8f01"
+      }
+    }
+  ],
+  "evidenceGroups": [
+    {
+      "groupId": "SV3-U34-G01",
+      "userBundleId": "SV3-U34",
+      "sourceFactId": "SV3-TC-FACT-U34-P01",
+      "description": "Primary transport",
+      "evidenceUnitIds": [
+        "SV3-U34-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U34-G02",
+      "userBundleId": "SV3-U34",
+      "sourceFactId": "SV3-TC-FACT-U34-P02",
+      "description": "Fallback transport",
+      "evidenceUnitIds": [
+        "SV3-U34-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U34-G03",
+      "userBundleId": "SV3-U34",
+      "sourceFactId": "SV3-TC-FACT-U34-P03",
+      "description": "Offline queue",
+      "evidenceUnitIds": [
+        "SV3-U34-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U34-G04",
+      "userBundleId": "SV3-U34",
+      "sourceFactId": "SV3-TC-FACT-U34-P04",
+      "description": "Unshipped prototype",
+      "evidenceUnitIds": [
+        "SV3-U34-P04-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U35-G01",
+      "userBundleId": "SV3-U35",
+      "sourceFactId": "SV3-TC-FACT-U35-P01",
+      "description": "정책 조사 기간",
+      "evidenceUnitIds": [
+        "SV3-U35-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U35-G02",
+      "userBundleId": "SV3-U35",
+      "sourceFactId": "SV3-TC-FACT-U35-P02",
+      "description": "전국 적용 시작",
+      "evidenceUnitIds": [
+        "SV3-U35-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U35-G03",
+      "userBundleId": "SV3-U35",
+      "sourceFactId": "SV3-TC-FACT-U35-P03",
+      "description": "계획 관리 도구",
+      "evidenceUnitIds": [
+        "SV3-U35-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U35-G04",
+      "userBundleId": "SV3-U35",
+      "sourceFactId": "SV3-TC-FACT-U35-P04",
+      "description": "미채택 초안",
+      "evidenceUnitIds": [
+        "SV3-U35-P04-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U36-G01",
+      "userBundleId": "SV3-U36",
+      "sourceFactId": "SV3-TC-FACT-U36-P01",
+      "description": "Current batch runtime",
+      "evidenceUnitIds": [
+        "SV3-U36-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U36-G02",
+      "userBundleId": "SV3-U36",
+      "sourceFactId": "SV3-TC-FACT-U36-P02",
+      "description": "Retired utility",
+      "evidenceUnitIds": [
+        "SV3-U36-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U36-G03",
+      "userBundleId": "SV3-U36",
+      "sourceFactId": "SV3-TC-FACT-U36-P03",
+      "description": "재처리 오류 개선",
+      "evidenceUnitIds": [
+        "SV3-U36-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U36-G04",
+      "userBundleId": "SV3-U36",
+      "sourceFactId": "SV3-TC-FACT-U36-P04",
+      "description": "데이터 검증량",
+      "evidenceUnitIds": [
+        "SV3-U36-P04-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U36-G05",
+      "userBundleId": "SV3-U36",
+      "sourceFactId": "SV3-TC-FACT-U36-P05",
+      "description": "사용자 preview",
+      "evidenceUnitIds": [
+        "SV3-U36-P05-E01"
+      ]
+    }
+  ],
+  "evidenceUnits": [
+    {
+      "evidenceUnitId": "SV3-U34-P01-E01",
+      "userBundleId": "SV3-U34",
+      "parentId": "SV3-U34-P01",
+      "groupId": "SV3-U34-G01",
+      "documentId": "SV3-U34-D01",
+      "versionId": "SV3-U34-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U34-P01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U34-P01-E01-S01",
+          "parentId": "SV3-U34-P01",
+          "documentId": "SV3-U34-D01",
+          "versionId": "SV3-U34-D01-V01",
+          "sourcePath": "documents/sv3-u34-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 42,
+          "charEnd": 128,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "The mobile gateway negotiated HTTP/2 in production and recorded the selected protocol.",
+          "textSha256": "892b5d12b07df4f5e1247238c19f4b088c8fa51afb9696e90a3458cc4d9f1a3d"
+        }
+      ],
+      "primarySpanId": "SV3-U34-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p01"
+      ],
+      "entities": [
+        {
+          "entityType": "IDENTIFIER_NUMBER",
+          "canonicalValue": "HTTP_2",
+          "surfaceForms": [
+            "HTTP/2"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U34-P02-E01",
+      "userBundleId": "SV3-U34",
+      "parentId": "SV3-U34-P02",
+      "groupId": "SV3-U34-G02",
+      "documentId": "SV3-U34-D01",
+      "versionId": "SV3-U34-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U34-P02",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U34-P02-E01-S01",
+          "parentId": "SV3-U34-P02",
+          "documentId": "SV3-U34-D01",
+          "versionId": "SV3-U34-D01-V01",
+          "sourcePath": "documents/sv3-u34-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 149,
+          "charEnd": 226,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "A retired fallback endpoint remained on HTTP/1.1 during the migration window.",
+          "textSha256": "07dcf970d234ab95b68351552c89f768edfdd9ae286dc57775eb025b4d958cb3"
+        }
+      ],
+      "primarySpanId": "SV3-U34-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p02"
+      ],
+      "entities": [
+        {
+          "entityType": "IDENTIFIER_NUMBER",
+          "canonicalValue": "HTTP_1_1",
+          "surfaceForms": [
+            "HTTP/1.1"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U34-P03-E01",
+      "userBundleId": "SV3-U34",
+      "parentId": "SV3-U34-P03",
+      "groupId": "SV3-U34-G03",
+      "documentId": "SV3-U34-D01",
+      "versionId": "SV3-U34-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U34-P03",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U34-P03-E01-S01",
+          "parentId": "SV3-U34-P03",
+          "documentId": "SV3-U34-D01",
+          "versionId": "SV3-U34-D01-V01",
+          "sourcePath": "documents/sv3-u34-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 242,
+          "charEnd": 330,
+          "lineStart": 10,
+          "lineEnd": 10,
+          "text": "The offline queue used NimbusCache to retain submitted work until connectivity returned.",
+          "textSha256": "7dbc068b3fdff60e4aad7444bcf246495278b8e6394ca7ed4c6c0d2e3d50d3df"
+        }
+      ],
+      "primarySpanId": "SV3-U34-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p03"
+      ],
+      "entities": [
+        {
+          "entityType": "LITERAL_IDENTIFIER",
+          "canonicalValue": "NIMBUSCACHE",
+          "surfaceForms": [
+            "NimbusCache"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U34-P04-E01",
+      "userBundleId": "SV3-U34",
+      "parentId": "SV3-U34-P04",
+      "groupId": "SV3-U34-G04",
+      "documentId": "SV3-U34-D01",
+      "versionId": "SV3-U34-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U34-P04",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U34-P04-E01-S01",
+          "parentId": "SV3-U34-P04",
+          "documentId": "SV3-U34-D01",
+          "versionId": "SV3-U34-D01-V01",
+          "sourcePath": "documents/sv3-u34-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 352,
+          "charEnd": 439,
+          "lineStart": 13,
+          "lineEnd": 13,
+          "text": "A separate prototype mentioned ZephyrDBX but was never connected to the mobile gateway.",
+          "textSha256": "6ee81407ff513e4b3e22453ac8ce495b93d2ebe0eff887a797e543e5125b61d7"
+        }
+      ],
+      "primarySpanId": "SV3-U34-P04-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p04"
+      ],
+      "entities": [
+        {
+          "entityType": "LITERAL_IDENTIFIER",
+          "canonicalValue": "ZEPHYRDBX",
+          "surfaceForms": [
+            "ZephyrDBX"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U35-P01-E01",
+      "userBundleId": "SV3-U35",
+      "parentId": "SV3-U35-P01",
+      "groupId": "SV3-U35-G01",
+      "documentId": "SV3-U35-D01",
+      "versionId": "SV3-U35-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U35-P01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U35-P01-E01-S01",
+          "parentId": "SV3-U35-P01",
+          "documentId": "SV3-U35-D01",
+          "versionId": "SV3-U35-D01-V01",
+          "sourcePath": "documents/sv3-u35-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 24,
+          "charEnd": 76,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "정책 조사 기간은 2024-03-01부터 2025-02-28까지였고 월별 검토 기록을 남겼다.",
+          "textSha256": "a5ece692ab1460d13f2fdabb062ac0031d8885cfe9b820ccc18cc91a8e684179"
+        }
+      ],
+      "primarySpanId": "SV3-U35-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p01"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": [
+        {
+          "start": "2024-03-01",
+          "end": "2025-02-28",
+          "precision": "DAY",
+          "sourceSurface": "2024-03-01부터 2025-02-28까지"
+        }
+      ]
+    },
+    {
+      "evidenceUnitId": "SV3-U35-P02-E01",
+      "userBundleId": "SV3-U35",
+      "parentId": "SV3-U35-P02",
+      "groupId": "SV3-U35-G02",
+      "documentId": "SV3-U35-D01",
+      "versionId": "SV3-U35-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U35-P02",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U35-P02-E01-S01",
+          "parentId": "SV3-U35-P02",
+          "documentId": "SV3-U35-D01",
+          "versionId": "SV3-U35-D01-V01",
+          "sourcePath": "documents/sv3-u35-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 87,
+          "charEnd": 137,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "전국 rollout은 2025-07-01에 시작됐고 지역별 담당자가 적용 상태를 확인했다.",
+          "textSha256": "49734e79e41f1c469a6f685a7bd5bd8e9e5b5b166004d9a7f5b4c723e7309ac1"
+        }
+      ],
+      "primarySpanId": "SV3-U35-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p02"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": [
+        {
+          "start": "2025-07-01",
+          "end": "2025-07-01",
+          "precision": "DAY",
+          "sourceSurface": "2025-07-01"
+        }
+      ]
+    },
+    {
+      "evidenceUnitId": "SV3-U35-P03-E01",
+      "userBundleId": "SV3-U35",
+      "parentId": "SV3-U35-P03",
+      "groupId": "SV3-U35-G03",
+      "documentId": "SV3-U35-D01",
+      "versionId": "SV3-U35-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U35-P03",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U35-P03-E01-S01",
+          "parentId": "SV3-U35-P03",
+          "documentId": "SV3-U35-D01",
+          "versionId": "SV3-U35-D01-V01",
+          "sourcePath": "documents/sv3-u35-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 148,
+          "charEnd": 183,
+          "lineStart": 10,
+          "lineEnd": 10,
+          "text": "프로그램 일정과 의사결정 기록은 AtlasPlan으로 관리했다.",
+          "textSha256": "93576959edee7a0a97fc3d49ed82b7798a0111e6477317f5b29d979cf5475ad1"
+        }
+      ],
+      "primarySpanId": "SV3-U35-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p03"
+      ],
+      "entities": [
+        {
+          "entityType": "LITERAL_IDENTIFIER",
+          "canonicalValue": "ATLASPLAN",
+          "surfaceForms": [
+            "AtlasPlan"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U35-P04-E01",
+      "userBundleId": "SV3-U35",
+      "parentId": "SV3-U35-P04",
+      "groupId": "SV3-U35-G04",
+      "documentId": "SV3-U35-D01",
+      "versionId": "SV3-U35-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U35-P04",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U35-P04-E01-S01",
+          "parentId": "SV3-U35-P04",
+          "documentId": "SV3-U35-D01",
+          "versionId": "SV3-U35-D01-V01",
+          "sourcePath": "documents/sv3-u35-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 192,
+          "charEnd": 230,
+          "lineStart": 13,
+          "lineEnd": 13,
+          "text": "별도 검토 문서에는 NorthStarX라는 초안 명칭만 남아 있었다.",
+          "textSha256": "11c20373cb263f9205665d423bcd0a7a5e71bbb80e493c7ebad1226b9231682a"
+        }
+      ],
+      "primarySpanId": "SV3-U35-P04-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p04"
+      ],
+      "entities": [
+        {
+          "entityType": "LITERAL_IDENTIFIER",
+          "canonicalValue": "NORTHSTARX",
+          "surfaceForms": [
+            "NorthStarX"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U36-P01-E01",
+      "userBundleId": "SV3-U36",
+      "parentId": "SV3-U36-P01",
+      "groupId": "SV3-U36-G01",
+      "documentId": "SV3-U36-D01",
+      "versionId": "SV3-U36-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U36-P01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U36-P01-E01-S01",
+          "parentId": "SV3-U36-P01",
+          "documentId": "SV3-U36-D01",
+          "versionId": "SV3-U36-D01-V01",
+          "sourcePath": "documents/sv3-u36-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 46,
+          "charEnd": 134,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "The production batch service runs on Java 17 and records its runtime version at startup.",
+          "textSha256": "568623bce5b829c8f6063248501a73440f135f188e1b312ef0df29a52fc081e3"
+        }
+      ],
+      "primarySpanId": "SV3-U36-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p01"
+      ],
+      "entities": [
+        {
+          "entityType": "IDENTIFIER_NUMBER",
+          "canonicalValue": "JAVA_17",
+          "surfaceForms": [
+            "Java 17"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U36-P02-E01",
+      "userBundleId": "SV3-U36",
+      "parentId": "SV3-U36-P02",
+      "groupId": "SV3-U36-G02",
+      "documentId": "SV3-U36-D01",
+      "versionId": "SV3-U36-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U36-P02",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U36-P02-E01-S01",
+          "parentId": "SV3-U36-P02",
+          "documentId": "SV3-U36-D01",
+          "versionId": "SV3-U36-D01-V01",
+          "sourcePath": "documents/sv3-u36-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 152,
+          "charEnd": 237,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "A retired import utility remained on Java 11 and was excluded from active processing.",
+          "textSha256": "e818c0cd9ccc4139e2d42af2a3942f4bfab989a711f446a80ddafdb0c7023f74"
+        }
+      ],
+      "primarySpanId": "SV3-U36-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p02"
+      ],
+      "entities": [
+        {
+          "entityType": "IDENTIFIER_NUMBER",
+          "canonicalValue": "JAVA_11",
+          "surfaceForms": [
+            "Java 11"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U36-P03-E01",
+      "userBundleId": "SV3-U36",
+      "parentId": "SV3-U36-P03",
+      "groupId": "SV3-U36-G03",
+      "documentId": "SV3-U36-D01",
+      "versionId": "SV3-U36-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U36-P03",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U36-P03-E01-S01",
+          "parentId": "SV3-U36-P03",
+          "documentId": "SV3-U36-D01",
+          "versionId": "SV3-U36-D01-V01",
+          "sourcePath": "documents/sv3-u36-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 249,
+          "charEnd": 285,
+          "lineStart": 10,
+          "lineEnd": 10,
+          "text": "검증 단계를 분리한 뒤 재처리 오류율을 정확히 50% 감소시켰다.",
+          "textSha256": "5c1155eb7fbf44be082fab3a3965e4e543671729e41c3ac35de47e5a0cb66007"
+        }
+      ],
+      "primarySpanId": "SV3-U36-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p03"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 50,
+          "unit": "%",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "50%",
+          "qualifierTokens": [
+            "재처리",
+            "오류율"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U36-P04-E01",
+      "userBundleId": "SV3-U36",
+      "parentId": "SV3-U36-P04",
+      "groupId": "SV3-U36-G04",
+      "documentId": "SV3-U36-D01",
+      "versionId": "SV3-U36-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U36-P04",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U36-P04-E01-S01",
+          "parentId": "SV3-U36-P04",
+          "documentId": "SV3-U36-D01",
+          "versionId": "SV3-U36-D01-V01",
+          "sourcePath": "documents/sv3-u36-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 295,
+          "charEnd": 366,
+          "lineStart": 13,
+          "lineEnd": 13,
+          "text": "The import job validated 데이터 2,329건 before publishing the daily report.",
+          "textSha256": "ca056563843b5b6a9a5bc4e06c339e2a0466f9e3528cf8aaa5dcee8435b0a96b"
+        }
+      ],
+      "primarySpanId": "SV3-U36-P04-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p04"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 2329,
+          "unit": "건",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "2,329건",
+          "qualifierTokens": [
+            "데이터"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U36-P05-E01",
+      "userBundleId": "SV3-U36",
+      "parentId": "SV3-U36-P05",
+      "groupId": "SV3-U36-G05",
+      "documentId": "SV3-U36-D01",
+      "versionId": "SV3-U36-D01-V01",
+      "sourceFactId": "SV3-TC-FACT-U36-P05",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U36-P05-E01-S01",
+          "parentId": "SV3-U36-P05",
+          "documentId": "SV3-U36-D01",
+          "versionId": "SV3-U36-D01-V01",
+          "sourcePath": "documents/sv3-u36-typed-stress-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 380,
+          "charEnd": 455,
+          "lineStart": 16,
+          "lineEnd": 16,
+          "text": "A small preview involved 사용자 300명 and did not proceed to a general release.",
+          "textSha256": "b4b198def9a1b91bb43465e3b9ebbaf5914bfa899995fc79d0cd61ac268c8f01"
+        }
+      ],
+      "primarySpanId": "SV3-U36-P05-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_stress_p05"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 300,
+          "unit": "명",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "300명",
+          "qualifierTokens": [
+            "사용자"
+          ]
+        }
+      ],
+      "dates": []
+    }
+  ]
+}

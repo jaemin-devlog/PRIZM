@@ -1,0 +1,161 @@
+{
+  "artifactType": "CORPUS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-seed-1.0.1",
+  "split": "DEV",
+  "userBundles": [
+    {
+      "userBundleId": "SV3-U01",
+      "split": "DEV",
+      "professionGroup": "BACKEND",
+      "profession": "backend engineer",
+      "languageProfile": "KO",
+      "documentFamilyId": "SV3-U01-DOC-FAMILY",
+      "templateFamilyId": "SV3-TEMPLATE-BACKEND-01",
+      "documents": [
+        {
+          "documentId": "SV3-U01-D01",
+          "logicalDocumentId": "SV3-U01-D01-LOGICAL",
+          "versionLineageId": "SV3-U01-D01-LINEAGE",
+          "versionId": "SV3-U01-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "합성 백엔드 경력 요약",
+          "documentType": "RESUME",
+          "documentStructure": "SHORT_RESUME",
+          "fileType": "TXT",
+          "language": "KO",
+          "contentPath": "documents/sv3-u01-backend-resume-v01.txt",
+          "contentSha256": "62aae40fb932798f7125fc56d5649505dfcf831e48b575076f978b89a624d1c6",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-search-v3-seed-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-SEED-BACKEND-8F1C"
+          }
+        },
+        {
+          "documentId": "SV3-U01-D01",
+          "logicalDocumentId": "SV3-U01-D01-LOGICAL",
+          "versionLineageId": "SV3-U01-D01-LINEAGE",
+          "versionId": "SV3-U01-D01-V00",
+          "versionNumber": 0,
+          "active": false,
+          "title": "합성 백엔드 경력 요약 초안",
+          "documentType": "RESUME",
+          "documentStructure": "SHORT_RESUME",
+          "fileType": "TXT",
+          "language": "KO",
+          "contentPath": "documents/sv3-u01-backend-resume-v00-inactive.txt",
+          "contentSha256": "3f72da0b99f31a2312904f1966e450c748eede39442488fbc4a8139283e7ddec",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-search-v3-seed-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-SEED-BACKEND-8F1C"
+          }
+        },
+        {
+          "documentId": "SV3-U01-D02",
+          "logicalDocumentId": "SV3-U01-D02-LOGICAL",
+          "versionLineageId": "SV3-U01-D02-LINEAGE",
+          "versionId": "SV3-U01-D02-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "합성 장애 대응 경력기술서",
+          "documentType": "CAREER_REVIEW",
+          "documentStructure": "CAREER_DESCRIPTION",
+          "fileType": "TXT",
+          "language": "KO",
+          "contentPath": "documents/sv3-u01-backend-career-v01.txt",
+          "contentSha256": "b2f7df1cdc8b69462a690a8c213e7b0d3365000e6e626633ea75d5b362784edb",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-search-v3-seed-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-SEED-BACKEND-8F1C"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-U04",
+      "split": "DEV",
+      "professionGroup": "DESIGN_PRODUCT",
+      "profession": "service designer and product researcher",
+      "languageProfile": "KO",
+      "documentFamilyId": "SV3-U04-DOC-FAMILY",
+      "templateFamilyId": "SV3-TEMPLATE-DESIGN-04",
+      "documents": [
+        {
+          "documentId": "SV3-U04-D01",
+          "logicalDocumentId": "SV3-U04-D01-LOGICAL",
+          "versionLineageId": "SV3-U04-D01-LINEAGE",
+          "versionId": "SV3-U04-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "합성 서비스 디자인 포트폴리오",
+          "documentType": "PORTFOLIO",
+          "documentStructure": "LONG_PORTFOLIO",
+          "fileType": "TXT",
+          "language": "KO",
+          "contentPath": "documents/sv3-u04-design-portfolio-v01.txt",
+          "contentSha256": "b3fa5f0eb5a73fc6927e4e37fea88e2683d1ca68a6079cbde96a19632a4845b4",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-search-v3-seed-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-SEED-DESIGN-5C2D"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-U06",
+      "split": "DEV",
+      "professionGroup": "MARKETING_SALES",
+      "profession": "growth marketer and sales operations specialist",
+      "languageProfile": "KO_EN_MIXED",
+      "documentFamilyId": "SV3-U06-DOC-FAMILY",
+      "templateFamilyId": "SV3-TEMPLATE-GROWTH-06",
+      "documents": [
+        {
+          "documentId": "SV3-U06-D01",
+          "logicalDocumentId": "SV3-U06-D01-LOGICAL",
+          "versionLineageId": "SV3-U06-D01-LINEAGE",
+          "versionId": "SV3-U06-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Synthetic Growth & Sales Career Description",
+          "documentType": "CAREER_REVIEW",
+          "documentStructure": "CAREER_DESCRIPTION",
+          "fileType": "TXT",
+          "language": "KO_EN_MIXED",
+          "contentPath": "documents/sv3-u06-growth-career-v01.txt",
+          "contentSha256": "20d2f006760b4429f71143e57d228a04f35976cd2f7aa70d5283577ee4af0d03",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-search-v3-seed-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-SEED-GROWTH-7E3F"
+          }
+        }
+      ]
+    }
+  ]
+}

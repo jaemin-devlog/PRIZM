@@ -1,0 +1,51 @@
+Synthetic Data Reliability and Applied ML Portfolio
+
+Production batch reliability
+
+The reporting platform received files from billing, support, and regional operations. Each source used a different delivery window and correction policy, so a late file could look identical to an empty day. I mapped those states before changing the pipeline and retained the original arrival record beside every normalized batch.
+
+I operated a production validation pipeline that checked 2.4 million records per day and reduced the median late-data detection time from 47 minutes to 11 minutes.
+
+- Freshness checks compared the source delivery promise with actual arrival time.
+- Completeness checks retained the expected partition count and the observed count.
+- Recovery notes identified whether a rerun replaced or supplemented an earlier batch.
+- Consumer notices described which dashboards were affected without claiming that unaffected products were delayed.
+
+The rollout was staged by source family. During the first week I kept the old alert and the new state model side by side, reviewed disagreements each morning, and only retired the old path after the data owners agreed on the meaning of late, missing, and corrected. This reduced ambiguity rather than merely lowering the number of alerts.
+
+A later review found that one regional source legitimately delivered after midnight. I changed the expectation for that source instead of widening the global threshold, then added a test fixture for the boundary. The decision and its owner were recorded so that a future schedule change would not silently restore the false alarm.
+
+Recommendation prototype boundary
+
+A product team asked whether support history could help order knowledge-base suggestions. I built an offline prototype using de-identified topic labels and a fixed evaluation snapshot. The objective was to measure whether ranking changed, not to send recommendations to customers.
+
+The recommendation model remained an offline prototype; it was not deployed to production and never served live customer traffic.
+
+The offline review compared the prototype with a frequency baseline, inspected queries where the two systems disagreed, and documented cases in which sparse history produced unstable suggestions. I did not convert that experiment into a claim about business impact because no customer-facing exposure occurred.
+
+Before any future deployment, the proposal would require data-retention review, an owner-scoped serving path, online safety monitoring, and a rollback plan. Those items are open requirements, not completed implementation.
+
+Incident prevention and ownership
+
+An upstream schema change once caused a field to be parsed as text rather than a decimal. The batch completed, but a downstream aggregate was wrong. I led the review with the source owner, added type expectations at the ingestion boundary, and made corrected runs distinguishable from the first publication.
+
+I introduced a release checklist that paired schema compatibility, sample reconciliation, consumer notification, and recovery rehearsal before a high-risk source change.
+
+The checklist did not eliminate judgment. A source owner could accept a known difference, but the decision needed a time limit and named consumer. On-call notes linked the alert, the accepted exception, and the replay command so a responder would not have to reconstruct the context from chat history.
+
+After three months the team removed two redundant alerts, kept the boundary validation, and moved a costly full comparison to a daily audit. The change reduced unnecessary pages while preserving the signal that had prevented a repeat of the incident.
+
+This work was shared with analysts and platform engineers in a blameless review. I owned the validation and recovery changes; the source team owned its publishing contract. The evidence keeps those actor boundaries explicit.
+
+Operating record
+
+Capability | Period | State
+Batch validation | 2024-01 to 2025-06 | production
+Recommendation ranking | 2025-03 | offline prototype
+Recovery rehearsal | quarterly | completed
+
+The table summarizes states already described in the source narrative. It is not a substitute for the evidence above, and the prototype row must not be combined with the production batch row to imply a production recommendation service.
+
+I also maintained a short runbook for checking source availability before escalating to consumers. It listed observable conditions rather than vendor-specific assumptions, which allowed the same process to be used when one source moved to a different delivery mechanism.
+
+The portfolio intentionally includes successful changes, rejected assumptions, and boundaries. Retrieval quality should preserve those distinctions when several semantically similar records appear in one long document.

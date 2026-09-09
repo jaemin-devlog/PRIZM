@@ -1,0 +1,471 @@
+{
+  "artifactType": "QUESTIONS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-seed-1.0.1",
+  "split": "CALIBRATION",
+  "queries": [
+    {
+      "queryId": "SV3-U02-Q01",
+      "userBundleId": "SV3-U02",
+      "questionGroupId": "SV3-U02-Q01-FAMILY",
+      "query": "Did the candidate ship WCAG 2.1 AA improvements?",
+      "normalizedQuery": "did the candidate ship wcag 2 1 aa improvements",
+      "categories": [
+        "literal_identifier",
+        "completed_production",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "accessibility_release"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "accessibility_release",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U02-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U02-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "STANDARD",
+                "canonicalValue": "WCAG_2_1_AA",
+                "surfaceForms": [
+                  "WCAG 2.1 AA"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [
+              "PRODUCTION"
+            ],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U02-Q02",
+      "userBundleId": "SV3-U02",
+      "questionGroupId": "SV3-U02-Q02-FAMILY",
+      "query": "What evidence shows the account flow became more accessible?",
+      "normalizedQuery": "what evidence shows the account flow became more accessible",
+      "categories": [
+        "semantic_paraphrase",
+        "abstract_competency",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "accessibility_release"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "accessibility_release",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U02-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U02-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U02-Q03",
+      "userBundleId": "SV3-U02",
+      "questionGroupId": "SV3-U02-Q03-FAMILY",
+      "query": "Was voice navigation released to production?",
+      "normalizedQuery": "was voice navigation released to production",
+      "categories": [
+        "hard_negative",
+        "attempted_prototype",
+        "completion_state",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "voice_navigation_production"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "voice_navigation_production",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U02-P02-E01",
+              "supportRelation": "RELATED"
+            },
+            {
+              "evidenceUnitId": "SV3-U02-P02-E02",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "FEATURE",
+                "canonicalValue": "VOICE_NAVIGATION",
+                "surfaceForms": [
+                  "voice-navigation"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [
+              "PRODUCTION"
+            ],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U02-Q04",
+      "userBundleId": "SV3-U02",
+      "questionGroupId": "SV3-U02-Q04-FAMILY",
+      "query": "Show accessibilty work for screen reader users.",
+      "normalizedQuery": "show accessibilty work for screen reader users",
+      "categories": [
+        "typo_format_variation",
+        "semantic_paraphrase",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "accessibility_release"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "accessibility_release",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U02-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U02-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U03-Q01",
+      "userBundleId": "SV3-U03",
+      "questionGroupId": "SV3-U03-Q01-FAMILY",
+      "query": "2023년 3월부터 2024년 2월까지 pipeline을 운영했나요?",
+      "normalizedQuery": "2023년 3월부터 2024년 2월까지 pipeline을 운영했나요",
+      "categories": [
+        "date_range",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "pipeline_operation"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "pipeline_operation",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U03-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U03-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [
+              {
+                "operator": "CONTAINS",
+                "start": "2023-03-01",
+                "end": "2024-02-29",
+                "precision": "MONTH"
+              }
+            ],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [
+              "PRODUCTION"
+            ],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U03-Q02",
+      "userBundleId": "SV3-U03",
+      "questionGroupId": "SV3-U03-Q02-FAMILY",
+      "query": "월 200만 records 이상을 검증한 경험이 있나요?",
+      "normalizedQuery": "월 200만 records 이상을 검증한 경험이 있나요",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "pipeline_volume"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "pipeline_volume",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U03-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U03-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GTE",
+                "value": 2000000,
+                "unit": "RECORD_PER_MONTH",
+                "semanticType": "DATA_RECORD_COUNT",
+                "qualifierTokens": [
+                  "records"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U03-Q03",
+      "userBundleId": "SV3-U03",
+      "questionGroupId": "SV3-U03-Q03-FAMILY",
+      "query": "운영 pipeline과 Kubernetes 교육을 모두 갖췄나요?",
+      "normalizedQuery": "운영 pipeline과 kubernetes 교육을 모두 갖췄나요",
+      "categories": [
+        "multi_evidence",
+        "multi_aspect",
+        "job_requirement",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "pipeline_operation",
+          "kubernetes_training"
+        ],
+        "minShouldMatch": 2
+      },
+      "aspects": [
+        {
+          "aspectId": "pipeline_operation",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U03-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U03-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        },
+        {
+          "aspectId": "kubernetes_training",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U03-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U03-G04"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U03-Q04",
+      "userBundleId": "SV3-U03",
+      "questionGroupId": "SV3-U03-Q04-FAMILY",
+      "query": "추천 모델을 production에 배포했나요?",
+      "normalizedQuery": "추천 모델을 production에 배포했나요",
+      "categories": [
+        "hard_negative",
+        "attempted_prototype",
+        "completion_state",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "model_production"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "model_production",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U03-P02-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "ARTIFACT",
+                "canonicalValue": "RECOMMENDATION_MODEL",
+                "surfaceForms": [
+                  "추천 모델"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [
+              "PRODUCTION"
+            ],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    }
+  ]
+}

@@ -1,0 +1,613 @@
+{
+  "artifactType": "QUESTIONS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+  "split": "DEV",
+  "queries": [
+    {
+      "queryId": "SV3-LF-U101-Q01",
+      "userBundleId": "SV3-LF-U101",
+      "questionGroupId": "SV3-LF-U101-Q01-FAMILY",
+      "query": "현장 관찰을 사용자 흐름 문제로 구조화한 근거가 있나요?",
+      "normalizedQuery": "현장 관찰을 사용자 흐름 문제로 구조화한 근거가 있나요",
+      "categories": [
+        "semantic_paraphrase",
+        "abstract_competency",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "research"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "research",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-LF-U101-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-LF-U101-G-P01-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-LF-U101-Q02",
+      "userBundleId": "SV3-LF-U101",
+      "questionGroupId": "SV3-LF-U101-Q02-FAMILY",
+      "query": "예약 변경 과업 완료율을 80% 이상으로 개선했나요?",
+      "normalizedQuery": "예약 변경 과업 완료율을 80 이상으로 개선했나요",
+      "categories": [
+        "numeric_quantity",
+        "semantic_paraphrase",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "outcome"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "outcome",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-LF-U101-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-LF-U101-G-P02-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-LF-U101-Q03",
+      "userBundleId": "SV3-LF-U101",
+      "questionGroupId": "SV3-LF-U101-Q03-FAMILY",
+      "query": "본인이 광고 문구 A/B 테스트를 직접 수행했나요?",
+      "normalizedQuery": "본인이 광고 문구 a b 테스트를 직접 수행했나요",
+      "categories": [
+        "other_actor",
+        "hard_negative",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "actor"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "actor",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-LF-U101-P03-E01",
+              "supportRelation": "INSUFFICIENT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-LF-U101-Q04",
+      "userBundleId": "SV3-LF-U101",
+      "questionGroupId": "SV3-LF-U101-Q04-FAMILY",
+      "query": "접근성 연구를 이미 production에 적용해 완료했나요?",
+      "normalizedQuery": "접근성 연구를 이미 production에 적용해 완료했나요",
+      "categories": [
+        "completion_state",
+        "negation",
+        "hard_negative",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "completion"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "completion",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-LF-U101-P04-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-LF-U102-Q01",
+      "userBundleId": "SV3-LF-U102",
+      "questionGroupId": "SV3-LF-U102-Q01-FAMILY",
+      "query": "Did the candidate validate at least two million records each day in production?",
+      "normalizedQuery": "did the candidate validate at least two million records each day in production",
+      "categories": [
+        "numeric_quantity",
+        "completed_production",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "scale"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "scale",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-LF-U102-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-LF-U102-G-P01-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-LF-U102-Q02",
+      "userBundleId": "SV3-LF-U102",
+      "questionGroupId": "SV3-LF-U102-Q02-FAMILY",
+      "query": "Was the recommendation model serving live customers in production?",
+      "normalizedQuery": "was the recommendation model serving live customers in production",
+      "categories": [
+        "completion_state",
+        "negation",
+        "hard_negative",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "deployment"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "deployment",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-LF-U102-P02-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-LF-U102-Q03",
+      "userBundleId": "SV3-LF-U102",
+      "questionGroupId": "SV3-LF-U102-Q03-FAMILY",
+      "query": "What evidence shows preventive ownership after a data incident?",
+      "normalizedQuery": "what evidence shows preventive ownership after a data incident",
+      "categories": [
+        "semantic_paraphrase",
+        "abstract_competency",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "prevention"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "prevention",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-LF-U102-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-LF-U102-G-P03-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-LF-U102-Q04",
+      "userBundleId": "SV3-LF-U102",
+      "questionGroupId": "SV3-LF-U102-Q04-FAMILY",
+      "query": "Show both high-volume pipeline operation and a concrete prevention process.",
+      "normalizedQuery": "show both high volume pipeline operation and a concrete prevention process",
+      "categories": [
+        "multi_evidence",
+        "job_requirement",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "operation",
+          "prevention"
+        ],
+        "minShouldMatch": 2
+      },
+      "aspects": [
+        {
+          "aspectId": "operation",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-LF-U102-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-LF-U102-G-P01-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        },
+        {
+          "aspectId": "prevention",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-LF-U102-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-LF-U102-G-P03-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-LF-U103-Q01",
+      "userBundleId": "SV3-LF-U103",
+      "questionGroupId": "SV3-LF-U103-Q01-FAMILY",
+      "query": "Did the bilingual campaign produce at least 800 qualified leads?",
+      "normalizedQuery": "did the bilingual campaign produce at least 800 qualified leads",
+      "categories": [
+        "numeric_quantity",
+        "semantic_paraphrase",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "leads"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "leads",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-LF-U103-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-LF-U103-G-P01-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-LF-U103-Q02",
+      "userBundleId": "SV3-LF-U103",
+      "questionGroupId": "SV3-LF-U103-Q02-FAMILY",
+      "query": "5개 지역에서 CRM stage 기준을 실제 운영으로 전환했나요?",
+      "normalizedQuery": "5개 지역에서 crm stage 기준을 실제 운영으로 전환했나요",
+      "categories": [
+        "completion_state",
+        "completed_production",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "crm"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "crm",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-LF-U103-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-LF-U103-G-P02-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-LF-U103-Q03",
+      "userBundleId": "SV3-LF-U103",
+      "questionGroupId": "SV3-LF-U103-Q03-FAMILY",
+      "query": "Did this person personally close 32 enterprise accounts?",
+      "normalizedQuery": "did this person personally close 32 enterprise accounts",
+      "categories": [
+        "other_actor",
+        "hard_negative",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "actor"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "actor",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-LF-U103-P03-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-LF-U103-Q04",
+      "userBundleId": "SV3-LF-U103",
+      "questionGroupId": "SV3-LF-U103-Q04-FAMILY",
+      "query": "webinar campaign과 geo budget experiment를 모두 이미 실행했나요?",
+      "normalizedQuery": "webinar campaign과 geo budget experiment를 모두 이미 실행했나요",
+      "categories": [
+        "multi_evidence",
+        "completion_state",
+        "hard_negative",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "PARTIALLY_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "campaign",
+          "experiment"
+        ],
+        "minShouldMatch": 2
+      },
+      "aspects": [
+        {
+          "aspectId": "campaign",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-LF-U103-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-LF-U103-G-P01-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        },
+        {
+          "aspectId": "experiment",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-LF-U103-P04-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    }
+  ]
+}

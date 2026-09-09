@@ -1,0 +1,33 @@
+Synthetic Data Platform 운영 기록
+
+Schema change safety
+
+여러 팀이 같은 event를 소비했지만 변경 요청은 서로 다른 문서에서 관리됐다. 작은 field rename도 지연 batch와 dashboard 오류로 이어질 수 있어 source, consumer, owner와 적용 시간을 하나의 change record로 모았다.
+
+본인은 producer schema 변경을 shadow validation으로 먼저 확인하고, 38개 downstream dataset의 compatibility report를 통과한 변경만 production registry에 반영하는 절차를 운영했다.
+
+검증 실패는 차단 사유와 영향을 받는 consumer를 보여 주었다. emergency override에는 별도 승인과 만료 시간을 요구했고, 적용 뒤 실제 payload sample과 contract 결과를 비교했다.
+
+Batch recovery practice
+
+사고 시 scheduler, storage, transformation 로그가 서로 다른 시간대를 사용했다. 공통 timeline을 만들고 입력 도착, checkpoint 생성, task retry와 output publish를 같은 시각 기준으로 맞췄다.
+
+새벽 집계 지연 사고에서 last safe checkpoint부터 1,700만 건을 재처리했고, 중복 key와 누락 partition 검사를 완료한 뒤 오전 보고 전에 정상 결과를 복구했다.
+
+복구 후 retry 성공만 확인하지 않고 row count, key uniqueness, partition completeness를 비교했다. 재처리 범위와 비용을 incident record에 남겨 다음 대응자가 같은 계산을 반복하지 않게 했다.
+
+Model monitoring boundary
+
+전체 평균 score는 신규 사용자와 장기 사용자의 변화를 상쇄했다. 학습 데이터와 serving event의 공통 segment key를 선택하고 missing 값과 sample size가 작은 구간을 별도로 표시했다.
+
+추천 score distribution drift를 segment별로 측정하는 monitor를 배포하고, 두 개 segment에서 기준을 넘었을 때 model owner가 원인 분석을 끝낼 때까지 자동 promotion을 중단했다.
+
+alert는 곧바로 모델 실패를 선언하지 않고 traffic composition, feature freshness와 upstream event를 차례로 확인했다. promotion 재개에는 owner 승인과 검증 결과를 요구했다.
+
+On-call learning loop
+
+회고 문서는 팀마다 표현이 달라 같은 유형의 문제를 찾기 어려웠다. trigger, detection gap, containment, recovery와 prevention 항목을 공통으로 만들되 관련 원인을 함께 기록했다.
+
+분기 동안 발생한 11건의 data incident를 공통 taxonomy로 다시 분류하고, 반복 원인 세 가지에 owner와 due date가 있는 preventive action을 연결해 모두 완료했다.
+
+action review에서는 문서 작성 자체를 완료로 보지 않고 alert, test, ownership 또는 운영 절차가 실제로 바뀌었는지 확인했다. 기한 변경도 이유와 새 책임자를 공개했다.

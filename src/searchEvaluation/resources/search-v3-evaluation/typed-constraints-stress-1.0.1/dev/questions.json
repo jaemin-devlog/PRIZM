@@ -1,0 +1,674 @@
+{
+  "artifactType": "QUESTIONS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.0.1",
+  "split": "DEV",
+  "queries": [
+    {
+      "queryId": "SV3-U31-Q01",
+      "userBundleId": "SV3-U31",
+      "questionGroupId": "SV3-U31-Q01-FAMILY",
+      "query": "유효 상담 요청 1,000건 이상을 만든 경험이 있나요?",
+      "normalizedQuery": "유효 상담 요청 1 000건 이상을 만든 경험이 있나요",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q01"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q01",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U31-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U31-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GTE",
+                "value": 1000,
+                "unit": "건",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "유효",
+                  "상담",
+                  "요청"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U31-Q02",
+      "userBundleId": "SV3-U31",
+      "questionGroupId": "SV3-U31-Q02-FAMILY",
+      "query": "사용자 1,300명이 이용한 캠페인인가요?",
+      "normalizedQuery": "사용자 1 300명이 이용한 캠페인인가요",
+      "categories": [
+        "numeric_quantity",
+        "hard_negative",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q02"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q02",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U31-P02-E01",
+              "supportRelation": "INSUFFICIENT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "EQ",
+                "value": 1300,
+                "unit": "명",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "사용자"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U31-Q03",
+      "userBundleId": "SV3-U31",
+      "questionGroupId": "SV3-U31-Q03-FAMILY",
+      "query": "미응답 비율을 50% 이상 감소시킨 경험이 있나요?",
+      "normalizedQuery": "미응답 비율을 50 이상 감소시킨 경험이 있나요",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q03"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q03",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U31-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U31-G03"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GTE",
+                "value": 50,
+                "unit": "%",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "미응답",
+                  "비율"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U31-Q04",
+      "userBundleId": "SV3-U31",
+      "questionGroupId": "SV3-U31-Q04-FAMILY",
+      "query": "OrbitCRM을 사용해 상담 단계를 관리했나요?",
+      "normalizedQuery": "orbitcrm을 사용해 상담 단계를 관리했나요",
+      "categories": [
+        "literal_identifier",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q04"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q04",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U31-P05-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U31-G05"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "LITERAL_IDENTIFIER",
+                "canonicalValue": "ORBITCRM",
+                "surfaceForms": [
+                  "OrbitCRM"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U32-Q01",
+      "userBundleId": "SV3-U32",
+      "questionGroupId": "SV3-U32-Q01-FAMILY",
+      "query": "Did the approved flow reach a task completion rate of at least 80%?",
+      "normalizedQuery": "did the approved flow reach a task completion rate of at least 80",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q01"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q01",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U32-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U32-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GTE",
+                "value": 80,
+                "unit": "%",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "task",
+                  "completion",
+                  "rate"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U32-Q02",
+      "userBundleId": "SV3-U32",
+      "questionGroupId": "SV3-U32-Q02-FAMILY",
+      "query": "Did the approved flow reach a task completion rate of at least 90%?",
+      "normalizedQuery": "did the approved flow reach a task completion rate of at least 90",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "hard_negative",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q02"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q02",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U32-P01-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GTE",
+                "value": 90,
+                "unit": "%",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "task",
+                  "completion",
+                  "rate"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U32-Q03",
+      "userBundleId": "SV3-U32",
+      "questionGroupId": "SV3-U32-Q03-FAMILY",
+      "query": "Was the approved service launch date after 2025-06-30?",
+      "normalizedQuery": "was the approved service launch date after 2025 06 30",
+      "categories": [
+        "date_range",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q03"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q03",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U32-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U32-G03"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U32-Q04",
+      "userBundleId": "SV3-U32",
+      "questionGroupId": "SV3-U32-Q04-FAMILY",
+      "query": "Was the approved service launch date before 2025-01-01?",
+      "normalizedQuery": "was the approved service launch date before 2025 01 01",
+      "categories": [
+        "date_range",
+        "hard_negative",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q04"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q04",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U32-P03-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U33-Q01",
+      "userBundleId": "SV3-U33",
+      "questionGroupId": "SV3-U33-Q01-FAMILY",
+      "query": "community operations를 3년 이상 운영한 경험이 있나요?",
+      "normalizedQuery": "community operations를 3년 이상 운영한 경험이 있나요",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q01"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q01",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U33-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U33-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GTE",
+                "value": 3,
+                "unit": "년",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "community",
+                  "operations"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U33-Q02",
+      "userBundleId": "SV3-U33",
+      "questionGroupId": "SV3-U33-Q02-FAMILY",
+      "query": "community operations를 5년 이상 운영했나요?",
+      "normalizedQuery": "community operations를 5년 이상 운영했나요",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "hard_negative",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q02"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q02",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U33-P01-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GTE",
+                "value": 5,
+                "unit": "년",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "community",
+                  "operations"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U33-Q03",
+      "userBundleId": "SV3-U33",
+      "questionGroupId": "SV3-U33-Q03-FAMILY",
+      "query": "한 분기에 교육 키트 50~100건을 점검했나요?",
+      "normalizedQuery": "한 분기에 교육 키트 50 100건을 점검했나요",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q03"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q03",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U33-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U33-G03"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "BETWEEN",
+                "value": 50,
+                "upperValue": 100,
+                "unit": "건",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "교육",
+                  "키트"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U33-Q04",
+      "userBundleId": "SV3-U33",
+      "questionGroupId": "SV3-U33-Q04-FAMILY",
+      "query": "한 분기에 교육 키트 130~150건을 점검했나요?",
+      "normalizedQuery": "한 분기에 교육 키트 130 150건을 점검했나요",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "hard_negative",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "typed_q04"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "typed_q04",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U33-P04-E01",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "BETWEEN",
+                "value": 130,
+                "upperValue": 150,
+                "unit": "건",
+                "semanticType": "QUANTITY",
+                "qualifierTokens": [
+                  "교육",
+                  "키트"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    }
+  ]
+}

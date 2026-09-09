@@ -1,0 +1,113 @@
+{
+  "artifactType": "CORPUS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.0.1",
+  "split": "CALIBRATION",
+  "userBundles": [
+    {
+      "userBundleId": "SV3-U34",
+      "split": "CALIBRATION",
+      "professionGroup": "FRONTEND_MOBILE",
+      "profession": "Mobile platform engineer",
+      "languageProfile": "EN",
+      "documentFamilyId": "SV3-U34-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC-TEMPLATE-MOBILE-34",
+      "documents": [
+        {
+          "documentId": "SV3-U34-D01",
+          "logicalDocumentId": "SV3-U34-D01-LOGICAL",
+          "versionLineageId": "SV3-U34-D01-LINEAGE",
+          "versionId": "SV3-U34-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Mobile delivery record",
+          "documentType": "PROJECT_REPORT",
+          "documentStructure": "PROJECT_DESCRIPTION",
+          "fileType": "TXT",
+          "language": "EN",
+          "contentPath": "documents/sv3-u34-typed-stress-v01.txt",
+          "contentSha256": "89e69bc52b222cabf466a68c4ddea61defde3c1edafba0e7b029f52e6ee8d4e3",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "PUBLIC_FIXTURE",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "materialize-prz028-typed-stress",
+            "generatorRevision": "prz028-typed-stress-correction-v1",
+            "generatorSeedId": "SV3-TC-SEED-MOBILE-34-D2A4"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-U35",
+      "split": "CALIBRATION",
+      "professionGroup": "PLANNING",
+      "profession": "Public program planner",
+      "languageProfile": "KO",
+      "documentFamilyId": "SV3-U35-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC-TEMPLATE-PLANNING-35",
+      "documents": [
+        {
+          "documentId": "SV3-U35-D01",
+          "logicalDocumentId": "SV3-U35-D01-LOGICAL",
+          "versionLineageId": "SV3-U35-D01-LINEAGE",
+          "versionId": "SV3-U35-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "지역 프로그램 기획 기록",
+          "documentType": "CAREER_REVIEW",
+          "documentStructure": "CAREER_DESCRIPTION",
+          "fileType": "TXT",
+          "language": "KO",
+          "contentPath": "documents/sv3-u35-typed-stress-v01.txt",
+          "contentSha256": "4a38ae84a1a772fa4eb5ec24f8a9ad23ad16c5b325c6fe8ead97b9712b1d001c",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "PUBLIC_FIXTURE",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "materialize-prz028-typed-stress",
+            "generatorRevision": "prz028-typed-stress-correction-v1",
+            "generatorSeedId": "SV3-TC-SEED-PLANNING-35-E8B5"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-U36",
+      "split": "CALIBRATION",
+      "professionGroup": "DATA_AI_INFRA",
+      "profession": "Data reliability engineer",
+      "languageProfile": "KO_EN_MIXED",
+      "documentFamilyId": "SV3-U36-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC-TEMPLATE-DATA-36",
+      "documents": [
+        {
+          "documentId": "SV3-U36-D01",
+          "logicalDocumentId": "SV3-U36-D01-LOGICAL",
+          "versionLineageId": "SV3-U36-D01-LINEAGE",
+          "versionId": "SV3-U36-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Data reliability 운영 기록",
+          "documentType": "PROJECT_REPORT",
+          "documentStructure": "TABLE_LIKE",
+          "fileType": "TXT",
+          "language": "KO_EN_MIXED",
+          "contentPath": "documents/sv3-u36-typed-stress-v01.txt",
+          "contentSha256": "0f8d7f988d8949381c3941c49ee0cab4999e66678863540e46a64b2f2f7041e0",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "PUBLIC_FIXTURE",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "materialize-prz028-typed-stress",
+            "generatorRevision": "prz028-typed-stress-correction-v1",
+            "generatorSeedId": "SV3-TC-SEED-DATA-36-F6C6"
+          }
+        }
+      ]
+    }
+  ]
+}

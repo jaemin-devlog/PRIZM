@@ -1,0 +1,678 @@
+{
+  "artifactType": "TYPED_ANNOTATIONS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.0.1",
+  "split": "DEV",
+  "observations": [
+    {
+      "observationId": "SV3-TC-U31-P01-O01",
+      "evidenceUnitId": "SV3-U31-P01-E01",
+      "sourceSpanId": "SV3-U31-P01-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "1,300건",
+      "charStart": 55,
+      "charEnd": 61,
+      "value": 1300,
+      "normalizedUnit": "건",
+      "qualifier": "유효 상담 요청",
+      "direction": "NONE",
+      "qualifierCharStart": 46,
+      "qualifierCharEnd": 54
+    },
+    {
+      "observationId": "SV3-TC-U31-P02-O01",
+      "evidenceUnitId": "SV3-U31-P02-E01",
+      "sourceSpanId": "SV3-U31-P02-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "1,300건",
+      "charStart": 107,
+      "charEnd": 113,
+      "value": 1300,
+      "normalizedUnit": "건",
+      "qualifier": "설문 응답 데이터",
+      "direction": "NONE",
+      "qualifierCharStart": 97,
+      "qualifierCharEnd": 106
+    },
+    {
+      "observationId": "SV3-TC-U31-P03-O01",
+      "evidenceUnitId": "SV3-U31-P03-E01",
+      "sourceSpanId": "SV3-U31-P03-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "65%",
+      "charStart": 153,
+      "charEnd": 156,
+      "value": 65,
+      "normalizedUnit": "%",
+      "qualifier": "미응답 비율",
+      "direction": "DECREASE",
+      "qualifierCharStart": 145,
+      "qualifierCharEnd": 151,
+      "directionSourceSurface": "감소",
+      "directionCharStart": 157,
+      "directionCharEnd": 159
+    },
+    {
+      "observationId": "SV3-TC-U31-P04-O01",
+      "evidenceUnitId": "SV3-U31-P04-E01",
+      "sourceSpanId": "SV3-U31-P04-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "65%",
+      "charStart": 201,
+      "charEnd": 204,
+      "value": 65,
+      "normalizedUnit": "%",
+      "qualifier": "미응답 비율",
+      "direction": "INCREASE",
+      "qualifierCharStart": 193,
+      "qualifierCharEnd": 199,
+      "directionSourceSurface": "증가",
+      "directionCharStart": 205,
+      "directionCharEnd": 207
+    },
+    {
+      "observationId": "SV3-TC-U31-P05-O01",
+      "evidenceUnitId": "SV3-U31-P05-E01",
+      "sourceSpanId": "SV3-U31-P05-E01-S01",
+      "kind": "LITERAL_IDENTIFIER",
+      "sourceSurface": "OrbitCRM",
+      "charStart": 221,
+      "charEnd": 229,
+      "normalizedLiteral": "orbitcrm"
+    },
+    {
+      "observationId": "SV3-TC-U32-P01-O01",
+      "evidenceUnitId": "SV3-U32-P01-E01",
+      "sourceSpanId": "SV3-U32-P01-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "80%",
+      "charStart": 90,
+      "charEnd": 93,
+      "value": 80,
+      "normalizedUnit": "%",
+      "qualifier": "task completion rate",
+      "direction": "NONE",
+      "qualifierCharStart": 94,
+      "qualifierCharEnd": 114
+    },
+    {
+      "observationId": "SV3-TC-U32-P02-O01",
+      "evidenceUnitId": "SV3-U32-P02-E01",
+      "sourceSpanId": "SV3-U32-P02-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "72%",
+      "charStart": 198,
+      "charEnd": 201,
+      "value": 72,
+      "normalizedUnit": "%",
+      "qualifier": "task completion rate",
+      "direction": "NONE",
+      "qualifierCharStart": 202,
+      "qualifierCharEnd": 222
+    },
+    {
+      "observationId": "SV3-TC-U32-P03-O01",
+      "evidenceUnitId": "SV3-U32-P03-E01",
+      "sourceSpanId": "SV3-U32-P03-E01-S01",
+      "kind": "DATE",
+      "sourceSurface": "2025-07-15",
+      "charStart": 298,
+      "charEnd": 308,
+      "start": "2025-07-15",
+      "end": "2025-07-15",
+      "precision": "FULL_DATE",
+      "qualifier": "approved service launch date",
+      "qualifierCharStart": 265,
+      "qualifierCharEnd": 293
+    },
+    {
+      "observationId": "SV3-TC-U33-P01-O01",
+      "evidenceUnitId": "SV3-U33-P01-E01",
+      "sourceSpanId": "SV3-U33-P01-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "4년",
+      "charStart": 57,
+      "charEnd": 59,
+      "value": 4,
+      "normalizedUnit": "년",
+      "qualifier": "community operations",
+      "direction": "NONE",
+      "qualifierCharStart": 35,
+      "qualifierCharEnd": 55
+    },
+    {
+      "observationId": "SV3-TC-U33-P02-O01",
+      "evidenceUnitId": "SV3-U33-P02-E01",
+      "sourceSpanId": "SV3-U33-P02-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "2년",
+      "charStart": 131,
+      "charEnd": 133,
+      "value": 2,
+      "normalizedUnit": "년",
+      "qualifier": "community operations",
+      "direction": "NONE",
+      "qualifierCharStart": 103,
+      "qualifierCharEnd": 123
+    },
+    {
+      "observationId": "SV3-TC-U33-P03-O01",
+      "evidenceUnitId": "SV3-U33-P03-E01",
+      "sourceSpanId": "SV3-U33-P03-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "75건",
+      "charStart": 171,
+      "charEnd": 174,
+      "value": 75,
+      "normalizedUnit": "건",
+      "qualifier": "교육 키트",
+      "direction": "NONE",
+      "qualifierCharStart": 176,
+      "qualifierCharEnd": 181
+    },
+    {
+      "observationId": "SV3-TC-U33-P04-O01",
+      "evidenceUnitId": "SV3-U33-P04-E01",
+      "sourceSpanId": "SV3-U33-P04-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "120건",
+      "charStart": 222,
+      "charEnd": 226,
+      "value": 120,
+      "normalizedUnit": "건",
+      "qualifier": "교육 키트",
+      "direction": "NONE",
+      "qualifierCharStart": 228,
+      "qualifierCharEnd": 233
+    }
+  ],
+  "queryAnnotations": [
+    {
+      "queryId": "SV3-U31-Q01",
+      "userBundleId": "SV3-U31",
+      "stressFamilies": [
+        "quantity_positive"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U31-Q01-C01",
+        "kind": "QUANTITY",
+        "surface": "1,000건 이상",
+        "operator": "GTE",
+        "value": 1000,
+        "normalizedUnit": "건",
+        "qualifier": "유효 상담 요청",
+        "direction": "NONE",
+        "queryCharStart": 9,
+        "queryCharEnd": 18,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 8
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U31-P01-E01",
+          "state": "SATISFIED"
+        },
+        {
+          "evidenceUnitId": "SV3-U31-P02-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U31-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U31-P04-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U31-P05-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U31-Q02",
+      "userBundleId": "SV3-U31",
+      "stressFamilies": [
+        "qualifier_mismatch",
+        "not_supported_hard_negative"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U31-Q02-C01",
+        "kind": "QUANTITY",
+        "surface": "1,300명",
+        "operator": "EQ",
+        "value": 1300,
+        "normalizedUnit": "명",
+        "qualifier": "사용자",
+        "direction": "NONE",
+        "queryCharStart": 4,
+        "queryCharEnd": 10,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 3
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U31-P01-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U31-P02-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U31-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U31-P04-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U31-P05-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U31-Q03",
+      "userBundleId": "SV3-U31",
+      "stressFamilies": [
+        "percentage_direction",
+        "quantity_positive"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U31-Q03-C01",
+        "kind": "QUANTITY",
+        "surface": "50% 이상 감소",
+        "operator": "GTE",
+        "value": 50,
+        "normalizedUnit": "%",
+        "qualifier": "미응답 비율",
+        "direction": "DECREASE",
+        "queryCharStart": 8,
+        "queryCharEnd": 17,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 6
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U31-P01-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U31-P02-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U31-P03-E01",
+          "state": "SATISFIED"
+        },
+        {
+          "evidenceUnitId": "SV3-U31-P04-E01",
+          "state": "CONTRADICTED"
+        },
+        {
+          "evidenceUnitId": "SV3-U31-P05-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U31-Q04",
+      "userBundleId": "SV3-U31",
+      "stressFamilies": [
+        "literal_exact"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U31-Q04-C01",
+        "kind": "LITERAL_IDENTIFIER",
+        "surface": "OrbitCRM",
+        "normalizedLiteral": "orbitcrm",
+        "queryCharStart": 0,
+        "queryCharEnd": 8
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U31-P01-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U31-P02-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U31-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U31-P04-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U31-P05-E01",
+          "state": "SATISFIED"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U32-Q01",
+      "userBundleId": "SV3-U32",
+      "stressFamilies": [
+        "quantity_boundary"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U32-Q01-C01",
+        "kind": "QUANTITY",
+        "surface": "at least 80%",
+        "operator": "GTE",
+        "value": 80,
+        "normalizedUnit": "%",
+        "qualifier": "task completion rate",
+        "direction": "NONE",
+        "queryCharStart": 54,
+        "queryCharEnd": 66,
+        "qualifierCharStart": 30,
+        "qualifierCharEnd": 50
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U32-P01-E01",
+          "state": "SATISFIED"
+        },
+        {
+          "evidenceUnitId": "SV3-U32-P02-E01",
+          "state": "CONTRADICTED"
+        },
+        {
+          "evidenceUnitId": "SV3-U32-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U32-P04-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U32-Q02",
+      "userBundleId": "SV3-U32",
+      "stressFamilies": [
+        "wrong_value",
+        "not_supported_hard_negative"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U32-Q02-C01",
+        "kind": "QUANTITY",
+        "surface": "at least 90%",
+        "operator": "GTE",
+        "value": 90,
+        "normalizedUnit": "%",
+        "qualifier": "task completion rate",
+        "direction": "NONE",
+        "queryCharStart": 54,
+        "queryCharEnd": 66,
+        "qualifierCharStart": 30,
+        "qualifierCharEnd": 50
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U32-P01-E01",
+          "state": "CONTRADICTED"
+        },
+        {
+          "evidenceUnitId": "SV3-U32-P02-E01",
+          "state": "CONTRADICTED"
+        },
+        {
+          "evidenceUnitId": "SV3-U32-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U32-P04-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U32-Q03",
+      "userBundleId": "SV3-U32",
+      "stressFamilies": [
+        "date_after"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U32-Q03-C01",
+        "kind": "DATE",
+        "surface": "after 2025-06-30",
+        "operator": "GT",
+        "value": "2025-06-30",
+        "precision": "FULL_DATE",
+        "qualifier": "approved service launch date",
+        "queryCharStart": 37,
+        "queryCharEnd": 53,
+        "qualifierCharStart": 8,
+        "qualifierCharEnd": 36
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U32-P01-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U32-P02-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U32-P03-E01",
+          "state": "SATISFIED"
+        },
+        {
+          "evidenceUnitId": "SV3-U32-P04-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U32-Q04",
+      "userBundleId": "SV3-U32",
+      "stressFamilies": [
+        "date_before",
+        "not_supported_hard_negative"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U32-Q04-C01",
+        "kind": "DATE",
+        "surface": "before 2025-01-01",
+        "operator": "LT",
+        "value": "2025-01-01",
+        "precision": "FULL_DATE",
+        "qualifier": "approved service launch date",
+        "queryCharStart": 37,
+        "queryCharEnd": 54,
+        "qualifierCharStart": 8,
+        "qualifierCharEnd": 36
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U32-P01-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U32-P02-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U32-P03-E01",
+          "state": "CONTRADICTED"
+        },
+        {
+          "evidenceUnitId": "SV3-U32-P04-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U33-Q01",
+      "userBundleId": "SV3-U33",
+      "stressFamilies": [
+        "duration",
+        "quantity_positive"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U33-Q01-C01",
+        "kind": "QUANTITY",
+        "surface": "3년 이상",
+        "operator": "GTE",
+        "value": 3,
+        "normalizedUnit": "년",
+        "qualifier": "community operations",
+        "direction": "NONE",
+        "queryCharStart": 22,
+        "queryCharEnd": 27,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 20
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U33-P01-E01",
+          "state": "SATISFIED"
+        },
+        {
+          "evidenceUnitId": "SV3-U33-P02-E01",
+          "state": "CONTRADICTED"
+        },
+        {
+          "evidenceUnitId": "SV3-U33-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U33-P04-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U33-Q02",
+      "userBundleId": "SV3-U33",
+      "stressFamilies": [
+        "duration",
+        "wrong_value",
+        "not_supported_hard_negative"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U33-Q02-C01",
+        "kind": "QUANTITY",
+        "surface": "5년 이상",
+        "operator": "GTE",
+        "value": 5,
+        "normalizedUnit": "년",
+        "qualifier": "community operations",
+        "direction": "NONE",
+        "queryCharStart": 22,
+        "queryCharEnd": 27,
+        "qualifierCharStart": 0,
+        "qualifierCharEnd": 20
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U33-P01-E01",
+          "state": "CONTRADICTED"
+        },
+        {
+          "evidenceUnitId": "SV3-U33-P02-E01",
+          "state": "CONTRADICTED"
+        },
+        {
+          "evidenceUnitId": "SV3-U33-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U33-P04-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U33-Q03",
+      "userBundleId": "SV3-U33",
+      "stressFamilies": [
+        "range"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U33-Q03-C01",
+        "kind": "QUANTITY",
+        "surface": "50~100건",
+        "operator": "RANGE",
+        "value": 50,
+        "upperValue": 100,
+        "normalizedUnit": "건",
+        "qualifier": "교육 키트",
+        "direction": "NONE",
+        "queryCharStart": 12,
+        "queryCharEnd": 19,
+        "qualifierCharStart": 6,
+        "qualifierCharEnd": 11
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U33-P01-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U33-P02-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U33-P03-E01",
+          "state": "SATISFIED"
+        },
+        {
+          "evidenceUnitId": "SV3-U33-P04-E01",
+          "state": "CONTRADICTED"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U33-Q04",
+      "userBundleId": "SV3-U33",
+      "stressFamilies": [
+        "range",
+        "wrong_value",
+        "not_supported_hard_negative"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U33-Q04-C01",
+        "kind": "QUANTITY",
+        "surface": "130~150건",
+        "operator": "RANGE",
+        "value": 130,
+        "upperValue": 150,
+        "normalizedUnit": "건",
+        "qualifier": "교육 키트",
+        "direction": "NONE",
+        "queryCharStart": 12,
+        "queryCharEnd": 20,
+        "qualifierCharStart": 6,
+        "qualifierCharEnd": 11
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U33-P01-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U33-P02-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U33-P03-E01",
+          "state": "CONTRADICTED"
+        },
+        {
+          "evidenceUnitId": "SV3-U33-P04-E01",
+          "state": "CONTRADICTED"
+        }
+      ]
+    }
+  ]
+}

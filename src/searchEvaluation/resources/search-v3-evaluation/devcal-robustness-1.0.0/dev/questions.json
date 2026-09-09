@@ -1,0 +1,572 @@
+{
+  "artifactType": "QUESTIONS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+  "split": "DEV",
+  "queries": [
+    {
+      "queryId": "SV3-RB-U201-Q01",
+      "userBundleId": "SV3-RB-U201",
+      "questionGroupId": "SV3-RB-U201-Q01-FAMILY",
+      "query": "연결이 불안정한 현장 앱에서 기록 중복을 줄이고 실제 배포한 근거가 있나요?",
+      "normalizedQuery": "연결이 불안정한 현장 앱에서 기록 중복을 줄이고 실제 배포한 근거가 있나요",
+      "categories": [
+        "semantic_paraphrase",
+        "completed_production",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "offline_sync_reliability"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "offline_sync_reliability",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U201-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U201-G-P01-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U201-Q02",
+      "userBundleId": "SV3-RB-U201",
+      "questionGroupId": "SV3-RB-U201-Q02-FAMILY",
+      "query": "보조 기술만으로 핵심 점검 과업을 끝낼 수 있게 검증한 경험이 있나요?",
+      "normalizedQuery": "보조 기술만으로 핵심 점검 과업을 끝낼 수 있게 검증한 경험이 있나요",
+      "categories": [
+        "abstract_competency",
+        "semantic_paraphrase",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "accessible_task_flow"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "accessible_task_flow",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U201-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U201-G-P02-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U201-Q03",
+      "userBundleId": "SV3-RB-U201",
+      "questionGroupId": "SV3-RB-U201-Q03-FAMILY",
+      "query": "대규모 모바일 목록의 첫 화면 지연을 절반 이하로 줄였다는 근거를 보여 주세요.",
+      "normalizedQuery": "대규모 모바일 목록의 첫 화면 지연을 절반 이하로 줄였다는 근거를 보여 주세요",
+      "categories": [
+        "numeric_quantity",
+        "semantic_paraphrase",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "mobile_rendering_performance"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "mobile_rendering_performance",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U201-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U201-G-P03-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U201-Q04",
+      "userBundleId": "SV3-RB-U201",
+      "questionGroupId": "SV3-RB-U201-Q04-FAMILY",
+      "query": "위험 신호를 근거로 모바일 배포를 중단하고 복구한 운영 경험이 있나요?",
+      "normalizedQuery": "위험 신호를 근거로 모바일 배포를 중단하고 복구한 운영 경험이 있나요",
+      "categories": [
+        "abstract_competency",
+        "completed_production",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "release_observability"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "release_observability",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U201-P04-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U201-G-P04-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U202-Q01",
+      "userBundleId": "SV3-RB-U202",
+      "questionGroupId": "SV3-RB-U202-Q01-FAMILY",
+      "query": "What evidence shows the candidate converted field observation into a cross-channel recovery model?",
+      "normalizedQuery": "what evidence shows the candidate converted field observation into a cross channel recovery model",
+      "categories": [
+        "semantic_paraphrase",
+        "abstract_competency",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "service_research_synthesis"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "service_research_synthesis",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U202-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U202-G-P01-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U202-Q02",
+      "userBundleId": "SV3-RB-U202",
+      "questionGroupId": "SV3-RB-U202-Q02-FAMILY",
+      "query": "Did a tested design improve appointment completion to at least eighty percent before approval?",
+      "normalizedQuery": "did a tested design improve appointment completion to at least eighty percent before approval",
+      "categories": [
+        "numeric_quantity",
+        "semantic_paraphrase",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "prototype_outcome"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "prototype_outcome",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U202-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U202-G-P02-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U202-Q03",
+      "userBundleId": "SV3-RB-U202",
+      "questionGroupId": "SV3-RB-U202-Q03-FAMILY",
+      "query": "Is there evidence of aligning several departments around a single operational escalation rule?",
+      "normalizedQuery": "is there evidence of aligning several departments around a single operational escalation rule",
+      "categories": [
+        "job_requirement",
+        "abstract_competency",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "cross_functional_alignment"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "cross_functional_alignment",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U202-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U202-G-P03-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U202-Q04",
+      "userBundleId": "SV3-RB-U202",
+      "questionGroupId": "SV3-RB-U202-Q04-FAMILY",
+      "query": "Was the redesigned recovery service launched across multiple offices with a sustained reduction in repeat contacts?",
+      "normalizedQuery": "was the redesigned recovery service launched across multiple offices with a sustained reduction in repeat contacts",
+      "categories": [
+        "completed_production",
+        "numeric_quantity",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "service_rollout_measurement"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "service_rollout_measurement",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U202-P04-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U202-G-P04-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U203-Q01",
+      "userBundleId": "SV3-RB-U203",
+      "questionGroupId": "SV3-RB-U203-Q01-FAMILY",
+      "query": "How did the candidate prevent incompatible event schemas from reaching production consumers?",
+      "normalizedQuery": "how did the candidate prevent incompatible event schemas from reaching production consumers",
+      "categories": [
+        "semantic_paraphrase",
+        "completed_production",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "schema_change_safety"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "schema_change_safety",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U203-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U203-G-P01-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U203-Q02",
+      "userBundleId": "SV3-RB-U203",
+      "questionGroupId": "SV3-RB-U203-Q02-FAMILY",
+      "query": "대규모 배치 지연 뒤 안전한 지점부터 데이터를 검증하며 복구한 근거가 있나요?",
+      "normalizedQuery": "대규모 배치 지연 뒤 안전한 지점부터 데이터를 검증하며 복구한 근거가 있나요",
+      "categories": [
+        "abstract_competency",
+        "numeric_quantity",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "batch_recovery"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "batch_recovery",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U203-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U203-G-P02-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U203-Q03",
+      "userBundleId": "SV3-RB-U203",
+      "questionGroupId": "SV3-RB-U203-Q03-FAMILY",
+      "query": "Was automatic model promotion stopped when segment-level drift crossed the monitoring boundary?",
+      "normalizedQuery": "was automatic model promotion stopped when segment level drift crossed the monitoring boundary",
+      "categories": [
+        "completion_state",
+        "semantic_paraphrase",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "model_monitoring_control"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "model_monitoring_control",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U203-P03-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U203-G-P03-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-RB-U203-Q04",
+      "userBundleId": "SV3-RB-U203",
+      "questionGroupId": "SV3-RB-U203-Q04-FAMILY",
+      "query": "반복 데이터 사고를 분류해 예방 조치를 끝까지 완료한 경험이 있나요?",
+      "normalizedQuery": "반복 데이터 사고를 분류해 예방 조치를 끝까지 완료한 경험이 있나요",
+      "categories": [
+        "abstract_competency",
+        "completed_production",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ANY",
+        "requiredAspectIds": [
+          "incident_prevention_loop"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "incident_prevention_loop",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-RB-U203-P04-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-RB-U203-G-P04-E01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    }
+  ]
+}

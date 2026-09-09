@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jaemin-devlog/PRIZM/search-v3-prediction.schema.json",
+  "title": "PRIZM Search V3 system-neutral prediction adapter",
+  "schemaVersion": "1.0.0",
+  "description": "Future Current Search and V3 outputs. No prediction is materialized in the frozen seed.",
+  "type": "object",
+  "required": [
+    "schemaVersion", "datasetVersion", "datasetCombinedSha256", "systemProfile",
+    "sourceRevision", "runId", "split", "queries"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "datasetVersion": { "type": "string" },
+    "datasetCombinedSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "systemProfile": { "type": "string", "minLength": 1 },
+    "sourceRevision": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "runId": { "type": "string", "minLength": 1 },
+    "split": { "enum": ["DEV", "CALIBRATION", "SEALED_FINAL_TEST"] },
+    "queries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["queryId", "predictedAnswerability", "results", "latencyMillis"],
+        "properties": {
+          "queryId": { "type": "string" },
+          "predictedAnswerability": { "enum": ["SUPPORTED", "PARTIALLY_SUPPORTED", "NOT_SUPPORTED"] },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "rank", "userBundleId", "documentId", "versionId", "parentLocator",
+                "sourceSpans", "resolvedEvidenceUnitIds"
+              ],
+              "properties": {
+                "rank": { "type": "integer", "minimum": 1 },
+                "userBundleId": { "type": "string" },
+                "documentId": { "type": "string" },
+                "versionId": { "type": "string" },
+                "parentLocator": { "type": ["string", "null"] },
+                "sourceSpans": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["sourcePath", "charStart", "charEnd", "textSha256"],
+                    "properties": {
+                      "sourcePath": { "type": "string" },
+                      "charStart": { "type": "integer", "minimum": 0 },
+                      "charEnd": { "type": "integer", "minimum": 1 },
+                      "textSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "resolvedEvidenceUnitIds": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+                "runtimeDiagnostics": {
+                  "type": "object",
+                  "description": "Optional chunk/parent IDs, score, channel, and stage trace. Never gold."
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "latencyMillis": { "type": "number", "minimum": 0 },
+          "errorCode": { "type": ["string", "null"] }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

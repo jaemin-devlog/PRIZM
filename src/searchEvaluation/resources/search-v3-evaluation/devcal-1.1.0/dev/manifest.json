@@ -1,0 +1,89 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+  "split": "DEV",
+  "status": "DEV_CAL_LONG_FORM_FROZEN",
+  "mutable": false,
+  "frozenAt": "2026-08-30T19:43:14.0659652+09:00",
+  "previousVersion": "search-v3-fresh-seed-1.0.1",
+  "materializationBaseRevision": "a9d093dd48e99a8d19675b3a8caa09c794d2888b",
+  "counts": {
+    "userBundles": 3,
+    "documents": 3,
+    "queries": 12,
+    "evidenceParents": 12,
+    "evidenceGroups": 11,
+    "evidenceUnits": 11
+  },
+  "distributions": {
+    "profession": {
+      "DATA_AI_INFRA": 1,
+      "DESIGN_PRODUCT": 1,
+      "MARKETING_SALES": 1
+    },
+    "documentLanguage": {
+      "EN": 1,
+      "KO": 1,
+      "KO_EN_MIXED": 1
+    },
+    "queryLanguage": {
+      "EN": 6,
+      "KO": 2,
+      "KO_EN_MIXED": 4
+    },
+    "answerability": {
+      "NOT_SUPPORTED": 4,
+      "PARTIALLY_SUPPORTED": 1,
+      "SUPPORTED": 7
+    },
+    "category": {
+      "abstract_competency": 2,
+      "completed_production": 2,
+      "completion_state": 4,
+      "english": 6,
+      "hard_negative": 5,
+      "job_requirement": 1,
+      "korean": 2,
+      "korean_english_mixed": 4,
+      "multi_evidence": 2,
+      "negation": 2,
+      "numeric_quantity": 3,
+      "other_actor": 2,
+      "semantic_paraphrase": 4
+    }
+  },
+  "files": [
+    {
+      "path": "corpus.json",
+      "bytes": 4355,
+      "sha256": "d1e570409d71acdb1034e1b86370e4ad602dd29b575a23d699a309aeffd2ca17"
+    },
+    {
+      "path": "documents/sv3-lf-u101-design-portfolio-v01.txt",
+      "bytes": 5211,
+      "sha256": "19cccd6fd5f040c8ab641a391da5027fd3a8ad8fb030d728955562df60c69906"
+    },
+    {
+      "path": "documents/sv3-lf-u102-data-reliability-v01.txt",
+      "bytes": 4823,
+      "sha256": "a489bbbcc124834f00d321e1e0181d0cdaa4e0627f4c964cae67c328de0c6734"
+    },
+    {
+      "path": "documents/sv3-lf-u103-growth-sales-v01.txt",
+      "bytes": 4123,
+      "sha256": "115d5884a1ef288bc144588f47d577af90e0aebb8c0adb07d6aecfeb3f3b08b0"
+    },
+    {
+      "path": "gold-evidence.json",
+      "bytes": 41650,
+      "sha256": "b45b552599fc89c8cfcbe1251b86ef365f08ee6772878c08b7bf2c05929b360e"
+    },
+    {
+      "path": "questions.json",
+      "bytes": 17475,
+      "sha256": "31425bb2c1ede2dd235f3e334471d97121ed74cc468f07b99a8dc7ad40899621"
+    }
+  ],
+  "combinedSha256": "4262a62a758e22f8b3a66573790edd00df2193caaa6046edd51e89975dd378af"
+}

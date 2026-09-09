@@ -1,0 +1,150 @@
+# PRZ-026 Phase 1 Plan
+
+- 상태: `IN_PROGRESS / PHASE_1_C1_NEEDS_ADJUSTMENT`
+- 허용 단계: `ORIENT → SPEC → PLAN → IMPLEMENT(evaluation-only) → VERIFY → AUDIT → INTEGRATE(commit only)`
+- 선행 조건: `DEPENDS_ON_PRZ_025`
+
+## 1. 역사적 Phase 1 입력과 freeze
+
+1. PRZ-025 HEAD, `origin/main`, branch 관계와 clean worktree를 기록한다.
+2. `search-v3-fresh-seed-1.0.1`의 DEV/CAL manifest, gold와 source만 loader가 연다.
+3. PRZ-025 validator를 전후 실행하고 SEALED FINAL combined hash와 flags를 byte-level로 비교한다.
+4. 최초 Phase 1에서는 corpus/PDF를 추가하지 않는다. 짧은 seed의 candidate ceiling은 결과 한계로
+   공개하며, 보완 fixture가 필요하면 기존 version을 덮지 않는 별도 DEV/CAL version으로 후속
+   계획한다.
+
+이 절은 B1 실행 계약의 역사 기록이다. 아래 Phase 1 Adjustment plan은 별도 version
+`search-v3-fresh-devcal-1.1.0`을 추가하도록 이 corpus 제한만 supersede하며 Original Seed와
+SEALED FINAL은 변경하지 않는다.
+
+## 2. 구현 순서
+
+1. `src/searchEvaluation/java/.../searchv3/structural/`에 source/provenance model을 만든다.
+2. 일반적인 line/layout 신호의 `StructuralBlockParser`를 구현한다.
+3. source/retrieval text를 분리한 `StructuralEvidenceChildBuilder`를 구현한다.
+4. actual Production `TextChunker` adapter와 PRZ-025 DEV/CAL-only loader를 만든다.
+5. dependency 추가 없이 Java HTTP client로 local Ollama `/api/embed`의 `bge-m3`를 호출한다.
+6. in-memory cosine ranker와 source-grounded gold mapper/metric calculator를 만든다.
+7. report는 Git 제외 경로 `local/search-v3-evaluation/prz026/`에 쓰고, 재현에 필요한 query별
+   결과와 report SHA-256을 `evidence.md`에 요약한다.
+
+## 3. Test와 verification
+
+- Parser: heading, paragraph, bullet, numbered list, key-value, table, blank boundary,
+  Korean/English/mixed와 type fallback
+- Builder: exact source/provenance, heading boundary, cross-parent 비혼합, table header trace,
+  long fallback split와 global overlap 0
+- Evaluation: same corpus/query/model, Production TextChunker 800/120, runtime ID contamination 0,
+  DEV/CAL allowlist, SEALED FINAL guard, source-grounded Unit mapping
+- Runtime: local Ollama tag/digest와 1024 dimensions 확인 후 DEV/CAL A/B 1회 실행
+- Repository: PRZ-025 validator/test, targeted Gradle tests, `git diff --check`, OSS readiness,
+  forbidden-path diff와 sealed hash/flags audit
+
+Backend 전체 unit/integration, frontend와 Docker runtime은 Production 변경이 없고 이 in-memory
+evaluation에 필요하지 않으면 `NOT_RUN`으로 기록한다.
+
+## 3.1 실제 Phase 1 deviation
+
+PDF/long-document fixture를 추가하지 않고 frozen seed를 그대로 사용했다. DEV/CAL ACTIVE 문서
+7개가 모두 800자 미만이어서 A는 문서당 1 candidate였고 Recall@5 이상에 ceiling이 생겼다.
+이는 실행 전 확인한 입력 특성이며 결과에 맞춰 dataset을 바꾸지 않았다. 이 Phase 결과는
+구조·runner 검증과 조정 필요성의 근거이고, 긴 문서 일반화나 release-grade 품질 근거가 아니다.
+
+## 4. 실패와 rollback
+
+Ollama/model이 없거나 필수 benchmark가 실패하면 품질 판정을 검증 완료로 표현하지 않는다.
+scope 밖 diff가 생기면 commit하지 않고 evaluation-only 변경만 조사한다. rollback 대상은 새
+PRZ-026 파일과 Registry 한 행뿐이며 PRZ-025, 사용자 PRZ-016 worktree, tag/history는 reset,
+rebase 또는 rewrite하지 않는다. push, PR, main merge는 금지한다.
+
+## 5. Phase 1 Adjustment plan
+
+1. 변경 전 HEAD에서 Phase 1 네 회귀의 rank, block/source/retrieval/parent와 score를 재현한다.
+2. 기존 Child 길이를 1–10/11–20/21–40/41–80/81+로 나눠 Gold와 rank noise를 확인한다.
+3. parser가 날짜·수치 value를 가진 독립 assertion을 heading으로 버리지 않도록 일반 구조 test를
+   먼저 추가한다.
+4. builder는 `HEADING`을 context-only boundary로 보존하되 Child로 만들지 않는다. heading을
+   retrieval text에 넣거나 길이 기반 merge를 추가하지 않는다.
+5. 별도 `search-v3-fresh-devcal-1.1.0` 경로에 DEV/CAL 각 3개의 1,500+ code-point synthetic
+   장문 문서와 전체 24+ query를 materialize한다. 이전 seed와 SEALED FINAL은 덮어쓰지 않는다.
+6. manifest·source span·lineage validator를 실행한 뒤 dataset input을 freeze한다. 결과 확인 뒤
+   query/gold/fixture를 조정하지 않는다.
+7. 동일 `bge-m3` query vector로 Original Seed와 Long-form A/B를 별도 report로 실행한다.
+   report에는 Adjustment 시작 commit과 실행에 사용한 evaluation source 파일별/combined SHA-256을
+   기록한다. DEV/CAL manifest는 실행 가능 정책만 담고 실제 실행 사실은 ignored report와
+   `evidence.md`에 기록한다.
+8. 결과와 실패 사례를 evidence에 추가하고 scope/hash/test/audit Gate를 통과한 변경만 commit한다.
+
+PDF는 page-local document model과 gold 좌표를 기존 TXT loader에 조용히 섞지 않는다. 기존
+PDFBox/Production extractor를 재사용한 evaluation-only fixture가 A/B 계약을 확장하지 않고
+구현 가능한지 검토하고, 그렇지 않으면 `BLOCKED_FOR_LATER_LAYOUT_PHASE`로 기록한다.
+
+## 6. Phase 1 Retrieval Passage plan
+
+1. B2 EvidenceChild는 변경하지 않고 `RetrievalPassage`와 evaluation-only builder를 추가한다.
+2. policy는 결과 확인 전에 `120 / 320 / 480 code points`, same-parent adjacency, overlap 0으로
+   한 번 고정한다. Gold/query/domain heuristic은 builder에 전달하지 않는다.
+3. passage는 ordered Child ID와 provenance를 보존하고, 모든 B2 Child가 정확히 한 passage에
+   존재하는지 fail-closed 검증한다.
+4. A Fixed, B2 atomic Child, B3 passage가 같은 ACTIVE corpus/query와 동일 query embedding을
+   공유하도록 기존 runner를 세 profile로 확장한다.
+5. Original Seed와 Long-form DEV/CAL을 별도 실행하고 candidate/embedding, latency, ranking,
+   user/profession/language, boundary와 passage 통계를 기록한다.
+6. SEALED hash/flags, 관련 source-set test, diff/OSS/scope Gate를 검증한 뒤 허용 파일만 commit한다.
+
+실제 결과는 B3가 비용과 전체 metric을 유지·개선했으나 Long-form `FRONTEND_MOBILE` 신규 회귀로
+`NEEDS_ADJUSTMENT`였다. 따라서 Parent Context로 진행하지 않고 B3 회귀를 후속 구조 실험에서
+분리 검증한다.
+
+## 7. Phase 1 Retrieval Passage robustness plan
+
+1. B3 builder와 EvidenceChild를 수정하지 않고 현재 policy/source hash를 robustness report에 넣는다.
+2. 별도 `devcal-robustness-1.0.0` generator와 fixture를 추가한다. source fact, normalized query,
+   template/seed/document lineage가 Original Seed와 DEV/CAL 1.1.0에 충돌하면 materialization을
+   fail-closed한다.
+3. loader는 새 root의 DEV/CAL만 허용하고 manifest hash/count를 검증한다. SEALED FINAL 경로 guard와
+   기존 dataset loader는 유지한다.
+4. 기존 A/B2/B3 engine으로 새 suite를 한 번 실행한다. B3 policy를 결과에 맞춰 조정하지 않는다.
+5. 별도 robustness Gate는 fresh suite와 기존 Long-form report의 paired B2/B3 query 결과를 받아
+   표본 충분성, query/user delta, clustered bootstrap interval과 누적 profession/language slice를
+   계산한다.
+6. 입력 fixture·계약·validator를 먼저 commit하여 benchmark 결과 이전 freeze revision을 남긴다.
+7. 그 commit에서 local Ollama `bge-m3` benchmark를 실행하고 ignored raw report SHA-256, aggregate,
+   신규 회귀와 판정을 evidence에 기록한다.
+8. 관련 source-set test, materializer `--check`, PRZ-025 validator, SEALED hash/flags,
+   `git diff --check`, OSS readiness와 forbidden scope를 검증한다.
+
+실패 시 fixture·B3 policy를 결과에 맞춰 재튜닝하지 않는다. runtime이 없으면 benchmark와 품질
+판정은 `NOT_RUN`; blocking regression이면 B3는 기존 `NEEDS_ADJUSTMENT`를 유지한다. Production,
+dependency, migration, frontend, MCP, Parent Context와 push/PR/merge는 범위 밖이다.
+
+실제 실행에서는 fresh 전체 B2/B3 ranking이 완전히 같았고 후보·embedding과 단일-run indexing
+wall time이 각각 30.56%, 31.14% 감소했다. 누적 충분 profession/language slice에
+`BLOCKING_REGRESSION`은 없었다. 누적 frontend와 EN의 interval은 `INCONCLUSIVE`이므로 Production
+근거로 사용하지 않되, 사전 계약에 따라 다음 evaluation-only Parent Context 실험은 진행 가능하다.
+
+## 8. C1 Structural Heading Path Parent Context plan
+
+1. 시작 HEAD와 B3/EvidenceChild builder SHA-256, SEALED tree/hash/flags를 기록한다.
+2. B3 객체를 수정하지 않는 contextual wrapper와 `STRUCTURAL_HEADING_PATH_V1` builder를 추가한다.
+3. source-order heading path, 명시적 Markdown level, 최대 depth 2/120 code points, heading 없는
+   fallback과 cross-parent fail-closed를 unit test로 먼저 고정한다.
+4. 기존 B3 passage candidate를 C1에 일대일 투영하고 source/evidence/provenance/candidate/embedding
+   parity 및 Gold가 context를 사용하지 않음을 검증한다.
+5. B3/C1 전용 raw Dense runner와 context 적용률/depth/길이, direct win/loss/tie,
+   context-only false-hit 및 profession/language metric을 추가한다.
+6. 코드·계약·test를 local input-freeze commit으로 결과 전에 고정한다.
+7. Original Seed, Long-form, robustness DEV/CAL을 각각 같은 `bge-m3` query vector로 한 번 실행하고
+   ignored raw report와 SHA-256만 남긴다. 결과를 보고 context policy를 조정하지 않는다.
+8. PRZ-025 validator, SEALED hash/flags, 관련 source-set test, `git diff --check`, OSS readiness와
+   forbidden scope를 검증하고 결과·실패 사례·판정을 evidence에 기록한다.
+
+Ollama/model이 없거나 parity/Safety가 실패하면 C1 결과는 `NOT_RUN` 또는 `NO_GO`로 기록하고
+Parent Dense로 진행하지 않는다. rollback 범위는 C1 evaluation-only source/test와 PRZ-026 문서뿐이다.
+Production, dependency, migration, frontend, MCP, Docker, dataset, SEALED FINAL, push/PR/merge는
+변경하지 않는다.
+
+공식 실행 결과 C1은 Original Seed 1건을 개선했지만 Long-form 1건과 robustness 2건을 rank 1에서
+rank 2로 내렸고, 모두 context-only false hit로 분류됐다. candidate/embedding과 구조 경계는
+보존됐으나 사전 Search Gate를 통과하지 못했으므로 판정은 `NEEDS_ADJUSTMENT`다. 결과를 본 뒤
+heading policy를 변경하지 않으며 Parent Dense 진입은 보류한다.

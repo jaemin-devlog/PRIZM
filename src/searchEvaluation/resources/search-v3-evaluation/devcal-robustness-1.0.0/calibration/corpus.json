@@ -1,0 +1,113 @@
+{
+  "artifactType": "CORPUS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+  "split": "CALIBRATION",
+  "userBundles": [
+    {
+      "userBundleId": "SV3-RB-U204",
+      "split": "CALIBRATION",
+      "professionGroup": "FRONTEND_MOBILE",
+      "profession": "frontend platform engineer",
+      "languageProfile": "EN",
+      "documentFamilyId": "SV3-RB-U204-DOC-FAMILY",
+      "templateFamilyId": "SV3-RB-TEMPLATE-FRONTEND-DELIVERY-204",
+      "documents": [
+        {
+          "documentId": "SV3-RB-U204-D01",
+          "logicalDocumentId": "SV3-RB-U204-D01-LOGICAL",
+          "versionLineageId": "SV3-RB-U204-D01-LINEAGE",
+          "versionId": "SV3-RB-U204-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Synthetic Multi-Region Web Delivery Portfolio",
+          "documentType": "PORTFOLIO",
+          "documentStructure": "LONG_PORTFOLIO",
+          "fileType": "TXT",
+          "language": "EN",
+          "contentPath": "documents/sv3-rb-u204-frontend-delivery-portfolio-v01.txt",
+          "contentSha256": "b868b4d19822b51bd35360a5367b921004355294823fbac992be8a903a200d6b",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-prz026-robustness-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-RB-SEED-FRONTEND-204-2D57"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-RB-U205",
+      "split": "CALIBRATION",
+      "professionGroup": "MARKETING_SALES",
+      "profession": "regional growth and partner marketing manager",
+      "languageProfile": "KO",
+      "documentFamilyId": "SV3-RB-U205-DOC-FAMILY",
+      "templateFamilyId": "SV3-RB-TEMPLATE-MARKETING-REVIEW-205",
+      "documents": [
+        {
+          "documentId": "SV3-RB-U205-D01",
+          "logicalDocumentId": "SV3-RB-U205-D01-LOGICAL",
+          "versionLineageId": "SV3-RB-U205-D01-LINEAGE",
+          "versionId": "SV3-RB-U205-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "합성 지역 파트너 마케팅 경력기술서",
+          "documentType": "CAREER_REVIEW",
+          "documentStructure": "CAREER_DESCRIPTION",
+          "fileType": "TXT",
+          "language": "KO",
+          "contentPath": "documents/sv3-rb-u205-partner-marketing-review-v01.txt",
+          "contentSha256": "8712d61c82d9c21e9b27d783319f9fdd98959a14650a63d71137022dde6bee2c",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-prz026-robustness-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-RB-SEED-MARKETING-205-8B40"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-RB-U206",
+      "split": "CALIBRATION",
+      "professionGroup": "NON_DEVELOPMENT_GENERAL",
+      "profession": "community learning operations coordinator",
+      "languageProfile": "KO_EN_MIXED",
+      "documentFamilyId": "SV3-RB-U206-DOC-FAMILY",
+      "templateFamilyId": "SV3-RB-TEMPLATE-LEARNING-OPERATIONS-206",
+      "documents": [
+        {
+          "documentId": "SV3-RB-U206-D01",
+          "logicalDocumentId": "SV3-RB-U206-D01-LOGICAL",
+          "versionLineageId": "SV3-RB-U206-D01-LINEAGE",
+          "versionId": "SV3-RB-U206-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Synthetic Community Learning 운영 Portfolio",
+          "documentType": "PORTFOLIO",
+          "documentStructure": "LONG_PORTFOLIO",
+          "fileType": "TXT",
+          "language": "KO_EN_MIXED",
+          "contentPath": "documents/sv3-rb-u206-learning-operations-portfolio-v01.txt",
+          "contentSha256": "ed677f263e681b5d9e8fd934abe1eedf95aa2998b0ef03cb684c0e22bb25e0db",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-prz026-robustness-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-RB-SEED-LEARNING-206-5E23"
+          }
+        }
+      ]
+    }
+  ]
+}

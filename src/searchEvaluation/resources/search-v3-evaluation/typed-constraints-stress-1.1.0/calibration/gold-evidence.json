@@ -1,0 +1,941 @@
+{
+  "artifactType": "GOLD_EVIDENCE",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+  "split": "CALIBRATION",
+  "parents": [
+    {
+      "parentId": "SV3-U44-P01",
+      "userBundleId": "SV3-U44",
+      "documentId": "SV3-U44-D01",
+      "versionId": "SV3-U44-D01-V01",
+      "label": "Annual renewal cycle",
+      "sourceSpan": {
+        "spanId": "SV3-U44-P01-PS01",
+        "parentId": "SV3-U44-P01",
+        "documentId": "SV3-U44-D01",
+        "versionId": "SV3-U44-D01-V01",
+        "sourcePath": "documents/sv3-u44-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 59,
+        "charEnd": 152,
+        "lineStart": 4,
+        "lineEnd": 4,
+        "text": "The annual membership cycle recorded 1,850 paid member renewals after payment reconciliation.",
+        "textSha256": "2a0eb8b8426ef09b06bce3338c0dab3b845adac3a3e666c7f6b96ca8c6433cb9"
+      }
+    },
+    {
+      "parentId": "SV3-U44-P02",
+      "userBundleId": "SV3-U44",
+      "documentId": "SV3-U44-D01",
+      "versionId": "SV3-U44-D01-V01",
+      "label": "Prior renewal cycle",
+      "sourceSpan": {
+        "spanId": "SV3-U44-P02-PS01",
+        "parentId": "SV3-U44-P02",
+        "documentId": "SV3-U44-D01",
+        "versionId": "SV3-U44-D01-V01",
+        "sourcePath": "documents/sv3-u44-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 174,
+        "charEnd": 274,
+        "lineStart": 7,
+        "lineEnd": 7,
+        "text": "The prior membership cycle recorded 1,240 paid member renewals before the reminder sequence changed.",
+        "textSha256": "db4552381d566891810564568daa6de2d476f479199758edc1aa09bd93f03135"
+      }
+    },
+    {
+      "parentId": "SV3-U44-P03",
+      "userBundleId": "SV3-U44",
+      "documentId": "SV3-U44-D01",
+      "versionId": "SV3-U44-D01-V01",
+      "label": "Lecture registrations",
+      "sourceSpan": {
+        "spanId": "SV3-U44-P03-PS01",
+        "parentId": "SV3-U44-P03",
+        "documentId": "SV3-U44-D01",
+        "versionId": "SV3-U44-D01-V01",
+        "sourcePath": "documents/sv3-u44-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 298,
+        "charEnd": 388,
+        "lineStart": 10,
+        "lineEnd": 10,
+        "text": "The public lecture series recorded 1,850 event registrations in the same reporting period.",
+        "textSha256": "ce075ad25b16c457c22abd99eb7f8f6cfece50af1a0dd23b3d94821244cbdb09"
+      }
+    },
+    {
+      "parentId": "SV3-U45-P01",
+      "userBundleId": "SV3-U45",
+      "documentId": "SV3-U45-D01",
+      "versionId": "SV3-U45-D01-V01",
+      "label": "서관 최적화",
+      "sourceSpan": {
+        "spanId": "SV3-U45-P01-PS01",
+        "parentId": "SV3-U45-P01",
+        "documentId": "SV3-U45-D01",
+        "versionId": "SV3-U45-D01-V01",
+        "sourcePath": "documents/sv3-u45-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 21,
+        "charEnd": 65,
+        "lineStart": 4,
+        "lineEnd": 4,
+        "text": "서관 최적화에서는 냉각 에너지 사용량이 27% 감소했고 월별 계측값을 검토했다.",
+        "textSha256": "33afd8d1100e608b82f416b057a0c5e326c82c993812521d8308c296651c1dbc"
+      }
+    },
+    {
+      "parentId": "SV3-U45-P02",
+      "userBundleId": "SV3-U45",
+      "documentId": "SV3-U45-D01",
+      "versionId": "SV3-U45-D01-V01",
+      "label": "동관 초기 조정",
+      "sourceSpan": {
+        "spanId": "SV3-U45-P02-PS01",
+        "parentId": "SV3-U45-P02",
+        "documentId": "SV3-U45-D01",
+        "versionId": "SV3-U45-D01-V01",
+        "sourcePath": "documents/sv3-u45-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 76,
+        "charEnd": 121,
+        "lineStart": 7,
+        "lineEnd": 7,
+        "text": "동관의 초기 조정 기간에는 냉각 에너지 사용량이 27% 증가해 제어값을 되돌렸다.",
+        "textSha256": "cc8a795db55f6c0e7930419ef7774548703ef8d79af8c93a1558a9601dd41ba5"
+      }
+    },
+    {
+      "parentId": "SV3-U45-P03",
+      "userBundleId": "SV3-U45",
+      "documentId": "SV3-U45-D01",
+      "versionId": "SV3-U45-D01-V01",
+      "label": "정비 알림 점검",
+      "sourceSpan": {
+        "spanId": "SV3-U45-P03-PS01",
+        "parentId": "SV3-U45-P03",
+        "documentId": "SV3-U45-D01",
+        "versionId": "SV3-U45-D01-V01",
+        "sourcePath": "documents/sv3-u45-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 132,
+        "charEnd": 167,
+        "lineStart": 10,
+        "lineEnd": 10,
+        "text": "설비 점검 절차를 바꾼 뒤 정비 알림 누락률이 27% 감소했다.",
+        "textSha256": "b84fdb3220a91c497438af3d34313ae22827e9aed3ef6c682dac93eb2f30a2f6"
+      }
+    },
+    {
+      "parentId": "SV3-U45-P04",
+      "userBundleId": "SV3-U45",
+      "documentId": "SV3-U45-D01",
+      "versionId": "SV3-U45-D01-V01",
+      "label": "주요 검증 기간",
+      "sourceSpan": {
+        "spanId": "SV3-U45-P04-PS01",
+        "parentId": "SV3-U45-P04",
+        "documentId": "SV3-U45-D01",
+        "versionId": "SV3-U45-D01-V01",
+        "sourcePath": "documents/sv3-u45-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 178,
+        "charEnd": 221,
+        "lineStart": 13,
+        "lineEnd": 13,
+        "text": "주요 냉각 최적화 검증은 18개월 동안 운영 데이터와 계절별 부하를 확인했다.",
+        "textSha256": "6e7adc8bbb984c47ecf3c568ba96fda31a3ca89208cda815d7745e3a9f097c13"
+      }
+    },
+    {
+      "parentId": "SV3-U45-P05",
+      "userBundleId": "SV3-U45",
+      "documentId": "SV3-U45-D01",
+      "versionId": "SV3-U45-D01-V01",
+      "label": "초기 검증 기간",
+      "sourceSpan": {
+        "spanId": "SV3-U45-P05-PS01",
+        "parentId": "SV3-U45-P05",
+        "documentId": "SV3-U45-D01",
+        "versionId": "SV3-U45-D01-V01",
+        "sourcePath": "documents/sv3-u45-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 232,
+        "charEnd": 267,
+        "lineStart": 16,
+        "lineEnd": 16,
+        "text": "초기 냉각 최적화 검증은 12개월 동안 제한된 구역만 관찰했다.",
+        "textSha256": "43ca0831d99a619fc8b049753fdb617ce14b114a7ffb4919be4c3d3dc7cf9b3f"
+      }
+    },
+    {
+      "parentId": "SV3-U46-P01",
+      "userBundleId": "SV3-U46",
+      "documentId": "SV3-U46-D01",
+      "versionId": "SV3-U46-D01-V01",
+      "label": "Active kiosk client",
+      "sourceSpan": {
+        "spanId": "SV3-U46-P01-PS01",
+        "parentId": "SV3-U46-P01",
+        "documentId": "SV3-U46-D01",
+        "versionId": "SV3-U46-D01-V01",
+        "sourcePath": "documents/sv3-u46-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 40,
+        "charEnd": 124,
+        "lineStart": 4,
+        "lineEnd": 4,
+        "text": "The active kiosk client uses KioskLink 8.4 for signed device messages in production.",
+        "textSha256": "a1132bf3624fc2c2f78fc883b542af10a139d5cc4e53d18c273db1ca2b1c4691"
+      }
+    },
+    {
+      "parentId": "SV3-U46-P02",
+      "userBundleId": "SV3-U46",
+      "documentId": "SV3-U46-D01",
+      "versionId": "SV3-U46-D01-V01",
+      "label": "Retired kiosk client",
+      "sourceSpan": {
+        "spanId": "SV3-U46-P02-PS01",
+        "parentId": "SV3-U46-P02",
+        "documentId": "SV3-U46-D01",
+        "versionId": "SV3-U46-D01-V01",
+        "sourcePath": "documents/sv3-u46-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 147,
+        "charEnd": 201,
+        "lineStart": 7,
+        "lineEnd": 7,
+        "text": "폐기된 kiosk client는 KioskLink 8.1을 사용했고 현재 배포 대상에서 제외됐다.",
+        "textSha256": "3a0cc86cab8653846082e2ce32fbabbbdea470ecd6643a8eb76c8ebb04f31949"
+      }
+    },
+    {
+      "parentId": "SV3-U46-P03",
+      "userBundleId": "SV3-U46",
+      "documentId": "SV3-U46-D01",
+      "versionId": "SV3-U46-D01-V01",
+      "label": "Current maintenance window",
+      "sourceSpan": {
+        "spanId": "SV3-U46-P03-PS01",
+        "parentId": "SV3-U46-P03",
+        "documentId": "SV3-U46-D01",
+        "versionId": "SV3-U46-D01-V01",
+        "sourcePath": "documents/sv3-u46-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 230,
+        "charEnd": 289,
+        "lineStart": 10,
+        "lineEnd": 10,
+        "text": "승인된 maintenance window 시작일은 2026-09-10이며 현장 장비 점검이 함께 진행됐다.",
+        "textSha256": "f6e35ec3e2f7009a902e76422fa3d8d1d04af81ab3378a1bdefeb0174c8fc8cc"
+      }
+    },
+    {
+      "parentId": "SV3-U46-P04",
+      "userBundleId": "SV3-U46",
+      "documentId": "SV3-U46-D01",
+      "versionId": "SV3-U46-D01-V01",
+      "label": "Earlier maintenance window",
+      "sourceSpan": {
+        "spanId": "SV3-U46-P04-PS01",
+        "parentId": "SV3-U46-P04",
+        "documentId": "SV3-U46-D01",
+        "versionId": "SV3-U46-D01-V01",
+        "sourcePath": "documents/sv3-u46-typed-capability-v01.txt",
+        "sourceType": "TXT_TEXT",
+        "page": null,
+        "charStart": 318,
+        "charEnd": 379,
+        "lineStart": 13,
+        "lineEnd": 13,
+        "text": "이전 승인 주기의 maintenance window 시작일은 2025-12-15였고 당일 복구 훈련을 마쳤다.",
+        "textSha256": "9ffaeaa2e1766b327f20c547660778b330a5dd92ac9746966feb949de19d5d2a"
+      }
+    }
+  ],
+  "evidenceGroups": [
+    {
+      "groupId": "SV3-U44-G01",
+      "userBundleId": "SV3-U44",
+      "sourceFactId": "SV3-TC11-FACT-U44-P01",
+      "description": "Annual renewal cycle",
+      "evidenceUnitIds": [
+        "SV3-U44-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U44-G02",
+      "userBundleId": "SV3-U44",
+      "sourceFactId": "SV3-TC11-FACT-U44-P02",
+      "description": "Prior renewal cycle",
+      "evidenceUnitIds": [
+        "SV3-U44-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U44-G03",
+      "userBundleId": "SV3-U44",
+      "sourceFactId": "SV3-TC11-FACT-U44-P03",
+      "description": "Lecture registrations",
+      "evidenceUnitIds": [
+        "SV3-U44-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U45-G01",
+      "userBundleId": "SV3-U45",
+      "sourceFactId": "SV3-TC11-FACT-U45-P01",
+      "description": "서관 최적화",
+      "evidenceUnitIds": [
+        "SV3-U45-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U45-G02",
+      "userBundleId": "SV3-U45",
+      "sourceFactId": "SV3-TC11-FACT-U45-P02",
+      "description": "동관 초기 조정",
+      "evidenceUnitIds": [
+        "SV3-U45-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U45-G03",
+      "userBundleId": "SV3-U45",
+      "sourceFactId": "SV3-TC11-FACT-U45-P03",
+      "description": "정비 알림 점검",
+      "evidenceUnitIds": [
+        "SV3-U45-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U45-G04",
+      "userBundleId": "SV3-U45",
+      "sourceFactId": "SV3-TC11-FACT-U45-P04",
+      "description": "주요 검증 기간",
+      "evidenceUnitIds": [
+        "SV3-U45-P04-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U45-G05",
+      "userBundleId": "SV3-U45",
+      "sourceFactId": "SV3-TC11-FACT-U45-P05",
+      "description": "초기 검증 기간",
+      "evidenceUnitIds": [
+        "SV3-U45-P05-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U46-G01",
+      "userBundleId": "SV3-U46",
+      "sourceFactId": "SV3-TC11-FACT-U46-P01",
+      "description": "Active kiosk client",
+      "evidenceUnitIds": [
+        "SV3-U46-P01-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U46-G02",
+      "userBundleId": "SV3-U46",
+      "sourceFactId": "SV3-TC11-FACT-U46-P02",
+      "description": "Retired kiosk client",
+      "evidenceUnitIds": [
+        "SV3-U46-P02-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U46-G03",
+      "userBundleId": "SV3-U46",
+      "sourceFactId": "SV3-TC11-FACT-U46-P03",
+      "description": "Current maintenance window",
+      "evidenceUnitIds": [
+        "SV3-U46-P03-E01"
+      ]
+    },
+    {
+      "groupId": "SV3-U46-G04",
+      "userBundleId": "SV3-U46",
+      "sourceFactId": "SV3-TC11-FACT-U46-P04",
+      "description": "Earlier maintenance window",
+      "evidenceUnitIds": [
+        "SV3-U46-P04-E01"
+      ]
+    }
+  ],
+  "evidenceUnits": [
+    {
+      "evidenceUnitId": "SV3-U44-P01-E01",
+      "userBundleId": "SV3-U44",
+      "parentId": "SV3-U44-P01",
+      "groupId": "SV3-U44-G01",
+      "documentId": "SV3-U44-D01",
+      "versionId": "SV3-U44-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U44-P01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U44-P01-E01-S01",
+          "parentId": "SV3-U44-P01",
+          "documentId": "SV3-U44-D01",
+          "versionId": "SV3-U44-D01-V01",
+          "sourcePath": "documents/sv3-u44-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 59,
+          "charEnd": 152,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "The annual membership cycle recorded 1,850 paid member renewals after payment reconciliation.",
+          "textSha256": "2a0eb8b8426ef09b06bce3338c0dab3b845adac3a3e666c7f6b96ca8c6433cb9"
+        }
+      ],
+      "primarySpanId": "SV3-U44-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p01"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 1850,
+          "unit": "count",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "1,850",
+          "qualifierTokens": [
+            "paid",
+            "member",
+            "renewals"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U44-P02-E01",
+      "userBundleId": "SV3-U44",
+      "parentId": "SV3-U44-P02",
+      "groupId": "SV3-U44-G02",
+      "documentId": "SV3-U44-D01",
+      "versionId": "SV3-U44-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U44-P02",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U44-P02-E01-S01",
+          "parentId": "SV3-U44-P02",
+          "documentId": "SV3-U44-D01",
+          "versionId": "SV3-U44-D01-V01",
+          "sourcePath": "documents/sv3-u44-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 174,
+          "charEnd": 274,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "The prior membership cycle recorded 1,240 paid member renewals before the reminder sequence changed.",
+          "textSha256": "db4552381d566891810564568daa6de2d476f479199758edc1aa09bd93f03135"
+        }
+      ],
+      "primarySpanId": "SV3-U44-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p02"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 1240,
+          "unit": "count",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "1,240",
+          "qualifierTokens": [
+            "paid",
+            "member",
+            "renewals"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U44-P03-E01",
+      "userBundleId": "SV3-U44",
+      "parentId": "SV3-U44-P03",
+      "groupId": "SV3-U44-G03",
+      "documentId": "SV3-U44-D01",
+      "versionId": "SV3-U44-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U44-P03",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U44-P03-E01-S01",
+          "parentId": "SV3-U44-P03",
+          "documentId": "SV3-U44-D01",
+          "versionId": "SV3-U44-D01-V01",
+          "sourcePath": "documents/sv3-u44-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 298,
+          "charEnd": 388,
+          "lineStart": 10,
+          "lineEnd": 10,
+          "text": "The public lecture series recorded 1,850 event registrations in the same reporting period.",
+          "textSha256": "ce075ad25b16c457c22abd99eb7f8f6cfece50af1a0dd23b3d94821244cbdb09"
+        }
+      ],
+      "primarySpanId": "SV3-U44-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p03"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 1850,
+          "unit": "count",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "1,850",
+          "qualifierTokens": [
+            "event",
+            "registrations"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U45-P01-E01",
+      "userBundleId": "SV3-U45",
+      "parentId": "SV3-U45-P01",
+      "groupId": "SV3-U45-G01",
+      "documentId": "SV3-U45-D01",
+      "versionId": "SV3-U45-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U45-P01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U45-P01-E01-S01",
+          "parentId": "SV3-U45-P01",
+          "documentId": "SV3-U45-D01",
+          "versionId": "SV3-U45-D01-V01",
+          "sourcePath": "documents/sv3-u45-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 21,
+          "charEnd": 65,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "서관 최적화에서는 냉각 에너지 사용량이 27% 감소했고 월별 계측값을 검토했다.",
+          "textSha256": "33afd8d1100e608b82f416b057a0c5e326c82c993812521d8308c296651c1dbc"
+        }
+      ],
+      "primarySpanId": "SV3-U45-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p01"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 27,
+          "unit": "%",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "27%",
+          "qualifierTokens": [
+            "냉각",
+            "에너지",
+            "사용량"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U45-P02-E01",
+      "userBundleId": "SV3-U45",
+      "parentId": "SV3-U45-P02",
+      "groupId": "SV3-U45-G02",
+      "documentId": "SV3-U45-D01",
+      "versionId": "SV3-U45-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U45-P02",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U45-P02-E01-S01",
+          "parentId": "SV3-U45-P02",
+          "documentId": "SV3-U45-D01",
+          "versionId": "SV3-U45-D01-V01",
+          "sourcePath": "documents/sv3-u45-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 76,
+          "charEnd": 121,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "동관의 초기 조정 기간에는 냉각 에너지 사용량이 27% 증가해 제어값을 되돌렸다.",
+          "textSha256": "cc8a795db55f6c0e7930419ef7774548703ef8d79af8c93a1558a9601dd41ba5"
+        }
+      ],
+      "primarySpanId": "SV3-U45-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p02"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 27,
+          "unit": "%",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "27%",
+          "qualifierTokens": [
+            "냉각",
+            "에너지",
+            "사용량"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U45-P03-E01",
+      "userBundleId": "SV3-U45",
+      "parentId": "SV3-U45-P03",
+      "groupId": "SV3-U45-G03",
+      "documentId": "SV3-U45-D01",
+      "versionId": "SV3-U45-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U45-P03",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U45-P03-E01-S01",
+          "parentId": "SV3-U45-P03",
+          "documentId": "SV3-U45-D01",
+          "versionId": "SV3-U45-D01-V01",
+          "sourcePath": "documents/sv3-u45-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 132,
+          "charEnd": 167,
+          "lineStart": 10,
+          "lineEnd": 10,
+          "text": "설비 점검 절차를 바꾼 뒤 정비 알림 누락률이 27% 감소했다.",
+          "textSha256": "b84fdb3220a91c497438af3d34313ae22827e9aed3ef6c682dac93eb2f30a2f6"
+        }
+      ],
+      "primarySpanId": "SV3-U45-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p03"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 27,
+          "unit": "%",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "27%",
+          "qualifierTokens": [
+            "정비",
+            "알림",
+            "누락률"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U45-P04-E01",
+      "userBundleId": "SV3-U45",
+      "parentId": "SV3-U45-P04",
+      "groupId": "SV3-U45-G04",
+      "documentId": "SV3-U45-D01",
+      "versionId": "SV3-U45-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U45-P04",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U45-P04-E01-S01",
+          "parentId": "SV3-U45-P04",
+          "documentId": "SV3-U45-D01",
+          "versionId": "SV3-U45-D01-V01",
+          "sourcePath": "documents/sv3-u45-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 178,
+          "charEnd": 221,
+          "lineStart": 13,
+          "lineEnd": 13,
+          "text": "주요 냉각 최적화 검증은 18개월 동안 운영 데이터와 계절별 부하를 확인했다.",
+          "textSha256": "6e7adc8bbb984c47ecf3c568ba96fda31a3ca89208cda815d7745e3a9f097c13"
+        }
+      ],
+      "primarySpanId": "SV3-U45-P04-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p04"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 18,
+          "unit": "개월",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "18개월",
+          "qualifierTokens": [
+            "냉각",
+            "최적화",
+            "검증"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U45-P05-E01",
+      "userBundleId": "SV3-U45",
+      "parentId": "SV3-U45-P05",
+      "groupId": "SV3-U45-G05",
+      "documentId": "SV3-U45-D01",
+      "versionId": "SV3-U45-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U45-P05",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U45-P05-E01-S01",
+          "parentId": "SV3-U45-P05",
+          "documentId": "SV3-U45-D01",
+          "versionId": "SV3-U45-D01-V01",
+          "sourcePath": "documents/sv3-u45-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 232,
+          "charEnd": 267,
+          "lineStart": 16,
+          "lineEnd": 16,
+          "text": "초기 냉각 최적화 검증은 12개월 동안 제한된 구역만 관찰했다.",
+          "textSha256": "43ca0831d99a619fc8b049753fdb617ce14b114a7ffb4919be4c3d3dc7cf9b3f"
+        }
+      ],
+      "primarySpanId": "SV3-U45-P05-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p05"
+      ],
+      "entities": [],
+      "numerics": [
+        {
+          "normalizedValue": 12,
+          "unit": "개월",
+          "semanticType": "QUANTITY",
+          "sourceSurface": "12개월",
+          "qualifierTokens": [
+            "냉각",
+            "최적화",
+            "검증"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U46-P01-E01",
+      "userBundleId": "SV3-U46",
+      "parentId": "SV3-U46-P01",
+      "groupId": "SV3-U46-G01",
+      "documentId": "SV3-U46-D01",
+      "versionId": "SV3-U46-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U46-P01",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U46-P01-E01-S01",
+          "parentId": "SV3-U46-P01",
+          "documentId": "SV3-U46-D01",
+          "versionId": "SV3-U46-D01-V01",
+          "sourcePath": "documents/sv3-u46-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 40,
+          "charEnd": 124,
+          "lineStart": 4,
+          "lineEnd": 4,
+          "text": "The active kiosk client uses KioskLink 8.4 for signed device messages in production.",
+          "textSha256": "a1132bf3624fc2c2f78fc883b542af10a139d5cc4e53d18c273db1ca2b1c4691"
+        }
+      ],
+      "primarySpanId": "SV3-U46-P01-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p01"
+      ],
+      "entities": [
+        {
+          "entityType": "IDENTIFIER_NUMBER",
+          "canonicalValue": "KIOSKLINK_8_4",
+          "surfaceForms": [
+            "KioskLink 8.4"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U46-P02-E01",
+      "userBundleId": "SV3-U46",
+      "parentId": "SV3-U46-P02",
+      "groupId": "SV3-U46-G02",
+      "documentId": "SV3-U46-D01",
+      "versionId": "SV3-U46-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U46-P02",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U46-P02-E01-S01",
+          "parentId": "SV3-U46-P02",
+          "documentId": "SV3-U46-D01",
+          "versionId": "SV3-U46-D01-V01",
+          "sourcePath": "documents/sv3-u46-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 147,
+          "charEnd": 201,
+          "lineStart": 7,
+          "lineEnd": 7,
+          "text": "폐기된 kiosk client는 KioskLink 8.1을 사용했고 현재 배포 대상에서 제외됐다.",
+          "textSha256": "3a0cc86cab8653846082e2ce32fbabbbdea470ecd6643a8eb76c8ebb04f31949"
+        }
+      ],
+      "primarySpanId": "SV3-U46-P02-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p02"
+      ],
+      "entities": [
+        {
+          "entityType": "IDENTIFIER_NUMBER",
+          "canonicalValue": "KIOSKLINK_8_1",
+          "surfaceForms": [
+            "KioskLink 8.1"
+          ]
+        }
+      ],
+      "numerics": [],
+      "dates": []
+    },
+    {
+      "evidenceUnitId": "SV3-U46-P03-E01",
+      "userBundleId": "SV3-U46",
+      "parentId": "SV3-U46-P03",
+      "groupId": "SV3-U46-G03",
+      "documentId": "SV3-U46-D01",
+      "versionId": "SV3-U46-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U46-P03",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U46-P03-E01-S01",
+          "parentId": "SV3-U46-P03",
+          "documentId": "SV3-U46-D01",
+          "versionId": "SV3-U46-D01-V01",
+          "sourcePath": "documents/sv3-u46-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 230,
+          "charEnd": 289,
+          "lineStart": 10,
+          "lineEnd": 10,
+          "text": "승인된 maintenance window 시작일은 2026-09-10이며 현장 장비 점검이 함께 진행됐다.",
+          "textSha256": "f6e35ec3e2f7009a902e76422fa3d8d1d04af81ab3378a1bdefeb0174c8fc8cc"
+        }
+      ],
+      "primarySpanId": "SV3-U46-P03-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p03"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": [
+        {
+          "start": "2026-09-10",
+          "end": "2026-09-10",
+          "precision": "DAY",
+          "sourceSurface": "2026-09-10"
+        }
+      ]
+    },
+    {
+      "evidenceUnitId": "SV3-U46-P04-E01",
+      "userBundleId": "SV3-U46",
+      "parentId": "SV3-U46-P04",
+      "groupId": "SV3-U46-G04",
+      "documentId": "SV3-U46-D01",
+      "versionId": "SV3-U46-D01-V01",
+      "sourceFactId": "SV3-TC11-FACT-U46-P04",
+      "sourceSpans": [
+        {
+          "spanId": "SV3-U46-P04-E01-S01",
+          "parentId": "SV3-U46-P04",
+          "documentId": "SV3-U46-D01",
+          "versionId": "SV3-U46-D01-V01",
+          "sourcePath": "documents/sv3-u46-typed-capability-v01.txt",
+          "sourceType": "TXT_TEXT",
+          "page": null,
+          "charStart": 318,
+          "charEnd": 379,
+          "lineStart": 13,
+          "lineEnd": 13,
+          "text": "이전 승인 주기의 maintenance window 시작일은 2025-12-15였고 당일 복구 훈련을 마쳤다.",
+          "textSha256": "9ffaeaa2e1766b327f20c547660778b330a5dd92ac9746966feb949de19d5d2a"
+        }
+      ],
+      "primarySpanId": "SV3-U46-P04-E01-S01",
+      "contextSpanIds": [],
+      "actor": "SELF",
+      "completionState": "COMPLETED",
+      "aspects": [
+        "typed_capability_p04"
+      ],
+      "entities": [],
+      "numerics": [],
+      "dates": [
+        {
+          "start": "2025-12-15",
+          "end": "2025-12-15",
+          "precision": "DAY",
+          "sourceSurface": "2025-12-15"
+        }
+      ]
+    }
+  ]
+}

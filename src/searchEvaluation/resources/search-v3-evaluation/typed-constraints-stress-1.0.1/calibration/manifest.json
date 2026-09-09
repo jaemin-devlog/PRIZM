@@ -1,0 +1,127 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.0.1",
+  "split": "CALIBRATION",
+  "status": "FRESH_BENCHMARK_SEED_FROZEN",
+  "mutable": false,
+  "opened": true,
+  "searchExecuted": false,
+  "sealedAt": null,
+  "frozenAt": "2026-08-31T19:00:00+09:00",
+  "generationSourceRevision": "4bbbc5de040aa3c84fcb9869ece2fce85d983c0c",
+  "generatorRevision": "prz028-typed-stress-correction-v1",
+  "previousVersion": "search-v3-typed-constraints-stress-1.0.0",
+  "previousVersionStatus": "INVALID_INPUT_HISTORICAL",
+  "counts": {
+    "userBundles": 3,
+    "documents": 3,
+    "queries": 12,
+    "typedQueryAnnotations": 12,
+    "evidenceParents": 13,
+    "evidenceGroups": 13,
+    "evidenceUnits": 13,
+    "typedObservations": 13
+  },
+  "distributions": {
+    "profession": {
+      "DATA_AI_INFRA": 1,
+      "FRONTEND_MOBILE": 1,
+      "PLANNING": 1
+    },
+    "documentLanguage": {
+      "EN": 1,
+      "KO": 1,
+      "KO_EN_MIXED": 1
+    },
+    "queryLanguage": {
+      "EN": 4,
+      "KO": 4,
+      "KO_EN_MIXED": 4
+    },
+    "answerability": {
+      "NOT_SUPPORTED": 6,
+      "SUPPORTED": 6
+    },
+    "category": {
+      "date_range": 3,
+      "english": 4,
+      "hard_negative": 6,
+      "korean": 4,
+      "korean_english_mixed": 4,
+      "literal_identifier": 7,
+      "numeric_quantity": 2,
+      "numeric_range_comparison": 1
+    },
+    "typedKind": {
+      "DATE": 3,
+      "IDENTIFIER_NUMBER": 4,
+      "LITERAL_IDENTIFIER": 3,
+      "QUANTITY": 2
+    },
+    "typedOperator": {
+      "EQ": 1,
+      "EXACT": 7,
+      "GTE": 2,
+      "LT": 1,
+      "RANGE": 1
+    },
+    "stressFamily": {
+      "date_after": 1,
+      "date_before": 1,
+      "date_range": 1,
+      "identifier_number_exact": 2,
+      "identifier_number_mismatch": 2,
+      "literal_exact": 1,
+      "literal_near_match": 2,
+      "not_supported_hard_negative": 6,
+      "percentage_direction": 1,
+      "qualifier_mismatch": 1,
+      "quantity_boundary": 1,
+      "wrong_value": 1
+    },
+    "expectedState": {
+      "CONTRADICTED": 8,
+      "SATISFIED": 6,
+      "UNKNOWN": 38
+    }
+  },
+  "files": [
+    {
+      "path": "corpus.json",
+      "bytes": 4271,
+      "sha256": "5fd99282a901a14e5c57ac93a679ab4c50f305657f1afda0560d2dbd37fe3f05"
+    },
+    {
+      "path": "documents/sv3-u34-typed-stress-v01.txt",
+      "bytes": 440,
+      "sha256": "89e69bc52b222cabf466a68c4ddea61defde3c1edafba0e7b029f52e6ee8d4e3"
+    },
+    {
+      "path": "documents/sv3-u35-typed-stress-v01.txt",
+      "bytes": 474,
+      "sha256": "4a38ae84a1a772fa4eb5ec24f8a9ad23ad16c5b325c6fe8ead97b9712b1d001c"
+    },
+    {
+      "path": "documents/sv3-u36-typed-stress-v01.txt",
+      "bytes": 560,
+      "sha256": "0f8d7f988d8949381c3941c49ee0cab4999e66678863540e46a64b2f2f7041e0"
+    },
+    {
+      "path": "gold-evidence.json",
+      "bytes": 30944,
+      "sha256": "c5fb5880064f11a06ea5634b65db3bb05ddb1a80632d4c06eee2c6f8e17f58af"
+    },
+    {
+      "path": "questions.json",
+      "bytes": 17700,
+      "sha256": "1bf461b6900d7129d3551cab69dca6c55be43e28489f958d987ab1f87670ce90"
+    },
+    {
+      "path": "typed-annotations.json",
+      "bytes": 16825,
+      "sha256": "351068bde6e56b6df527dff56b6f5650fa2be1a869b5ca20373cf0f3635151c2"
+    }
+  ],
+  "combinedSha256": "b754d92e49246aec955c3bef252eeb09a6978272b7b7ba869059bf5a536e606e"
+}

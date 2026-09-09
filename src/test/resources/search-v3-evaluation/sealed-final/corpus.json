@@ -1,0 +1,102 @@
+{
+  "artifactType": "CORPUS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-seed-1.0.1",
+  "split": "SEALED_FINAL_TEST",
+  "userBundles": [
+    {
+      "userBundleId": "SV3-U05",
+      "split": "SEALED_FINAL_TEST",
+      "professionGroup": "PLANNING",
+      "profession": "business planner",
+      "languageProfile": "KO",
+      "documentFamilyId": "SV3-U05-DOC-FAMILY",
+      "templateFamilyId": "SV3-TEMPLATE-PLANNING-05",
+      "documents": [
+        {
+          "documentId": "SV3-U05-D01",
+          "logicalDocumentId": "SV3-U05-D01-LOGICAL",
+          "versionLineageId": "SV3-U05-D01-LINEAGE",
+          "versionId": "SV3-U05-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "합성 기획 자기소개서",
+          "documentType": "COVER_LETTER",
+          "documentStructure": "NARRATIVE_SELF_INTRODUCTION",
+          "fileType": "TXT",
+          "language": "KO",
+          "contentPath": "documents/sv3-u05-planning-narrative-v01.txt",
+          "contentSha256": "0983f80a8a863962de79f6ee9d5451641a7ae501c624b959fb318293d7ca6559",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-search-v3-seed-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-SEED-PLANNING-3B6A"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-U07",
+      "split": "SEALED_FINAL_TEST",
+      "professionGroup": "NON_DEVELOPMENT_GENERAL",
+      "profession": "customer operations coordinator",
+      "languageProfile": "KO",
+      "documentFamilyId": "SV3-U07-DOC-FAMILY",
+      "templateFamilyId": "SV3-TEMPLATE-OPERATIONS-07",
+      "documents": [
+        {
+          "documentId": "SV3-U07-D01",
+          "logicalDocumentId": "SV3-U07-D01-LOGICAL",
+          "versionLineageId": "SV3-U07-D01-LINEAGE",
+          "versionId": "SV3-U07-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "합성 고객 운영 이력서",
+          "documentType": "RESUME",
+          "documentStructure": "SHORT_RESUME",
+          "fileType": "TXT",
+          "language": "KO",
+          "contentPath": "documents/sv3-u07-operations-resume-v01.txt",
+          "contentSha256": "68dcb6ad002252e692d3724fc22edb748b1d57fc7f9ffb8c058aae0db3432ffa",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-search-v3-seed-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-SEED-OPERATIONS-9A4C"
+          }
+        },
+        {
+          "documentId": "SV3-U07-D02",
+          "logicalDocumentId": "SV3-U07-D02-LOGICAL",
+          "versionLineageId": "SV3-U07-D02-LINEAGE",
+          "versionId": "SV3-U07-D02-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "합성 교육 및 수료 기록",
+          "documentType": "CERTIFICATE",
+          "documentStructure": "CERTIFICATION_TRAINING",
+          "fileType": "TXT",
+          "language": "KO",
+          "contentPath": "documents/sv3-u07-operations-training-v01.txt",
+          "contentSha256": "735d1bdf14ed9ed73d61b1498de1b869de9c258dc0cb77e0430f66c41d65cb3c",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-search-v3-seed-materializer",
+            "generatorRevision": "1.0.0",
+            "generatorSeedId": "SV3-SEED-OPERATIONS-9A4C"
+          }
+        }
+      ]
+    }
+  ]
+}

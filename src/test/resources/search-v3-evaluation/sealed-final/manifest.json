@@ -1,0 +1,114 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-seed-1.0.1",
+  "split": "SEALED_FINAL_TEST",
+  "status": "SEALED",
+  "mutable": false,
+  "opened": false,
+  "searchExecuted": false,
+  "sealedAt": "2026-08-30T18:42:16.0307918+09:00",
+  "generationSourceRevision": "14073dd1664fddb009a5bea8823a228e582abf51",
+  "counts": {
+    "userBundles": 2,
+    "logicalDocuments": 3,
+    "documentVersions": 3,
+    "activeDocumentVersions": 3,
+    "inactiveDocumentVersions": 0,
+    "queries": 8,
+    "evidenceParents": 5,
+    "evidenceGroups": 7,
+    "evidenceUnits": 7
+  },
+  "distributions": {
+    "split": {
+      "SEALED_FINAL_TEST": 2
+    },
+    "profession": {
+      "NON_DEVELOPMENT_GENERAL": 1,
+      "PLANNING": 1
+    },
+    "documentLanguage": {
+      "KO": 3
+    },
+    "documentFileType": {
+      "TXT": 3
+    },
+    "documentStructure": {
+      "CERTIFICATION_TRAINING": 1,
+      "NARRATIVE_SELF_INTRODUCTION": 1,
+      "SHORT_RESUME": 1
+    },
+    "queryLanguage": {
+      "KO": 8
+    },
+    "answerability": {
+      "NOT_SUPPORTED": 3,
+      "SUPPORTED": 5
+    },
+    "category": {
+      "abstract_competency": 1,
+      "completed_production": 2,
+      "completion_state": 1,
+      "date_range": 3,
+      "hard_negative": 3,
+      "job_requirement": 1,
+      "korean": 8,
+      "literal_identifier": 1,
+      "multi_aspect": 1,
+      "multi_evidence": 2,
+      "negation": 1,
+      "no_answer": 1,
+      "planned": 1,
+      "semantic_paraphrase": 1
+    }
+  },
+  "files": [
+    {
+      "path": "lineage.json",
+      "bytes": 10515,
+      "sha256": "789034fc96a511028b9c129fa4126d180ed6562390907efa2997bdcb5430f66b"
+    },
+    {
+      "path": "schema/search-v3-benchmark.schema.json",
+      "bytes": 19429,
+      "sha256": "c347f9ecb925b2f7d78817ae5bf5deb364b749eabb89359eb17d0bf0e24df465"
+    },
+    {
+      "path": "schema/search-v3-prediction.schema.json",
+      "bytes": 3182,
+      "sha256": "99d199ce3e4c65523c03755634e1853c86d6357a8c37d40aca108cc95da2cf84"
+    },
+    {
+      "path": "sealed-final/corpus.json",
+      "bytes": 3864,
+      "sha256": "513dcbcb41cf8b2cecedb289fc6f1889c77c7fc233c6e4f9b4557b0bdcebedd3"
+    },
+    {
+      "path": "sealed-final/documents/sv3-u05-planning-narrative-v01.txt",
+      "bytes": 395,
+      "sha256": "0983f80a8a863962de79f6ee9d5451641a7ae501c624b959fb318293d7ca6559"
+    },
+    {
+      "path": "sealed-final/documents/sv3-u07-operations-resume-v01.txt",
+      "bytes": 300,
+      "sha256": "68dcb6ad002252e692d3724fc22edb748b1d57fc7f9ffb8c058aae0db3432ffa"
+    },
+    {
+      "path": "sealed-final/documents/sv3-u07-operations-training-v01.txt",
+      "bytes": 193,
+      "sha256": "735d1bdf14ed9ed73d61b1498de1b869de9c258dc0cb77e0430f66c41d65cb3c"
+    },
+    {
+      "path": "sealed-final/gold-evidence.json",
+      "bytes": 16550,
+      "sha256": "b64556a367d1cc6c05a1120baecceadf505dc48adb0107f62c2d86e7e17cc819"
+    },
+    {
+      "path": "sealed-final/questions.json",
+      "bytes": 12707,
+      "sha256": "0dbd539017ea13bbec0b16c8ddbc73eb6f02701c74f2ca581818346dee20541e"
+    }
+  ],
+  "combinedSha256": "e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383"
+}

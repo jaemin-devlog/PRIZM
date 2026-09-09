@@ -1,0 +1,235 @@
+{
+  "artifactType": "LINEAGE",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.1.0",
+  "status": "INPUT_FROZEN",
+  "generator": "scripts/evaluation/search-v3/materialize-prz028-typed-stress-1.1.0.mjs",
+  "generatorRevision": "prz028-typed-capability-stress-v1",
+  "generatorSourceSha256": "b6c6a678ea30a0d605a55ca1d80953ffc6c055b6e2dcf006cba1eab1f2452d92",
+  "inputBaselineRevision": "d195f3bd8645bef88964ecf033a5815626d1004c",
+  "sealedFinalPolicy": "SEALED_FINAL_TEST access is limited to manifest hash/flags and unified lineage identifiers. Documents, questions, gold, predictions, and search are never accessed.",
+  "bundles": [
+    {
+      "userBundleId": "SV3-U41",
+      "split": "DEV",
+      "documentFamilyId": "SV3-U41-TC11-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC11-TEMPLATE-PARCEL-41",
+      "generatorSeedId": "SV3-TC11-SEED-PARCEL-41-H2K7",
+      "logicalDocumentIds": [
+        "SV3-U41-D01-TC11-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U41-D01-TC11-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-TC11-FACT-U41-P01",
+        "SV3-TC11-FACT-U41-P02",
+        "SV3-TC11-FACT-U41-P03"
+      ],
+      "sourceFactSignatures": [
+        "4783dd3aebc57a8d8084786ebd7eff242103a80bb6917f81f8703a0106fba43d",
+        "cf02284b46ac119c4a19efc932344c3f5afda37aa14b305ecd32a40cddb8a9a3",
+        "efa96ae6f2413e2675f1c81f8c2bdcb80151e6b3f646e8240f83ab62784adc95"
+      ],
+      "questionGroupIds": [
+        "SV3-U41-Q01-TC11-FAMILY",
+        "SV3-U41-Q02-TC11-FAMILY",
+        "SV3-U41-Q03-TC11-FAMILY",
+        "SV3-U41-Q04-TC11-FAMILY"
+      ],
+      "normalizedQueries": [
+        "파손 소포 보상 요청을 600건 이상 종결한 경험이 있나요",
+        "파손 소포 보상 요청을 정확히 680건 종결한 기간이 있나요",
+        "파손 소포 보상 요청을 420건 이하 종결한 기간이 있나요",
+        "파손 소포 보상 요청을 700건 초과 종결한 기간이 있나요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-U42",
+      "split": "DEV",
+      "documentFamilyId": "SV3-U42-TC11-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC11-TEMPLATE-EXHIBIT-42",
+      "generatorSeedId": "SV3-TC11-SEED-EXHIBIT-42-J5M8",
+      "logicalDocumentIds": [
+        "SV3-U42-D01-TC11-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U42-D01-TC11-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-TC11-FACT-U42-P01",
+        "SV3-TC11-FACT-U42-P02",
+        "SV3-TC11-FACT-U42-P03",
+        "SV3-TC11-FACT-U42-P04",
+        "SV3-TC11-FACT-U42-P05"
+      ],
+      "sourceFactSignatures": [
+        "37651b985f4ed5b0a21ec03f54a8c47183d7cdd88dd81ec29c901eeb94e88247",
+        "66fbc541c49bcff8ec0916fb423b1aef00f871a9bd27e5e57ea078a9c298fe20",
+        "e853449161c5ee4512cbe7343754ff35f60eee34351bc7bc44d169e7984dd55f",
+        "e778fc27fd72e29bc6deb342f82bcfe7ef41f8b3a1294788ba4034e881477371",
+        "88ee328407b368b92c07a1ddb045982effc07a8180403116780e5412cd34043d"
+      ],
+      "questionGroupIds": [
+        "SV3-U42-Q01-TC11-FAMILY",
+        "SV3-U42-Q02-TC11-FAMILY",
+        "SV3-U42-Q03-TC11-FAMILY",
+        "SV3-U42-Q04-TC11-FAMILY"
+      ],
+      "normalizedQueries": [
+        "did the permanent exhibit decrease the wayfinding error rate by at least 38",
+        "did any installation increase the wayfinding error rate by more than 30",
+        "did the primary gallery redesign last between 9 and 11 months",
+        "did the portfolio document a 38 decrease in fabrication scrap"
+      ]
+    },
+    {
+      "userBundleId": "SV3-U43",
+      "split": "DEV",
+      "documentFamilyId": "SV3-U43-TC11-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC11-TEMPLATE-PERMIT-43",
+      "generatorSeedId": "SV3-TC11-SEED-PERMIT-43-L8Q4",
+      "logicalDocumentIds": [
+        "SV3-U43-D01-TC11-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U43-D01-TC11-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-TC11-FACT-U43-P01",
+        "SV3-TC11-FACT-U43-P02",
+        "SV3-TC11-FACT-U43-P03",
+        "SV3-TC11-FACT-U43-P04"
+      ],
+      "sourceFactSignatures": [
+        "cc5e9eab951144aa97dfafa20406f239a39f08456732dbb9a7b08e3c014ff100",
+        "d9be6bc7e7fc89a681a365736c076616e9f8bedfe69021d10c75f5360014d648",
+        "40a1040076c26711cc32aeca358f7d700212825eef041f0d25424b81f67ac30b",
+        "59670c61739e5d3fc71507abfcf5e716a8a04408ab3bf6e66989e101c5235432"
+      ],
+      "questionGroupIds": [
+        "SV3-U43-Q01-TC11-FAMILY",
+        "SV3-U43-Q02-TC11-FAMILY",
+        "SV3-U43-Q03-TC11-FAMILY",
+        "SV3-U43-Q04-TC11-FAMILY"
+      ],
+      "normalizedQueries": [
+        "permit review 시작일이 2026 01 31 이후였나요",
+        "permit review 시작일이 2025 01 01 이전이었나요",
+        "승인된 운영 명세가 transitform 4 2를 요구했나요",
+        "승인된 운영 명세가 transitform 4 5를 요구했나요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-U44",
+      "split": "CALIBRATION",
+      "documentFamilyId": "SV3-U44-TC11-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC11-TEMPLATE-RENEWAL-44",
+      "generatorSeedId": "SV3-TC11-SEED-RENEWAL-44-N3R9",
+      "logicalDocumentIds": [
+        "SV3-U44-D01-TC11-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U44-D01-TC11-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-TC11-FACT-U44-P01",
+        "SV3-TC11-FACT-U44-P02",
+        "SV3-TC11-FACT-U44-P03"
+      ],
+      "sourceFactSignatures": [
+        "7b615b9ec0f209ac5e59238af9b4267c34f5b1b2f0f5e505c713f81b715b3046",
+        "769d9be7a6d977dc7507343004024a051b4ab762324936d44fbd748672be74f5",
+        "5b346c85c525f39e0685075ab00788ef9dd2ae54391f1ad2b8c7fdc451af8809"
+      ],
+      "questionGroupIds": [
+        "SV3-U44-Q01-TC11-FAMILY",
+        "SV3-U44-Q02-TC11-FAMILY",
+        "SV3-U44-Q03-TC11-FAMILY",
+        "SV3-U44-Q04-TC11-FAMILY"
+      ],
+      "normalizedQueries": [
+        "did the membership cycle record at least 1 800 member renewals",
+        "did the cycle record exactly 1 850 member renewals",
+        "was there a cycle with no more than 1 240 member renewals",
+        "did a cycle exceed 2 000 member renewals"
+      ]
+    },
+    {
+      "userBundleId": "SV3-U45",
+      "split": "CALIBRATION",
+      "documentFamilyId": "SV3-U45-TC11-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC11-TEMPLATE-ENERGY-45",
+      "generatorSeedId": "SV3-TC11-SEED-ENERGY-45-P6S2",
+      "logicalDocumentIds": [
+        "SV3-U45-D01-TC11-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U45-D01-TC11-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-TC11-FACT-U45-P01",
+        "SV3-TC11-FACT-U45-P02",
+        "SV3-TC11-FACT-U45-P03",
+        "SV3-TC11-FACT-U45-P04",
+        "SV3-TC11-FACT-U45-P05"
+      ],
+      "sourceFactSignatures": [
+        "7d6aa62860c118ac626105e5e485b26ef7248e0d5ee4dd14322863f32484c980",
+        "21889a52e85a26a120b771a735d8c3da429dff766f3d7b498b4ecc2c4e0d8504",
+        "3f2b2eb3f8a44f8bc0b29c88ca9f846396a2d0022d733c2bce05d6b44a22346d",
+        "588447f4957d5baf6d9fb8349072d46c5584c4a13c3324b2aa422ff1efe6acec",
+        "8f5632b47ecf8dcb93b3f7b7fcb84aef4db71e5be71ec5d3ab917b7dbfde04c2"
+      ],
+      "questionGroupIds": [
+        "SV3-U45-Q01-TC11-FAMILY",
+        "SV3-U45-Q02-TC11-FAMILY",
+        "SV3-U45-Q03-TC11-FAMILY",
+        "SV3-U45-Q04-TC11-FAMILY"
+      ],
+      "normalizedQueries": [
+        "냉각 에너지 사용량을 27 이상 감소시킨 사례가 있나요",
+        "냉각 에너지 사용량이 20 초과 증가한 사례가 있나요",
+        "냉각 최적화 검증을 15 20개월 동안 진행했나요",
+        "냉각수 누수율을 27 감소시킨 기록이 있나요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-U46",
+      "split": "CALIBRATION",
+      "documentFamilyId": "SV3-U46-TC11-DOC-FAMILY",
+      "templateFamilyId": "SV3-TC11-TEMPLATE-KIOSK-46",
+      "generatorSeedId": "SV3-TC11-SEED-KIOSK-46-T4V7",
+      "logicalDocumentIds": [
+        "SV3-U46-D01-TC11-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U46-D01-TC11-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-TC11-FACT-U46-P01",
+        "SV3-TC11-FACT-U46-P02",
+        "SV3-TC11-FACT-U46-P03",
+        "SV3-TC11-FACT-U46-P04"
+      ],
+      "sourceFactSignatures": [
+        "febb29c126e7a3b37eca56261ecca1e324dde5a0dcd16ba88f41c36d2d270c15",
+        "a837e751ada4d23989410e2af109ae8a6692c6647c82e2fa182f0eb2cf1b488d",
+        "a8f4bc42df188884ee7b64e87c98a5f367dee01a08c47baf085d9137a7f2f154",
+        "52faef0d183fdf3d8b45c88c5a63ddab34f701ea29cbbf08ef2d11787fa2881f"
+      ],
+      "questionGroupIds": [
+        "SV3-U46-Q01-TC11-FAMILY",
+        "SV3-U46-Q02-TC11-FAMILY",
+        "SV3-U46-Q03-TC11-FAMILY",
+        "SV3-U46-Q04-TC11-FAMILY"
+      ],
+      "normalizedQueries": [
+        "production kiosk client가 kiosklink 8 4를 사용하나요",
+        "production kiosk client가 kiosklink 8 7을 사용하나요",
+        "maintenance window 시작일이 2026 06 30 이후였나요",
+        "maintenance window 시작일이 2025 01 01 이전이었나요"
+      ]
+    }
+  ]
+}

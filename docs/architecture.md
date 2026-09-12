@@ -307,6 +307,68 @@ flowchart TD
 브라우저가 임의 경로를 등록하는 API는 없으며, 사용자별 문서 작업이나 업로드
 rollback 보상 경로가 정리 작업을 만듭니다.
 
+### Search V3 shadow 저장과 활성화 경계
+
+V18은 Search V2의 `document_chunks`를 유지한 채 Search V3 색인 세대를 나란히 저장할 수 있는
+shadow schema를 추가합니다. `SearchIndexGeneration`은 `DocumentVersion`과 분리돼 같은 원본 version을
+정책·모델 계약이 다른 여러 세대로 다시 색인할 수 있습니다. 각 세대에는 독립 manifest, V3 전용 작업,
+`RetrievalPassage`, `EvidenceChild`와 두 종류의 BGE-M3 vector가 연결됩니다.
+
+`documents.active_search_v3_generation_id`는 nullable입니다. 최초 업로드나 V3 색인이 없는 문서는 null이
+정상이며, 값이 있으면 owner·문서·현재 `active_version_id`가 같은 generation만 가리킬 수 있습니다. 실제
+검색 가능 조건인 `ACTIVE generation + COMPLETED V3 job` 확인과 원자적 pointer 교체는 PRZ-039 service
+transaction이 수행합니다. 현재 Production Search와 Search V2 Worker source는 이 schema를 직접 읽거나 쓰지 않습니다.
+
+복합 FK는 generation부터 Passage·Child·vector까지 owner·문서·version 계보가 섞이지 않게 합니다.
+vector PK/FK는 artifact별 중복과 orphan을 막고, frozen manifest와 실제 inventory가 모두 존재하는지는
+READY/activation service가 잠금 아래 확인합니다. V19의 `verified_inventory_sha256`은 READY에서 검증한
+logical inventory와 vector payload를 묶고, activation은 이를 현재 DB inventory와 다시 비교합니다.
+
+V20은 `BUILDING` generation의 expected manifest 세 필드를 모두 null로 시작할 수 있게 합니다. Worker가
+원문을 구조화한 뒤 DB insert 전 논리 inventory를 canonicalize하고, current full claim과 빈 inventory를
+확인해 count와 SHA-256을 한 번만 동결합니다. partial manifest와 manifest 없는 READY 이후 상태는 DB
+constraint가 거부합니다.
+
+Search V3 전용 job runtime은 V18의 full owner·문서·version·generation identity를 JDBC 조건으로 확인합니다.
+`PENDING` 또는 due `RETRY_WAIT` 작업은 `FOR UPDATE SKIP LOCKED`로 한 Worker만 claim하고, lease와 retry 시각은
+PostgreSQL `now()`를 기준으로 계산합니다. 만료 작업은 recovery token을 먼저 기록한 뒤 exact token을 가진
+복구자만 claim version을 올려 reclaim할 수 있습니다. retry·terminal failure도 같은 full identity와 현재
+claim에 묶이며 terminal failure는 job과 generation을 함께 `FAILED`로 바꿉니다.
+
+READY는 현재 PROCESSING claim과 BUILDING generation을 full lineage로 잠근 뒤 exact inventory를 검증합니다.
+같은 Production `active_version_id`의 READY generation만 활성화할 수 있으며, transaction 하나에서 기존
+ACTIVE를 `SUPERSEDED`, 신규 READY를 `ACTIVE`, 신규 job을 `COMPLETED`로 바꾸고 V3 pointer를 전환합니다.
+document row는 검증 뒤 `NOWAIT`로 짧게 잠가 V2 lifecycle과의 역순 대기를 피하며, rollback과 concurrent
+activation에서도 ACTIVE와 pointer를 하나로 유지합니다.
+
+V19 trigger는 Production V2가 active version을 바꾸거나 null로 해제할 때 기존 ACTIVE V3 generation을
+`SUPERSEDED`로 바꾸고 shadow pointer만 비웁니다. `documents.active_version_id`, version 상태와 V2 chunk를
+V3 activation이 변경하지는 않습니다.
+
+Search V3 shadow Worker는 claim한 immutable `DocumentVersion` 원문을 기존 추출기로 읽고, 구조 신호만으로
+page-aware `EvidenceChild`와 B3 `RetrievalPassage`를 만듭니다. TXT provenance의 page는 null이고 text-layer
+PDF는 원래 1-based page를 보존하며, 서로 다른 page나 structural parent를 한 Passage로 합치지 않습니다.
+Passage는 `retrievalText`, Child는 `sourceText`를 동일 BGE-M3로 미리 embedding합니다. Ollama model digest는
+embedding 전후에 generation 계약과 다시 맞춰 tag 변경으로 생길 수 있는 metadata 불일치를 저장 전에
+차단합니다.
+
+저장은 current `job → generation` 잠금 아래 candidate generation의 기존 Passage를 지우고 네 artifact 계열을
+한 transaction에서 전체 치환합니다. 실패하면 delete와 일부 insert가 함께 rollback됩니다. READY activation이
+현재 Production active version과 아직 맞지 않으면 generation은 READY로 유지하고 job만 `RETRY_WAIT`으로
+연기합니다. 다음 claim은 parsing과 embedding을 반복하지 않고 activation만 재시도합니다.
+
+PRZ-041의 opt-in scheduler는 current V3 계약이 없는 Production active version을 `FOR UPDATE SKIP LOCKED`로
+한 건씩 dispatch합니다. 일반 claim과 due retry는 기존 processor로 보내고, 만료 lease는 exact recovery token으로
+reclaim한 새 claim을 즉시 같은 processor에 전달합니다. 기본값은 꺼져 있으며 Search V2 scheduler를 교체하지 않습니다.
+
+비공개 shadow query runtime은 owner의 `active_search_v3_generation_id`가 가리키고 current active version과 같은
+`ACTIVE + COMPLETED` inventory만 조회합니다. 동일 BGE-M3 query vector로 Passage exact cosine Top20을 구한 뒤,
+Top5 Passage 각각에서 저장된 Child vector를 다시 비교합니다. 후보와 최종 근거 집합은 바꾸지 않고, 문서별 상위
+비중복 Passage 최대 2개의 cosine score 평균으로 최종 문서 순서만 정합니다. 같은 Child ID 또는 동일 source span은
+두 번 집계하지 않습니다. 원문·page·line·code-point provenance를 보존한 `EvidenceChild`를 최대 5건 반환하며,
+deterministic typed validation은 원문의 숫자·날짜 등 조건만 검증합니다. 경력의 진위나 보유 여부는 판정하지 않으며
+Search V3 API와 Search V2 cutover는 아직 없습니다.
+
 근거:
 
 - [사용자 entity](../src/main/java/com/prizm/user/entity/UserAccount.java)
@@ -320,6 +382,23 @@ rollback 보상 경로가 정리 작업을 만듭니다.
 - [ChangeLog migration](../src/main/resources/db/migration/V14__create_document_change_logs.sql)
 - [파일 정리 migration](../src/main/resources/db/migration/V12__add_file_cleanup_jobs.sql)
 - [문서 태그 migration](../src/main/resources/db/migration/V16__create_document_tags.sql)
+- [Search V3 shadow storage migration](../src/main/resources/db/migration/V18__create_search_v3_shadow_storage.sql)
+- [Search V3 inventory fingerprint migration](../src/main/resources/db/migration/V19__add_verified_search_v3_inventory_fingerprint.sql)
+- [Search V3 claim-first manifest migration](../src/main/resources/db/migration/V20__allow_unfrozen_search_v3_generation_manifest.sql)
+- [Search V3 job repository](../src/main/java/com/prizm/search/v3/indexing/repository/SearchV3IndexingJobRepository.java)
+- [Search V3 job service](../src/main/java/com/prizm/search/v3/indexing/service/SearchV3IndexingJobService.java)
+- [Search V3 inventory repository](../src/main/java/com/prizm/search/v3/indexing/repository/SearchV3InventoryActivationRepository.java)
+- [Search V3 inventory verifier](../src/main/java/com/prizm/search/v3/indexing/service/SearchV3InventoryVerifier.java)
+- [Search V3 activation service](../src/main/java/com/prizm/search/v3/indexing/service/SearchV3InventoryActivationService.java)
+- [Search V3 shadow indexing processor](../src/main/java/com/prizm/search/v3/indexing/service/SearchV3ShadowIndexingProcessor.java)
+- [Search V3 artifact storage service](../src/main/java/com/prizm/search/v3/indexing/service/SearchV3ArtifactStorageService.java)
+- [Search V3 structure builder](../src/main/java/com/prizm/search/v3/indexing/structure/SearchV3StructureBuilder.java)
+- [Search V3 dispatch repository](../src/main/java/com/prizm/search/v3/indexing/repository/SearchV3JobDispatchRepository.java)
+- [Search V3 shadow query repository](../src/main/java/com/prizm/search/v3/query/repository/SearchV3ShadowQueryRepository.java)
+- [Search V3 shadow query service](../src/main/java/com/prizm/search/v3/query/service/SearchV3ShadowQueryService.java)
+- [Search V3 inventory·activation PostgreSQL test](../src/integrationTest/java/com/prizm/infrastructure/SearchV3InventoryActivationRuntimeTest.java)
+- [Search V3 shadow Worker PostgreSQL test](../src/integrationTest/java/com/prizm/infrastructure/SearchV3ShadowIndexingWorkerRuntimeTest.java)
+- [Search V3 실제 BGE-M3 smoke](../src/integrationTest/java/com/prizm/infrastructure/SearchV3RealBgeM3RuntimeIntegrationTest.java)
 
 ## 8. 상태 전이
 

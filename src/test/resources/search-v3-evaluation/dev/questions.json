@@ -1,0 +1,794 @@
+{
+  "artifactType": "QUESTIONS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-seed-1.0.1",
+  "split": "DEV",
+  "queries": [
+    {
+      "queryId": "SV3-U01-Q01",
+      "userBundleId": "SV3-U01",
+      "questionGroupId": "SV3-U01-Q01-FAMILY",
+      "query": "PAY GW 운영 경험이 있나요?",
+      "normalizedQuery": "pay gw 운영 경험이 있나요",
+      "categories": [
+        "literal_identifier",
+        "typo_format_variation",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "paygw_operation"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "paygw_operation",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U01-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U01-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "PRODUCT_IDENTIFIER",
+                "canonicalValue": "PAY-GW",
+                "surfaceForms": [
+                  "PAY-GW"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [
+              "PRODUCTION"
+            ],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": [
+        {
+          "evidenceUnitId": "SV3-U02-P01-E01",
+          "reason": "OWNER_LEAKAGE"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U01-Q02",
+      "userBundleId": "SV3-U01",
+      "questionGroupId": "SV3-U01-Q02-FAMILY",
+      "query": "하루 1,000건 이상 요청을 처리한 경험이 있나요?",
+      "normalizedQuery": "하루 1 000건 이상 요청을 처리한 경험이 있나요",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "request_volume"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "request_volume",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U01-P01-E02",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U01-G02"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GTE",
+                "value": 1000,
+                "unit": "REQUEST_PER_DAY",
+                "semanticType": "REQUEST_COUNT",
+                "qualifierTokens": [
+                  "요청"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U01-Q03",
+      "userBundleId": "SV3-U01",
+      "questionGroupId": "SV3-U01-Q03-FAMILY",
+      "query": "Kafka를 운영 환경에 도입했나요?",
+      "normalizedQuery": "kafka를 운영 환경에 도입했나요",
+      "categories": [
+        "hard_negative",
+        "negation",
+        "completion_state",
+        "completed_production",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "kafka_production"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "kafka_production",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U01-P01-E03",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "TECHNOLOGY",
+                "canonicalValue": "KAFKA",
+                "surfaceForms": [
+                  "Kafka"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [
+              "PRODUCTION"
+            ],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U01-Q04",
+      "userBundleId": "SV3-U01",
+      "questionGroupId": "SV3-U01-Q04-FAMILY",
+      "query": "장애가 반복되지 않도록 어떤 체계를 만들었나요?",
+      "normalizedQuery": "장애가 반복되지 않도록 어떤 체계를 만들었나요",
+      "categories": [
+        "semantic_paraphrase",
+        "abstract_competency",
+        "multi_evidence",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "incident_prevention"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "incident_prevention",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U01-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U01-G04"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [
+              "COMPLETED"
+            ],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U01-Q05",
+      "userBundleId": "SV3-U01",
+      "questionGroupId": "SV3-U01-Q05-FAMILY",
+      "query": "DormantQueue 운영 경험이 있나요?",
+      "normalizedQuery": "dormantqueue 운영 경험이 있나요",
+      "categories": [
+        "no_answer",
+        "hard_negative",
+        "completion_state",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "dormantqueue_production"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "dormantqueue_production",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U01-P03-E01",
+              "supportRelation": "RELATED"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [
+              {
+                "entityType": "TECHNOLOGY",
+                "canonicalValue": "DORMANTQUEUE",
+                "surfaceForms": [
+                  "DormantQueue"
+                ]
+              }
+            ],
+            "numerics": [],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [
+              "PRODUCTION"
+            ],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": [
+        {
+          "evidenceUnitId": "SV3-U01-P03-E01",
+          "reason": "INACTIVE_VERSION_LEAKAGE"
+        },
+        {
+          "evidenceUnitId": "SV3-U01-P03-E01",
+          "reason": "WRONG_VERSION_LEAKAGE"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U04-Q01",
+      "userBundleId": "SV3-U04",
+      "questionGroupId": "SV3-U04-Q01-FAMILY",
+      "query": "사용자 문제를 발견하고 디자인 결정으로 연결한 근거는?",
+      "normalizedQuery": "사용자 문제를 발견하고 디자인 결정으로 연결한 근거는",
+      "categories": [
+        "semantic_paraphrase",
+        "abstract_competency",
+        "multi_evidence",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "research_to_design"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "research_to_design",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U04-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            },
+            {
+              "evidenceUnitId": "SV3-U04-P01-E02",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U04-G01",
+            "SV3-U04-G02"
+          ],
+          "minEvidenceGroups": 2,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U04-Q02",
+      "userBundleId": "SV3-U04",
+      "questionGroupId": "SV3-U04-Q02-FAMILY",
+      "query": "본인이 A/B 테스트를 수행했나요?",
+      "normalizedQuery": "본인이 a b 테스트를 수행했나요",
+      "categories": [
+        "hard_negative",
+        "other_actor",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "ab_test_self"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "ab_test_self",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U04-P03-E01",
+              "supportRelation": "INSUFFICIENT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [
+              "COMPLETED"
+            ],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U04-Q03",
+      "userBundleId": "SV3-U04",
+      "questionGroupId": "SV3-U04-Q03-FAMILY",
+      "query": "본인이 사용자 인터뷰와 A/B 테스트를 모두 했나요?",
+      "normalizedQuery": "본인이 사용자 인터뷰와 a b 테스트를 모두 했나요",
+      "categories": [
+        "multi_aspect",
+        "other_actor",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "PARTIALLY_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "user_research",
+          "ab_test_self"
+        ],
+        "minShouldMatch": 2
+      },
+      "aspects": [
+        {
+          "aspectId": "user_research",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U04-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U04-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        },
+        {
+          "aspectId": "ab_test_self",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U04-P03-E01",
+              "supportRelation": "INSUFFICIENT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U04-Q04",
+      "userBundleId": "SV3-U04",
+      "questionGroupId": "SV3-U04-Q04-FAMILY",
+      "query": "재설계가 실제 사용성 결과로 이어졌나요?",
+      "normalizedQuery": "재설계가 실제 사용성 결과로 이어졌나요",
+      "categories": [
+        "semantic_paraphrase",
+        "numeric_quantity",
+        "korean"
+      ],
+      "language": "KO",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "usability_outcome"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "usability_outcome",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U04-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U04-G03"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GTE",
+                "value": 80,
+                "unit": "PERCENT",
+                "semanticType": "TASK_COMPLETION_RATE_AFTER",
+                "qualifierTokens": [
+                  "과업",
+                  "완료율"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U06-Q01",
+      "userBundleId": "SV3-U06",
+      "questionGroupId": "SV3-U06-Q01-FAMILY",
+      "query": "Did the campaign generate at least 1,000 qualified leads?",
+      "normalizedQuery": "did the campaign generate at least 1 000 qualified leads",
+      "categories": [
+        "numeric_quantity",
+        "numeric_range_comparison",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "qualified_leads"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "qualified_leads",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U06-P01-E02",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U06-G02"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GTE",
+                "value": 1000,
+                "unit": "LEAD",
+                "semanticType": "QUALIFIED_LEAD_COUNT",
+                "qualifierTokens": [
+                  "qualified",
+                  "leads"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U06-Q02",
+      "userBundleId": "SV3-U06",
+      "questionGroupId": "SV3-U06-Q02-FAMILY",
+      "query": "Did the campaign acquire 1,000 paid customers?",
+      "normalizedQuery": "did the campaign acquire 1 000 paid customers",
+      "categories": [
+        "hard_negative",
+        "negation",
+        "numeric_quantity",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "paid_customers"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "paid_customers",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U06-P01-E02",
+              "supportRelation": "CONTRADICTS"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "GTE",
+                "value": 1000,
+                "unit": "CUSTOMER",
+                "semanticType": "PAID_CUSTOMER_COUNT",
+                "qualifierTokens": [
+                  "paid",
+                  "customers"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U06-Q03",
+      "userBundleId": "SV3-U06",
+      "questionGroupId": "SV3-U06-Q03-FAMILY",
+      "query": "Did this person close 40 enterprise accounts?",
+      "normalizedQuery": "did this person close 40 enterprise accounts",
+      "categories": [
+        "hard_negative",
+        "other_actor",
+        "numeric_quantity",
+        "english"
+      ],
+      "language": "EN",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "enterprise_accounts_self"
+        ],
+        "minShouldMatch": 1
+      },
+      "aspects": [
+        {
+          "aspectId": "enterprise_accounts_self",
+          "required": true,
+          "answerability": "NOT_SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U06-P03-E01",
+              "supportRelation": "INSUFFICIENT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [],
+          "minEvidenceGroups": 0,
+          "constraints": {
+            "entities": [],
+            "numerics": [
+              {
+                "operator": "EQ",
+                "value": 40,
+                "unit": "ACCOUNT",
+                "semanticType": "ENTERPRISE_ACCOUNT_COUNT",
+                "qualifierTokens": [
+                  "enterprise",
+                  "accounts"
+                ]
+              }
+            ],
+            "dates": [],
+            "actors": [
+              "SELF"
+            ],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    },
+    {
+      "queryId": "SV3-U06-Q04",
+      "userBundleId": "SV3-U06",
+      "questionGroupId": "SV3-U06-Q04-FAMILY",
+      "query": "email/webinar campaign과 CRM 운영 경험을 모두 보여 주세요.",
+      "normalizedQuery": "email webinar campaign과 crm 운영 경험을 모두 보여 주세요",
+      "categories": [
+        "multi_evidence",
+        "multi_aspect",
+        "job_requirement",
+        "korean_english_mixed"
+      ],
+      "language": "KO_EN_MIXED",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {
+        "operator": "ALL",
+        "requiredAspectIds": [
+          "campaign_execution",
+          "sales_operations"
+        ],
+        "minShouldMatch": 2
+      },
+      "aspects": [
+        {
+          "aspectId": "campaign_execution",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U06-P01-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U06-G01"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        },
+        {
+          "aspectId": "sales_operations",
+          "required": true,
+          "answerability": "SUPPORTED",
+          "expectedEvidence": [
+            {
+              "evidenceUnitId": "SV3-U06-P02-E01",
+              "supportRelation": "DIRECT_SUPPORT"
+            }
+          ],
+          "requiredEvidenceGroupIds": [
+            "SV3-U06-G03"
+          ],
+          "minEvidenceGroups": 1,
+          "constraints": {
+            "entities": [],
+            "numerics": [],
+            "dates": [],
+            "actors": [],
+            "completionStates": [],
+            "polarity": "POSITIVE"
+          }
+        }
+      ],
+      "safetyExclusions": []
+    }
+  ]
+}

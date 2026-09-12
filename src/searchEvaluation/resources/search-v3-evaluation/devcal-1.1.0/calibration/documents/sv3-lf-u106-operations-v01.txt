@@ -1,0 +1,46 @@
+Synthetic Multi-site Operations Career Description
+
+Shift handoff across three sites
+
+세 개 운영 현장은 같은 고객 요청을 서로 다른 spreadsheet와 구두 메모로 넘겼다. 교대가 바뀌면 완료 여부와 다음 행동을 다시 확인해야 했고, 긴급하지 않은 요청이 여러 번 미뤄졌다. 나는 각 현장의 실제 handoff를 관찰하고 공통으로 필요한 상태를 정리했다.
+
+본인은 3개 현장에 공통 shift handoff checklist를 적용해 인수인계 누락 작업을 12주 동안 27% 줄였다.
+
+- 요청의 현재 상태와 다음 행동을 분리했다.
+- 완료라고 표시하려면 확인한 사람과 시간을 남기게 했다.
+- 다음 교대가 판단해야 하는 항목은 질문 형태로 전달했다.
+- 고객의 민감한 내용은 checklist에 복사하지 않고 권한 있는 원문 위치만 연결했다.
+
+도입 첫 주에는 작성 시간이 늘었다는 의견이 있었다. 나는 모든 메모를 요구하지 않고 교대 뒤 다시 물어본 항목을 분석해 필수 field를 줄였다. 주간 review에서는 누락률과 함께 checklist 사용 시간을 살펴 비용을 숨기지 않았다.
+
+현장별 예외는 별도 note로 유지했지만 공통 상태 이름은 바꾸지 않았다. 덕분에 다른 현장을 지원하는 직원도 완료, 대기, 확인 필요를 같은 의미로 읽을 수 있었다.
+
+Emergency response training
+
+운영 업무에는 경미한 부상, 시설 경보, 대피 안내가 포함됐다. 나는 현장 책임자의 절차를 대신 만들지 않고 실제 상황에서 누구에게 연락하고 어떤 구역을 비워야 하는지 학습했다.
+
+Emergency response fundamentals — completed in 2024-09.
+
+교육은 이론 설명, 역할별 연락, 대피 경로 확인, 모의 상황 회고로 구성됐다. 수료 뒤에는 현장별 연락처와 집결지 변경을 확인하는 월간 점검에 참여했다.
+
+수료 기록은 전문 의료 자격이나 소방 지휘 권한을 뜻하지 않는다. 문서에는 실제 교육 범위와 완료 날짜만 남기며 확인하지 않은 능력을 확대하지 않는다.
+
+Equipment qualification boundary
+
+일부 현장에는 지게차와 적재 장비가 있었지만 내 역할은 작업 순서와 요청 상태를 조정하는 것이었다. 장비 운전은 별도의 승인과 교육을 받은 담당자가 수행했다.
+
+Forklift operator certificate: not held.
+
+장비 작업이 필요한 요청은 자격이 있는 담당자에게 전달했고 완료 확인을 handoff 기록에 연결했다. 내가 일정 조정에 참여했다는 이유로 장비 운전 경험이나 자격을 보유한 것으로 표시하지 않는다.
+
+안전 관련 부정 근거는 단순히 검색에서 사라지면 안 된다. 자격 보유 질문에는 관련 장비가 등장하는 문장보다 명시적인 미보유 상태가 올바른 판단 근거다.
+
+Warehouse automation actor boundary
+
+창고 동선 변경 프로젝트에서 vendor는 barcode automation을 설계하고 설치했다. 나는 운영 중단 시간을 조정하고 현장 직원이 변경된 절차를 이해할 수 있도록 작업 순서를 문서화했다.
+
+The automation vendor built the barcode routing system; I documented the operating SOP and did not develop the routing software.
+
+설치 뒤에는 barcode를 읽지 못한 물품, 수동 처리, 재작업 요청을 별도 상태로 기록했다. vendor의 결함 수정과 내 운영 문서 변경은 같은 issue에서 시작했더라도 서로 다른 actor의 작업으로 남겼다.
+
+프로젝트 결과 보고서는 처리 흐름과 예외를 설명하지만 software 개발 경험을 주장하지 않는다. 운영 evidence는 SOP 작성, handoff, 안전한 escalation에 한정한다.

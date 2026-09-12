@@ -1,0 +1,214 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.0.1",
+  "split": "ALL",
+  "status": "FRESH_BENCHMARK_SEED_FROZEN",
+  "mutable": false,
+  "opened": true,
+  "searchExecuted": false,
+  "sealedAt": null,
+  "frozenAt": "2026-08-31T19:00:00+09:00",
+  "generationSourceRevision": "4bbbc5de040aa3c84fcb9869ece2fce85d983c0c",
+  "generatorRevision": "prz028-typed-stress-correction-v1",
+  "previousDatasets": [
+    {
+      "datasetVersion": "search-v3-typed-constraints-stress-1.0.0",
+      "status": "INVALID_INPUT_HISTORICAL",
+      "benchmarkExecuted": false
+    },
+    {
+      "datasetVersion": "search-v3-fresh-seed-1.0.1",
+      "status": "FROZEN_INPUT"
+    },
+    {
+      "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+      "status": "FROZEN_INPUT"
+    },
+    {
+      "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+      "status": "FROZEN_INPUT"
+    }
+  ],
+  "splitCombinedSha256": {
+    "DEV": "35c6e84b85302aad5f1499bc5f8a96fdeeb3a635a3d2da3595f4473654e17350",
+    "CALIBRATION": "b754d92e49246aec955c3bef252eeb09a6978272b7b7ba869059bf5a536e606e"
+  },
+  "counts": {
+    "userBundles": 6,
+    "documents": 6,
+    "queries": 24,
+    "typedQueryAnnotations": 24,
+    "evidenceParents": 26,
+    "evidenceGroups": 26,
+    "evidenceUnits": 26,
+    "typedObservations": 25
+  },
+  "distributions": {
+    "split": {
+      "CALIBRATION": 3,
+      "DEV": 3
+    },
+    "profession": {
+      "DATA_AI_INFRA": 1,
+      "DESIGN_PRODUCT": 1,
+      "FRONTEND_MOBILE": 1,
+      "MARKETING_SALES": 1,
+      "NON_DEVELOPMENT_GENERAL": 1,
+      "PLANNING": 1
+    },
+    "documentLanguage": {
+      "EN": 2,
+      "KO": 2,
+      "KO_EN_MIXED": 2
+    },
+    "queryLanguage": {
+      "EN": 8,
+      "KO": 8,
+      "KO_EN_MIXED": 8
+    },
+    "answerability": {
+      "NOT_SUPPORTED": 11,
+      "SUPPORTED": 13
+    },
+    "category": {
+      "date_range": 5,
+      "english": 8,
+      "hard_negative": 11,
+      "korean": 8,
+      "korean_english_mixed": 8,
+      "literal_identifier": 8,
+      "numeric_quantity": 11,
+      "numeric_range_comparison": 9
+    },
+    "typedKind": {
+      "DATE": 5,
+      "IDENTIFIER_NUMBER": 4,
+      "LITERAL_IDENTIFIER": 4,
+      "QUANTITY": 11
+    },
+    "typedOperator": {
+      "EQ": 2,
+      "EXACT": 8,
+      "GT": 1,
+      "GTE": 8,
+      "LT": 2,
+      "RANGE": 3
+    },
+    "stressFamily": {
+      "date_after": 2,
+      "date_before": 2,
+      "date_range": 1,
+      "duration": 2,
+      "identifier_number_exact": 2,
+      "identifier_number_mismatch": 2,
+      "literal_exact": 2,
+      "literal_near_match": 2,
+      "not_supported_hard_negative": 11,
+      "percentage_direction": 2,
+      "qualifier_mismatch": 2,
+      "quantity_boundary": 2,
+      "quantity_positive": 3,
+      "range": 2,
+      "wrong_value": 4
+    },
+    "expectedState": {
+      "CONTRADICTED": 19,
+      "SATISFIED": 13,
+      "UNKNOWN": 72
+    }
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 809,
+      "sha256": "7c78667fa952b43749d4704de0a923a5b5d530054084852b3f12d267a514dbbc"
+    },
+    {
+      "path": "calibration/corpus.json",
+      "bytes": 4271,
+      "sha256": "5fd99282a901a14e5c57ac93a679ab4c50f305657f1afda0560d2dbd37fe3f05"
+    },
+    {
+      "path": "calibration/documents/sv3-u34-typed-stress-v01.txt",
+      "bytes": 440,
+      "sha256": "89e69bc52b222cabf466a68c4ddea61defde3c1edafba0e7b029f52e6ee8d4e3"
+    },
+    {
+      "path": "calibration/documents/sv3-u35-typed-stress-v01.txt",
+      "bytes": 474,
+      "sha256": "4a38ae84a1a772fa4eb5ec24f8a9ad23ad16c5b325c6fe8ead97b9712b1d001c"
+    },
+    {
+      "path": "calibration/documents/sv3-u36-typed-stress-v01.txt",
+      "bytes": 560,
+      "sha256": "0f8d7f988d8949381c3941c49ee0cab4999e66678863540e46a64b2f2f7041e0"
+    },
+    {
+      "path": "calibration/gold-evidence.json",
+      "bytes": 30944,
+      "sha256": "c5fb5880064f11a06ea5634b65db3bb05ddb1a80632d4c06eee2c6f8e17f58af"
+    },
+    {
+      "path": "calibration/manifest.json",
+      "bytes": 3358,
+      "sha256": "d668dc2dc72d88a1123c5c7ff01cdef320325412b04a53988ed9bdb759d8defa"
+    },
+    {
+      "path": "calibration/questions.json",
+      "bytes": 17700,
+      "sha256": "1bf461b6900d7129d3551cab69dca6c55be43e28489f958d987ab1f87670ce90"
+    },
+    {
+      "path": "calibration/typed-annotations.json",
+      "bytes": 16825,
+      "sha256": "351068bde6e56b6df527dff56b6f5650fa2be1a869b5ca20373cf0f3635151c2"
+    },
+    {
+      "path": "dev/corpus.json",
+      "bytes": 4276,
+      "sha256": "190b13b96368a4245d2b14ff64972d711232ec589b654c3ffe9c4aa0febaca57"
+    },
+    {
+      "path": "dev/documents/sv3-u31-typed-stress-v01.txt",
+      "bytes": 579,
+      "sha256": "051eb13d978499e7dd804c77b84a7b760004c1ec8b3f727d8bb0952520d58d30"
+    },
+    {
+      "path": "dev/documents/sv3-u32-typed-stress-v01.txt",
+      "bytes": 432,
+      "sha256": "cc11e23b39874e246e9bafe54257dcd5eb3e9b06fe34c24852ea2801ccc43847"
+    },
+    {
+      "path": "dev/documents/sv3-u33-typed-stress-v01.txt",
+      "bytes": 472,
+      "sha256": "694a874d8820b0724dca024786d91d45082109182dbcf05eafdafa547c3cce85"
+    },
+    {
+      "path": "dev/gold-evidence.json",
+      "bytes": 31377,
+      "sha256": "0805f84bca86d929538b883569788cf2502e7016fe7630070a6bd5b363eaa728"
+    },
+    {
+      "path": "dev/manifest.json",
+      "bytes": 3292,
+      "sha256": "e088b350a5bc6e7578a3718eb27a3e72eabaf88240ca3526ce76bd691f69e202"
+    },
+    {
+      "path": "dev/questions.json",
+      "bytes": 18722,
+      "sha256": "1028c33ad44e13bfacc133ace7bd69f4019e04c2d0b9aa034ddc80fd2903628a"
+    },
+    {
+      "path": "dev/typed-annotations.json",
+      "bytes": 17798,
+      "sha256": "14dcf8b2ec97621745ce41984734372a747c9e34fe65407b0178ceee6d760d39"
+    },
+    {
+      "path": "lineage.json",
+      "bytes": 9056,
+      "sha256": "159ce853a476401acaff898cf05d57bb644ae79bd5b1ac15338b3740fa194900"
+    }
+  ],
+  "combinedSha256": "96c1ddc6cbdd6722619d7806cbe418babc414c0d5179af84d4694a94c8ed015b"
+}

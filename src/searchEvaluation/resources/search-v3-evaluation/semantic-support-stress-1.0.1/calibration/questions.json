@@ -1,0 +1,200 @@
+{
+  "artifactType": "SEARCH_V3_SEMANTIC_SUPPORT_QUESTIONS_OVERLAY",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "semantic-support-stress-1.0.1",
+  "split": "CALIBRATION",
+  "queries": [
+    {
+      "queryId": "SV3-SS-U204-Q01",
+      "questionGroupId": "SV3-SS-QG-U204-01",
+      "userBundleId": "SV3-RB-U204",
+      "query": "Was a resumable form actually shipped and shown to recover interrupted submissions?",
+      "normalizedQuery": "was a resumable form actually shipped and shown to recover interrupted submissions",
+      "categories": ["semantic_paraphrase", "completion_state", "english"],
+      "language": "EN",
+      "polarity": "POSITIVE",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {"operator": "ALL", "requiredAspectIds": ["claim"], "minShouldMatch": 1},
+      "aspects": [{"aspectId": "claim", "required": true, "answerability": "SUPPORTED", "minEvidenceGroups": 1, "requiredEvidenceGroupIds": ["SV3-SS-U204-G01"], "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U204-P01-E01", "evidenceGroupId": "SV3-SS-U204-G01", "supportRelation": "DIRECT_SUPPORT"}]}],
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U204-P01-E01", "evidenceGroupId": "SV3-SS-U204-G01", "supportRelation": "DIRECT_SUPPORT"}]
+    },
+    {
+      "queryId": "SV3-SS-U204-Q02",
+      "questionGroupId": "SV3-SS-QG-U204-02",
+      "userBundleId": "SV3-RB-U204",
+      "query": "Was the resumable form shipped, and which of the thirty-four right-to-left component changes did the candidate personally implement?",
+      "normalizedQuery": "was the resumable form shipped and which of the thirty four right to left component changes did the candidate personally implement",
+      "categories": ["semantic_paraphrase", "other_actor", "english"],
+      "language": "EN",
+      "polarity": "POSITIVE",
+      "answerability": "PARTIALLY_SUPPORTED",
+      "aspectExpression": {"operator": "ALL", "requiredAspectIds": ["resumable_release", "rtl_actor"], "minShouldMatch": 2},
+      "aspects": [
+        {"aspectId": "resumable_release", "required": true, "answerability": "SUPPORTED", "minEvidenceGroups": 1, "requiredEvidenceGroupIds": ["SV3-SS-U204-G01"], "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U204-P01-E01", "evidenceGroupId": "SV3-SS-U204-G01", "supportRelation": "DIRECT_SUPPORT"}]},
+        {"aspectId": "rtl_actor", "required": true, "answerability": "NOT_SUPPORTED", "minEvidenceGroups": 0, "requiredEvidenceGroupIds": [], "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U204-P02-E01", "evidenceGroupId": "SV3-SS-U204-G02", "supportRelation": "INSUFFICIENT"}]}
+      ],
+      "expectedEvidence": [
+        {"evidenceUnitId": "SV3-SS-U204-P01-E01", "evidenceGroupId": "SV3-SS-U204-G01", "supportRelation": "DIRECT_SUPPORT"},
+        {"evidenceUnitId": "SV3-SS-U204-P02-E01", "evidenceGroupId": "SV3-SS-U204-G02", "supportRelation": "INSUFFICIENT"}
+      ]
+    },
+    {
+      "queryId": "SV3-SS-U204-Q03",
+      "questionGroupId": "SV3-SS-QG-U204-03",
+      "userBundleId": "SV3-RB-U204",
+      "query": "Did incident response require a global rollback that interrupted every region?",
+      "normalizedQuery": "did incident response require a global rollback that interrupted every region",
+      "categories": ["semantic_paraphrase", "abstract_competency", "negation", "english"],
+      "language": "EN",
+      "polarity": "NEGATIVE",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {"operator": "ALL", "requiredAspectIds": ["claim"], "minShouldMatch": 1},
+      "aspects": [{"aspectId": "claim", "required": true, "answerability": "NOT_SUPPORTED", "minEvidenceGroups": 0, "requiredEvidenceGroupIds": [], "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U204-P04-E01", "evidenceGroupId": "SV3-SS-U204-G04", "supportRelation": "CONTRADICTS"}]}],
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U204-P04-E01", "evidenceGroupId": "SV3-SS-U204-G04", "supportRelation": "CONTRADICTS"}]
+    },
+    {
+      "queryId": "SV3-SS-U204-Q04",
+      "questionGroupId": "SV3-SS-QG-U204-04",
+      "userBundleId": "SV3-RB-U204",
+      "query": "Did the team release right-to-left support across all thirty-four shared components?",
+      "normalizedQuery": "did the team release right to left support across all thirty four shared components",
+      "categories": ["semantic_paraphrase", "other_actor", "completion_state", "english"],
+      "language": "EN",
+      "polarity": "POSITIVE",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {"operator": "ALL", "requiredAspectIds": ["claim"], "minShouldMatch": 1},
+      "aspects": [{"aspectId": "claim", "required": true, "answerability": "SUPPORTED", "minEvidenceGroups": 1, "requiredEvidenceGroupIds": ["SV3-SS-U204-G02"], "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U204-P02-E01", "evidenceGroupId": "SV3-SS-U204-G02", "supportRelation": "DIRECT_SUPPORT"}]}],
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U204-P02-E01", "evidenceGroupId": "SV3-SS-U204-G02", "supportRelation": "DIRECT_SUPPORT"}]
+    },
+    {
+      "queryId": "SV3-SS-U205-Q01",
+      "questionGroupId": "SV3-SS-QG-U205-01",
+      "userBundleId": "SV3-RB-U205",
+      "query": "지역 고객 인터뷰와 검색 표현을 근거로 공통 메시지 체계를 운영했나요?",
+      "normalizedQuery": "지역 고객 인터뷰와 검색 표현을 근거로 공통 메시지 체계를 운영했나요",
+      "categories": ["semantic_paraphrase", "abstract_competency", "korean"],
+      "language": "KO",
+      "polarity": "POSITIVE",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {"operator": "ALL", "requiredAspectIds": ["claim"], "minShouldMatch": 1},
+      "aspects": [{"aspectId": "claim", "required": true, "answerability": "SUPPORTED", "minEvidenceGroups": 1, "requiredEvidenceGroupIds": ["SV3-SS-U205-G02"], "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U205-P02-E01", "evidenceGroupId": "SV3-SS-U205-G02", "supportRelation": "DIRECT_SUPPORT"}]}],
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U205-P02-E01", "evidenceGroupId": "SV3-SS-U205-G02", "supportRelation": "DIRECT_SUPPORT"}]
+    },
+    {
+      "queryId": "SV3-SS-U205-Q02",
+      "questionGroupId": "SV3-SS-QG-U205-02",
+      "userBundleId": "SV3-RB-U205",
+      "query": "고객 인터뷰 기반 공통 메시지 체계를 운영했고, 예산 재배분 효과도 다음 분기까지 그대로 유지됐나요?",
+      "normalizedQuery": "고객 인터뷰 기반 공통 메시지 체계를 운영했고 예산 재배분 효과도 다음 분기까지 그대로 유지됐나요",
+      "categories": ["semantic_paraphrase", "completion_state", "korean"],
+      "language": "KO",
+      "polarity": "POSITIVE",
+      "answerability": "PARTIALLY_SUPPORTED",
+      "aspectExpression": {"operator": "ALL", "requiredAspectIds": ["message_system", "next_quarter_effect"], "minShouldMatch": 2},
+      "aspects": [
+        {"aspectId": "message_system", "required": true, "answerability": "SUPPORTED", "minEvidenceGroups": 1, "requiredEvidenceGroupIds": ["SV3-SS-U205-G02"], "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U205-P02-E01", "evidenceGroupId": "SV3-SS-U205-G02", "supportRelation": "DIRECT_SUPPORT"}]},
+        {"aspectId": "next_quarter_effect", "required": true, "answerability": "NOT_SUPPORTED", "minEvidenceGroups": 0, "requiredEvidenceGroupIds": [], "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U205-P03-E01", "evidenceGroupId": "SV3-SS-U205-G03", "supportRelation": "RELATED"}]}
+      ],
+      "expectedEvidence": [
+        {"evidenceUnitId": "SV3-SS-U205-P02-E01", "evidenceGroupId": "SV3-SS-U205-G02", "supportRelation": "DIRECT_SUPPORT"},
+        {"evidenceUnitId": "SV3-SS-U205-P03-E01", "evidenceGroupId": "SV3-SS-U205-G03", "supportRelation": "RELATED"}
+      ]
+    },
+    {
+      "queryId": "SV3-SS-U205-Q03",
+      "questionGroupId": "SV3-SS-QG-U205-03",
+      "userBundleId": "SV3-RB-U205",
+      "query": "검증된 상담 요청 수에 중복 계정과 내부 테스트를 포함했나요?",
+      "normalizedQuery": "검증된 상담 요청 수에 중복 계정과 내부 테스트를 포함했나요",
+      "categories": ["semantic_paraphrase", "negation", "korean"],
+      "language": "KO",
+      "polarity": "NEGATIVE",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {"operator": "ALL", "requiredAspectIds": ["claim"], "minShouldMatch": 1},
+      "aspects": [{"aspectId": "claim", "required": true, "answerability": "NOT_SUPPORTED", "minEvidenceGroups": 0, "requiredEvidenceGroupIds": [], "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U205-P01-E01", "evidenceGroupId": "SV3-SS-U205-G01", "supportRelation": "CONTRADICTS"}]}],
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U205-P01-E01", "evidenceGroupId": "SV3-SS-U205-G01", "supportRelation": "CONTRADICTS"}]
+    },
+    {
+      "queryId": "SV3-SS-U205-Q04",
+      "questionGroupId": "SV3-SS-QG-U205-04",
+      "userBundleId": "SV3-RB-U205",
+      "query": "공통 메시지 체계를 운영했고, 영업 담당자가 누락률 개선 방식도 직접 설계했나요?",
+      "normalizedQuery": "공통 메시지 체계를 운영했고 영업 담당자가 누락률 개선 방식도 직접 설계했나요",
+      "categories": ["semantic_paraphrase", "abstract_competency", "other_actor", "korean"],
+      "language": "KO",
+      "polarity": "POSITIVE",
+      "answerability": "PARTIALLY_SUPPORTED",
+      "aspectExpression": {"operator": "ALL", "requiredAspectIds": ["message_system", "sales_actor"], "minShouldMatch": 2},
+      "aspects": [
+        {"aspectId": "message_system", "required": true, "answerability": "SUPPORTED", "minEvidenceGroups": 1, "requiredEvidenceGroupIds": ["SV3-SS-U205-G02"], "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U205-P02-E01", "evidenceGroupId": "SV3-SS-U205-G02", "supportRelation": "DIRECT_SUPPORT"}]},
+        {"aspectId": "sales_actor", "required": true, "answerability": "NOT_SUPPORTED", "minEvidenceGroups": 0, "requiredEvidenceGroupIds": [], "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U205-P04-E01", "evidenceGroupId": "SV3-SS-U205-G04", "supportRelation": "INSUFFICIENT"}]}
+      ],
+      "expectedEvidence": [
+        {"evidenceUnitId": "SV3-SS-U205-P02-E01", "evidenceGroupId": "SV3-SS-U205-G02", "supportRelation": "DIRECT_SUPPORT"},
+        {"evidenceUnitId": "SV3-SS-U205-P04-E01", "evidenceGroupId": "SV3-SS-U205-G04", "supportRelation": "INSUFFICIENT"}
+      ]
+    },
+    {
+      "queryId": "SV3-SS-U206-Q01",
+      "questionGroupId": "SV3-SS-QG-U206-01",
+      "userBundleId": "SV3-RB-U206",
+      "query": "역할 연습과 follow-up coaching까지 포함한 facilitator onboarding을 완료했나요?",
+      "normalizedQuery": "역할 연습과 follow-up coaching까지 포함한 facilitator onboarding을 완료했나요",
+      "categories": ["semantic_paraphrase", "completion_state", "korean_english_mixed"],
+      "language": "KO_EN_MIXED",
+      "polarity": "POSITIVE",
+      "answerability": "SUPPORTED",
+      "aspectExpression": {"operator": "ALL", "requiredAspectIds": ["claim"], "minShouldMatch": 1},
+      "aspects": [{"aspectId": "claim", "required": true, "answerability": "SUPPORTED", "minEvidenceGroups": 1, "requiredEvidenceGroupIds": ["SV3-SS-U206-G01"], "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U206-P01-E01", "evidenceGroupId": "SV3-SS-U206-G01", "supportRelation": "DIRECT_SUPPORT"}]}],
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U206-P01-E01", "evidenceGroupId": "SV3-SS-U206-G01", "supportRelation": "DIRECT_SUPPORT"}]
+    },
+    {
+      "queryId": "SV3-SS-U206-Q02",
+      "questionGroupId": "SV3-SS-QG-U206-02",
+      "userBundleId": "SV3-RB-U206",
+      "query": "Was facilitator onboarding completed, and did partner organizations help design the learning-kit transfer process?",
+      "normalizedQuery": "was facilitator onboarding completed and did partner organizations help design the learning kit transfer process",
+      "categories": ["semantic_paraphrase", "other_actor", "english"],
+      "language": "EN",
+      "polarity": "POSITIVE",
+      "answerability": "PARTIALLY_SUPPORTED",
+      "aspectExpression": {"operator": "ALL", "requiredAspectIds": ["onboarding_complete", "partner_actor"], "minShouldMatch": 2},
+      "aspects": [
+        {"aspectId": "onboarding_complete", "required": true, "answerability": "SUPPORTED", "minEvidenceGroups": 1, "requiredEvidenceGroupIds": ["SV3-SS-U206-G01"], "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U206-P01-E01", "evidenceGroupId": "SV3-SS-U206-G01", "supportRelation": "DIRECT_SUPPORT"}]},
+        {"aspectId": "partner_actor", "required": true, "answerability": "NOT_SUPPORTED", "minEvidenceGroups": 0, "requiredEvidenceGroupIds": [], "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U206-P04-E01", "evidenceGroupId": "SV3-SS-U206-G04", "supportRelation": "INSUFFICIENT"}]}
+      ],
+      "expectedEvidence": [
+        {"evidenceUnitId": "SV3-SS-U206-P01-E01", "evidenceGroupId": "SV3-SS-U206-G01", "supportRelation": "DIRECT_SUPPORT"},
+        {"evidenceUnitId": "SV3-SS-U206-P04-E01", "evidenceGroupId": "SV3-SS-U206-G04", "supportRelation": "INSUFFICIENT"}
+      ]
+    },
+    {
+      "queryId": "SV3-SS-U206-Q03",
+      "questionGroupId": "SV3-SS-QG-U206-03",
+      "userBundleId": "SV3-RB-U206",
+      "query": "Did the attendance redesign exclude learners who needed schedule changes?",
+      "normalizedQuery": "did the attendance redesign exclude learners who needed schedule changes",
+      "categories": ["semantic_paraphrase", "negation", "english"],
+      "language": "EN",
+      "polarity": "NEGATIVE",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {"operator": "ALL", "requiredAspectIds": ["claim"], "minShouldMatch": 1},
+      "aspects": [{"aspectId": "claim", "required": true, "answerability": "NOT_SUPPORTED", "minEvidenceGroups": 0, "requiredEvidenceGroupIds": [], "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U206-P02-E01", "evidenceGroupId": "SV3-SS-U206-G02", "supportRelation": "CONTRADICTS"}]}],
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U206-P02-E01", "evidenceGroupId": "SV3-SS-U206-G02", "supportRelation": "CONTRADICTS"}]
+    },
+    {
+      "queryId": "SV3-SS-U206-Q04",
+      "questionGroupId": "SV3-SS-QG-U206-04",
+      "userBundleId": "SV3-RB-U206",
+      "query": "safeguarding escalation card가 한 교육장에만 prototype으로 남았나요?",
+      "normalizedQuery": "safeguarding escalation card가 한 교육장에만 prototype으로 남았나요",
+      "categories": ["abstract_competency", "negation", "completion_state", "korean_english_mixed"],
+      "language": "KO_EN_MIXED",
+      "polarity": "NEGATIVE",
+      "answerability": "NOT_SUPPORTED",
+      "aspectExpression": {"operator": "ALL", "requiredAspectIds": ["claim"], "minShouldMatch": 1},
+      "aspects": [{"aspectId": "claim", "required": true, "answerability": "NOT_SUPPORTED", "minEvidenceGroups": 0, "requiredEvidenceGroupIds": [], "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U206-P03-E01", "evidenceGroupId": "SV3-SS-U206-G03", "supportRelation": "CONTRADICTS"}]}],
+      "expectedEvidence": [{"evidenceUnitId": "SV3-SS-U206-P03-E01", "evidenceGroupId": "SV3-SS-U206-G03", "supportRelation": "CONTRADICTS"}]
+    }
+  ]
+}

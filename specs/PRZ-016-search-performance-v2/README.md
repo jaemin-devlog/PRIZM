@@ -4,9 +4,10 @@
 안내한다. 먼저 [현재 검색 요약](SEARCH-FINAL-SUMMARY.md)을 읽고, 구현 순서가 필요하면
 [현재 검색 아키텍처](SEARCH-FINAL-ARCHITECTURE.md)를 확인한다.
 
-PRZ-016의 형식 상태는 `IN_PROGRESS`다. 현재 기능 개발이 진행 중이라는 뜻이 아니라,
-P15 `NOT_VERIFIED`와 제품에 적용하지 않은 P16 `NEEDS_ADJUSTMENT`를 소급해서 닫지 않기
-위해 보존하는 상태다.
+PRZ-016의 형식 상태는 `IN_PROGRESS`다. P15 `NOT_VERIFIED`와 제품에 적용하지 않은 P16
+`NEEDS_ADJUSTMENT`를 소급해서 닫지 않는다. P17 평가셋은 전체 unit과 AUDIT를 통과했지만
+실제 검색 방식 비교가 `NOT_RUN`이다. P17은 평가 자산 작업이며 Production 검색 기능을
+바꾸지 않는다.
 
 ## 현재 검색을 확인할 때
 
@@ -33,6 +34,7 @@ P15 `NOT_VERIFIED`와 제품에 적용하지 않은 P16 `NEEDS_ADJUSTMENT`를 �
 | P7-B | `FAIL` | [P7-B Evidence](p7-b-independent-generalization/evidence.md) |
 | P15 | `NOT_VERIFIED` | [Evidence의 P15 기록](evidence.md#p15-pdf-document-confirmation-ux) |
 | P16 | `NEEDS_ADJUSTMENT`, 제품 미적용 | [P16 Evidence](p16-literal-candidate-phase-a/evidence.md) |
+| P17 | `IMPLEMENTED — VERIFY_AND_AUDIT_PASS`, 통합·실제 검색 비교 `NOT_RUN` | [P17 Spec](p17-prizm-dedicated-dataset/spec.md) |
 
 PostgreSQL·pgvector 결과를 OpenSQL 결과로 바꾸어 쓰지 않는다. 각 단계의 owner·`ACTIVE`
 격리 결과와 제품 경로·평가 전용 경로의 구분도 해당 evidence에 기록된 범위 그대로
@@ -47,6 +49,9 @@ PostgreSQL·pgvector 결과를 OpenSQL 결과로 바꾸어 쓰지 않는다. 각
 - `p7-b-independent-generalization/`과 `p7-*` — 독립 일반화, trace, semantic shadow와
   frozen 평가 기록.
 - `p16-literal-candidate-phase-a/` — literal candidate 실험과 `NEEDS_ADJUSTMENT` 근거.
+- `p17-prizm-dedicated-dataset/` — 프로젝트·식별자·source fact가 겹치지 않는 A/B/C
+  cohort, 114문서·300문항으로 만든 PRIZM 전용 합성 평가셋의 계약·계획·검증 상태.
+  실제 검색 방식 비교는 `NOT_RUN`.
 - [과거 통합 요약](history/2026-08-search-integration-summary.md)과
   [과거 통합 아키텍처](history/2026-08-search-integration-architecture.md) — 현재 소스에서
   제거된 structured claim evaluator를 포함하던 당시 snapshot의 원문.

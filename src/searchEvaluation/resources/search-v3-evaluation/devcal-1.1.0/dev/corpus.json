@@ -1,0 +1,113 @@
+{
+  "artifactType": "CORPUS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+  "split": "DEV",
+  "userBundles": [
+    {
+      "userBundleId": "SV3-LF-U101",
+      "split": "DEV",
+      "professionGroup": "DESIGN_PRODUCT",
+      "profession": "service designer and product researcher",
+      "languageProfile": "KO",
+      "documentFamilyId": "SV3-LF-U101-DOC-FAMILY",
+      "templateFamilyId": "SV3-LF-TEMPLATE-DESIGN-101",
+      "documents": [
+        {
+          "documentId": "SV3-LF-U101-D01",
+          "logicalDocumentId": "SV3-LF-U101-D01-LOGICAL",
+          "versionLineageId": "SV3-LF-U101-D01-LINEAGE",
+          "versionId": "SV3-LF-U101-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "합성 지역 교통 예약 서비스 디자인 포트폴리오",
+          "documentType": "PORTFOLIO",
+          "documentStructure": "LONG_PORTFOLIO",
+          "fileType": "TXT",
+          "language": "KO",
+          "contentPath": "documents/sv3-lf-u101-design-portfolio-v01.txt",
+          "contentSha256": "19cccd6fd5f040c8ab641a391da5027fd3a8ad8fb030d728955562df60c69906",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-prz026-long-form-materializer",
+            "generatorRevision": "1.1.0",
+            "generatorSeedId": "SV3-LF-SEED-DESIGN-101-A7C2"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-LF-U102",
+      "split": "DEV",
+      "professionGroup": "DATA_AI_INFRA",
+      "profession": "data reliability engineer",
+      "languageProfile": "EN",
+      "documentFamilyId": "SV3-LF-U102-DOC-FAMILY",
+      "templateFamilyId": "SV3-LF-TEMPLATE-DATA-102",
+      "documents": [
+        {
+          "documentId": "SV3-LF-U102-D01",
+          "logicalDocumentId": "SV3-LF-U102-D01-LOGICAL",
+          "versionLineageId": "SV3-LF-U102-D01-LINEAGE",
+          "versionId": "SV3-LF-U102-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Synthetic Data Reliability and Applied ML Portfolio",
+          "documentType": "PORTFOLIO",
+          "documentStructure": "LONG_PORTFOLIO",
+          "fileType": "TXT",
+          "language": "EN",
+          "contentPath": "documents/sv3-lf-u102-data-reliability-v01.txt",
+          "contentSha256": "a489bbbcc124834f00d321e1e0181d0cdaa4e0627f4c964cae67c328de0c6734",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-prz026-long-form-materializer",
+            "generatorRevision": "1.1.0",
+            "generatorSeedId": "SV3-LF-SEED-DATA-102-C4E8"
+          }
+        }
+      ]
+    },
+    {
+      "userBundleId": "SV3-LF-U103",
+      "split": "DEV",
+      "professionGroup": "MARKETING_SALES",
+      "profession": "growth marketing and sales operations lead",
+      "languageProfile": "KO_EN_MIXED",
+      "documentFamilyId": "SV3-LF-U103-DOC-FAMILY",
+      "templateFamilyId": "SV3-LF-TEMPLATE-GROWTH-103",
+      "documents": [
+        {
+          "documentId": "SV3-LF-U103-D01",
+          "logicalDocumentId": "SV3-LF-U103-D01-LOGICAL",
+          "versionLineageId": "SV3-LF-U103-D01-LINEAGE",
+          "versionId": "SV3-LF-U103-D01-V01",
+          "versionNumber": 1,
+          "active": true,
+          "title": "Synthetic Growth Marketing & Sales Operations Career Review",
+          "documentType": "CAREER_REVIEW",
+          "documentStructure": "CAREER_DESCRIPTION",
+          "fileType": "TXT",
+          "language": "KO_EN_MIXED",
+          "contentPath": "documents/sv3-lf-u103-growth-sales-v01.txt",
+          "contentSha256": "115d5884a1ef288bc144588f47d577af90e0aebb8c0adb07d6aecfeb3f3b08b0",
+          "supportScope": "SUPPORTED_BY_CURRENT",
+          "visibility": "OWNER_ONLY",
+          "provenance": {
+            "classification": "SYNTHETIC",
+            "license": "Apache-2.0",
+            "generatorName": "prizm-prz026-long-form-materializer",
+            "generatorRevision": "1.1.0",
+            "generatorSeedId": "SV3-LF-SEED-GROWTH-103-D5B1"
+          }
+        }
+      ]
+    }
+  ]
+}

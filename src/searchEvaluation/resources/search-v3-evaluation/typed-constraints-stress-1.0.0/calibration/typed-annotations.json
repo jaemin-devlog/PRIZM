@@ -1,0 +1,626 @@
+{
+  "artifactType": "TYPED_ANNOTATIONS",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-typed-constraints-stress-1.0.0",
+  "split": "CALIBRATION",
+  "observations": [
+    {
+      "observationId": "SV3-TC-U34-P01-O01",
+      "evidenceUnitId": "SV3-U34-P01-E01",
+      "sourceSpanId": "SV3-U34-P01-E01-S01",
+      "kind": "IDENTIFIER_NUMBER",
+      "sourceSurface": "HTTP/2",
+      "charStart": 72,
+      "charEnd": 78,
+      "identifier": "HTTP",
+      "numberSurface": "2",
+      "normalizedSegments": [
+        2
+      ]
+    },
+    {
+      "observationId": "SV3-TC-U34-P02-O01",
+      "evidenceUnitId": "SV3-U34-P02-E01",
+      "sourceSpanId": "SV3-U34-P02-E01-S01",
+      "kind": "IDENTIFIER_NUMBER",
+      "sourceSurface": "HTTP/1.1",
+      "charStart": 189,
+      "charEnd": 197,
+      "identifier": "HTTP",
+      "numberSurface": "1.1",
+      "normalizedSegments": [
+        1,
+        1
+      ]
+    },
+    {
+      "observationId": "SV3-TC-U34-P03-O01",
+      "evidenceUnitId": "SV3-U34-P03-E01",
+      "sourceSpanId": "SV3-U34-P03-E01-S01",
+      "kind": "LITERAL_IDENTIFIER",
+      "sourceSurface": "NimbusCache",
+      "charStart": 265,
+      "charEnd": 276,
+      "normalizedLiteral": "nimbuscache"
+    },
+    {
+      "observationId": "SV3-TC-U34-P04-O01",
+      "evidenceUnitId": "SV3-U34-P04-E01",
+      "sourceSpanId": "SV3-U34-P04-E01-S01",
+      "kind": "LITERAL_IDENTIFIER",
+      "sourceSurface": "ZephyrDBX",
+      "charStart": 383,
+      "charEnd": 392,
+      "normalizedLiteral": "zephyrdbx"
+    },
+    {
+      "observationId": "SV3-TC-U35-P01-O01",
+      "evidenceUnitId": "SV3-U35-P01-E01",
+      "sourceSpanId": "SV3-U35-P01-E01-S01",
+      "kind": "DATE",
+      "sourceSurface": "2024-03-01부터 2025-02-28까지",
+      "charStart": 34,
+      "charEnd": 59,
+      "start": "2024-03-01",
+      "end": "2025-02-28",
+      "precision": "FULL_DATE",
+      "qualifier": "정책 조사 기간"
+    },
+    {
+      "observationId": "SV3-TC-U35-P02-O01",
+      "evidenceUnitId": "SV3-U35-P02-E01",
+      "sourceSpanId": "SV3-U35-P02-E01-S01",
+      "kind": "DATE",
+      "sourceSurface": "2025-07-01",
+      "charStart": 99,
+      "charEnd": 109,
+      "start": "2025-07-01",
+      "end": "2025-07-01",
+      "precision": "FULL_DATE",
+      "qualifier": "전국 rollout 시작"
+    },
+    {
+      "observationId": "SV3-TC-U35-P03-O01",
+      "evidenceUnitId": "SV3-U35-P03-E01",
+      "sourceSpanId": "SV3-U35-P03-E01-S01",
+      "kind": "LITERAL_IDENTIFIER",
+      "sourceSurface": "AtlasPlan",
+      "charStart": 166,
+      "charEnd": 175,
+      "normalizedLiteral": "atlasplan"
+    },
+    {
+      "observationId": "SV3-TC-U35-P04-O01",
+      "evidenceUnitId": "SV3-U35-P04-E01",
+      "sourceSpanId": "SV3-U35-P04-E01-S01",
+      "kind": "LITERAL_IDENTIFIER",
+      "sourceSurface": "NorthStarX",
+      "charStart": 203,
+      "charEnd": 213,
+      "normalizedLiteral": "northstarx"
+    },
+    {
+      "observationId": "SV3-TC-U36-P01-O01",
+      "evidenceUnitId": "SV3-U36-P01-E01",
+      "sourceSpanId": "SV3-U36-P01-E01-S01",
+      "kind": "IDENTIFIER_NUMBER",
+      "sourceSurface": "Java 17",
+      "charStart": 83,
+      "charEnd": 90,
+      "identifier": "Java",
+      "numberSurface": "17",
+      "normalizedSegments": [
+        17
+      ]
+    },
+    {
+      "observationId": "SV3-TC-U36-P02-O01",
+      "evidenceUnitId": "SV3-U36-P02-E01",
+      "sourceSpanId": "SV3-U36-P02-E01-S01",
+      "kind": "IDENTIFIER_NUMBER",
+      "sourceSurface": "Java 11",
+      "charStart": 189,
+      "charEnd": 196,
+      "identifier": "Java",
+      "numberSurface": "11",
+      "normalizedSegments": [
+        11
+      ]
+    },
+    {
+      "observationId": "SV3-TC-U36-P03-O01",
+      "evidenceUnitId": "SV3-U36-P03-E01",
+      "sourceSpanId": "SV3-U36-P03-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "50%",
+      "charStart": 275,
+      "charEnd": 278,
+      "value": 50,
+      "normalizedUnit": "%",
+      "qualifier": "재처리 오류율",
+      "direction": "DECREASE"
+    },
+    {
+      "observationId": "SV3-TC-U36-P04-O01",
+      "evidenceUnitId": "SV3-U36-P04-E01",
+      "sourceSpanId": "SV3-U36-P04-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "2,329건",
+      "charStart": 324,
+      "charEnd": 330,
+      "value": 2329,
+      "normalizedUnit": "건",
+      "qualifier": "데이터",
+      "direction": "NONE"
+    },
+    {
+      "observationId": "SV3-TC-U36-P05-O01",
+      "evidenceUnitId": "SV3-U36-P05-E01",
+      "sourceSpanId": "SV3-U36-P05-E01-S01",
+      "kind": "QUANTITY",
+      "sourceSurface": "300명",
+      "charStart": 409,
+      "charEnd": 413,
+      "value": 300,
+      "normalizedUnit": "명",
+      "qualifier": "사용자",
+      "direction": "NONE"
+    }
+  ],
+  "queryAnnotations": [
+    {
+      "queryId": "SV3-U34-Q01",
+      "userBundleId": "SV3-U34",
+      "stressFamilies": [
+        "identifier_number_exact"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U34-Q01-C01",
+        "kind": "IDENTIFIER_NUMBER",
+        "surface": "HTTP/2",
+        "identifier": "HTTP",
+        "numberSurface": "2",
+        "normalizedSegments": [
+          2
+        ],
+        "queryCharStart": 31,
+        "queryCharEnd": 37
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U34-P01-E01",
+          "state": "SATISFIED"
+        },
+        {
+          "evidenceUnitId": "SV3-U34-P02-E01",
+          "state": "CONTRADICTED"
+        },
+        {
+          "evidenceUnitId": "SV3-U34-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U34-P04-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U34-Q02",
+      "userBundleId": "SV3-U34",
+      "stressFamilies": [
+        "identifier_number_mismatch",
+        "not_supported_hard_negative"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U34-Q02-C01",
+        "kind": "IDENTIFIER_NUMBER",
+        "surface": "HTTP/3",
+        "identifier": "HTTP",
+        "numberSurface": "3",
+        "normalizedSegments": [
+          3
+        ],
+        "queryCharStart": 31,
+        "queryCharEnd": 37
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U34-P01-E01",
+          "state": "CONTRADICTED"
+        },
+        {
+          "evidenceUnitId": "SV3-U34-P02-E01",
+          "state": "CONTRADICTED"
+        },
+        {
+          "evidenceUnitId": "SV3-U34-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U34-P04-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U34-Q03",
+      "userBundleId": "SV3-U34",
+      "stressFamilies": [
+        "literal_exact"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U34-Q03-C01",
+        "kind": "LITERAL_IDENTIFIER",
+        "surface": "NimbusCache",
+        "normalizedLiteral": "nimbuscache",
+        "queryCharStart": 26,
+        "queryCharEnd": 37
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U34-P01-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U34-P02-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U34-P03-E01",
+          "state": "SATISFIED"
+        },
+        {
+          "evidenceUnitId": "SV3-U34-P04-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U34-Q04",
+      "userBundleId": "SV3-U34",
+      "stressFamilies": [
+        "literal_near_match",
+        "not_supported_hard_negative"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U34-Q04-C01",
+        "kind": "LITERAL_IDENTIFIER",
+        "surface": "ZephyrDB",
+        "normalizedLiteral": "zephyrdb",
+        "queryCharStart": 27,
+        "queryCharEnd": 35
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U34-P01-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U34-P02-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U34-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U34-P04-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U35-Q01",
+      "userBundleId": "SV3-U35",
+      "stressFamilies": [
+        "date_range"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U35-Q01-C01",
+        "kind": "DATE",
+        "surface": "2024-03-01부터 2025-02-28까지",
+        "operator": "RANGE",
+        "start": "2024-03-01",
+        "end": "2025-02-28",
+        "precision": "FULL_DATE",
+        "qualifier": "정책 조사 기간",
+        "queryCharStart": 7,
+        "queryCharEnd": 32
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U35-P01-E01",
+          "state": "SATISFIED"
+        },
+        {
+          "evidenceUnitId": "SV3-U35-P02-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U35-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U35-P04-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U35-Q02",
+      "userBundleId": "SV3-U35",
+      "stressFamilies": [
+        "date_after"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U35-Q02-C01",
+        "kind": "DATE",
+        "surface": "2025-06-30 이후",
+        "operator": "AFTER",
+        "value": "2025-06-30",
+        "precision": "FULL_DATE",
+        "qualifier": "전국 rollout 시작",
+        "queryCharStart": 12,
+        "queryCharEnd": 25
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U35-P01-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U35-P02-E01",
+          "state": "SATISFIED"
+        },
+        {
+          "evidenceUnitId": "SV3-U35-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U35-P04-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U35-Q03",
+      "userBundleId": "SV3-U35",
+      "stressFamilies": [
+        "date_before",
+        "not_supported_hard_negative"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U35-Q03-C01",
+        "kind": "DATE",
+        "surface": "2024-12-31 이전",
+        "operator": "BEFORE",
+        "value": "2024-12-31",
+        "precision": "FULL_DATE",
+        "qualifier": "전국 rollout 시작",
+        "queryCharStart": 12,
+        "queryCharEnd": 25
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U35-P01-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U35-P02-E01",
+          "state": "CONTRADICTED"
+        },
+        {
+          "evidenceUnitId": "SV3-U35-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U35-P04-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U35-Q04",
+      "userBundleId": "SV3-U35",
+      "stressFamilies": [
+        "literal_near_match",
+        "not_supported_hard_negative"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U35-Q04-C01",
+        "kind": "LITERAL_IDENTIFIER",
+        "surface": "NorthStar",
+        "normalizedLiteral": "northstar",
+        "queryCharStart": 0,
+        "queryCharEnd": 9
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U35-P01-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U35-P02-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U35-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U35-P04-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U36-Q01",
+      "userBundleId": "SV3-U36",
+      "stressFamilies": [
+        "identifier_number_exact"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U36-Q01-C01",
+        "kind": "IDENTIFIER_NUMBER",
+        "surface": "Java 17",
+        "identifier": "Java",
+        "numberSurface": "17",
+        "normalizedSegments": [
+          17
+        ],
+        "queryCharStart": 41,
+        "queryCharEnd": 48
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U36-P01-E01",
+          "state": "SATISFIED"
+        },
+        {
+          "evidenceUnitId": "SV3-U36-P02-E01",
+          "state": "CONTRADICTED"
+        },
+        {
+          "evidenceUnitId": "SV3-U36-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U36-P04-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U36-P05-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U36-Q02",
+      "userBundleId": "SV3-U36",
+      "stressFamilies": [
+        "identifier_number_mismatch",
+        "not_supported_hard_negative"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U36-Q02-C01",
+        "kind": "IDENTIFIER_NUMBER",
+        "surface": "Java 21",
+        "identifier": "Java",
+        "numberSurface": "21",
+        "normalizedSegments": [
+          21
+        ],
+        "queryCharStart": 41,
+        "queryCharEnd": 48
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U36-P01-E01",
+          "state": "CONTRADICTED"
+        },
+        {
+          "evidenceUnitId": "SV3-U36-P02-E01",
+          "state": "CONTRADICTED"
+        },
+        {
+          "evidenceUnitId": "SV3-U36-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U36-P04-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U36-P05-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U36-Q03",
+      "userBundleId": "SV3-U36",
+      "stressFamilies": [
+        "percentage_direction",
+        "quantity_boundary"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U36-Q03-C01",
+        "kind": "QUANTITY",
+        "surface": "50% 이상 감소",
+        "operator": "GTE",
+        "value": 50,
+        "normalizedUnit": "%",
+        "qualifier": "재처리 오류율",
+        "direction": "DECREASE",
+        "queryCharStart": 9,
+        "queryCharEnd": 18
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U36-P01-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U36-P02-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U36-P03-E01",
+          "state": "SATISFIED"
+        },
+        {
+          "evidenceUnitId": "SV3-U36-P04-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U36-P05-E01",
+          "state": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "queryId": "SV3-U36-Q04",
+      "userBundleId": "SV3-U36",
+      "stressFamilies": [
+        "qualifier_mismatch",
+        "wrong_value",
+        "not_supported_hard_negative"
+      ],
+      "constraint": {
+        "constraintId": "SV3-U36-Q04-C01",
+        "kind": "QUANTITY",
+        "surface": "사용자 2,329명",
+        "operator": "EQ",
+        "value": 2329,
+        "normalizedUnit": "명",
+        "qualifier": "사용자",
+        "direction": "NONE",
+        "queryCharStart": 0,
+        "queryCharEnd": 10
+      },
+      "expectedEvidenceStates": [
+        {
+          "evidenceUnitId": "SV3-U36-P01-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U36-P02-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U36-P03-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U36-P04-E01",
+          "state": "UNKNOWN"
+        },
+        {
+          "evidenceUnitId": "SV3-U36-P05-E01",
+          "state": "CONTRADICTED"
+        }
+      ]
+    }
+  ]
+}

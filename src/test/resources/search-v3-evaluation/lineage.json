@@ -1,0 +1,288 @@
+{
+  "artifactType": "LINEAGE",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-seed-1.0.1",
+  "bundles": [
+    {
+      "userBundleId": "SV3-U01",
+      "split": "DEV",
+      "documentFamilyId": "SV3-U01-DOC-FAMILY",
+      "templateFamilyId": "SV3-TEMPLATE-BACKEND-01",
+      "generatorName": "prizm-search-v3-seed-materializer",
+      "generatorRevision": "1.0.0",
+      "generatorSeedId": "SV3-SEED-BACKEND-8F1C",
+      "logicalDocumentIds": [
+        "SV3-U01-D01-LOGICAL",
+        "SV3-U01-D02-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U01-D01-LINEAGE",
+        "SV3-U01-D02-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-FACT-U01-PAYGW",
+        "SV3-FACT-U01-REQUESTS",
+        "SV3-FACT-U01-KAFKA-NOT-ADOPTED",
+        "SV3-FACT-U01-INCIDENT-PREVENTION",
+        "SV3-FACT-U01-DORMANTQUEUE-INACTIVE"
+      ],
+      "sourceFactSignatures": [
+        "eeb13ed577791df1e8d530690f2662d061e878b5cc70ddd7dcb56dd8c8cc2758",
+        "0bc4e0aed355a0cb8a0135b86610113d7f5393d55f76fa2057238a141e0513b3",
+        "523ba49c63c7c1a1908c88a234b28bbd01237a435b9e6a6afa015cdbae162f2b",
+        "d0317eaaa4503e8d1c390d225477f406af7cf795c6e99ca72f8085aa804feac5",
+        "735f49f8291e0fcfcb2331823881360edc3e9d3a443558b9bf9e887ca96a1b02"
+      ],
+      "questionGroupIds": [
+        "SV3-U01-Q01-FAMILY",
+        "SV3-U01-Q02-FAMILY",
+        "SV3-U01-Q03-FAMILY",
+        "SV3-U01-Q04-FAMILY",
+        "SV3-U01-Q05-FAMILY"
+      ],
+      "normalizedQueries": [
+        "pay gw 운영 경험이 있나요",
+        "하루 1 000건 이상 요청을 처리한 경험이 있나요",
+        "kafka를 운영 환경에 도입했나요",
+        "장애가 반복되지 않도록 어떤 체계를 만들었나요",
+        "dormantqueue 운영 경험이 있나요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-U02",
+      "split": "CALIBRATION",
+      "documentFamilyId": "SV3-U02-DOC-FAMILY",
+      "templateFamilyId": "SV3-TEMPLATE-FRONTEND-02",
+      "generatorName": "prizm-search-v3-seed-materializer",
+      "generatorRevision": "1.0.0",
+      "generatorSeedId": "SV3-SEED-FRONTEND-2A7E",
+      "logicalDocumentIds": [
+        "SV3-U02-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U02-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-FACT-U02-A11Y",
+        "SV3-FACT-U02-VOICE-PROTOTYPE",
+        "SV3-FACT-U02-VOICE-NOT-PROD",
+        "SV3-FACT-U02-MOBILE-RELEASE"
+      ],
+      "sourceFactSignatures": [
+        "5015748390c898d3379be330c58d7904de0983c7348797db9384f3c106d8e5b5",
+        "fa34a9f94b106dd2787b86f03a9c6c77bc6941880d81a8ab5477a2f516e87dd0",
+        "e7a8c959588265b3c4feda7102b71eb3aaaeafe50963fdf7fefb130cfa8b2ac0",
+        "28a59877f7e7c0c93398091bad0664ac071c4c1a099c7008714b60d33644b581"
+      ],
+      "questionGroupIds": [
+        "SV3-U02-Q01-FAMILY",
+        "SV3-U02-Q02-FAMILY",
+        "SV3-U02-Q03-FAMILY",
+        "SV3-U02-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "did the candidate ship wcag 2 1 aa improvements",
+        "what evidence shows the account flow became more accessible",
+        "was voice navigation released to production",
+        "show accessibilty work for screen reader users"
+      ]
+    },
+    {
+      "userBundleId": "SV3-U03",
+      "split": "CALIBRATION",
+      "documentFamilyId": "SV3-U03-DOC-FAMILY",
+      "templateFamilyId": "SV3-TEMPLATE-DATA-03",
+      "generatorName": "prizm-search-v3-seed-materializer",
+      "generatorRevision": "1.0.0",
+      "generatorSeedId": "SV3-SEED-DATA-4D9B",
+      "logicalDocumentIds": [
+        "SV3-U03-D01-LOGICAL",
+        "SV3-U03-D02-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U03-D01-LINEAGE",
+        "SV3-U03-D02-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-FACT-U03-PIPELINE",
+        "SV3-FACT-U03-INCIDENT",
+        "SV3-FACT-U03-MODEL-NOT-PROD",
+        "SV3-FACT-U03-K8S-TRAINING"
+      ],
+      "sourceFactSignatures": [
+        "0eacbc8a94c5b7e00a40b02ef2253a15592b0057b01910f626f1282f6f3039ba",
+        "e29bcf42ccc16ceddbb6c7a67e2e42e27f8abe75aa5be5289825fb359f489315",
+        "5aab2e2e96bb2adac491f6bdc655cdcadbba8a45f3c4780de9ffda29eb104582",
+        "1bbda53f4a0ef40db41b6bd3f1d2193f22f6178907f846e89874d8a710cc3728"
+      ],
+      "questionGroupIds": [
+        "SV3-U03-Q01-FAMILY",
+        "SV3-U03-Q02-FAMILY",
+        "SV3-U03-Q03-FAMILY",
+        "SV3-U03-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "2023년 3월부터 2024년 2월까지 pipeline을 운영했나요",
+        "월 200만 records 이상을 검증한 경험이 있나요",
+        "운영 pipeline과 kubernetes 교육을 모두 갖췄나요",
+        "추천 모델을 production에 배포했나요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-U04",
+      "split": "DEV",
+      "documentFamilyId": "SV3-U04-DOC-FAMILY",
+      "templateFamilyId": "SV3-TEMPLATE-DESIGN-04",
+      "generatorName": "prizm-search-v3-seed-materializer",
+      "generatorRevision": "1.0.0",
+      "generatorSeedId": "SV3-SEED-DESIGN-5C2D",
+      "logicalDocumentIds": [
+        "SV3-U04-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U04-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-FACT-U04-INTERVIEWS",
+        "SV3-FACT-U04-REDESIGN",
+        "SV3-FACT-U04-USABILITY",
+        "SV3-FACT-U04-OTHER-ACTOR-AB"
+      ],
+      "sourceFactSignatures": [
+        "69428c32fab2ab94f3638616eeed79ed334d04fe427bd84d44925a7b84887409",
+        "d50f210ad878b4bdff796abeac23ad49fab1c398861ccf3d0deac4fcbc254d27",
+        "e556950ab5ea4a91c0d3da10145dbd0d7edb6587a89a3ba688a452f67797d615",
+        "2e121e2c8314e2b30dac5d2bb6c0a60796a37dbf1b6885a1745d8c26990a1620"
+      ],
+      "questionGroupIds": [
+        "SV3-U04-Q01-FAMILY",
+        "SV3-U04-Q02-FAMILY",
+        "SV3-U04-Q03-FAMILY",
+        "SV3-U04-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "사용자 문제를 발견하고 디자인 결정으로 연결한 근거는",
+        "본인이 a b 테스트를 수행했나요",
+        "본인이 사용자 인터뷰와 a b 테스트를 모두 했나요",
+        "재설계가 실제 사용성 결과로 이어졌나요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-U05",
+      "split": "SEALED_FINAL_TEST",
+      "documentFamilyId": "SV3-U05-DOC-FAMILY",
+      "templateFamilyId": "SV3-TEMPLATE-PLANNING-05",
+      "generatorName": "prizm-search-v3-seed-materializer",
+      "generatorRevision": "1.0.0",
+      "generatorSeedId": "SV3-SEED-PLANNING-3B6A",
+      "logicalDocumentIds": [
+        "SV3-U05-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U05-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-FACT-U05-CLASSIFICATION",
+        "SV3-FACT-U05-RETROSPECTIVE",
+        "SV3-FACT-U05-PLANNED-TRAINING"
+      ],
+      "sourceFactSignatures": [
+        "b5cda135071afe3147270addce8b0bc296f299a423dd35cd46c43f190e4264ae",
+        "b1506a0fedf55d30b42a363a40da63770b8a0e2109b1280bda8b7124cf277f49",
+        "990f351e87f96f075754caf7afdc8bc2202029495ac6ff06124a54088743ffd9"
+      ],
+      "questionGroupIds": [
+        "SV3-U05-Q01-FAMILY",
+        "SV3-U05-Q02-FAMILY",
+        "SV3-U05-Q03-FAMILY",
+        "SV3-U05-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "2025년 1분기에 실제로 적용한 기획 업무가 있나요",
+        "파트너 교육 프로그램을 이미 운영했나요",
+        "계획을 실행하고 피드백으로 우선순위를 조정한 경험은",
+        "2024년에 해외 법인 설립을 완료했나요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-U06",
+      "split": "DEV",
+      "documentFamilyId": "SV3-U06-DOC-FAMILY",
+      "templateFamilyId": "SV3-TEMPLATE-GROWTH-06",
+      "generatorName": "prizm-search-v3-seed-materializer",
+      "generatorRevision": "1.0.0",
+      "generatorSeedId": "SV3-SEED-GROWTH-7E3F",
+      "logicalDocumentIds": [
+        "SV3-U06-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U06-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-FACT-U06-CAMPAIGN",
+        "SV3-FACT-U06-LEADS",
+        "SV3-FACT-U06-CRM",
+        "SV3-FACT-U06-OTHER-ACTOR-SALES"
+      ],
+      "sourceFactSignatures": [
+        "11476aefbc617849287cb913c048e011e372477d90848c42f9e386f45113ef44",
+        "a099cc9e600a649d00ec28b11e5abe195e58784156e264a2ccc29bd77357fcf5",
+        "04f3227f27bccacef38cd7fedccb7a10f07ef4a9cd4471dbe308db10aff07813",
+        "6885da8f570436528c48e53938a22f26eefe196e55732651e5e4945eabedc7de"
+      ],
+      "questionGroupIds": [
+        "SV3-U06-Q01-FAMILY",
+        "SV3-U06-Q02-FAMILY",
+        "SV3-U06-Q03-FAMILY",
+        "SV3-U06-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "did the campaign generate at least 1 000 qualified leads",
+        "did the campaign acquire 1 000 paid customers",
+        "did this person close 40 enterprise accounts",
+        "email webinar campaign과 crm 운영 경험을 모두 보여 주세요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-U07",
+      "split": "SEALED_FINAL_TEST",
+      "documentFamilyId": "SV3-U07-DOC-FAMILY",
+      "templateFamilyId": "SV3-TEMPLATE-OPERATIONS-07",
+      "generatorName": "prizm-search-v3-seed-materializer",
+      "generatorRevision": "1.0.0",
+      "generatorSeedId": "SV3-SEED-OPERATIONS-9A4C",
+      "logicalDocumentIds": [
+        "SV3-U07-D01-LOGICAL",
+        "SV3-U07-D02-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-U07-D01-LINEAGE",
+        "SV3-U07-D02-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-FACT-U07-SHIFT-HANDOFF",
+        "SV3-FACT-U07-INQUIRIES",
+        "SV3-FACT-U07-NO-FORKLIFT",
+        "SV3-FACT-U07-EMERGENCY-TRAINING"
+      ],
+      "sourceFactSignatures": [
+        "4fc065d8be105e1d978b49a4dec556c06dbf70268fea340e795bef3b28833713",
+        "0c53fc3d28bc076cc84fb55e1c32878378cc223d18c434418a2c0f020dbf2c0d",
+        "4ec0ccf0268c528d0faf31927c2ac6cd9855deacaffb67dd23fe06e0e590c1a6",
+        "b12bfcb2540dd7777e24b2061e4a1ce43d908f658d45b917b38d2e9ece323fc7"
+      ],
+      "questionGroupIds": [
+        "SV3-U07-Q01-FAMILY",
+        "SV3-U07-Q02-FAMILY",
+        "SV3-U07-Q03-FAMILY",
+        "SV3-U07-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "응급 대응 기본 교육을 수료했나요",
+        "2022년 5월부터 2023년 11월까지 교대 운영을 맡았나요",
+        "지게차 운전 자격증을 보유했나요",
+        "고객 문의 운영과 현장 응급 대응을 모두 수행할 수 있는 근거는"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "artifactType": "SEARCH_V3_SEMANTIC_SUPPORT_STRESS_OVERLAY_MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "semantic-support-stress-1.0.1",
+  "previousVersion": "semantic-support-stress-1.0.0",
+  "changeReason": "PRE_RETRIEVAL_FIX_PRZ025_ASPECT_CONTRACT_AND_OTHER_ACTOR_COVERAGE",
+  "status": "INPUT_FROZEN",
+  "mutable": false,
+  "frozenAt": "2026-09-01T01:15:56.6391883+09:00",
+  "baseDatasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+  "splits": ["DEV", "CALIBRATION"],
+  "counts": {
+    "userBundlesReferenced": 6,
+    "documentsReferenced": 6,
+    "documentsCopied": 0,
+    "queries": 24,
+    "goldEvidenceUnits": 24,
+    "devQueries": 12,
+    "calibrationQueries": 12,
+    "payloadFiles": 11
+  },
+  "answerabilityDistribution": {
+    "SUPPORTED": 8,
+    "PARTIALLY_SUPPORTED": 8,
+    "NOT_SUPPORTED": 8
+  },
+  "supportRelationDistribution": {
+    "DIRECT_SUPPORT": 16,
+    "RELATED": 4,
+    "INSUFFICIENT": 4,
+    "CONTRADICTS": 8
+  },
+  "categoryDistribution": {
+    "semantic_paraphrase": 22,
+    "abstract_competency": 11,
+    "other_actor": 7,
+    "negation": 8,
+    "completion_state": 10,
+    "korean": 8,
+    "english": 10,
+    "korean_english_mixed": 6
+  },
+  "professionDistribution": {
+    "FRONTEND_MOBILE": 8,
+    "DESIGN_PRODUCT": 4,
+    "DATA_AI_INFRA": 4,
+    "MARKETING_SALES": 4,
+    "NON_DEVELOPMENT_GENERAL": 4
+  },
+  "languageDistribution": {
+    "KO": 8,
+    "EN": 10,
+    "KO_EN_MIXED": 6
+  },
+  "hashStatus": "SHA256_FROZEN",
+  "combinedHashAlgorithm": "SHA-256(relativePath + NUL + lowercaseSha256 + LF, sorted by ordinal relativePath; manifest excluded)",
+  "combinedSha256": "b541a570eb304970d165ce25e835f15576381d29670c7439bd60c25f3e46f75d",
+  "files": [
+    {"path": "README.md", "bytes": 1811, "sha256": "686efd74d007076820cfb757bc3bfbecf5b683ad99c2f2af3de42589b02e9f41"},
+    {"path": "calibration/corpus-overlay.json", "bytes": 1803, "sha256": "50299bf59211bad5edf04e3d6aecfb39c8b52c6da2107acf8b1473bed118424d"},
+    {"path": "calibration/gold-evidence.json", "bytes": 13325, "sha256": "0da81063bf2baa9e3383ba9755cb9f58864dbaebfd79cf9abce68a2cc6bc8ca5"},
+    {"path": "calibration/questions.json", "bytes": 15212, "sha256": "e871ec735829fcba90b408050a03b9eed2bbc415f7062b25ffd2b41876796e62"},
+    {"path": "calibration/runtime-questions.json", "bytes": 2549, "sha256": "510d0c7e696177ddace6771b648335e62be72cbed669df6078151c2d5bbdd81b"},
+    {"path": "dev/corpus-overlay.json", "bytes": 1721, "sha256": "0510ccde4ad650d163dfb28d5cbb97278ec2c2f4429aef2ae6af824c36ece456"},
+    {"path": "dev/gold-evidence.json", "bytes": 13296, "sha256": "cbf0088bd9b6a4f445ce3da212aa5228394d92f86e49bf1ffa9a46b1377d2a47"},
+    {"path": "dev/questions.json", "bytes": 15375, "sha256": "5058d97db8af080a495eccd40c7e1a3b1f6247cb25dcd9c8034429449b2d1af4"},
+    {"path": "dev/runtime-questions.json", "bytes": 2598, "sha256": "c78ac6083306cbd28701b9fea4e413ba9a27c5e7220d22c2c7bbe5562abbdf4d"},
+    {"path": "lineage.json", "bytes": 2874, "sha256": "7929df2f44d1f76a7532ee4f01585d3c63926d33b860f5a23adf6da1db4aa2a7"},
+    {"path": "runtime-manifest.json", "bytes": 1610, "sha256": "cca7b39718472e37bc502c985d233d802d57c0a533909bbc7eeabbd8f0082d58"}
+  ],
+  "execution": {
+    "retrievalExecuted": false,
+    "embeddingExecuted": false,
+    "sealedFinalAccessed": false
+  }
+}

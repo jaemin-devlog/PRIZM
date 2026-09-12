@@ -1,0 +1,115 @@
+{
+  "artifactType": "PRZ042_TRACKED_FINAL_RUN_RECEIPT",
+  "protocolVersion": "PRZ042_FINAL_PROTOCOL_V1",
+  "attempt": 1,
+  "status": "COMPLETED",
+  "resultScope": "SEED_FINAL_PROTOCOL_RESULT",
+  "verdict": "V3_NO_GO",
+  "completedAt": "2026-09-02T05:42:54.467231300Z",
+  "baseCommit": "0e95472bb68f72accf0d6b2171c22f0719fe6941",
+  "contractSha256": "bcc7b2ed27f1f97894f27cb7760aa9bf23f9d7a4843aafea08db3e1004e4c5ec",
+  "sealed": {
+    "datasetVersion": "search-v3-fresh-seed-1.0.1",
+    "manifestSha256": "d58165dc8609684e1bdd194457241abb2caeb860269caaba80761675fa7919aa",
+    "combinedSha256": "e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383",
+    "gitTree": "a129080861d7dafd32a9b3b3357b61aebb237e59",
+    "manifestMutated": false,
+    "opened": true,
+    "searchExecuted": true,
+    "currentFreshBaseline": "EXECUTED"
+  },
+  "input": {
+    "userBundles": 2,
+    "documents": 3,
+    "queries": 8,
+    "directPositiveQueries": 5,
+    "fileType": "TXT",
+    "language": "KO"
+  },
+  "model": {
+    "modelId": "bge-m3",
+    "resolvedDigest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "dimension": 1024,
+    "similarity": "COSINE",
+    "realRuntime": true,
+    "additionalModelCount": 0,
+    "additionalServiceCount": 0,
+    "gpuRequired": false
+  },
+  "artifacts": {
+    "attemptSha256": "088730fb54db204cb06cd039cc1d27cd15e299745c0ab41580826e5b23d5c521",
+    "predictionsCanonicalSha256": "1d6d4b9cc5d59ebdde966665edea799adaf701d3e621ec5aad4400a9b2f53dc5",
+    "predictionsFileSha256": "57013ef2c0dcedde4b710f9bc2bbc697561ed07afb788829696fba131fcde43f",
+    "reportSha256": "07251f4a7a4c5bf2aee72848440435ef31d1704e2c465022e401f2e283d77a10",
+    "completionReceiptSha256": "32b50c3a9a4a3da0648238a676588248adb3ef2c32fbbd6e9e0b5e1cd44c1410"
+  },
+  "queryMicro": {
+    "v2": {
+      "top1": 1.0,
+      "mrr": 1.0,
+      "ndcgAt5": 0.9447353132522084,
+      "recallAt5": 1.0
+    },
+    "v3": {
+      "top1": 0.8,
+      "mrr": 0.9,
+      "ndcgAt5": 0.8920109923338452,
+      "recallAt5": 1.0
+    }
+  },
+  "userMacro": {
+    "v2Top1": 1.0,
+    "v3Top1": 0.75,
+    "v2Mrr": 1.0,
+    "v3Mrr": 0.875,
+    "top1Delta": -0.25,
+    "paired95CiLower": -0.5,
+    "paired95CiUpper": 0.0
+  },
+  "structure": {
+    "v2CrossParentContamination": 0.6875,
+    "v3CrossParentContamination": 0.0,
+    "v2LocalizationPrecision": 0.5030232678120002,
+    "v3LocalizationPrecision": 0.6329196293902177,
+    "v2LocalizationRecall": 0.8,
+    "v3LocalizationRecall": 1.0,
+    "v2DuplicateRate": 0.0,
+    "v3DuplicateRate": 0.0,
+    "v2FragmentationRate": 0.0,
+    "v3FragmentationRate": 0.0
+  },
+  "operation": {
+    "v2QueryP50Ms": 30.3997,
+    "v2QueryP95Ms": 40.3765,
+    "v3QueryP50Ms": 37.8123,
+    "v3QueryP95Ms": 58.7597,
+    "v2ObservedIndexingWallMs": 121.4686,
+    "v3ObservedIndexingWallMs": 581.2809,
+    "v2VectorCount": 3,
+    "v3VectorCount": 10,
+    "v2RawVectorBytes": 12288,
+    "v3RawVectorBytes": 40960,
+    "indexingAndStorageGate": "NOT_ASSESSED"
+  },
+  "gate": {
+    "releaseAdequacy": "FAIL",
+    "safety": "PASS",
+    "primaryQuality": "NOT_ASSESSED",
+    "secondaryQuality": "FAIL",
+    "localization": "FAIL",
+    "queryLatency": "PASS",
+    "actualRuntime": "PASS",
+    "resources": "PASS",
+    "typedContract": "FAIL",
+    "sliceRegression": "NOT_ASSESSED",
+    "noAnswerContract": "NOT_ASSESSED",
+    "pdfFinalQuality": "NOT_ASSESSED"
+  },
+  "blockingFindings": [
+    "The verifier does not bind the official attempt to execution.runDirectory/officialRunsAllowed, while the Gradle task permits a prz042RunDir override. The official run count was one, but automated one-shot path enforcement is incomplete."
+  ],
+  "integrityLimitations": [
+    "questions.json physically colocates query text and Gold annotations; only allowed query fields were projected before prediction freeze.",
+    "The Gold loader reverified the frozen prediction file and hashes, while the evaluator consumed the same immutable in-memory bundle rather than a deserialized copy."
+  ]
+}

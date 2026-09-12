@@ -1,0 +1,234 @@
+{
+  "artifactType": "LINEAGE",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+  "previousVersion": "search-v3-fresh-devcal-1.1.0",
+  "changeReason": "Replicate B3 retrieval-passage ranking and cost on independent DEV/CAL lineages.",
+  "sealedFinalPolicy": "PRZ-025 SEALED_FINAL_TEST remains byte-identical, unopened, and unsearched.",
+  "generator": "scripts/evaluation/search-v3/materialize-prz026-robustness-devcal.mjs",
+  "materializationBaseRevision": "01d9ae2f90eff691d96041579e42a02aa04a3486",
+  "bundles": [
+    {
+      "userBundleId": "SV3-RB-U201",
+      "split": "DEV",
+      "documentFamilyId": "SV3-RB-U201-DOC-FAMILY",
+      "templateFamilyId": "SV3-RB-TEMPLATE-MOBILE-NARRATIVE-201",
+      "generatorSeedId": "SV3-RB-SEED-MOBILE-201-7F31",
+      "logicalDocumentIds": [
+        "SV3-RB-U201-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-RB-U201-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-RB-FACT-U201-P01-E01",
+        "SV3-RB-FACT-U201-P02-E01",
+        "SV3-RB-FACT-U201-P03-E01",
+        "SV3-RB-FACT-U201-P04-E01"
+      ],
+      "sourceFactSignatures": [
+        "ad224b6be2a429f3a136716bc4e7f47d3830af7fdb5fd9d40337a16fd43cb8ea",
+        "7d9706614192905481e7c0906d36980fc3addc23f365886340dbfce0051f636b",
+        "57e8f85b4ec89a175c2a7654f347d1f6d0c7e809467772e5f47015b506e99f35",
+        "fc22bf1d22d8ce519099ba4d6bbef4ddf1725f065c0887c09bffe0713185d1b6"
+      ],
+      "questionGroupIds": [
+        "SV3-RB-U201-Q01-FAMILY",
+        "SV3-RB-U201-Q02-FAMILY",
+        "SV3-RB-U201-Q03-FAMILY",
+        "SV3-RB-U201-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "연결이 불안정한 현장 앱에서 기록 중복을 줄이고 실제 배포한 근거가 있나요",
+        "보조 기술만으로 핵심 점검 과업을 끝낼 수 있게 검증한 경험이 있나요",
+        "대규모 모바일 목록의 첫 화면 지연을 절반 이하로 줄였다는 근거를 보여 주세요",
+        "위험 신호를 근거로 모바일 배포를 중단하고 복구한 운영 경험이 있나요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-RB-U202",
+      "split": "DEV",
+      "documentFamilyId": "SV3-RB-U202-DOC-FAMILY",
+      "templateFamilyId": "SV3-RB-TEMPLATE-DESIGN-CASEBOOK-202",
+      "generatorSeedId": "SV3-RB-SEED-DESIGN-202-4A86",
+      "logicalDocumentIds": [
+        "SV3-RB-U202-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-RB-U202-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-RB-FACT-U202-P01-E01",
+        "SV3-RB-FACT-U202-P02-E01",
+        "SV3-RB-FACT-U202-P03-E01",
+        "SV3-RB-FACT-U202-P04-E01"
+      ],
+      "sourceFactSignatures": [
+        "692c690401bd93b316de5605e6c01dd5b70491996cc933aaa660040cb89a1932",
+        "05cd4ed65e516d2219b6e2d641b48632723d94aa15c12e5562e129a749cd76c3",
+        "194d6d09ddcee1a2495f231f780c76b56d4a63cea24e1f31a4bbb6604a68d413",
+        "29014c292cfc7a663252d193e18818b4c303e158952bd62115bba21d2ed926d8"
+      ],
+      "questionGroupIds": [
+        "SV3-RB-U202-Q01-FAMILY",
+        "SV3-RB-U202-Q02-FAMILY",
+        "SV3-RB-U202-Q03-FAMILY",
+        "SV3-RB-U202-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "what evidence shows the candidate converted field observation into a cross channel recovery model",
+        "did a tested design improve appointment completion to at least eighty percent before approval",
+        "is there evidence of aligning several departments around a single operational escalation rule",
+        "was the redesigned recovery service launched across multiple offices with a sustained reduction in repeat contacts"
+      ]
+    },
+    {
+      "userBundleId": "SV3-RB-U203",
+      "split": "DEV",
+      "documentFamilyId": "SV3-RB-U203-DOC-FAMILY",
+      "templateFamilyId": "SV3-RB-TEMPLATE-DATA-OPERATIONS-203",
+      "generatorSeedId": "SV3-RB-SEED-DATA-203-C912",
+      "logicalDocumentIds": [
+        "SV3-RB-U203-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-RB-U203-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-RB-FACT-U203-P01-E01",
+        "SV3-RB-FACT-U203-P02-E01",
+        "SV3-RB-FACT-U203-P03-E01",
+        "SV3-RB-FACT-U203-P04-E01"
+      ],
+      "sourceFactSignatures": [
+        "e10798aaa8d497993c824bff7b2db481bdc6e69cebd5b3c554f21a680675e36c",
+        "7aa24599915bba6ef183ed79281bf24023ef7b4c467081c3ea8b099d13be89c4",
+        "95a42f0f3c8d33dd19bd1cbaf9cd3dff5b5d8fd5e1a84679c81ddd63ed8c5483",
+        "664280190c0210302e285ccf01fff43fa567df2039b5e36c61f62419e2183c1d"
+      ],
+      "questionGroupIds": [
+        "SV3-RB-U203-Q01-FAMILY",
+        "SV3-RB-U203-Q02-FAMILY",
+        "SV3-RB-U203-Q03-FAMILY",
+        "SV3-RB-U203-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "how did the candidate prevent incompatible event schemas from reaching production consumers",
+        "대규모 배치 지연 뒤 안전한 지점부터 데이터를 검증하며 복구한 근거가 있나요",
+        "was automatic model promotion stopped when segment level drift crossed the monitoring boundary",
+        "반복 데이터 사고를 분류해 예방 조치를 끝까지 완료한 경험이 있나요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-RB-U204",
+      "split": "CALIBRATION",
+      "documentFamilyId": "SV3-RB-U204-DOC-FAMILY",
+      "templateFamilyId": "SV3-RB-TEMPLATE-FRONTEND-DELIVERY-204",
+      "generatorSeedId": "SV3-RB-SEED-FRONTEND-204-2D57",
+      "logicalDocumentIds": [
+        "SV3-RB-U204-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-RB-U204-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-RB-FACT-U204-P01-E01",
+        "SV3-RB-FACT-U204-P02-E01",
+        "SV3-RB-FACT-U204-P03-E01",
+        "SV3-RB-FACT-U204-P04-E01"
+      ],
+      "sourceFactSignatures": [
+        "db05f0484cb683bdefcd3afd3051c3201f6dac02eaa626d01c689efe8d69319d",
+        "4ddea4b5a95b84fe4357f0e3503651c06411599af7d4da300f57030449739c04",
+        "6d9d766d8c8f7bd3191e61f345cac3526ba809f4fff3612c1d2c366e7c6e3b7c",
+        "25fea34dfd9c4ae13a12db26de9c0f21a2747a6cb1f0b91acc53880954680c65"
+      ],
+      "questionGroupIds": [
+        "SV3-RB-U204-Q01-FAMILY",
+        "SV3-RB-U204-Q02-FAMILY",
+        "SV3-RB-U204-Q03-FAMILY",
+        "SV3-RB-U204-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "what evidence shows that interrupted web applications could resume without losing submitted work",
+        "was bidirectional layout support released and verified across the shared component library",
+        "did the candidate bring typical checkout interaction latency below two hundred milliseconds",
+        "is there evidence of limiting a frontend incident to one locale while keeping other regions available"
+      ]
+    },
+    {
+      "userBundleId": "SV3-RB-U205",
+      "split": "CALIBRATION",
+      "documentFamilyId": "SV3-RB-U205-DOC-FAMILY",
+      "templateFamilyId": "SV3-RB-TEMPLATE-MARKETING-REVIEW-205",
+      "generatorSeedId": "SV3-RB-SEED-MARKETING-205-8B40",
+      "logicalDocumentIds": [
+        "SV3-RB-U205-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-RB-U205-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-RB-FACT-U205-P01-E01",
+        "SV3-RB-FACT-U205-P02-E01",
+        "SV3-RB-FACT-U205-P03-E01",
+        "SV3-RB-FACT-U205-P04-E01"
+      ],
+      "sourceFactSignatures": [
+        "424478bd1b285c027274890517f0c7ea316e8c95302b3b42b7cc9a7d4d5a1e44",
+        "ea1fef5b112b9674aa2071ad990ac323624e236475f7b6f8485ad24b9cc423f0",
+        "dd3ac000dfbae87f1998306ecf2c1249509465518e5fb7f0e25540fc3b09a9ba",
+        "2ab503e972cd5b0f8a248c2a58f432592208af5f9c3f6a27cdd21749e18a79dd"
+      ],
+      "questionGroupIds": [
+        "SV3-RB-U205-Q01-FAMILY",
+        "SV3-RB-U205-Q02-FAMILY",
+        "SV3-RB-U205-Q03-FAMILY",
+        "SV3-RB-U205-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "공동 파트너 캠페인으로 천 건 이상의 유효 상담 요청을 만든 근거가 있나요",
+        "여러 지역의 실제 고객 언어를 근거로 마케팅 메시지를 표준화했나요",
+        "실험 결과를 근거로 낮은 성과 채널의 예산을 실제 재배치한 경험이 있나요",
+        "영업 인계에 필요한 맥락 누락을 10 아래로 낮춘 근거가 있나요"
+      ]
+    },
+    {
+      "userBundleId": "SV3-RB-U206",
+      "split": "CALIBRATION",
+      "documentFamilyId": "SV3-RB-U206-DOC-FAMILY",
+      "templateFamilyId": "SV3-RB-TEMPLATE-LEARNING-OPERATIONS-206",
+      "generatorSeedId": "SV3-RB-SEED-LEARNING-206-5E23",
+      "logicalDocumentIds": [
+        "SV3-RB-U206-D01-LOGICAL"
+      ],
+      "versionLineageIds": [
+        "SV3-RB-U206-D01-LINEAGE"
+      ],
+      "sourceFactIds": [
+        "SV3-RB-FACT-U206-P01-E01",
+        "SV3-RB-FACT-U206-P02-E01",
+        "SV3-RB-FACT-U206-P03-E01",
+        "SV3-RB-FACT-U206-P04-E01"
+      ],
+      "sourceFactSignatures": [
+        "a042c33efdc2ce57fc9de1aafccd701a604ae233f4de01d2fc5ef1ced8ad42ba",
+        "0fe74fdcf1b2e17a0654822ce66c833b61dc54e81cf62f66ee3636f2cb507ef4",
+        "8d0b3e8267e0e6d7d24cf93106ccf8466a1eaa25c99d9849aa45457ce55d3426",
+        "8e8e9d674d123b292fddb718c863b118be41541d698896dd054cbaaada777e2b"
+      ],
+      "questionGroupIds": [
+        "SV3-RB-U206-Q01-FAMILY",
+        "SV3-RB-U206-Q02-FAMILY",
+        "SV3-RB-U206-Q03-FAMILY",
+        "SV3-RB-U206-Q04-FAMILY"
+      ],
+      "normalizedQueries": [
+        "실제 상황 연습과 관찰을 포함해 수십 명의 진행자를 준비시킨 근거가 있나요",
+        "did the revised class follow up process reduce missed attendance while retaining schedule change cases",
+        "여러 교육장에서 보호 우려를 같은 절차로 기록하고 담당자에게 인계했나요",
+        "what evidence shows that accountable transfers sharply reduced missing learning kits"
+      ]
+    }
+  ]
+}

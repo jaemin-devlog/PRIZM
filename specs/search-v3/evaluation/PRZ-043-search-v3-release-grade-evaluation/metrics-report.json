@@ -1,0 +1,32 @@
+{
+  "artifactType": "PRZ043_METRICS_REPORT",
+  "schemaVersion": 1,
+  "datasetId": "prizm-release-eval-v1.0.2",
+  "datasetCombinedSha256": "78b8612eab01ec09be4e30f665366b45366b0f12f1d9d516ab247bf6a33617a8",
+  "evaluationStatus": "EVALUATION_INVALID",
+  "reasonCode": "GOLD_MEANING_CONTENT_EXPOSED_BEFORE_PREDICTION_FREEZE",
+  "officialAttemptCount": 0,
+  "metrics": {
+    "directTop1": "NOT_ASSESSED",
+    "mrr": "NOT_ASSESSED",
+    "ndcgAt5": "NOT_ASSESSED",
+    "recallAt5": "NOT_ASSESSED",
+    "userMacroTop1": "NOT_ASSESSED",
+    "userMacroMrr": "NOT_ASSESSED",
+    "professionSlices": "NOT_ASSESSED",
+    "queryCategorySlices": "NOT_ASSESSED",
+    "projectNamePresentAbsent": "NOT_ASSESSED",
+    "typed": "NOT_ASSESSED",
+    "noAnswer": "NOT_ASSESSED",
+    "localization": "NOT_ASSESSED",
+    "contamination": "NOT_ASSESSED",
+    "latency": "NOT_ASSESSED",
+    "pairedUserBootstrap": "NOT_ASSESSED"
+  },
+  "safety": {
+    "datasetMutationCount": 0,
+    "productionSearchSourceMutationCount": 0,
+    "runtimeLeakage": "NOT_ASSESSED"
+  },
+  "verdict": "EVALUATION_INVALID"
+}

@@ -1,0 +1,156 @@
+{
+  "artifactType": "PRZ042_FINAL_EVALUATION_CONTRACT",
+  "protocolVersion": "PRZ042_FINAL_PROTOCOL_V1",
+  "status": "INPUT_FROZEN",
+  "attempt": 1,
+  "baseCommit": "0e95472bb68f72accf0d6b2171c22f0719fe6941",
+  "dataset": {
+    "datasetVersion": "search-v3-fresh-seed-1.0.1",
+    "split": "SEALED_FINAL_TEST",
+    "splitRoot": "src/test/resources/search-v3-evaluation/sealed-final",
+    "manifestSha256": "d58165dc8609684e1bdd194457241abb2caeb860269caaba80761675fa7919aa",
+    "combinedSha256": "e5b3159798ed55713c6112d735ee5edb0fb3c6304e87a127e0b9e37a395c7383",
+    "goldSchemaSha256": "c347f9ecb925b2f7d78817ae5bf5deb364b749eabb89359eb17d0bf0e24df465",
+    "gitTree": "a129080861d7dafd32a9b3b3357b61aebb237e59",
+    "userBundles": 2,
+    "documents": 3,
+    "queries": 8,
+    "directPositiveQueries": 5,
+    "notSupportedQueries": 3,
+    "releaseAdequacyMet": false
+  },
+  "queryInputBoundary": {
+    "physicalArtifact": "sealed-final/questions.json",
+    "annotationColocated": true,
+    "allowedPrePredictionFields": [
+      "queryId",
+      "userBundleId",
+      "query",
+      "language"
+    ],
+    "forbiddenPrePredictionFields": [
+      "answerability",
+      "categories",
+      "aspects",
+      "aspectExpression",
+      "requiredConstraints",
+      "expectedEvidence"
+    ],
+    "claim": "Gold annotation values are not projected into or used by inference; physical file access is recorded before search. Full Gold parsing begins only after prediction freeze verification."
+  },
+  "model": {
+    "modelId": "bge-m3",
+    "resolvedDigest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "dimension": 1024,
+    "similarity": "COSINE",
+    "additionalModelCount": 0,
+    "additionalServiceCount": 0,
+    "gpuRequired": false
+  },
+  "profiles": {
+    "v2": "PRODUCTION_SEARCH_V2_SOURCE_DEDUP_EVIDENCE_SIGNALS_V1",
+    "v3": "MINIMAL_V3_B3_TYPED_CHILD_DENSE_V1",
+    "passageCandidateLimit": 20,
+    "childSelectorPassageLimit": 5,
+    "finalResultLimit": 5,
+    "newSearchCapability": false
+  },
+  "measurement": {
+    "runtime": "Spring application components + PostgreSQL 16/pgvector + local Ollama",
+    "modelWarmup": "one fixed Gold-free embedding before both measured paths",
+    "executionOrder": "V2 index, V3 index, then paired V2/V3 queries in manifest order",
+    "queryLatency": "public service call wall time per query; p50/p95 nearest-rank percentile",
+    "indexingBoundary": "V2 uses actual TextChunker/EmbeddingService/DocumentChunkRepository adapter; V3 uses actual dispatch/coordinator/runtime",
+    "indexingAndStorageGate": "NOT_ASSESSED because V2 does not traverse the full DocumentIndexingProcessor",
+    "bootstrap": {
+      "unit": "user bundle",
+      "samples": 10000,
+      "seed": 42042,
+      "interval": "paired percentile 95%"
+    },
+    "failedQueryPolicy": "any runtime exception fails and consumes official attempt; append-only failure receipt records actual opened/searchExecuted state"
+  },
+  "gate": {
+    "frozenBeforeExecution": true,
+    "releaseAdequacyMet": false,
+    "releaseMinUserBundles": 50,
+    "hardSafetyMaxViolations": 0,
+    "userMacroTop1MinDelta": 0.03,
+    "pairedUserCiLowerExclusive": 0.0,
+    "secondaryMinDelta": -0.01,
+    "adequateSliceMinUsers": 3,
+    "adequateSliceMinDirectQueries": 5,
+    "adequateSliceMinDelta": -0.05,
+    "queryP95MaxRelative": 1.5,
+    "queryP95MaxAbsoluteIncreaseMs": 100.0,
+    "vectorStorageMaxRelative": 3.0,
+    "indexingLatencyMaxRelative": 3.0,
+    "noAnswerContract": "NOT_ASSESSED",
+    "pdfFinalQuality": "NOT_ASSESSED",
+    "adoptionCeiling": "V3_NEEDS_ADJUSTMENT"
+  },
+  "sourceBoundaries": [
+    {
+      "name": "V2",
+      "files": [
+        "src/main/java/com/prizm/search/service/SearchService.java",
+        "src/main/java/com/prizm/search/repository/VectorSearchRepository.java",
+        "src/main/java/com/prizm/search/profile/CompositeSearchProfile.java",
+        "src/main/java/com/prizm/search/profile/EvidenceQualityReranker.java",
+        "src/main/java/com/prizm/search/profile/NaturalLanguageQueryFallback.java",
+        "src/main/java/com/prizm/search/profile/NumericAnchorRescueProfile.java",
+        "src/main/java/com/prizm/search/profile/ShortGeneralExactTokenRescueProfile.java",
+        "src/main/java/com/prizm/search/service/EvidenceExpansionService.java",
+        "src/main/java/com/prizm/search/service/SearchSnippetGenerator.java",
+        "src/main/java/com/prizm/ingestion/service/TextChunker.java",
+        "src/main/resources/application.yml"
+      ],
+      "directories": [],
+      "sha256": "aa9d95fa54d6c54b01b64f8421d4926c2e7bdd5d3f39e914f83459f90509127a"
+    },
+    {
+      "name": "V3",
+      "files": [
+        "src/main/resources/db/migration/V18__create_search_v3_shadow_storage.sql",
+        "src/main/resources/db/migration/V19__add_verified_search_v3_inventory_fingerprint.sql",
+        "src/main/resources/db/migration/V20__allow_unfrozen_search_v3_generation_manifest.sql",
+        "src/main/resources/application.yml"
+      ],
+      "directories": [
+        "src/main/java/com/prizm/search/v3"
+      ],
+      "sha256": "cfe1112b515b82a6375e88c0b6f43de68852cfa6e3254f1fad75631bb598543d"
+    },
+    {
+      "name": "SHARED",
+      "files": [
+        "src/main/java/com/prizm/ingestion/service/DocumentTextExtractor.java",
+        "src/main/java/com/prizm/embedding/service/EmbeddingService.java",
+        "src/main/java/com/prizm/embedding/service/EmbeddingValidator.java",
+        "src/main/java/com/prizm/embedding/service/OllamaEmbeddingService.java",
+        "src/main/java/com/prizm/infrastructure/storage/FileStorage.java",
+        "src/main/java/com/prizm/infrastructure/storage/LocalFileStorage.java"
+      ],
+      "directories": [],
+      "sha256": "a5c056ff1662c291c6485e47a22cd4e31c3dfd734a7480914511707a1bed0e6b"
+    },
+    {
+      "name": "EVALUATOR",
+      "files": [
+        "build.gradle"
+      ],
+      "directories": [
+        "src/searchEvaluation/java/com/prizm/search/evaluation/searchv3/structural"
+      ],
+      "sha256": "340d7c342c2f47665cc37bbbe9f73dcbaf9760eac2ec0c12ddd1f1ee2c4c207b"
+    }
+  ],
+  "execution": {
+    "task": "prz042FinalEvaluation",
+    "command": ".\\gradlew.bat prz042FinalEvaluation",
+    "runDirectory": "local/search-v3-evaluation/prz042/final/attempt-1",
+    "officialRunsAllowed": 1,
+    "rawArtifactsTracked": false,
+    "sealedManifestMutable": false
+  }
+}

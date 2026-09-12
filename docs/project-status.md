@@ -1,6 +1,6 @@
 # PRIZM 현재 구현 현황
 
-> 기준일: 2026-08-30
+> 기준일: 2026-09-02
 >
 > PRZ-020 기능 통합 근거: [PR #62](https://github.com/jaemin-devlog/PRIZM/pull/62), 병합 `adb033b`
 >
@@ -68,6 +68,36 @@
 - 실패 시 이전 `ACTIVE` 유지, 작업 유효시간·복구·선점 세대 확인으로 이전 Worker 결과 차단
 - 안전한 파일 삭제 조건을 만족하지 않으면 정리를 중단하는 fail-closed 동작
 
+### Search V3 리팩토링 branch
+
+- V18은 기존 `document_chunks` 옆에 generation, V3 전용 작업, `RetrievalPassage`, `EvidenceChild`와 두 vector
+  계열을 저장하는 shadow schema를 정의함. V19은 검증된 inventory fingerprint와 V2 lifecycle 호환 trigger를,
+  V20은 Worker가 claim 뒤 expected manifest를 동결할 수 있는 전이 제약을 추가함
+- owner·문서·version·generation composite FK, nullable active-generation pointer와 artifact/vector 중복·orphan
+  방지 제약을 포함함
+- V3 전용 JDBC job runtime은 full owner·문서·version·generation identity로 claim, lease renew, retry/failure,
+  recovery lock과 exact-token reclaim을 수행함
+- 실제 PostgreSQL inventory의 key·순서·membership·hash·provenance와 vector 계약을 검증하고,
+  `BUILDING → READY`와 같은-version generation 활성화를 full claim fencing 아래 원자적으로 수행함
+- Search V3 Worker는 TXT와 text-layer PDF 원문을 구조 분석해 B3 `RetrievalPassage`와
+  `EvidenceChild`를 만들고, 동일 BGE-M3로 두 vector 계열을 미리 계산해 generation 단위로 원자 저장함
+- Worker는 원문 읽기부터 activation 전까지 lease를 갱신하며, reclaim된 이전 claim의 저장·READY·activation을
+  차단함. inactive version은 `READY`와 activation 재시도 상태에 두고 같은 Production active version만 활성화함
+- Production Search V2 source·query·API·frontend·MCP는 shadow schema를 직접 사용하지 않음. 다만 V19 trigger는
+  V2가 active version을 바꾸거나 해제할 때 stale V3 generation을 `SUPERSEDED`로 바꾸고 shadow pointer만 비움
+- opt-in Search V3 scheduler는 현재 active version을 원자 dispatch하고, 일반 claim과 만료 lease exact-token
+  recovery를 같은 Worker 경로로 처리함. 기본 설정은 꺼져 있어 Search V2 scheduler와 나란히 존재함
+- 비공개 shadow query service는 V3 pointer가 가리키는 `ACTIVE` generation과 `COMPLETED` job만 owner 범위에서 읽고,
+  Passage exact cosine Top20 뒤 Top5 Passage 내부 저장 Child vector로 `CHILD_DENSE_V1`을 적용함. 선택된 원문 근거는
+  문서별 상위 비중복 Passage 최대 2개의 평균 점수로 문서 순서만 정한 뒤 최대 5건을 반환함
+- PostgreSQL 16+pgvector Testcontainers와 실제 로컬 Ollama `bge-m3`로 TXT 색인·activation·query smoke를 통과함.
+  전체 backend `check`는 unit `657`건과 integration `164`건에서 failure/error `0`이며 OpenSQL은 `NOT_RUN`
+- Search V3 API/cutover는 구현하지 않았고 Production Search V2는 계속 기본 검색임
+- Search V3 job fencing은 PostgreSQL 시나리오 `6/6`에서 concurrent duplicate claim 0, recovery token과
+  stale claim·cross-lineage 차단을 확인했으며 자세한 범위는 PRZ-038 evidence를 따름
+- Search V3 inventory·activation은 PostgreSQL 시나리오 `11/11`에서 exact inventory, READY, 첫 activation,
+  같은-version 재색인, rollback·동시성과 V2 active-version 변경 경계를 확인했으며 자세한 범위는 PRZ-039 evidence를 따름
+
 ### 검색과 원문 위치
 
 - 단일 결과와 최대 5개의 경력 근거 결과
@@ -132,6 +162,12 @@ PostgreSQL 성공은 OpenSQL 증거가 아닙니다. OpenSQL·OpenProxy 결과�
 - PRZ-016은 현재 검색 구조를 통합한 뒤에도 P15 `NOT_VERIFIED`와 제품에 적용하지
   않은 P16 `NEEDS_ADJUSTMENT`를 역사 판정으로 보존해 lifecycle 상태가
   `IN_PROGRESS`입니다.
+- PRZ-016 P17의 `prizm-career-evidence-synthetic-v1.0` 평가셋은 schema v2,
+  프로젝트·식별자·source fact가 겹치지 않는 A/B/C cohort의 114문서·300문항으로
+  구현됐습니다. focused test 24건, 전체 backend unit, SBOM·OSS readiness와 독립 AUDIT가
+  통과했습니다. frozen TEST 검색, 실제 PDF·OpenSQL과 Production 검색 방식 비교는
+  `NOT_RUN`이며 P17은 Production 검색 코드를 바꾸지 않습니다. 현재 evaluation FTS의
+  자연어 전체 AND 질의와 이 데이터셋의 실행 적합성도 `NOT_VERIFIED`입니다.
 - 이 상태들은 현재 기능 개발이 진행 중이라는 뜻이 아닙니다. 현재 검색과 연구
   기록의 경계는 [PRZ-016 검색 문서 안내](../specs/PRZ-016-search-performance-v2/README.md)를
   따릅니다.

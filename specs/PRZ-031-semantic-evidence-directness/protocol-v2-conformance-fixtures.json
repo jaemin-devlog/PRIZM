@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "artifactType": "PRZ031_SEMANTIC_DIRECTNESS_PROTOCOL_V2_CONFORMANCE_FIXTURES",
+  "protocol": "SEMANTIC_DIRECTNESS_PROTOCOL_V2",
+  "caseCount": 16,
+  "cases": [
+    {
+      "caseId": "CF-KO-01",
+      "language": "KO",
+      "queryText": "모임 시작 시간을 알려줘.",
+      "sourceText": "모임은 오전 10시에 시작한다."
+    },
+    {
+      "caseId": "CF-KO-02",
+      "language": "KO",
+      "queryText": "택배가 배송 완료됐는지 알려줘.",
+      "sourceText": "택배는 오늘 배송을 시작할 예정이다."
+    },
+    {
+      "caseId": "CF-KO-03",
+      "language": "KO",
+      "queryText": "도서관의 토요일 운영 시간을 찾아줘.",
+      "sourceText": "도서관은 평일 오전 9시부터 오후 6시까지 운영한다."
+    },
+    {
+      "caseId": "CF-KO-04",
+      "language": "KO",
+      "queryText": "예약을 취소한 내용을 찾아줘.",
+      "sourceText": "예약 변경 가능 여부를 문의했다."
+    },
+    {
+      "caseId": "CF-KO-05",
+      "language": "KO",
+      "queryText": "우산 대여 장소를 알려줘.",
+      "sourceText": "우산은 안내 데스크에서 대여할 수 있다."
+    },
+    {
+      "caseId": "CF-KO-06",
+      "language": "KO",
+      "queryText": "행사 참석 인원을 알려줘.",
+      "sourceText": "행사장은 200명을 수용할 수 있다."
+    },
+    {
+      "caseId": "CF-EN-01",
+      "language": "EN",
+      "queryText": "Find the train's departure time.",
+      "sourceText": "The train departs at 7:30 p.m."
+    },
+    {
+      "caseId": "CF-EN-02",
+      "language": "EN",
+      "queryText": "Show whether the package was delivered.",
+      "sourceText": "The package is waiting at the distribution center."
+    },
+    {
+      "caseId": "CF-EN-03",
+      "language": "EN",
+      "queryText": "Find the room's seating capacity.",
+      "sourceText": "The room is located on the second floor."
+    },
+    {
+      "caseId": "CF-EN-04",
+      "language": "EN",
+      "queryText": "Find the approved refund request.",
+      "sourceText": "The refund request was rejected after review."
+    },
+    {
+      "caseId": "CF-EN-05",
+      "language": "EN",
+      "queryText": "Find where visitors can collect badges.",
+      "sourceText": "Visitors can collect badges at the reception desk."
+    },
+    {
+      "caseId": "CF-EN-06",
+      "language": "EN",
+      "queryText": "Find the date of the next inspection.",
+      "sourceText": "The equipment passed its previous inspection."
+    },
+    {
+      "caseId": "CF-MIX-01",
+      "language": "KO_EN_MIXED",
+      "queryText": "Workshop 시작 날짜를 알려줘.",
+      "sourceText": "The workshop starts on September 12."
+    },
+    {
+      "caseId": "CF-MIX-02",
+      "language": "KO_EN_MIXED",
+      "queryText": "Wi-Fi password 변경이 완료됐는지 찾아줘.",
+      "sourceText": "The Wi-Fi password change is planned for next week."
+    },
+    {
+      "caseId": "CF-MIX-03",
+      "language": "KO_EN_MIXED",
+      "queryText": "Guest parking 요금을 알려줘.",
+      "sourceText": "Guest parking is available behind the building."
+    },
+    {
+      "caseId": "CF-MIX-04",
+      "language": "KO_EN_MIXED",
+      "queryText": "Newsletter 발송을 중단한 기록을 찾아줘.",
+      "sourceText": "The newsletter delivery was expanded to more subscribers."
+    }
+  ]
+}

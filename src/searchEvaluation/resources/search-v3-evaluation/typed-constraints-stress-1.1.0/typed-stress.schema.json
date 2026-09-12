@@ -1,0 +1,604 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jaemin-devlog/PRIZM/search-v3-typed-stress-1.1.0.schema.json",
+  "title": "PRIZM Search V3 Typed Constraint Capability Stress Contract",
+  "contractVersion": "1.1.0",
+  "description": "Formal artifact shape. The dependency-free deterministic materializer validator is authoritative; no external JSON Schema engine result is claimed.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/corpusArtifact"
+    },
+    {
+      "$ref": "#/$defs/goldArtifact"
+    },
+    {
+      "$ref": "#/$defs/questionsArtifact"
+    },
+    {
+      "$ref": "#/$defs/typedAnnotationsArtifact"
+    },
+    {
+      "$ref": "#/$defs/lineageArtifact"
+    },
+    {
+      "$ref": "#/$defs/manifestArtifact"
+    }
+  ],
+  "$defs": {
+    "split": {
+      "enum": [
+        "DEV",
+        "CALIBRATION"
+      ]
+    },
+    "matchState": {
+      "enum": [
+        "SATISFIED",
+        "CONTRADICTED",
+        "UNKNOWN"
+      ]
+    },
+    "expectedReason": {
+      "enum": [
+        "MATCHED",
+        "VALUE_MISMATCH",
+        "DIRECTION_MISMATCH",
+        "QUALIFIER_MISMATCH",
+        "UNIT_MISMATCH",
+        "NO_MATCHING_OBSERVATION",
+        "AMBIGUOUS_OBSERVATION"
+      ]
+    },
+    "typedKind": {
+      "enum": [
+        "QUANTITY",
+        "DATE",
+        "IDENTIFIER_NUMBER"
+      ]
+    },
+    "primaryFamily": {
+      "enum": [
+        "quantity_wrong_value",
+        "qualifier_mismatch",
+        "date",
+        "identifier_number",
+        "percentage_direction",
+        "range_boundary"
+      ]
+    },
+    "expectedEvidenceState": {
+      "type": "object",
+      "required": [
+        "evidenceUnitId",
+        "state",
+        "reason"
+      ],
+      "properties": {
+        "evidenceUnitId": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/$defs/matchState"
+        },
+        "reason": {
+          "$ref": "#/$defs/expectedReason"
+        }
+      },
+      "additionalProperties": false
+    },
+    "observation": {
+      "type": "object",
+      "required": [
+        "observationId",
+        "evidenceUnitId",
+        "sourceSpanId",
+        "kind",
+        "sourceSurface",
+        "charStart",
+        "charEnd"
+      ],
+      "properties": {
+        "observationId": {
+          "type": "string"
+        },
+        "evidenceUnitId": {
+          "type": "string"
+        },
+        "sourceSpanId": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/typedKind"
+        },
+        "sourceSurface": {
+          "type": "string",
+          "minLength": 1
+        },
+        "charStart": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "charEnd": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "value": {
+          "type": "number"
+        },
+        "normalizedUnit": {
+          "type": "string"
+        },
+        "qualifier": {
+          "type": "string"
+        },
+        "qualifierCharStart": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "qualifierCharEnd": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "direction": {
+          "enum": [
+            "NONE",
+            "INCREASE",
+            "DECREASE"
+          ]
+        },
+        "directionSourceSurface": {
+          "type": "string"
+        },
+        "directionCharStart": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "directionCharEnd": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "start": {
+          "type": "string",
+          "format": "date"
+        },
+        "end": {
+          "type": "string",
+          "format": "date"
+        },
+        "precision": {
+          "enum": [
+            "FULL_DATE"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "numberSurface": {
+          "type": "string"
+        },
+        "normalizedSegments": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "queryConstraint": {
+      "type": "object",
+      "required": [
+        "constraintId",
+        "kind",
+        "surface",
+        "queryCharStart",
+        "queryCharEnd"
+      ],
+      "properties": {
+        "constraintId": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/typedKind"
+        },
+        "surface": {
+          "type": "string",
+          "minLength": 1
+        },
+        "queryCharStart": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "queryCharEnd": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "operator": {
+          "enum": [
+            "EQ",
+            "GTE",
+            "LTE",
+            "GT",
+            "LT",
+            "RANGE"
+          ]
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string",
+              "format": "date"
+            }
+          ]
+        },
+        "upperValue": {
+          "type": "number"
+        },
+        "normalizedUnit": {
+          "type": "string"
+        },
+        "qualifier": {
+          "type": "string"
+        },
+        "qualifierCharStart": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "qualifierCharEnd": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "direction": {
+          "enum": [
+            "NONE",
+            "INCREASE",
+            "DECREASE"
+          ]
+        },
+        "directionSourceSurface": {
+          "type": "string"
+        },
+        "directionCharStart": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "directionCharEnd": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "precision": {
+          "enum": [
+            "FULL_DATE"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "numberSurface": {
+          "type": "string"
+        },
+        "normalizedSegments": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "queryAnnotation": {
+      "type": "object",
+      "required": [
+        "queryId",
+        "userBundleId",
+        "primaryFamily",
+        "constraint",
+        "expectedEvidenceStates"
+      ],
+      "properties": {
+        "queryId": {
+          "type": "string"
+        },
+        "userBundleId": {
+          "type": "string"
+        },
+        "primaryFamily": {
+          "$ref": "#/$defs/primaryFamily"
+        },
+        "constraint": {
+          "$ref": "#/$defs/queryConstraint"
+        },
+        "expectedEvidenceStates": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/expectedEvidenceState"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "corpusArtifact": {
+      "type": "object",
+      "required": [
+        "artifactType",
+        "schemaVersion",
+        "datasetVersion",
+        "split",
+        "userBundles"
+      ],
+      "properties": {
+        "artifactType": {
+          "const": "CORPUS"
+        },
+        "schemaVersion": {
+          "const": "1.0.0"
+        },
+        "datasetVersion": {
+          "const": "search-v3-typed-constraints-stress-1.1.0"
+        },
+        "split": {
+          "$ref": "#/$defs/split"
+        },
+        "userBundles": {
+          "type": "array",
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "goldArtifact": {
+      "type": "object",
+      "required": [
+        "artifactType",
+        "schemaVersion",
+        "datasetVersion",
+        "split",
+        "parents",
+        "evidenceGroups",
+        "evidenceUnits"
+      ],
+      "properties": {
+        "artifactType": {
+          "const": "GOLD_EVIDENCE"
+        },
+        "schemaVersion": {
+          "const": "1.0.0"
+        },
+        "datasetVersion": {
+          "const": "search-v3-typed-constraints-stress-1.1.0"
+        },
+        "split": {
+          "$ref": "#/$defs/split"
+        },
+        "parents": {
+          "type": "array"
+        },
+        "evidenceGroups": {
+          "type": "array"
+        },
+        "evidenceUnits": {
+          "type": "array"
+        }
+      },
+      "additionalProperties": false
+    },
+    "questionsArtifact": {
+      "type": "object",
+      "required": [
+        "artifactType",
+        "schemaVersion",
+        "datasetVersion",
+        "split",
+        "queries"
+      ],
+      "properties": {
+        "artifactType": {
+          "const": "QUESTIONS"
+        },
+        "schemaVersion": {
+          "const": "1.0.0"
+        },
+        "datasetVersion": {
+          "const": "search-v3-typed-constraints-stress-1.1.0"
+        },
+        "split": {
+          "$ref": "#/$defs/split"
+        },
+        "queries": {
+          "type": "array",
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "typedAnnotationsArtifact": {
+      "type": "object",
+      "required": [
+        "artifactType",
+        "schemaVersion",
+        "datasetVersion",
+        "split",
+        "observations",
+        "queryAnnotations"
+      ],
+      "properties": {
+        "artifactType": {
+          "const": "TYPED_ANNOTATIONS"
+        },
+        "schemaVersion": {
+          "const": "1.1.0"
+        },
+        "datasetVersion": {
+          "const": "search-v3-typed-constraints-stress-1.1.0"
+        },
+        "split": {
+          "$ref": "#/$defs/split"
+        },
+        "observations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/observation"
+          }
+        },
+        "queryAnnotations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/queryAnnotation"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "lineageArtifact": {
+      "type": "object",
+      "required": [
+        "artifactType",
+        "schemaVersion",
+        "datasetVersion",
+        "status",
+        "generator",
+        "generatorRevision",
+        "generatorSourceSha256",
+        "inputBaselineRevision",
+        "sealedFinalPolicy",
+        "bundles"
+      ],
+      "properties": {
+        "artifactType": {
+          "const": "LINEAGE"
+        },
+        "schemaVersion": {
+          "const": "1.0.0"
+        },
+        "datasetVersion": {
+          "const": "search-v3-typed-constraints-stress-1.1.0"
+        },
+        "status": {
+          "const": "INPUT_FROZEN"
+        },
+        "generator": {
+          "type": "string"
+        },
+        "generatorRevision": {
+          "type": "string"
+        },
+        "generatorSourceSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "inputBaselineRevision": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "sealedFinalPolicy": {
+          "type": "string"
+        },
+        "bundles": {
+          "type": "array",
+          "minItems": 6
+        }
+      },
+      "additionalProperties": false
+    },
+    "manifestArtifact": {
+      "type": "object",
+      "required": [
+        "artifactType",
+        "schemaVersion",
+        "datasetVersion",
+        "split",
+        "status",
+        "mutable",
+        "opened",
+        "searchExecuted",
+        "frozenAt",
+        "generationSourceRevision",
+        "generatorRevision",
+        "validationMode",
+        "counts",
+        "distributions",
+        "files",
+        "combinedSha256"
+      ],
+      "properties": {
+        "artifactType": {
+          "const": "MANIFEST"
+        },
+        "schemaVersion": {
+          "const": "1.0.0"
+        },
+        "datasetVersion": {
+          "const": "search-v3-typed-constraints-stress-1.1.0"
+        },
+        "split": {
+          "enum": [
+            "DEV",
+            "CALIBRATION",
+            "ALL"
+          ]
+        },
+        "status": {
+          "const": "INPUT_FROZEN"
+        },
+        "mutable": {
+          "const": false
+        },
+        "opened": {
+          "const": true
+        },
+        "searchExecuted": {
+          "const": false
+        },
+        "sealedAt": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "frozenAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "generationSourceRevision": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "generatorRevision": {
+          "type": "string"
+        },
+        "validationMode": {
+          "const": "DETERMINISTIC_CONTRACT_VALIDATOR_NO_EXTERNAL_JSON_SCHEMA_ENGINE"
+        },
+        "previousDatasets": {
+          "type": "array"
+        },
+        "splitCombinedSha256": {
+          "type": "object"
+        },
+        "counts": {
+          "type": "object"
+        },
+        "distributions": {
+          "type": "object"
+        },
+        "files": {
+          "type": "array",
+          "minItems": 1
+        },
+        "combinedSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

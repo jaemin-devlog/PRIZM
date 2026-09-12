@@ -1,0 +1,133 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-seed-1.0.1",
+  "split": "DEV",
+  "status": "MATERIALIZED",
+  "mutable": true,
+  "opened": false,
+  "searchExecuted": false,
+  "sealedAt": null,
+  "generationSourceRevision": "14073dd1664fddb009a5bea8823a228e582abf51",
+  "counts": {
+    "userBundles": 3,
+    "logicalDocuments": 4,
+    "documentVersions": 5,
+    "activeDocumentVersions": 4,
+    "inactiveDocumentVersions": 1,
+    "queries": 13,
+    "evidenceParents": 9,
+    "evidenceGroups": 13,
+    "evidenceUnits": 13
+  },
+  "distributions": {
+    "split": {
+      "DEV": 3
+    },
+    "profession": {
+      "BACKEND": 1,
+      "DESIGN_PRODUCT": 1,
+      "MARKETING_SALES": 1
+    },
+    "documentLanguage": {
+      "KO": 4,
+      "KO_EN_MIXED": 1
+    },
+    "documentFileType": {
+      "TXT": 5
+    },
+    "documentStructure": {
+      "CAREER_DESCRIPTION": 2,
+      "LONG_PORTFOLIO": 1,
+      "SHORT_RESUME": 2
+    },
+    "queryLanguage": {
+      "EN": 3,
+      "KO": 4,
+      "KO_EN_MIXED": 6
+    },
+    "answerability": {
+      "NOT_SUPPORTED": 5,
+      "PARTIALLY_SUPPORTED": 1,
+      "SUPPORTED": 7
+    },
+    "category": {
+      "abstract_competency": 2,
+      "completed_production": 1,
+      "completion_state": 2,
+      "english": 3,
+      "hard_negative": 5,
+      "job_requirement": 1,
+      "korean": 4,
+      "korean_english_mixed": 6,
+      "literal_identifier": 1,
+      "multi_aspect": 2,
+      "multi_evidence": 3,
+      "negation": 2,
+      "no_answer": 1,
+      "numeric_quantity": 5,
+      "numeric_range_comparison": 2,
+      "other_actor": 3,
+      "semantic_paraphrase": 3,
+      "typo_format_variation": 1
+    }
+  },
+  "files": [
+    {
+      "path": "dev/corpus.json",
+      "bytes": 6180,
+      "sha256": "1c1116fd4144e44a8bca8a120b1af1700f8c8f3301ed225ef61d050fd0f86d91"
+    },
+    {
+      "path": "dev/documents/sv3-u01-backend-career-v01.txt",
+      "bytes": 228,
+      "sha256": "b2f7df1cdc8b69462a690a8c213e7b0d3365000e6e626633ea75d5b362784edb"
+    },
+    {
+      "path": "dev/documents/sv3-u01-backend-resume-v00-inactive.txt",
+      "bytes": 113,
+      "sha256": "3f72da0b99f31a2312904f1966e450c748eede39442488fbc4a8139283e7ddec"
+    },
+    {
+      "path": "dev/documents/sv3-u01-backend-resume-v01.txt",
+      "bytes": 430,
+      "sha256": "62aae40fb932798f7125fc56d5649505dfcf831e48b575076f978b89a624d1c6"
+    },
+    {
+      "path": "dev/documents/sv3-u04-design-portfolio-v01.txt",
+      "bytes": 435,
+      "sha256": "b3fa5f0eb5a73fc6927e4e37fea88e2683d1ca68a6079cbde96a19632a4845b4"
+    },
+    {
+      "path": "dev/documents/sv3-u06-growth-career-v01.txt",
+      "bytes": 434,
+      "sha256": "20d2f006760b4429f71143e57d228a04f35976cd2f7aa70d5283577ee4af0d03"
+    },
+    {
+      "path": "dev/gold-evidence.json",
+      "bytes": 29796,
+      "sha256": "712f222f8b9f3164be7a1fb36d546de03eba9f88f03c459998a1978487c9d485"
+    },
+    {
+      "path": "dev/questions.json",
+      "bytes": 21832,
+      "sha256": "ce2315fcc4d8fc918697f6c5bcf593061efae65fe88d8981d3b414259e7dc654"
+    },
+    {
+      "path": "lineage.json",
+      "bytes": 10515,
+      "sha256": "789034fc96a511028b9c129fa4126d180ed6562390907efa2997bdcb5430f66b"
+    },
+    {
+      "path": "schema/search-v3-benchmark.schema.json",
+      "bytes": 19429,
+      "sha256": "c347f9ecb925b2f7d78817ae5bf5deb364b749eabb89359eb17d0bf0e24df465"
+    },
+    {
+      "path": "schema/search-v3-prediction.schema.json",
+      "bytes": 3182,
+      "sha256": "99d199ce3e4c65523c03755634e1853c86d6357a8c37d40aca108cc95da2cf84"
+    }
+  ],
+  "combinedSha256": "e6d6e872045b002f8f74ddbabdd9fa220993db803d1d6f6829d4675434ee17c5"
+}

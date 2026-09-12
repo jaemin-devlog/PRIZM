@@ -1,0 +1,80 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-devcal-robustness-1.0.0",
+  "split": "CALIBRATION",
+  "status": "DEV_CAL_ROBUSTNESS_FROZEN",
+  "mutable": false,
+  "frozenAt": "2026-08-30T22:26:53.1683097+09:00",
+  "previousVersion": "search-v3-fresh-devcal-1.1.0",
+  "materializationBaseRevision": "01d9ae2f90eff691d96041579e42a02aa04a3486",
+  "counts": {
+    "userBundles": 3,
+    "documents": 3,
+    "queries": 12,
+    "evidenceParents": 12,
+    "evidenceGroups": 12,
+    "evidenceUnits": 12
+  },
+  "distributions": {
+    "profession": {
+      "FRONTEND_MOBILE": 1,
+      "MARKETING_SALES": 1,
+      "NON_DEVELOPMENT_GENERAL": 1
+    },
+    "documentLanguage": {
+      "EN": 1,
+      "KO": 1,
+      "KO_EN_MIXED": 1
+    },
+    "queryLanguage": {
+      "EN": 6,
+      "KO": 6
+    },
+    "answerability": {
+      "SUPPORTED": 12
+    },
+    "category": {
+      "abstract_competency": 5,
+      "completed_production": 4,
+      "english": 6,
+      "job_requirement": 2,
+      "korean": 6,
+      "numeric_quantity": 6,
+      "semantic_paraphrase": 7
+    }
+  },
+  "files": [
+    {
+      "path": "corpus.json",
+      "bytes": 4465,
+      "sha256": "c77c3fdaba521aa144677f9f06cb64eab333feb0f8002c86608ea274be589690"
+    },
+    {
+      "path": "documents/sv3-rb-u204-frontend-delivery-portfolio-v01.txt",
+      "bytes": 2686,
+      "sha256": "b868b4d19822b51bd35360a5367b921004355294823fbac992be8a903a200d6b"
+    },
+    {
+      "path": "documents/sv3-rb-u205-partner-marketing-review-v01.txt",
+      "bytes": 2939,
+      "sha256": "8712d61c82d9c21e9b27d783319f9fdd98959a14650a63d71137022dde6bee2c"
+    },
+    {
+      "path": "documents/sv3-rb-u206-learning-operations-portfolio-v01.txt",
+      "bytes": 2617,
+      "sha256": "ed677f263e681b5d9e8fd934abe1eedf95aa2998b0ef03cb684c0e22bb25e0db"
+    },
+    {
+      "path": "gold-evidence.json",
+      "bytes": 36785,
+      "sha256": "4c8852973ee2434caa27a0986ddc28cace0d429f76f4aea87286bbcf2a4e17f0"
+    },
+    {
+      "path": "questions.json",
+      "bytes": 17335,
+      "sha256": "8205d19a68702c35e3cc1f9f2967cdbe48959e5cb695265ed5aef22b3ecf7ee5"
+    }
+  ],
+  "combinedSha256": "7daf613be385915a2895b3d2215fc0e616407cf25953c520b1e951476a784a19"
+}

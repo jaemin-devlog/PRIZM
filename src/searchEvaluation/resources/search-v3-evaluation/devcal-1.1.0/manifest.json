@@ -1,0 +1,161 @@
+{
+  "artifactType": "MANIFEST",
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "search-v3-fresh-devcal-1.1.0",
+  "split": "DEV_CAL_ONLY",
+  "status": "DEV_CAL_LONG_FORM_FROZEN",
+  "mutable": false,
+  "opened": true,
+  "executionPolicy": "DEV_CAL_EVALUATION_ALLOWED",
+  "executionStateRecord": "ignored benchmark report plus specs/PRZ-026-structural-parsing-parent-child/evidence.md",
+  "frozenAt": "2026-08-30T19:43:14.0659652+09:00",
+  "previousVersion": "search-v3-fresh-seed-1.0.1",
+  "materializationBaseRevision": "a9d093dd48e99a8d19675b3a8caa09c794d2888b",
+  "splitCombinedSha256": {
+    "DEV": "4262a62a758e22f8b3a66573790edd00df2193caaa6046edd51e89975dd378af",
+    "CALIBRATION": "fb3175062a7879f4dfb586b4e02e608e01dcb03fb6dcd4750e85dcfdeb8a4405"
+  },
+  "counts": {
+    "userBundles": 6,
+    "documents": 6,
+    "queries": 24,
+    "evidenceParents": 24,
+    "evidenceGroups": 22,
+    "evidenceUnits": 22
+  },
+  "distributions": {
+    "split": {
+      "CALIBRATION": 3,
+      "DEV": 3
+    },
+    "profession": {
+      "DATA_AI_INFRA": 1,
+      "DESIGN_PRODUCT": 1,
+      "FRONTEND_MOBILE": 1,
+      "MARKETING_SALES": 1,
+      "NON_DEVELOPMENT_GENERAL": 1,
+      "PLANNING": 1
+    },
+    "documentLanguage": {
+      "EN": 2,
+      "KO": 2,
+      "KO_EN_MIXED": 2
+    },
+    "documentCodePointLength": {
+      "SV3-LF-U101-D01": 2253,
+      "SV3-LF-U102-D01": 4823,
+      "SV3-LF-U103-D01": 2573,
+      "SV3-LF-U104-D01": 4307,
+      "SV3-LF-U105-D01": 1951,
+      "SV3-LF-U106-D01": 1929
+    },
+    "queryLanguage": {
+      "EN": 12,
+      "KO": 7,
+      "KO_EN_MIXED": 5
+    },
+    "answerability": {
+      "NOT_SUPPORTED": 9,
+      "PARTIALLY_SUPPORTED": 1,
+      "SUPPORTED": 14
+    },
+    "category": {
+      "abstract_competency": 4,
+      "completed_production": 3,
+      "completion_state": 7,
+      "english": 12,
+      "hard_negative": 10,
+      "job_requirement": 2,
+      "korean": 7,
+      "korean_english_mixed": 5,
+      "multi_evidence": 3,
+      "negation": 5,
+      "numeric_quantity": 7,
+      "other_actor": 4,
+      "semantic_paraphrase": 7
+    }
+  },
+  "files": [
+    {
+      "path": "calibration/corpus.json",
+      "bytes": 4381,
+      "sha256": "7c133cdc81e3bfdc9b2bcb7fa9a4053bc772ed6f7a520a4f6df6f1fe4458f4bf"
+    },
+    {
+      "path": "calibration/documents/sv3-lf-u104-mobile-portfolio-v01.txt",
+      "bytes": 4307,
+      "sha256": "b016714928a2c841ddaca9c368b999d3f3714e9fde2ad1ec423168feb9f768ed"
+    },
+    {
+      "path": "calibration/documents/sv3-lf-u105-planning-narrative-v01.txt",
+      "bytes": 4533,
+      "sha256": "bce017a5873ba64de43daa682aaec2861ce33d532e415c7fdff5684a3b63b0b5"
+    },
+    {
+      "path": "calibration/documents/sv3-lf-u106-operations-v01.txt",
+      "bytes": 3791,
+      "sha256": "70e58fa8cbff6e8b794536d0de9e99ba8f4df489c642b43067c5adeb68ac1621"
+    },
+    {
+      "path": "calibration/gold-evidence.json",
+      "bytes": 39555,
+      "sha256": "b212cec77378ebcaf67ac4d4ed740414dfddc71991daae4f2907f7ea3e6cf9fa"
+    },
+    {
+      "path": "calibration/manifest.json",
+      "bytes": 2388,
+      "sha256": "2a6dce4246c3104a58e5cca1a593fd3fca6f6114de34c5679615696c4db7303d"
+    },
+    {
+      "path": "calibration/questions.json",
+      "bytes": 16669,
+      "sha256": "94d9806f913b7611cc0082322263de0809c5945259a623bcd20934362fb647ac"
+    },
+    {
+      "path": "dev/corpus.json",
+      "bytes": 4355,
+      "sha256": "d1e570409d71acdb1034e1b86370e4ad602dd29b575a23d699a309aeffd2ca17"
+    },
+    {
+      "path": "dev/documents/sv3-lf-u101-design-portfolio-v01.txt",
+      "bytes": 5211,
+      "sha256": "19cccd6fd5f040c8ab641a391da5027fd3a8ad8fb030d728955562df60c69906"
+    },
+    {
+      "path": "dev/documents/sv3-lf-u102-data-reliability-v01.txt",
+      "bytes": 4823,
+      "sha256": "a489bbbcc124834f00d321e1e0181d0cdaa4e0627f4c964cae67c328de0c6734"
+    },
+    {
+      "path": "dev/documents/sv3-lf-u103-growth-sales-v01.txt",
+      "bytes": 4123,
+      "sha256": "115d5884a1ef288bc144588f47d577af90e0aebb8c0adb07d6aecfeb3f3b08b0"
+    },
+    {
+      "path": "dev/gold-evidence.json",
+      "bytes": 41650,
+      "sha256": "b45b552599fc89c8cfcbe1251b86ef365f08ee6772878c08b7bf2c05929b360e"
+    },
+    {
+      "path": "dev/manifest.json",
+      "bytes": 2408,
+      "sha256": "c0d5a5cd744b20088f569e12df748b4d179cbe49f596e282a9276ae38ef563d8"
+    },
+    {
+      "path": "dev/questions.json",
+      "bytes": 17475,
+      "sha256": "31425bb2c1ede2dd235f3e334471d97121ed74cc468f07b99a8dc7ad40899621"
+    },
+    {
+      "path": "lineage.json",
+      "bytes": 8953,
+      "sha256": "e26a5e69e543e1161b817ff4d21ff7479e8e79db29246ee70e4565566687b767"
+    },
+    {
+      "path": "README.md",
+      "bytes": 527,
+      "sha256": "87ce08c67379d01b5cef71c1782d688bcaa8e63b0ace0fa96dcecdd8f1e2d00d"
+    }
+  ],
+  "combinedSha256": "a1fcd76c93dfc52dbd1c201c069f9fc1e1fd3ab25d99759f6c8cc686e47d41df"
+}
